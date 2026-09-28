@@ -83,6 +83,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get uiFontKfgqpcAn => 'KFGQPC font (AN)';
 
   @override
+  String get uiFontChanga => 'Changa';
+
+  @override
   String get languageLabel => 'Language';
 
   @override

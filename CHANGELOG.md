@@ -6,6 +6,19 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-28
+
+### Fixed
+- Selected radio buttons and switches were invisible in several styles (for example, white on white in Calm light). Controls now use a dedicated colour that is at least 7:1 against the page in all 12 style/mode combinations, and a test guards it.
+
+### Added
+- Changa as a third interface font option.
+
+### How to test
+1. Settings: the selected language option is clearly marked in every style and mode.
+2. Turn the crash-report switch on and off: both states are clear.
+3. Settings > Appearance > Interface font: choose Changa.
+
 ## [0.1.0] - 2026-09-28
 
 Phase 0: foundation. No Quran or religious text appears in this release.
@@ -28,5 +41,6 @@ Phase 0: foundation. No Quran or religious text appears in this release.
 4. Switch the language to English and back to Arabic; the layout should flip direction.
 5. Close and reopen the app: every choice should be kept.
 
-[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.1
 [0.1.0]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.0

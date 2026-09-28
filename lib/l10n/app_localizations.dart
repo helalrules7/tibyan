@@ -242,6 +242,12 @@ abstract class AppLocalizations {
   /// **'خط المجمع (AN)'**
   String get uiFontKfgqpcAn;
 
+  /// No description provided for @uiFontChanga.
+  ///
+  /// In ar, this message translates to:
+  /// **'Changa'**
+  String get uiFontChanga;
+
   /// No description provided for @languageLabel.
   ///
   /// In ar, this message translates to:
