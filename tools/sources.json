@@ -50,8 +50,8 @@
       "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-hafs/UthmanicHafs_v2-0.zip",
       "method": "GET",
       "sha256": "a7b0e5591945712ec5e4d6142938ae4d1e9b49bdc89dff06222789bfebdfd72c",
-      "license": "Reference for comparison only (verse text not covered by the KFGQPC grant)",
-      "evidence": "docs/verification/2026-09-28_tanzil_vs_kfgqpc_v18.md"
+      "license": "Shown in the continuous view since 2026-09-28; explicit permission for the verse text requested (letter 13). Font: embedded KFGQPC license, unmodified",
+      "evidence": "docs/verification/2026-09-28_tanzil_vs_kfgqpc_v18.md; docs/review/DECISIONS.md"
     },
     {
       "id": "quran-ws-hafs-json-1.1.1",
