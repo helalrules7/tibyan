@@ -10,6 +10,7 @@ import '../../features/mushaf/presentation/fawasil_screen.dart';
 import '../../features/mushaf/presentation/index_screen.dart';
 import '../../features/mushaf/presentation/mushaf_screen.dart';
 import '../../features/onboarding/onboarding_edition_screen.dart';
+import '../../features/onboarding/onboarding_language_screen.dart';
 import '../../features/onboarding/onboarding_style_screen.dart';
 import '../../features/settings/appearance_screen.dart';
 import '../../features/settings/settings_screen.dart';
@@ -20,14 +21,18 @@ int? _int(GoRouterState s, String key) =>
 
 final appRouterProvider = Provider<GoRouter>(
   (ref) => GoRouter(
-    // First launch: style and colours, then the mushaf edition.
+    // First launch: language, then style and colours, then the edition.
     redirect: (context, state) {
       final done = ref.read(settingsProvider).onboardingDone;
       final inOnboarding = state.matchedLocation.startsWith('/onboarding');
-      if (!done && !inOnboarding) return '/onboarding/style';
+      if (!done && !inOnboarding) return '/onboarding/language';
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/onboarding/language',
+        builder: (context, state) => const OnboardingLanguageScreen(),
+      ),
       GoRoute(
         path: '/onboarding/style',
         builder: (context, state) => const OnboardingStyleScreen(),
