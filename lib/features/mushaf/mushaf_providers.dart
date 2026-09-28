@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+import '../../core/db/ayahinfo_database.dart';
 import '../../core/db/content_database.dart';
+import '../../core/settings/app_settings.dart';
+import '../../core/settings/settings_controller.dart';
 import '../../core/db/user_database.dart';
 import 'data/mushaf_repository.dart';
 import 'data/page_pack.dart';
@@ -31,12 +34,33 @@ final surahsProvider = FutureProvider<List<SurahRow>>(
   (ref) => ref.watch(mushafRepositoryProvider).surahs(),
 );
 
+/// The Madina edition the reader chose.
+final editionProvider = Provider<MushafEdition>(
+  (ref) => ref.watch(settingsProvider.select((s) => s.edition)),
+);
+
 final pageInstallerProvider = Provider<PagePackInstaller>(
   (ref) => PagePackInstaller(
     root: Directory(p.join(ref.watch(packRootProvider).path, 'packs')),
-    spec: PagePackSpec.madina1441,
+    spec: ref.watch(editionProvider) == MushafEdition.madina1405
+        ? PagePackSpec.madina1405
+        : PagePackSpec.madina1441,
   ),
 );
+
+/// Glyph boxes of the old edition, once its pack is installed.
+final ayahInfoDatabaseProvider = Provider<AyahInfoDatabase?>((ref) {
+  final installer = ref.watch(pageInstallerProvider);
+  if (installer.spec.format != PackFormat.pngQuranCom ||
+      !ref.watch(pagesInstalledProvider)) {
+    return null;
+  }
+  final db = AyahInfoDatabase.open(
+    File(p.join(installer.dir.path, 'ayahinfo.db')),
+  );
+  ref.onDispose(db.close);
+  return db;
+});
 
 final pageStoreProvider = Provider<PageStore>(
   (ref) => PageStore(ref.watch(pageInstallerProvider).dir),
@@ -103,7 +127,9 @@ final pageDownloadProvider =
     );
 
 final pageAyahsProvider = FutureProvider.family<List<AyahRow>, int>(
-  (ref, page) => ref.watch(mushafRepositoryProvider).ayahsOnPage(page),
+  (ref, page) => ref
+      .watch(mushafRepositoryProvider)
+      .ayahsOnPage(page, ref.watch(editionProvider)),
 );
 
 final surahAyahsProvider = FutureProvider.family<List<AyahRow>, int>(

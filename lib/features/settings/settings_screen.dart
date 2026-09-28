@@ -68,6 +68,23 @@ class SettingsScreen extends ConsumerWidget {
           Card(
             child: Column(
               children: [
+                RadioGroup<MushafEdition>(
+                  groupValue: settings.edition,
+                  onChanged: (v) => v == null ? null : controller.setEdition(v),
+                  child: Column(
+                    children: [
+                      RadioListTile(
+                        value: MushafEdition.madina1441,
+                        title: Text(l.editionNew),
+                      ),
+                      RadioListTile(
+                        value: MushafEdition.madina1405,
+                        title: Text(l.editionOld),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l.keepScreenOn),
                   value: settings.keepScreenOn,

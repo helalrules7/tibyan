@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/db/content_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'mushaf_screen.dart';
 import 'navigation.dart';
@@ -44,9 +45,7 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
   ) async {
     if (r.surah < 1 || r.surah > 114) return;
     final ayah = r.ayah.clamp(1, surahs[r.surah - 1].ayahCount);
-    final row = await ref.read(mushafRepositoryProvider).ayah(r.surah, ayah);
-    if (!mounted) return;
-    openVerse(context, ref, surah: r.surah, ayah: ayah, page: row.page);
+    await openVerse(context, ref, surah: r.surah, ayah: ayah);
   }
 
   @override
@@ -145,7 +144,6 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
                       ref,
                       surah: first.surah,
                       ayah: first.number,
-                      page: pageNumber,
                     );
                   },
                 ),
@@ -165,16 +163,10 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
                     style: TextStyle(color: t.muted),
                   ),
                   trailing: Text(
-                    l.pageShort('${s.startPage}'),
+                    l.pageShort('${s.startPageIn(ref.watch(editionProvider))}'),
                     style: TextStyle(color: t.muted),
                   ),
-                  onTap: () => openVerse(
-                    context,
-                    ref,
-                    surah: s.id,
-                    ayah: 1,
-                    page: s.startPage,
-                  ),
+                  onTap: () => openVerse(context, ref, surah: s.id, ayah: 1),
                 ),
             ],
           ),
@@ -213,7 +205,7 @@ class _JuzTab extends ConsumerWidget {
               style: TextStyle(color: t.muted),
             ),
             trailing: Text(
-              l.pageShort('${j.ayah.page}'),
+              l.pageShort('${j.ayah.pageIn(ref.watch(editionProvider))}'),
               style: TextStyle(color: t.muted),
             ),
             onTap: () => openVerse(
@@ -221,7 +213,6 @@ class _JuzTab extends ConsumerWidget {
               ref,
               surah: j.ayah.surah,
               ayah: j.ayah.number,
-              page: j.ayah.page,
             ),
           ),
       ],
@@ -253,13 +244,7 @@ class _PagesTab extends ConsumerWidget {
             final first = (await ref.read(pageAyahsProvider(i + 1).future))
                 .first;
             if (!context.mounted) return;
-            openVerse(
-              context,
-              ref,
-              surah: first.surah,
-              ayah: first.number,
-              page: i + 1,
-            );
+            openVerse(context, ref, surah: first.surah, ayah: first.number);
           },
           child: Text('${i + 1}'),
         ),

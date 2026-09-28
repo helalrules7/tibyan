@@ -16,9 +16,10 @@ class DownloadScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
     final p = ref.watch(pageDownloadProvider);
+    final spec = ref.watch(pageInstallerProvider).spec;
     final ctrl = ref.read(pageDownloadProvider.notifier);
     String mb(int bytes) => (bytes / 1e6).toStringAsFixed(1);
-    final total = p.total > 0 ? p.total : PagePackSpec.madina1441.bytes;
+    final total = p.total > 0 ? p.total : spec.bytes;
     final fraction = switch (p.phase) {
       PackPhase.downloading || PackPhase.idle => p.received / total,
       PackPhase.verifying || PackPhase.installing => null,
@@ -44,7 +45,7 @@ class DownloadScreen extends ConsumerWidget {
             Icon(Icons.menu_book_outlined, size: 56, color: t.goldText),
             const SizedBox(height: 12),
             Text(
-              l.pagesDownloadNote(mb(PagePackSpec.madina1441.bytes)),
+              l.pagesDownloadNote(mb(spec.bytes)),
               textAlign: TextAlign.center,
               style: const TextStyle(height: 1.7),
             ),
@@ -95,7 +96,9 @@ class DownloadScreen extends ConsumerWidget {
               ),
             const SizedBox(height: 16),
             Text(
-              l.pagesCredit,
+              spec.format == PackFormat.pngQuranCom
+                  ? l.pagesCreditOld
+                  : l.pagesCredit,
               textAlign: TextAlign.center,
               style: TextStyle(color: t.muted, fontSize: 12),
             ),

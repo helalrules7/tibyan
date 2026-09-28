@@ -90,6 +90,17 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _startPage1405Meta = const VerificationMeta(
+    'startPage1405',
+  );
+  @override
+  late final GeneratedColumn<int> startPage1405 = GeneratedColumn<int>(
+    'start_page_1405',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _sourceIdMeta = const VerificationMeta(
     'sourceId',
   );
@@ -111,6 +122,7 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
     revelationOrder,
     ayahCount,
     startPage,
+    startPage1405,
     sourceId,
   ];
   @override
@@ -187,6 +199,17 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
     } else if (isInserting) {
       context.missing(_startPageMeta);
     }
+    if (data.containsKey('start_page_1405')) {
+      context.handle(
+        _startPage1405Meta,
+        startPage1405.isAcceptableOrUnknown(
+          data['start_page_1405']!,
+          _startPage1405Meta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_startPage1405Meta);
+    }
     if (data.containsKey('source_id')) {
       context.handle(
         _sourceIdMeta,
@@ -236,6 +259,10 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
         DriftSqlType.int,
         data['${effectivePrefix}start_page'],
       )!,
+      startPage1405: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_page_1405'],
+      )!,
       sourceId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}source_id'],
@@ -257,7 +284,12 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
   final String revelation;
   final int revelationOrder;
   final int ayahCount;
+
+  /// First page in the new edition (1441H).
   final int startPage;
+
+  /// First page in the old edition (1405H).
+  final int startPage1405;
   final int sourceId;
   const SurahRow({
     required this.id,
@@ -268,6 +300,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     required this.revelationOrder,
     required this.ayahCount,
     required this.startPage,
+    required this.startPage1405,
     required this.sourceId,
   });
   @override
@@ -281,6 +314,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     map['revelation_order'] = Variable<int>(revelationOrder);
     map['ayah_count'] = Variable<int>(ayahCount);
     map['start_page'] = Variable<int>(startPage);
+    map['start_page_1405'] = Variable<int>(startPage1405);
     map['source_id'] = Variable<int>(sourceId);
     return map;
   }
@@ -295,6 +329,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
       revelationOrder: Value(revelationOrder),
       ayahCount: Value(ayahCount),
       startPage: Value(startPage),
+      startPage1405: Value(startPage1405),
       sourceId: Value(sourceId),
     );
   }
@@ -313,6 +348,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
       revelationOrder: serializer.fromJson<int>(json['revelationOrder']),
       ayahCount: serializer.fromJson<int>(json['ayahCount']),
       startPage: serializer.fromJson<int>(json['startPage']),
+      startPage1405: serializer.fromJson<int>(json['startPage1405']),
       sourceId: serializer.fromJson<int>(json['sourceId']),
     );
   }
@@ -328,6 +364,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
       'revelationOrder': serializer.toJson<int>(revelationOrder),
       'ayahCount': serializer.toJson<int>(ayahCount),
       'startPage': serializer.toJson<int>(startPage),
+      'startPage1405': serializer.toJson<int>(startPage1405),
       'sourceId': serializer.toJson<int>(sourceId),
     };
   }
@@ -341,6 +378,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     int? revelationOrder,
     int? ayahCount,
     int? startPage,
+    int? startPage1405,
     int? sourceId,
   }) => SurahRow(
     id: id ?? this.id,
@@ -351,6 +389,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     revelationOrder: revelationOrder ?? this.revelationOrder,
     ayahCount: ayahCount ?? this.ayahCount,
     startPage: startPage ?? this.startPage,
+    startPage1405: startPage1405 ?? this.startPage1405,
     sourceId: sourceId ?? this.sourceId,
   );
   SurahRow copyWithCompanion(SurahCompanion data) {
@@ -367,6 +406,9 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
           : this.revelationOrder,
       ayahCount: data.ayahCount.present ? data.ayahCount.value : this.ayahCount,
       startPage: data.startPage.present ? data.startPage.value : this.startPage,
+      startPage1405: data.startPage1405.present
+          ? data.startPage1405.value
+          : this.startPage1405,
       sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
     );
   }
@@ -382,6 +424,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
           ..write('revelationOrder: $revelationOrder, ')
           ..write('ayahCount: $ayahCount, ')
           ..write('startPage: $startPage, ')
+          ..write('startPage1405: $startPage1405, ')
           ..write('sourceId: $sourceId')
           ..write(')'))
         .toString();
@@ -397,6 +440,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     revelationOrder,
     ayahCount,
     startPage,
+    startPage1405,
     sourceId,
   );
   @override
@@ -411,6 +455,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
           other.revelationOrder == this.revelationOrder &&
           other.ayahCount == this.ayahCount &&
           other.startPage == this.startPage &&
+          other.startPage1405 == this.startPage1405 &&
           other.sourceId == this.sourceId);
 }
 
@@ -423,6 +468,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
   final Value<int> revelationOrder;
   final Value<int> ayahCount;
   final Value<int> startPage;
+  final Value<int> startPage1405;
   final Value<int> sourceId;
   const SurahCompanion({
     this.id = const Value.absent(),
@@ -433,6 +479,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     this.revelationOrder = const Value.absent(),
     this.ayahCount = const Value.absent(),
     this.startPage = const Value.absent(),
+    this.startPage1405 = const Value.absent(),
     this.sourceId = const Value.absent(),
   });
   SurahCompanion.insert({
@@ -444,6 +491,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     required int revelationOrder,
     required int ayahCount,
     required int startPage,
+    required int startPage1405,
     required int sourceId,
   }) : nameAr = Value(nameAr),
        nameEn = Value(nameEn),
@@ -452,6 +500,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
        revelationOrder = Value(revelationOrder),
        ayahCount = Value(ayahCount),
        startPage = Value(startPage),
+       startPage1405 = Value(startPage1405),
        sourceId = Value(sourceId);
   static Insertable<SurahRow> custom({
     Expression<int>? id,
@@ -462,6 +511,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     Expression<int>? revelationOrder,
     Expression<int>? ayahCount,
     Expression<int>? startPage,
+    Expression<int>? startPage1405,
     Expression<int>? sourceId,
   }) {
     return RawValuesInsertable({
@@ -473,6 +523,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
       if (revelationOrder != null) 'revelation_order': revelationOrder,
       if (ayahCount != null) 'ayah_count': ayahCount,
       if (startPage != null) 'start_page': startPage,
+      if (startPage1405 != null) 'start_page_1405': startPage1405,
       if (sourceId != null) 'source_id': sourceId,
     });
   }
@@ -486,6 +537,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     Value<int>? revelationOrder,
     Value<int>? ayahCount,
     Value<int>? startPage,
+    Value<int>? startPage1405,
     Value<int>? sourceId,
   }) {
     return SurahCompanion(
@@ -497,6 +549,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
       revelationOrder: revelationOrder ?? this.revelationOrder,
       ayahCount: ayahCount ?? this.ayahCount,
       startPage: startPage ?? this.startPage,
+      startPage1405: startPage1405 ?? this.startPage1405,
       sourceId: sourceId ?? this.sourceId,
     );
   }
@@ -528,6 +581,9 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     if (startPage.present) {
       map['start_page'] = Variable<int>(startPage.value);
     }
+    if (startPage1405.present) {
+      map['start_page_1405'] = Variable<int>(startPage1405.value);
+    }
     if (sourceId.present) {
       map['source_id'] = Variable<int>(sourceId.value);
     }
@@ -545,6 +601,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
           ..write('revelationOrder: $revelationOrder, ')
           ..write('ayahCount: $ayahCount, ')
           ..write('startPage: $startPage, ')
+          ..write('startPage1405: $startPage1405, ')
           ..write('sourceId: $sourceId')
           ..write(')'))
         .toString();
@@ -675,6 +732,17 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _page1405Meta = const VerificationMeta(
+    'page1405',
+  );
+  @override
+  late final GeneratedColumn<int> page1405 = GeneratedColumn<int>(
+    'page_1405',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _sajdaMeta = const VerificationMeta('sajda');
   @override
   late final GeneratedColumn<String> sajda = GeneratedColumn<String>(
@@ -731,6 +799,7 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     hizbQuarter,
     manzil,
     page,
+    page1405,
     sajda,
     textSourceId,
     displaySourceId,
@@ -851,6 +920,14 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     } else if (isInserting) {
       context.missing(_pageMeta);
     }
+    if (data.containsKey('page_1405')) {
+      context.handle(
+        _page1405Meta,
+        page1405.isAcceptableOrUnknown(data['page_1405']!, _page1405Meta),
+      );
+    } else if (isInserting) {
+      context.missing(_page1405Meta);
+    }
     if (data.containsKey('sajda')) {
       context.handle(
         _sajdaMeta,
@@ -947,6 +1024,10 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
         DriftSqlType.int,
         data['${effectivePrefix}page'],
       )!,
+      page1405: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page_1405'],
+      )!,
       sajda: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}sajda'],
@@ -992,7 +1073,12 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
   final int juz;
   final int hizbQuarter;
   final int manzil;
+
+  /// Page in the new edition (1441H).
   final int page;
+
+  /// Page in the old edition (1405H).
+  final int page1405;
   final String? sajda;
   final int textSourceId;
   final int displaySourceId;
@@ -1010,6 +1096,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     required this.hizbQuarter,
     required this.manzil,
     required this.page,
+    required this.page1405,
     this.sajda,
     required this.textSourceId,
     required this.displaySourceId,
@@ -1030,6 +1117,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     map['hizb_quarter'] = Variable<int>(hizbQuarter);
     map['manzil'] = Variable<int>(manzil);
     map['page'] = Variable<int>(page);
+    map['page_1405'] = Variable<int>(page1405);
     if (!nullToAbsent || sajda != null) {
       map['sajda'] = Variable<String>(sajda);
     }
@@ -1053,6 +1141,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       hizbQuarter: Value(hizbQuarter),
       manzil: Value(manzil),
       page: Value(page),
+      page1405: Value(page1405),
       sajda: sajda == null && nullToAbsent
           ? const Value.absent()
           : Value(sajda),
@@ -1082,6 +1171,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       hizbQuarter: serializer.fromJson<int>(json['hizbQuarter']),
       manzil: serializer.fromJson<int>(json['manzil']),
       page: serializer.fromJson<int>(json['page']),
+      page1405: serializer.fromJson<int>(json['page1405']),
       sajda: serializer.fromJson<String?>(json['sajda']),
       textSourceId: serializer.fromJson<int>(json['textSourceId']),
       displaySourceId: serializer.fromJson<int>(json['displaySourceId']),
@@ -1104,6 +1194,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       'hizbQuarter': serializer.toJson<int>(hizbQuarter),
       'manzil': serializer.toJson<int>(manzil),
       'page': serializer.toJson<int>(page),
+      'page1405': serializer.toJson<int>(page1405),
       'sajda': serializer.toJson<String?>(sajda),
       'textSourceId': serializer.toJson<int>(textSourceId),
       'displaySourceId': serializer.toJson<int>(displaySourceId),
@@ -1124,6 +1215,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     int? hizbQuarter,
     int? manzil,
     int? page,
+    int? page1405,
     Value<String?> sajda = const Value.absent(),
     int? textSourceId,
     int? displaySourceId,
@@ -1141,6 +1233,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     hizbQuarter: hizbQuarter ?? this.hizbQuarter,
     manzil: manzil ?? this.manzil,
     page: page ?? this.page,
+    page1405: page1405 ?? this.page1405,
     sajda: sajda.present ? sajda.value : this.sajda,
     textSourceId: textSourceId ?? this.textSourceId,
     displaySourceId: displaySourceId ?? this.displaySourceId,
@@ -1170,6 +1263,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           : this.hizbQuarter,
       manzil: data.manzil.present ? data.manzil.value : this.manzil,
       page: data.page.present ? data.page.value : this.page,
+      page1405: data.page1405.present ? data.page1405.value : this.page1405,
       sajda: data.sajda.present ? data.sajda.value : this.sajda,
       textSourceId: data.textSourceId.present
           ? data.textSourceId.value
@@ -1198,6 +1292,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           ..write('hizbQuarter: $hizbQuarter, ')
           ..write('manzil: $manzil, ')
           ..write('page: $page, ')
+          ..write('page1405: $page1405, ')
           ..write('sajda: $sajda, ')
           ..write('textSourceId: $textSourceId, ')
           ..write('displaySourceId: $displaySourceId, ')
@@ -1220,6 +1315,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     hizbQuarter,
     manzil,
     page,
+    page1405,
     sajda,
     textSourceId,
     displaySourceId,
@@ -1241,6 +1337,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           other.hizbQuarter == this.hizbQuarter &&
           other.manzil == this.manzil &&
           other.page == this.page &&
+          other.page1405 == this.page1405 &&
           other.sajda == this.sajda &&
           other.textSourceId == this.textSourceId &&
           other.displaySourceId == this.displaySourceId &&
@@ -1260,6 +1357,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
   final Value<int> hizbQuarter;
   final Value<int> manzil;
   final Value<int> page;
+  final Value<int> page1405;
   final Value<String?> sajda;
   final Value<int> textSourceId;
   final Value<int> displaySourceId;
@@ -1277,6 +1375,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     this.hizbQuarter = const Value.absent(),
     this.manzil = const Value.absent(),
     this.page = const Value.absent(),
+    this.page1405 = const Value.absent(),
     this.sajda = const Value.absent(),
     this.textSourceId = const Value.absent(),
     this.displaySourceId = const Value.absent(),
@@ -1295,6 +1394,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     required int hizbQuarter,
     required int manzil,
     required int page,
+    required int page1405,
     this.sajda = const Value.absent(),
     required int textSourceId,
     required int displaySourceId,
@@ -1310,6 +1410,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
        hizbQuarter = Value(hizbQuarter),
        manzil = Value(manzil),
        page = Value(page),
+       page1405 = Value(page1405),
        textSourceId = Value(textSourceId),
        displaySourceId = Value(displaySourceId),
        pageSourceId = Value(pageSourceId);
@@ -1326,6 +1427,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     Expression<int>? hizbQuarter,
     Expression<int>? manzil,
     Expression<int>? page,
+    Expression<int>? page1405,
     Expression<String>? sajda,
     Expression<int>? textSourceId,
     Expression<int>? displaySourceId,
@@ -1345,6 +1447,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       if (hizbQuarter != null) 'hizb_quarter': hizbQuarter,
       if (manzil != null) 'manzil': manzil,
       if (page != null) 'page': page,
+      if (page1405 != null) 'page_1405': page1405,
       if (sajda != null) 'sajda': sajda,
       if (textSourceId != null) 'text_source_id': textSourceId,
       if (displaySourceId != null) 'display_source_id': displaySourceId,
@@ -1365,6 +1468,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     Value<int>? hizbQuarter,
     Value<int>? manzil,
     Value<int>? page,
+    Value<int>? page1405,
     Value<String?>? sajda,
     Value<int>? textSourceId,
     Value<int>? displaySourceId,
@@ -1383,6 +1487,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       hizbQuarter: hizbQuarter ?? this.hizbQuarter,
       manzil: manzil ?? this.manzil,
       page: page ?? this.page,
+      page1405: page1405 ?? this.page1405,
       sajda: sajda ?? this.sajda,
       textSourceId: textSourceId ?? this.textSourceId,
       displaySourceId: displaySourceId ?? this.displaySourceId,
@@ -1429,6 +1534,9 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     if (page.present) {
       map['page'] = Variable<int>(page.value);
     }
+    if (page1405.present) {
+      map['page_1405'] = Variable<int>(page1405.value);
+    }
     if (sajda.present) {
       map['sajda'] = Variable<String>(sajda.value);
     }
@@ -1459,6 +1567,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
           ..write('hizbQuarter: $hizbQuarter, ')
           ..write('manzil: $manzil, ')
           ..write('page: $page, ')
+          ..write('page1405: $page1405, ')
           ..write('sajda: $sajda, ')
           ..write('textSourceId: $textSourceId, ')
           ..write('displaySourceId: $displaySourceId, ')
@@ -2547,6 +2656,7 @@ typedef $$SurahTableCreateCompanionBuilder = SurahCompanion Function({
   required int revelationOrder,
   required int ayahCount,
   required int startPage,
+  required int startPage1405,
   required int sourceId,
 });
 typedef $$SurahTableUpdateCompanionBuilder = SurahCompanion Function({
@@ -2558,6 +2668,7 @@ typedef $$SurahTableUpdateCompanionBuilder = SurahCompanion Function({
   Value<int> revelationOrder,
   Value<int> ayahCount,
   Value<int> startPage,
+  Value<int> startPage1405,
   Value<int> sourceId,
 });
 
@@ -2607,6 +2718,11 @@ class $$SurahTableFilterComposer
 
   ColumnFilters<int> get startPage => $composableBuilder(
     column: $table.startPage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startPage1405 => $composableBuilder(
+    column: $table.startPage1405,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2665,6 +2781,11 @@ class $$SurahTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get startPage1405 => $composableBuilder(
+    column: $table.startPage1405,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get sourceId => $composableBuilder(
     column: $table.sourceId,
     builder: (column) => ColumnOrderings(column),
@@ -2708,6 +2829,11 @@ class $$SurahTableAnnotationComposer
   GeneratedColumn<int> get startPage =>
       $composableBuilder(column: $table.startPage, builder: (column) => column);
 
+  GeneratedColumn<int> get startPage1405 => $composableBuilder(
+    column: $table.startPage1405,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get sourceId =>
       $composableBuilder(column: $table.sourceId, builder: (column) => column);
 }
@@ -2748,6 +2874,7 @@ class $$SurahTableTableManager
                 Value<int> revelationOrder = const Value.absent(),
                 Value<int> ayahCount = const Value.absent(),
                 Value<int> startPage = const Value.absent(),
+                Value<int> startPage1405 = const Value.absent(),
                 Value<int> sourceId = const Value.absent(),
               }) => SurahCompanion(
                 id: id,
@@ -2758,6 +2885,7 @@ class $$SurahTableTableManager
                 revelationOrder: revelationOrder,
                 ayahCount: ayahCount,
                 startPage: startPage,
+                startPage1405: startPage1405,
                 sourceId: sourceId,
               ),
           createCompanionCallback:
@@ -2770,6 +2898,7 @@ class $$SurahTableTableManager
                 required int revelationOrder,
                 required int ayahCount,
                 required int startPage,
+                required int startPage1405,
                 required int sourceId,
               }) => SurahCompanion.insert(
                 id: id,
@@ -2780,6 +2909,7 @@ class $$SurahTableTableManager
                 revelationOrder: revelationOrder,
                 ayahCount: ayahCount,
                 startPage: startPage,
+                startPage1405: startPage1405,
                 sourceId: sourceId,
               ),
           withReferenceMapper: (p0) => p0
@@ -2826,6 +2956,7 @@ typedef $$AyahTableCreateCompanionBuilder = AyahCompanion Function({
   required int hizbQuarter,
   required int manzil,
   required int page,
+  required int page1405,
   Value<String?> sajda,
   required int textSourceId,
   required int displaySourceId,
@@ -2844,6 +2975,7 @@ typedef $$AyahTableUpdateCompanionBuilder = AyahCompanion Function({
   Value<int> hizbQuarter,
   Value<int> manzil,
   Value<int> page,
+  Value<int> page1405,
   Value<String?> sajda,
   Value<int> textSourceId,
   Value<int> displaySourceId,
@@ -2916,6 +3048,11 @@ class $$AyahTableFilterComposer
 
   ColumnFilters<int> get page => $composableBuilder(
     column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page1405 => $composableBuilder(
+    column: $table.page1405,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3009,6 +3146,11 @@ class $$AyahTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get page1405 => $composableBuilder(
+    column: $table.page1405,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get sajda => $composableBuilder(
     column: $table.sajda,
     builder: (column) => ColumnOrderings(column),
@@ -3085,6 +3227,9 @@ class $$AyahTableAnnotationComposer
   GeneratedColumn<int> get page =>
       $composableBuilder(column: $table.page, builder: (column) => column);
 
+  GeneratedColumn<int> get page1405 =>
+      $composableBuilder(column: $table.page1405, builder: (column) => column);
+
   GeneratedColumn<String> get sajda =>
       $composableBuilder(column: $table.sajda, builder: (column) => column);
 
@@ -3144,6 +3289,7 @@ class $$AyahTableTableManager
                 Value<int> hizbQuarter = const Value.absent(),
                 Value<int> manzil = const Value.absent(),
                 Value<int> page = const Value.absent(),
+                Value<int> page1405 = const Value.absent(),
                 Value<String?> sajda = const Value.absent(),
                 Value<int> textSourceId = const Value.absent(),
                 Value<int> displaySourceId = const Value.absent(),
@@ -3161,6 +3307,7 @@ class $$AyahTableTableManager
                 hizbQuarter: hizbQuarter,
                 manzil: manzil,
                 page: page,
+                page1405: page1405,
                 sajda: sajda,
                 textSourceId: textSourceId,
                 displaySourceId: displaySourceId,
@@ -3180,6 +3327,7 @@ class $$AyahTableTableManager
                 required int hizbQuarter,
                 required int manzil,
                 required int page,
+                required int page1405,
                 Value<String?> sajda = const Value.absent(),
                 required int textSourceId,
                 required int displaySourceId,
@@ -3197,6 +3345,7 @@ class $$AyahTableTableManager
                 hizbQuarter: hizbQuarter,
                 manzil: manzil,
                 page: page,
+                page1405: page1405,
                 sajda: sajda,
                 textSourceId: textSourceId,
                 displaySourceId: displaySourceId,

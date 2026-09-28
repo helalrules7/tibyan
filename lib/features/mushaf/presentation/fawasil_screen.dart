@@ -38,13 +38,8 @@ class FawasilScreen extends ConsumerWidget {
                     '${last.page}',
                   ),
                 ),
-                onTap: () => openVerse(
-                  context,
-                  ref,
-                  surah: last.surah,
-                  ayah: last.ayah,
-                  page: last.page,
-                ),
+                onTap: () =>
+                    openVerse(context, ref, surah: last.surah, ayah: last.ayah),
               ),
             ),
           const SizedBox(height: 12),
@@ -70,13 +65,8 @@ class FawasilScreen extends ConsumerWidget {
                 subtitle: Text(
                   l.fasilLastAt(name(s.surah), '${s.ayah}', '${s.page}'),
                 ),
-                onTap: () => openVerse(
-                  context,
-                  ref,
-                  surah: s.surah,
-                  ayah: s.ayah,
-                  page: s.page,
-                ),
+                onTap: () =>
+                    openVerse(context, ref, surah: s.surah, ayah: s.ayah),
                 trailing: IconButton(
                   tooltip: l.delete,
                   icon: const Icon(Icons.delete_outline),

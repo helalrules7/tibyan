@@ -470,6 +470,18 @@ abstract class AppLocalizations {
   /// **'صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.'**
   String get pagesCredit;
 
+  /// No description provided for @pagesCreditOld.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.'**
+  String get pagesCreditOld;
+
+  /// No description provided for @editionLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'طبعة المصحف'**
+  String get editionLabel;
+
   /// No description provided for @viewPage.
   ///
   /// In ar, this message translates to:
@@ -727,12 +739,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'جارٍ التحميل…'**
   String get loadingLabel;
-
-  /// No description provided for @editionComingSoon.
-  ///
-  /// In ar, this message translates to:
-  /// **'قريبا'**
-  String get editionComingSoon;
 }
 
 class _AppLocalizationsDelegate

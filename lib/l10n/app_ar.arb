@@ -93,6 +93,8 @@
   "readContinuousNow": "افتح العرض المتصل",
   "readWhileDownloading": "اقرأ الآن حتى يكتمل التحميل",
   "pagesCredit": "صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.",
+  "pagesCreditOld": "صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.",
+  "editionLabel": "طبعة المصحف",
   "viewPage": "الصفحة",
   "viewContinuous": "متصل",
   "viewModeLabel": "طريقة العرض",
@@ -231,6 +233,5 @@
     }
   },
   "mushafOpen": "افتح المصحف",
-  "loadingLabel": "جارٍ التحميل…",
-  "editionComingSoon": "قريبا"
+  "loadingLabel": "جارٍ التحميل…"
 }

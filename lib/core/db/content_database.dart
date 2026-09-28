@@ -23,7 +23,12 @@ class Surah extends Table {
   TextColumn get revelation => text()();
   IntColumn get revelationOrder => integer()();
   IntColumn get ayahCount => integer()();
+
+  /// First page in the new edition (1441H).
   IntColumn get startPage => integer()();
+
+  /// First page in the old edition (1405H).
+  IntColumn get startPage1405 => integer().named('start_page_1405')();
   IntColumn get sourceId => integer()();
 
   @override
@@ -54,7 +59,12 @@ class Ayah extends Table {
   IntColumn get juz => integer()();
   IntColumn get hizbQuarter => integer()();
   IntColumn get manzil => integer()();
+
+  /// Page in the new edition (1441H).
   IntColumn get page => integer()();
+
+  /// Page in the old edition (1405H).
+  IntColumn get page1405 => integer().named('page_1405')();
   TextColumn get sajda => text().nullable()();
   IntColumn get textSourceId => integer()();
   IntColumn get displaySourceId => integer()();
@@ -107,7 +117,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

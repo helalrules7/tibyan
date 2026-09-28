@@ -62,6 +62,8 @@
   "readContinuousNow": "Open the continuous view",
   "readWhileDownloading": "Read now while the download finishes",
   "pagesCredit": "Madina Mushaf pages by the King Fahd Glorious Quran Printing Complex.",
+  "pagesCreditOld": "Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, downloaded directly from quran.com.",
+  "editionLabel": "Mushaf edition",
   "viewPage": "Page",
   "viewContinuous": "Continuous",
   "viewModeLabel": "View",
@@ -104,6 +106,5 @@
   "reviewNotesTitle": "Questions under review",
   "reviewNotesBody": "{count} places where the two text sources differ (two juz boundaries and four spellings) are with a qualified reviewer. The app follows the Tanzil text until a decision is made.",
   "mushafOpen": "Open the mushaf",
-  "loadingLabel": "Loading…",
-  "editionComingSoon": "Coming soon"
+  "loadingLabel": "Loading…"
 }

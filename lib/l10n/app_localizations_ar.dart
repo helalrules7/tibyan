@@ -211,6 +211,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.';
 
   @override
+  String get pagesCreditOld =>
+      'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.';
+
+  @override
+  String get editionLabel => 'طبعة المصحف';
+
+  @override
   String get viewPage => 'الصفحة';
 
   @override
@@ -363,7 +370,4 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loadingLabel => 'جارٍ التحميل…';
-
-  @override
-  String get editionComingSoon => 'قريبا';
 }

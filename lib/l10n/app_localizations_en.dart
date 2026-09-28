@@ -211,6 +211,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Madina Mushaf pages by the King Fahd Glorious Quran Printing Complex.';
 
   @override
+  String get pagesCreditOld =>
+      'Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, downloaded directly from quran.com.';
+
+  @override
+  String get editionLabel => 'Mushaf edition';
+
+  @override
   String get viewPage => 'Page';
 
   @override
@@ -364,7 +371,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadingLabel => 'Loading…';
-
-  @override
-  String get editionComingSoon => 'Coming soon';
 }

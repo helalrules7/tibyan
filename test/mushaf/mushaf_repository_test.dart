@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tibyan/core/db/content_database.dart';
+import 'package:tibyan/core/settings/app_settings.dart';
 import 'package:tibyan/features/mushaf/data/mushaf_repository.dart';
 
 /// Runs against the real bundled database.
@@ -57,6 +58,19 @@ void main() {
       expect(first.verseText.startsWith('بِسْمِ'), isTrue);
     },
   );
+
+  test('old edition (1405H) pages come from Tanzil', () async {
+    final kursi = await repo.ayah(2, 255);
+    expect(kursi.page, 42);
+    expect(kursi.page1405, 42);
+    final baqarah = await repo.surahById(2);
+    expect(baqarah.startPage1405, 2);
+    // 56 verses sit on different pages in the two editions, e.g. 5:77.
+    final maidah77 = await repo.ayah(5, 77);
+    expect((maidah77.page, maidah77.page1405), (120, 121));
+    final onOldPage = await repo.ayahsOnPage(121, MushafEdition.madina1405);
+    expect(onOldPage.any((a) => a.surah == 5 && a.number == 77), isTrue);
+  });
 
   test('all six review items are decided', () async {
     expect(await repo.reviewNoteCount(), 0);

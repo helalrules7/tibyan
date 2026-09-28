@@ -8,6 +8,16 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
+/// How a pack's zip is laid out.
+enum PackFormat {
+  /// Our pack: `NNN.svg.xz` pages and a manifest with per-page SHA-256.
+  svgXz,
+
+  /// quran.com's `images_1024.zip`: `width_1024/pageNNN.png` and
+  /// `databases/ayahinfo_1024.db` (glyph boxes).
+  pngQuranCom,
+}
+
 /// A downloadable set of mushaf pages.
 class PagePackSpec {
   const PagePackSpec({
@@ -15,12 +25,14 @@ class PagePackSpec {
     required this.url,
     required this.sha256,
     required this.bytes,
+    required this.format,
   });
 
   final String id;
   final String url;
   final String sha256;
   final int bytes;
+  final PackFormat format;
 
   /// New Madina edition (1441H), Hafs: 604 SVG pages, each xz-compressed.
   /// Built by tools/build_page_pack.py; published as a GitHub release.
@@ -29,6 +41,17 @@ class PagePackSpec {
     url: 'https://github.com/helalrules7/tibyan/releases/download/pages-hafs-1441-v1/pages-hafs-1441-v1.zip',
     sha256: '9013b4c47c96eb36b5c9b7ad2b25b43a5d09c939879d85f8976147fce9d4580e',
     bytes: 65649525,
+    format: PackFormat.svgXz,
+  );
+
+  /// Old Madina edition (1405H), Hafs: 604 PNG pages and glyph boxes,
+  /// downloaded from quran.com directly (we do not re-host them).
+  static const madina1405 = PagePackSpec(
+    id: 'pages-hafs-1405-qurancom-1024',
+    url: 'https://files.quran.app/hafs/madani/zips/images_1024.zip',
+    sha256: '401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85',
+    bytes: 63441877,
+    format: PackFormat.pngQuranCom,
   );
 }
 
@@ -142,7 +165,12 @@ class PagePackInstaller {
         total: spec.bytes,
       );
       final target = dir.path;
-      await Isolate.run(() => _extractAndVerify(partPath, target));
+      final format = spec.format;
+      await Isolate.run(
+        () => format == PackFormat.svgXz
+            ? _extractAndVerify(partPath, target)
+            : _extractQuranCom(partPath, target),
+      );
       _done.writeAsStringSync(DateTime.now().toIso8601String());
       _part.deleteSync();
       yield PackProgress(
@@ -178,6 +206,36 @@ class PagePackInstaller {
       File(p.join(targetDir, entry.name)).writeAsBytesSync(bytes, flush: true);
     }
     input.closeSync();
+  }
+}
+
+/// Keeps the 604 page images and the glyph database. The whole zip was
+/// already checked against its SHA-256.
+void _extractQuranCom(String zipPath, String targetDir) {
+  final input = InputFileStream(zipPath);
+  final archive = ZipDecoder().decodeStream(input);
+  final pageName = RegExp(r'^width_1024/page(\d{3})\.png$');
+  Directory(targetDir).createSync(recursive: true);
+  var pages = 0;
+  var glyphs = false;
+  for (final entry in archive.files) {
+    if (!entry.isFile) continue;
+    final m = pageName.firstMatch(entry.name);
+    final String out;
+    if (m != null) {
+      out = 'p${m[1]}.png';
+      pages++;
+    } else if (entry.name == 'databases/ayahinfo_1024.db') {
+      out = 'ayahinfo.db';
+      glyphs = true;
+    } else {
+      continue;
+    }
+    File(p.join(targetDir, out)).writeAsBytesSync(entry.content, flush: true);
+  }
+  input.closeSync();
+  if (pages != 604 || !glyphs) {
+    throw const FormatException('The page pack is incomplete.');
   }
 }
 
