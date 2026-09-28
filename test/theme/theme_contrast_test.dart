@@ -40,6 +40,9 @@ void main() {
         ('Player bar', (t) => t.playerFg, (t) => t.player, 4.5),
         ('Accent button', (t) => t.accentFg, (t) => t.accent, 4.5),
         ('Verse marker on paper', (t) => t.marker, (t) => t.paper, 3),
+        ('Selected control on paper', (t) => t.control, (t) => t.paper, 3),
+        ('Selected control on background', (t) => t.control, (t) => t.bg, 3),
+        ('Text on selected control', (t) => t.onControl, (t) => t.control, 4.5),
       ];
 
   test('contrast rules hold for every style and mode', () {
