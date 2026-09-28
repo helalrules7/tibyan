@@ -118,3 +118,4 @@
 | nquran | نموذج التواصل | https://www.nquran.com/ar/index.php?group=contactus | — |
 | everyayah | مركز المساعدة | https://quran.zendesk.com/hc/en-us | — |
 | مجمع الملك فهد | `info@qurancomplex.gov.sa` | من نتائج البحث فقط (الموقع مقفول من هنا) | — |
+| QuranEnc | `info@quranenc.com` | https://quranenc.com/en/home/about (البريد مخفي بحماية Cloudflare، وفُك في 2026-09-28) | — |
