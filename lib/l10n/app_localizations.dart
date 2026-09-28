@@ -319,6 +319,420 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'محدد'**
   String get selected;
+
+  /// No description provided for @onbStyleTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الشكل الذي يريح عينك'**
+  String get onbStyleTitle;
+
+  /// No description provided for @onbStyleHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكنك تغييره في أي وقت من الإعدادات'**
+  String get onbStyleHint;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة'**
+  String get continueLabel;
+
+  /// No description provided for @skipLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخطي'**
+  String get skipLabel;
+
+  /// No description provided for @onbEditionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر طبعة المصحف'**
+  String get onbEditionTitle;
+
+  /// No description provided for @editionNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصحف المدينة: الطبعة الحديثة'**
+  String get editionNew;
+
+  /// No description provided for @editionNewDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'طبعة 1441هـ من مجمع الملك فهد، مع تظليل الآية أثناء التلاوة.'**
+  String get editionNewDesc;
+
+  /// No description provided for @editionOld.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصحف المدينة: الطبعة القديمة'**
+  String get editionOld;
+
+  /// No description provided for @editionOldDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'طبعة 1405هـ المشهورة في التطبيقات القديمة، مع تظليل الكلمة.'**
+  String get editionOldDesc;
+
+  /// No description provided for @defaultTag.
+  ///
+  /// In ar, this message translates to:
+  /// **'الافتراضية'**
+  String get defaultTag;
+
+  /// No description provided for @pagesDownloadNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحات المصحف تُحمّل مرة واحدة (نحو {size} ميجا)، ثم تعمل دون اتصال. ويمكنك القراءة بالعرض المتصل فورا.'**
+  String pagesDownloadNote(String size);
+
+  /// No description provided for @downloadTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل صفحات المصحف'**
+  String get downloadTitle;
+
+  /// No description provided for @downloadStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ التحميل'**
+  String get downloadStart;
+
+  /// No description provided for @downloadPause.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف مؤقت'**
+  String get downloadPause;
+
+  /// No description provided for @downloadResume.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة التحميل'**
+  String get downloadResume;
+
+  /// No description provided for @downloadRetry.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة المحاولة'**
+  String get downloadRetry;
+
+  /// No description provided for @downloadVerifying.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحقق من سلامة الملفات…'**
+  String get downloadVerifying;
+
+  /// No description provided for @downloadInstalling.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تجهيز الصفحات…'**
+  String get downloadInstalling;
+
+  /// No description provided for @downloadDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمل التحميل'**
+  String get downloadDone;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر التحميل: {error}'**
+  String downloadFailed(String error);
+
+  /// No description provided for @downloadProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'{received} من {total} ميجا'**
+  String downloadProgress(String received, String total);
+
+  /// No description provided for @downloadWifiHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يكمل التحميل من حيث توقف إذا انقطع الاتصال. يُفضّل الاتصال بشبكة Wi-Fi.'**
+  String get downloadWifiHint;
+
+  /// No description provided for @readContinuousNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح العرض المتصل'**
+  String get readContinuousNow;
+
+  /// No description provided for @readWhileDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ الآن حتى يكتمل التحميل'**
+  String get readWhileDownloading;
+
+  /// No description provided for @pagesCredit.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.'**
+  String get pagesCredit;
+
+  /// No description provided for @viewPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة'**
+  String get viewPage;
+
+  /// No description provided for @viewContinuous.
+  ///
+  /// In ar, this message translates to:
+  /// **'متصل'**
+  String get viewContinuous;
+
+  /// No description provided for @viewModeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'طريقة العرض'**
+  String get viewModeLabel;
+
+  /// No description provided for @indexTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفهرس'**
+  String get indexTitle;
+
+  /// No description provided for @fawasilTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفواصل'**
+  String get fawasilTitle;
+
+  /// No description provided for @aboutMushafTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'عن هذا المصحف'**
+  String get aboutMushafTitle;
+
+  /// No description provided for @juzPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجزء {juz} · الصفحة {page}'**
+  String juzPage(String juz, String page);
+
+  /// No description provided for @surahWord.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {name}'**
+  String surahWord(String name);
+
+  /// No description provided for @verseSelected.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {number} محددة'**
+  String verseSelected(String number);
+
+  /// No description provided for @tapVerseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط أي آية لتحديدها'**
+  String get tapVerseHint;
+
+  /// No description provided for @pageOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة {page}'**
+  String pageOf(String page);
+
+  /// No description provided for @indexSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم السورة، أو رقم صفحة، أو ٢:٢٥٥'**
+  String get indexSearchHint;
+
+  /// No description provided for @tabSurahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'السور'**
+  String get tabSurahs;
+
+  /// No description provided for @tabJuz.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأجزاء'**
+  String get tabJuz;
+
+  /// No description provided for @tabPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحات'**
+  String get tabPages;
+
+  /// No description provided for @meccan.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكية'**
+  String get meccan;
+
+  /// No description provided for @medinan.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدنية'**
+  String get medinan;
+
+  /// No description provided for @ayahCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} آية'**
+  String ayahCount(String count);
+
+  /// No description provided for @juzLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجزء {number}'**
+  String juzLabel(String number);
+
+  /// No description provided for @juzStartsAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'يبدأ من {surah} {ayah}'**
+  String juzStartsAt(String surah, String ayah);
+
+  /// No description provided for @pageShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'ص {page}'**
+  String pageShort(String page);
+
+  /// No description provided for @lastPosition.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر موضع قراءة، يُحفظ تلقائيا'**
+  String get lastPosition;
+
+  /// No description provided for @yourFawasil.
+  ///
+  /// In ar, this message translates to:
+  /// **'فواصلك'**
+  String get yourFawasil;
+
+  /// No description provided for @fasilNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'فاصل جديد'**
+  String get fasilNew;
+
+  /// No description provided for @fasilName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم الفاصل'**
+  String get fasilName;
+
+  /// No description provided for @fasilSaveHere.
+  ///
+  /// In ar, this message translates to:
+  /// **'احفظ الموضع الحالي في فاصل'**
+  String get fasilSaveHere;
+
+  /// No description provided for @fasilLastAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر موضع: {surah} {ayah} · الصفحة {page}'**
+  String fasilLastAt(String surah, String ayah, String page);
+
+  /// No description provided for @fasilHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لكل فاصل لون واسم، ويتحرك إلى آخر موضع قرأت عنده.'**
+  String get fasilHint;
+
+  /// No description provided for @save.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get save;
+
+  /// No description provided for @cancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
+  String get cancel;
+
+  /// No description provided for @delete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف'**
+  String get delete;
+
+  /// No description provided for @saved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الحفظ'**
+  String get saved;
+
+  /// No description provided for @noFawasil.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد فواصل بعد'**
+  String get noFawasil;
+
+  /// No description provided for @readingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراءة'**
+  String get readingTitle;
+
+  /// No description provided for @keepScreenOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'إبقاء الشاشة مضاءة أثناء القراءة'**
+  String get keepScreenOn;
+
+  /// No description provided for @quranFontSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجم خط القرآن في العرض المتصل'**
+  String get quranFontSize;
+
+  /// No description provided for @aboutMushafIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل نص في تبيان منقول من مصدر موثق، ولا يُعدَّل بأيدينا. وهذه مصادر المصحف في التطبيق:'**
+  String get aboutMushafIntro;
+
+  /// No description provided for @licenseLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرخصة: {license}'**
+  String licenseLabel(String license);
+
+  /// No description provided for @versionShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدار: {version}'**
+  String versionShort(String version);
+
+  /// No description provided for @reviewNotesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسائل معروضة على المراجعة'**
+  String get reviewNotesTitle;
+
+  /// No description provided for @reviewNotesBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} مواضع يختلف فيها مصدرا النص (حدود جزأين، وأربعة مواضع في الرسم) معروضة على مراجع متخصص، ويتبع التطبيق نص تنزيل حتى يصدر القرار.'**
+  String reviewNotesBody(String count);
+
+  /// No description provided for @mushafOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح المصحف'**
+  String get mushafOpen;
+
+  /// No description provided for @loadingLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحميل…'**
+  String get loadingLabel;
+
+  /// No description provided for @editionComingSoon.
+  ///
+  /// In ar, this message translates to:
+  /// **'قريبا'**
+  String get editionComingSoon;
 }
 
 class _AppLocalizationsDelegate
