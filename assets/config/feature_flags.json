@@ -1,0 +1,17 @@
+{
+  "_comment": "A flagged feature appears only when its flag is true AND its reviewed data pack is installed. Scholarly features stay false until reviewed data exists.",
+  "tajweed": false,
+  "qiraat": false,
+  "tawjih": false,
+  "munasabat": false,
+  "wujuh_nazair": false,
+  "asbab_nuzul": false,
+  "stories": false,
+  "topics": false,
+  "library": false,
+  "tafsir_audio": false,
+  "old_madina_edition": false,
+  "meaning_search": false,
+  "accounts_sync": false,
+  "group_khatma": false
+}
