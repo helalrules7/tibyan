@@ -28,11 +28,15 @@ A free, non-profit Quran app for Android and iOS: tafsir, recitation and memoriz
 
 | Path | Contents |
 |---|---|
-| `lib/` | Flutter app code, organized by feature (added in Phase 0) |
-| `assets/` | Fonts, theme tokens and the bundled content database (Git LFS) |
+| `lib/core/` | Theme token system, settings, feature flags, routing, crash reporting |
+| `lib/features/` | App screens, one folder per feature |
+| `lib/l10n/` | Arabic (template) and English interface strings |
+| `assets/themes/` | One JSON file per visual style (Classic, Manuscript, Royal, Calm), each with Light, Night and Black |
+| `assets/fonts/` | KFGQPC fonts (unmodified) and SIL OFL fonts, in Git LFS |
+| `assets/config/` | Feature flags |
 | `tools/` | Python scripts that download, verify and build the data reproducibly |
-| `docs/` | Data sources, missing data, permission requests, license evidence, verification reports |
-| `fonts/` | KFGQPC fonts (moving to `assets/fonts/` in Phase 0) |
+| `docs/` | Data sources, missing data, permission requests, license evidence, verification reports, plan |
+| `test/` | Unit and widget tests, including the theme contrast check |
 
 ## Setup
 
@@ -44,7 +48,9 @@ git clone https://github.com/helalrules7/tibyan.git
 cd tibyan
 cp .env.example .env   # optional: crash reporting and sync keys
 flutter pub get
-flutter run
+flutter run --dart-define-from-file=.env
+flutter test
+python3 tools/fetch_sources.py   # optional: download and verify raw data
 ```
 
 ## Data
