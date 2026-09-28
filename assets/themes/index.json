@@ -1,0 +1,9 @@
+{
+  "default": "classic",
+  "styles": [
+    "classic",
+    "manuscript",
+    "royal",
+    "calm"
+  ]
+}

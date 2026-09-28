@@ -1,0 +1,43 @@
+{
+  "_comment": "Every raw source the build uses. fetch_sources.py downloads each one into tools/.cache/ and refuses any file whose SHA-256 differs. License evidence for each source is in docs/licenses/ and docs/DATA_SOURCES.md.",
+  "sources": [
+    {
+      "id": "tanzil-uthmani-1.1",
+      "file": "quran-uthmani.txt",
+      "url": "https://tanzil.net/pub/download/index.php",
+      "method": "POST",
+      "form": {"quranType": "uthmani", "outType": "txt-2", "agree": "true", "marks": "true", "sajdah": "true", "tatweel": "true"},
+      "sha256": "bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+      "license": "CC BY 3.0, verbatim copies only (Tanzil)",
+      "evidence": "docs/licenses/2026-09-28_tanzil_text_license.pdf"
+    },
+    {
+      "id": "tanzil-simple-clean-1.1",
+      "file": "quran-simple-clean.txt",
+      "url": "https://tanzil.net/pub/download/index.php",
+      "method": "POST",
+      "form": {"quranType": "simple-clean", "outType": "txt-2", "agree": "true", "marks": "true", "sajdah": "true", "tatweel": "true"},
+      "sha256": "228df2a717671aeb9d2ff573002bd28d6b3f973f4bc7153554e3a81663d67610",
+      "license": "CC BY 3.0, verbatim copies only (Tanzil)",
+      "evidence": "docs/licenses/2026-09-28_tanzil_text_license.pdf"
+    },
+    {
+      "id": "tanzil-metadata-1.0",
+      "file": "quran-data.xml",
+      "url": "https://tanzil.net/res/text/metadata/quran-data.xml",
+      "method": "GET",
+      "sha256": "8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
+      "license": "cc-by (file header)",
+      "evidence": "docs/licenses/2026-09-28_tanzil_quran-data-xml_header.txt"
+    },
+    {
+      "id": "kfgqpc-hafs-2.0",
+      "file": "UthmanicHafs_v2-0.zip",
+      "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-hafs/UthmanicHafs_v2-0.zip",
+      "method": "GET",
+      "sha256": "a7b0e5591945712ec5e4d6142938ae4d1e9b49bdc89dff06222789bfebdfd72c",
+      "license": "Reference for comparison only (verse text not covered by the KFGQPC grant)",
+      "evidence": "docs/verification/2026-09-28_tanzil_vs_kfgqpc_v18.md"
+    }
+  ]
+}
