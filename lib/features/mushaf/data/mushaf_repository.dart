@@ -76,6 +76,17 @@ class MushafRepository {
     return row.read<int>('n');
   }
 
+  /// Word boxes on a page of the new edition (1441H).
+  Future<List<WordBoxRow>> wordBoxes(int page) =>
+      (_db.select(_db.wordBox)
+            ..where((t) => t.page.equals(page))
+            ..orderBy([
+              (t) => OrderingTerm.asc(t.surah),
+              (t) => OrderingTerm.asc(t.ayah),
+              (t) => OrderingTerm.asc(t.word),
+            ]))
+          .get();
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }
