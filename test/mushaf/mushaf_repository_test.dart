@@ -42,17 +42,25 @@ void main() {
   });
 
   test(
-    'basmala prefix is hidden for display, not removed from storage',
+    'shown text is the KFGQPC text, split only at the verse number',
     () async {
+      final a = await repo.ayah(2, 255);
+      expect(a.displaySourceId, 5);
+      expect('${a.displayBody}\u00a0${a.displayNumber}', a.displayText);
+      expect(a.displayNumber.runes.length, 1);
+      // 2:286 has an ordinary space before its number.
+      final last = await repo.ayah(2, 286);
+      expect('${last.displayBody} ${last.displayNumber}', last.displayText);
+      // Tanzil text is kept, unchanged, for reference.
       final first = await repo.ayah(2, 1);
       expect(first.basmalaPrefix, greaterThan(0));
-      expect(first.verseText.length, greaterThan(first.displayText.length));
-      expect(first.verseText.endsWith(first.displayText), isTrue);
-      final fatiha = await repo.ayah(1, 1);
-      expect(fatiha.basmalaPrefix, 0);
-      expect(fatiha.displayText, fatiha.verseText);
+      expect(first.verseText.startsWith('بِسْمِ'), isTrue);
     },
   );
+
+  test('all six review items are decided', () async {
+    expect(await repo.reviewNoteCount(), 0);
+  });
 
   test('30 juz starts, first is 1:1', () async {
     final starts = await repo.juzStarts();

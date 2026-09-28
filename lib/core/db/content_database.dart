@@ -39,8 +39,13 @@ class Ayah extends Table {
   IntColumn get surah => integer()();
   IntColumn get number => integer()();
 
-  /// Tanzil Uthmani text, verbatim (may start with the basmala).
+  /// Tanzil Uthmani text, verbatim (may start with the basmala). Kept for
+  /// reference and comparison; not shown.
   TextColumn get verseText => text().named('text')();
+
+  /// KFGQPC Hafs 2.0 text, verbatim, for the KFGQPC Hafs font. Shown in the
+  /// continuous view. Ends with a space and the verse-number glyph.
+  TextColumn get displayText => text()();
 
   /// Characters of the basmala before verse 1 in the Tanzil file.
   IntColumn get basmalaPrefix => integer()();
@@ -52,6 +57,7 @@ class Ayah extends Table {
   IntColumn get page => integer()();
   TextColumn get sajda => text().nullable()();
   IntColumn get textSourceId => integer()();
+  IntColumn get displaySourceId => integer()();
   IntColumn get pageSourceId => integer()();
 
   @override
@@ -101,7 +107,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

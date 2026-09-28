@@ -61,7 +61,9 @@ class MushafRepository {
   /// Number of open questions awaiting a qualified reviewer.
   Future<int> reviewNoteCount() async {
     final row = await _db
-        .customSelect('SELECT COUNT(*) AS n FROM review_note')
+        .customSelect(
+          'SELECT COUNT(*) AS n FROM review_note WHERE decision IS NULL',
+        )
         .getSingle();
     return row.read<int>('n');
   }
@@ -73,7 +75,11 @@ class MushafRepository {
 /// Text helpers that never change the stored text: they only choose
 /// which part of the verbatim string to show.
 extension AyahDisplay on AyahRow {
-  /// The verse without the basmala that Tanzil's file places before
-  /// verse 1 of 112 surahs (shown separately as a header).
-  String get displayText => verseText.substring(basmalaPrefix);
+  int get _numberSplit => displayText.lastIndexOf(RegExp('[\u00a0 ]'));
+
+  /// The verse without its number glyph.
+  String get displayBody => displayText.substring(0, _numberSplit);
+
+  /// The verse-number glyph of the KFGQPC font.
+  String get displayNumber => displayText.substring(_numberSplit + 1);
 }
