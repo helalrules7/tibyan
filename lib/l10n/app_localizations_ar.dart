@@ -126,6 +126,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selected => 'محدد';
 
   @override
+  String get onbLanguageTitle => 'اختر اللغة\nChoose your language';
+
+  @override
   String get onbStyleTitle => 'اختر الشكل الذي يريح عينك';
 
   @override
