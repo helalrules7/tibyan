@@ -6,7 +6,14 @@
       "file": "quran-uthmani.txt",
       "url": "https://tanzil.net/pub/download/index.php",
       "method": "POST",
-      "form": {"quranType": "uthmani", "outType": "txt-2", "agree": "true", "marks": "true", "sajdah": "true", "tatweel": "true"},
+      "form": {
+        "quranType": "uthmani",
+        "outType": "txt-2",
+        "agree": "true",
+        "marks": "true",
+        "sajdah": "true",
+        "tatweel": "true"
+      },
       "sha256": "bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
       "license": "CC BY 3.0, verbatim copies only (Tanzil)",
       "evidence": "docs/licenses/2026-09-28_tanzil_text_license.pdf"
@@ -16,7 +23,14 @@
       "file": "quran-simple-clean.txt",
       "url": "https://tanzil.net/pub/download/index.php",
       "method": "POST",
-      "form": {"quranType": "simple-clean", "outType": "txt-2", "agree": "true", "marks": "true", "sajdah": "true", "tatweel": "true"},
+      "form": {
+        "quranType": "simple-clean",
+        "outType": "txt-2",
+        "agree": "true",
+        "marks": "true",
+        "sajdah": "true",
+        "tatweel": "true"
+      },
       "sha256": "228df2a717671aeb9d2ff573002bd28d6b3f973f4bc7153554e3a81663d67610",
       "license": "CC BY 3.0, verbatim copies only (Tanzil)",
       "evidence": "docs/licenses/2026-09-28_tanzil_text_license.pdf"
@@ -38,6 +52,15 @@
       "sha256": "a7b0e5591945712ec5e4d6142938ae4d1e9b49bdc89dff06222789bfebdfd72c",
       "license": "Reference for comparison only (verse text not covered by the KFGQPC grant)",
       "evidence": "docs/verification/2026-09-28_tanzil_vs_kfgqpc_v18.md"
+    },
+    {
+      "id": "quran-ws-hafs-json-1.1.1",
+      "file": "hafs-kfqc-json.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/hafs-kfqc-json.zip",
+      "method": "GET",
+      "sha256": "27dd192cec6b5f919ffd6e7df5216464aa57a671e326fc1a37a9d82dee3f6c13",
+      "license": "CC BY 4.0, attribution waived inside products (quran-ws); page artwork KFGQPC",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_LICENSE.txt"
     }
   ]
 }
