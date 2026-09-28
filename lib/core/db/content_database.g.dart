@@ -2628,6 +2628,527 @@ class SourceCompanion extends UpdateCompanion<SourceRow> {
   }
 }
 
+class $WordBoxTable extends WordBox with TableInfo<$WordBoxTable, WordBoxRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WordBoxTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordMeta = const VerificationMeta('word');
+  @override
+  late final GeneratedColumn<int> word = GeneratedColumn<int>(
+    'word',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _exactMeta = const VerificationMeta('exact');
+  @override
+  late final GeneratedColumn<int> exact = GeneratedColumn<int>(
+    'exact',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    surah,
+    ayah,
+    word,
+    page,
+    x0,
+    y0,
+    x1,
+    y1,
+    exact,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'word_box';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WordBoxRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('word')) {
+      context.handle(
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordMeta);
+    }
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    if (data.containsKey('exact')) {
+      context.handle(
+        _exactMeta,
+        exact.isAcceptableOrUnknown(data['exact']!, _exactMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_exactMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {surah, ayah, word};
+  @override
+  WordBoxRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WordBoxRow(
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}word'],
+      )!,
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+      exact: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}exact'],
+      )!,
+    );
+  }
+
+  @override
+  $WordBoxTable createAlias(String alias) {
+    return $WordBoxTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class WordBoxRow extends DataClass implements Insertable<WordBoxRow> {
+  final int surah;
+  final int ayah;
+
+  /// 1-based among the words of the KFGQPC text.
+  final int word;
+  final int page;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+
+  /// 1 when every word of the verse matched its predicted letter groups.
+  final int exact;
+  const WordBoxRow({
+    required this.surah,
+    required this.ayah,
+    required this.word,
+    required this.page,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+    required this.exact,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['word'] = Variable<int>(word);
+    map['page'] = Variable<int>(page);
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    map['exact'] = Variable<int>(exact);
+    return map;
+  }
+
+  WordBoxCompanion toCompanion(bool nullToAbsent) {
+    return WordBoxCompanion(
+      surah: Value(surah),
+      ayah: Value(ayah),
+      word: Value(word),
+      page: Value(page),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+      exact: Value(exact),
+    );
+  }
+
+  factory WordBoxRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WordBoxRow(
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      word: serializer.fromJson<int>(json['word']),
+      page: serializer.fromJson<int>(json['page']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+      exact: serializer.fromJson<int>(json['exact']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'word': serializer.toJson<int>(word),
+      'page': serializer.toJson<int>(page),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+      'exact': serializer.toJson<int>(exact),
+    };
+  }
+
+  WordBoxRow copyWith({
+    int? surah,
+    int? ayah,
+    int? word,
+    int? page,
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+    int? exact,
+  }) => WordBoxRow(
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    word: word ?? this.word,
+    page: page ?? this.page,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+    exact: exact ?? this.exact,
+  );
+  WordBoxRow copyWithCompanion(WordBoxCompanion data) {
+    return WordBoxRow(
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      word: data.word.present ? data.word.value : this.word,
+      page: data.page.present ? data.page.value : this.page,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+      exact: data.exact.present ? data.exact.value : this.exact,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WordBoxRow(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('page: $page, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('exact: $exact')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(surah, ayah, word, page, x0, y0, x1, y1, exact);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WordBoxRow &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.word == this.word &&
+          other.page == this.page &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1 &&
+          other.exact == this.exact);
+}
+
+class WordBoxCompanion extends UpdateCompanion<WordBoxRow> {
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> word;
+  final Value<int> page;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  final Value<int> exact;
+  const WordBoxCompanion({
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.word = const Value.absent(),
+    this.page = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+    this.exact = const Value.absent(),
+  });
+  WordBoxCompanion.insert({
+    required int surah,
+    required int ayah,
+    required int word,
+    required int page,
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+    required int exact,
+  }) : surah = Value(surah),
+       ayah = Value(ayah),
+       word = Value(word),
+       page = Value(page),
+       x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1),
+       exact = Value(exact);
+  static Insertable<WordBoxRow> custom({
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? word,
+    Expression<int>? page,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+    Expression<int>? exact,
+  }) {
+    return RawValuesInsertable({
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (word != null) 'word': word,
+      if (page != null) 'page': page,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+      if (exact != null) 'exact': exact,
+    });
+  }
+
+  WordBoxCompanion copyWith({
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? word,
+    Value<int>? page,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+    Value<int>? exact,
+  }) {
+    return WordBoxCompanion(
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      word: word ?? this.word,
+      page: page ?? this.page,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+      exact: exact ?? this.exact,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (word.present) {
+      map['word'] = Variable<int>(word.value);
+    }
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    if (exact.present) {
+      map['exact'] = Variable<int>(exact.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WordBoxCompanion(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('page: $page, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('exact: $exact')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -2635,6 +3156,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $AyahTable ayah = $AyahTable(this);
   late final $AyahPolygonTable ayahPolygon = $AyahPolygonTable(this);
   late final $SourceTable source = $SourceTable(this);
+  late final $WordBoxTable wordBox = $WordBoxTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2644,6 +3166,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     ayah,
     ayahPolygon,
     source,
+    wordBox,
   ];
 }
 
@@ -3930,6 +4453,283 @@ typedef $$SourceTableProcessedTableManager =
       SourceRow,
       PrefetchHooks Function()
     >;
+typedef $$WordBoxTableCreateCompanionBuilder = WordBoxCompanion Function({
+  required int surah,
+  required int ayah,
+  required int word,
+  required int page,
+  required int x0,
+  required int y0,
+  required int x1,
+  required int y1,
+  required int exact,
+});
+typedef $$WordBoxTableUpdateCompanionBuilder = WordBoxCompanion Function({
+  Value<int> surah,
+  Value<int> ayah,
+  Value<int> word,
+  Value<int> page,
+  Value<int> x0,
+  Value<int> y0,
+  Value<int> x1,
+  Value<int> y1,
+  Value<int> exact,
+});
+
+class $$WordBoxTableFilterComposer
+    extends Composer<_$ContentDatabase, $WordBoxTable> {
+  $$WordBoxTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get exact => $composableBuilder(
+    column: $table.exact,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WordBoxTableOrderingComposer
+    extends Composer<_$ContentDatabase, $WordBoxTable> {
+  $$WordBoxTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get exact => $composableBuilder(
+    column: $table.exact,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WordBoxTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $WordBoxTable> {
+  $$WordBoxTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get word =>
+      $composableBuilder(column: $table.word, builder: (column) => column);
+
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+
+  GeneratedColumn<int> get exact =>
+      $composableBuilder(column: $table.exact, builder: (column) => column);
+}
+
+class $$WordBoxTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $WordBoxTable,
+          WordBoxRow,
+          $$WordBoxTableFilterComposer,
+          $$WordBoxTableOrderingComposer,
+          $$WordBoxTableAnnotationComposer,
+          $$WordBoxTableCreateCompanionBuilder,
+          $$WordBoxTableUpdateCompanionBuilder,
+          (
+            WordBoxRow,
+            BaseReferences<_$ContentDatabase, $WordBoxTable, WordBoxRow>,
+          ),
+          WordBoxRow,
+          PrefetchHooks Function()
+        > {
+  $$WordBoxTableTableManager(_$ContentDatabase db, $WordBoxTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WordBoxTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WordBoxTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WordBoxTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> word = const Value.absent(),
+                Value<int> page = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+                Value<int> exact = const Value.absent(),
+              }) => WordBoxCompanion(
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                page: page,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                exact: exact,
+              ),
+          createCompanionCallback:
+              ({
+                required int surah,
+                required int ayah,
+                required int word,
+                required int page,
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+                required int exact,
+              }) => WordBoxCompanion.insert(
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                page: page,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                exact: exact,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WordBoxTable, WordBoxRow>(table),
+                  BaseReferences<_$ContentDatabase, $WordBoxTable, WordBoxRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WordBoxTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $WordBoxTable,
+      WordBoxRow,
+      $$WordBoxTableFilterComposer,
+      $$WordBoxTableOrderingComposer,
+      $$WordBoxTableAnnotationComposer,
+      $$WordBoxTableCreateCompanionBuilder,
+      $$WordBoxTableUpdateCompanionBuilder,
+      (
+        WordBoxRow,
+        BaseReferences<_$ContentDatabase, $WordBoxTable, WordBoxRow>,
+      ),
+      WordBoxRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -3941,4 +4741,6 @@ class $ContentDatabaseManager {
       $$AyahPolygonTableTableManager(_db, _db.ayahPolygon);
   $$SourceTableTableManager get source =>
       $$SourceTableTableManager(_db, _db.source);
+  $$WordBoxTableTableManager get wordBox =>
+      $$WordBoxTableTableManager(_db, _db.wordBox);
 }

@@ -10,6 +10,7 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
                                                              pages of the old 1405H edition)
   tools/.cache/hafs-kfqc-json.zip       quran-ws 1.1.1       (pages, verse polygons)
   tools/.cache/UthmanicHafs_v2-0.zip    KFGQPC Hafs 2.0      (continuous view, KFGQPC font)
+  tools/.cache/hafs-kfqc-svg.zip        quran-ws 1.1.1       (word boxes, see build_word_boxes.py)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -17,6 +18,7 @@ Usage:
 """
 import hashlib
 import json
+import math
 import re
 import sqlite3
 import sys
@@ -25,11 +27,13 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
+import build_word_boxes
+
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -179,6 +183,13 @@ def main():
       page INTEGER NOT NULL, surah INTEGER NOT NULL, number INTEGER NOT NULL,
       path TEXT NOT NULL, marker_x REAL, marker_y REAL,
       PRIMARY KEY (page, surah, number));
+    CREATE TABLE word_box (                 -- word boxes on the new edition's pages (tenths of viewBox units)
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
+      word INTEGER NOT NULL,                -- 1-based, words of the KFGQPC text (۞ not counted)
+      page INTEGER NOT NULL,
+      x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
+      exact INTEGER NOT NULL,               -- 1: every word in the verse matched its predicted pieces
+      PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -254,7 +265,15 @@ def main():
     # drift reads user_version as the schema version; the app opens this
     # file read-only, so the version must already be set here.
     db.execute(f'PRAGMA user_version = {SCHEMA_VERSION}')
+    word_boxes = build_word_boxes.build()
+    db.executemany('INSERT INTO word_box VALUES (?,?,?,?,?,?,?,?,?)', [
+        (s, a, n, page, math.floor(x0 * 10), math.floor(y0 * 10), math.ceil(x1 * 10), math.ceil(y1 * 10),
+         int(exact))
+        for (s, a), (exact, words) in word_boxes.items()
+        for n, page, x0, y0, x1, y1 in words
+    ])
     db.execute('CREATE INDEX ayah_page ON ayah(page)')
+    db.execute('CREATE INDEX word_box_page ON word_box(page)')
     db.execute('CREATE INDEX ayah_juz ON ayah(juz)')
     db.commit()
     db.execute('VACUUM')
@@ -267,6 +286,7 @@ def main():
     prefixed = check.execute('SELECT COUNT(*) FROM ayah WHERE basmala_prefix > 0').fetchone()[0]
     assert prefixed == 112, prefixed
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
+    assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0

@@ -72,6 +72,19 @@ void main() {
     expect(onOldPage.any((a) => a.surah == 5 && a.number == 77), isTrue);
   });
 
+  test('every word has a box; Ayat al-Kursi has 50 on page 42', () async {
+    final boxes = await repo.wordBoxes(42);
+    final kursi = boxes.where((b) => b.surah == 2 && b.ayah == 255).toList();
+    expect(kursi.length, 50);
+    expect(kursi.map((b) => b.word), List.generate(50, (i) => i + 1));
+    for (final b in kursi) {
+      expect(b.x1, greaterThan(b.x0));
+      expect(b.y1, greaterThan(b.y0));
+    }
+    // Words run right to left: the first word starts right of the last.
+    expect(kursi.first.x1, greaterThan(kursi[4].x1));
+  });
+
   test('all six review items are decided', () async {
     expect(await repo.reviewNoteCount(), 0);
   });

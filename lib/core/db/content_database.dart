@@ -111,13 +111,42 @@ class Source extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Surah, Ayah, AyahPolygon, Source])
+/// A word's box on a page of the new edition, in tenths of the page's
+/// viewBox units. Derived from the page geometry by
+/// tools/build_word_boxes.py.
+@DataClassName('WordBoxRow')
+class WordBox extends Table {
+  @override
+  String get tableName => 'word_box';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+
+  /// 1-based among the words of the KFGQPC text.
+  IntColumn get word => integer()();
+  IntColumn get page => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  /// 1 when every word of the verse matched its predicted letter groups.
+  IntColumn get exact => integer()();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah, word};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+@DriftDatabase(tables: [Surah, Ayah, AyahPolygon, Source, WordBox])
 class ContentDatabase extends _$ContentDatabase {
   ContentDatabase(super.executor);
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override
