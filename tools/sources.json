@@ -70,6 +70,15 @@
       "sha256": "5d5e29eae66d9353dd8e0e51af4274c7768f81f722414b538dfd7c8de014fc91",
       "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products",
       "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
+    },
+    {
+      "id": "qurancom-ayahinfo-1024",
+      "file": "ayahinfo_1024.zip",
+      "url": "https://files.quran.app/hafs/madani/databases/ayahinfo/ayahinfo_1024.zip",
+      "method": "GET",
+      "sha256": "b36fce9dab5275a0324b9cf78f67e6b6167cb68661ee53c64861217135b8eaa1",
+      "license": "NO WRITTEN LICENSE. Old 1405H edition (quran.com). Used by Ahmed's decision (2026-09-28) until KFGQPC and Quran Foundation reply. Not re-hosted; the app downloads it from quran.com.",
+      "evidence": "docs/outreach/PERMISSION_REQUESTS.md (letters 2 and 10)"
     }
   ]
 }
