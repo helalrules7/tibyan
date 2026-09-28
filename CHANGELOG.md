@@ -6,6 +6,9 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Old edition (1405H) pages now fill the screen: the text takes the full width, and the 15 lines spread evenly over the full height, without stretching the calligraphy. Pages 1 and 2 are centred whole, so their ornament stays intact.
+
 ### Added
 - First launch now starts with the interface language (Arabic, English or the device language), titled in both languages; then style and colours, then the edition.
 
