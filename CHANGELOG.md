@@ -6,6 +6,10 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-28
+
+Phase 0: foundation. No Quran or religious text appears in this release.
+
 ### Added
 - Flutter app (Android, iOS) with Arabic and English interfaces and full right-to-left layout.
 - Theme token system: 4 styles (Classic, Manuscript, Royal, Calm) x 3 modes (Light, Night, Black), defined as JSON files. A test fails the build if any combination breaks a contrast rule.
@@ -16,3 +20,13 @@ All notable changes to Tibyan are recorded here. The format follows
 - `tools/fetch_sources.py`: downloads and verifies raw sources by SHA-256.
 - Planning documents: data sources, missing data, permission requests, source links and saved license evidence in `docs/`.
 - Text verification tool `tools/verify_text/compare_tanzil_kfgqpc.py`.
+
+### How to test
+1. Install the APK from this release, or run `flutter run`.
+2. Settings > Appearance: try all 4 styles in Light, Night and Black; check that text is easy to read everywhere.
+3. Switch the interface font between IBM Plex Sans Arabic and KFGQPC AN.
+4. Switch the language to English and back to Arabic; the layout should flip direction.
+5. Close and reopen the app: every choice should be kept.
+
+[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.0
