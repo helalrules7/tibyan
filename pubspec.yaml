@@ -92,6 +92,10 @@ flutter:
           weight: 700
         - asset: assets/fonts/kfgqpc/KFGQPCAnExtra.ttf
           weight: 800
+    # Interface (Arabic and Latin), alternative chosen in settings. SIL OFL 1.1
+    - family: Changa
+      fonts:
+        - asset: assets/fonts/ofl/changa/Changa[wght].ttf
     # Logo. SIL OFL 1.1
     - family: ArefRuqaa
       fonts:

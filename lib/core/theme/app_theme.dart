@@ -5,7 +5,8 @@ import 'theme_tokens.dart';
 /// Interface font families the user can choose in settings.
 enum UiFont {
   plex('IBMPlexSansArabic'),
-  kfgqpcAn('KFGQPCAN');
+  kfgqpcAn('KFGQPCAN'),
+  changa('Changa');
 
   const UiFont(this.family);
   final String family;

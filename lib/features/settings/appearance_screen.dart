@@ -134,6 +134,13 @@ class AppearanceScreen extends ConsumerWidget {
                       style: TextStyle(fontFamily: UiFont.kfgqpcAn.family),
                     ),
                   ),
+                  RadioListTile(
+                    value: UiFont.changa,
+                    title: Text(
+                      l.uiFontChanga,
+                      style: TextStyle(fontFamily: UiFont.changa.family),
+                    ),
+                  ),
                 ],
               ),
             ),
