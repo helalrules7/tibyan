@@ -24,6 +24,7 @@
   "uiFontLabel": "خط الواجهة",
   "uiFontPlex": "آي بي إم بلكس عربي",
   "uiFontKfgqpcAn": "خط المجمع (AN)",
+  "uiFontChanga": "Changa",
   "languageLabel": "اللغة",
   "languageSystem": "لغة الجهاز",
   "languageArabic": "العربية",
@@ -35,7 +36,11 @@
   "aboutBody": "تبيان تطبيق مجاني غير ربحي، بلا إعلانات ولا مشتريات، وشيفرته مفتوحة. كل نص فيه من مصدر موثق مذكور بجانبه.",
   "versionLabel": "الإصدار {version}",
   "@versionLabel": {
-    "placeholders": { "version": { "type": "String" } }
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
   },
   "previewLabel": "معاينة",
   "selected": "محدد"
