@@ -11,7 +11,14 @@ void main() {
   late MushafRepository repo;
 
   setUpAll(() {
-    db = ContentDatabase(NativeDatabase(File('assets/db/content.db')));
+    // Open exactly as the app does: read-only. Any write (for example a
+    // schema-version update) fails the tests instead of crashing the app.
+    db = ContentDatabase(
+      NativeDatabase(
+        File('assets/db/content.db'),
+        setup: (raw) => raw.execute('PRAGMA query_only = ON'),
+      ),
+    );
     repo = MushafRepository(db);
   });
   tearDownAll(() => db.close());
