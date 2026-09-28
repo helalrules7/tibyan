@@ -6,7 +6,14 @@
       "file": "quran-uthmani.txt",
       "url": "https://tanzil.net/pub/download/index.php",
       "method": "POST",
-      "form": {"quranType": "uthmani", "outType": "txt-2", "agree": "true", "marks": "true", "sajdah": "true", "tatweel": "true"},
+      "form": {
+        "quranType": "uthmani",
+        "outType": "txt-2",
+        "agree": "true",
+        "marks": "true",
+        "sajdah": "true",
+        "tatweel": "true"
+      },
       "sha256": "bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
       "license": "CC BY 3.0, verbatim copies only (Tanzil)",
       "evidence": "docs/licenses/2026-09-28_tanzil_text_license.pdf"
@@ -16,7 +23,14 @@
       "file": "quran-simple-clean.txt",
       "url": "https://tanzil.net/pub/download/index.php",
       "method": "POST",
-      "form": {"quranType": "simple-clean", "outType": "txt-2", "agree": "true", "marks": "true", "sajdah": "true", "tatweel": "true"},
+      "form": {
+        "quranType": "simple-clean",
+        "outType": "txt-2",
+        "agree": "true",
+        "marks": "true",
+        "sajdah": "true",
+        "tatweel": "true"
+      },
       "sha256": "228df2a717671aeb9d2ff573002bd28d6b3f973f4bc7153554e3a81663d67610",
       "license": "CC BY 3.0, verbatim copies only (Tanzil)",
       "evidence": "docs/licenses/2026-09-28_tanzil_text_license.pdf"
@@ -36,8 +50,44 @@
       "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-hafs/UthmanicHafs_v2-0.zip",
       "method": "GET",
       "sha256": "a7b0e5591945712ec5e4d6142938ae4d1e9b49bdc89dff06222789bfebdfd72c",
-      "license": "Reference for comparison only (verse text not covered by the KFGQPC grant)",
-      "evidence": "docs/verification/2026-09-28_tanzil_vs_kfgqpc_v18.md"
+      "license": "Shown in the continuous view since 2026-09-28; explicit permission for the verse text requested (letter 13). Font: embedded KFGQPC license, unmodified",
+      "evidence": "docs/verification/2026-09-28_tanzil_vs_kfgqpc_v18.md; docs/review/DECISIONS.md"
+    },
+    {
+      "id": "quran-ws-hafs-json-1.1.1",
+      "file": "hafs-kfqc-json.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/hafs-kfqc-json.zip",
+      "method": "GET",
+      "sha256": "27dd192cec6b5f919ffd6e7df5216464aa57a671e326fc1a37a9d82dee3f6c13",
+      "license": "CC BY 4.0, attribution waived inside products (quran-ws); page artwork KFGQPC",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_LICENSE.txt"
+    },
+    {
+      "id": "quran-ws-hafs-svg-1.1.1",
+      "file": "hafs-kfqc-svg.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/hafs-kfqc-svg.zip",
+      "method": "GET",
+      "sha256": "5d5e29eae66d9353dd8e0e51af4274c7768f81f722414b538dfd7c8de014fc91",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products",
+      "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
+    },
+    {
+      "id": "qurancom-ayahinfo-1024",
+      "file": "ayahinfo_1024.zip",
+      "url": "https://files.quran.app/hafs/madani/databases/ayahinfo/ayahinfo_1024.zip",
+      "method": "GET",
+      "sha256": "b36fce9dab5275a0324b9cf78f67e6b6167cb68661ee53c64861217135b8eaa1",
+      "license": "NO WRITTEN LICENSE. Old 1405H edition (quran.com). Used by Ahmed's decision (2026-09-28) until KFGQPC and Quran Foundation reply. Not re-hosted; the app downloads it from quran.com.",
+      "evidence": "docs/outreach/PERMISSION_REQUESTS.md (letters 2 and 10)"
+    },
+    {
+      "id": "qurancom-images-1024",
+      "file": "images_1024.zip",
+      "url": "https://files.quran.app/hafs/madani/zips/images_1024.zip",
+      "method": "GET",
+      "sha256": "401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85",
+      "license": "NO WRITTEN LICENSE. Old 1405H edition page images (604 PNG) plus the same ayahinfo_1024.db. Used by Ahmed's decision (2026-09-28) until KFGQPC and Quran Foundation reply. Not re-hosted; the app downloads it from quran.com.",
+      "evidence": "docs/outreach/PERMISSION_REQUESTS.md (letters 2 and 10)"
     }
   ]
 }

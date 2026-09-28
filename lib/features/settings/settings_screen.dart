@@ -64,6 +64,47 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+          _SectionTitle(l.readingTitle),
+          Card(
+            child: Column(
+              children: [
+                RadioGroup<MushafEdition>(
+                  groupValue: settings.edition,
+                  onChanged: (v) => v == null ? null : controller.setEdition(v),
+                  child: Column(
+                    children: [
+                      RadioListTile(
+                        value: MushafEdition.madina1441,
+                        title: Text(l.editionNew),
+                      ),
+                      RadioListTile(
+                        value: MushafEdition.madina1405,
+                        title: Text(l.editionOld),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  title: Text(l.keepScreenOn),
+                  value: settings.keepScreenOn,
+                  onChanged: controller.setKeepScreenOn,
+                ),
+                ListTile(
+                  title: Text(l.quranFontSize),
+                  subtitle: Slider(
+                    value: settings.quranFontScale,
+                    min: 0.8,
+                    max: 2.0,
+                    divisions: 12,
+                    label: '${(settings.quranFontScale * 100).round()}%',
+                    onChanged: controller.setQuranFontScale,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           _SectionTitle(l.privacyTitle),
           Card(
             child: SwitchListTile(

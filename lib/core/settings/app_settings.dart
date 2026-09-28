@@ -9,14 +9,21 @@ enum ModeSetting { system, light, night, black }
 /// Interface language: follow the device, or fixed by the user.
 enum LanguageSetting { system, ar, en }
 
+/// Madina mushaf edition shown in the page view.
+enum MushafEdition { madina1441, madina1405 }
+
 @immutable
 class AppSettings {
   const AppSettings({
     required this.styleId,
-    this.mode = ModeSetting.system,
-    this.uiFont = UiFont.plex,
+    this.mode = ModeSetting.light,
+    this.uiFont = UiFont.kfgqpcAn,
     this.language = LanguageSetting.system,
     this.crashReportsOptIn = false,
+    this.onboardingDone = false,
+    this.edition = MushafEdition.madina1441,
+    this.keepScreenOn = true,
+    this.quranFontScale = 1.0,
   });
 
   final String styleId;
@@ -27,18 +34,36 @@ class AppSettings {
   /// Crash reports are sent only after the user turns this on.
   final bool crashReportsOptIn;
 
+  /// The first-launch screens (style, then edition) were completed or skipped.
+  final bool onboardingDone;
+  final MushafEdition edition;
+
+  /// Keep the screen awake while the mushaf is open.
+  final bool keepScreenOn;
+
+  /// Quran text size in the continuous view (1.0 = default).
+  final double quranFontScale;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
     UiFont? uiFont,
     LanguageSetting? language,
     bool? crashReportsOptIn,
+    bool? onboardingDone,
+    MushafEdition? edition,
+    bool? keepScreenOn,
+    double? quranFontScale,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
     uiFont: uiFont ?? this.uiFont,
     language: language ?? this.language,
     crashReportsOptIn: crashReportsOptIn ?? this.crashReportsOptIn,
+    onboardingDone: onboardingDone ?? this.onboardingDone,
+    edition: edition ?? this.edition,
+    keepScreenOn: keepScreenOn ?? this.keepScreenOn,
+    quranFontScale: quranFontScale ?? this.quranFontScale,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

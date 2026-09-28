@@ -124,4 +124,250 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get selected => 'محدد';
+
+  @override
+  String get onbStyleTitle => 'اختر الشكل الذي يريح عينك';
+
+  @override
+  String get onbStyleHint => 'يمكنك تغييره في أي وقت من الإعدادات';
+
+  @override
+  String get continueLabel => 'متابعة';
+
+  @override
+  String get skipLabel => 'تخطي';
+
+  @override
+  String get onbEditionTitle => 'اختر طبعة المصحف';
+
+  @override
+  String get editionNew => 'مصحف المدينة: الطبعة الحديثة';
+
+  @override
+  String get editionNewDesc =>
+      'طبعة 1441هـ من مجمع الملك فهد، مع تظليل الآية أثناء التلاوة.';
+
+  @override
+  String get editionOld => 'مصحف المدينة: الطبعة القديمة';
+
+  @override
+  String get editionOldDesc =>
+      'طبعة 1405هـ المشهورة في التطبيقات القديمة، مع تظليل الكلمة.';
+
+  @override
+  String get defaultTag => 'الافتراضية';
+
+  @override
+  String pagesDownloadNote(String size) {
+    return 'صفحات المصحف تُحمّل مرة واحدة (نحو $size ميجا)، ثم تعمل دون اتصال. ويمكنك القراءة بالعرض المتصل فورا.';
+  }
+
+  @override
+  String get downloadTitle => 'تحميل صفحات المصحف';
+
+  @override
+  String get downloadStart => 'ابدأ التحميل';
+
+  @override
+  String get downloadPause => 'إيقاف مؤقت';
+
+  @override
+  String get downloadResume => 'متابعة التحميل';
+
+  @override
+  String get downloadRetry => 'إعادة المحاولة';
+
+  @override
+  String get downloadVerifying => 'جارٍ التحقق من سلامة الملفات…';
+
+  @override
+  String get downloadInstalling => 'جارٍ تجهيز الصفحات…';
+
+  @override
+  String get downloadDone => 'اكتمل التحميل';
+
+  @override
+  String downloadFailed(String error) {
+    return 'تعذّر التحميل: $error';
+  }
+
+  @override
+  String downloadProgress(String received, String total) {
+    return '$received من $total ميجا';
+  }
+
+  @override
+  String get downloadWifiHint =>
+      'يكمل التحميل من حيث توقف إذا انقطع الاتصال. يُفضّل الاتصال بشبكة Wi-Fi.';
+
+  @override
+  String get readContinuousNow => 'افتح العرض المتصل';
+
+  @override
+  String get readWhileDownloading => 'اقرأ الآن حتى يكتمل التحميل';
+
+  @override
+  String get pagesCredit =>
+      'صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.';
+
+  @override
+  String get pagesCreditOld =>
+      'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.';
+
+  @override
+  String get editionLabel => 'طبعة المصحف';
+
+  @override
+  String get viewPage => 'الصفحة';
+
+  @override
+  String get viewContinuous => 'متصل';
+
+  @override
+  String get viewModeLabel => 'طريقة العرض';
+
+  @override
+  String get indexTitle => 'الفهرس';
+
+  @override
+  String get fawasilTitle => 'الفواصل';
+
+  @override
+  String get aboutMushafTitle => 'عن هذا المصحف';
+
+  @override
+  String juzPage(String juz, String page) {
+    return 'الجزء $juz · الصفحة $page';
+  }
+
+  @override
+  String surahWord(String name) {
+    return 'سورة $name';
+  }
+
+  @override
+  String verseSelected(String number) {
+    return 'الآية $number محددة';
+  }
+
+  @override
+  String get tapVerseHint => 'اضغط أي آية لتحديدها';
+
+  @override
+  String pageOf(String page) {
+    return 'الصفحة $page';
+  }
+
+  @override
+  String get indexSearchHint => 'اسم السورة، أو رقم صفحة، أو ٢:٢٥٥';
+
+  @override
+  String get tabSurahs => 'السور';
+
+  @override
+  String get tabJuz => 'الأجزاء';
+
+  @override
+  String get tabPages => 'الصفحات';
+
+  @override
+  String get meccan => 'مكية';
+
+  @override
+  String get medinan => 'مدنية';
+
+  @override
+  String ayahCount(String count) {
+    return '$count آية';
+  }
+
+  @override
+  String juzLabel(String number) {
+    return 'الجزء $number';
+  }
+
+  @override
+  String juzStartsAt(String surah, String ayah) {
+    return 'يبدأ من $surah $ayah';
+  }
+
+  @override
+  String pageShort(String page) {
+    return 'ص $page';
+  }
+
+  @override
+  String get lastPosition => 'آخر موضع قراءة، يُحفظ تلقائيا';
+
+  @override
+  String get yourFawasil => 'فواصلك';
+
+  @override
+  String get fasilNew => 'فاصل جديد';
+
+  @override
+  String get fasilName => 'اسم الفاصل';
+
+  @override
+  String get fasilSaveHere => 'احفظ الموضع الحالي في فاصل';
+
+  @override
+  String fasilLastAt(String surah, String ayah, String page) {
+    return 'آخر موضع: $surah $ayah · الصفحة $page';
+  }
+
+  @override
+  String get fasilHint => 'لكل فاصل لون واسم، ويتحرك إلى آخر موضع قرأت عنده.';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get saved => 'تم الحفظ';
+
+  @override
+  String get noFawasil => 'لا توجد فواصل بعد';
+
+  @override
+  String get readingTitle => 'القراءة';
+
+  @override
+  String get keepScreenOn => 'إبقاء الشاشة مضاءة أثناء القراءة';
+
+  @override
+  String get quranFontSize => 'حجم خط القرآن في العرض المتصل';
+
+  @override
+  String get aboutMushafIntro =>
+      'كل نص في تبيان منقول من مصدر موثق، ولا يُعدَّل بأيدينا. وهذه مصادر المصحف في التطبيق:';
+
+  @override
+  String licenseLabel(String license) {
+    return 'الرخصة: $license';
+  }
+
+  @override
+  String versionShort(String version) {
+    return 'الإصدار: $version';
+  }
+
+  @override
+  String get reviewNotesTitle => 'مسائل معروضة على المراجعة';
+
+  @override
+  String reviewNotesBody(String count) {
+    return '$count مواضع يختلف فيها مصدرا النص (حدود جزأين، وأربعة مواضع في الرسم) معروضة على مراجع متخصص، ويتبع التطبيق نص تنزيل حتى يصدر القرار.';
+  }
+
+  @override
+  String get mushafOpen => 'افتح المصحف';
+
+  @override
+  String get loadingLabel => 'جارٍ التحميل…';
 }
