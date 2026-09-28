@@ -24,12 +24,12 @@ void main() {
     );
   }
 
-  test('defaults: Classic, follow system, Plex, crash reports off', () async {
+  test('defaults: Calm, Light, KFGQPC AN, crash reports off', () async {
     final c = await containerWith({});
     final s = c.read(settingsProvider);
-    expect(s.styleId, 'classic');
-    expect(s.mode, ModeSetting.system);
-    expect(s.uiFont, UiFont.plex);
+    expect(s.styleId, 'calm');
+    expect(s.mode, ModeSetting.light);
+    expect(s.uiFont, UiFont.kfgqpcAn);
     expect(s.crashReportsOptIn, isFalse);
   });
 
@@ -54,11 +54,11 @@ void main() {
 
   test('unknown stored style falls back to the default', () async {
     final c = await containerWith({'settings.style': 'removed-style'});
-    expect(c.read(settingsProvider).styleId, 'classic');
+    expect(c.read(settingsProvider).styleId, 'calm');
   });
 
   test('system mode: dark device gives Night, never Black', () {
-    const s = AppSettings(styleId: 'classic');
+    const s = AppSettings(styleId: 'classic', mode: ModeSetting.system);
     expect(s.resolveMode(Brightness.dark), ThemeModeId.night);
     expect(s.resolveMode(Brightness.light), ThemeModeId.light);
     expect(

@@ -43,5 +43,195 @@
     }
   },
   "previewLabel": "معاينة",
-  "selected": "محدد"
+  "selected": "محدد",
+  "onbStyleTitle": "اختر الشكل الذي يريح عينك",
+  "onbStyleHint": "يمكنك تغييره في أي وقت من الإعدادات",
+  "continueLabel": "متابعة",
+  "skipLabel": "تخطي",
+  "onbEditionTitle": "اختر طبعة المصحف",
+  "editionNew": "مصحف المدينة: الطبعة الحديثة",
+  "editionNewDesc": "طبعة 1441هـ من مجمع الملك فهد، مع تظليل الآية أثناء التلاوة.",
+  "editionOld": "مصحف المدينة: الطبعة القديمة",
+  "editionOldDesc": "طبعة 1405هـ المشهورة في التطبيقات القديمة، مع تظليل الكلمة.",
+  "defaultTag": "الافتراضية",
+  "pagesDownloadNote": "صفحات المصحف تُحمّل مرة واحدة (نحو {size} ميجا)، ثم تعمل دون اتصال. ويمكنك القراءة بالعرض المتصل فورا.",
+  "@pagesDownloadNote": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadTitle": "تحميل صفحات المصحف",
+  "downloadStart": "ابدأ التحميل",
+  "downloadPause": "إيقاف مؤقت",
+  "downloadResume": "متابعة التحميل",
+  "downloadRetry": "إعادة المحاولة",
+  "downloadVerifying": "جارٍ التحقق من سلامة الملفات…",
+  "downloadInstalling": "جارٍ تجهيز الصفحات…",
+  "downloadDone": "اكتمل التحميل",
+  "downloadFailed": "تعذّر التحميل: {error}",
+  "@downloadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadProgress": "{received} من {total} ميجا",
+  "@downloadProgress": {
+    "placeholders": {
+      "received": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadWifiHint": "يكمل التحميل من حيث توقف إذا انقطع الاتصال. يُفضّل الاتصال بشبكة Wi-Fi.",
+  "readContinuousNow": "افتح العرض المتصل",
+  "readWhileDownloading": "اقرأ الآن حتى يكتمل التحميل",
+  "pagesCredit": "صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.",
+  "pagesCreditOld": "صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.",
+  "editionLabel": "طبعة المصحف",
+  "viewPage": "الصفحة",
+  "viewContinuous": "متصل",
+  "viewModeLabel": "طريقة العرض",
+  "indexTitle": "الفهرس",
+  "fawasilTitle": "الفواصل",
+  "aboutMushafTitle": "عن هذا المصحف",
+  "juzPage": "الجزء {juz} · الصفحة {page}",
+  "@juzPage": {
+    "placeholders": {
+      "juz": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "surahWord": "سورة {name}",
+  "@surahWord": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verseSelected": "الآية {number} محددة",
+  "@verseSelected": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "tapVerseHint": "اضغط أي آية لتحديدها",
+  "pageOf": "الصفحة {page}",
+  "@pageOf": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "indexSearchHint": "اسم السورة، أو رقم صفحة، أو ٢:٢٥٥",
+  "tabSurahs": "السور",
+  "tabJuz": "الأجزاء",
+  "tabPages": "الصفحات",
+  "meccan": "مكية",
+  "medinan": "مدنية",
+  "ayahCount": "{count} آية",
+  "@ayahCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "juzLabel": "الجزء {number}",
+  "@juzLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "juzStartsAt": "يبدأ من {surah} {ayah}",
+  "@juzStartsAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "pageShort": "ص {page}",
+  "@pageShort": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "lastPosition": "آخر موضع قراءة، يُحفظ تلقائيا",
+  "yourFawasil": "فواصلك",
+  "fasilNew": "فاصل جديد",
+  "fasilName": "اسم الفاصل",
+  "fasilSaveHere": "احفظ الموضع الحالي في فاصل",
+  "fasilLastAt": "آخر موضع: {surah} {ayah} · الصفحة {page}",
+  "@fasilLastAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "fasilHint": "لكل فاصل لون واسم، ويتحرك إلى آخر موضع قرأت عنده.",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "saved": "تم الحفظ",
+  "noFawasil": "لا توجد فواصل بعد",
+  "readingTitle": "القراءة",
+  "keepScreenOn": "إبقاء الشاشة مضاءة أثناء القراءة",
+  "quranFontSize": "حجم خط القرآن في العرض المتصل",
+  "aboutMushafIntro": "كل نص في تبيان منقول من مصدر موثق، ولا يُعدَّل بأيدينا. وهذه مصادر المصحف في التطبيق:",
+  "licenseLabel": "الرخصة: {license}",
+  "@licenseLabel": {
+    "placeholders": {
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "versionShort": "الإصدار: {version}",
+  "@versionShort": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewNotesTitle": "مسائل معروضة على المراجعة",
+  "reviewNotesBody": "{count} مواضع يختلف فيها مصدرا النص (حدود جزأين، وأربعة مواضع في الرسم) معروضة على مراجع متخصص، ويتبع التطبيق نص تنزيل حتى يصدر القرار.",
+  "@reviewNotesBody": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "mushafOpen": "افتح المصحف",
+  "loadingLabel": "جارٍ التحميل…"
 }

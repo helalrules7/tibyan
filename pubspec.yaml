@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.1.1+2
+version: 0.2.0+3
 
 environment:
   sdk: ^3.13.4
@@ -41,6 +41,15 @@ dependencies:
   intl: ^0.20.3
   flutter_localizations:
     sdk: flutter
+  drift: ^2.35.0
+  drift_flutter: ^0.3.1
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  flutter_svg: ^2.3.0
+  archive: ^4.3.0
+  http: ^1.6.0
+  crypto: ^3.0.7
+  wakelock_plus: ^1.8.0
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +61,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  drift_dev: ^2.35.0
+  build_runner: ^2.16.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -64,6 +75,7 @@ flutter:
   assets:
     - assets/themes/
     - assets/config/
+    - assets/db/
 
   fonts:
     # Interface (Arabic). SIL OFL 1.1
@@ -101,6 +113,15 @@ flutter:
       fonts:
         - asset: assets/fonts/ofl/arefruqaa/ArefRuqaa-Bold.ttf
           weight: 700
+    # Quran text in the continuous view (Tanzil Uthmani encoding). SIL OFL 1.1
+    - family: AmiriQuran
+      fonts:
+        - asset: assets/fonts/ofl/amiriquran/AmiriQuran-Regular.ttf
+    # Quran text in the continuous view (KFGQPC Hafs v2.0 text encoding).
+    # KFGQPC, shipped unmodified
+    - family: UthmanicHafs
+      fonts:
+        - asset: assets/fonts/kfgqpc/uthmanic_hafs_v20.ttf
     # Surah headers per style. KFGQPC, shipped unmodified
     - family: UthmanTahaNaskh
       fonts:

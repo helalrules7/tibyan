@@ -4,7 +4,7 @@
 
 A free, non-profit Quran app for Android and iOS: tafsir, recitation and memorization.
 
-> **الحالة / Status:** قيد البناء، المرحلة 0 (الأساس). Under construction, Phase 0 (foundation).
+> **الحالة / Status:** قيد البناء. المرحلة 1 (المصحف) اكتملت في الإصدار 0.2.0. Under construction; Phase 1 (the mushaf) shipped in 0.2.0.
 
 ---
 
