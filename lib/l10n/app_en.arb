@@ -37,6 +37,7 @@
   "versionLabel": "Version {version}",
   "previewLabel": "Preview",
   "selected": "Selected",
+  "onbLanguageTitle": "اختر اللغة\nChoose your language",
   "onbStyleTitle": "Choose the look that is easy on your eyes",
   "onbStyleHint": "You can change it anytime in Settings",
   "continueLabel": "Continue",

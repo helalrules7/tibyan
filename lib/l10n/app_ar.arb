@@ -44,6 +44,7 @@
   },
   "previewLabel": "معاينة",
   "selected": "محدد",
+  "onbLanguageTitle": "اختر اللغة\nChoose your language",
   "onbStyleTitle": "اختر الشكل الذي يريح عينك",
   "onbStyleHint": "يمكنك تغييره في أي وقت من الإعدادات",
   "continueLabel": "متابعة",

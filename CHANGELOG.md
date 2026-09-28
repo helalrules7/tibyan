@@ -6,6 +6,9 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- First launch now starts with the interface language (Arabic, English or the device language), titled in both languages; then style and colours, then the edition.
+
 ## [0.2.0] - 2026-09-29
 
 Phase 1: the mushaf.

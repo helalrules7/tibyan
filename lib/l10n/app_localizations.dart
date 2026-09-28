@@ -320,6 +320,12 @@ abstract class AppLocalizations {
   /// **'محدد'**
   String get selected;
 
+  /// No description provided for @onbLanguageTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر اللغة\nChoose your language'**
+  String get onbLanguageTitle;
+
   /// No description provided for @onbStyleTitle.
   ///
   /// In ar, this message translates to:
