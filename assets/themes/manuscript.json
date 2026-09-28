@@ -48,7 +48,9 @@
       "accent": "#C9A24B",
       "accentFg": "#1A1206",
       "muted": "#665845",
-      "highlight": "#A67C2E38"
+      "highlight": "#A67C2E38",
+      "control": "#1F3A6B",
+      "onControl": "#F1E3C2"
     },
     "night": {
       "bg": "#17120B",
@@ -65,7 +67,9 @@
       "accent": "#C9A24B",
       "accentFg": "#17120B",
       "muted": "#8F846E",
-      "highlight": "#9C763138"
+      "highlight": "#9C763138",
+      "control": "#D9B76E",
+      "onControl": "#17120B"
     },
     "black": {
       "bg": "#000000",
@@ -82,7 +86,9 @@
       "accent": "#B8913F",
       "accentFg": "#000000",
       "muted": "#847B68",
-      "highlight": "#86662A38"
+      "highlight": "#86662A38",
+      "control": "#C9A55E",
+      "onControl": "#000000"
     }
   }
 }
