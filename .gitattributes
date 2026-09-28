@@ -1,0 +1,11 @@
+# Fonts and the bundled content database ship with the app: store them in Git LFS.
+*.ttf filter=lfs diff=lfs merge=lfs -text
+*.otf filter=lfs diff=lfs merge=lfs -text
+assets/db/*.db filter=lfs diff=lfs merge=lfs -text
+
+# Arabic text files: always UTF-8, LF line endings
+*.md text eol=lf
+*.dart text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.arb text eol=lf

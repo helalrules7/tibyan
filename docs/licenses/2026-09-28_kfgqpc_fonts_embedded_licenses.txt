@@ -1,0 +1,417 @@
+KFGQPC fonts provided by Ahmed on 2026-09-28 (downloaded from the KFGQPC fonts site before it was removed).
+Each font carries a DSIG digital-signature table. Text below is copied verbatim from each font's own "name" table (platform 3, English).
+
+==================== AlJalilDot_v01.ttf
+SHA-256: b66cf99d27741479dc526a72ff7759ce9f2f7f0509e97dbb3198af47044a0028
+Family: KFGQPC AlJalil Dot
+Version: 0.1
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2024), King Fahd Glorious Quran Printing Complex.
+
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2024 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== AlJalil_v01.ttf
+SHA-256: 6164d038a6edcedfcb8b95cc7eed4a657f09df0e154381d57a9d8417f1fb8c95
+Family: KFGQPC AlJalil
+Version: 0.1
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2024), King Fahd Glorious Quran Printing Complex.
+
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2024 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KFGQPC-KufiExtV14.ttf
+SHA-256: 3cb0c8e8f800e1752b1633b401018bdd9efa1ce3d18eb87b1363013b0e47d560
+Family: KFGQPC Kufi Extended
+Version: Version 1.4
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2023), King Fahd Glorious Quran Printing Complex.
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2023 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KFGQPC-KufiStyV14.ttf
+SHA-256: 234482a828807ba6ea0e9f5255f1124a4b7e8dd7520f792af144a0799a846e5f
+Family: KFGQPC Kufi Stylistic
+Version: Version 1.4
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2023), King Fahd Glorious Quran Printing Complex.
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2023 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KFGQPCAnBold.ttf
+SHA-256: 5fde0c9e5acda4484901a1dfc9735255c1808dbbac1c6c9dcd6613461a89721e
+Family: KFGQPC AN Regular
+Version: Version 0.01
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2021), King Fahd Glorious Quran Printing Complex.
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2021 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KFGQPCAnExtra.ttf
+SHA-256: f49039dd75d452545887bf946fbbe21105edfabe42c793ae2674ca56e9c2d2ae
+Family: KFGQPC AN Extra
+Version: Version 0.01
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2021), King Fahd Glorious Quran Printing Complex.
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2021 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KFGQPCAnLight.ttf
+SHA-256: 1d8d2bb3e886509fed66462fbae36618a3973abdd0215b340632782bae21553c
+Family: KFGQPC AN Light
+Version: Version 0.01
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2021), King Fahd Glorious Quran Printing Complex.
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2021 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KFGQPCAnRegular.ttf
+SHA-256: 32356cddc83b01cc62cce5045d959674f4730b71c6065ccd5d1cb2e3e3056f87
+Family: KFGQPC AN Regular
+Version: Version 0.01
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2021), King Fahd Glorious Quran Printing Complex.
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2021 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KFGQPCDotFont.otf.ttf
+SHA-256: fc705f2daa494f093658b0f176197aed2871a1a819c15e30f87648e01fd5d9de
+Family: KFGQPC Alphabet Dotted
+Version: Version 0.02
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted ©, (2008-2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8010-71-6, Accession No. 1432/2026
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2011 by King Fahd Glorious Quran Printing Complex (KFGQPC), Al-Madinah Al-Munawarrah, Kingdom of Saudi Arabia. All Rights Reserved. The Font is owned by KFGQPC and its structure, organization and code are the valuable asset of KFGQPC. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KSAExtra.ttf
+SHA-256: 2d2c3bdc3775d61b84a6e43a8b09fec6bd127a48982eb99600fc501e2fd3d455
+Family: KFGQPC KSA Extra
+Version: Version 0.03
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2020), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8311-33-2, Accession No. 1442/6782
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2020 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KSAHeading.ttf
+SHA-256: 8191f0ca0be18d46a48d650ca2f630672e0161a70f2ada19b9f831db904f246f
+Family: KFGQPC KSA Heading
+Version: Version 0.03
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2020), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8311-33-2, Accession No. 1442/6782
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2020 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KSAHeavy.ttf
+SHA-256: 62d9282338c5e908b0def3a58c1d0c241f74b0a5e9756b286a4548db364bff55
+Family: KFGQPC KSA Heavy
+Version: Version 0.03
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2020), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8311-33-2, Accession No. 1442/6782
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2020 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KSARegular.ttf
+SHA-256: 2a1837a648af114b1abd76411d6676a77a5519fdf958663a3c015a9171714d53
+Family: KFGQPC KSA Regular
+Version: Version 0.03
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2020), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8311-33-2, Accession No. 1442/6782
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2020 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== KSARegular_B.ttf
+SHA-256: 7bc29584df72fbefe32f7b607b3720a0e6f72753c32857cf1ad77d442b4a8710
+Family: KFGQPC KSA Regular
+Version: Version 0.03
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2020), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8311-33-2, Accession No. 1442/6782
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2020 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== Outlinedv001.otf.ttf
+SHA-256: b9abd8c47cfa7496670075eb9e1bc07f4c046dabfa5f6633945ca1d22915110b
+Family: KFGQPC Alphabet Outlined
+Version: Version 0.01
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted ©, (2008-2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8010-70-9, Accession No. 1432/2025
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2008 by King Fahd Glorious Quran Printing Complex (KFGQPC), Al-Madinah Al-Munawarrah, Kingdom of Saudi Arabia. All Rights Reserved. The Font is owned by KFGQPC and its structure, organization and code are the valuable asset of KFGQPC. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== UthmanTN_v2-0.ttf
+SHA-256: f4a2b776261e390089ee108029d9a5f1ee862435ea52f571af2c5e0817c361ba
+Family: KFGQPC Uthman Taha Naskh
+Version: Version 2.0
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2008-2022), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-9960-8010, Accession No. 1429/5834
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2008 by King Fahd Glorious Quran Printing Complex (KFGQPC), Al-Madinah Al-Munawarrah, Kingdom of Saudi Arabia. All Rights Reserved. The Font is owned by KFGQPC and its structure, organization and code are the valuable asset of KFGQPC. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== UthmanTSBVer1.ttf
+SHA-256: a4b9d8ca8d14d0b1237d6fd7881462b66f30970767faae992ee3d7a0cd74671a
+Family: KFGQPC Sindhi Naskh
+Version: Version 1.0
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted ?, (2008-2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-9960-8010, Accession No. 1429/5834
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2021 by King Fahd Glorious Quran Printing Complex (KFGQPC), Al-Madinah Munawarrah, Kingdom of Saudi Arabia. All Rights Reserved. The Font is owned by KFGQPC and its structure, organization and code are the valuable asset of KFGQPC. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== UthmanTSVer1.ttf
+SHA-256: 103b4f5b65aef187d992ec0a07c212f5e073625d72fb946d52e1fcd566053ec6
+Family: KFGQPC Sindhi Naskh
+Version: Version 1.0
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted ?, (2008-2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-9960-8010, Accession No. 1429/5834
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2008 by King Fahd Glorious Quran Printing Complex (KFGQPC), Al-Madinah Al-Munawarrah, Kingdom of Saudi Arabia. All Rights Reserved. The Font is owned by KFGQPC and its structure, organization and code are the valuable asset of KFGQPC. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== Zakhrfa.ttf
+SHA-256: 6a152430f95cc98e4fcda14f5697f051f30f25d26be78dc4f0b636b64cdba3f8
+Family: KFGQPC Zakhrfa
+Version: Version 1.0
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2024), King Fahd Glorious Quran Printing Complex.
+
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2010 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== ZakhrfaBlk.ttf
+SHA-256: b0d949463bdda80aa075ca71c5f8fb061bdab767f70244a407cff154426c69b5
+Family: KFGQPC Zakhrfa Blk
+Version: Version 1.0
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2024), King Fahd Glorious Quran Printing Complex.
+
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2010 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+==================== ZakhrfaOutline.ttf
+SHA-256: 0eb43028797fe81b5364ccb48385f526d58b8e11411235bf05981f6e498879c7
+Family: KFGQPC Zakhrfa Outline
+Version: Version 1.0
+Copyright: The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2024), King Fahd Glorious Quran Printing Complex.
+
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+License:
+ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2010 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+

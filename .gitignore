@@ -1,0 +1,90 @@
+# ── Local-only material (never commit) ─────────────────────────────
+# Third-party app binaries kept for reference only (not a data source)
+/-src/
+# Secrets
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+key.properties
+**/android/key.properties
+*.p8
+*.p12
+*.mobileprovision
+# Raw downloads and generated data (rebuilt by tools/)
+/tools/.cache/
+/tools/out/
+/data/raw/
+/data/build/
+
+# ── Flutter / Dart ─────────────────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+*.g.dart.bak
+.metadata.bak
+
+# ── Android ────────────────────────────────────────────────────────
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+*.apk
+*.aab
+
+# ── iOS / macOS ────────────────────────────────────────────────────
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+*.ipa
+*.dSYM.zip
+
+# ── IDE / OS ───────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.swp
+*.log
+
+# ── Python (tools/) ────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.venv/
