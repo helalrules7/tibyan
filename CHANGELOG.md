@@ -6,8 +6,34 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-29
+
+Phase 1: the mushaf.
+
 ### Added
-- Bundled content database (`assets/db/content.db`, 3.5 MB): Tanzil Uthmani text (verbatim), Tanzil search text, surah and juz/hizb/sajda metadata, new-edition page numbers and verse polygons from quran-ws. Built reproducibly by `tools/build_content_db.py`.
+- First launch: choose the style and colours with a live preview of a real mushaf page, then the Madina edition (new 1441H or old 1405H). Defaults: Calm, Light, new edition.
+- Page view of the new Madina edition (1441H): the KFGQPC page artwork, unchanged, downloaded once (65 MB, resumable, checked by SHA-256 page by page) and then offline. Pages turn right to left in every language; tap a verse to highlight it.
+- Page view of the old Madina edition (1405H): page images downloaded directly from quran.com (63 MB, checked by SHA-256), not re-hosted. Verses highlight through quran.com's glyph boxes.
+- Continuous view: the KFGQPC Hafs text (version 2.0, digitally signed), verbatim, in the KFGQPC Hafs font, justified, with the basmala above each surah and adjustable size.
+- Index: surahs, juz and pages; search by surah name, page number, or a reference such as 2:255.
+- Fawasil: named bookmarks that move to where you last read with them, plus automatic last-position saving.
+- About this mushaf: every source with its license and attribution, and the Tanzil notice.
+- Settings: edition, keep the screen on while reading, Quran text size.
+- Word boxes for all 77,430 words of the new edition, derived from the page geometry (`tools/build_word_boxes.py`); not used in the app yet, pending human review.
+- Bundled content database (`assets/db/content.db`), built reproducibly by `tools/build_content_db.py`: KFGQPC text (shown), Tanzil Uthmani text (kept verbatim for comparison), Tanzil search text, surah, juz, hizb, sajda and page metadata for both editions, verse outlines, word boxes, and the reviewer's decisions.
+
+### Text review
+- Six places where Tanzil and the KFGQPC text differ (two juz boundaries, four spellings) went to a qualified reviewer. All six are decided and recorded in `docs/review/DECISIONS.md`; the KFGQPC text matches all six.
+- Permission to include the KFGQPC Hafs text has been requested from KFGQPC (letter 13). If refused, the continuous view returns to the Tanzil text.
+
+### How to test
+1. Fresh install: pick a style and mode (the page preview follows), then an edition.
+2. Download the pages (Wi-Fi recommended). Pause and resume once.
+3. Page view: swipe through pages, tap a verse, save it to a new fasil, reopen the app: it opens where you stopped.
+4. Index: search `2:255`, then open surah 114 and page 604.
+5. Continuous view: open Al-Isra 7 and Ya-Sin 22; change the text size in Settings.
+6. Settings: switch to the old edition, download its pages, open 5:77 (page 121 there, 120 in the new edition).
+7. About this mushaf: every source is listed with its license.
 
 ## [0.1.1] - 2026-09-28
 
@@ -44,6 +70,7 @@ Phase 0: foundation. No Quran or religious text appears in this release.
 4. Switch the language to English and back to Arabic; the layout should flip direction.
 5. Close and reopen the app: every choice should be kept.
 
-[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/helalrules7/tibyan/releases/tag/v0.2.0
 [0.1.1]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.1
 [0.1.0]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.0
