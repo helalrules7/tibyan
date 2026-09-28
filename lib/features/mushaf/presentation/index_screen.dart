@@ -84,6 +84,12 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
     final verseRef = parseVerseRef(_query);
+    final pageNumber = int.tryParse(
+      _query.trim().replaceAllMapped(
+        RegExp('[\u0660-\u0669]'),
+        (m) => '${m[0]!.codeUnitAt(0) - 0x0660}',
+      ),
+    );
     final q = _fold(_query.trim());
     final shown = [
       for (final s in surahs)
@@ -122,6 +128,26 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
                     '${l.surahWord(surahName(context, surahs[verseRef.surah - 1]))} ${verseRef.ayah}',
                   ),
                   onTap: () => _goToRef(verseRef, surahs),
+                ),
+              if (pageNumber != null &&
+                  pageNumber >= 1 &&
+                  pageNumber <= mushafPageCount)
+                ListTile(
+                  leading: const Icon(Icons.description_outlined),
+                  title: Text(l.pageOf('$pageNumber')),
+                  onTap: () async {
+                    final first = (await ref.read(
+                      pageAyahsProvider(pageNumber).future,
+                    )).first;
+                    if (!context.mounted) return;
+                    openVerse(
+                      context,
+                      ref,
+                      surah: first.surah,
+                      ayah: first.number,
+                      page: pageNumber,
+                    );
+                  },
                 ),
               for (final s in shown)
                 ListTile(
