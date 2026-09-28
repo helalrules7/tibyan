@@ -151,40 +151,45 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
                   ? Center(child: Text(l.loadingLabel))
                   : Directionality(
                       textDirection: TextDirection.rtl,
-                      child: ListView(
+                      // Not lazy: every page paragraph needs a context so a
+                      // verse can be scrolled into view.
+                      child: SingleChildScrollView(
                         padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
-                        children: [
-                          _SurahHeader(surah: surah),
-                          if (ayahs.first.basmalaPrefix > 0)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Text(
-                                ayahs.first.verseText
-                                    .substring(0, ayahs.first.basmalaPrefix)
-                                    .trim(),
-                                textAlign: TextAlign.center,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _SurahHeader(surah: surah),
+                            if (ayahs.first.basmalaPrefix > 0)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Text(
+                                  ayahs.first.verseText
+                                      .substring(0, ayahs.first.basmalaPrefix)
+                                      .trim(),
+                                  textAlign: TextAlign.center,
+                                  style: quranStyle,
+                                ),
+                              ),
+                            for (final entry in byPage.entries) ...[
+                              Text.rich(
+                                key: _pageKeys.putIfAbsent(
+                                  entry.key,
+                                  GlobalKey.new,
+                                ),
+                                TextSpan(
+                                  children: [
+                                    for (final a in entry.value)
+                                      _verseSpan(a, t.highlight, t.marker),
+                                  ],
+                                ),
+                                textAlign: TextAlign.justify,
                                 style: quranStyle,
                               ),
-                            ),
-                          for (final entry in byPage.entries) ...[
-                            Text.rich(
-                              key: _pageKeys.putIfAbsent(
-                                entry.key,
-                                GlobalKey.new,
-                              ),
-                              TextSpan(
-                                children: [
-                                  for (final a in entry.value)
-                                    _verseSpan(a, t.highlight, t.marker),
-                                ],
-                              ),
-                              textAlign: TextAlign.justify,
-                              style: quranStyle,
-                            ),
-                            _PageDivider(page: entry.key),
+                              _PageDivider(page: entry.key),
+                            ],
+                            _SurahNav(surah: widget.surah),
                           ],
-                          _SurahNav(surah: widget.surah),
-                        ],
+                        ),
                       ),
                     ),
             ),
