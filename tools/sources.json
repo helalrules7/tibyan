@@ -61,6 +61,15 @@
       "sha256": "27dd192cec6b5f919ffd6e7df5216464aa57a671e326fc1a37a9d82dee3f6c13",
       "license": "CC BY 4.0, attribution waived inside products (quran-ws); page artwork KFGQPC",
       "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_LICENSE.txt"
+    },
+    {
+      "id": "quran-ws-hafs-svg-1.1.1",
+      "file": "hafs-kfqc-svg.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/hafs-kfqc-svg.zip",
+      "method": "GET",
+      "sha256": "5d5e29eae66d9353dd8e0e51af4274c7768f81f722414b538dfd7c8de014fc91",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products",
+      "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
     }
   ]
 }
