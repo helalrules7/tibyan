@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
+import '../mushaf_providers.dart';
+
+/// Where the text and pages come from, their licences, and open review notes.
+class AboutMushafScreen extends ConsumerWidget {
+  const AboutMushafScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final sources = ref.watch(sourcesProvider).value;
+    final reviewCount = ref.watch(reviewNoteCountProvider).value;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(l.aboutMushafTitle)),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(l.aboutMushafIntro, style: const TextStyle(height: 1.7)),
+          const SizedBox(height: 12),
+          if (reviewCount != null && reviewCount > 0)
+            Card(
+              child: ListTile(
+                leading: Icon(Icons.rate_review_outlined, color: t.goldText),
+                title: Text(l.reviewNotesTitle),
+                subtitle: Text(
+                  l.reviewNotesBody('$reviewCount'),
+                  style: const TextStyle(height: 1.6),
+                ),
+              ),
+            ),
+          for (final s in sources ?? const [])
+            Card(
+              child: ExpansionTile(
+                title: Text(s.title),
+                subtitle: Text(s.publisher, style: TextStyle(color: t.muted)),
+                expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                children: [
+                  if (s.version != null) Text(l.versionShort(s.version!)),
+                  Text(l.licenseLabel(s.license)),
+                  SelectableText(s.url, style: TextStyle(color: t.accent)),
+                  const SizedBox(height: 6),
+                  Text(s.attribution, style: TextStyle(color: t.muted)),
+                  if (s.notice != null) ...[
+                    const SizedBox(height: 8),
+                    // The source's notice, shown exactly as published.
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: SelectableText(
+                        s.notice!,
+                        style: const TextStyle(fontSize: 12, height: 1.5),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
