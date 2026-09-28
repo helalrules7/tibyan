@@ -1,0 +1,88 @@
+{
+  "id": "royal",
+  "version": 1,
+  "name": {
+    "ar": "ملكي",
+    "en": "Royal"
+  },
+  "description": {
+    "ar": "زمرد وذهب فاخر",
+    "en": "Emerald and rich gold"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCKufiExtended"
+  },
+  "frame": {
+    "outerWidth": 6,
+    "outerStyle": "solid",
+    "innerWidth": 2,
+    "gap": 6,
+    "radius": 12,
+    "innerRadius": 6,
+    "corner": "none"
+  },
+  "ornaments": {
+    "surahHeader": "cartouche",
+    "ayahMarker": "star8",
+    "density": "rich"
+  },
+  "radii": {
+    "card": 16,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 8
+  },
+  "modes": {
+    "light": {
+      "bg": "#F3EFE6",
+      "paper": "#FFFDF8",
+      "ink": "#14201B",
+      "frame": "#0E3B2E",
+      "goldText": "#7A5716",
+      "border": "#DCCFA8",
+      "headBg": "#0E3B2E",
+      "headFg": "#E7C66B",
+      "marker": "#B08B34",
+      "player": "#0E3B2E",
+      "playerFg": "#F3EFE6",
+      "accent": "#E7C66B",
+      "accentFg": "#0E3B2E",
+      "muted": "#666D68",
+      "highlight": "#0E3B2E38"
+    },
+    "night": {
+      "bg": "#07261D",
+      "paper": "#0B3226",
+      "ink": "#F1E6C8",
+      "frame": "#C49A3A",
+      "goldText": "#E7C66B",
+      "border": "#1E5443",
+      "headBg": "#C49A3A",
+      "headFg": "#07261D",
+      "marker": "#C49A3A",
+      "player": "#C49A3A",
+      "playerFg": "#07261D",
+      "accent": "#07261D",
+      "accentFg": "#E7C66B",
+      "muted": "#8E9982",
+      "highlight": "#C49A3A38"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#04100C",
+      "ink": "#EFE4C6",
+      "frame": "#A5822F",
+      "goldText": "#E0BE63",
+      "border": "#1B2A24",
+      "headBg": "#A5822F",
+      "headFg": "#000000",
+      "marker": "#A5822F",
+      "player": "#A5822F",
+      "playerFg": "#000000",
+      "accent": "#000000",
+      "accentFg": "#E0BE63",
+      "muted": "#7E7E6D",
+      "highlight": "#A5822F38"
+    }
+  }
+}
