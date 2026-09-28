@@ -6,6 +6,9 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Bundled content database (`assets/db/content.db`, 3.5 MB): Tanzil Uthmani text (verbatim), Tanzil search text, surah and juz/hizb/sajda metadata, new-edition page numbers and verse polygons from quran-ws. Built reproducibly by `tools/build_content_db.py`.
+
 ## [0.1.1] - 2026-09-28
 
 ### Fixed
