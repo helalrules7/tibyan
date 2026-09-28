@@ -42,4 +42,71 @@ class UserDatabase extends _$UserDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  Stream<ReadingPositionRow?> watchPosition() => (select(
+    readingPositions,
+  )..where((t) => t.id.equals(1))).watchSingleOrNull();
+
+  Future<ReadingPositionRow?> position() => (select(
+    readingPositions,
+  )..where((t) => t.id.equals(1))).getSingleOrNull();
+
+  Future<void> savePosition({
+    required String edition,
+    required String view,
+    required int surah,
+    required int ayah,
+    required int page,
+  }) => into(readingPositions).insertOnConflictUpdate(
+    ReadingPositionsCompanion.insert(
+      id: const Value(1),
+      edition: edition,
+      view: view,
+      surah: surah,
+      ayah: ayah,
+      page: page,
+      updatedAt: DateTime.now(),
+    ),
+  );
+
+  Stream<List<BookmarkSetRow>> watchBookmarkSets() =>
+      (select(bookmarkSets)..orderBy([
+            (t) => OrderingTerm.asc(t.sortOrder),
+            (t) => OrderingTerm.asc(t.id),
+          ]))
+          .watch();
+
+  Future<int> addBookmarkSet({
+    required String name,
+    required int color,
+    required int surah,
+    required int ayah,
+    required int page,
+  }) => into(bookmarkSets).insert(
+    BookmarkSetsCompanion.insert(
+      name: name,
+      color: color,
+      surah: surah,
+      ayah: ayah,
+      page: page,
+      updatedAt: DateTime.now(),
+    ),
+  );
+
+  Future<void> moveBookmarkSet(
+    int id, {
+    required int surah,
+    required int ayah,
+    required int page,
+  }) => (update(bookmarkSets)..where((t) => t.id.equals(id))).write(
+    BookmarkSetsCompanion(
+      surah: Value(surah),
+      ayah: Value(ayah),
+      page: Value(page),
+      updatedAt: Value(DateTime.now()),
+    ),
+  );
+
+  Future<void> deleteBookmarkSet(int id) =>
+      (delete(bookmarkSets)..where((t) => t.id.equals(id))).go();
 }

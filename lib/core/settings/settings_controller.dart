@@ -24,6 +24,10 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kUiFont = 'settings.uiFont';
   static const _kLanguage = 'settings.language';
   static const _kCrash = 'settings.crashReportsOptIn';
+  static const _kOnboarding = 'settings.onboardingDone';
+  static const _kEdition = 'settings.edition';
+  static const _kKeepOn = 'settings.keepScreenOn';
+  static const _kFontScale = 'settings.quranFontScale';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -46,6 +50,12 @@ class SettingsController extends Notifier<AppSettings> {
           _enumByName(LanguageSetting.values, _prefs.getString(_kLanguage)) ??
           LanguageSetting.system,
       crashReportsOptIn: _prefs.getBool(_kCrash) ?? false,
+      onboardingDone: _prefs.getBool(_kOnboarding) ?? false,
+      edition:
+          _enumByName(MushafEdition.values, _prefs.getString(_kEdition)) ??
+          MushafEdition.madina1441,
+      keepScreenOn: _prefs.getBool(_kKeepOn) ?? true,
+      quranFontScale: _prefs.getDouble(_kFontScale) ?? 1.0,
     );
   }
 
@@ -72,6 +82,27 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setCrashReportsOptIn(bool value) async {
     state = state.copyWith(crashReportsOptIn: value);
     await _prefs.setBool(_kCrash, value);
+  }
+
+  Future<void> completeOnboarding() async {
+    state = state.copyWith(onboardingDone: true);
+    await _prefs.setBool(_kOnboarding, true);
+  }
+
+  Future<void> setEdition(MushafEdition edition) async {
+    state = state.copyWith(edition: edition);
+    await _prefs.setString(_kEdition, edition.name);
+  }
+
+  Future<void> setKeepScreenOn(bool value) async {
+    state = state.copyWith(keepScreenOn: value);
+    await _prefs.setBool(_kKeepOn, value);
+  }
+
+  Future<void> setQuranFontScale(double value) async {
+    final clamped = value.clamp(0.8, 2.0).toDouble();
+    state = state.copyWith(quranFontScale: clamped);
+    await _prefs.setDouble(_kFontScale, clamped);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {
