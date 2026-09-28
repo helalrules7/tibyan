@@ -8,10 +8,12 @@ import '../../../core/settings/app_settings.dart';
 import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'widgets/fasil_sheet.dart';
 import 'widgets/mushaf_page.dart';
+import 'widgets/old_mushaf_page.dart';
 
 const mushafPageCount = 604;
 
@@ -53,15 +55,22 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   }
 
   Future<void> _open() async {
+    final edition = ref.read(editionProvider);
     final saved = await ref.read(userDatabaseProvider).position();
-    final page = (widget.initialPage ?? saved?.page ?? 1).clamp(
-      1,
-      mushafPageCount,
-    );
+    var page = widget.initialPage;
+    if (page == null && saved != null) {
+      page = saved.edition == edition.name
+          ? saved.page
+          : (await ref
+                    .read(mushafRepositoryProvider)
+                    .ayah(saved.surah, saved.ayah))
+                .pageIn(edition);
+    }
+    final start = (page ?? 1).clamp(1, mushafPageCount);
     if (!mounted) return;
     setState(() {
-      _page = page;
-      _controller = PageController(initialPage: page - 1);
+      _page = start;
+      _controller = PageController(initialPage: start - 1);
     });
   }
 
@@ -82,7 +91,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
     await ref
         .read(userDatabaseProvider)
         .savePosition(
-          edition: MushafEdition.madina1441.name,
+          edition: ref.read(editionProvider).name,
           view: 'page',
           surah: ayahs.first.surah,
           ayah: ayahs.first.number,
@@ -100,8 +109,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
     final title = first == null || surahs == null
         ? ''
         : l.surahWord(surahName(context, surahs[first.surah - 1]));
-    final oldEdition =
-        ref.watch(settingsProvider).edition == MushafEdition.madina1405;
+    final oldEdition = ref.watch(editionProvider) == MushafEdition.madina1405;
 
     return Scaffold(
       backgroundColor: t.paper,
@@ -147,11 +155,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            if (oldEdition && _chrome)
-              MaterialBanner(
-                content: Text(l.editionComingSoon),
-                actions: const [SizedBox.shrink()],
-              ),
             Expanded(
               child: _controller == null
                   ? const Center(child: CircularProgressIndicator())
@@ -162,27 +165,39 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
                         controller: _controller,
                         itemCount: mushafPageCount,
                         onPageChanged: _onPageChanged,
-                        itemBuilder: (context, i) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: MushafPage(
-                            page: i + 1,
-                            selected: i + 1 == _page ? _selected : null,
-                            onVerseTap: (v) => setState(() {
-                              _selected = v == _selected ? null : v;
-                              _chrome = true;
-                            }),
-                            onBackgroundTap: () => setState(() {
-                              if (_selected != null) {
-                                _selected = null;
-                              } else {
-                                _chrome = !_chrome;
-                              }
-                            }),
-                          ),
-                        ),
+                        itemBuilder: (context, i) {
+                          final selected = i + 1 == _page ? _selected : null;
+                          void onVerseTap(VerseKey v) => setState(() {
+                            _selected = v == _selected ? null : v;
+                            _chrome = true;
+                          });
+                          void onBackgroundTap() => setState(() {
+                            if (_selected != null) {
+                              _selected = null;
+                            } else {
+                              _chrome = !_chrome;
+                            }
+                          });
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: oldEdition
+                                ? OldMushafPage(
+                                    page: i + 1,
+                                    selected: selected,
+                                    onVerseTap: onVerseTap,
+                                    onBackgroundTap: onBackgroundTap,
+                                  )
+                                : MushafPage(
+                                    page: i + 1,
+                                    selected: selected,
+                                    onVerseTap: onVerseTap,
+                                    onBackgroundTap: onBackgroundTap,
+                                  ),
+                          );
+                        },
                       ),
                     ),
             ),

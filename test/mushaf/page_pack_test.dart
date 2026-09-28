@@ -27,22 +27,40 @@ List<int> buildPack({bool corruptPage = false}) {
   return ZipEncoder().encode(archive);
 }
 
+/// Builds a zip laid out like quran.com's images_1024.zip.
+List<int> buildQuranComPack({int pages = 604, bool withGlyphs = true}) {
+  final archive = Archive()..addFile(ArchiveFile.string('width_1024/.v8', ''));
+  for (var i = 1; i <= pages; i++) {
+    final name = 'width_1024/page${i.toString().padLeft(3, '0')}.png';
+    archive.addFile(ArchiveFile.bytes(name, [i % 256]));
+  }
+  if (withGlyphs) {
+    archive.addFile(ArchiveFile.bytes('databases/ayahinfo_1024.db', [0]));
+  }
+  archive.addFile(ArchiveFile.bytes('databases/quran.ar.db', [0]));
+  return ZipEncoder().encode(archive);
+}
+
 void main() {
   late Directory tmp;
   setUp(() => tmp = Directory.systemTemp.createTempSync('tibyan_pack'));
   tearDown(() => tmp.deleteSync(recursive: true));
 
-  PagePackInstaller installerFor(List<int> zip, {String? sha}) =>
-      PagePackInstaller(
-        root: tmp,
-        spec: PagePackSpec(
-          id: 'test-pack',
-          url: 'https://example.invalid/pack.zip',
-          sha256: sha ?? sha256.convert(zip).toString(),
-          bytes: zip.length,
-        ),
-        client: MockClient((request) async => http.Response.bytes(zip, 200)),
-      );
+  PagePackInstaller installerFor(
+    List<int> zip, {
+    String? sha,
+    PackFormat format = PackFormat.svgXz,
+  }) => PagePackInstaller(
+    root: tmp,
+    spec: PagePackSpec(
+      id: 'test-pack',
+      url: 'https://example.invalid/pack.zip',
+      sha256: sha ?? sha256.convert(zip).toString(),
+      bytes: zip.length,
+      format: format,
+    ),
+    client: MockClient((request) async => http.Response.bytes(zip, 200)),
+  );
 
   test('installs a valid pack and reads a page', () async {
     final zip = buildPack();
@@ -66,5 +84,29 @@ void main() {
     final last = await installer.install().last;
     expect(last.phase, PackPhase.failed);
     expect(installer.isInstalled, isFalse);
+  });
+
+  test('installs the old edition from a quran.com-style zip', () async {
+    final installer = installerFor(
+      buildQuranComPack(),
+      format: PackFormat.pngQuranCom,
+    );
+    expect((await installer.install().last).phase, PackPhase.installed);
+    expect(File('${installer.dir.path}/p001.png').existsSync(), isTrue);
+    expect(File('${installer.dir.path}/p604.png').existsSync(), isTrue);
+    expect(File('${installer.dir.path}/ayahinfo.db').existsSync(), isTrue);
+    // Other files in quran.com's zip are not kept.
+    expect(File('${installer.dir.path}/quran.ar.db').existsSync(), isFalse);
+  });
+
+  test('rejects a quran.com-style zip with missing pages or glyphs', () async {
+    for (final zip in [
+      buildQuranComPack(pages: 603),
+      buildQuranComPack(withGlyphs: false),
+    ]) {
+      final installer = installerFor(zip, format: PackFormat.pngQuranCom);
+      expect((await installer.install().last).phase, PackPhase.failed);
+      expect(installer.isInstalled, isFalse);
+    }
   });
 }

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/content_database.dart';
+import '../../../core/settings/app_settings.dart';
 
 /// First verse of a juz, for the juz index.
 class JuzStart {
@@ -23,10 +24,17 @@ class MushafRepository {
   Future<SurahRow> surahById(int id) =>
       (_db.select(_db.surah)..where((t) => t.id.equals(id))).getSingle();
 
-  /// Verses on a page of the new Madina edition (1441H).
-  Future<List<AyahRow>> ayahsOnPage(int page) =>
+  /// Verses on a page of the given Madina edition.
+  Future<List<AyahRow>> ayahsOnPage(
+    int page, [
+    MushafEdition edition = MushafEdition.madina1441,
+  ]) =>
       (_db.select(_db.ayah)
-            ..where((t) => t.page.equals(page))
+            ..where(
+              (t) => edition == MushafEdition.madina1405
+                  ? t.page1405.equals(page)
+                  : t.page.equals(page),
+            )
             ..orderBy([(t) => OrderingTerm.asc(t.id)]))
           .get();
 
@@ -82,4 +90,15 @@ extension AyahDisplay on AyahRow {
 
   /// The verse-number glyph of the KFGQPC font.
   String get displayNumber => displayText.substring(_numberSplit + 1);
+}
+
+/// Page numbers differ between the two Madina editions.
+extension EditionPages on AyahRow {
+  int pageIn(MushafEdition edition) =>
+      edition == MushafEdition.madina1405 ? page1405 : page;
+}
+
+extension EditionStartPages on SurahRow {
+  int startPageIn(MushafEdition edition) =>
+      edition == MushafEdition.madina1405 ? startPage1405 : startPage;
 }

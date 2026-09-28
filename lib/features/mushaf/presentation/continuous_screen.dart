@@ -57,7 +57,7 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
         view: 'continuous',
         surah: a.surah,
         ayah: a.number,
-        page: a.page,
+        page: a.pageIn(ref.read(editionProvider)),
       );
 
   void _scrollToTarget(List<AyahRow> ayahs) {
@@ -72,7 +72,8 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
     _save(target);
     if (widget.ayah == null || widget.ayah == 1) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ctx = _pageKeys[target.page]?.currentContext;
+      final ctx =
+          _pageKeys[target.pageIn(ref.read(editionProvider))]?.currentContext;
       if (ctx != null) Scrollable.ensureVisible(ctx, alignment: 0.1);
     });
   }
@@ -86,6 +87,7 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
     final ayahs = ref.watch(surahAyahsProvider(widget.surah)).value;
     final surah = surahs?[widget.surah - 1];
     final basmala = ref.watch(basmalaProvider).value;
+    final edition = ref.watch(editionProvider);
 
     for (final r in _recognizers) {
       r.dispose();
@@ -104,7 +106,7 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
     // One paragraph per mushaf page, so a verse can be scrolled to.
     final byPage = <int, List<AyahRow>>{};
     for (final a in ayahs ?? const <AyahRow>[]) {
-      byPage.putIfAbsent(a.page, () => []).add(a);
+      byPage.putIfAbsent(a.pageIn(edition), () => []).add(a);
     }
 
     return Scaffold(
@@ -122,7 +124,7 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
                 final a = _selected == null
                     ? ayahs?.first
                     : ayahs?.firstWhere((x) => x.number == _selected!.ayah);
-                context.go('/mushaf?page=${a?.page ?? 1}');
+                context.go('/mushaf?page=${a?.pageIn(edition) ?? 1}');
               },
             ),
           IconButton(
@@ -199,7 +201,7 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
                     context,
                     ref,
                     verse: _selected!,
-                    page: a.page,
+                    page: a.pageIn(edition),
                   );
                 },
                 onClose: () => setState(() => _selected = null),

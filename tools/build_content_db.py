@@ -6,7 +6,8 @@ joins them by (surah, ayah). It never edits religious text.
 Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quran-uthmani.txt        Tanzil Uthmani 1.1   (display, copy)
   tools/.cache/quran-simple-clean.txt   Tanzil Simple Clean  (search only)
-  tools/.cache/quran-data.xml           Tanzil metadata      (surahs, juz, hizb, sajda)
+  tools/.cache/quran-data.xml           Tanzil metadata      (surahs, juz, hizb, sajda,
+                                                             pages of the old 1405H edition)
   tools/.cache/hafs-kfqc-json.zip       quran-ws 1.1.1       (pages, verse polygons)
   tools/.cache/UthmanicHafs_v2-0.zip    KFGQPC Hafs 2.0      (continuous view, KFGQPC font)
 
@@ -28,7 +29,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -115,6 +116,9 @@ def main():
         return out
 
     juz, quarter, manzil = spans('juzs'), spans('hizbs'), spans('manzils')
+    # Tanzil's page data follows the old Madina edition (1405H); checked
+    # against the quran.com glyph boxes for all 6,236 verses.
+    page_old = spans('pages')
     sajda = {(int(e.get('sura')), int(e.get('aya'))): e.get('type')
              for e in meta.find('sajdas')}
 
@@ -151,7 +155,9 @@ def main():
       id INTEGER PRIMARY KEY, name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
       meaning_en TEXT NOT NULL, revelation TEXT NOT NULL,
       revelation_order INTEGER NOT NULL, ayah_count INTEGER NOT NULL,
-      start_page INTEGER NOT NULL, source_id INTEGER NOT NULL);
+      start_page INTEGER NOT NULL,          -- new edition (1441H)
+      start_page_1405 INTEGER NOT NULL,     -- old edition (1405H)
+      source_id INTEGER NOT NULL);
     CREATE TABLE ayah (
       id INTEGER PRIMARY KEY,               -- 1..6236 in mushaf order
       surah INTEGER NOT NULL REFERENCES surah(id),
@@ -162,7 +168,9 @@ def main():
       text_search TEXT NOT NULL,            -- Tanzil Simple Clean, verbatim
       search_basmala_prefix INTEGER NOT NULL,
       juz INTEGER NOT NULL, hizb_quarter INTEGER NOT NULL,
-      manzil INTEGER NOT NULL, page INTEGER NOT NULL,
+      manzil INTEGER NOT NULL,
+      page INTEGER NOT NULL,                -- new edition (1441H), quran-ws
+      page_1405 INTEGER NOT NULL,           -- old edition (1405H), Tanzil
       sajda TEXT,                           -- recommended | obligatory | NULL
       text_source_id INTEGER NOT NULL, display_source_id INTEGER NOT NULL,
       page_source_id INTEGER NOT NULL,
@@ -199,12 +207,18 @@ def main():
          'KFGQPC; permission for the text requested, see docs/DATA_SOURCES.md',
          'https://qurancomplex.gov.sa', 'Quran text: King Fahd Glorious Quran Printing Complex',
          None, sha256(kfgqpc_path), today),
+        (6, 'qurancom-images-1024', 'Old Madina edition (1405H): page images and glyph boxes, width 1024',
+         'Quran.com (Quran Foundation); page artwork: King Fahd Glorious Quran Printing Complex', None,
+         'No written license yet; permission requested (letters 2 and 10). Downloaded from quran.com, not re-hosted',
+         'https://files.quran.app/hafs/madani/zips/images_1024.zip',
+         'Old edition pages: King Fahd Glorious Quran Printing Complex, via Quran.com', None,
+         '401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85', today),
     ])
 
-    db.executemany('INSERT INTO surah VALUES (?,?,?,?,?,?,?,?,?)', [
+    db.executemany('INSERT INTO surah VALUES (?,?,?,?,?,?,?,?,?,?)', [
         (s['id'], s['name_ar'], s['name_en'], s['meaning_en'],
          'meccan' if s['type'] == 'Meccan' else 'medinan', s['revelation_order'],
-         s['ayas'], surah_meta[s['id']]['pageNumber'], 3)
+         s['ayas'], surah_meta[s['id']]['pageNumber'], page_old[(s['id'], 1)], 3)
         for s in surahs
     ])
 
@@ -213,9 +227,9 @@ def main():
         rows.append((
             i, key[0], key[1], uthmani[key], kfgqpc[key], basmala_prefix_length(uthmani, key),
             clean[key], basmala_prefix_length(clean, key),
-            juz[key], quarter[key], manzil[key], pages[key], sajda.get(key), 1, 5, 4,
+            juz[key], quarter[key], manzil[key], pages[key], page_old[key], sajda.get(key), 1, 5, 4,
         ))
-    db.executemany('INSERT INTO ayah VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rows)
+    db.executemany('INSERT INTO ayah VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rows)
     db.executemany('INSERT INTO ayah_polygon VALUES (?,?,?,?,?,?)', polygons)
     # Decisions of the reviewer (2026-09-28), recorded in docs/review/DECISIONS.md.
     db.executemany('INSERT INTO review_note (topic, surah, number, note, decision) VALUES (?,?,?,?,?)', [
@@ -249,6 +263,7 @@ def main():
     check = sqlite3.connect(OUT)
     assert check.execute('SELECT COUNT(*) FROM ayah').fetchone()[0] == 6236
     assert check.execute('SELECT COUNT(DISTINCT page) FROM ayah').fetchone()[0] == 604
+    assert check.execute('SELECT COUNT(DISTINCT page_1405) FROM ayah').fetchone()[0] == 604
     prefixed = check.execute('SELECT COUNT(*) FROM ayah WHERE basmala_prefix > 0').fetchone()[0]
     assert prefixed == 112, prefixed
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
