@@ -79,6 +79,15 @@
       "sha256": "b36fce9dab5275a0324b9cf78f67e6b6167cb68661ee53c64861217135b8eaa1",
       "license": "NO WRITTEN LICENSE. Old 1405H edition (quran.com). Used by Ahmed's decision (2026-09-28) until KFGQPC and Quran Foundation reply. Not re-hosted; the app downloads it from quran.com.",
       "evidence": "docs/outreach/PERMISSION_REQUESTS.md (letters 2 and 10)"
+    },
+    {
+      "id": "qurancom-images-1024",
+      "file": "images_1024.zip",
+      "url": "https://files.quran.app/hafs/madani/zips/images_1024.zip",
+      "method": "GET",
+      "sha256": "401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85",
+      "license": "NO WRITTEN LICENSE. Old 1405H edition page images (604 PNG) plus the same ayahinfo_1024.db. Used by Ahmed's decision (2026-09-28) until KFGQPC and Quran Foundation reply. Not re-hosted; the app downloads it from quran.com.",
+      "evidence": "docs/outreach/PERMISSION_REQUESTS.md (letters 2 and 10)"
     }
   ]
 }
