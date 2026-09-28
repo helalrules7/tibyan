@@ -13,8 +13,8 @@ enum LanguageSetting { system, ar, en }
 class AppSettings {
   const AppSettings({
     required this.styleId,
-    this.mode = ModeSetting.system,
-    this.uiFont = UiFont.plex,
+    this.mode = ModeSetting.light,
+    this.uiFont = UiFont.kfgqpcAn,
     this.language = LanguageSetting.system,
     this.crashReportsOptIn = false,
   });

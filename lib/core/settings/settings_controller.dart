@@ -38,9 +38,10 @@ class SettingsController extends Notifier<AppSettings> {
           : registry.defaultStyleId,
       mode:
           _enumByName(ModeSetting.values, _prefs.getString(_kMode)) ??
-          ModeSetting.system,
+          ModeSetting.light,
       uiFont:
-          _enumByName(UiFont.values, _prefs.getString(_kUiFont)) ?? UiFont.plex,
+          _enumByName(UiFont.values, _prefs.getString(_kUiFont)) ??
+          UiFont.kfgqpcAn,
       language:
           _enumByName(LanguageSetting.values, _prefs.getString(_kLanguage)) ??
           LanguageSetting.system,
