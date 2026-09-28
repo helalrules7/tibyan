@@ -206,6 +206,9 @@ def main():
         ('built_at', today),
         ('tanzil_notice', notice),
     ])
+    # drift reads user_version as the schema version; the app opens this
+    # file read-only, so the version must already be set here.
+    db.execute(f'PRAGMA user_version = {SCHEMA_VERSION}')
     db.execute('CREATE INDEX ayah_page ON ayah(page)')
     db.execute('CREATE INDEX ayah_juz ON ayah(juz)')
     db.commit()
@@ -217,6 +220,7 @@ def main():
     assert check.execute('SELECT COUNT(DISTINCT page) FROM ayah').fetchone()[0] == 604
     prefixed = check.execute('SELECT COUNT(*) FROM ayah WHERE basmala_prefix > 0').fetchone()[0]
     assert prefixed == 112, prefixed
+    assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0
