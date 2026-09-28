@@ -58,6 +58,14 @@ class MushafRepository {
     return [for (final a in ayahs) JuzStart(juz: a.juz, ayah: a)];
   }
 
+  /// Number of open questions awaiting a qualified reviewer.
+  Future<int> reviewNoteCount() async {
+    final row = await _db
+        .customSelect('SELECT COUNT(*) AS n FROM review_note')
+        .getSingle();
+    return row.read<int>('n');
+  }
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }
