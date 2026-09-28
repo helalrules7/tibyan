@@ -117,6 +117,11 @@ flutter:
     - family: AmiriQuran
       fonts:
         - asset: assets/fonts/ofl/amiriquran/AmiriQuran-Regular.ttf
+    # Quran text in the continuous view (KFGQPC Hafs v2.0 text encoding).
+    # KFGQPC, shipped unmodified
+    - family: UthmanicHafs
+      fonts:
+        - asset: assets/fonts/kfgqpc/uthmanic_hafs_v20.ttf
     # Surah headers per style. KFGQPC, shipped unmodified
     - family: UthmanTahaNaskh
       fonts:

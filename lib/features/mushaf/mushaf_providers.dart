@@ -113,3 +113,10 @@ final surahAyahsProvider = FutureProvider.family<List<AyahRow>, int>(
 final reviewNoteCountProvider = FutureProvider<int>(
   (ref) => ref.watch(mushafRepositoryProvider).reviewNoteCount(),
 );
+
+/// The basmala shown above surahs 2–114 (except 9): verse 1:1 of the
+/// KFGQPC text without its number.
+final basmalaProvider = FutureProvider<String>(
+  (ref) async =>
+      (await ref.watch(mushafRepositoryProvider).ayah(1, 1)).displayBody,
+);

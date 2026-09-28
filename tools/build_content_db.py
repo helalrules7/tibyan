@@ -8,6 +8,7 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quran-simple-clean.txt   Tanzil Simple Clean  (search only)
   tools/.cache/quran-data.xml           Tanzil metadata      (surahs, juz, hizb, sajda)
   tools/.cache/hafs-kfqc-json.zip       quran-ws 1.1.1       (pages, verse polygons)
+  tools/.cache/UthmanicHafs_v2-0.zip    KFGQPC Hafs 2.0      (continuous view, KFGQPC font)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -27,7 +28,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -47,6 +48,19 @@ def read_tanzil(path):
     start = next(i for i, l in enumerate(lines) if l.startswith(TANZIL_NOTICE_MARK))
     notice = '\n'.join(lines[start:]).strip()
     return verses, notice
+
+
+def read_kfgqpc(path):
+    """Returns {(surah, ayah): aya_text} from the KFGQPC Hafs 2.0 data, verbatim.
+    Each text ends with a space and the verse-number glyph of the KFGQPC font."""
+    with zipfile.ZipFile(path) as z:
+        rows = json.loads(z.read('UthmanicHafs_v2-0 data/hafsData_v2-0.json'))
+    out = {}
+    for r in rows:
+        text = r['aya_text']
+        assert text[-2] in '\u00a0 ' and '\ufc00' <= text[-1] <= '\ufdff', (r['sura_no'], r['aya_no'])
+        out[(r['sura_no'], r['aya_no'])] = text
+    return out
 
 
 def basmala_prefix_length(verses, key):
@@ -72,10 +86,12 @@ def main():
     clean_path = CACHE / 'quran-simple-clean.txt'
     meta_path = CACHE / 'quran-data.xml'
     qws_path = CACHE / 'hafs-kfqc-json.zip'
+    kfgqpc_path = CACHE / 'UthmanicHafs_v2-0.zip'
 
     uthmani, notice = read_tanzil(uthmani_path)
     clean, clean_notice = read_tanzil(clean_path)
     meta = ET.parse(meta_path).getroot()
+    kfgqpc = read_kfgqpc(kfgqpc_path)
 
     surahs = [
         dict(
@@ -87,7 +103,7 @@ def main():
         for s in meta.find('suras')
     ]
     order = [(s['id'], a) for s in surahs for a in range(1, s['ayas'] + 1)]
-    assert len(order) == 6236 and set(order) == set(uthmani) == set(clean)
+    assert len(order) == 6236 and set(order) == set(uthmani) == set(clean) == set(kfgqpc)
 
     def spans(tag):
         starts = {(int(e.get('sura')), int(e.get('aya'))): i + 1
@@ -140,14 +156,16 @@ def main():
       id INTEGER PRIMARY KEY,               -- 1..6236 in mushaf order
       surah INTEGER NOT NULL REFERENCES surah(id),
       number INTEGER NOT NULL,
-      text TEXT NOT NULL,                   -- Tanzil Uthmani, verbatim
+      text TEXT NOT NULL,                   -- Tanzil Uthmani, verbatim (reference)
+      display_text TEXT NOT NULL,           -- KFGQPC Hafs 2.0, verbatim (shown)
       basmala_prefix INTEGER NOT NULL,      -- chars of the basmala before verse 1
       text_search TEXT NOT NULL,            -- Tanzil Simple Clean, verbatim
       search_basmala_prefix INTEGER NOT NULL,
       juz INTEGER NOT NULL, hizb_quarter INTEGER NOT NULL,
       manzil INTEGER NOT NULL, page INTEGER NOT NULL,
       sajda TEXT,                           -- recommended | obligatory | NULL
-      text_source_id INTEGER NOT NULL, page_source_id INTEGER NOT NULL,
+      text_source_id INTEGER NOT NULL, display_source_id INTEGER NOT NULL,
+      page_source_id INTEGER NOT NULL,
       UNIQUE (surah, number));
     CREATE TABLE ayah_polygon (             -- verse outline on a page (viewBox units)
       page INTEGER NOT NULL, surah INTEGER NOT NULL, number INTEGER NOT NULL,
@@ -155,7 +173,8 @@ def main():
       PRIMARY KEY (page, surah, number));
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
-      note TEXT NOT NULL);
+      note TEXT NOT NULL,
+      decision TEXT);                       -- NULL while open; see docs/review/DECISIONS.md
     ''')
 
     today = date.today().isoformat()
@@ -175,6 +194,11 @@ def main():
          'https://github.com/quran-ws/quran-svg',
          'Mushaf pages: King Fahd Glorious Quran Printing Complex', None,
          sha256(qws_path), today),
+        (5, 'kfgqpc-hafs-2.0', 'Uthmanic Hafs text, version 2.0 (digitally signed)',
+         'King Fahd Glorious Quran Printing Complex', '2.0',
+         'KFGQPC; permission for the text requested, see docs/DATA_SOURCES.md',
+         'https://qurancomplex.gov.sa', 'Quran text: King Fahd Glorious Quran Printing Complex',
+         None, sha256(kfgqpc_path), today),
     ])
 
     db.executemany('INSERT INTO surah VALUES (?,?,?,?,?,?,?,?,?)', [
@@ -187,19 +211,26 @@ def main():
     rows = []
     for i, key in enumerate(order, start=1):
         rows.append((
-            i, key[0], key[1], uthmani[key], basmala_prefix_length(uthmani, key),
+            i, key[0], key[1], uthmani[key], kfgqpc[key], basmala_prefix_length(uthmani, key),
             clean[key], basmala_prefix_length(clean, key),
-            juz[key], quarter[key], manzil[key], pages[key], sajda.get(key), 1, 4,
+            juz[key], quarter[key], manzil[key], pages[key], sajda.get(key), 1, 5, 4,
         ))
-    db.executemany('INSERT INTO ayah VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rows)
+    db.executemany('INSERT INTO ayah VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rows)
     db.executemany('INSERT INTO ayah_polygon VALUES (?,?,?,?,?,?)', polygons)
-    db.executemany('INSERT INTO review_note (topic, surah, number, note) VALUES (?,?,?,?)', [
-        ('juz-boundary', 3, 92, 'Tanzil and the KFGQPC 2.0 data place a juz boundary differently near this verse. Juz numbers currently follow Tanzil.'),
-        ('juz-boundary', 9, 93, 'Tanzil and the KFGQPC 2.0 data place a juz boundary differently near this verse. Juz numbers currently follow Tanzil.'),
-        ('text-difference', 15, 7, 'Word joining differs from the KFGQPC text (see docs/verification).'),
-        ('text-difference', 17, 7, 'Small waw differs from the KFGQPC text (see docs/verification).'),
-        ('text-difference', 27, 20, 'Word joining differs from the KFGQPC text (see docs/verification).'),
-        ('text-difference', 36, 22, 'Word joining differs from the KFGQPC text (see docs/verification).'),
+    # Decisions of the reviewer (2026-09-28), recorded in docs/review/DECISIONS.md.
+    db.executemany('INSERT INTO review_note (topic, surah, number, note, decision) VALUES (?,?,?,?,?)', [
+        ('juz-boundary', 3, 92, 'Tanzil and the KFGQPC 2.0 data place a juz boundary differently near this verse.',
+         'Juz 4 starts at 3:93. Juz numbers follow Tanzil.'),
+        ('juz-boundary', 9, 93, 'Tanzil and the KFGQPC 2.0 data place a juz boundary differently near this verse.',
+         'Juz 11 starts at 9:93. Juz numbers follow Tanzil.'),
+        ('text-difference', 15, 7, 'Word joining differs between Tanzil and the KFGQPC text.',
+         'The KFGQPC spelling is accepted: the two words look separate either way.'),
+        ('text-difference', 17, 7, 'Small waw differs between Tanzil and the KFGQPC text.',
+         'The form drawn by the KFGQPC font (small waw with madda) is the chosen one.'),
+        ('text-difference', 27, 20, 'Word joining differs between Tanzil and the KFGQPC text.',
+         'Joined, as in the KFGQPC text.'),
+        ('text-difference', 36, 22, 'Word joining differs between Tanzil and the KFGQPC text.',
+         'Joined, as in the KFGQPC text.'),
     ])
     db.executemany('INSERT INTO meta VALUES (?,?)', [
         ('schema_version', str(SCHEMA_VERSION)),

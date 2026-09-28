@@ -594,6 +594,17 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _displayTextMeta = const VerificationMeta(
+    'displayText',
+  );
+  @override
+  late final GeneratedColumn<String> displayText = GeneratedColumn<String>(
+    'display_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _basmalaPrefixMeta = const VerificationMeta(
     'basmalaPrefix',
   );
@@ -684,6 +695,17 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _displaySourceIdMeta = const VerificationMeta(
+    'displaySourceId',
+  );
+  @override
+  late final GeneratedColumn<int> displaySourceId = GeneratedColumn<int>(
+    'display_source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _pageSourceIdMeta = const VerificationMeta(
     'pageSourceId',
   );
@@ -701,6 +723,7 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     surah,
     number,
     verseText,
+    displayText,
     basmalaPrefix,
     textSearch,
     searchBasmalaPrefix,
@@ -710,6 +733,7 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     page,
     sajda,
     textSourceId,
+    displaySourceId,
     pageSourceId,
   ];
   @override
@@ -750,6 +774,17 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
       );
     } else if (isInserting) {
       context.missing(_verseTextMeta);
+    }
+    if (data.containsKey('display_text')) {
+      context.handle(
+        _displayTextMeta,
+        displayText.isAcceptableOrUnknown(
+          data['display_text']!,
+          _displayTextMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displayTextMeta);
     }
     if (data.containsKey('basmala_prefix')) {
       context.handle(
@@ -833,6 +868,17 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     } else if (isInserting) {
       context.missing(_textSourceIdMeta);
     }
+    if (data.containsKey('display_source_id')) {
+      context.handle(
+        _displaySourceIdMeta,
+        displaySourceId.isAcceptableOrUnknown(
+          data['display_source_id']!,
+          _displaySourceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displaySourceIdMeta);
+    }
     if (data.containsKey('page_source_id')) {
       context.handle(
         _pageSourceIdMeta,
@@ -868,6 +914,10 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
       verseText: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}text'],
+      )!,
+      displayText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_text'],
       )!,
       basmalaPrefix: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -905,6 +955,10 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
         DriftSqlType.int,
         data['${effectivePrefix}text_source_id'],
       )!,
+      displaySourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}display_source_id'],
+      )!,
       pageSourceId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}page_source_id'],
@@ -923,8 +977,13 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
   final int surah;
   final int number;
 
-  /// Tanzil Uthmani text, verbatim (may start with the basmala).
+  /// Tanzil Uthmani text, verbatim (may start with the basmala). Kept for
+  /// reference and comparison; not shown.
   final String verseText;
+
+  /// KFGQPC Hafs 2.0 text, verbatim, for the KFGQPC Hafs font. Shown in the
+  /// continuous view. Ends with a space and the verse-number glyph.
+  final String displayText;
 
   /// Characters of the basmala before verse 1 in the Tanzil file.
   final int basmalaPrefix;
@@ -936,12 +995,14 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
   final int page;
   final String? sajda;
   final int textSourceId;
+  final int displaySourceId;
   final int pageSourceId;
   const AyahRow({
     required this.id,
     required this.surah,
     required this.number,
     required this.verseText,
+    required this.displayText,
     required this.basmalaPrefix,
     required this.textSearch,
     required this.searchBasmalaPrefix,
@@ -951,6 +1012,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     required this.page,
     this.sajda,
     required this.textSourceId,
+    required this.displaySourceId,
     required this.pageSourceId,
   });
   @override
@@ -960,6 +1022,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     map['surah'] = Variable<int>(surah);
     map['number'] = Variable<int>(number);
     map['text'] = Variable<String>(verseText);
+    map['display_text'] = Variable<String>(displayText);
     map['basmala_prefix'] = Variable<int>(basmalaPrefix);
     map['text_search'] = Variable<String>(textSearch);
     map['search_basmala_prefix'] = Variable<int>(searchBasmalaPrefix);
@@ -971,6 +1034,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       map['sajda'] = Variable<String>(sajda);
     }
     map['text_source_id'] = Variable<int>(textSourceId);
+    map['display_source_id'] = Variable<int>(displaySourceId);
     map['page_source_id'] = Variable<int>(pageSourceId);
     return map;
   }
@@ -981,6 +1045,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       surah: Value(surah),
       number: Value(number),
       verseText: Value(verseText),
+      displayText: Value(displayText),
       basmalaPrefix: Value(basmalaPrefix),
       textSearch: Value(textSearch),
       searchBasmalaPrefix: Value(searchBasmalaPrefix),
@@ -992,6 +1057,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           ? const Value.absent()
           : Value(sajda),
       textSourceId: Value(textSourceId),
+      displaySourceId: Value(displaySourceId),
       pageSourceId: Value(pageSourceId),
     );
   }
@@ -1006,6 +1072,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       surah: serializer.fromJson<int>(json['surah']),
       number: serializer.fromJson<int>(json['number']),
       verseText: serializer.fromJson<String>(json['verseText']),
+      displayText: serializer.fromJson<String>(json['displayText']),
       basmalaPrefix: serializer.fromJson<int>(json['basmalaPrefix']),
       textSearch: serializer.fromJson<String>(json['textSearch']),
       searchBasmalaPrefix: serializer.fromJson<int>(
@@ -1017,6 +1084,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       page: serializer.fromJson<int>(json['page']),
       sajda: serializer.fromJson<String?>(json['sajda']),
       textSourceId: serializer.fromJson<int>(json['textSourceId']),
+      displaySourceId: serializer.fromJson<int>(json['displaySourceId']),
       pageSourceId: serializer.fromJson<int>(json['pageSourceId']),
     );
   }
@@ -1028,6 +1096,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       'surah': serializer.toJson<int>(surah),
       'number': serializer.toJson<int>(number),
       'verseText': serializer.toJson<String>(verseText),
+      'displayText': serializer.toJson<String>(displayText),
       'basmalaPrefix': serializer.toJson<int>(basmalaPrefix),
       'textSearch': serializer.toJson<String>(textSearch),
       'searchBasmalaPrefix': serializer.toJson<int>(searchBasmalaPrefix),
@@ -1037,6 +1106,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       'page': serializer.toJson<int>(page),
       'sajda': serializer.toJson<String?>(sajda),
       'textSourceId': serializer.toJson<int>(textSourceId),
+      'displaySourceId': serializer.toJson<int>(displaySourceId),
       'pageSourceId': serializer.toJson<int>(pageSourceId),
     };
   }
@@ -1046,6 +1116,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     int? surah,
     int? number,
     String? verseText,
+    String? displayText,
     int? basmalaPrefix,
     String? textSearch,
     int? searchBasmalaPrefix,
@@ -1055,12 +1126,14 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     int? page,
     Value<String?> sajda = const Value.absent(),
     int? textSourceId,
+    int? displaySourceId,
     int? pageSourceId,
   }) => AyahRow(
     id: id ?? this.id,
     surah: surah ?? this.surah,
     number: number ?? this.number,
     verseText: verseText ?? this.verseText,
+    displayText: displayText ?? this.displayText,
     basmalaPrefix: basmalaPrefix ?? this.basmalaPrefix,
     textSearch: textSearch ?? this.textSearch,
     searchBasmalaPrefix: searchBasmalaPrefix ?? this.searchBasmalaPrefix,
@@ -1070,6 +1143,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     page: page ?? this.page,
     sajda: sajda.present ? sajda.value : this.sajda,
     textSourceId: textSourceId ?? this.textSourceId,
+    displaySourceId: displaySourceId ?? this.displaySourceId,
     pageSourceId: pageSourceId ?? this.pageSourceId,
   );
   AyahRow copyWithCompanion(AyahCompanion data) {
@@ -1078,6 +1152,9 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       surah: data.surah.present ? data.surah.value : this.surah,
       number: data.number.present ? data.number.value : this.number,
       verseText: data.verseText.present ? data.verseText.value : this.verseText,
+      displayText: data.displayText.present
+          ? data.displayText.value
+          : this.displayText,
       basmalaPrefix: data.basmalaPrefix.present
           ? data.basmalaPrefix.value
           : this.basmalaPrefix,
@@ -1097,6 +1174,9 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       textSourceId: data.textSourceId.present
           ? data.textSourceId.value
           : this.textSourceId,
+      displaySourceId: data.displaySourceId.present
+          ? data.displaySourceId.value
+          : this.displaySourceId,
       pageSourceId: data.pageSourceId.present
           ? data.pageSourceId.value
           : this.pageSourceId,
@@ -1110,6 +1190,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           ..write('surah: $surah, ')
           ..write('number: $number, ')
           ..write('verseText: $verseText, ')
+          ..write('displayText: $displayText, ')
           ..write('basmalaPrefix: $basmalaPrefix, ')
           ..write('textSearch: $textSearch, ')
           ..write('searchBasmalaPrefix: $searchBasmalaPrefix, ')
@@ -1119,6 +1200,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           ..write('page: $page, ')
           ..write('sajda: $sajda, ')
           ..write('textSourceId: $textSourceId, ')
+          ..write('displaySourceId: $displaySourceId, ')
           ..write('pageSourceId: $pageSourceId')
           ..write(')'))
         .toString();
@@ -1130,6 +1212,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     surah,
     number,
     verseText,
+    displayText,
     basmalaPrefix,
     textSearch,
     searchBasmalaPrefix,
@@ -1139,6 +1222,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     page,
     sajda,
     textSourceId,
+    displaySourceId,
     pageSourceId,
   );
   @override
@@ -1149,6 +1233,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           other.surah == this.surah &&
           other.number == this.number &&
           other.verseText == this.verseText &&
+          other.displayText == this.displayText &&
           other.basmalaPrefix == this.basmalaPrefix &&
           other.textSearch == this.textSearch &&
           other.searchBasmalaPrefix == this.searchBasmalaPrefix &&
@@ -1158,6 +1243,7 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           other.page == this.page &&
           other.sajda == this.sajda &&
           other.textSourceId == this.textSourceId &&
+          other.displaySourceId == this.displaySourceId &&
           other.pageSourceId == this.pageSourceId);
 }
 
@@ -1166,6 +1252,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
   final Value<int> surah;
   final Value<int> number;
   final Value<String> verseText;
+  final Value<String> displayText;
   final Value<int> basmalaPrefix;
   final Value<String> textSearch;
   final Value<int> searchBasmalaPrefix;
@@ -1175,12 +1262,14 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
   final Value<int> page;
   final Value<String?> sajda;
   final Value<int> textSourceId;
+  final Value<int> displaySourceId;
   final Value<int> pageSourceId;
   const AyahCompanion({
     this.id = const Value.absent(),
     this.surah = const Value.absent(),
     this.number = const Value.absent(),
     this.verseText = const Value.absent(),
+    this.displayText = const Value.absent(),
     this.basmalaPrefix = const Value.absent(),
     this.textSearch = const Value.absent(),
     this.searchBasmalaPrefix = const Value.absent(),
@@ -1190,6 +1279,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     this.page = const Value.absent(),
     this.sajda = const Value.absent(),
     this.textSourceId = const Value.absent(),
+    this.displaySourceId = const Value.absent(),
     this.pageSourceId = const Value.absent(),
   });
   AyahCompanion.insert({
@@ -1197,6 +1287,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     required int surah,
     required int number,
     required String verseText,
+    required String displayText,
     required int basmalaPrefix,
     required String textSearch,
     required int searchBasmalaPrefix,
@@ -1206,10 +1297,12 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     required int page,
     this.sajda = const Value.absent(),
     required int textSourceId,
+    required int displaySourceId,
     required int pageSourceId,
   }) : surah = Value(surah),
        number = Value(number),
        verseText = Value(verseText),
+       displayText = Value(displayText),
        basmalaPrefix = Value(basmalaPrefix),
        textSearch = Value(textSearch),
        searchBasmalaPrefix = Value(searchBasmalaPrefix),
@@ -1218,12 +1311,14 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
        manzil = Value(manzil),
        page = Value(page),
        textSourceId = Value(textSourceId),
+       displaySourceId = Value(displaySourceId),
        pageSourceId = Value(pageSourceId);
   static Insertable<AyahRow> custom({
     Expression<int>? id,
     Expression<int>? surah,
     Expression<int>? number,
     Expression<String>? verseText,
+    Expression<String>? displayText,
     Expression<int>? basmalaPrefix,
     Expression<String>? textSearch,
     Expression<int>? searchBasmalaPrefix,
@@ -1233,6 +1328,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     Expression<int>? page,
     Expression<String>? sajda,
     Expression<int>? textSourceId,
+    Expression<int>? displaySourceId,
     Expression<int>? pageSourceId,
   }) {
     return RawValuesInsertable({
@@ -1240,6 +1336,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       if (surah != null) 'surah': surah,
       if (number != null) 'number': number,
       if (verseText != null) 'text': verseText,
+      if (displayText != null) 'display_text': displayText,
       if (basmalaPrefix != null) 'basmala_prefix': basmalaPrefix,
       if (textSearch != null) 'text_search': textSearch,
       if (searchBasmalaPrefix != null)
@@ -1250,6 +1347,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       if (page != null) 'page': page,
       if (sajda != null) 'sajda': sajda,
       if (textSourceId != null) 'text_source_id': textSourceId,
+      if (displaySourceId != null) 'display_source_id': displaySourceId,
       if (pageSourceId != null) 'page_source_id': pageSourceId,
     });
   }
@@ -1259,6 +1357,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     Value<int>? surah,
     Value<int>? number,
     Value<String>? verseText,
+    Value<String>? displayText,
     Value<int>? basmalaPrefix,
     Value<String>? textSearch,
     Value<int>? searchBasmalaPrefix,
@@ -1268,6 +1367,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     Value<int>? page,
     Value<String?>? sajda,
     Value<int>? textSourceId,
+    Value<int>? displaySourceId,
     Value<int>? pageSourceId,
   }) {
     return AyahCompanion(
@@ -1275,6 +1375,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       surah: surah ?? this.surah,
       number: number ?? this.number,
       verseText: verseText ?? this.verseText,
+      displayText: displayText ?? this.displayText,
       basmalaPrefix: basmalaPrefix ?? this.basmalaPrefix,
       textSearch: textSearch ?? this.textSearch,
       searchBasmalaPrefix: searchBasmalaPrefix ?? this.searchBasmalaPrefix,
@@ -1284,6 +1385,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       page: page ?? this.page,
       sajda: sajda ?? this.sajda,
       textSourceId: textSourceId ?? this.textSourceId,
+      displaySourceId: displaySourceId ?? this.displaySourceId,
       pageSourceId: pageSourceId ?? this.pageSourceId,
     );
   }
@@ -1302,6 +1404,9 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     }
     if (verseText.present) {
       map['text'] = Variable<String>(verseText.value);
+    }
+    if (displayText.present) {
+      map['display_text'] = Variable<String>(displayText.value);
     }
     if (basmalaPrefix.present) {
       map['basmala_prefix'] = Variable<int>(basmalaPrefix.value);
@@ -1330,6 +1435,9 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     if (textSourceId.present) {
       map['text_source_id'] = Variable<int>(textSourceId.value);
     }
+    if (displaySourceId.present) {
+      map['display_source_id'] = Variable<int>(displaySourceId.value);
+    }
     if (pageSourceId.present) {
       map['page_source_id'] = Variable<int>(pageSourceId.value);
     }
@@ -1343,6 +1451,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
           ..write('surah: $surah, ')
           ..write('number: $number, ')
           ..write('verseText: $verseText, ')
+          ..write('displayText: $displayText, ')
           ..write('basmalaPrefix: $basmalaPrefix, ')
           ..write('textSearch: $textSearch, ')
           ..write('searchBasmalaPrefix: $searchBasmalaPrefix, ')
@@ -1352,6 +1461,7 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
           ..write('page: $page, ')
           ..write('sajda: $sajda, ')
           ..write('textSourceId: $textSourceId, ')
+          ..write('displaySourceId: $displaySourceId, ')
           ..write('pageSourceId: $pageSourceId')
           ..write(')'))
         .toString();
@@ -2708,6 +2818,7 @@ typedef $$AyahTableCreateCompanionBuilder = AyahCompanion Function({
   required int surah,
   required int number,
   required String verseText,
+  required String displayText,
   required int basmalaPrefix,
   required String textSearch,
   required int searchBasmalaPrefix,
@@ -2717,6 +2828,7 @@ typedef $$AyahTableCreateCompanionBuilder = AyahCompanion Function({
   required int page,
   Value<String?> sajda,
   required int textSourceId,
+  required int displaySourceId,
   required int pageSourceId,
 });
 typedef $$AyahTableUpdateCompanionBuilder = AyahCompanion Function({
@@ -2724,6 +2836,7 @@ typedef $$AyahTableUpdateCompanionBuilder = AyahCompanion Function({
   Value<int> surah,
   Value<int> number,
   Value<String> verseText,
+  Value<String> displayText,
   Value<int> basmalaPrefix,
   Value<String> textSearch,
   Value<int> searchBasmalaPrefix,
@@ -2733,6 +2846,7 @@ typedef $$AyahTableUpdateCompanionBuilder = AyahCompanion Function({
   Value<int> page,
   Value<String?> sajda,
   Value<int> textSourceId,
+  Value<int> displaySourceId,
   Value<int> pageSourceId,
 });
 
@@ -2762,6 +2876,11 @@ class $$AyahTableFilterComposer
 
   ColumnFilters<String> get verseText => $composableBuilder(
     column: $table.verseText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayText => $composableBuilder(
+    column: $table.displayText,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2810,6 +2929,11 @@ class $$AyahTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get displaySourceId => $composableBuilder(
+    column: $table.displaySourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get pageSourceId => $composableBuilder(
     column: $table.pageSourceId,
     builder: (column) => ColumnFilters(column),
@@ -2842,6 +2966,11 @@ class $$AyahTableOrderingComposer
 
   ColumnOrderings<String> get verseText => $composableBuilder(
     column: $table.verseText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayText => $composableBuilder(
+    column: $table.displayText,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2890,6 +3019,11 @@ class $$AyahTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get displaySourceId => $composableBuilder(
+    column: $table.displaySourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get pageSourceId => $composableBuilder(
     column: $table.pageSourceId,
     builder: (column) => ColumnOrderings(column),
@@ -2916,6 +3050,11 @@ class $$AyahTableAnnotationComposer
 
   GeneratedColumn<String> get verseText =>
       $composableBuilder(column: $table.verseText, builder: (column) => column);
+
+  GeneratedColumn<String> get displayText => $composableBuilder(
+    column: $table.displayText,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get basmalaPrefix => $composableBuilder(
     column: $table.basmalaPrefix,
@@ -2951,6 +3090,11 @@ class $$AyahTableAnnotationComposer
 
   GeneratedColumn<int> get textSourceId => $composableBuilder(
     column: $table.textSourceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get displaySourceId => $composableBuilder(
+    column: $table.displaySourceId,
     builder: (column) => column,
   );
 
@@ -2992,6 +3136,7 @@ class $$AyahTableTableManager
                 Value<int> surah = const Value.absent(),
                 Value<int> number = const Value.absent(),
                 Value<String> verseText = const Value.absent(),
+                Value<String> displayText = const Value.absent(),
                 Value<int> basmalaPrefix = const Value.absent(),
                 Value<String> textSearch = const Value.absent(),
                 Value<int> searchBasmalaPrefix = const Value.absent(),
@@ -3001,12 +3146,14 @@ class $$AyahTableTableManager
                 Value<int> page = const Value.absent(),
                 Value<String?> sajda = const Value.absent(),
                 Value<int> textSourceId = const Value.absent(),
+                Value<int> displaySourceId = const Value.absent(),
                 Value<int> pageSourceId = const Value.absent(),
               }) => AyahCompanion(
                 id: id,
                 surah: surah,
                 number: number,
                 verseText: verseText,
+                displayText: displayText,
                 basmalaPrefix: basmalaPrefix,
                 textSearch: textSearch,
                 searchBasmalaPrefix: searchBasmalaPrefix,
@@ -3016,6 +3163,7 @@ class $$AyahTableTableManager
                 page: page,
                 sajda: sajda,
                 textSourceId: textSourceId,
+                displaySourceId: displaySourceId,
                 pageSourceId: pageSourceId,
               ),
           createCompanionCallback:
@@ -3024,6 +3172,7 @@ class $$AyahTableTableManager
                 required int surah,
                 required int number,
                 required String verseText,
+                required String displayText,
                 required int basmalaPrefix,
                 required String textSearch,
                 required int searchBasmalaPrefix,
@@ -3033,12 +3182,14 @@ class $$AyahTableTableManager
                 required int page,
                 Value<String?> sajda = const Value.absent(),
                 required int textSourceId,
+                required int displaySourceId,
                 required int pageSourceId,
               }) => AyahCompanion.insert(
                 id: id,
                 surah: surah,
                 number: number,
                 verseText: verseText,
+                displayText: displayText,
                 basmalaPrefix: basmalaPrefix,
                 textSearch: textSearch,
                 searchBasmalaPrefix: searchBasmalaPrefix,
@@ -3048,6 +3199,7 @@ class $$AyahTableTableManager
                 page: page,
                 sajda: sajda,
                 textSourceId: textSourceId,
+                displaySourceId: displaySourceId,
                 pageSourceId: pageSourceId,
               ),
           withReferenceMapper: (p0) => p0

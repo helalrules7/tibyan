@@ -14,15 +14,8 @@ import 'mushaf_screen.dart';
 import 'widgets/fasil_sheet.dart';
 import 'widgets/mushaf_page.dart';
 
-/// Arabic-Indic digits for verse numbers.
-String arabicDigits(int n) => n
-    .toString()
-    .split('')
-    .map((d) => String.fromCharCode(0x0660 + int.parse(d)))
-    .join();
-
-/// Continuous reading of one surah in the Amiri Quran font. The verse text
-/// is Tanzil's, verbatim; only the verse-end sign and number are added.
+/// Continuous reading of one surah: the KFGQPC Hafs text, verbatim, in the
+/// KFGQPC Hafs font (the verse-number glyph is part of the text).
 class ContinuousScreen extends ConsumerStatefulWidget {
   const ContinuousScreen({super.key, required this.surah, this.ayah});
 
@@ -92,6 +85,7 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
     final surahs = ref.watch(surahsProvider).value;
     final ayahs = ref.watch(surahAyahsProvider(widget.surah)).value;
     final surah = surahs?[widget.surah - 1];
+    final basmala = ref.watch(basmalaProvider).value;
 
     for (final r in _recognizers) {
       r.dispose();
@@ -101,8 +95,8 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
     if (ayahs != null) _scrollToTarget(ayahs);
 
     final quranStyle = TextStyle(
-      fontFamily: 'AmiriQuran',
-      fontSize: 24 * settings.quranFontScale,
+      fontFamily: 'UthmanicHafs',
+      fontSize: 27 * settings.quranFontScale,
       height: 2.1,
       color: t.ink,
     );
@@ -159,13 +153,13 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             _SurahHeader(surah: surah),
-                            if (ayahs.first.basmalaPrefix > 0)
+                            if (widget.surah != 1 &&
+                                widget.surah != 9 &&
+                                basmala != null)
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Text(
-                                  ayahs.first.verseText
-                                      .substring(0, ayahs.first.basmalaPrefix)
-                                      .trim(),
+                                  basmala,
                                   textAlign: TextAlign.center,
                                   style: quranStyle,
                                 ),
@@ -230,9 +224,9 @@ class _ContinuousScreenState extends ConsumerState<ContinuousScreen> {
       style: selected ? TextStyle(backgroundColor: highlight) : null,
       semanticsLabel: null,
       children: [
-        TextSpan(text: a.displayText),
+        TextSpan(text: '${a.displayBody}\u00a0'),
         TextSpan(
-          text: ' ۝${arabicDigits(a.number)} ',
+          text: '${a.displayNumber} ',
           style: TextStyle(color: marker),
         ),
       ],
