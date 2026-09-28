@@ -87,7 +87,7 @@ class SettingsScreen extends ConsumerWidget {
                   Text(l.aboutBody),
                   const SizedBox(height: 8),
                   Text(
-                    l.versionLabel('0.1.0'),
+                    l.versionLabel('0.1.1'),
                     style: TextStyle(color: t.muted),
                   ),
                 ],

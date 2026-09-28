@@ -75,6 +75,8 @@ class ModeTokens {
     required this.player,
     required this.playerFg,
     required this.highlight,
+    required this.control,
+    required this.onControl,
   });
 
   /// Screen background.
@@ -116,6 +118,13 @@ class ModeTokens {
   /// Selected-verse highlight (translucent).
   final Color highlight;
 
+  /// Selected state of controls (radio, switch, check box, filled button,
+  /// progress). Must be at least 3:1 against paper and background.
+  final Color control;
+
+  /// Text and icons drawn on [control]. Must be at least 4.5:1 against it.
+  final Color onControl;
+
   factory ModeTokens.fromJson(Map<String, dynamic> json) {
     Color c(String key) => parseHexColor(json[key] as String);
     return ModeTokens(
@@ -134,6 +143,8 @@ class ModeTokens {
       player: c('player'),
       playerFg: c('playerFg'),
       highlight: c('highlight'),
+      control: c('control'),
+      onControl: c('onControl'),
     );
   }
 }

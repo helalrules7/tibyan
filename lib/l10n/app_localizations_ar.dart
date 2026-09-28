@@ -83,6 +83,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get uiFontKfgqpcAn => 'خط المجمع (AN)';
 
   @override
+  String get uiFontChanga => 'Changa';
+
+  @override
   String get languageLabel => 'اللغة';
 
   @override

@@ -5,7 +5,8 @@ import 'theme_tokens.dart';
 /// Interface font families the user can choose in settings.
 enum UiFont {
   plex('IBMPlexSansArabic'),
-  kfgqpcAn('KFGQPCAN');
+  kfgqpcAn('KFGQPCAN'),
+  changa('Changa');
 
   const UiFont(this.family);
   final String family;
@@ -57,8 +58,8 @@ ThemeData buildTheme({
 
   final scheme = ColorScheme(
     brightness: brightness,
-    primary: t.headBg,
-    onPrimary: t.headFg,
+    primary: t.control,
+    onPrimary: t.onControl,
     secondary: t.goldText,
     onSecondary: t.paper,
     tertiary: t.accent,
@@ -109,6 +110,43 @@ ThemeData buildTheme({
       iconColor: t.goldText,
       textColor: t.ink,
       minVerticalPadding: 12,
+    ),
+    // Selected states use the dedicated control colour, never the surah
+    // header colour (which is white or near the paper colour in some styles).
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? t.control : t.muted,
+      ),
+    ),
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? t.control : null,
+      ),
+      checkColor: WidgetStatePropertyAll(t.onControl),
+      side: BorderSide(color: t.muted, width: 2),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith(
+        (states) =>
+            states.contains(WidgetState.selected) ? t.onControl : t.muted,
+      ),
+      trackColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? t.control : t.paper,
+      ),
+      trackOutlineColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.selected) ? t.control : t.muted,
+      ),
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: t.control,
+      linearTrackColor: t.border,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: t.control,
+        foregroundColor: t.onControl,
+        minimumSize: const Size(48, 48),
+      ),
     ),
   );
 }
