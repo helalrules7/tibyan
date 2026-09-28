@@ -1,0 +1,56 @@
+# تبيان | Tibyan
+
+تطبيق مجاني غير ربحي للقرآن الكريم على أندرويد وآي أو إس: تفسير وتلاوة وحفظ.
+
+A free, non-profit Quran app for Android and iOS: tafsir, recitation and memorization.
+
+> **الحالة / Status:** قيد البناء، المرحلة 0 (الأساس). Under construction, Phase 0 (foundation).
+
+---
+
+## المبادئ
+
+1. **لا يكتب الذكاء الاصطناعي أي محتوى ديني.** كل نص للقرآن أو التفسير أو القراءات أو غيرها يأتي من مصدر موثق، ومصدره محفوظ بجانبه.
+2. **لا يظهر محتوى علمي إلا بعد مراجعة متخصص**، واسم المراجع يظهر عليه.
+3. **لا نأخذ بيانات بلا إذن.** كل مصدر مسجل في [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md)، ونص إذنه محفوظ في [`docs/licenses/`](docs/licenses/).
+4. **مجاني بالكامل**: بلا إعلانات، ولا مشتريات، ولا اشتراكات.
+
+## Principles
+
+1. **No AI-written religious content.** Every Quran, tafsir, qiraat or scholarly text comes from a verified source, stored with its source.
+2. **Scholarly content appears only after review by a qualified person**, whose name is shown with it.
+3. **No data without permission.** Every source is listed in [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md), with its license text saved in [`docs/licenses/`](docs/licenses/).
+4. **Completely free**: no ads, no purchases, no subscriptions.
+
+---
+
+## Folder layout
+
+| Path | Contents |
+|---|---|
+| `lib/` | Flutter app code, organized by feature (added in Phase 0) |
+| `assets/` | Fonts, theme tokens and the bundled content database (Git LFS) |
+| `tools/` | Python scripts that download, verify and build the data reproducibly |
+| `docs/` | Data sources, missing data, permission requests, license evidence, verification reports |
+| `fonts/` | KFGQPC fonts (moving to `assets/fonts/` in Phase 0) |
+
+## Setup
+
+Requirements: Flutter (stable), Xcode (for iOS), Android SDK, Git LFS, Python 3.
+
+```sh
+git lfs install
+git clone https://github.com/helalrules7/tibyan.git
+cd tibyan
+cp .env.example .env   # optional: crash reporting and sync keys
+flutter pub get
+flutter run
+```
+
+## Data
+
+Raw datasets and audio are never committed. The scripts in `tools/` rebuild them from their sources and check each file's SHA-256. What is still missing is tracked in [`docs/MISSING_DATA.md`](docs/MISSING_DATA.md).
+
+## License
+
+Code: [GPL-3.0](LICENSE). Data keeps the license of its source (see [`docs/DATA_SOURCES.md`](docs/DATA_SOURCES.md)). Data derived from OpenITI is published under CC BY-NC-SA 4.0, separately from the code. KFGQPC fonts are distributed unmodified under the Complex's terms.
