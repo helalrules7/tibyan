@@ -64,6 +64,30 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+          _SectionTitle(l.readingTitle),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: Text(l.keepScreenOn),
+                  value: settings.keepScreenOn,
+                  onChanged: controller.setKeepScreenOn,
+                ),
+                ListTile(
+                  title: Text(l.quranFontSize),
+                  subtitle: Slider(
+                    value: settings.quranFontScale,
+                    min: 0.8,
+                    max: 2.0,
+                    divisions: 12,
+                    label: '${(settings.quranFontScale * 100).round()}%',
+                    onChanged: controller.setQuranFontScale,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           _SectionTitle(l.privacyTitle),
           Card(
             child: SwitchListTile(

@@ -12,7 +12,10 @@ void main() {
   testWidgets('app starts in Arabic, right-to-left, and opens settings', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({'settings.language': 'ar'});
+    SharedPreferences.setMockInitialValues({
+      'settings.language': 'ar',
+      'settings.onboardingDone': true,
+    });
     final registry = await ThemeRegistry.load(rootBundle);
     final flags = await FeatureFlags.load(rootBundle);
     final prefs = await SharedPreferences.getInstance();

@@ -12,7 +12,6 @@ class HomeScreen extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
     final sections = <(IconData, String)>[
-      (Icons.menu_book_outlined, l.sectionMushaf),
       (Icons.auto_stories_outlined, l.sectionTafsir),
       (Icons.headphones_outlined, l.sectionListen),
       (Icons.task_alt_outlined, l.sectionHifz),
@@ -88,11 +87,59 @@ class HomeScreen extends StatelessWidget {
               crossAxisSpacing: 10,
               childAspectRatio: 1,
               children: [
+                _SectionTile(
+                  icon: Icons.menu_book_outlined,
+                  label: l.sectionMushaf,
+                  note: l.mushafOpen,
+                  onTap: () => context.go('/mushaf'),
+                ),
                 for (final (icon, label) in sections)
                   _ComingSoonTile(icon: icon, label: label, note: l.comingSoon),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionTile extends StatelessWidget {
+  const _SectionTile({
+    required this.icon,
+    required this.label,
+    required this.note,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String note;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens.colors;
+    return Semantics(
+      button: true,
+      label: '$label. $note',
+      excludeSemantics: true,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: t.goldText, size: 26),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: TextStyle(color: t.ink, fontWeight: FontWeight.w600),
+              ),
+              Text(note, style: TextStyle(color: t.accent, fontSize: 12)),
+            ],
+          ),
         ),
       ),
     );
