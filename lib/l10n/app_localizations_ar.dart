@@ -769,4 +769,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notifPaused => 'التحميل متوقف مؤقتا';
+
+  @override
+  String get readInMadinaWhileDownloading =>
+      'اقرأ في مصحف المدينة (الطبعة الحديثة) حتى يكتمل التحميل';
+
+  @override
+  String downloadingBanner(String name, String percent) {
+    return 'يُحمَّل $name: $percent٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)';
+  }
 }

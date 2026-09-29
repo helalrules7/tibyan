@@ -772,4 +772,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifPaused => 'Download paused';
+
+  @override
+  String get readInMadinaWhileDownloading =>
+      'Read the new Madina edition until the download finishes';
+
+  @override
+  String downloadingBanner(String name, String percent) {
+    return 'Downloading $name: $percent%. Reading the new Madina edition meanwhile';
+  }
 }

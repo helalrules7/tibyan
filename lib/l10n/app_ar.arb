@@ -570,5 +570,17 @@
   "notifDownloading": "تحميل صفحات المصحف",
   "notifComplete": "اكتمل تحميل المصحف",
   "notifFailed": "تعذّر تحميل المصحف",
-  "notifPaused": "التحميل متوقف مؤقتا"
+  "notifPaused": "التحميل متوقف مؤقتا",
+  "readInMadinaWhileDownloading": "اقرأ في مصحف المدينة (الطبعة الحديثة) حتى يكتمل التحميل",
+  "downloadingBanner": "يُحمَّل {name}: {percent}٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)",
+  "@downloadingBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

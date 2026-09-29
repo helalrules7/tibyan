@@ -436,5 +436,17 @@
   "notifDownloading": "Downloading mushaf pages",
   "notifComplete": "Mushaf download complete",
   "notifFailed": "Mushaf download failed",
-  "notifPaused": "Download paused"
+  "notifPaused": "Download paused",
+  "readInMadinaWhileDownloading": "Read the new Madina edition until the download finishes",
+  "downloadingBanner": "Downloading {name}: {percent}%. Reading the new Madina edition meanwhile",
+  "@downloadingBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

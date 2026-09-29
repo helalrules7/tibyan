@@ -1417,6 +1417,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'التحميل متوقف مؤقتا'**
   String get notifPaused;
+
+  /// No description provided for @readInMadinaWhileDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ في مصحف المدينة (الطبعة الحديثة) حتى يكتمل التحميل'**
+  String get readInMadinaWhileDownloading;
+
+  /// No description provided for @downloadingBanner.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُحمَّل {name}: {percent}٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)'**
+  String downloadingBanner(String name, String percent);
 }
 
 class _AppLocalizationsDelegate

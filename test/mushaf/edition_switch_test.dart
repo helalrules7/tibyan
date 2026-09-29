@@ -49,5 +49,15 @@ void main() {
       container.read(installedEditionsProvider),
       isNot(contains(MushafEdition.shamarly)),
     );
+    // Meanwhile the pages are read in the new Madina edition.
+    expect(container.read(chosenEditionProvider), MushafEdition.shamarly);
+    expect(container.read(editionProvider), MushafEdition.madina1441);
+
+    // Once the Shamarly pages land, they are read.
+    final dir = Directory(p.join(root.path, 'packs', PagePackSpec.shamarly.id))
+      ..createSync(recursive: true);
+    File(p.join(dir.path, '.installed')).writeAsStringSync('x');
+    container.read(packInstallsProvider.notifier).changed();
+    expect(container.read(editionProvider), MushafEdition.shamarly);
   });
 }

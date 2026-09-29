@@ -530,6 +530,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               bottom: 12,
               child: const SafeArea(top: false, child: PlayerBar()),
             ),
+          // The chosen edition is still downloading: say so, and that the
+          // new Madina edition is read meanwhile.
+          if (ref.watch(chosenEditionProvider) != edition && !_chrome)
+            const Positioned(
+              top: 0,
+              left: 24,
+              right: 24,
+              child: SafeArea(child: DownloadingBanner()),
+            ),
           if (_multi)
             Positioned(
               top: 0,

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
+import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
 import '../../l10n/app_localizations.dart';
@@ -20,6 +21,10 @@ class OnboardingEditionScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final ctrl = ref.read(settingsProvider.notifier);
     final t = context.tokens.colors;
+    // The new Madina edition ships with the app; others download.
+    final onDevice = ref
+        .watch(installedEditionsProvider)
+        .contains(settings.edition);
 
     Future<void> finish(String to) async {
       await ctrl.completeOnboarding();
@@ -79,38 +84,36 @@ class OnboardingEditionScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 14),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.download_outlined, color: t.goldText),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        l.pagesDownloadNote(
-                          (PagePackSpec.of(settings.edition).bytes / 1e6)
-                              .round()
-                              .toString(),
+            if (!onDevice)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.download_outlined, color: t.goldText),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          l.pagesDownloadNote(
+                            (PagePackSpec.of(settings.edition).bytes / 1e6)
+                                .round()
+                                .toString(),
+                          ),
+                          style: const TextStyle(height: 1.6),
                         ),
-                        style: const TextStyle(height: 1.6),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 12),
             const DownloadAllButton(),
             const SizedBox(height: 10),
             FilledButton(
-              onPressed: () => finish('/mushaf/download'),
+              onPressed: () =>
+                  finish(onDevice ? '/mushaf' : '/mushaf/download'),
               child: Text(l.continueLabel),
-            ),
-            TextButton(
-              onPressed: () => finish('/mushaf/continuous'),
-              child: Text('${l.skipLabel}: ${l.readContinuousNow}'),
             ),
           ],
         ),

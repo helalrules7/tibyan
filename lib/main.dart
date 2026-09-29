@@ -15,6 +15,7 @@ import 'core/flags/feature_flags.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
 import 'features/mushaf/data/background_packs.dart';
+import 'features/mushaf/data/bundled_pack.dart';
 import 'features/mushaf/mushaf_providers.dart';
 import 'l10n/app_localizations.dart';
 
@@ -53,6 +54,13 @@ Future<void> main() async {
     (_, optIn) => CrashReporting.apply(optIn: optIn),
   );
 
+  // The new Madina edition ships with the app: install it on first launch.
+  try {
+    await installBundledPack(rootBundle, container.read(packsDirProvider));
+  } catch (_) {
+    // It can still be downloaded like the other editions.
+  }
+
   // Pack downloads run in the background; finish any that ended while the
   // app was closed. Notifications speak the interface language.
   final l = lookupAppLocalizations(
@@ -68,7 +76,7 @@ Future<void> main() async {
     container
         .read(backgroundPacksProvider)
         .start()
-        .then((_) => container.invalidate(pagesInstalledProvider)),
+        .then((_) => container.read(packInstallsProvider.notifier).changed()),
   );
 
   runApp(

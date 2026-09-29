@@ -80,6 +80,7 @@ flutter:
     - assets/config/
     - assets/db/
     - assets/ornaments/
+    - assets/packs/
 
   fonts:
     # Interface (Arabic). SIL OFL 1.1

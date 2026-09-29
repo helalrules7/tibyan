@@ -12,3 +12,6 @@ assets/db/*.db filter=lfs diff=lfs merge=lfs -text
 
 # Ornament source files (large vectors)
 tools/ornaments/src/** filter=lfs diff=lfs merge=lfs -text
+
+# The new Madina edition's pages ship with the app.
+assets/packs/*.zip filter=lfs diff=lfs merge=lfs -text
