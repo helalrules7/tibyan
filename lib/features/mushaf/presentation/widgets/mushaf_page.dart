@@ -7,25 +7,19 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../mushaf_providers.dart';
+import 'page_interaction.dart';
 
 /// Identifies a verse.
 typedef VerseKey = ({int surah, int ayah});
 
 /// One page of the new Madina edition: the KFGQPC page artwork (unchanged),
-/// coloured for the current mode, with the selected verse highlighted.
+/// coloured for the current mode, with the selection, marked verse
+/// markers and selection handles drawn over it.
 class MushafPage extends ConsumerStatefulWidget {
-  const MushafPage({
-    super.key,
-    required this.page,
-    required this.selected,
-    required this.onVerseTap,
-    required this.onBackgroundTap,
-  });
+  const MushafPage({super.key, required this.page, required this.interaction});
 
   final int page;
-  final VerseKey? selected;
-  final ValueChanged<VerseKey> onVerseTap;
-  final VoidCallback onBackgroundTap;
+  final PageInteraction interaction;
 
   @override
   ConsumerState<MushafPage> createState() => _MushafPageState();
@@ -57,6 +51,8 @@ class _MushafPageState extends ConsumerState<MushafPage> {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
+    final x = widget.interaction;
+    final l = AppLocalizations.of(context);
     return FutureBuilder(
       future: _load,
       builder: (context, snap) {
@@ -65,61 +61,131 @@ class _MushafPageState extends ConsumerState<MushafPage> {
         }
         final (svg, polys) = snap.data!;
         final viewBox = _viewBox(svg);
-        final outlines = [
+        final verses = [
           for (final p in polys)
-            (key: (surah: p.surah, ayah: p.number), path: parseOutline(p.path)),
+            (
+              key: (surah: p.surah, ayah: p.number),
+              path: parseOutline(p.path),
+              rects: outlineRects(p.path),
+              marker: p.markerX == null ? null : Offset(p.markerX!, p.markerY!),
+            ),
         ];
+        VerseKey? verseAt(Offset point) {
+          for (final v in verses) {
+            if (v.path.contains(point)) return v.key;
+          }
+          return null;
+        }
+
+        VerseKey? markerAt(Offset point) {
+          for (final v in verses) {
+            final m = v.marker;
+            if (m != null && (m - point).distance <= _markerRadius + 3) {
+              return v.key;
+            }
+          }
+          return null;
+        }
+
         return Center(
           child: AspectRatio(
             aspectRatio: viewBox.width / viewBox.height,
             child: LayoutBuilder(
               builder: (context, box) {
                 final scale = box.maxWidth / viewBox.width;
-                return GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTapUp: (d) {
-                    final point = d.localPosition / scale;
-                    for (final o in outlines) {
-                      if (o.path.contains(point)) {
-                        widget.onVerseTap(o.key);
-                        return;
-                      }
-                    }
-                    widget.onBackgroundTap();
-                  },
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Semantics(
-                        label: AppLocalizations.of(context)
-                            .pageOf('${widget.page}'),
-                        image: true,
-                        child: SvgPicture.string(
-                          svg,
-                          fit: BoxFit.contain,
-                          colorFilter: tokens.mode == ThemeModeId.light
-                              ? null
-                              : ColorFilter.mode(
-                                  tokens.colors.ink,
-                                  BlendMode.srcIn,
-                                ),
+                final selected = [
+                  for (final v in verses)
+                    if (x.selection.contains(v.key)) v,
+                ];
+                final handles = <Widget>[];
+                if (selected.isNotEmpty) {
+                  // Right-to-left: the selection starts at the top right of
+                  // its first verse and ends at the bottom left of its last.
+                  final first = selected.first.rects.first;
+                  final last = selected.last.rects.last;
+                  final box0 = context.findRenderObject();
+                  void drag(bool start, Offset global) {
+                    final ro = box0 is RenderBox
+                        ? box0
+                        : context.findRenderObject() as RenderBox?;
+                    if (ro == null) return;
+                    final v = verseAt(ro.globalToLocal(global) / scale);
+                    if (v != null) x.onHandleDrag(start, v);
+                  }
+
+                  handles
+                    ..add(
+                      Positioned(
+                        left: first.right * scale - 22,
+                        top: first.top * scale - 34,
+                        child: SelectionHandle(
+                          start: true,
+                          label: l.selectionStart,
+                          onDrag: (g) => drag(true, g),
                         ),
                       ),
-                      if (widget.selected != null)
-                        IgnorePointer(
-                          child: CustomPaint(
-                            painter: _HighlightPainter(
-                              paths: [
-                                for (final o in outlines)
-                                  if (o.key == widget.selected) o.path,
-                              ],
-                              scale: scale,
-                              color: tokens.colors.highlight,
-                            ),
+                    )
+                    ..add(
+                      Positioned(
+                        left: last.left * scale - 22,
+                        top: last.bottom * scale - 10,
+                        child: SelectionHandle(
+                          start: false,
+                          label: l.selectionEnd,
+                          onDrag: (g) => drag(false, g),
+                        ),
+                      ),
+                    );
+                }
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned.fill(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTapUp: (d) {
+                          final m = markerAt(d.localPosition / scale);
+                          m != null ? x.onMarkerTap(m) : x.onTap();
+                        },
+                        onLongPressStart: (d) {
+                          final v = verseAt(d.localPosition / scale);
+                          if (v != null) x.onVerseLongPress(v);
+                        },
+                        child: Semantics(
+                          label: l.pageOf('${widget.page}'),
+                          image: true,
+                          child: SvgPicture.string(
+                            svg,
+                            fit: BoxFit.contain,
+                            colorFilter: tokens.mode == ThemeModeId.light
+                                ? null
+                                : ColorFilter.mode(
+                                    tokens.colors.ink,
+                                    BlendMode.srcIn,
+                                  ),
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: SelectionPainter(
+                            paths: [for (final v in selected) v.path],
+                            rings: [
+                              for (final v in verses)
+                                if (v.marker != null &&
+                                    x.marks.containsKey(v.key))
+                                  (v.marker!, _markerRadius, x.marks[v.key]!),
+                            ],
+                            highlight: tokens.colors.highlight,
+                            transform: Matrix4.diagonal3Values(scale, scale, 1),
+                          ),
+                        ),
+                      ),
+                    ),
+                    ...handles,
+                  ],
                 );
               },
             ),
@@ -128,6 +194,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
       },
     );
   }
+
+  /// Verse-end marker radius in page units.
+  static const _markerRadius = 7.5;
 
   static Size _viewBox(String svg) {
     final m = RegExp(r'viewBox="([\d.\s-]+)"').firstMatch(svg);
@@ -140,6 +209,42 @@ class _MushafPageState extends ConsumerState<MushafPage> {
         .toList();
     return Size(v[2], v[3]);
   }
+}
+
+/// Bounds of each sub-path of a verse outline, in reading order.
+List<Rect> outlineRects(String d) {
+  final rects = <Rect>[];
+  final tokens = d.trim().split(RegExp(r'\s+'));
+  var xs = <double>[];
+  var ys = <double>[];
+  var i = 0;
+  while (i < tokens.length) {
+    final t = tokens[i];
+    if (t == 'M' || t == 'L') {
+      xs.add(double.parse(tokens[i + 1]));
+      ys.add(double.parse(tokens[i + 2]));
+      i += 3;
+    } else {
+      if (t == 'Z' && xs.isNotEmpty) {
+        rects.add(
+          Rect.fromLTRB(
+            xs.reduce((a, b) => a < b ? a : b),
+            ys.reduce((a, b) => a < b ? a : b),
+            xs.reduce((a, b) => a > b ? a : b),
+            ys.reduce((a, b) => a > b ? a : b),
+          ),
+        );
+        xs = [];
+        ys = [];
+      }
+      i += 1;
+    }
+  }
+  rects.sort(
+    (a, b) =>
+        a.top != b.top ? a.top.compareTo(b.top) : b.right.compareTo(a.right),
+  );
+  return rects;
 }
 
 /// Parses the outline format of the verse polygons: "M x y L x y ... Z",
@@ -163,29 +268,4 @@ Path parseOutline(String d) {
     }
   }
   return path;
-}
-
-class _HighlightPainter extends CustomPainter {
-  _HighlightPainter({
-    required this.paths,
-    required this.scale,
-    required this.color,
-  });
-
-  final List<Path> paths;
-  final double scale;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.scale(scale);
-    final paint = Paint()..color = color;
-    for (final p in paths) {
-      canvas.drawPath(p, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_HighlightPainter old) =>
-      old.paths != paths || old.scale != scale || old.color != color;
 }

@@ -401,4 +401,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String hizbStartsAt(String surah, String ayah) {
     return 'Starts at $surah $ayah';
   }
+
+  @override
+  String get selectionStart => 'Start of selection';
+
+  @override
+  String get selectionEnd => 'End of selection';
+
+  @override
+  String get servicesTitle => 'Verse services';
+
+  @override
+  String get markReading => 'Reading';
+
+  @override
+  String get markReview => 'Review';
+
+  @override
+  String get markHifz => 'Memorizing';
+
+  @override
+  String get markTadabbur => 'Reflection';
+
+  @override
+  String autoFasil(String surah, String ayah) {
+    return 'Reading mark set at $surah $ayah';
+  }
+
+  @override
+  String markMoved(String mark, String surah, String ayah) {
+    return '$mark: $surah $ayah';
+  }
+
+  @override
+  String verseRange(String surah, String from, String to) {
+    return '$surah $from–$to';
+  }
+
+  @override
+  String versesCount(String count) {
+    return '$count verses';
+  }
+
+  @override
+  String get twoVerses => '2 verses';
 }

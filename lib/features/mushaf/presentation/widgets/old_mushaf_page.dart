@@ -11,6 +11,7 @@ import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../mushaf_providers.dart';
 import 'mushaf_page.dart';
+import 'page_interaction.dart';
 
 /// Ink area shared by all quran.com page images (1024 x 1656), and the
 /// 15 line slots inside it.
@@ -111,15 +112,11 @@ class OldMushafPage extends ConsumerStatefulWidget {
   const OldMushafPage({
     super.key,
     required this.page,
-    required this.selected,
-    required this.onVerseTap,
-    required this.onBackgroundTap,
+    required this.interaction,
   });
 
   final int page;
-  final VerseKey? selected;
-  final ValueChanged<VerseKey> onVerseTap;
-  final VoidCallback onBackgroundTap;
+  final PageInteraction interaction;
 
   @override
   ConsumerState<OldMushafPage> createState() => _OldMushafPageState();
@@ -172,46 +169,124 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
           return const Center(child: CircularProgressIndicator());
         }
         final (image, glyphs) = snap.data!;
+        final x = widget.interaction;
+        final l = AppLocalizations.of(context);
+        // The verse-end marker is the last glyph of each verse on the page.
+        final markers = <VerseKey, GlyphRow>{};
+        for (final g in glyphs) {
+          final k = (surah: g.suraNumber, ayah: g.ayahNumber);
+          final m = markers[k];
+          if (m == null || g.position > m.position) markers[k] = g;
+        }
         return LayoutBuilder(
           builder: (context, box) {
             final layout = _PageLayout(box.biggest, opening: widget.page <= 2);
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTapUp: (d) {
-                final point = layout.toImage(d.localPosition);
-                for (final g in glyphs) {
-                  if (_rect(g).inflate(6).contains(point)) {
-                    widget.onVerseTap((
-                      surah: g.suraNumber,
-                      ayah: g.ayahNumber,
-                    ));
-                    return;
-                  }
+            VerseKey? verseAt(Offset local) {
+              final point = layout.toImage(local);
+              for (final g in glyphs) {
+                if (_rect(g).inflate(6).contains(point)) {
+                  return (surah: g.suraNumber, ayah: g.ayahNumber);
                 }
-                widget.onBackgroundTap();
-              },
-              child: Semantics(
-                label: AppLocalizations.of(context).pageOf('${widget.page}'),
-                image: true,
-                child: CustomPaint(
-                  size: box.biggest,
-                  painter: _OldPagePainter(
-                    image: image,
-                    layout: layout,
-                    ink: tokens.mode == ThemeModeId.light
-                        ? null
-                        : tokens.colors.ink,
-                    highlight: tokens.colors.highlight,
-                    selected: [
-                      if (widget.selected != null)
-                        for (final g in glyphs)
-                          if (g.suraNumber == widget.selected!.surah &&
-                              g.ayahNumber == widget.selected!.ayah)
-                            layout.toScreenRect(_rect(g)),
-                    ],
+              }
+              return null;
+            }
+
+            VerseKey? markerAt(Offset local) {
+              final point = layout.toImage(local);
+              for (final e in markers.entries) {
+                if (_rect(e.value).inflate(8).contains(point)) return e.key;
+              }
+              return null;
+            }
+
+            final selectedGlyphs = [
+              for (final g in glyphs)
+                if (x.selection.contains((
+                  surah: g.suraNumber,
+                  ayah: g.ayahNumber,
+                )))
+                  g,
+            ]..sort((a, b) => a.glyphId.compareTo(b.glyphId));
+            final handles = <Widget>[];
+            if (selectedGlyphs.isNotEmpty) {
+              final first = layout.toScreenRect(_rect(selectedGlyphs.first));
+              final last = layout.toScreenRect(_rect(selectedGlyphs.last));
+              void drag(bool start, Offset global) {
+                final ro = context.findRenderObject();
+                if (ro is! RenderBox) return;
+                final v = verseAt(ro.globalToLocal(global));
+                if (v != null) x.onHandleDrag(start, v);
+              }
+
+              handles
+                ..add(
+                  Positioned(
+                    left: first.right - 22,
+                    top: first.top - 34,
+                    child: SelectionHandle(
+                      start: true,
+                      label: l.selectionStart,
+                      onDrag: (g) => drag(true, g),
+                    ),
+                  ),
+                )
+                ..add(
+                  Positioned(
+                    left: last.left - 22,
+                    top: last.bottom - 10,
+                    child: SelectionHandle(
+                      start: false,
+                      label: l.selectionEnd,
+                      onDrag: (g) => drag(false, g),
+                    ),
+                  ),
+                );
+            }
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapUp: (d) {
+                      final m = markerAt(d.localPosition);
+                      m != null ? x.onMarkerTap(m) : x.onTap();
+                    },
+                    onLongPressStart: (d) {
+                      final v = verseAt(d.localPosition);
+                      if (v != null) x.onVerseLongPress(v);
+                    },
+                    child: Semantics(
+                      label: l.pageOf('${widget.page}'),
+                      image: true,
+                      child: CustomPaint(
+                        size: box.biggest,
+                        painter: _OldPagePainter(
+                          image: image,
+                          layout: layout,
+                          ink: tokens.mode == ThemeModeId.light
+                              ? null
+                              : tokens.colors.ink,
+                          highlight: tokens.colors.highlight,
+                          selected: [
+                            for (final g in selectedGlyphs)
+                              layout.toScreenRect(_rect(g)),
+                          ],
+                          rings: [
+                            for (final e in markers.entries)
+                              if (x.marks.containsKey(e.key))
+                                (
+                                  layout.toScreenRect(_rect(e.value)),
+                                  x.marks[e.key]!,
+                                ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                ...handles,
+              ],
             );
           },
         );
@@ -234,6 +309,7 @@ class _OldPagePainter extends CustomPainter {
     required this.ink,
     required this.highlight,
     required this.selected,
+    required this.rings,
   });
 
   final ui.Image image;
@@ -242,6 +318,9 @@ class _OldPagePainter extends CustomPainter {
   final Color highlight;
   final List<Rect> selected;
 
+  /// Marked verse-end markers and their mark colour.
+  final List<(Rect, Color)> rings;
+
   @override
   void paint(Canvas canvas, Size size) {
     final fill = Paint()..color = highlight;
@@ -249,6 +328,22 @@ class _OldPagePainter extends CustomPainter {
       canvas.drawRRect(
         RRect.fromRectAndRadius(r.inflate(1), const Radius.circular(4)),
         fill,
+      );
+    }
+    for (final (r, color) in rings) {
+      final radius = r.shortestSide / 2 + 2;
+      canvas.drawCircle(
+        r.center,
+        radius,
+        Paint()..color = color.withValues(alpha: 0.35),
+      );
+      canvas.drawCircle(
+        r.center,
+        radius,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = color,
       );
     }
     final paint = Paint()..filterQuality = FilterQuality.medium;
@@ -265,5 +360,6 @@ class _OldPagePainter extends CustomPainter {
       old.ink != ink ||
       old.highlight != highlight ||
       old.selected.length != selected.length ||
+      old.rings.length != rings.length ||
       (selected.isNotEmpty && old.selected.first != selected.first);
 }

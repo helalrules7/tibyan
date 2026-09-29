@@ -400,4 +400,48 @@ class AppLocalizationsAr extends AppLocalizations {
   String hizbStartsAt(String surah, String ayah) {
     return 'يبدأ من $surah $ayah';
   }
+
+  @override
+  String get selectionStart => 'بداية التحديد';
+
+  @override
+  String get selectionEnd => 'نهاية التحديد';
+
+  @override
+  String get servicesTitle => 'خدمات الآيات';
+
+  @override
+  String get markReading => 'قراءة';
+
+  @override
+  String get markReview => 'مراجعة';
+
+  @override
+  String get markHifz => 'حفظ';
+
+  @override
+  String get markTadabbur => 'تدبر';
+
+  @override
+  String autoFasil(String surah, String ayah) {
+    return 'فاصل تلقائي عند $surah $ayah';
+  }
+
+  @override
+  String markMoved(String mark, String surah, String ayah) {
+    return '$mark: $surah $ayah';
+  }
+
+  @override
+  String verseRange(String surah, String from, String to) {
+    return '$surah $from–$to';
+  }
+
+  @override
+  String versesCount(String count) {
+    return '$count آيات';
+  }
+
+  @override
+  String get twoVerses => 'آيتان';
 }
