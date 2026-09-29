@@ -455,6 +455,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   _setChrome(false);
                   setState(() => _multi = true);
                 },
+                onTafsir: () => context.push(
+                  '/mushaf/tafsir?s=${range.first.surah}&a=${range.first.ayah}',
+                ),
               ),
             ),
         ],

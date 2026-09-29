@@ -1075,6 +1075,84 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تلوين «الله» و«رب» و«ربنا» في صفحات المصحف'**
   String get highlightDivineNamesHint;
+
+  /// No description provided for @tafsirTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التفسير والترجمة'**
+  String get tafsirTitle;
+
+  /// No description provided for @tafsirSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات التفسير'**
+  String get tafsirSettings;
+
+  /// No description provided for @tafsirFontLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'خط التفسير'**
+  String get tafsirFontLabel;
+
+  /// No description provided for @tafsirFontNaskh.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ عثمان طه'**
+  String get tafsirFontNaskh;
+
+  /// No description provided for @tafsirFontInterface.
+  ///
+  /// In ar, this message translates to:
+  /// **'خط الواجهة'**
+  String get tafsirFontInterface;
+
+  /// No description provided for @tafsirTextSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجم النص'**
+  String get tafsirTextSize;
+
+  /// No description provided for @tafsirShown.
+  ///
+  /// In ar, this message translates to:
+  /// **'النصوص المعروضة'**
+  String get tafsirShown;
+
+  /// No description provided for @tafsirNoneShown.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل النصوص مخفية. اختر نصا من إعدادات التفسير.'**
+  String get tafsirNoneShown;
+
+  /// No description provided for @tafsirFootnotes.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحواشي'**
+  String get tafsirFootnotes;
+
+  /// No description provided for @previousVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية السابقة'**
+  String get previousVerse;
+
+  /// No description provided for @nextVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية التالية'**
+  String get nextVerse;
+
+  /// No description provided for @sourceVersion.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدار {version}'**
+  String sourceVersion(String version);
+
+  /// No description provided for @sourceRetrieved.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخة {date}'**
+  String sourceRetrieved(String date);
 }
 
 class _AppLocalizationsDelegate

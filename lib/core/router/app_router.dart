@@ -14,6 +14,7 @@ import '../../features/onboarding/onboarding_language_screen.dart';
 import '../../features/onboarding/onboarding_style_screen.dart';
 import '../../features/settings/appearance_screen.dart';
 import '../../features/splash/splash_screen.dart';
+import '../../features/tafsir/tafsir_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../settings/settings_controller.dart';
 
@@ -101,6 +102,13 @@ final appRouterProvider = Provider<GoRouter>(
           GoRoute(
             path: 'fawasil',
             builder: (context, state) => const FawasilScreen(),
+          ),
+          GoRoute(
+            path: 'tafsir',
+            builder: (context, state) => TafsirScreen(
+              surah: _int(state, 's') ?? 1,
+              ayah: _int(state, 'a') ?? 1,
+            ),
           ),
           GoRoute(
             path: 'about',

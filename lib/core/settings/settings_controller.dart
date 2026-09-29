@@ -31,6 +31,9 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kMarkerStyle = 'settings.markerStyle';
   static const _kMarkerTint = 'settings.markerTint';
   static const _kDivine = 'settings.highlightDivineNames';
+  static const _kTafsirFont = 'settings.tafsirFont';
+  static const _kTafsirScale = 'settings.tafsirFontScale';
+  static const _kHiddenCommentaries = 'settings.hiddenCommentaries';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -64,6 +67,14 @@ class SettingsController extends Notifier<AppSettings> {
           MarkerStyle.traditional,
       markerTint: _prefs.getInt(_kMarkerTint),
       highlightDivineNames: _prefs.getBool(_kDivine) ?? true,
+      tafsirFont:
+          _enumByName(TafsirFont.values, _prefs.getString(_kTafsirFont)) ??
+          TafsirFont.naskh,
+      tafsirFontScale: _prefs.getDouble(_kTafsirScale) ?? 1.0,
+      hiddenCommentaries: {
+        for (final id in _prefs.getStringList(_kHiddenCommentaries) ?? [])
+          ?int.tryParse(id),
+      },
     );
   }
 
@@ -130,6 +141,26 @@ class SettingsController extends Notifier<AppSettings> {
     } else {
       await _prefs.setInt(_kMarkerTint, argb);
     }
+  }
+
+  Future<void> setTafsirFont(TafsirFont font) async {
+    state = state.copyWith(tafsirFont: font);
+    await _prefs.setString(_kTafsirFont, font.name);
+  }
+
+  Future<void> setTafsirFontScale(double value) async {
+    final clamped = value.clamp(0.8, 1.8).toDouble();
+    state = state.copyWith(tafsirFontScale: clamped);
+    await _prefs.setDouble(_kTafsirScale, clamped);
+  }
+
+  Future<void> setCommentaryShown(int sourceId, bool shown) async {
+    final hidden = {...state.hiddenCommentaries};
+    shown ? hidden.remove(sourceId) : hidden.add(sourceId);
+    state = state.copyWith(hiddenCommentaries: hidden);
+    await _prefs.setStringList(_kHiddenCommentaries, [
+      for (final id in hidden) '$id',
+    ]);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {
