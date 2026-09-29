@@ -566,4 +566,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noMarks => 'لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.';
+
+  @override
+  String get highlightDivineNames => 'تمييز لفظ الجلالة';
+
+  @override
+  String get highlightDivineNamesHint =>
+      'تلوين «الله» و«رب» و«ربنا» في صفحات المصحف';
 }

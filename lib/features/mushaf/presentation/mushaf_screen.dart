@@ -10,6 +10,7 @@ import '../../../core/db/user_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
@@ -225,6 +226,20 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         onHiddenTap: (v) => setState(() => _revealed.add(v)),
         ornateOpening: illuminated && pg <= 2,
         showHandles: _multi,
+        divineNames: settings.highlightDivineNames
+            ? ref.watch(divineNameBoxesProvider(pg)).value ?? const []
+            : const [],
+        divineColor: settings.highlightDivineNames
+            ? (context.tokens.mode == ThemeModeId.light
+                  ? const Color(0xFFC62828)
+                  : const Color(0xFFFF8A80))
+            : null,
+        emphasisLines: {
+          for (final b
+              in ref.watch(frameInfoProvider(pg)).value?.banners ??
+                  const <SurahBanner>[])
+            if (b.number != 9) b.line + 1,
+        },
       );
       final pageWidget = oldEdition
           ? OldMushafPage(page: pg, interaction: interaction)

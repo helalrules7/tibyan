@@ -30,6 +30,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kFontScale = 'settings.quranFontScale';
   static const _kMarkerStyle = 'settings.markerStyle';
   static const _kMarkerTint = 'settings.markerTint';
+  static const _kDivine = 'settings.highlightDivineNames';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -62,6 +63,7 @@ class SettingsController extends Notifier<AppSettings> {
           _enumByName(MarkerStyle.values, _prefs.getString(_kMarkerStyle)) ??
           MarkerStyle.traditional,
       markerTint: _prefs.getInt(_kMarkerTint),
+      highlightDivineNames: _prefs.getBool(_kDivine) ?? true,
     );
   }
 
@@ -114,6 +116,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setMarkerStyle(MarkerStyle style) async {
     state = state.copyWith(markerStyle: style);
     await _prefs.setString(_kMarkerStyle, style.name);
+  }
+
+  Future<void> setHighlightDivineNames(bool value) async {
+    state = state.copyWith(highlightDivineNames: value);
+    await _prefs.setBool(_kDivine, value);
   }
 
   Future<void> setMarkerTint(int? argb) async {

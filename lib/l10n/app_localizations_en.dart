@@ -567,4 +567,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noMarks => 'No marks yet. Tap a verse marker to mark it.';
+
+  @override
+  String get highlightDivineNames => 'Highlight the divine name';
+
+  @override
+  String get highlightDivineNamesHint =>
+      'Colour «Allah», «Rabb» and «Rabbana» on the pages';
 }

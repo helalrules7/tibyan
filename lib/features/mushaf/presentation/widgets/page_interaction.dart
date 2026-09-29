@@ -23,7 +23,17 @@ class PageInteraction {
     this.onHiddenTap,
     this.ornateOpening = false,
     this.showHandles = false,
+    this.divineNames = const [],
+    this.divineColor,
+    this.emphasisLines = const {},
   });
+
+  /// Boxes of the divine names to colour (edition units), and the colour.
+  final List<Rect> divineNames;
+  final Color? divineColor;
+
+  /// Line slots drawn larger and bolder (the basmala lines).
+  final Set<int> emphasisLines;
 
   /// Multi-verse selection is on: show the two drag handles.
   final bool showHandles;
