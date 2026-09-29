@@ -26,10 +26,14 @@ class PagePackSpec {
     required this.sha256,
     required this.bytes,
     required this.format,
+    this.mirrors = const [],
   });
 
   final String id;
   final String url;
+
+  /// Copies tried in order when [url] fails (same bytes, same SHA-256).
+  final List<String> mirrors;
   final String sha256;
   final int bytes;
   final PackFormat format;
@@ -42,16 +46,22 @@ class PagePackSpec {
     sha256: '9013b4c47c96eb36b5c9b7ad2b25b43a5d09c939879d85f8976147fce9d4580e',
     bytes: 65649525,
     format: PackFormat.svgXz,
+    mirrors: [
+      'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1441-v1.zip',
+    ],
   );
 
   /// Old Madina edition (1405H), Hafs: 604 PNG pages and glyph boxes,
-  /// downloaded from quran.com directly (we do not re-host them).
+  /// downloaded from quran.com, with our mirror as a fallback.
   static const madina1405 = PagePackSpec(
     id: 'pages-hafs-1405-qurancom-1024',
     url: 'https://files.quran.app/hafs/madani/zips/images_1024.zip',
     sha256: '401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85',
     bytes: 63441877,
     format: PackFormat.pngQuranCom,
+    mirrors: [
+      'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1405-qurancom-1024.zip',
+    ],
   );
 }
 
@@ -108,13 +118,28 @@ class PagePackInstaller {
     try {
       var received = _part.existsSync() ? _part.lengthSync() : 0;
       if (received < spec.bytes) {
-        final request = http.Request('GET', Uri.parse(spec.url));
-        if (received > 0) request.headers['Range'] = 'bytes=$received-';
-        final response = await _client.send(request);
+        // The source first, then each mirror, until one answers.
+        http.StreamedResponse? response;
+        Object? lastError;
+        for (final url in [spec.url, ...spec.mirrors]) {
+          try {
+            final request = http.Request('GET', Uri.parse(url));
+            if (received > 0) request.headers['Range'] = 'bytes=$received-';
+            final r = await _client.send(request);
+            if (r.statusCode == 200 || r.statusCode == 206) {
+              response = r;
+              break;
+            }
+            lastError = HttpException('HTTP ${r.statusCode}');
+          } on Exception catch (e) {
+            lastError = e;
+          }
+        }
+        if (response == null) {
+          throw lastError ?? const HttpException('No source');
+        }
         if (response.statusCode == 200) {
           received = 0; // server ignored Range: start over
-        } else if (response.statusCode != 206) {
-          throw HttpException('HTTP ${response.statusCode}');
         }
         final sink = _part.openWrite(
           mode: received == 0 ? FileMode.write : FileMode.append,
