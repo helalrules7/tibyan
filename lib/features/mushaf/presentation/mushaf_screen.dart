@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../core/db/content_database.dart';
+import '../../../core/db/user_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
@@ -17,6 +18,8 @@ import 'widgets/go_to_page.dart';
 import 'widgets/illuminated_frame.dart';
 import 'widgets/mushaf_page.dart';
 import 'widgets/old_mushaf_page.dart';
+import 'widgets/page_interaction.dart';
+import 'widgets/verse_services.dart';
 
 const mushafPageCount = 604;
 
@@ -48,13 +51,16 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   /// Reading is immersive: no bars until the reader touches the page.
   bool _chrome = false;
   int? _scrubPage;
-  VerseKey? _selected;
+
+  /// The selection: two ends on the current page, in either order.
+  VerseKey? _selA;
+  VerseKey? _selB;
 
   @override
   void initState() {
     super.initState();
     if (widget.selectSurah != null && widget.selectAyah != null) {
-      _selected = (surah: widget.selectSurah!, ayah: widget.selectAyah!);
+      _selA = _selB = (surah: widget.selectSurah!, ayah: widget.selectAyah!);
     }
     _open();
     if (ref.read(settingsProvider).keepScreenOn) WakelockPlus.enable();
@@ -104,7 +110,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   Future<void> _onPageChanged(int index) async {
     setState(() {
       _page = index + 1;
-      _selected = null;
+      _selA = _selB = null;
     });
     final ayahs = await ref.read(pageAyahsProvider(index + 1).future);
     if (ayahs.isEmpty) return;
@@ -135,32 +141,35 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
             .outerStyle ==
         'illuminated';
 
-    Widget pageAt(int i) {
-      final selected = i + 1 == _page ? _selected : null;
-      void onVerseTap(VerseKey v) => setState(() {
-        _selected = v == _selected ? null : v;
-      });
-      void onBackgroundTap() {
-        if (_selected != null) {
-          setState(() => _selected = null);
-        } else {
-          _setChrome(!_chrome);
-        }
-      }
+    final marks = <VerseKey, Color>{
+      for (final m
+          in ref.watch(bookmarkSetsProvider).value ?? const <BookmarkSetRow>[])
+        (surah: m.surah, ayah: m.ayah): Color(m.color),
+    };
 
+    Widget pageAt(int i) {
+      final interaction = PageInteraction(
+        selection: i + 1 == _page ? _selectionOn(i + 1) : const {},
+        marks: marks,
+        onTap: () {
+          if (_selA != null) {
+            setState(() => _selA = _selB = null);
+          } else {
+            _setChrome(!_chrome);
+          }
+        },
+        onVerseLongPress: (v) {
+          HapticFeedback.selectionClick();
+          _setChrome(false);
+          setState(() => _selA = _selB = v);
+        },
+        onMarkerTap: (v) => _setMark(MarkKind.reading, v, i + 1, auto: true),
+        onHandleDrag: (start, v) =>
+            setState(() => start ? _selA = v : _selB = v),
+      );
       final pageWidget = oldEdition
-          ? OldMushafPage(
-              page: i + 1,
-              selected: selected,
-              onVerseTap: onVerseTap,
-              onBackgroundTap: onBackgroundTap,
-            )
-          : MushafPage(
-              page: i + 1,
-              selected: selected,
-              onVerseTap: onVerseTap,
-              onBackgroundTap: onBackgroundTap,
-            );
+          ? OldMushafPage(page: i + 1, interaction: interaction)
+          : MushafPage(page: i + 1, interaction: interaction);
       if (!illuminated) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -191,6 +200,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
     }
 
     final scrubbing = _scrubPage ?? _page;
+    final range = _range();
     return Scaffold(
       backgroundColor: t.bg,
       body: Stack(
@@ -268,29 +278,77 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
               ),
             ),
           ],
-          if (_selected != null)
+          if (range != null)
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              child: SafeArea(
-                top: false,
-                child: VerseBar(
-                  verse: _selected!,
-                  surahs: surahs,
-                  onSave: () => showSaveToFasil(
-                    context,
-                    ref,
-                    verse: _selected!,
-                    page: _page,
-                  ),
-                  onClose: () => setState(() => _selected = null),
+              child: VerseServicesPanel(
+                verses: range,
+                surahs: surahs,
+                onMark: (kind) => _setMark(kind, range.first, _page),
+                onSaveToFasil: () => showSaveToFasil(
+                  context,
+                  ref,
+                  verse: range.first,
+                  page: _page,
                 ),
+                onClose: () => setState(() => _selA = _selB = null),
               ),
             ),
         ],
       ),
     );
+  }
+
+  /// Verses between the two selection ends on the current page, in order.
+  List<VerseKey>? _range() {
+    if (_selA == null || _selB == null) return null;
+    final ayahs = ref.watch(pageAyahsProvider(_page)).value;
+    if (ayahs == null) return [_selA!];
+    final keys = [for (final a in ayahs) (surah: a.surah, ayah: a.number)];
+    final ia = keys.indexOf(_selA!);
+    final ib = keys.indexOf(_selB!);
+    if (ia < 0 || ib < 0) return [_selA!];
+    return keys.sublist(ia < ib ? ia : ib, (ia < ib ? ib : ia) + 1);
+  }
+
+  Set<VerseKey> _selectionOn(int page) => {...?_range()};
+
+  Future<void> _setMark(
+    MarkKind kind,
+    VerseKey v,
+    int page, {
+    bool auto = false,
+  }) async {
+    final l = AppLocalizations.of(context);
+    final name = switch (kind) {
+      MarkKind.reading => l.markReading,
+      MarkKind.review => l.markReview,
+      MarkKind.hifz => l.markHifz,
+      MarkKind.tadabbur => l.markTadabbur,
+    };
+    HapticFeedback.lightImpact();
+    await ref
+        .read(userDatabaseProvider)
+        .setMark(kind, name: name, surah: v.surah, ayah: v.ayah, page: page);
+    if (!mounted) return;
+    final surahs = ref.read(surahsProvider).value;
+    final sName = surahs == null ? '' : surahName(context, surahs[v.surah - 1]);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(milliseconds: 1600),
+          content: Text(
+            auto
+                ? l.autoFasil(sName, digits(v.ayah))
+                : l.markMoved(name, sName, digits(v.ayah)),
+          ),
+        ),
+      );
   }
 
   Future<void> _goToPage() async {

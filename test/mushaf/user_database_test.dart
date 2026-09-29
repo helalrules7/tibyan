@@ -42,4 +42,32 @@ void main() {
     sets = await db.watchBookmarkSets().first;
     expect(sets, isEmpty);
   });
+
+  test('fixed marks move instead of multiplying, and sort first', () async {
+    await db.addBookmarkSet(
+      name: 'Mine',
+      color: 0xFF000000,
+      surah: 1,
+      ayah: 1,
+      page: 1,
+    );
+    await db.setMark(
+      MarkKind.reading,
+      name: 'قراءة',
+      surah: 2,
+      ayah: 1,
+      page: 2,
+    );
+    await db.setMark(
+      MarkKind.reading,
+      name: 'قراءة',
+      surah: 3,
+      ayah: 5,
+      page: 50,
+    );
+    await db.setMark(MarkKind.hifz, name: 'حفظ', surah: 67, ayah: 1, page: 562);
+    final sets = await db.watchBookmarkSets().first;
+    expect(sets.map((s) => s.kind), ['reading', 'hifz', null]);
+    expect((sets.first.surah, sets.first.ayah), (3, 5));
+  });
 }

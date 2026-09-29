@@ -109,13 +109,89 @@
   "mushafOpen": "Open the mushaf",
   "loadingLabel": "Loading…",
   "hizbLabel": "Hizb {number}",
-  "@hizbLabel": {"placeholders": {"number": {"type": "String"}}},
+  "@hizbLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "catchwordLabel": "First word of the next page: {word}",
-  "@catchwordLabel": {"placeholders": {"word": {"type": "String"}}},
+  "@catchwordLabel": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
   "tabHizb": "Hizbs",
   "goToPage": "Go to page",
   "goToPageHint": "Page number, 1 to 604",
   "goLabel": "Go",
   "hizbStartsAt": "Starts at {surah} {ayah}",
-  "@hizbStartsAt": {"placeholders": {"surah": {"type": "String"}, "ayah": {"type": "String"}}}
+  "@hizbStartsAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "selectionStart": "Start of selection",
+  "selectionEnd": "End of selection",
+  "servicesTitle": "Verse services",
+  "markReading": "Reading",
+  "markReview": "Review",
+  "markHifz": "Memorizing",
+  "markTadabbur": "Reflection",
+  "autoFasil": "Reading mark set at {surah} {ayah}",
+  "@autoFasil": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "markMoved": "{mark}: {surah} {ayah}",
+  "@markMoved": {
+    "placeholders": {
+      "mark": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "verseRange": "{surah} {from}–{to}",
+  "@verseRange": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "versesCount": "{count} verses",
+  "@versesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "twoVerses": "2 verses"
 }

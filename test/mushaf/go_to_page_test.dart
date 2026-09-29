@@ -9,7 +9,9 @@ import 'package:tibyan/features/mushaf/presentation/widgets/go_to_page.dart';
 import 'package:tibyan/l10n/app_localizations.dart';
 
 void main() {
-  testWidgets('go to page accepts 1 to 604 in either digit set', (tester) async {
+  testWidgets('go to page accepts 1 to 604 in either digit set', (
+    tester,
+  ) async {
     final registry = await ThemeRegistry.load(rootBundle);
     int? result = -1;
     await tester.pumpWidget(
@@ -25,7 +27,8 @@ void main() {
           ),
           home: Builder(
             builder: (context) => TextButton(
-              onPressed: () async => result = await showGoToPage(context, current: 50),
+              onPressed: () async =>
+                  result = await showGoToPage(context, current: 50),
               child: const Text('open'),
             ),
           ),

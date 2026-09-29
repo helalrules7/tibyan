@@ -787,6 +787,78 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'يبدأ من {surah} {ayah}'**
   String hizbStartsAt(String surah, String ayah);
+
+  /// No description provided for @selectionStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'بداية التحديد'**
+  String get selectionStart;
+
+  /// No description provided for @selectionEnd.
+  ///
+  /// In ar, this message translates to:
+  /// **'نهاية التحديد'**
+  String get selectionEnd;
+
+  /// No description provided for @servicesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'خدمات الآيات'**
+  String get servicesTitle;
+
+  /// No description provided for @markReading.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة'**
+  String get markReading;
+
+  /// No description provided for @markReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراجعة'**
+  String get markReview;
+
+  /// No description provided for @markHifz.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get markHifz;
+
+  /// No description provided for @markTadabbur.
+  ///
+  /// In ar, this message translates to:
+  /// **'تدبر'**
+  String get markTadabbur;
+
+  /// No description provided for @autoFasil.
+  ///
+  /// In ar, this message translates to:
+  /// **'فاصل تلقائي عند {surah} {ayah}'**
+  String autoFasil(String surah, String ayah);
+
+  /// No description provided for @markMoved.
+  ///
+  /// In ar, this message translates to:
+  /// **'{mark}: {surah} {ayah}'**
+  String markMoved(String mark, String surah, String ayah);
+
+  /// No description provided for @verseRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'{surah} {from}–{to}'**
+  String verseRange(String surah, String from, String to);
+
+  /// No description provided for @versesCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} آيات'**
+  String versesCount(String count);
+
+  /// No description provided for @twoVerses.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيتان'**
+  String get twoVerses;
 }
 
 class _AppLocalizationsDelegate
