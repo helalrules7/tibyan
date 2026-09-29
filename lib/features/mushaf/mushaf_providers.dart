@@ -206,6 +206,55 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
     }
   }
 
+  // A surah whose first verse opens the next page may have its header (and
+  // basmala) at the end of this page.
+  if (page > 2 && page < 604) {
+    final next = (await repo.ayahsOnPage(page + 1, edition)).firstOrNull;
+    if (next != null && next.number == 1) {
+      int? lineOnNext;
+      if (edition == MushafEdition.madina1405) {
+        final glyphs =
+            await ref.watch(ayahInfoDatabaseProvider)?.page(page + 1) ??
+            const [];
+        for (final g in glyphs) {
+          if (g.suraNumber == next.surah && g.ayahNumber == 1) {
+            final l = g.lineNumber - 1;
+            if (lineOnNext == null || l < lineOnNext) lineOnNext = l;
+          }
+        }
+      } else {
+        for (final p in await repo.polygons(page + 1)) {
+          if (p.surah == next.surah && p.number == 1) {
+            lineOnNext = ((outlineRects(p.path).first.top - 8.3) / 35.75)
+                .round()
+                .clamp(0, 14);
+          }
+        }
+      }
+      // Header and basmala need two lines (one for at-Tawba); those that do
+      // not fit on the next page are the last lines of this one.
+      final needed = next.surah == 9 ? 1 : 2;
+      if (lineOnNext != null && lineOnNext < needed) {
+        final header = 15 - (needed - lineOnNext);
+        final s = surahs[next.surah - 1];
+        final before = surahs
+            .where((x) => x.revelationOrder == s.revelationOrder - 1)
+            .firstOrNull;
+        banners.add(
+          SurahBanner(
+            line: header,
+            number: s.id,
+            name: s.nameAr,
+            meccan: s.revelation == 'meccan',
+            ayahCount: s.ayahCount,
+            order: s.revelationOrder,
+            after: before?.nameAr,
+          ),
+        );
+      }
+    }
+  }
+
   final quarters = <QuarterMark>[
     if (page > 2)
       for (final a in await repo.quarterStartsOnPage(page, edition))
