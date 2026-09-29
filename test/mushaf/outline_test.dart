@@ -11,4 +11,14 @@ void main() {
     expect(path.contains(const Offset(300, 130)), isTrue);
     expect(path.contains(const Offset(300, 90)), isFalse);
   });
+
+  test('printed verse markers can be removed from a page', () {
+    const svg =
+        '<svg><g><g id="ayah_markers"><g class="ayah-mark"><path d="M0 0"/></g></g>'
+        '<g id="content"><path d="M1 1"/></g></g></svg>';
+    final out = withoutMarkers(svg);
+    expect(out.contains('ayah_markers'), isFalse);
+    expect(out.contains('<g id="content"><path d="M1 1"/></g>'), isTrue);
+    expect(withoutMarkers('<svg></svg>'), '<svg></svg>');
+  });
 }
