@@ -311,6 +311,19 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               for (final v in verses)
                 if (x.selection.contains(v.key)) v,
             ];
+            // Pages 1 and 2 keep their own layout; their verses are drawn
+            // as whole outlines there.
+            final boxes = widget.page <= 2
+                ? [
+                    for (final v in selected)
+                      for (final r in v.rects) r.inflate(1),
+                  ]
+                : lineBoxes(
+                    [for (final v in selected) ...v.rects],
+                    lineOf: (r) => layout._lineOf(r.center.dy),
+                    centre: layout._centre,
+                    halfHeight: _pitch * 0.42,
+                  );
             final handles = <Widget>[];
             if (selected.isNotEmpty && x.showHandles) {
               // Right-to-left: the selection starts at the top right of its
@@ -400,11 +413,13 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 }
                               }
                             }
-                            final fill = Paint()
-                              ..color = tokens.colors.highlight;
-                            for (final v in selected) {
-                              c.drawPath(v.path, fill);
-                            }
+                            paintVerseBoxes(
+                              c,
+                              boxes,
+                              tokens.colors.highlight,
+                              stroke: 0.7,
+                              radius: 3,
+                            );
                             for (final v in verses) {
                               final colour = x.marks[v.key];
                               if (v.marker == null || colour == null) continue;
