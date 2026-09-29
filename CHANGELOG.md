@@ -6,6 +6,17 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (listening)
+- Seven recitations from mp3quran.net: al-Minshawi, al-Husary, Abdul Basit, al-Banna and Mustafa Ismail (murattal), and al-Banna and Mustafa Ismail (mujawwad).
+- The recited verse is highlighted and pages turn with it, using mp3quran's published verse timings (five recitations; two surahs with a verse missing in the source play without highlighting).
+- Repeat a verse or a selected stretch 1 to 10 times or until stopped, with silence between repeats; sleep timer; background playback with lock-screen controls; per-surah downloads that resume.
+
+### Changed
+- The verse highlight is a framed box per line instead of following every letter.
+
+### Fixed
+- Android release builds now declare the INTERNET permission needed to download pages and recitations.
+
 ### Added (tafsir and translation)
 - Tafsir and translation screen, opened from verse services: al-Tafsir al-Muyassar (KFGQPC, via QuranEnc), Saheeh International 1.1.2 with its footnotes (via QuranEnc), and Pickthall (public domain, via Tanzil). Every text is shown verbatim with its source's credit and version.
 - Swipe or use the arrows to move through the surah's verses; texts sit side by side on wide screens for comparison.
