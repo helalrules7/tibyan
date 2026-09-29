@@ -8,6 +8,8 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
+import '../../../core/settings/app_settings.dart';
+
 /// How a pack's zip is laid out.
 enum PackFormat {
   /// Our pack: `NNN.svg.xz` pages and a manifest with per-page SHA-256.
@@ -16,6 +18,10 @@ enum PackFormat {
   /// quran.com's `images_1024.zip`: `width_1024/pageNNN.png` and
   /// `databases/ayahinfo_1024.db` (glyph boxes).
   pngQuranCom,
+
+  /// The Shamarly page images as archived: `001.png` … `522.png` at the
+  /// zip root. Their geometry is in content.db.
+  pngShamarly,
 }
 
 /// A downloadable set of mushaf pages.
@@ -26,43 +32,65 @@ class PagePackSpec {
     required this.sha256,
     required this.bytes,
     required this.format,
-    this.mirrors = const [],
+    this.fallbacks = const [],
   });
 
   final String id;
+
+  /// Tried first: Tibyan's mirror, which is the fastest.
   final String url;
 
-  /// Copies tried in order when [url] fails (same bytes, same SHA-256).
-  final List<String> mirrors;
+  /// The original sources, tried in order when [url] fails (same bytes,
+  /// same SHA-256).
+  final List<String> fallbacks;
   final String sha256;
   final int bytes;
   final PackFormat format;
 
   /// New Madina edition (1441H), Hafs: 604 SVG pages, each xz-compressed.
-  /// Built by tools/build_page_pack.py; published as a GitHub release.
+  /// Built by tools/build_page_pack.py; on Tibyan's mirror and as a GitHub
+  /// release.
   static const madina1441 = PagePackSpec(
     id: 'pages-hafs-1441-v1',
-    url: 'https://github.com/helalrules7/tibyan/releases/download/pages-hafs-1441-v1/pages-hafs-1441-v1.zip',
+    url: 'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1441-v1.zip',
     sha256: '9013b4c47c96eb36b5c9b7ad2b25b43a5d09c939879d85f8976147fce9d4580e',
     bytes: 65649525,
     format: PackFormat.svgXz,
-    mirrors: [
-      'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1441-v1.zip',
+    fallbacks: [
+      'https://github.com/helalrules7/tibyan/releases/download/pages-hafs-1441-v1/pages-hafs-1441-v1.zip',
     ],
   );
 
   /// Old Madina edition (1405H), Hafs: 604 PNG pages and glyph boxes,
-  /// downloaded from quran.com, with our mirror as a fallback.
+  /// from Tibyan's mirror, with quran.com as the fallback.
   static const madina1405 = PagePackSpec(
     id: 'pages-hafs-1405-qurancom-1024',
-    url: 'https://files.quran.app/hafs/madani/zips/images_1024.zip',
+    url: 'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1405-qurancom-1024.zip',
     sha256: '401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85',
     bytes: 63441877,
     format: PackFormat.pngQuranCom,
-    mirrors: [
-      'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1405-qurancom-1024.zip',
-    ],
+    fallbacks: ['https://files.quran.app/hafs/madani/zips/images_1024.zip'],
   );
+
+  /// Shamarly (Egyptian) edition, Hafs: 522 PNG pages (886 x 1377) from
+  /// archive.org (details/shamerly), stored unchanged in one zip on
+  /// Tibyan's mirror.
+  static const shamarly = PagePackSpec(
+    id: 'pages-hafs-shamarly-v1',
+    url: 'https://tibyan.ahmedhelal.dev/mirror/sources/shamarly/shamarly-pages-archive-org.zip',
+    sha256: '03199bf95590458df94670d6d1ba5f17e56ec72413df51dd30087aa5beaa712d',
+    bytes: 214988080,
+    format: PackFormat.pngShamarly,
+    // No fallback: archive.org serves the pages one by one, never as this
+    // zip, so no other source has the same bytes and SHA-256.
+    fallbacks: [],
+  );
+
+  static PagePackSpec of(MushafEdition edition) => switch (edition) {
+    MushafEdition.madina1441 => madina1441,
+    MushafEdition.madina1405 => madina1405,
+    MushafEdition.shamarly => shamarly,
+  };
 }
 
 enum PackPhase { idle, downloading, verifying, installing, installed, failed }
@@ -118,10 +146,11 @@ class PagePackInstaller {
     try {
       var received = _part.existsSync() ? _part.lengthSync() : 0;
       if (received < spec.bytes) {
-        // The source first, then each mirror, until one answers.
+        // Tibyan's mirror first, then each original source, until one
+        // answers.
         http.StreamedResponse? response;
         Object? lastError;
-        for (final url in [spec.url, ...spec.mirrors]) {
+        for (final url in [spec.url, ...spec.fallbacks]) {
           try {
             final request = http.Request('GET', Uri.parse(url));
             if (received > 0) request.headers['Range'] = 'bytes=$received-';
@@ -192,9 +221,11 @@ class PagePackInstaller {
       final target = dir.path;
       final format = spec.format;
       await Isolate.run(
-        () => format == PackFormat.svgXz
-            ? _extractAndVerify(partPath, target)
-            : _extractQuranCom(partPath, target),
+        () => switch (format) {
+          PackFormat.svgXz => _extractAndVerify(partPath, target),
+          PackFormat.pngQuranCom => _extractQuranCom(partPath, target),
+          PackFormat.pngShamarly => _extractShamarly(partPath, target),
+        },
       );
       _done.writeAsStringSync(DateTime.now().toIso8601String());
       _part.deleteSync();
@@ -263,6 +294,29 @@ void _extractQuranCom(String zipPath, String targetDir) {
     throw const FormatException('The page pack is incomplete.');
   }
 }
+
+/// Keeps the 522 Shamarly page images as `NNN.png`. The whole zip was
+/// already checked against its SHA-256.
+void _extractShamarly(String zipPath, String targetDir) {
+  final input = InputFileStream(zipPath);
+  final archive = ZipDecoder().decodeStream(input);
+  final pageName = RegExp(r'^(\d{3})\.png$');
+  Directory(targetDir).createSync(recursive: true);
+  final pages = <String>{};
+  for (final entry in archive.files) {
+    if (!entry.isFile || pageName.firstMatch(entry.name) == null) continue;
+    File(p.join(targetDir, entry.name))
+        .writeAsBytesSync(entry.content, flush: true);
+    pages.add(entry.name);
+  }
+  input.closeSync();
+  if (pages.length != shamarlyPageCount) {
+    throw const FormatException('The page pack is incomplete.');
+  }
+}
+
+/// Pages in the Shamarly pack (page 1 is the cover).
+const shamarlyPageCount = 522;
 
 /// Reads one installed page as SVG text. Decompression runs off the UI
 /// thread; recent pages are kept in memory for fast page turns.

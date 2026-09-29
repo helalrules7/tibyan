@@ -3,19 +3,26 @@ import 'package:flutter/services.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'illuminated_frame.dart' show NumberFormatter;
 
-/// Asks for a page number from 1 to 604; returns it, or null if cancelled.
-Future<int?> showGoToPage(BuildContext context, {required int current}) {
+/// Asks for a page number from 1 to [max] (604 in the Madina editions);
+/// returns it, or null if cancelled.
+Future<int?> showGoToPage(
+  BuildContext context, {
+  required int current,
+  int max = 604,
+}) {
   return showDialog<int>(
     context: context,
-    builder: (context) => _GoToPageDialog(current: current),
+    builder: (context) => _GoToPageDialog(current: current, max: max),
   );
 }
 
 class _GoToPageDialog extends StatefulWidget {
-  const _GoToPageDialog({required this.current});
+  const _GoToPageDialog({required this.current, required this.max});
 
   final int current;
+  final int max;
 
   @override
   State<_GoToPageDialog> createState() => _GoToPageDialogState();
@@ -36,11 +43,11 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
       (m) => '${m[0]!.codeUnitAt(0) - 0x0660}',
     );
     final n = int.tryParse(latin);
-    return n != null && n >= 1 && n <= 604 ? n : null;
+    return n != null && n >= 1 && n <= widget.max ? n : null;
   }
 
   void _step(int by) {
-    final n = ((_value ?? widget.current) + by).clamp(1, 604);
+    final n = ((_value ?? widget.current) + by).clamp(1, widget.max);
     setState(() => _field.text = '$n');
   }
 
@@ -48,6 +55,9 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
+    final hint = l.goToPageHint(
+      NumberFormatter(Localizations.localeOf(context))(widget.max),
+    );
     return AlertDialog(
       title: Text(l.goToPage, textAlign: TextAlign.center),
       content: Row(
@@ -75,9 +85,9 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
                 color: t.ink,
               ),
               decoration: InputDecoration(
-                labelText: l.goToPageHint,
+                labelText: hint,
                 errorText: _field.text.isNotEmpty && _value == null
-                    ? l.goToPageHint
+                    ? hint
                     : null,
                 border: const OutlineInputBorder(),
               ),

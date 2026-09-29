@@ -49,6 +49,17 @@ int? ayahAt(List<AyahTimingRow> timings, int ms) {
 
 String surahFile(int surah) => '${surah.toString().padLeft(3, '0')}.mp3';
 
+/// Tibyan's mirror of the recitations, laid out like mp3quran's servers.
+const recitationMirror =
+    'https://tibyan.ahmedhelal.dev/mirror/sources/recitations';
+
+/// Where a surah file can be fetched, in order: Tibyan's mirror first
+/// (faster), then mp3quran itself.
+List<Uri> surahUrls(ReciterRow reciter, int surah) {
+  final source = Uri.parse('${reciter.folderUrl}${surahFile(surah)}');
+  return [Uri.parse('$recitationMirror${source.path}'), source];
+}
+
 /// Surah files kept on the device, under `<app support>/audio/<reciter>/`.
 class AudioFiles {
   AudioFiles(this.root);
@@ -84,15 +95,25 @@ class AudioFiles {
     final have = part.existsSync() ? part.lengthSync() : 0;
     final c = client ?? http.Client();
     try {
-      final request = http.Request(
-        'GET',
-        Uri.parse('${reciter.folderUrl}${surahFile(surah)}'),
-      );
-      if (have > 0) request.headers['Range'] = 'bytes=$have-';
-      final response = await c.send(request);
-      if (response.statusCode != 200 && response.statusCode != 206) {
-        throw HttpException('HTTP ${response.statusCode}');
+      // The mirror first, then the source; both serve the same bytes, so
+      // a partial file resumes from either.
+      http.StreamedResponse? response;
+      Object? lastError;
+      for (final url in surahUrls(reciter, surah)) {
+        try {
+          final request = http.Request('GET', url);
+          if (have > 0) request.headers['Range'] = 'bytes=$have-';
+          final r = await c.send(request);
+          if (r.statusCode == 200 || r.statusCode == 206) {
+            response = r;
+            break;
+          }
+          lastError = HttpException('HTTP ${r.statusCode}');
+        } on Exception catch (e) {
+          lastError = e;
+        }
       }
+      if (response == null) throw lastError ?? const HttpException('No source');
       final sink = part.openWrite(
         mode: response.statusCode == 206 ? FileMode.append : FileMode.write,
       );
@@ -297,27 +318,31 @@ class RecitationController extends Notifier<RecitationState> {
     );
     final files = ref.read(audioFilesProvider);
     final local = files.file(reciter.id, surah);
-    final uri = local.existsSync()
-        ? local.uri
-        : Uri.parse('${reciter.folderUrl}${surahFile(surah)}');
-    try {
-      await _p.setAudioSource(
-        AudioSource.uri(
-          uri,
-          tag: MediaItem(
-            id: '${reciter.id}/$surah',
-            title: surahRow.nameAr,
-            artist: reciter.nameAr,
-            album: 'تبيان',
+    // A downloaded copy, else the mirror, else mp3quran itself.
+    final uris = local.existsSync() ? [local.uri] : surahUrls(reciter, surah);
+    Object? error;
+    for (final uri in uris) {
+      try {
+        await _p.setAudioSource(
+          AudioSource.uri(
+            uri,
+            tag: MediaItem(
+              id: '${reciter.id}/$surah',
+              title: surahRow.nameAr,
+              artist: reciter.nameAr,
+              album: 'تبيان',
+            ),
           ),
-        ),
-        initialPosition: _startOf(from),
-      );
-      state = state.copyWith(loading: false);
-      unawaited(_p.play());
-    } catch (e) {
-      state = state.copyWith(loading: false, error: () => e.toString());
+          initialPosition: _startOf(from),
+        );
+        state = state.copyWith(loading: false);
+        unawaited(_p.play());
+        return;
+      } catch (e) {
+        error = e;
+      }
     }
+    state = state.copyWith(loading: false, error: () => error.toString());
   }
 
   /// Where [ayah] starts; verse 1 (or none) starts at the top of the file

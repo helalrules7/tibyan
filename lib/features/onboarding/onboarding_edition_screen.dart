@@ -6,6 +6,7 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../mushaf/data/page_pack.dart';
 
 /// First launch, screen 2: which Madina mushaf edition to read.
 class OnboardingEditionScreen extends ConsumerWidget {
@@ -66,6 +67,12 @@ class OnboardingEditionScreen extends ConsumerWidget {
                     title: l.editionOld,
                     body: l.editionOldDesc,
                   ),
+                  const SizedBox(height: 12),
+                  _EditionCard(
+                    value: MushafEdition.shamarly,
+                    title: l.editionShamarly,
+                    body: l.editionShamarlyDesc,
+                  ),
                 ],
               ),
             ),
@@ -80,7 +87,11 @@ class OnboardingEditionScreen extends ConsumerWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        l.pagesDownloadNote('65'),
+                        l.pagesDownloadNote(
+                          (PagePackSpec.of(settings.edition).bytes / 1e6)
+                              .round()
+                              .toString(),
+                        ),
                         style: const TextStyle(height: 1.6),
                       ),
                     ),

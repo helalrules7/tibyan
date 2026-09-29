@@ -380,6 +380,18 @@ abstract class AppLocalizations {
   /// **'طبعة 1405هـ المشهورة في التطبيقات القديمة، مع تظليل الكلمة.'**
   String get editionOldDesc;
 
+  /// No description provided for @editionShamarly.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصحف الشمرلي (الطبعة المصرية)'**
+  String get editionShamarly;
+
+  /// No description provided for @editionShamarlyDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'طبعة الشمرلي المصرية المعروفة، 522 صفحة، مع تظليل الآية وتظليل الكلمة في كثير من الآيات.'**
+  String get editionShamarlyDesc;
+
   /// No description provided for @defaultTag.
   ///
   /// In ar, this message translates to:
@@ -481,6 +493,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.'**
   String get pagesCreditOld;
+
+  /// No description provided for @pagesCreditShamarly.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.'**
+  String get pagesCreditShamarly;
 
   /// No description provided for @editionLabel.
   ///
@@ -773,8 +791,8 @@ abstract class AppLocalizations {
   /// No description provided for @goToPageHint.
   ///
   /// In ar, this message translates to:
-  /// **'رقم الصفحة من ١ إلى ٦٠٤'**
-  String get goToPageHint;
+  /// **'رقم الصفحة من ١ إلى {max}'**
+  String goToPageHint(String max);
 
   /// No description provided for @goLabel.
   ///

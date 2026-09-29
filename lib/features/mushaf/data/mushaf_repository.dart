@@ -24,16 +24,21 @@ class MushafRepository {
   Future<SurahRow> surahById(int id) =>
       (_db.select(_db.surah)..where((t) => t.id.equals(id))).getSingle();
 
-  /// Verses on a page of the given Madina edition.
+  /// Verses on a page of the given edition, in order. In the Shamarly
+  /// edition this includes a verse that started on the page before.
   Future<List<AyahRow>> ayahsOnPage(
     int page, [
     MushafEdition edition = MushafEdition.madina1441,
   ]) =>
       (_db.select(_db.ayah)
             ..where(
-              (t) => edition == MushafEdition.madina1405
-                  ? t.page1405.equals(page)
-                  : t.page.equals(page),
+              (t) => switch (edition) {
+                MushafEdition.madina1441 => t.page.equals(page),
+                MushafEdition.madina1405 => t.page1405.equals(page),
+                MushafEdition.shamarly =>
+                  t.pageShamarly.isSmallerOrEqualValue(page) &
+                      t.pageShamarlyEnd.isBiggerOrEqualValue(page),
+              },
             )
             ..orderBy([(t) => OrderingTerm.asc(t.id)]))
           .get();
@@ -121,7 +126,7 @@ class MushafRepository {
     int page,
     MushafEdition edition,
   ) async {
-    final col = edition == MushafEdition.madina1405 ? 'page_1405' : 'page';
+    final col = edition.pageColumn;
     final rows = await _db
         .customSelect(
           'SELECT a.id AS id FROM ayah a LEFT JOIN ayah b ON b.id = a.id - 1 '
@@ -132,6 +137,65 @@ class MushafRepository {
     final ids = [for (final r in rows) r.read<int>('id')];
     if (ids.isEmpty) return const [];
     return (_db.select(_db.ayah)..where((t) => t.id.isIn(ids))).get();
+  }
+
+  /// Shamarly page geometry: the page, its line slots and the ink that
+  /// crosses a band edge.
+  Future<ShamarlyPageRow?> shamarlyPage(int page) => (_db.select(
+    _db.shamarlyPage,
+  )..where((t) => t.page.equals(page))).getSingleOrNull();
+
+  Future<List<ShamarlyLineRow>> shamarlyLines(int page) =>
+      (_db.select(_db.shamarlyLine)
+            ..where((t) => t.page.equals(page))
+            ..orderBy([(t) => OrderingTerm.asc(t.line)]))
+          .get();
+
+  Future<List<ShamarlyOverflowRow>> shamarlyOverflow(int page) => (_db.select(
+    _db.shamarlyLineOverflow,
+  )..where((t) => t.page.equals(page))).get();
+
+  /// Printed surah headers on a Shamarly page.
+  Future<List<ShamarlyHeaderRow>> shamarlyHeaders(int page) =>
+      (_db.select(_db.shamarlyHeader)..where((t) => t.page.equals(page))).get();
+
+  Future<List<ShamarlyMarkerRow>> shamarlyMarkers(int page) =>
+      (_db.select(_db.shamarlyMarker)..where((t) => t.page.equals(page))).get();
+
+  /// One box per verse per line on a Shamarly page, in reading order.
+  Future<List<ShamarlyVerseBoxRow>> shamarlyVerseBoxes(int page) =>
+      (_db.select(_db.shamarlyVerseBox)
+            ..where((t) => t.page.equals(page))
+            ..orderBy([
+              (t) => OrderingTerm.asc(t.surah),
+              (t) => OrderingTerm.asc(t.ayah),
+              (t) => OrderingTerm.asc(t.part),
+            ]))
+          .get();
+
+  /// Shamarly word boxes on a page whose split is at least [minLevel]
+  /// sure (see [shamarlyWordLevel]).
+  Future<List<ShamarlyWordBoxRow>> shamarlyWordBoxes(
+    int page, {
+    int minLevel = shamarlyWordLevel,
+  }) =>
+      (_db.select(_db.shamarlyWordBox)..where(
+            (t) => t.page.equals(page) & t.level.isBiggerOrEqualValue(minLevel),
+          ))
+          .get();
+
+  /// Page of each word of a verse in the Shamarly edition, for words
+  /// with boxes of at least [shamarlyWordLevel].
+  Future<Map<int, int>> shamarlyWordPages(int surah, int ayah) async {
+    final rows =
+        await (_db.select(_db.shamarlyWordBox)..where(
+              (t) =>
+                  t.surah.equals(surah) &
+                  t.ayah.equals(ayah) &
+                  t.level.isBiggerOrEqualValue(shamarlyWordLevel),
+            ))
+            .get();
+    return {for (final r in rows) r.word: r.page};
   }
 
   Future<List<OldOverflowRow>> oldLineOverflow(int page) => (_db.select(
@@ -185,13 +249,34 @@ extension AyahDisplay on AyahRow {
   String get displayNumber => displayText.substring(_numberSplit + 1);
 }
 
-/// Page numbers differ between the two Madina editions.
+/// Shamarly word boxes are shown only for verses whose split into words
+/// is at least this sure: 2 = the four splits of tools/build_shamarly.py
+/// agree; 1 = not yet reviewed. Verses below it are highlighted whole.
+const shamarlyWordLevel = 2;
+
+/// Page numbers differ between the editions. In the Shamarly edition this
+/// is the page where the verse starts.
 extension EditionPages on AyahRow {
-  int pageIn(MushafEdition edition) =>
-      edition == MushafEdition.madina1405 ? page1405 : page;
+  int pageIn(MushafEdition edition) => switch (edition) {
+    MushafEdition.madina1441 => page,
+    MushafEdition.madina1405 => page1405,
+    MushafEdition.shamarly => pageShamarly,
+  };
 }
 
 extension EditionStartPages on SurahRow {
-  int startPageIn(MushafEdition edition) =>
-      edition == MushafEdition.madina1405 ? startPage1405 : startPage;
+  int startPageIn(MushafEdition edition) => switch (edition) {
+    MushafEdition.madina1441 => startPage,
+    MushafEdition.madina1405 => startPage1405,
+    MushafEdition.shamarly => startPageShamarly,
+  };
+}
+
+extension on MushafEdition {
+  /// The `ayah` column holding the (start) page in this edition.
+  String get pageColumn => switch (this) {
+    MushafEdition.madina1441 => 'page',
+    MushafEdition.madina1405 => 'page_1405',
+    MushafEdition.shamarly => 'page_shamarly',
+  };
 }

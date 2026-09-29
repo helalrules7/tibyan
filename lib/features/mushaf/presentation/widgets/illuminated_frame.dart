@@ -77,8 +77,12 @@ class FrameInfo {
     this.catchword,
     this.banners = const [],
     this.quarters = const [],
+    this.basmalaLines = const {},
     this.outerRight = true,
   });
+
+  /// Line slots of the basmala under a surah header, drawn a little larger.
+  final Set<int> basmalaLines;
 
   /// Surahs that start on this page, drawn over their printed header line.
   final List<SurahBanner> banners;
@@ -102,6 +106,7 @@ class FrameInfo {
 class SurahBanner {
   const SurahBanner({
     required this.line,
+    this.slots = 1,
     required this.number,
     required this.name,
     required this.meccan,
@@ -110,8 +115,10 @@ class SurahBanner {
     this.after,
   });
 
-  /// Line slot (0..14) of the printed header.
+  /// Line slot (0..14) of the printed header, and how many slots it takes
+  /// (two in the Shamarly edition).
   final int line;
+  final int slots;
   final int number;
   final String name;
   final bool meccan;
@@ -153,7 +160,12 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onPageTap,
     this.onQuarterTap,
     this.tools,
+    this.linePadding,
   });
+
+  /// Room the page keeps above its first line and below its last, for a
+  /// page of the given size; the banners and margin marks follow it.
+  final EdgeInsets Function(Size page)? linePadding;
 
   static const band = 30.0;
   static const lines = 15;
@@ -176,21 +188,27 @@ class IlluminatedFrame extends ConsumerWidget {
     final overlays = LayoutBuilder(
       builder: (context, box) {
         const inset = band + 6;
-        final slot = (box.maxHeight - 2 * inset) / lines;
+        final pad =
+            linePadding?.call(
+              Size(box.maxWidth - 2 * inset, box.maxHeight - 2 * inset),
+            ) ??
+            EdgeInsets.zero;
+        final slot = (box.maxHeight - 2 * inset - pad.vertical) / lines;
+        final top = inset + pad.top;
         return Stack(
           clipBehavior: Clip.none,
           children: [
             for (final b in info?.banners ?? const <SurahBanner>[])
               Positioned(
-                top: inset + b.line * slot,
+                top: top + b.line * slot,
                 left: inset - 4,
                 right: inset - 4,
-                height: slot,
+                height: slot * b.slots,
                 child: SurahBannerView(banner: b, images: images),
               ),
             for (final q in info?.quarters ?? const <QuarterMark>[])
               Positioned(
-                top: inset + (q.line + 0.5) * slot - 17,
+                top: top + (q.line + 0.5) * slot - 17,
                 left: (info!.outerRight) ? null : band / 2 - 17,
                 right: (info!.outerRight) ? band / 2 - 17 : null,
                 child: _QuarterRosette(

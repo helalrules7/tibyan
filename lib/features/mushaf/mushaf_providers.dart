@@ -38,7 +38,7 @@ final surahsProvider = FutureProvider<List<SurahRow>>(
   (ref) => ref.watch(mushafRepositoryProvider).surahs(),
 );
 
-/// The Madina edition the reader chose.
+/// The mushaf edition the reader chose.
 final editionProvider = Provider<MushafEdition>(
   (ref) => ref.watch(settingsProvider.select((s) => s.edition)),
 );
@@ -46,9 +46,7 @@ final editionProvider = Provider<MushafEdition>(
 final pageInstallerProvider = Provider<PagePackInstaller>(
   (ref) => PagePackInstaller(
     root: Directory(p.join(ref.watch(packRootProvider).path, 'packs')),
-    spec: ref.watch(editionProvider) == MushafEdition.madina1405
-        ? PagePackSpec.madina1405
-        : PagePackSpec.madina1441,
+    spec: PagePackSpec.of(ref.watch(editionProvider)),
   ),
 );
 
@@ -151,12 +149,118 @@ final basmalaProvider = FutureProvider<String>(
       (await ref.watch(mushafRepositoryProvider).ayah(1, 1)).displayBody,
 );
 
+/// Page of a verse in the chosen edition (where it starts).
+final versePageProvider = FutureProvider.family<int, (int, int)>(
+  (ref, v) async => (await ref.watch(mushafRepositoryProvider).ayah(v.$1, v.$2))
+      .pageIn(ref.watch(editionProvider)),
+);
+
+SurahBanner _banner(List<SurahRow> surahs, int surah, int line, int slots) {
+  final s = surahs[surah - 1];
+  final before = surahs
+      .where((x) => x.revelationOrder == s.revelationOrder - 1)
+      .firstOrNull;
+  return SurahBanner(
+    line: line,
+    slots: slots,
+    number: s.id,
+    name: s.nameAr,
+    meccan: s.revelation == 'meccan',
+    ayahCount: s.ayahCount,
+    order: s.revelationOrder,
+    after: before?.nameAr,
+  );
+}
+
+/// Frame details of a Shamarly page, from its printed headers, line slots
+/// and verse boxes.
+Future<FrameInfo?> _shamarlyFrameInfo(Ref ref, int page) async {
+  final repo = ref.watch(mushafRepositoryProvider);
+  const edition = MushafEdition.shamarly;
+  final ayahs = await repo.ayahsOnPage(page, edition);
+  if (ayahs.isEmpty) return null;
+  final surahs = await ref.watch(surahsProvider.future);
+  final first = ayahs.first;
+  final lines = await repo.shamarlyLines(page);
+
+  // Line where each verse starts on this page.
+  final lineOf = <(int, int), int>{};
+  for (final b in await repo.shamarlyVerseBoxes(page)) {
+    lineOf.putIfAbsent((b.surah, b.ayah), () => b.line);
+  }
+  // Pages 1-3 are the cover and the ornate opening pages.
+  final text = page > 3;
+  final banners = [
+    if (text)
+      for (final h in await repo.shamarlyHeaders(page))
+        if (h.firstLine != null) _banner(surahs, h.surah, h.firstLine!, 2),
+  ];
+  final quarters = <QuarterMark>[
+    if (text)
+      for (final a in await repo.quarterStartsOnPage(page, edition))
+        if (lineOf[(a.surah, a.number)] case final line?)
+          QuarterMark(
+            line: line,
+            quarter: a.hizbQuarter,
+            surah: a.surah,
+            ayah: a.number,
+          ),
+  ];
+
+  String? catchword;
+  if (page < edition.pageCount) {
+    final next = (await repo.ayahsOnPage(page + 1, edition)).firstOrNull;
+    if (next != null && next.pageShamarly <= page) {
+      // The verse runs over the page: its first word there, when the
+      // verse's words are placed surely enough; otherwise none.
+      final pages = await repo.shamarlyWordPages(next.surah, next.number);
+      final words = _words(next);
+      int? n;
+      for (final e in pages.entries) {
+        if (e.value == page + 1 && (n == null || e.key < n)) n = e.key;
+      }
+      if (n != null && n <= words.length) catchword = words[n - 1];
+    } else if (next != null) {
+      final opensWith = (await repo.shamarlyLines(page + 1)).firstOrNull?.kind;
+      catchword =
+          (opensWith == 'basmala' || opensWith == 'header') && next.surah != 9
+          ? (await ref.watch(basmalaProvider.future))
+                .split(' ')
+                .take(2)
+                .join(' ')
+          : _words(next).firstOrNull;
+    }
+  }
+  return FrameInfo(
+    page: page,
+    juz: first.juz,
+    hizb: (first.hizbQuarter - 1) ~/ 4 + 1,
+    surahName: surahs[first.surah - 1].nameAr,
+    catchword: catchword,
+    banners: banners,
+    quarters: quarters,
+    basmalaLines: {
+      for (final l in lines)
+        if (l.kind == 'basmala') l.line,
+    },
+    outerRight: page.isOdd,
+  );
+}
+
+/// Words of a verse as numbered in the word boxes (the hizb sign is not
+/// a word).
+List<String> _words(AyahRow a) => [
+  for (final w in a.displayBody.split(RegExp('[\u00a0 ]')))
+    if (w.isNotEmpty && w != '۞') w,
+];
+
 /// Juz, hizb, surah and catchword for the frame around a page.
 final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
   ref,
   page,
 ) async {
   final edition = ref.watch(editionProvider);
+  if (edition == MushafEdition.shamarly) return _shamarlyFrameInfo(ref, page);
   final repo = ref.watch(mushafRepositoryProvider);
   final ayahs = await repo.ayahsOnPage(page, edition);
   if (ayahs.isEmpty) return null;
@@ -188,21 +292,7 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
       // The header, then the basmala line (none before at-Tawba).
       final header = line - (a.surah == 9 ? 1 : 2);
       if (header < 0) continue;
-      final s = surahs[a.surah - 1];
-      final before = surahs
-          .where((x) => x.revelationOrder == s.revelationOrder - 1)
-          .firstOrNull;
-      banners.add(
-        SurahBanner(
-          line: header,
-          number: s.id,
-          name: s.nameAr,
-          meccan: s.revelation == 'meccan',
-          ayahCount: s.ayahCount,
-          order: s.revelationOrder,
-          after: before?.nameAr,
-        ),
-      );
+      banners.add(_banner(surahs, a.surah, header, 1));
     }
   }
 
@@ -236,21 +326,7 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
       final needed = next.surah == 9 ? 1 : 2;
       if (lineOnNext != null && lineOnNext < needed) {
         final header = 15 - (needed - lineOnNext);
-        final s = surahs[next.surah - 1];
-        final before = surahs
-            .where((x) => x.revelationOrder == s.revelationOrder - 1)
-            .firstOrNull;
-        banners.add(
-          SurahBanner(
-            line: header,
-            number: s.id,
-            name: s.nameAr,
-            meccan: s.revelation == 'meccan',
-            ayahCount: s.ayahCount,
-            order: s.revelationOrder,
-            after: before?.nameAr,
-          ),
-        );
+        banners.add(_banner(surahs, next.surah, header, 1));
       }
     }
   }
@@ -290,6 +366,10 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
     catchword: catchword,
     banners: banners,
     quarters: quarters,
+    basmalaLines: {
+      for (final b in banners)
+        if (b.number != 9) b.line + 1,
+    },
     outerRight: page.isOdd,
   );
 });
@@ -305,19 +385,14 @@ Future<Map<(int, int), List<String>>> _pageWords(Ref ref, int page) async {
   final ayahs = await ref
       .watch(mushafRepositoryProvider)
       .ayahsOnPage(page, edition);
-  return {
-    for (final a in ayahs)
-      (a.surah, a.number): [
-        for (final w in a.displayBody.split(RegExp('[  ]')))
-          if (w.isNotEmpty && w != '۞') w,
-      ],
-  };
+  return {for (final a in ayahs) (a.surah, a.number): _words(a)};
 }
 
 /// The boxes of every word on a page, keyed by (surah, verse, word): one
 /// box in page units in the new edition (tools/build_word_boxes.py); the
 /// word's glyph boxes in image pixels in the old one (quran.com's glyph
-/// boxes matched to the words).
+/// boxes matched to the words); one box in image pixels in the Shamarly
+/// edition, for verses split surely enough (`shamarlyWordLevel`).
 final pageWordBoxesProvider =
     FutureProvider.family<Map<(int, int, int), List<Rect>>, int>((
       ref,
@@ -330,6 +405,20 @@ final pageWordBoxesProvider =
             in await ref.watch(mushafRepositoryProvider).wordBoxes(page)) {
           out[(b.surah, b.ayah, b.word)] = [
             Rect.fromLTRB(b.x0 / 10, b.y0 / 10, b.x1 / 10, b.y1 / 10),
+          ];
+        }
+        return out;
+      }
+      if (edition == MushafEdition.shamarly) {
+        final repo = ref.watch(mushafRepositoryProvider);
+        for (final b in await repo.shamarlyWordBoxes(page)) {
+          out[(b.surah, b.ayah, b.word)] = [
+            Rect.fromLTRB(
+              b.x0.toDouble(),
+              b.y0.toDouble(),
+              b.x1.toDouble(),
+              b.y1.toDouble(),
+            ),
           ];
         }
         return out;

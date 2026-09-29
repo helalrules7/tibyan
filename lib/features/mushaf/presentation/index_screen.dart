@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/content_database.dart';
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/mushaf_repository.dart';
@@ -150,16 +151,11 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
         ),
       if (pageNumber != null &&
           pageNumber >= 1 &&
-          pageNumber <= mushafPageCount)
+          pageNumber <= ref.watch(editionProvider).pageCount)
         ListTile(
           leading: const Icon(Icons.description_outlined),
           title: Text(l.pageOf('$pageNumber')),
-          onTap: () async {
-            final first = (await ref.read(pageAyahsProvider(pageNumber).future))
-                .first;
-            if (!context.mounted) return;
-            openVerse(context, ref, surah: first.surah, ayah: first.number);
-          },
+          onTap: () => openPage(context, ref, pageNumber),
         ),
     ];
     final current = q.isEmpty ? widget.surah : null;
@@ -398,7 +394,7 @@ class _PagesTabState extends ConsumerState<_PagesTab> {
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
           ),
-          itemCount: mushafPageCount,
+          itemCount: ref.watch(editionProvider).pageCount,
           itemBuilder: (context, i) {
             final current = i + 1 == widget.current;
             return Semantics(
@@ -413,18 +409,7 @@ class _PagesTabState extends ConsumerState<_PagesTab> {
                   foregroundColor: current ? t.onControl : null,
                   side: current ? BorderSide(color: t.control, width: 2) : null,
                 ),
-                onPressed: () async {
-                  final first = (await ref.read(
-                    pageAyahsProvider(i + 1).future,
-                  )).first;
-                  if (!context.mounted) return;
-                  openVerse(
-                    context,
-                    ref,
-                    surah: first.surah,
-                    ayah: first.number,
-                  );
-                },
+                onPressed: () => openPage(context, ref, i + 1),
                 child: Text(
                   '${i + 1}',
                   style: TextStyle(
@@ -479,7 +464,9 @@ class _MarksTab extends ConsumerWidget {
               l.fasilLastAt(
                 surahName(context, surahs[m.surah - 1]),
                 '${m.ayah}',
-                '${m.page}',
+                // The page in the edition shown now, not the one it was
+                // set in.
+                '${ref.watch(versePageProvider((m.surah, m.ayah))).value ?? m.page}',
               ),
               style: TextStyle(color: t.muted),
             ),

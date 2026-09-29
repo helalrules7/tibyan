@@ -7,7 +7,8 @@ import '../../../l10n/app_localizations.dart';
 import '../data/page_pack.dart';
 import '../mushaf_providers.dart';
 
-/// One-time download of the mushaf pages (about 65 MB), with resume.
+/// One-time download of the chosen edition's pages (65 to 215 MB), with
+/// resume.
 class DownloadScreen extends ConsumerWidget {
   const DownloadScreen({super.key});
 
@@ -96,9 +97,11 @@ class DownloadScreen extends ConsumerWidget {
               ),
             const SizedBox(height: 16),
             Text(
-              spec.format == PackFormat.pngQuranCom
-                  ? l.pagesCreditOld
-                  : l.pagesCredit,
+              switch (spec.format) {
+                PackFormat.svgXz => l.pagesCredit,
+                PackFormat.pngQuranCom => l.pagesCreditOld,
+                PackFormat.pngShamarly => l.pagesCreditShamarly,
+              },
               textAlign: TextAlign.center,
               style: TextStyle(color: t.muted, fontSize: 12),
             ),

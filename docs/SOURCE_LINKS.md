@@ -119,3 +119,12 @@
 | everyayah | مركز المساعدة | https://quran.zendesk.com/hc/en-us | — |
 | مجمع الملك فهد | `info@qurancomplex.gov.sa` | من نتائج البحث فقط (الموقع مقفول من هنا) | — |
 | QuranEnc | `info@quranenc.com` | https://quranenc.com/en/home/about (البريد مخفي بحماية Cloudflare، وفُك في 2026-09-28) | — |
+
+## مصحف الشمرلي (الطبعة المصرية)
+
+| المصدر | الرابط | صفحة الترخيص | ما وجدناه | النسخة المحفوظة | ملاحظاتك |
+|---|---|---|---|---|---|
+| صور الصفحات | https://archive.org/details/shamerly | لا يوجد (حقل الترخيص فارغ) | 522 صفحة PNG (886×1377)، مستخرجة من `shamarly_v3_crop_3.pdf` على مدونة quraankarem | `2026-09-29_shamarly_archive_org_metadata.json` | |
+| تطبيق الشمرلي للأندرويد | https://github.com/Mr-DDDAlKilanny/Shamarly | لا ترخيص للتطبيق | `shamerly.db`: صفحة كل آية وموضع علامة نهايتها | — | |
+| اكتشاف علامات الآيات | https://github.com/quran/ayah-detection | لا ترخيص | سكربتات Python جُربت على الشمرلي | — | |
+| فهرس أول كلمة لكل صفحة | https://github.com/quran/quran_android/issues/1180 | — | ملف `shemerly_page_first_word_index.txt` | — | |

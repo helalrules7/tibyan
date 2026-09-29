@@ -20,6 +20,10 @@ class FawasilScreen extends ConsumerWidget {
     final sets = ref.watch(bookmarkSetsProvider).value;
     String name(int surah) =>
         surahs == null ? '' : surahName(context, surahs[surah - 1]);
+    // Pages in the edition shown now; marks may have been set in another.
+    final edition = ref.watch(editionProvider);
+    String pageOf(int surah, int ayah, int saved) =>
+        '${ref.watch(versePageProvider((surah, ayah))).value ?? saved}';
 
     return Scaffold(
       appBar: AppBar(title: Text(l.fawasilTitle)),
@@ -35,11 +39,19 @@ class FawasilScreen extends ConsumerWidget {
                   l.fasilLastAt(
                     name(last.surah),
                     '${last.ayah}',
-                    '${last.page}',
+                    last.edition == edition.name
+                        ? '${last.page}'
+                        : pageOf(last.surah, last.ayah, last.page),
                   ),
                 ),
-                onTap: () =>
-                    openVerse(context, ref, surah: last.surah, ayah: last.ayah),
+                onTap: () => last.edition == edition.name && last.view == 'page'
+                    ? openPage(context, ref, last.page)
+                    : openVerse(
+                        context,
+                        ref,
+                        surah: last.surah,
+                        ayah: last.ayah,
+                      ),
               ),
             ),
           const SizedBox(height: 12),
@@ -63,7 +75,11 @@ class FawasilScreen extends ConsumerWidget {
                 leading: Icon(Icons.bookmark, color: Color(s.color)),
                 title: Text(s.name),
                 subtitle: Text(
-                  l.fasilLastAt(name(s.surah), '${s.ayah}', '${s.page}'),
+                  l.fasilLastAt(
+                    name(s.surah),
+                    '${s.ayah}',
+                    pageOf(s.surah, s.ayah, s.page),
+                  ),
                 ),
                 onTap: () =>
                     openVerse(context, ref, surah: s.surah, ayah: s.ayah),

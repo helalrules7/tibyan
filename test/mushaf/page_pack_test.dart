@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:tibyan/core/settings/app_settings.dart';
 import 'package:tibyan/features/mushaf/data/page_pack.dart';
 
 /// Builds a tiny pack in the same format as tools/build_page_pack.py.
@@ -38,6 +39,17 @@ List<int> buildQuranComPack({int pages = 604, bool withGlyphs = true}) {
     archive.addFile(ArchiveFile.bytes('databases/ayahinfo_1024.db', [0]));
   }
   archive.addFile(ArchiveFile.bytes('databases/quran.ar.db', [0]));
+  return ZipEncoder().encode(archive);
+}
+
+/// Builds a zip laid out like the Shamarly archive on Tibyan's mirror.
+List<int> buildShamarlyPack({int pages = 522}) {
+  final archive = Archive();
+  for (var i = 1; i <= pages; i++) {
+    archive.addFile(
+      ArchiveFile.bytes('${i.toString().padLeft(3, '0')}.png', [i % 256]),
+    );
+  }
   return ZipEncoder().encode(archive);
 }
 
@@ -110,24 +122,99 @@ void main() {
     }
   });
 
-  test('falls back to a mirror when the source fails', () async {
+  test('falls back to the original source when the mirror fails', () async {
     final zip = buildPack();
     final installer = PagePackInstaller(
       root: tmp,
       spec: PagePackSpec(
         id: 'mirror-pack',
-        url: 'https://source.invalid/pack.zip',
-        mirrors: const ['https://mirror.invalid/pack.zip'],
+        url: 'https://mirror.invalid/pack.zip',
+        fallbacks: const ['https://source.invalid/pack.zip'],
         sha256: sha256.convert(zip).toString(),
         bytes: zip.length,
         format: PackFormat.svgXz,
       ),
       client: MockClient(
-        (request) async => request.url.host == 'mirror.invalid'
+        (request) async => request.url.host == 'source.invalid'
             ? http.Response.bytes(zip, 200)
             : http.Response('down', 503),
       ),
     );
     expect((await installer.install().last).phase, PackPhase.installed);
+  });
+
+  test('page packs come from the mirror first', () {
+    for (final spec in [PagePackSpec.madina1441, PagePackSpec.madina1405]) {
+      expect(spec.url, startsWith('https://tibyan.ahmedhelal.dev/mirror/'));
+      expect(spec.fallbacks, isNotEmpty);
+    }
+    // Shamarly: only the mirror has this zip (no byte-identical source).
+    const shamarly = PagePackSpec.shamarly;
+    expect(
+      shamarly.url,
+      'https://tibyan.ahmedhelal.dev/mirror/sources/shamarly/shamarly-pages-archive-org.zip',
+    );
+    expect(shamarly.fallbacks, isEmpty);
+    expect(shamarly.format, PackFormat.pngShamarly);
+    expect(
+      shamarly.sha256,
+      '03199bf95590458df94670d6d1ba5f17e56ec72413df51dd30087aa5beaa712d',
+    );
+    expect(shamarly.bytes, 214988080);
+    for (final e in MushafEdition.values) {
+      expect(PagePackSpec.of(e).id, isNotEmpty);
+    }
+    expect(PagePackSpec.of(MushafEdition.shamarly), same(shamarly));
+  });
+
+  test('installs the Shamarly pages and rejects an incomplete zip', () async {
+    final installer = installerFor(
+      buildShamarlyPack(),
+      format: PackFormat.pngShamarly,
+    );
+    expect((await installer.install().last).phase, PackPhase.installed);
+    expect(File('${installer.dir.path}/001.png').existsSync(), isTrue);
+    expect(File('${installer.dir.path}/522.png').existsSync(), isTrue);
+
+    final short = PagePackInstaller(
+      root: Directory('${tmp.path}/short'),
+      spec: PagePackSpec(
+        id: 'short',
+        url: 'https://example.invalid/short.zip',
+        sha256: sha256.convert(buildShamarlyPack(pages: 521)).toString(),
+        bytes: buildShamarlyPack(pages: 521).length,
+        format: PackFormat.pngShamarly,
+      ),
+      client: MockClient(
+        (request) async =>
+            http.Response.bytes(buildShamarlyPack(pages: 521), 200),
+      ),
+    );
+    expect((await short.install().last).phase, PackPhase.failed);
+    expect(short.isInstalled, isFalse);
+  });
+
+  test('a paused download resumes where it stopped', () async {
+    final zip = buildShamarlyPack();
+    final ranges = <String?>[];
+    final client = MockClient((request) async {
+      ranges.add(request.headers['Range']);
+      final from = int.parse(
+        (request.headers['Range'] ?? 'bytes=0-').split('=')[1].split('-')[0],
+      );
+      return http.Response.bytes(zip.sublist(from), from == 0 ? 200 : 206);
+    });
+    final spec = PagePackSpec(
+      id: 'resume',
+      url: 'https://example.invalid/resume.zip',
+      sha256: sha256.convert(zip).toString(),
+      bytes: zip.length,
+      format: PackFormat.pngShamarly,
+    );
+    // A partial file left by a paused download.
+    File('${tmp.path}/resume.zip.part').writeAsBytesSync(zip.sublist(0, 100));
+    final installer = PagePackInstaller(root: tmp, spec: spec, client: client);
+    expect((await installer.install().last).phase, PackPhase.installed);
+    expect(ranges, ['bytes=100-']);
   });
 }
