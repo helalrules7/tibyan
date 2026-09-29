@@ -57,7 +57,8 @@ class SettingsController extends Notifier<AppSettings> {
           UiFont.kfgqpcAn,
       language:
           _enumByName(LanguageSetting.values, _prefs.getString(_kLanguage)) ??
-          LanguageSetting.system,
+          // Arabic unless the reader chooses otherwise, whatever the device.
+          LanguageSetting.ar,
       crashReportsOptIn: _prefs.getBool(_kCrash) ?? false,
       onboardingDone: _prefs.getBool(_kOnboarding) ?? false,
       edition:

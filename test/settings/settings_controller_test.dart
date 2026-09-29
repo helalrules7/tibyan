@@ -24,14 +24,20 @@ void main() {
     );
   }
 
-  test('defaults: Zakhrafa, Light, KFGQPC AN, crash reports off', () async {
-    final c = await containerWith({});
-    final s = c.read(settingsProvider);
-    expect(s.styleId, 'zakhrafa');
-    expect(s.mode, ModeSetting.light);
-    expect(s.uiFont, UiFont.kfgqpcAn);
-    expect(s.crashReportsOptIn, isFalse);
-  });
+  test(
+    'defaults: Arabic, Zakhrafa, Light, KFGQPC AN, crash reports off',
+    () async {
+      final c = await containerWith({});
+      final s = c.read(settingsProvider);
+      expect(s.styleId, 'zakhrafa');
+      expect(s.mode, ModeSetting.light);
+      expect(s.uiFont, UiFont.kfgqpcAn);
+      expect(s.crashReportsOptIn, isFalse);
+      // Arabic whatever the device's language.
+      expect(s.language, LanguageSetting.ar);
+      expect(s.locale, const Locale('ar'));
+    },
+  );
 
   test('changes are saved and restored', () async {
     final c = await containerWith({});

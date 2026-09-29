@@ -41,7 +41,7 @@ class AppSettings {
     required this.styleId,
     this.mode = ModeSetting.light,
     this.uiFont = UiFont.kfgqpcAn,
-    this.language = LanguageSetting.system,
+    this.language = LanguageSetting.ar,
     this.crashReportsOptIn = false,
     this.onboardingDone = false,
     this.edition = MushafEdition.madina1441,
