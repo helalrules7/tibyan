@@ -408,5 +408,7 @@
       }
     }
   },
-  "audioCredit": "Recitations and verse timings: mp3quran.net"
+  "audioCredit": "Recitations and verse timings: mp3quran.net",
+  "touchReading": "Touch reading",
+  "touchReadingOn": "Touch reading: tap the verse you are reading"
 }

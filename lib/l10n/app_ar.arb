@@ -535,5 +535,7 @@
       }
     }
   },
-  "audioCredit": "التلاوات وتوقيت الآيات: mp3quran.net"
+  "audioCredit": "التلاوات وتوقيت الآيات: mp3quran.net",
+  "touchReading": "القراءة اللمسية",
+  "touchReadingOn": "القراءة اللمسية: المس الآية التي تقرؤها"
 }

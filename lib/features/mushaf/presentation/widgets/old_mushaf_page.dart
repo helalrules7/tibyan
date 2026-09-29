@@ -370,7 +370,11 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                         }
                       }
                       final m = markerAt(d.localPosition);
-                      m != null ? x.onMarkerTap(m) : x.onTap();
+                      if (m != null) return x.onMarkerTap(m);
+                      final v = x.onVerseTap == null
+                          ? null
+                          : verseAt(d.localPosition);
+                      v != null ? x.onVerseTap!(v) : x.onTap();
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(d.localPosition);
@@ -388,12 +392,51 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                               ? null
                               : tokens.colors.ink,
                           highlight: tokens.colors.highlight,
+                          touchColor: x.touchColor,
+                          touched: x.touched == null
+                              ? const []
+                              : [
+                                  for (final b in lineBoxes(
+                                    [
+                                      for (final g in glyphs)
+                                        if (g.suraNumber == x.touched!.surah &&
+                                            g.ayahNumber == x.touched!.ayah)
+                                          _rect(g),
+                                    ],
+                                    lineOf: (r) =>
+                                        layout._lineOfImageY(r.center.dy),
+                                    centre: layout._centre,
+                                    halfHeight: _pitch * 0.42,
+                                    band: (j) => (
+                                      layout._bandTop(j),
+                                      layout._bandBottom(j),
+                                    ),
+                                  ))
+                                    layout.toScreenRect(b),
+                                ],
+                          word: x.activeWord == null
+                              ? null
+                              : layout.toScreenRect(
+                                  lineBoxes(
+                                    [x.activeWord!],
+                                    lineOf: (r) =>
+                                        layout._lineOfImageY(r.center.dy),
+                                    centre: layout._centre,
+                                    halfHeight: _pitch * 0.42,
+                                    band: (j) => (
+                                      layout._bandTop(j),
+                                      layout._bandBottom(j),
+                                    ),
+                                  ).first.widen(2),
+                                ),
                           selected: [
                             for (final b in lineBoxes(
                               [for (final g in selectedGlyphs) _rect(g)],
                               lineOf: (r) => layout._lineOfImageY(r.center.dy),
                               centre: layout._centre,
                               halfHeight: _pitch * 0.42,
+                              band: (j) =>
+                                  (layout._bandTop(j), layout._bandBottom(j)),
                             ))
                               layout.toScreenRect(b),
                           ],
@@ -457,6 +500,9 @@ class _OldPagePainter extends CustomPainter {
     required this.layout,
     required this.ink,
     required this.highlight,
+    required this.word,
+    required this.touched,
+    required this.touchColor,
     required this.selected,
     required this.rings,
     required this.look,
@@ -490,12 +536,31 @@ class _OldPagePainter extends CustomPainter {
   final Color highlight;
   final List<Rect> selected;
 
+  /// The word being recited (screen pixels).
+  final Rect? word;
+
+  /// Touch reading: the shaded verse's line boxes (screen pixels).
+  final List<Rect> touched;
+  final Color? touchColor;
+
   /// Marked verse-end markers and their mark colour.
   final List<(Rect, Color)> rings;
 
   @override
   void paint(Canvas canvas, Size size) {
     paintVerseBoxes(canvas, selected, highlight, stroke: 1.2, radius: 5);
+    if (touchColor != null) {
+      paintVerseBoxes(canvas, touched, touchColor!, stroke: 1.2, radius: 5);
+    }
+    if (word != null) {
+      paintVerseBoxes(
+        canvas,
+        [word!],
+        highlight.withValues(alpha: highlight.a * 2.4),
+        stroke: 1.5,
+        radius: 5,
+      );
+    }
     for (final (r, color) in rings) {
       final radius = r.shortestSide / 2 + 2;
       canvas.drawCircle(
@@ -556,6 +621,8 @@ class _OldPagePainter extends CustomPainter {
       old.layout.size != layout.size ||
       old.ink != ink ||
       old.highlight != highlight ||
+      old.word != word ||
+      old.touched != touched ||
       old.selected.length != selected.length ||
       old.rings.length != rings.length ||
       old.hidden.length != hidden.length ||

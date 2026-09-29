@@ -720,4 +720,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get audioCredit => 'Recitations and verse timings: mp3quran.net';
+
+  @override
+  String get touchReading => 'Touch reading';
+
+  @override
+  String get touchReadingOn => 'Touch reading: tap the verse you are reading';
 }

@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tibyan/core/db/content_database.dart';
 import 'package:tibyan/features/audio/recitation.dart';
 import 'package:tibyan/features/mushaf/data/mushaf_repository.dart';
+import 'package:flutter/painting.dart';
+import 'package:tibyan/features/mushaf/presentation/widgets/page_interaction.dart';
 
 void main() {
   late ContentDatabase db;
@@ -60,5 +62,42 @@ void main() {
     expect(ayahAt(t, third.startMs), 3);
     expect(ayahAt(t, third.endMs - 1), 3);
     expect(ayahAt(t, 1 << 30), 7);
+  });
+
+  test(
+    'word timings: most verses, words in order, the word at a time',
+    () async {
+      for (final reciter in [1, 2, 3]) {
+        final words = await repo.wordTimings(reciter, 2);
+        expect(words.length, greaterThan(6000), reason: 'reciter $reciter');
+        for (var i = 1; i < words.length; i++) {
+          expect(words[i].startMs, greaterThanOrEqualTo(words[i - 1].startMs));
+        }
+      }
+      final w = await repo.wordTimings(1, 2);
+      final third = w.firstWhere((r) => r.ayah == 7 && r.word == 3);
+      expect(wordAt(w, third.startMs + 1), (7, 3));
+      expect(wordAt(w, 0), isNull);
+      // No word timing where the recitation has none.
+      expect(await repo.wordTimings(4, 2), isEmpty);
+    },
+  );
+
+  test('highlight boxes: one per line, clamped to the line band', () {
+    final boxes = lineBoxes(
+      [
+        const Rect.fromLTRB(10, 12, 30, 18),
+        const Rect.fromLTRB(40, 11, 60, 19),
+        const Rect.fromLTRB(5, 42, 25, 48),
+      ],
+      lineOf: (r) => r.center.dy ~/ 30,
+      centre: (j) => j * 30 + 15,
+      halfHeight: 14,
+      band: (j) => (j * 30 + 2.0, j * 30 + 28.0),
+    );
+    expect(boxes, [
+      const Rect.fromLTRB(10, 3, 60, 27),
+      const Rect.fromLTRB(5, 33, 25, 57),
+    ]);
   });
 }
