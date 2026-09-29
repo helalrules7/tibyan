@@ -267,12 +267,13 @@ class ImagePageData {
 /// A colour filter that draws the page's ink in [color].
 ColorFilter inkFilter(Color color, {required bool alphaInk}) => alphaInk
     ? ColorFilter.mode(color, BlendMode.srcIn)
-    // Opaque scan: dark = ink, light = paper (transparent).
+    // Opaque scan: dark = ink, light = paper (transparent). The ramp is
+    // steepened so the scan's tinted paper drops out completely.
     : ColorFilter.matrix([
         0, 0, 0, 0, color.r * 255, //
         0, 0, 0, 0, color.g * 255,
         0, 0, 0, 0, color.b * 255,
-        -0.299, -0.587, -0.114, 0, 255,
+        -0.299 * 1.5, -0.587 * 1.5, -0.114 * 1.5, 0, 255 * 1.5 - 25,
       ]);
 
 /// One page drawn from a page image (unchanged), coloured for the current
@@ -433,7 +434,9 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                           image: data.image,
                           alphaInk: data.alphaInk,
                           layout: layout,
-                          ink: tokens.mode == ThemeModeId.light
+                          // Opaque scans are always recoloured, so their
+                          // tinted paper never shows on ours.
+                          ink: tokens.mode == ThemeModeId.light && data.alphaInk
                               ? null
                               : tokens.colors.ink,
                           highlight: tokens.colors.highlight,

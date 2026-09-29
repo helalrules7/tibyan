@@ -15,6 +15,10 @@ import 'page_interaction.dart';
 /// two ornate opening pages (2, 3) are opaque scans.
 const _image = Rect.fromLTRB(0, 0, 886, 1377);
 
+/// The text of the two ornate opening pages (2 and 3), inside their printed
+/// frame and surah panels: the app's own frame replaces those.
+const _openingText = Rect.fromLTRB(95, 325, 791, 1060);
+
 /// A line's centre sits this many pitches above its baseline, in the
 /// middle of its letters.
 const _lift = 0.2;
@@ -68,8 +72,9 @@ PageGeometry shamarlyGeometry(
       ? j - 0.5
       : j.toDouble();
   final n = lines.length;
+  final opening = page.kind == 'ornate';
   return PageGeometry(
-    ink: _image,
+    ink: opening ? _openingText : _image,
     whole: page.kind != 'text',
     centres: [for (var j = 0; j < n; j++) top + (slot(j) - _lift) * pitch],
     slots: [for (var j = 0; j < n; j++) slot(j)],
