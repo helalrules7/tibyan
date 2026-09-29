@@ -16,6 +16,9 @@ enum MushafEdition { madina1441, madina1405 }
 /// (default) or one of three rosettes drawn over it.
 enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
 
+/// Font of tafsir and translation texts.
+enum TafsirFont { naskh, interface }
+
 /// Colours offered for tinting verse-end markers (ARGB); null = none.
 const markerTints = <int>[
   0xFF1FA79B,
@@ -40,6 +43,9 @@ class AppSettings {
     this.markerStyle = MarkerStyle.traditional,
     this.markerTint,
     this.highlightDivineNames = true,
+    this.tafsirFont = TafsirFont.naskh,
+    this.tafsirFontScale = 1.0,
+    this.hiddenCommentaries = const {},
   });
 
   final String styleId;
@@ -68,6 +74,14 @@ class AppSettings {
   /// Colour «الله» and «رب» / «ربنا» on the page (on by default).
   final bool highlightDivineNames;
 
+  final TafsirFont tafsirFont;
+
+  /// Size of tafsir and translation texts (1.0 = default).
+  final double tafsirFontScale;
+
+  /// Source ids of tafsirs and translations the reader turned off.
+  final Set<int> hiddenCommentaries;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -81,6 +95,9 @@ class AppSettings {
     MarkerStyle? markerStyle,
     int? Function()? markerTint,
     bool? highlightDivineNames,
+    TafsirFont? tafsirFont,
+    double? tafsirFontScale,
+    Set<int>? hiddenCommentaries,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -94,6 +111,9 @@ class AppSettings {
     markerStyle: markerStyle ?? this.markerStyle,
     markerTint: markerTint == null ? this.markerTint : markerTint(),
     highlightDivineNames: highlightDivineNames ?? this.highlightDivineNames,
+    tafsirFont: tafsirFont ?? this.tafsirFont,
+    tafsirFontScale: tafsirFontScale ?? this.tafsirFontScale,
+    hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

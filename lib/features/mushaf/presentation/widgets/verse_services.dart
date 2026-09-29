@@ -8,9 +8,9 @@ import '../mushaf_screen.dart';
 import 'illuminated_frame.dart';
 import 'mushaf_page.dart';
 
-/// Services for the selected verses: the four one-tap marks and saving to
-/// a named fasil. Services whose data is not enabled yet (tafsir,
-/// translation, recitation, copy and share) are not shown.
+/// Services for the selected verses: tafsir and translation, the four
+/// one-tap marks and saving to a named fasil. Services whose data is not
+/// enabled yet (recitation, copy and share) are not shown.
 class VerseServicesPanel extends StatelessWidget {
   const VerseServicesPanel({
     super.key,
@@ -20,6 +20,7 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onSaveToFasil,
     required this.onClose,
     required this.onMultiSelect,
+    required this.onTafsir,
   });
 
   final List<VerseKey> verses;
@@ -28,6 +29,7 @@ class VerseServicesPanel extends StatelessWidget {
   final VoidCallback onSaveToFasil;
   final VoidCallback onClose;
   final VoidCallback onMultiSelect;
+  final VoidCallback onTafsir;
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +111,15 @@ class VerseServicesPanel extends StatelessWidget {
                     icon: const Icon(Icons.close),
                   ),
                 ],
+              ),
+              const SizedBox(height: 10),
+              FilledButton.icon(
+                onPressed: onTafsir,
+                icon: const Icon(Icons.menu_book_outlined),
+                label: Text(l.tafsirTitle),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
               ),
               const SizedBox(height: 10),
               Row(

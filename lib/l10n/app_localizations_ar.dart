@@ -573,4 +573,47 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get highlightDivineNamesHint =>
       'تلوين «الله» و«رب» و«ربنا» في صفحات المصحف';
+
+  @override
+  String get tafsirTitle => 'التفسير والترجمة';
+
+  @override
+  String get tafsirSettings => 'إعدادات التفسير';
+
+  @override
+  String get tafsirFontLabel => 'خط التفسير';
+
+  @override
+  String get tafsirFontNaskh => 'نسخ عثمان طه';
+
+  @override
+  String get tafsirFontInterface => 'خط الواجهة';
+
+  @override
+  String get tafsirTextSize => 'حجم النص';
+
+  @override
+  String get tafsirShown => 'النصوص المعروضة';
+
+  @override
+  String get tafsirNoneShown => 'كل النصوص مخفية. اختر نصا من إعدادات التفسير.';
+
+  @override
+  String get tafsirFootnotes => 'الحواشي';
+
+  @override
+  String get previousVerse => 'الآية السابقة';
+
+  @override
+  String get nextVerse => 'الآية التالية';
+
+  @override
+  String sourceVersion(String version) {
+    return 'الإصدار $version';
+  }
+
+  @override
+  String sourceRetrieved(String date) {
+    return 'نسخة $date';
+  }
 }

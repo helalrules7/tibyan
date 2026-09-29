@@ -574,4 +574,48 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get highlightDivineNamesHint =>
       'Colour «Allah», «Rabb» and «Rabbana» on the pages';
+
+  @override
+  String get tafsirTitle => 'Tafsir and translation';
+
+  @override
+  String get tafsirSettings => 'Tafsir settings';
+
+  @override
+  String get tafsirFontLabel => 'Tafsir font';
+
+  @override
+  String get tafsirFontNaskh => 'Uthman Taha Naskh';
+
+  @override
+  String get tafsirFontInterface => 'Interface font';
+
+  @override
+  String get tafsirTextSize => 'Text size';
+
+  @override
+  String get tafsirShown => 'Texts shown';
+
+  @override
+  String get tafsirNoneShown =>
+      'All texts are hidden. Choose one in the tafsir settings.';
+
+  @override
+  String get tafsirFootnotes => 'Footnotes';
+
+  @override
+  String get previousVerse => 'Previous verse';
+
+  @override
+  String get nextVerse => 'Next verse';
+
+  @override
+  String sourceVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String sourceRetrieved(String date) {
+    return 'Copy of $date';
+  }
 }

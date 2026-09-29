@@ -193,6 +193,47 @@ class LineOverflow1405 extends Table {
   Set<Column> get primaryKey => {page, line, x0, y0};
 }
 
+/// A tafsir or translation shipped in the content database.
+@DataClassName('CommentaryEditionRow')
+class CommentaryEdition extends Table {
+  @override
+  String get tableName => 'commentary_edition';
+
+  IntColumn get sourceId => integer()();
+
+  /// `tafsir` or `translation`.
+  TextColumn get kind => text()();
+  TextColumn get language => text()();
+
+  /// `rtl` or `ltr`.
+  TextColumn get direction => text()();
+  TextColumn get nameAr => text()();
+  TextColumn get nameEn => text()();
+  IntColumn get sortOrder => integer()();
+
+  @override
+  Set<Column> get primaryKey => {sourceId};
+}
+
+/// One verse's entry in a tafsir or translation, verbatim from the source.
+@DataClassName('CommentaryRow')
+class Commentary extends Table {
+  @override
+  String get tableName => 'commentary';
+
+  IntColumn get sourceId => integer()();
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+  TextColumn get body => text().named('text')();
+  TextColumn get footnotes => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {sourceId, surah, ayah};
+
+  @override
+  bool get withoutRowId => true;
+}
+
 @DriftDatabase(
   tables: [
     Surah,
@@ -203,6 +244,8 @@ class LineOverflow1405 extends Table {
     LineCut,
     LineOverflow,
     LineOverflow1405,
+    CommentaryEdition,
+    Commentary,
   ],
 )
 class ContentDatabase extends _$ContentDatabase {
@@ -210,7 +253,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override
