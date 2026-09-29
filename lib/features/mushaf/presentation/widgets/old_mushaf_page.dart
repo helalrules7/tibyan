@@ -389,8 +389,13 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                               : tokens.colors.ink,
                           highlight: tokens.colors.highlight,
                           selected: [
-                            for (final g in selectedGlyphs)
-                              layout.toScreenRect(_rect(g)),
+                            for (final b in lineBoxes(
+                              [for (final g in selectedGlyphs) _rect(g)],
+                              lineOf: (r) => layout._lineOfImageY(r.center.dy),
+                              centre: layout._centre,
+                              halfHeight: _pitch * 0.42,
+                            ))
+                              layout.toScreenRect(b),
                           ],
                           look: x.markerLook,
                           markers: [
@@ -490,13 +495,7 @@ class _OldPagePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final fill = Paint()..color = highlight;
-    for (final r in selected) {
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(r.inflate(1), const Radius.circular(4)),
-        fill,
-      );
-    }
+    paintVerseBoxes(canvas, selected, highlight, stroke: 1.2, radius: 5);
     for (final (r, color) in rings) {
       final radius = r.shortestSide / 2 + 2;
       canvas.drawCircle(

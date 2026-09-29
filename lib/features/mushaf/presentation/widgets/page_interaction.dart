@@ -67,6 +67,50 @@ class PageInteraction {
   final void Function(bool start, VerseKey verse) onHandleDrag;
 }
 
+/// One box per line of the highlighted verses: the width the verses take
+/// on that line, and a fixed height around the line's centre, so the
+/// highlight reads as a tidy frame rather than following every letter.
+List<Rect> lineBoxes(
+  Iterable<Rect> pieces, {
+  required int Function(Rect piece) lineOf,
+  required double Function(int line) centre,
+  required double halfHeight,
+}) {
+  final spans = <int, (double, double)>{};
+  for (final r in pieces) {
+    final j = lineOf(r);
+    final s = spans[j];
+    spans[j] = s == null
+        ? (r.left, r.right)
+        : (s.$1 < r.left ? s.$1 : r.left, s.$2 > r.right ? s.$2 : r.right);
+  }
+  return [
+    for (final MapEntry(key: j, value: (l, r)) in spans.entries)
+      Rect.fromLTRB(l, centre(j) - halfHeight, r, centre(j) + halfHeight),
+  ];
+}
+
+/// Draws [boxes] as the verse highlight: a light frame over a faint fill.
+void paintVerseBoxes(
+  Canvas canvas,
+  Iterable<Rect> boxes,
+  Color highlight, {
+  required double stroke,
+  required double radius,
+}) {
+  final fill = Paint()..color = highlight.withValues(alpha: highlight.a * 0.6);
+  final edge = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = stroke
+    ..color = highlight.withValues(alpha: (highlight.a * 3.2).clamp(0, 0.85));
+  for (final b in boxes) {
+    final r = RRect.fromRectAndRadius(b, Radius.circular(radius));
+    canvas
+      ..drawRRect(r, fill)
+      ..drawRRect(r, edge);
+  }
+}
+
 /// A round drag handle, like a text selection handle.
 class SelectionHandle extends StatelessWidget {
   const SelectionHandle({
