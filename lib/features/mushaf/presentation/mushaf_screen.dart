@@ -13,6 +13,7 @@ import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'widgets/fasil_sheet.dart';
+import 'widgets/go_to_page.dart';
 import 'widgets/illuminated_frame.dart';
 import 'widgets/mushaf_page.dart';
 import 'widgets/old_mushaf_page.dart';
@@ -166,14 +167,24 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
           child: pageWidget,
         );
       }
-      void openIndex() => context.push('/mushaf/index');
+      final info = ref.watch(frameInfoProvider(i + 1)).value;
+      void openIndex(String tab) {
+        final a = ref.read(pageAyahsProvider(i + 1)).value?.firstOrNull;
+        context.push(
+          '/mushaf/index?tab=$tab&p=${i + 1}'
+          '${a == null ? '' : '&s=${a.surah}'}'
+          '${info == null ? '' : '&j=${info.juz}&h=${info.hizb}'}',
+        );
+      }
+
       return Padding(
         padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
         child: IlluminatedFrame(
-          info: ref.watch(frameInfoProvider(i + 1)).value,
-          onJuzTap: openIndex,
-          onHizbTap: openIndex,
-          onSurahTap: openIndex,
+          info: info,
+          onJuzTap: () => openIndex('juz'),
+          onHizbTap: () => openIndex('hizb'),
+          onSurahTap: () => openIndex('surahs'),
+          onPageTap: _goToPage,
           child: pageWidget,
         ),
       );
@@ -280,6 +291,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _goToPage() async {
+    final page = await showGoToPage(context, current: _page);
+    if (page != null) _controller?.jumpToPage(page - 1);
   }
 
   String _scrubLabel(BuildContext context, int page, List<SurahRow>? surahs) {

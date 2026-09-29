@@ -383,4 +383,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String catchwordLabel(String word) {
     return 'الكلمة الأولى في الصفحة التالية: $word';
   }
+
+  @override
+  String get tabHizb => 'الأحزاب';
+
+  @override
+  String get goToPage => 'انتقال إلى صفحة';
+
+  @override
+  String get goToPageHint => 'رقم الصفحة من ١ إلى ٦٠٤';
+
+  @override
+  String get goLabel => 'انتقال';
+
+  @override
+  String hizbStartsAt(String surah, String ayah) {
+    return 'يبدأ من $surah $ayah';
+  }
 }

@@ -29,8 +29,29 @@ String _fold(String s) => s
   return (surah: int.parse(m[1]!), ayah: int.parse(m[2]!));
 }
 
+enum IndexTab { surahs, juz, hizb, pages }
+
+/// Row height in the index lists, fixed so the current row can be
+/// scrolled into view before it is built.
+const _rowExtent = 72.0;
+
 class IndexScreen extends ConsumerStatefulWidget {
-  const IndexScreen({super.key});
+  const IndexScreen({
+    super.key,
+    this.tab = IndexTab.surahs,
+    this.surah,
+    this.juz,
+    this.hizb,
+    this.page,
+  });
+
+  final IndexTab tab;
+
+  /// The reader's current place, highlighted and scrolled to.
+  final int? surah;
+  final int? juz;
+  final int? hizb;
+  final int? page;
 
   @override
   ConsumerState<IndexScreen> createState() => _IndexScreenState();
@@ -54,7 +75,8 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
     final surahs = ref.watch(surahsProvider).value;
 
     return DefaultTabController(
-      length: 3,
+      length: IndexTab.values.length,
+      initialIndex: widget.tab.index,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l.indexTitle),
@@ -62,6 +84,7 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
             tabs: [
               Tab(text: l.tabSurahs),
               Tab(text: l.tabJuz),
+              Tab(text: l.tabHizb),
               Tab(text: l.tabPages),
             ],
           ),
@@ -71,8 +94,23 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
             : TabBarView(
                 children: [
                   _surahTab(context, surahs),
-                  _JuzTab(surahs: surahs),
-                  const _PagesTab(),
+                  _StartsTab(
+                    surahs: surahs,
+                    starts: ref
+                        .watch(juzStartsProvider)
+                        .value
+                        ?.map((j) => j.ayah)
+                        .toList(),
+                    current: widget.juz,
+                    title: (n) => l.juzLabel('$n'),
+                  ),
+                  _StartsTab(
+                    surahs: surahs,
+                    starts: ref.watch(hizbStartsProvider).value,
+                    current: widget.hizb,
+                    title: (n) => l.hizbLabel('$n'),
+                  ),
+                  _PagesTab(current: widget.page),
                 ],
               ),
       ),
@@ -81,7 +119,6 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
 
   Widget _surahTab(BuildContext context, List<SurahRow> surahs) {
     final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
     final verseRef = parseVerseRef(_query);
     final pageNumber = int.tryParse(
       _query.trim().replaceAllMapped(
@@ -98,6 +135,30 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
             '${s.id}' == q)
           s,
     ];
+    final extras = <Widget>[
+      if (verseRef != null && verseRef.surah >= 1 && verseRef.surah <= 114)
+        ListTile(
+          leading: const Icon(Icons.arrow_back),
+          title: Text(
+            '${l.surahWord(surahName(context, surahs[verseRef.surah - 1]))} ${verseRef.ayah}',
+          ),
+          onTap: () => _goToRef(verseRef, surahs),
+        ),
+      if (pageNumber != null &&
+          pageNumber >= 1 &&
+          pageNumber <= mushafPageCount)
+        ListTile(
+          leading: const Icon(Icons.description_outlined),
+          title: Text(l.pageOf('$pageNumber')),
+          onTap: () async {
+            final first = (await ref.read(pageAyahsProvider(pageNumber).future))
+                .first;
+            if (!context.mounted) return;
+            openVerse(context, ref, surah: first.surah, ayah: first.number);
+          },
+        ),
+    ];
+    final current = q.isEmpty ? widget.surah : null;
     return Column(
       children: [
         Padding(
@@ -115,60 +176,27 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
             },
           ),
         ),
+        ...extras,
         Expanded(
-          child: ListView(
-            children: [
-              if (verseRef != null &&
-                  verseRef.surah >= 1 &&
-                  verseRef.surah <= 114)
-                ListTile(
-                  leading: const Icon(Icons.arrow_back),
-                  title: Text(
-                    '${l.surahWord(surahName(context, surahs[verseRef.surah - 1]))} ${verseRef.ayah}',
-                  ),
-                  onTap: () => _goToRef(verseRef, surahs),
-                ),
-              if (pageNumber != null &&
-                  pageNumber >= 1 &&
-                  pageNumber <= mushafPageCount)
-                ListTile(
-                  leading: const Icon(Icons.description_outlined),
-                  title: Text(l.pageOf('$pageNumber')),
-                  onTap: () async {
-                    final first = (await ref.read(
-                      pageAyahsProvider(pageNumber).future,
-                    )).first;
-                    if (!context.mounted) return;
-                    openVerse(
-                      context,
-                      ref,
-                      surah: first.surah,
-                      ayah: first.number,
-                    );
-                  },
-                ),
-              for (final s in shown)
-                ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: t.headBg,
-                    foregroundColor: t.headFg,
-                    child: Text(
-                      '${s.id}',
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ),
-                  title: Text(surahName(context, s)),
-                  subtitle: Text(
+          child: _CurrentList(
+            count: shown.length,
+            currentIndex: current == null
+                ? null
+                : shown.indexWhere((s) => s.id == current),
+            itemBuilder: (context, i, isCurrent) {
+              final s = shown[i];
+              return _Row(
+                current: isCurrent,
+                badge: '${s.id}',
+                title: surahName(context, s),
+                subtitle:
                     '${s.revelation == 'meccan' ? l.meccan : l.medinan} · ${l.ayahCount('${s.ayahCount}')}',
-                    style: TextStyle(color: t.muted),
-                  ),
-                  trailing: Text(
-                    l.pageShort('${s.startPageIn(ref.watch(editionProvider))}'),
-                    style: TextStyle(color: t.muted),
-                  ),
-                  onTap: () => openVerse(context, ref, surah: s.id, ayah: 1),
+                trailing: l.pageShort(
+                  '${s.startPageIn(ref.watch(editionProvider))}',
                 ),
-            ],
+                onTap: () => openVerse(context, ref, surah: s.id, ayah: 1),
+              );
+            },
           ),
         ),
       ],
@@ -176,79 +204,234 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
   }
 }
 
-class _JuzTab extends ConsumerWidget {
-  const _JuzTab({required this.surahs});
+/// A list with fixed row heights that opens scrolled to the current row.
+class _CurrentList extends StatefulWidget {
+  const _CurrentList({
+    required this.count,
+    required this.currentIndex,
+    required this.itemBuilder,
+  });
 
-  final List<SurahRow> surahs;
+  final int count;
+  final int? currentIndex;
+  final Widget Function(BuildContext context, int index, bool current)
+  itemBuilder;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
+  State<_CurrentList> createState() => _CurrentListState();
+}
+
+class _CurrentListState extends State<_CurrentList> {
+  late final ScrollController _scroll = ScrollController(
+    initialScrollOffset: widget.currentIndex == null || widget.currentIndex! < 0
+        ? 0
+        // Leave two rows above the current one visible.
+        : ((widget.currentIndex! - 2) * _rowExtent).clamp(0, double.infinity),
+  );
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      controller: _scroll,
+      itemExtent: _rowExtent,
+      itemCount: widget.count,
+      itemBuilder: (context, i) =>
+          widget.itemBuilder(context, i, i == widget.currentIndex),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row({
+    required this.current,
+    required this.badge,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+    required this.onTap,
+  });
+
+  final bool current;
+  final String badge;
+  final String title;
+  final String subtitle;
+  final String trailing;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
     final t = context.tokens.colors;
-    final starts = ref.watch(juzStartsProvider).value;
-    if (starts == null) return Center(child: Text(l.loadingLabel));
-    return ListView(
-      children: [
-        for (final j in starts)
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: t.headBg,
-              foregroundColor: t.headFg,
-              child: Text('${j.juz}', style: const TextStyle(fontSize: 13)),
+    final weight = current ? FontWeight.w800 : FontWeight.w400;
+    return Semantics(
+      selected: current,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        child: Material(
+          color: current ? t.highlight : Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: current
+                ? BorderSide(color: t.control, width: 2)
+                : BorderSide.none,
+          ),
+          child: ListTile(
+            onTap: onTap,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
             ),
-            title: Text(l.juzLabel('${j.juz}')),
-            subtitle: Text(
-              l.juzStartsAt(
-                surahName(context, surahs[j.ayah.surah - 1]),
-                '${j.ayah.number}',
+            leading: CircleAvatar(
+              backgroundColor: current ? t.control : t.headBg,
+              foregroundColor: current ? t.onControl : t.headFg,
+              child: Text(badge, style: const TextStyle(fontSize: 13)),
+            ),
+            title: Text(
+              title,
+              style: TextStyle(
+                fontWeight: current ? FontWeight.w800 : FontWeight.w500,
               ),
-              style: TextStyle(color: t.muted),
+            ),
+            subtitle: Text(
+              subtitle,
+              style: TextStyle(color: t.muted, fontWeight: weight),
             ),
             trailing: Text(
-              l.pageShort('${j.ayah.pageIn(ref.watch(editionProvider))}'),
-              style: TextStyle(color: t.muted),
-            ),
-            onTap: () => openVerse(
-              context,
-              ref,
-              surah: j.ayah.surah,
-              ayah: j.ayah.number,
+              trailing,
+              style: TextStyle(color: t.muted, fontWeight: weight),
             ),
           ),
-      ],
+        ),
+      ),
     );
   }
 }
 
-class _PagesTab extends ConsumerWidget {
-  const _PagesTab();
+/// Juz or hizb starts.
+class _StartsTab extends ConsumerWidget {
+  const _StartsTab({
+    required this.surahs,
+    required this.starts,
+    required this.current,
+    required this.title,
+  });
+
+  final List<SurahRow> surahs;
+  final List<AyahRow>? starts;
+  final int? current;
+  final String Function(int n) title;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 72,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-      ),
-      itemCount: mushafPageCount,
-      itemBuilder: (context, i) => Semantics(
-        button: true,
-        label: l.pageOf('${i + 1}'),
-        excludeSemantics: true,
-        child: OutlinedButton(
-          style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
-          onPressed: () async {
-            final first = (await ref.read(pageAyahsProvider(i + 1).future))
-                .first;
-            if (!context.mounted) return;
-            openVerse(context, ref, surah: first.surah, ayah: first.number);
+    final list = starts;
+    if (list == null) return Center(child: Text(l.loadingLabel));
+    return _CurrentList(
+      count: list.length,
+      currentIndex: current == null ? null : current! - 1,
+      itemBuilder: (context, i, isCurrent) {
+        final a = list[i];
+        return _Row(
+          current: isCurrent,
+          badge: '${i + 1}',
+          title: title(i + 1),
+          subtitle: l.juzStartsAt(
+            surahName(context, surahs[a.surah - 1]),
+            '${a.number}',
+          ),
+          trailing: l.pageShort('${a.pageIn(ref.watch(editionProvider))}'),
+          onTap: () => openVerse(context, ref, surah: a.surah, ayah: a.number),
+        );
+      },
+    );
+  }
+}
+
+class _PagesTab extends ConsumerStatefulWidget {
+  const _PagesTab({this.current});
+
+  final int? current;
+
+  @override
+  ConsumerState<_PagesTab> createState() => _PagesTabState();
+}
+
+class _PagesTabState extends ConsumerState<_PagesTab> {
+  ScrollController? _scroll;
+
+  @override
+  void dispose() {
+    _scroll?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    return LayoutBuilder(
+      builder: (context, box) {
+        const extent = 72.0;
+        final perRow = ((box.maxWidth - 24 + 8) / (extent + 8)).ceil();
+        final cell = (box.maxWidth - 24 - 8 * (perRow - 1)) / perRow;
+        _scroll ??= ScrollController(
+          initialScrollOffset: widget.current == null
+              ? 0
+              : (((widget.current! - 1) ~/ perRow - 2) * (cell + 8)).clamp(
+                  0,
+                  double.infinity,
+                ),
+        );
+        return GridView.builder(
+          controller: _scroll,
+          padding: const EdgeInsets.all(12),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: extent,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+          ),
+          itemCount: mushafPageCount,
+          itemBuilder: (context, i) {
+            final current = i + 1 == widget.current;
+            return Semantics(
+              button: true,
+              selected: current,
+              label: l.pageOf('${i + 1}'),
+              excludeSemantics: true,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: current ? t.control : null,
+                  foregroundColor: current ? t.onControl : null,
+                  side: current ? BorderSide(color: t.control, width: 2) : null,
+                ),
+                onPressed: () async {
+                  final first = (await ref.read(
+                    pageAyahsProvider(i + 1).future,
+                  )).first;
+                  if (!context.mounted) return;
+                  openVerse(
+                    context,
+                    ref,
+                    surah: first.surah,
+                    ayah: first.number,
+                  );
+                },
+                child: Text(
+                  '${i + 1}',
+                  style: TextStyle(
+                    fontWeight: current ? FontWeight.w800 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            );
           },
-          child: Text('${i + 1}'),
-        ),
-      ),
+        );
+      },
     );
   }
 }
