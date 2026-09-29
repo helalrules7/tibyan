@@ -11,6 +11,9 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/hafs-kfqc-json.zip       quran-ws 1.1.1       (pages, verse polygons)
   tools/.cache/UthmanicHafs_v2-0.zip    KFGQPC Hafs 2.0      (continuous view, KFGQPC font)
   tools/.cache/hafs-kfqc-svg.zip        quran-ws 1.1.1       (word boxes, see build_word_boxes.py)
+  tools/.cache/qe_arabic_moyassar.sqlite  QuranEnc             (al-Tafsir al-Muyassar)
+  tools/.cache/qe_english_saheeh.sqlite   QuranEnc 1.1.2       (Saheeh International)
+  tools/.cache/tanzil_en.pickthall.txt    Tanzil               (Pickthall, public domain)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -34,7 +37,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -69,6 +72,26 @@ def read_kfgqpc(path):
     return out
 
 
+def read_quranenc(path):
+    """Returns {(surah, ayah): (text, footnotes)} from a QuranEnc SQLite file, verbatim."""
+    db = sqlite3.connect(path)
+    rows = db.execute('SELECT sura, aya, translation, footnotes FROM translations').fetchall()
+    db.close()
+    return {(s, a): (t, f or None) for s, a, t, f in rows}
+
+
+def read_tanzil_translation(path):
+    """Returns ({(surah, ayah): text}, header comment block) from a Tanzil translation file, verbatim."""
+    verses, notice = {}, []
+    for line in path.read_text(encoding='utf-8').split('\n'):
+        parts = line.split('|')
+        if len(parts) == 3 and parts[0].isdigit():
+            verses[(int(parts[0]), int(parts[1]))] = parts[2]
+        elif line.startswith('#'):
+            notice.append(line)
+    return verses, '\n'.join(notice).strip()
+
+
 def basmala_prefix_length(verses, key):
     """Tanzil's text files put the basmala before verse 1 of 112 surahs.
     The text is stored verbatim; the app hides this prefix when it shows
@@ -93,11 +116,17 @@ def main():
     meta_path = CACHE / 'quran-data.xml'
     qws_path = CACHE / 'hafs-kfqc-json.zip'
     kfgqpc_path = CACHE / 'UthmanicHafs_v2-0.zip'
+    moyassar_path = CACHE / 'qe_arabic_moyassar.sqlite'
+    saheeh_path = CACHE / 'qe_english_saheeh.sqlite'
+    pickthall_path = CACHE / 'tanzil_en.pickthall.txt'
 
     uthmani, notice = read_tanzil(uthmani_path)
     clean, clean_notice = read_tanzil(clean_path)
     meta = ET.parse(meta_path).getroot()
     kfgqpc = read_kfgqpc(kfgqpc_path)
+    moyassar = read_quranenc(moyassar_path)
+    saheeh = read_quranenc(saheeh_path)
+    pickthall, pickthall_notice = read_tanzil_translation(pickthall_path)
 
     surahs = [
         dict(
@@ -110,6 +139,7 @@ def main():
     ]
     order = [(s['id'], a) for s in surahs for a in range(1, s['ayas'] + 1)]
     assert len(order) == 6236 and set(order) == set(uthmani) == set(clean) == set(kfgqpc)
+    assert set(order) == set(moyassar) == set(saheeh) == set(pickthall)
 
     def spans(tag):
         starts = {(int(e.get('sura')), int(e.get('aya'))): i + 1
@@ -201,6 +231,16 @@ def main():
     CREATE TABLE line_overflow_1405 (       -- 1405 ink crossing a cut (image px), and its line
       page INTEGER NOT NULL, line INTEGER NOT NULL,
       x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL);
+    CREATE TABLE commentary_edition (       -- tafsir and translation texts shipped in this file
+      source_id INTEGER PRIMARY KEY REFERENCES source(id),
+      kind TEXT NOT NULL,                   -- tafsir | translation
+      language TEXT NOT NULL, direction TEXT NOT NULL,
+      name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
+      sort_order INTEGER NOT NULL);
+    CREATE TABLE commentary (               -- one entry per verse, verbatim from the source
+      source_id INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
+      text TEXT NOT NULL, footnotes TEXT,
+      PRIMARY KEY (source_id, surah, ayah)) WITHOUT ROWID;
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -235,6 +275,36 @@ def main():
          'https://files.quran.app/hafs/madani/zips/images_1024.zip',
          'Old edition pages: King Fahd Glorious Quran Printing Complex, via Quran.com', None,
          '401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85', today),
+        # QuranEnc publishes no version number for this tafsir; the SHA-256
+        # and the retrieval date identify the copy.
+        (7, 'quranenc-arabic-moyassar', 'التفسير الميسر',
+         'King Fahd Glorious Quran Printing Complex', None,
+         'QuranEnc terms: no change, addition or removal; credit the publisher and QuranEnc.com; state the version',
+         'https://quranenc.com/ar/browse/arabic_moyassar',
+         'التفسير الميسر: مجمع الملك فهد لطباعة المصحف الشريف، عبر موقع QuranEnc.com',
+         None, sha256(moyassar_path), today),
+        (8, 'quranenc-english-saheeh', 'Saheeh International',
+         'Saheeh International', '1.1.2',
+         'QuranEnc terms: no change, addition or removal; credit the translator and QuranEnc.com; state the version',
+         'https://quranenc.com/en/browse/english_saheeh',
+         'Saheeh International, via QuranEnc.com, version 1.1.2',
+         None, sha256(saheeh_path), today),
+        (9, 'tanzil-en-pickthall', 'The Meaning of the Glorious Koran',
+         'Mohammed Marmaduke Pickthall (1930)', None,
+         'Public domain; Tanzil copy for non-commercial use',
+         'https://tanzil.net/trans/en.pickthall',
+         'Pickthall (1930), text from Tanzil.net', pickthall_notice, sha256(pickthall_path), today),
+    ])
+    db.executemany('INSERT INTO commentary_edition VALUES (?,?,?,?,?,?,?)', [
+        (7, 'tafsir', 'ar', 'rtl', 'التفسير الميسر', 'Al-Tafsir al-Muyassar', 1),
+        (8, 'translation', 'en', 'ltr', 'الترجمة الإنجليزية: صحيح إنترناشونال', 'Saheeh International', 2),
+        (9, 'translation', 'en', 'ltr', 'الترجمة الإنجليزية: بكثال', 'Pickthall', 3),
+    ])
+    db.executemany('INSERT INTO commentary VALUES (?,?,?,?,?)', [
+        (sid, *key, *entry)
+        for sid, texts in ((7, moyassar), (8, saheeh), (9, {k: (v, None) for k, v in pickthall.items()}))
+        for key in order
+        for entry in [texts[key]]
     ])
 
     db.executemany('INSERT INTO surah VALUES (?,?,?,?,?,?,?,?,?,?)', [
@@ -309,6 +379,7 @@ def main():
     assert prefixed == 112, prefixed
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
     assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
+    assert check.execute('SELECT COUNT(*) FROM commentary').fetchone()[0] == 3 * 6236
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0

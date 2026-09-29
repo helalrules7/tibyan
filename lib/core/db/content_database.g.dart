@@ -4089,6 +4089,814 @@ class LineOverflow1405Companion extends UpdateCompanion<OldOverflowRow> {
   }
 }
 
+class $CommentaryEditionTable extends CommentaryEdition
+    with TableInfo<$CommentaryEditionTable, CommentaryEditionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CommentaryEditionTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<int> sourceId = GeneratedColumn<int>(
+    'source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _languageMeta = const VerificationMeta(
+    'language',
+  );
+  @override
+  late final GeneratedColumn<String> language = GeneratedColumn<String>(
+    'language',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _directionMeta = const VerificationMeta(
+    'direction',
+  );
+  @override
+  late final GeneratedColumn<String> direction = GeneratedColumn<String>(
+    'direction',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameArMeta = const VerificationMeta('nameAr');
+  @override
+  late final GeneratedColumn<String> nameAr = GeneratedColumn<String>(
+    'name_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    sourceId,
+    kind,
+    language,
+    direction,
+    nameAr,
+    nameEn,
+    sortOrder,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'commentary_edition';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CommentaryEditionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('language')) {
+      context.handle(
+        _languageMeta,
+        language.isAcceptableOrUnknown(data['language']!, _languageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_languageMeta);
+    }
+    if (data.containsKey('direction')) {
+      context.handle(
+        _directionMeta,
+        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_directionMeta);
+    }
+    if (data.containsKey('name_ar')) {
+      context.handle(
+        _nameArMeta,
+        nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameArMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameEnMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sortOrderMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sourceId};
+  @override
+  CommentaryEditionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CommentaryEditionRow(
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      language: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}language'],
+      )!,
+      direction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}direction'],
+      )!,
+      nameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ar'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+    );
+  }
+
+  @override
+  $CommentaryEditionTable createAlias(String alias) {
+    return $CommentaryEditionTable(attachedDatabase, alias);
+  }
+}
+
+class CommentaryEditionRow extends DataClass
+    implements Insertable<CommentaryEditionRow> {
+  final int sourceId;
+
+  /// `tafsir` or `translation`.
+  final String kind;
+  final String language;
+
+  /// `rtl` or `ltr`.
+  final String direction;
+  final String nameAr;
+  final String nameEn;
+  final int sortOrder;
+  const CommentaryEditionRow({
+    required this.sourceId,
+    required this.kind,
+    required this.language,
+    required this.direction,
+    required this.nameAr,
+    required this.nameEn,
+    required this.sortOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['source_id'] = Variable<int>(sourceId);
+    map['kind'] = Variable<String>(kind);
+    map['language'] = Variable<String>(language);
+    map['direction'] = Variable<String>(direction);
+    map['name_ar'] = Variable<String>(nameAr);
+    map['name_en'] = Variable<String>(nameEn);
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  CommentaryEditionCompanion toCompanion(bool nullToAbsent) {
+    return CommentaryEditionCompanion(
+      sourceId: Value(sourceId),
+      kind: Value(kind),
+      language: Value(language),
+      direction: Value(direction),
+      nameAr: Value(nameAr),
+      nameEn: Value(nameEn),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory CommentaryEditionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CommentaryEditionRow(
+      sourceId: serializer.fromJson<int>(json['sourceId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      language: serializer.fromJson<String>(json['language']),
+      direction: serializer.fromJson<String>(json['direction']),
+      nameAr: serializer.fromJson<String>(json['nameAr']),
+      nameEn: serializer.fromJson<String>(json['nameEn']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sourceId': serializer.toJson<int>(sourceId),
+      'kind': serializer.toJson<String>(kind),
+      'language': serializer.toJson<String>(language),
+      'direction': serializer.toJson<String>(direction),
+      'nameAr': serializer.toJson<String>(nameAr),
+      'nameEn': serializer.toJson<String>(nameEn),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  CommentaryEditionRow copyWith({
+    int? sourceId,
+    String? kind,
+    String? language,
+    String? direction,
+    String? nameAr,
+    String? nameEn,
+    int? sortOrder,
+  }) => CommentaryEditionRow(
+    sourceId: sourceId ?? this.sourceId,
+    kind: kind ?? this.kind,
+    language: language ?? this.language,
+    direction: direction ?? this.direction,
+    nameAr: nameAr ?? this.nameAr,
+    nameEn: nameEn ?? this.nameEn,
+    sortOrder: sortOrder ?? this.sortOrder,
+  );
+  CommentaryEditionRow copyWithCompanion(CommentaryEditionCompanion data) {
+    return CommentaryEditionRow(
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      language: data.language.present ? data.language.value : this.language,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommentaryEditionRow(')
+          ..write('sourceId: $sourceId, ')
+          ..write('kind: $kind, ')
+          ..write('language: $language, ')
+          ..write('direction: $direction, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    sourceId,
+    kind,
+    language,
+    direction,
+    nameAr,
+    nameEn,
+    sortOrder,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CommentaryEditionRow &&
+          other.sourceId == this.sourceId &&
+          other.kind == this.kind &&
+          other.language == this.language &&
+          other.direction == this.direction &&
+          other.nameAr == this.nameAr &&
+          other.nameEn == this.nameEn &&
+          other.sortOrder == this.sortOrder);
+}
+
+class CommentaryEditionCompanion extends UpdateCompanion<CommentaryEditionRow> {
+  final Value<int> sourceId;
+  final Value<String> kind;
+  final Value<String> language;
+  final Value<String> direction;
+  final Value<String> nameAr;
+  final Value<String> nameEn;
+  final Value<int> sortOrder;
+  const CommentaryEditionCompanion({
+    this.sourceId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.language = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.nameAr = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+  });
+  CommentaryEditionCompanion.insert({
+    this.sourceId = const Value.absent(),
+    required String kind,
+    required String language,
+    required String direction,
+    required String nameAr,
+    required String nameEn,
+    required int sortOrder,
+  }) : kind = Value(kind),
+       language = Value(language),
+       direction = Value(direction),
+       nameAr = Value(nameAr),
+       nameEn = Value(nameEn),
+       sortOrder = Value(sortOrder);
+  static Insertable<CommentaryEditionRow> custom({
+    Expression<int>? sourceId,
+    Expression<String>? kind,
+    Expression<String>? language,
+    Expression<String>? direction,
+    Expression<String>? nameAr,
+    Expression<String>? nameEn,
+    Expression<int>? sortOrder,
+  }) {
+    return RawValuesInsertable({
+      if (sourceId != null) 'source_id': sourceId,
+      if (kind != null) 'kind': kind,
+      if (language != null) 'language': language,
+      if (direction != null) 'direction': direction,
+      if (nameAr != null) 'name_ar': nameAr,
+      if (nameEn != null) 'name_en': nameEn,
+      if (sortOrder != null) 'sort_order': sortOrder,
+    });
+  }
+
+  CommentaryEditionCompanion copyWith({
+    Value<int>? sourceId,
+    Value<String>? kind,
+    Value<String>? language,
+    Value<String>? direction,
+    Value<String>? nameAr,
+    Value<String>? nameEn,
+    Value<int>? sortOrder,
+  }) {
+    return CommentaryEditionCompanion(
+      sourceId: sourceId ?? this.sourceId,
+      kind: kind ?? this.kind,
+      language: language ?? this.language,
+      direction: direction ?? this.direction,
+      nameAr: nameAr ?? this.nameAr,
+      nameEn: nameEn ?? this.nameEn,
+      sortOrder: sortOrder ?? this.sortOrder,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sourceId.present) {
+      map['source_id'] = Variable<int>(sourceId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (language.present) {
+      map['language'] = Variable<String>(language.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<String>(direction.value);
+    }
+    if (nameAr.present) {
+      map['name_ar'] = Variable<String>(nameAr.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommentaryEditionCompanion(')
+          ..write('sourceId: $sourceId, ')
+          ..write('kind: $kind, ')
+          ..write('language: $language, ')
+          ..write('direction: $direction, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CommentaryTable extends Commentary
+    with TableInfo<$CommentaryTable, CommentaryRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CommentaryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<int> sourceId = GeneratedColumn<int>(
+    'source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _footnotesMeta = const VerificationMeta(
+    'footnotes',
+  );
+  @override
+  late final GeneratedColumn<String> footnotes = GeneratedColumn<String>(
+    'footnotes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    sourceId,
+    surah,
+    ayah,
+    body,
+    footnotes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'commentary';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CommentaryRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceIdMeta);
+    }
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('text')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['text']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('footnotes')) {
+      context.handle(
+        _footnotesMeta,
+        footnotes.isAcceptableOrUnknown(data['footnotes']!, _footnotesMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sourceId, surah, ayah};
+  @override
+  CommentaryRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CommentaryRow(
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_id'],
+      )!,
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text'],
+      )!,
+      footnotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}footnotes'],
+      ),
+    );
+  }
+
+  @override
+  $CommentaryTable createAlias(String alias) {
+    return $CommentaryTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class CommentaryRow extends DataClass implements Insertable<CommentaryRow> {
+  final int sourceId;
+  final int surah;
+  final int ayah;
+  final String body;
+  final String? footnotes;
+  const CommentaryRow({
+    required this.sourceId,
+    required this.surah,
+    required this.ayah,
+    required this.body,
+    this.footnotes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['source_id'] = Variable<int>(sourceId);
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['text'] = Variable<String>(body);
+    if (!nullToAbsent || footnotes != null) {
+      map['footnotes'] = Variable<String>(footnotes);
+    }
+    return map;
+  }
+
+  CommentaryCompanion toCompanion(bool nullToAbsent) {
+    return CommentaryCompanion(
+      sourceId: Value(sourceId),
+      surah: Value(surah),
+      ayah: Value(ayah),
+      body: Value(body),
+      footnotes: footnotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(footnotes),
+    );
+  }
+
+  factory CommentaryRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CommentaryRow(
+      sourceId: serializer.fromJson<int>(json['sourceId']),
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      body: serializer.fromJson<String>(json['body']),
+      footnotes: serializer.fromJson<String?>(json['footnotes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sourceId': serializer.toJson<int>(sourceId),
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'body': serializer.toJson<String>(body),
+      'footnotes': serializer.toJson<String?>(footnotes),
+    };
+  }
+
+  CommentaryRow copyWith({
+    int? sourceId,
+    int? surah,
+    int? ayah,
+    String? body,
+    Value<String?> footnotes = const Value.absent(),
+  }) => CommentaryRow(
+    sourceId: sourceId ?? this.sourceId,
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    body: body ?? this.body,
+    footnotes: footnotes.present ? footnotes.value : this.footnotes,
+  );
+  CommentaryRow copyWithCompanion(CommentaryCompanion data) {
+    return CommentaryRow(
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      body: data.body.present ? data.body.value : this.body,
+      footnotes: data.footnotes.present ? data.footnotes.value : this.footnotes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommentaryRow(')
+          ..write('sourceId: $sourceId, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('body: $body, ')
+          ..write('footnotes: $footnotes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(sourceId, surah, ayah, body, footnotes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CommentaryRow &&
+          other.sourceId == this.sourceId &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.body == this.body &&
+          other.footnotes == this.footnotes);
+}
+
+class CommentaryCompanion extends UpdateCompanion<CommentaryRow> {
+  final Value<int> sourceId;
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<String> body;
+  final Value<String?> footnotes;
+  const CommentaryCompanion({
+    this.sourceId = const Value.absent(),
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.body = const Value.absent(),
+    this.footnotes = const Value.absent(),
+  });
+  CommentaryCompanion.insert({
+    required int sourceId,
+    required int surah,
+    required int ayah,
+    required String body,
+    this.footnotes = const Value.absent(),
+  }) : sourceId = Value(sourceId),
+       surah = Value(surah),
+       ayah = Value(ayah),
+       body = Value(body);
+  static Insertable<CommentaryRow> custom({
+    Expression<int>? sourceId,
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<String>? body,
+    Expression<String>? footnotes,
+  }) {
+    return RawValuesInsertable({
+      if (sourceId != null) 'source_id': sourceId,
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (body != null) 'text': body,
+      if (footnotes != null) 'footnotes': footnotes,
+    });
+  }
+
+  CommentaryCompanion copyWith({
+    Value<int>? sourceId,
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<String>? body,
+    Value<String?>? footnotes,
+  }) {
+    return CommentaryCompanion(
+      sourceId: sourceId ?? this.sourceId,
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      body: body ?? this.body,
+      footnotes: footnotes ?? this.footnotes,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sourceId.present) {
+      map['source_id'] = Variable<int>(sourceId.value);
+    }
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (body.present) {
+      map['text'] = Variable<String>(body.value);
+    }
+    if (footnotes.present) {
+      map['footnotes'] = Variable<String>(footnotes.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommentaryCompanion(')
+          ..write('sourceId: $sourceId, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('body: $body, ')
+          ..write('footnotes: $footnotes')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -4102,6 +4910,9 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $LineOverflow1405Table lineOverflow1405 = $LineOverflow1405Table(
     this,
   );
+  late final $CommentaryEditionTable commentaryEdition =
+      $CommentaryEditionTable(this);
+  late final $CommentaryTable commentary = $CommentaryTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4115,6 +4926,8 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     lineCut,
     lineOverflow,
     lineOverflow1405,
+    commentaryEdition,
+    commentary,
   ];
 }
 
@@ -6269,6 +7082,463 @@ typedef $$LineOverflow1405TableProcessedTableManager =
       OldOverflowRow,
       PrefetchHooks Function()
     >;
+typedef $$CommentaryEditionTableCreateCompanionBuilder =
+    CommentaryEditionCompanion Function({
+      Value<int> sourceId,
+      required String kind,
+      required String language,
+      required String direction,
+      required String nameAr,
+      required String nameEn,
+      required int sortOrder,
+    });
+typedef $$CommentaryEditionTableUpdateCompanionBuilder =
+    CommentaryEditionCompanion Function({
+      Value<int> sourceId,
+      Value<String> kind,
+      Value<String> language,
+      Value<String> direction,
+      Value<String> nameAr,
+      Value<String> nameEn,
+      Value<int> sortOrder,
+    });
+
+class $$CommentaryEditionTableFilterComposer
+    extends Composer<_$ContentDatabase, $CommentaryEditionTable> {
+  $$CommentaryEditionTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CommentaryEditionTableOrderingComposer
+    extends Composer<_$ContentDatabase, $CommentaryEditionTable> {
+  $$CommentaryEditionTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CommentaryEditionTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $CommentaryEditionTable> {
+  $$CommentaryEditionTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get sourceId =>
+      $composableBuilder(column: $table.sourceId, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get language =>
+      $composableBuilder(column: $table.language, builder: (column) => column);
+
+  GeneratedColumn<String> get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumn<String> get nameAr =>
+      $composableBuilder(column: $table.nameAr, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+}
+
+class $$CommentaryEditionTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $CommentaryEditionTable,
+          CommentaryEditionRow,
+          $$CommentaryEditionTableFilterComposer,
+          $$CommentaryEditionTableOrderingComposer,
+          $$CommentaryEditionTableAnnotationComposer,
+          $$CommentaryEditionTableCreateCompanionBuilder,
+          $$CommentaryEditionTableUpdateCompanionBuilder,
+          (
+            CommentaryEditionRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $CommentaryEditionTable,
+              CommentaryEditionRow
+            >,
+          ),
+          CommentaryEditionRow,
+          PrefetchHooks Function()
+        > {
+  $$CommentaryEditionTableTableManager(
+    _$ContentDatabase db,
+    $CommentaryEditionTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CommentaryEditionTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CommentaryEditionTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CommentaryEditionTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> sourceId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> language = const Value.absent(),
+                Value<String> direction = const Value.absent(),
+                Value<String> nameAr = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+              }) => CommentaryEditionCompanion(
+                sourceId: sourceId,
+                kind: kind,
+                language: language,
+                direction: direction,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                sortOrder: sortOrder,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> sourceId = const Value.absent(),
+                required String kind,
+                required String language,
+                required String direction,
+                required String nameAr,
+                required String nameEn,
+                required int sortOrder,
+              }) => CommentaryEditionCompanion.insert(
+                sourceId: sourceId,
+                kind: kind,
+                language: language,
+                direction: direction,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                sortOrder: sortOrder,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CommentaryEditionTable, CommentaryEditionRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $CommentaryEditionTable,
+                    CommentaryEditionRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CommentaryEditionTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $CommentaryEditionTable,
+      CommentaryEditionRow,
+      $$CommentaryEditionTableFilterComposer,
+      $$CommentaryEditionTableOrderingComposer,
+      $$CommentaryEditionTableAnnotationComposer,
+      $$CommentaryEditionTableCreateCompanionBuilder,
+      $$CommentaryEditionTableUpdateCompanionBuilder,
+      (
+        CommentaryEditionRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $CommentaryEditionTable,
+          CommentaryEditionRow
+        >,
+      ),
+      CommentaryEditionRow,
+      PrefetchHooks Function()
+    >;
+typedef $$CommentaryTableCreateCompanionBuilder = CommentaryCompanion Function({
+  required int sourceId,
+  required int surah,
+  required int ayah,
+  required String body,
+  Value<String?> footnotes,
+});
+typedef $$CommentaryTableUpdateCompanionBuilder = CommentaryCompanion Function({
+  Value<int> sourceId,
+  Value<int> surah,
+  Value<int> ayah,
+  Value<String> body,
+  Value<String?> footnotes,
+});
+
+class $$CommentaryTableFilterComposer
+    extends Composer<_$ContentDatabase, $CommentaryTable> {
+  $$CommentaryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get footnotes => $composableBuilder(
+    column: $table.footnotes,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CommentaryTableOrderingComposer
+    extends Composer<_$ContentDatabase, $CommentaryTable> {
+  $$CommentaryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get footnotes => $composableBuilder(
+    column: $table.footnotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CommentaryTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $CommentaryTable> {
+  $$CommentaryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get sourceId =>
+      $composableBuilder(column: $table.sourceId, builder: (column) => column);
+
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<String> get footnotes =>
+      $composableBuilder(column: $table.footnotes, builder: (column) => column);
+}
+
+class $$CommentaryTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $CommentaryTable,
+          CommentaryRow,
+          $$CommentaryTableFilterComposer,
+          $$CommentaryTableOrderingComposer,
+          $$CommentaryTableAnnotationComposer,
+          $$CommentaryTableCreateCompanionBuilder,
+          $$CommentaryTableUpdateCompanionBuilder,
+          (
+            CommentaryRow,
+            BaseReferences<_$ContentDatabase, $CommentaryTable, CommentaryRow>,
+          ),
+          CommentaryRow,
+          PrefetchHooks Function()
+        > {
+  $$CommentaryTableTableManager(_$ContentDatabase db, $CommentaryTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CommentaryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CommentaryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CommentaryTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> sourceId = const Value.absent(),
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<String?> footnotes = const Value.absent(),
+              }) => CommentaryCompanion(
+                sourceId: sourceId,
+                surah: surah,
+                ayah: ayah,
+                body: body,
+                footnotes: footnotes,
+              ),
+          createCompanionCallback:
+              ({
+                required int sourceId,
+                required int surah,
+                required int ayah,
+                required String body,
+                Value<String?> footnotes = const Value.absent(),
+              }) => CommentaryCompanion.insert(
+                sourceId: sourceId,
+                surah: surah,
+                ayah: ayah,
+                body: body,
+                footnotes: footnotes,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CommentaryTable, CommentaryRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $CommentaryTable,
+                    CommentaryRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CommentaryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $CommentaryTable,
+      CommentaryRow,
+      $$CommentaryTableFilterComposer,
+      $$CommentaryTableOrderingComposer,
+      $$CommentaryTableAnnotationComposer,
+      $$CommentaryTableCreateCompanionBuilder,
+      $$CommentaryTableUpdateCompanionBuilder,
+      (
+        CommentaryRow,
+        BaseReferences<_$ContentDatabase, $CommentaryTable, CommentaryRow>,
+      ),
+      CommentaryRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -6288,4 +7558,8 @@ class $ContentDatabaseManager {
       $$LineOverflowTableTableManager(_db, _db.lineOverflow);
   $$LineOverflow1405TableTableManager get lineOverflow1405 =>
       $$LineOverflow1405TableTableManager(_db, _db.lineOverflow1405);
+  $$CommentaryEditionTableTableManager get commentaryEdition =>
+      $$CommentaryEditionTableTableManager(_db, _db.commentaryEdition);
+  $$CommentaryTableTableManager get commentary =>
+      $$CommentaryTableTableManager(_db, _db.commentary);
 }

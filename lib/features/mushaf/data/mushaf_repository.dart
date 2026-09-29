@@ -138,6 +138,19 @@ class MushafRepository {
     _db.lineOverflow1405,
   )..where((t) => t.page.equals(page))).get();
 
+  /// Tafsir and translation texts in the content database, in display order.
+  Future<List<CommentaryEditionRow>> commentaryEditions() => (_db.select(
+    _db.commentaryEdition,
+  )..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).get();
+
+  /// Every shipped entry for one verse, keyed by source id.
+  Future<Map<int, CommentaryRow>> commentary(int surah, int ayah) async {
+    final rows = await (_db.select(
+      _db.commentary,
+    )..where((t) => t.surah.equals(surah) & t.ayah.equals(ayah))).get();
+    return {for (final r in rows) r.sourceId: r};
+  }
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }
