@@ -6,6 +6,11 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (tafsir and translation)
+- Tafsir and translation screen, opened from verse services: al-Tafsir al-Muyassar (KFGQPC, via QuranEnc), Saheeh International 1.1.2 with its footnotes (via QuranEnc), and Pickthall (public domain, via Tanzil). Every text is shown verbatim with its source's credit and version.
+- Swipe or use the arrows to move through the surah's verses; texts sit side by side on wide screens for comparison.
+- Tafsir settings: Uthman Taha Naskh or the interface font, text size, and which texts are shown.
+
 ## [0.3.0] - 2026-09-29
 
 ### Added (Zakhrafa style)
