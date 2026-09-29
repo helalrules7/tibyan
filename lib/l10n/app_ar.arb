@@ -478,5 +478,64 @@
   "tafsirKashida": "الشد بالكشيدة (تجربة)",
   "tafsirKashidaHint": "ضبط سطور التفسير بمدّ الحروف بدل توسيع المسافات. لا يمس الكلمات القرآنية بين الأقواس، والنسخ يأخذ النص الأصلي",
   "copyText": "نسخ النص",
-  "copied": "تم النسخ"
+  "copied": "تم النسخ",
+  "listen": "استماع",
+  "reciterLabel": "القارئ",
+  "murattal": "مرتل",
+  "mujawwad": "مجود",
+  "repeatLabel": "عدد مرات التكرار",
+  "repeatForever": "بلا توقف",
+  "repeatTimes": "×{n}",
+  "@repeatTimes": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "silenceLabel": "سكوت بين كل تكرار والتالي (للترديد خلف القارئ)",
+  "silenceNone": "بلا",
+  "seconds": "{n} ث",
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "repeatVerse": "كرر هذه الآية",
+  "playToEnd": "أكمل السورة",
+  "sleepLabel": "مؤقت النوم",
+  "sleepOff": "إيقاف",
+  "minutes": "{n} د",
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepSurahEnd": "نهاية السورة",
+  "followRecitation": "تقليب الصفحات مع التلاوة",
+  "audioDownloads": "تحميل التلاوات",
+  "downloadAll": "تحميل الكل",
+  "audioDownloaded": "محملة على الجهاز",
+  "noTiming": "هذه التلاوة بلا توقيت للآيات في هذه السورة: تُسمع كاملة بلا تظليل ولا تكرار آية",
+  "playerError": "تعذر تشغيل التلاوة. تأكد من الاتصال بالإنترنت أو حمّل السورة.",
+  "playerSettings": "إعدادات الاستماع",
+  "stopListening": "إيقاف الاستماع",
+  "repeatProgress": "التكرار {done} من {total}",
+  "@repeatProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "audioCredit": "التلاوات وتوقيت الآيات: mp3quran.net",
+  "touchReading": "القراءة اللمسية",
+  "touchReadingOn": "القراءة اللمسية: المس الآية التي تقرؤها"
 }

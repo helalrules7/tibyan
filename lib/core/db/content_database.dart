@@ -234,6 +234,68 @@ class Commentary extends Table {
   bool get withoutRowId => true;
 }
 
+/// A recitation, streamed or downloaded one surah file at a time.
+@DataClassName('ReciterRow')
+class Reciter extends Table {
+  @override
+  String get tableName => 'reciter';
+
+  IntColumn get id => integer()();
+  TextColumn get nameAr => text()();
+  TextColumn get nameEn => text()();
+
+  /// `murattal` or `mujawwad`.
+  TextColumn get style => text()();
+
+  /// A surah's file is this URL followed by `NNN.mp3`.
+  TextColumn get folderUrl => text()();
+  IntColumn get sourceId => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Where a verse starts and ends in its surah file, in milliseconds.
+/// Verse 0 is the opening before verse 1, when the source times it.
+@DataClassName('AyahTimingRow')
+class AyahTiming extends Table {
+  @override
+  String get tableName => 'ayah_timing';
+
+  IntColumn get reciter => integer()();
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+  IntColumn get startMs => integer()();
+  IntColumn get endMs => integer()();
+
+  @override
+  Set<Column> get primaryKey => {reciter, surah, ayah};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+/// Where a word starts and ends in its surah file, in milliseconds.
+/// Words are numbered as in [WordBox].
+@DataClassName('WordTimingRow')
+class WordTiming extends Table {
+  @override
+  String get tableName => 'word_timing';
+
+  IntColumn get reciter => integer()();
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+  IntColumn get word => integer()();
+  IntColumn get startMs => integer()();
+  IntColumn get endMs => integer()();
+
+  @override
+  Set<Column> get primaryKey => {reciter, surah, ayah, word};
+
+  @override
+  bool get withoutRowId => true;
+}
+
 @DriftDatabase(
   tables: [
     Surah,
@@ -246,6 +308,9 @@ class Commentary extends Table {
     LineOverflow1405,
     CommentaryEdition,
     Commentary,
+    Reciter,
+    AyahTiming,
+    WordTiming,
   ],
 )
 class ContentDatabase extends _$ContentDatabase {
@@ -253,7 +318,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 9;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

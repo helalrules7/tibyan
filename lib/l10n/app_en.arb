@@ -351,5 +351,64 @@
   "tafsirKashida": "Kashida justification (trial)",
   "tafsirKashidaHint": "Justify tafsir lines by stretching letters instead of widening spaces. Quran words in brackets are never stretched, and copying gives the original text",
   "copyText": "Copy text",
-  "copied": "Copied"
+  "copied": "Copied",
+  "listen": "Listen",
+  "reciterLabel": "Reciter",
+  "murattal": "Murattal",
+  "mujawwad": "Mujawwad",
+  "repeatLabel": "Times to repeat",
+  "repeatForever": "Until stopped",
+  "repeatTimes": "×{n}",
+  "@repeatTimes": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "silenceLabel": "Silence between repeats (to recite after the reciter)",
+  "silenceNone": "None",
+  "seconds": "{n} s",
+  "@seconds": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "repeatVerse": "Repeat this verse",
+  "playToEnd": "Play to the end",
+  "sleepLabel": "Sleep timer",
+  "sleepOff": "Off",
+  "minutes": "{n} min",
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "sleepSurahEnd": "End of surah",
+  "followRecitation": "Turn pages with the recitation",
+  "audioDownloads": "Download recitations",
+  "downloadAll": "Download all",
+  "audioDownloaded": "On this device",
+  "noTiming": "This recitation has no verse timing for this surah: it plays whole, without highlighting or verse repeat",
+  "playerError": "The recitation could not play. Check the connection or download the surah.",
+  "playerSettings": "Listening settings",
+  "stopListening": "Stop listening",
+  "repeatProgress": "Repeat {done} of {total}",
+  "@repeatProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "audioCredit": "Recitations and verse timings: mp3quran.net",
+  "touchReading": "Touch reading",
+  "touchReadingOn": "Touch reading: tap the verse you are reading"
 }

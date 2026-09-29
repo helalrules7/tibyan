@@ -311,6 +311,44 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               for (final v in verses)
                 if (x.selection.contains(v.key)) v,
             ];
+            // Pages 1 and 2 keep their own layout; their verses are drawn
+            // as whole outlines there.
+            final boxes = widget.page <= 2
+                ? [
+                    for (final v in selected)
+                      for (final r in v.rects) r.inflate(1),
+                  ]
+                : lineBoxes(
+                    [for (final v in selected) ...v.rects],
+                    lineOf: (r) => layout._lineOf(r.center.dy),
+                    centre: layout._centre,
+                    halfHeight: _pitch * 0.42,
+                    band: (j) => (layout._bandTop(j), layout._bandBottom(j)),
+                  );
+            final touchedBoxes = [
+              for (final v in verses)
+                if (v.key == x.touched)
+                  ...widget.page <= 2
+                      ? [for (final r in v.rects) r.inflate(1)]
+                      : lineBoxes(
+                          v.rects,
+                          lineOf: (r) => layout._lineOf(r.center.dy),
+                          centre: layout._centre,
+                          halfHeight: _pitch * 0.42,
+                          band: (j) =>
+                              (layout._bandTop(j), layout._bandBottom(j)),
+                        ),
+            ];
+            final active = x.activeWord;
+            final wordBox = active == null || widget.page <= 2
+                ? active?.inflate(0.6)
+                : lineBoxes(
+                    [active],
+                    lineOf: (r) => layout._lineOf(r.center.dy),
+                    centre: layout._centre,
+                    halfHeight: _pitch * 0.42,
+                    band: (j) => (layout._bandTop(j), layout._bandBottom(j)),
+                  ).first.widen(0.6);
             final handles = <Widget>[];
             if (selected.isNotEmpty && x.showHandles) {
               // Right-to-left: the selection starts at the top right of its
@@ -376,7 +414,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                         }
                       }
                       final m = markerAt(point);
-                      m != null ? x.onMarkerTap(m) : x.onTap();
+                      if (m != null) return x.onMarkerTap(m);
+                      final v = x.onVerseTap == null ? null : verseAt(point);
+                      v != null ? x.onVerseTap!(v) : x.onTap();
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(layout.toPage(d.localPosition));
@@ -400,10 +440,32 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 }
                               }
                             }
-                            final fill = Paint()
-                              ..color = tokens.colors.highlight;
-                            for (final v in selected) {
-                              c.drawPath(v.path, fill);
+                            paintVerseBoxes(
+                              c,
+                              boxes,
+                              tokens.colors.highlight,
+                              stroke: 0.7,
+                              radius: 3,
+                            );
+                            if (x.touchColor != null) {
+                              paintVerseBoxes(
+                                c,
+                                touchedBoxes,
+                                x.touchColor!,
+                                stroke: 0.7,
+                                radius: 3,
+                              );
+                            }
+                            if (wordBox != null) {
+                              paintVerseBoxes(
+                                c,
+                                [wordBox],
+                                tokens.colors.highlight.withValues(
+                                  alpha: tokens.colors.highlight.a * 2.4,
+                                ),
+                                stroke: 0.9,
+                                radius: 3,
+                              );
                             }
                             for (final v in verses) {
                               final colour = x.marks[v.key];

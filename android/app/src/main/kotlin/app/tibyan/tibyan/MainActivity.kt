@@ -1,5 +1,7 @@
 package app.tibyan.tibyan
 
-import io.flutter.embedding.android.FlutterActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 
-class MainActivity : FlutterActivity()
+// AudioServiceActivity keeps one Flutter engine for the app and the
+// background recitation service.
+class MainActivity : AudioServiceActivity()

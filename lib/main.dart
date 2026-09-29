@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,12 @@ import 'features/mushaf/mushaf_providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Recitation keeps playing with the screen off, with lock-screen controls.
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'app.tibyan.recitation',
+    androidNotificationChannelName: 'التلاوة',
+    androidNotificationOngoing: true,
+  );
 
   final registry = await ThemeRegistry.load(rootBundle);
   final flags = await FeatureFlags.load(rootBundle);
