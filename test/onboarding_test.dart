@@ -35,7 +35,7 @@ void main() {
 
       // Defaults: Calm style, Light mode, new edition.
       final settings = container.read(settingsProvider);
-      expect(settings.styleId, 'calm');
+      expect(settings.styleId, 'zakhrafa');
       expect(settings.mode, ModeSetting.light);
       expect(settings.edition, MushafEdition.madina1441);
 

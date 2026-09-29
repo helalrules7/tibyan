@@ -1,0 +1,94 @@
+{
+  "id": "zakhrafa",
+  "version": 1,
+  "name": {
+    "ar": "زخرفة",
+    "en": "Zakhrafa"
+  },
+  "description": {
+    "ar": "إطار مزخرف بالتركواز والبرتقالي كالمصاحف المطبوعة",
+    "en": "An illuminated turquoise and coral frame, like printed mushafs"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCAN"
+  },
+  "frame": {
+    "outerWidth": 30,
+    "outerStyle": "illuminated",
+    "innerWidth": 1,
+    "gap": 3,
+    "radius": 0,
+    "innerRadius": 0,
+    "corner": "illuminated"
+  },
+  "ornaments": {
+    "surahHeader": "mosaic",
+    "ayahMarker": "rosette",
+    "density": "rich"
+  },
+  "radii": {
+    "card": 14,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 0
+  },
+  "modes": {
+    "light": {
+      "bg": "#FFFDF8",
+      "paper": "#FFFFFF",
+      "ink": "#231F20",
+      "frame": "#1C2F45",
+      "goldText": "#0D5F59",
+      "border": "#E9DFD2",
+      "headBg": "#1C2F45",
+      "headFg": "#FFFFFF",
+      "marker": "#1A9589",
+      "player": "#1C2F45",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#0D5F59",
+      "muted": "#6B6158",
+      "highlight": "#1FA79B33",
+      "control": "#0D5F59",
+      "onControl": "#FFFFFF"
+    },
+    "night": {
+      "bg": "#0E1A1E",
+      "paper": "#12211F",
+      "ink": "#E9E1CF",
+      "frame": "#1C2F45",
+      "goldText": "#7FD0C5",
+      "border": "#24383C",
+      "headBg": "#1C2F45",
+      "headFg": "#E9E1CF",
+      "marker": "#2E9E92",
+      "player": "#1C2F45",
+      "playerFg": "#E9E1CF",
+      "accent": "#E9E1CF",
+      "accentFg": "#12211F",
+      "muted": "#A89E8E",
+      "highlight": "#2E9E9240",
+      "control": "#7FD0C5",
+      "onControl": "#0B1A1C"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#070B0C",
+      "ink": "#E4DCCA",
+      "frame": "#14202E",
+      "goldText": "#6CBFB4",
+      "border": "#172224",
+      "headBg": "#14202E",
+      "headFg": "#E4DCCA",
+      "marker": "#23776E",
+      "player": "#14202E",
+      "playerFg": "#E4DCCA",
+      "accent": "#E4DCCA",
+      "accentFg": "#070B0C",
+      "muted": "#958B7C",
+      "highlight": "#23776E40",
+      "control": "#6CBFB4",
+      "onControl": "#000000"
+    }
+  }
+}
