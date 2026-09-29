@@ -273,6 +273,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             setState(() => start ? _selA = v : _selB = v),
         markerLook: markerLook,
         hidden: _recite && pg == _page ? _hiddenOn(pg) : null,
+        hiddenWords: _recite && pg == _page
+            ? _wordsOf(_hiddenOn(pg), pg)
+            : const {},
         onHiddenTap: (v) => setState(() => _revealed.add(v)),
         ornateOpening: illuminated && openingSurah != null,
         showHandles: _multi,
@@ -595,6 +598,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   Set<VerseKey> _selectionOn(int page) => {...?_range()};
+
+  /// Word boxes of [verses] on [page], by verse (edition units).
+  Map<VerseKey, List<Rect>> _wordsOf(Set<VerseKey> verses, int page) {
+    final boxes = ref.watch(pageWordBoxesProvider(page)).value ?? const {};
+    final out = <VerseKey, List<Rect>>{};
+    for (final MapEntry(key: (s, a, _), value: pieces) in boxes.entries) {
+      final k = (surah: s, ayah: a);
+      if (verses.contains(k)) (out[k] ??= []).addAll(pieces);
+    }
+    return out;
+  }
 
   static Rect? _union(List<Rect>? pieces) =>
       pieces?.reduce((a, b) => a.expandToInclude(b));

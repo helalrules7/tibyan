@@ -21,6 +21,7 @@ class PageInteraction {
     required this.onHandleDrag,
     this.markerLook,
     this.hidden,
+    this.hiddenWords = const {},
     this.onHiddenTap,
     this.ornateOpening = false,
     this.showHandles = false,
@@ -61,6 +62,12 @@ class PageInteraction {
 
   /// Recitation mode: verses covered on this page; null = mode off.
   final Set<VerseKey>? hidden;
+
+  /// Recitation mode: the word boxes of each covered verse, where known
+  /// (edition units). Only the words are covered, so verse-end markers and
+  /// the hizb sign stay visible; verses without word boxes are covered
+  /// whole and their markers drawn again on top.
+  final Map<VerseKey, List<Rect>> hiddenWords;
 
   /// Recitation mode: a covered verse was tapped.
   final ValueChanged<VerseKey>? onHiddenTap;
