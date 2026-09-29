@@ -75,7 +75,10 @@ class _PageLayout {
   late final bool strips;
   late final Offset offset;
 
-  double get _slot => size.height / _lineCount;
+  /// The lines sit this far above the bottom, so the last line's marks
+  /// below the baseline are never cut.
+  static const _lift = 10.0;
+  double get _slot => (size.height - _lift) / _lineCount;
   double _centre(int j) => _firstLine + j * _pitch;
   bool get _hasCuts => cuts.length == _lineCount - 1;
   double _bandTop(int j) =>

@@ -240,8 +240,8 @@ class IlluminatedFrame extends ConsumerWidget {
                       rosette: images?.rosette,
                       child: DefaultTextStyle.merge(
                         style: TextStyle(
-                          fontFamily: 'KFGQPCAN',
-                          fontSize: 13,
+                          fontFamily: 'UthmanTahaNaskh',
+                          fontSize: 15,
                           color: t.ink,
                         ),
                         child: Row(
@@ -381,6 +381,7 @@ class _Tap extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
+                  fontFamily: 'UthmanTahaNaskh',
                   fontWeight: bold ? FontWeight.w700 : FontWeight.w400,
                   fontSize: fontSize,
                 ),
@@ -522,6 +523,15 @@ class _FramePainter extends CustomPainter {
       canvas.restore();
     }
 
+    // Everything below stays inside the band: the corner pieces are larger
+    // than the band and would otherwise show as squares inside the page.
+    canvas.save();
+    canvas.clipPath(
+      Path()
+        ..fillType = PathFillType.evenOdd
+        ..addRect(Offset.zero & size)
+        ..addRect(Rect.fromLTRB(band, band, w - band, h - band)),
+    );
     // Edges: whole repeats, stretched a little so they fit exactly.
     final spanX = w - 2 * c;
     final tileW = band * images.edgeH.width / images.edgeH.height;
@@ -556,6 +566,7 @@ class _FramePainter extends CustomPainter {
       flipX: true,
       flipY: true,
     );
+    canvas.restore();
   }
 
   @override
@@ -628,7 +639,7 @@ class SurahBannerView extends StatelessWidget {
                         Text(
                           l.surahBannerTitle(digits(b.number), b.name, type),
                           style: TextStyle(
-                            fontFamily: 'KFGQPCAN',
+                            fontFamily: 'UthmanTahaNaskh',
                             fontWeight: FontWeight.w700,
                             fontSize: 15,
                             height: 1.2,

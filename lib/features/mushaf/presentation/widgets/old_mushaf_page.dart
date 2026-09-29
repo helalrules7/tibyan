@@ -58,7 +58,11 @@ class _PageLayout {
   late final Offset offset;
 
   bool get _hasCuts => cuts.length == _lineCount - 1;
-  double get _slot => size.height / _lineCount;
+
+  /// The lines sit this far above the bottom, so the last line's marks
+  /// below the baseline are never cut.
+  static const _lift = 10.0;
+  double get _slot => (size.height - _lift) / _lineCount;
 
   /// Line centre on the image, and where it lands on screen.
   double _centre(int j) => ink.top + (j + 0.5) * _pitch;
