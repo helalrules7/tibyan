@@ -17,6 +17,23 @@ class BookmarkSets extends Table {
   IntColumn get page => integer()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   DateTimeColumn get updatedAt => dateTime()();
+
+  /// One of [MarkKind] for the four fixed marks; null for the reader's
+  /// own named fawasil.
+  TextColumn get kind => text().nullable()();
+}
+
+/// The four fixed marks, set with one tap.
+enum MarkKind {
+  reading(0xFF2F6FD0),
+  review(0xFFD0453B),
+  hifz(0xFF2E9A53),
+  tadabbur(0xFFC98A12);
+
+  const MarkKind(this.color);
+
+  /// ARGB colour.
+  final int color;
 }
 
 /// The last reading position, saved automatically. One row.
@@ -41,7 +58,45 @@ class UserDatabase extends _$UserDatabase {
   UserDatabase.open() : super(driftDatabase(name: 'user'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(bookmarkSets, bookmarkSets.kind);
+      }
+    },
+  );
+
+  /// Moves a fixed mark to a verse, creating it the first time.
+  Future<void> setMark(
+    MarkKind kind, {
+    required String name,
+    required int surah,
+    required int ayah,
+    required int page,
+  }) async {
+    final existing = await (select(
+      bookmarkSets,
+    )..where((t) => t.kind.equals(kind.name))).getSingleOrNull();
+    if (existing != null) {
+      await moveBookmarkSet(existing.id, surah: surah, ayah: ayah, page: page);
+      return;
+    }
+    await into(bookmarkSets).insert(
+      BookmarkSetsCompanion.insert(
+        name: name,
+        color: kind.color,
+        surah: surah,
+        ayah: ayah,
+        page: page,
+        sortOrder: Value(-10 + kind.index),
+        kind: Value(kind.name),
+        updatedAt: DateTime.now(),
+      ),
+    );
+  }
 
   Stream<ReadingPositionRow?> watchPosition() => (select(
     readingPositions,

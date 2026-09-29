@@ -234,5 +234,218 @@
     }
   },
   "mushafOpen": "افتح المصحف",
-  "loadingLabel": "جارٍ التحميل…"
+  "loadingLabel": "جارٍ التحميل…",
+  "hizbLabel": "الحزب {number}",
+  "@hizbLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "catchwordLabel": "الكلمة الأولى في الصفحة التالية: {word}",
+  "@catchwordLabel": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "tabHizb": "الأحزاب",
+  "goToPage": "انتقال إلى صفحة",
+  "goToPageHint": "رقم الصفحة من ١ إلى ٦٠٤",
+  "goLabel": "انتقال",
+  "hizbStartsAt": "يبدأ من {surah} {ayah}",
+  "@hizbStartsAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "selectionStart": "بداية التحديد",
+  "selectionEnd": "نهاية التحديد",
+  "servicesTitle": "خدمات الآيات",
+  "markReading": "قراءة",
+  "markReview": "مراجعة",
+  "markHifz": "حفظ",
+  "markTadabbur": "تدبر",
+  "autoFasil": "فاصل تلقائي عند {surah} {ayah}",
+  "@autoFasil": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "markMoved": "{mark}: {surah} {ayah}",
+  "@markMoved": {
+    "placeholders": {
+      "mark": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "verseRange": "{surah} {from}–{to}",
+  "@verseRange": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "versesCount": "{count} آيات",
+  "@versesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "twoVerses": "آيتان",
+  "markerStyleLabel": "شكل فواصل الآيات",
+  "markerTraditional": "الفاصل التقليدي",
+  "markerRosette": "وردة",
+  "markerTintLabel": "لون الفواصل",
+  "markerTintNone": "بلا لون",
+  "reciteMode": "وضع التسميع",
+  "revealNextVerse": "الآية التالية",
+  "revealAll": "الكل",
+  "endRecite": "إنهاء التسميع",
+  "autoScroll": "التمرير التلقائي",
+  "resume": "متابعة",
+  "pause": "إيقاف مؤقت",
+  "slower": "أبطأ",
+  "faster": "أسرع",
+  "stopAutoScroll": "إيقاف التمرير",
+  "speedLabel": "السرعة {speed}",
+  "@speedLabel": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerTitle": "({number}) سورة {name} · {type}",
+  "@surahBannerTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfo": "آياتها {count} · ترتيبها في النزول {order} · نزلت بعد {after}",
+  "@surahBannerInfo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfoFirst": "آياتها {count} · ترتيبها في النزول {order}",
+  "@surahBannerInfoFirst": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "quarterHizb": "ربع الحزب {number}",
+  "@quarterHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "halfHizb": "نصف الحزب {number}",
+  "@halfHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "threeQuartersHizb": "ثلاثة أرباع الحزب {number}",
+  "@threeQuartersHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "coverTitle": "القرآن الكريم",
+  "coverSubtitle": "بالرسم العثماني",
+  "riwayaHafs": "رواية حفص عن عاصم",
+  "openingInfo": "{type} · آياتها {count} · ترتيبها {number}",
+  "@openingInfo": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedOrder": "ترتيبها في النزول {order}",
+  "@revealedOrder": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedAfter": "نزلت بعد {after}",
+  "@revealedAfter": {
+    "placeholders": {
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "multiSelect": "تحديد عدة آيات",
+  "multiSelectHint": "اسحب المقبضين لتحديد الآيات",
+  "doneLabel": "تم",
+  "markRemoved": "أُزيل الفاصل",
+  "tabMarks": "فواصل القراءة",
+  "noMarks": "لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.",
+  "highlightDivineNames": "تمييز لفظ الجلالة",
+  "highlightDivineNamesHint": "تلوين «الله» و«رب» و«ربنا» في صفحات المصحف"
 }

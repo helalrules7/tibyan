@@ -27,13 +27,14 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
+import build_line_cuts
 import build_word_boxes
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 6
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -190,6 +191,16 @@ def main():
       x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
       exact INTEGER NOT NULL,               -- 1: every word in the verse matched its predicted pieces
       PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
+    CREATE TABLE line_cut (                 -- where to split a page into its 15 lines
+      edition TEXT NOT NULL, page INTEGER NOT NULL,
+      gap INTEGER NOT NULL,                 -- 0..13, below line gap
+      y REAL NOT NULL,                      -- page units (1441) or image px (1405)
+      PRIMARY KEY (edition, page, gap)) WITHOUT ROWID;
+    CREATE TABLE line_overflow (            -- 1441 marks that cross a cut, and their line
+      page INTEGER NOT NULL, line INTEGER NOT NULL, path TEXT NOT NULL);
+    CREATE TABLE line_overflow_1405 (       -- 1405 ink crossing a cut (image px), and its line
+      page INTEGER NOT NULL, line INTEGER NOT NULL,
+      x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL);
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -272,6 +283,17 @@ def main():
         for (s, a), (exact, words) in word_boxes.items()
         for n, page, x0, y0, x1, y1 in words
     ])
+    for page, cuts, overflow in build_line_cuts.new_edition():
+        db.executemany('INSERT INTO line_cut VALUES (?,?,?,?)',
+                       [('madina1441', page, j, round(y, 2)) for j, y in enumerate(cuts)])
+        db.executemany('INSERT INTO line_overflow VALUES (?,?,?)', [(page, k, d) for k, d in overflow])
+    if build_line_cuts.IMAGES.exists():
+        for page, cuts, overflow in build_line_cuts.old_edition():
+            db.executemany('INSERT INTO line_cut VALUES (?,?,?,?)',
+                           [('madina1405', page, j, y) for j, y in enumerate(cuts)])
+            db.executemany('INSERT INTO line_overflow_1405 VALUES (?,?,?,?,?,?)',
+                           [(page, k, *b) for k, b in overflow])
+    db.execute('CREATE INDEX line_overflow_page ON line_overflow(page)')
     db.execute('CREATE INDEX ayah_page ON ayah(page)')
     db.execute('CREATE INDEX word_box_page ON word_box(page)')
     db.execute('CREATE INDEX ayah_juz ON ayah(juz)')

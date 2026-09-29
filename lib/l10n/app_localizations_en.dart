@@ -374,4 +374,204 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadingLabel => 'Loading…';
+
+  @override
+  String hizbLabel(String number) {
+    return 'Hizb $number';
+  }
+
+  @override
+  String catchwordLabel(String word) {
+    return 'First word of the next page: $word';
+  }
+
+  @override
+  String get tabHizb => 'Hizbs';
+
+  @override
+  String get goToPage => 'Go to page';
+
+  @override
+  String get goToPageHint => 'Page number, 1 to 604';
+
+  @override
+  String get goLabel => 'Go';
+
+  @override
+  String hizbStartsAt(String surah, String ayah) {
+    return 'Starts at $surah $ayah';
+  }
+
+  @override
+  String get selectionStart => 'Start of selection';
+
+  @override
+  String get selectionEnd => 'End of selection';
+
+  @override
+  String get servicesTitle => 'Verse services';
+
+  @override
+  String get markReading => 'Reading';
+
+  @override
+  String get markReview => 'Review';
+
+  @override
+  String get markHifz => 'Memorizing';
+
+  @override
+  String get markTadabbur => 'Reflection';
+
+  @override
+  String autoFasil(String surah, String ayah) {
+    return 'Reading mark set at $surah $ayah';
+  }
+
+  @override
+  String markMoved(String mark, String surah, String ayah) {
+    return '$mark: $surah $ayah';
+  }
+
+  @override
+  String verseRange(String surah, String from, String to) {
+    return '$surah $from–$to';
+  }
+
+  @override
+  String versesCount(String count) {
+    return '$count verses';
+  }
+
+  @override
+  String get twoVerses => '2 verses';
+
+  @override
+  String get markerStyleLabel => 'Verse marker shape';
+
+  @override
+  String get markerTraditional => 'Traditional marker';
+
+  @override
+  String get markerRosette => 'Rosette';
+
+  @override
+  String get markerTintLabel => 'Marker colour';
+
+  @override
+  String get markerTintNone => 'No colour';
+
+  @override
+  String get reciteMode => 'Recitation mode';
+
+  @override
+  String get revealNextVerse => 'Next verse';
+
+  @override
+  String get revealAll => 'All';
+
+  @override
+  String get endRecite => 'End recitation';
+
+  @override
+  String get autoScroll => 'Auto-scroll';
+
+  @override
+  String get resume => 'Resume';
+
+  @override
+  String get pause => 'Pause';
+
+  @override
+  String get slower => 'Slower';
+
+  @override
+  String get faster => 'Faster';
+
+  @override
+  String get stopAutoScroll => 'Stop scrolling';
+
+  @override
+  String speedLabel(String speed) {
+    return 'Speed $speed';
+  }
+
+  @override
+  String surahBannerTitle(String number, String name, String type) {
+    return '($number) Surah $name · $type';
+  }
+
+  @override
+  String surahBannerInfo(String count, String order, String after) {
+    return '$count verses · revealed ${order}th · after $after';
+  }
+
+  @override
+  String surahBannerInfoFirst(String count, String order) {
+    return '$count verses · revealed ${order}th';
+  }
+
+  @override
+  String quarterHizb(String number) {
+    return 'Quarter of hizb $number';
+  }
+
+  @override
+  String halfHizb(String number) {
+    return 'Half of hizb $number';
+  }
+
+  @override
+  String threeQuartersHizb(String number) {
+    return 'Three quarters of hizb $number';
+  }
+
+  @override
+  String get coverTitle => 'The Noble Quran';
+
+  @override
+  String get coverSubtitle => 'In the Uthmani script';
+
+  @override
+  String get riwayaHafs => 'Hafs from Asim';
+
+  @override
+  String openingInfo(String type, String count, String number) {
+    return '$type · $count verses · surah $number';
+  }
+
+  @override
+  String revealedOrder(String order) {
+    return 'Revealed ${order}th';
+  }
+
+  @override
+  String revealedAfter(String after) {
+    return 'After $after';
+  }
+
+  @override
+  String get multiSelect => 'Select several verses';
+
+  @override
+  String get multiSelectHint => 'Drag the handles to select verses';
+
+  @override
+  String get doneLabel => 'Done';
+
+  @override
+  String get markRemoved => 'Mark removed';
+
+  @override
+  String get tabMarks => 'Reading marks';
+
+  @override
+  String get noMarks => 'No marks yet. Tap a verse marker to mark it.';
+
+  @override
+  String get highlightDivineNames => 'Highlight the divine name';
+
+  @override
+  String get highlightDivineNamesHint =>
+      'Colour «Allah», «Rabb» and «Rabbana» on the pages';
 }

@@ -28,6 +28,9 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kEdition = 'settings.edition';
   static const _kKeepOn = 'settings.keepScreenOn';
   static const _kFontScale = 'settings.quranFontScale';
+  static const _kMarkerStyle = 'settings.markerStyle';
+  static const _kMarkerTint = 'settings.markerTint';
+  static const _kDivine = 'settings.highlightDivineNames';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -56,6 +59,11 @@ class SettingsController extends Notifier<AppSettings> {
           MushafEdition.madina1441,
       keepScreenOn: _prefs.getBool(_kKeepOn) ?? true,
       quranFontScale: _prefs.getDouble(_kFontScale) ?? 1.0,
+      markerStyle:
+          _enumByName(MarkerStyle.values, _prefs.getString(_kMarkerStyle)) ??
+          MarkerStyle.traditional,
+      markerTint: _prefs.getInt(_kMarkerTint),
+      highlightDivineNames: _prefs.getBool(_kDivine) ?? true,
     );
   }
 
@@ -103,6 +111,25 @@ class SettingsController extends Notifier<AppSettings> {
     final clamped = value.clamp(0.8, 2.0).toDouble();
     state = state.copyWith(quranFontScale: clamped);
     await _prefs.setDouble(_kFontScale, clamped);
+  }
+
+  Future<void> setMarkerStyle(MarkerStyle style) async {
+    state = state.copyWith(markerStyle: style);
+    await _prefs.setString(_kMarkerStyle, style.name);
+  }
+
+  Future<void> setHighlightDivineNames(bool value) async {
+    state = state.copyWith(highlightDivineNames: value);
+    await _prefs.setBool(_kDivine, value);
+  }
+
+  Future<void> setMarkerTint(int? argb) async {
+    state = state.copyWith(markerTint: () => argb);
+    if (argb == null) {
+      await _prefs.remove(_kMarkerTint);
+    } else {
+      await _prefs.setInt(_kMarkerTint, argb);
+    }
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

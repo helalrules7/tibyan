@@ -66,6 +66,21 @@ class MushafRepository {
     return [for (final a in ayahs) JuzStart(juz: a.juz, ayah: a)];
   }
 
+  /// First verse of each of the 60 hizbs.
+  Future<List<AyahRow>> hizbStarts() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT MIN(id) AS id FROM ayah GROUP BY (hizb_quarter - 1) / 4 ORDER BY 1',
+        )
+        .get();
+    final ids = rows.map((r) => r.read<int>('id')).toList();
+    final ayahs = await (_db.select(
+      _db.ayah,
+    )..where((t) => t.id.isIn(ids))).get();
+    ayahs.sort((a, b) => a.id.compareTo(b.id));
+    return ayahs;
+  }
+
   /// Number of open questions awaiting a qualified reviewer.
   Future<int> reviewNoteCount() async {
     final row = await _db
@@ -86,6 +101,42 @@ class MushafRepository {
               (t) => OrderingTerm.asc(t.word),
             ]))
           .get();
+
+  /// The 14 cuts between the lines of a page, top to bottom; empty for
+  /// pages 1 and 2.
+  Future<List<double>> lineCuts(String edition, int page) async {
+    final rows =
+        await (_db.select(_db.lineCut)
+              ..where((t) => t.edition.equals(edition) & t.page.equals(page))
+              ..orderBy([(t) => OrderingTerm.asc(t.gap)]))
+            .get();
+    return [for (final r in rows) r.y];
+  }
+
+  Future<List<LineOverflowRow>> lineOverflow(int page) =>
+      (_db.select(_db.lineOverflow)..where((t) => t.page.equals(page))).get();
+
+  /// Verses on a page that start a new hizb quarter.
+  Future<List<AyahRow>> quarterStartsOnPage(
+    int page,
+    MushafEdition edition,
+  ) async {
+    final col = edition == MushafEdition.madina1405 ? 'page_1405' : 'page';
+    final rows = await _db
+        .customSelect(
+          'SELECT a.id AS id FROM ayah a LEFT JOIN ayah b ON b.id = a.id - 1 '
+          'WHERE a.$col = ? AND (b.id IS NULL OR b.hizb_quarter <> a.hizb_quarter)',
+          variables: [Variable.withInt(page)],
+        )
+        .get();
+    final ids = [for (final r in rows) r.read<int>('id')];
+    if (ids.isEmpty) return const [];
+    return (_db.select(_db.ayah)..where((t) => t.id.isIn(ids))).get();
+  }
+
+  Future<List<OldOverflowRow>> oldLineOverflow(int page) => (_db.select(
+    _db.lineOverflow1405,
+  )..where((t) => t.page.equals(page))).get();
 
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();

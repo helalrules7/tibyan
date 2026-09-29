@@ -12,6 +12,19 @@ enum LanguageSetting { system, ar, en }
 /// Madina mushaf edition shown in the page view.
 enum MushafEdition { madina1441, madina1405 }
 
+/// Shape of the verse-end markers in the page view: the mushaf's own
+/// (default) or one of three rosettes drawn over it.
+enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
+
+/// Colours offered for tinting verse-end markers (ARGB); null = none.
+const markerTints = <int>[
+  0xFF1FA79B,
+  0xFFE6784A,
+  0xFF4F79B7,
+  0xFF1C2F45,
+  0xFFC9A45C,
+];
+
 @immutable
 class AppSettings {
   const AppSettings({
@@ -24,6 +37,9 @@ class AppSettings {
     this.edition = MushafEdition.madina1441,
     this.keepScreenOn = true,
     this.quranFontScale = 1.0,
+    this.markerStyle = MarkerStyle.traditional,
+    this.markerTint,
+    this.highlightDivineNames = true,
   });
 
   final String styleId;
@@ -44,6 +60,14 @@ class AppSettings {
   /// Quran text size in the continuous view (1.0 = default).
   final double quranFontScale;
 
+  final MarkerStyle markerStyle;
+
+  /// ARGB tint behind verse-end markers; null leaves them as printed.
+  final int? markerTint;
+
+  /// Colour «الله» and «رب» / «ربنا» on the page (on by default).
+  final bool highlightDivineNames;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -54,6 +78,9 @@ class AppSettings {
     MushafEdition? edition,
     bool? keepScreenOn,
     double? quranFontScale,
+    MarkerStyle? markerStyle,
+    int? Function()? markerTint,
+    bool? highlightDivineNames,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -64,6 +91,9 @@ class AppSettings {
     edition: edition ?? this.edition,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
     quranFontScale: quranFontScale ?? this.quranFontScale,
+    markerStyle: markerStyle ?? this.markerStyle,
+    markerTint: markerTint == null ? this.markerTint : markerTint(),
+    highlightDivineNames: highlightDivineNames ?? this.highlightDivineNames,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

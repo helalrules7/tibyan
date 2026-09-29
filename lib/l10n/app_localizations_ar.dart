@@ -373,4 +373,204 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loadingLabel => 'جارٍ التحميل…';
+
+  @override
+  String hizbLabel(String number) {
+    return 'الحزب $number';
+  }
+
+  @override
+  String catchwordLabel(String word) {
+    return 'الكلمة الأولى في الصفحة التالية: $word';
+  }
+
+  @override
+  String get tabHizb => 'الأحزاب';
+
+  @override
+  String get goToPage => 'انتقال إلى صفحة';
+
+  @override
+  String get goToPageHint => 'رقم الصفحة من ١ إلى ٦٠٤';
+
+  @override
+  String get goLabel => 'انتقال';
+
+  @override
+  String hizbStartsAt(String surah, String ayah) {
+    return 'يبدأ من $surah $ayah';
+  }
+
+  @override
+  String get selectionStart => 'بداية التحديد';
+
+  @override
+  String get selectionEnd => 'نهاية التحديد';
+
+  @override
+  String get servicesTitle => 'خدمات الآيات';
+
+  @override
+  String get markReading => 'قراءة';
+
+  @override
+  String get markReview => 'مراجعة';
+
+  @override
+  String get markHifz => 'حفظ';
+
+  @override
+  String get markTadabbur => 'تدبر';
+
+  @override
+  String autoFasil(String surah, String ayah) {
+    return 'فاصل تلقائي عند $surah $ayah';
+  }
+
+  @override
+  String markMoved(String mark, String surah, String ayah) {
+    return '$mark: $surah $ayah';
+  }
+
+  @override
+  String verseRange(String surah, String from, String to) {
+    return '$surah $from–$to';
+  }
+
+  @override
+  String versesCount(String count) {
+    return '$count آيات';
+  }
+
+  @override
+  String get twoVerses => 'آيتان';
+
+  @override
+  String get markerStyleLabel => 'شكل فواصل الآيات';
+
+  @override
+  String get markerTraditional => 'الفاصل التقليدي';
+
+  @override
+  String get markerRosette => 'وردة';
+
+  @override
+  String get markerTintLabel => 'لون الفواصل';
+
+  @override
+  String get markerTintNone => 'بلا لون';
+
+  @override
+  String get reciteMode => 'وضع التسميع';
+
+  @override
+  String get revealNextVerse => 'الآية التالية';
+
+  @override
+  String get revealAll => 'الكل';
+
+  @override
+  String get endRecite => 'إنهاء التسميع';
+
+  @override
+  String get autoScroll => 'التمرير التلقائي';
+
+  @override
+  String get resume => 'متابعة';
+
+  @override
+  String get pause => 'إيقاف مؤقت';
+
+  @override
+  String get slower => 'أبطأ';
+
+  @override
+  String get faster => 'أسرع';
+
+  @override
+  String get stopAutoScroll => 'إيقاف التمرير';
+
+  @override
+  String speedLabel(String speed) {
+    return 'السرعة $speed';
+  }
+
+  @override
+  String surahBannerTitle(String number, String name, String type) {
+    return '($number) سورة $name · $type';
+  }
+
+  @override
+  String surahBannerInfo(String count, String order, String after) {
+    return 'آياتها $count · ترتيبها في النزول $order · نزلت بعد $after';
+  }
+
+  @override
+  String surahBannerInfoFirst(String count, String order) {
+    return 'آياتها $count · ترتيبها في النزول $order';
+  }
+
+  @override
+  String quarterHizb(String number) {
+    return 'ربع الحزب $number';
+  }
+
+  @override
+  String halfHizb(String number) {
+    return 'نصف الحزب $number';
+  }
+
+  @override
+  String threeQuartersHizb(String number) {
+    return 'ثلاثة أرباع الحزب $number';
+  }
+
+  @override
+  String get coverTitle => 'القرآن الكريم';
+
+  @override
+  String get coverSubtitle => 'بالرسم العثماني';
+
+  @override
+  String get riwayaHafs => 'رواية حفص عن عاصم';
+
+  @override
+  String openingInfo(String type, String count, String number) {
+    return '$type · آياتها $count · ترتيبها $number';
+  }
+
+  @override
+  String revealedOrder(String order) {
+    return 'ترتيبها في النزول $order';
+  }
+
+  @override
+  String revealedAfter(String after) {
+    return 'نزلت بعد $after';
+  }
+
+  @override
+  String get multiSelect => 'تحديد عدة آيات';
+
+  @override
+  String get multiSelectHint => 'اسحب المقبضين لتحديد الآيات';
+
+  @override
+  String get doneLabel => 'تم';
+
+  @override
+  String get markRemoved => 'أُزيل الفاصل';
+
+  @override
+  String get tabMarks => 'فواصل القراءة';
+
+  @override
+  String get noMarks => 'لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.';
+
+  @override
+  String get highlightDivineNames => 'تمييز لفظ الجلالة';
+
+  @override
+  String get highlightDivineNamesHint =>
+      'تلوين «الله» و«رب» و«ربنا» في صفحات المصحف';
 }
