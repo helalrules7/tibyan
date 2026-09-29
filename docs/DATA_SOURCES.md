@@ -109,6 +109,18 @@
 - الآيات المقتبسة داخل التفسير إن كانت بالرسم العثماني تُعرض بخط حفص للمجمع (خط احتياطي للحروف الناقصة)، والإنجليزية والأرقام اللاتينية بخط الواجهة.
 - الملف يُشحن كما هو (موقّع رقميا، ومنع التعديل)، بلا تقليص.
 
+## زخارف شكل «زخرفة» (`assets/ornaments/`)
+
+ملفات فيكتور أرسلها أحمد في 2026-09-29، محفوظة كما هي في `tools/ornaments/src/` (Git LFS). الصور في `assets/ornaments/` مبنية منها بـ `tools/build_ornaments.py` (إعادة تلوين وقص فقط). **التراخيص يتابعها أحمد** (قراره: تُضمَّن الآن). لم تُراجَع الشروط هنا.
+
+| الملف في `src/` | الاسم الأصلي | يُستخدم في | الترخيص |
+|---|---|---|---|
+| `turkish_border.svg` | Turkish Islamic Border Free Vector | إطار الصفحات (أُعيد تلوينه) | يتابعه أحمد |
+| `border_vol2.svg` | Islamic Border Vol 2 Vector | فسيفساء رأس السورة والصفحات المزخرفة | يتابعه أحمد. نتيجة بحث تذكر صفحة للملف بترخيص «Non-commercial use» على UIDownload |
+| `rosettes_a.svg` | Islamic Border Vector | ورود الخانات والهامش، وفاصل الشكل ٧ | يتابعه أحمد |
+| `rosettes_b.svg` | Islamic Ornament Vectors-01 | فاصلا الشكل ٩ و١٦ | يتابعه أحمد |
+| `golden_decor_06.eps` | Islam golden decor background vectors set 06 | شاشة البداية الغامقة | يتابعه أحمد. نتيجة بحث: سلسلة freedesignfile.com، استخدام تجاري مع رابط لذكر المصدر |
+
 ## قاعدة المحتوى المضمّنة (`assets/db/content.db`)
 
 تُبنى بـ `tools/build_content_db.py` من المصادر المحققة ببصماتها في `tools/sources.json`. المخطط الإصدار 1 (2026-09-28):
