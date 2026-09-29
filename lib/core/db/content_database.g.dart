@@ -4897,6 +4897,746 @@ class CommentaryCompanion extends UpdateCompanion<CommentaryRow> {
   }
 }
 
+class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReciterTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nameArMeta = const VerificationMeta('nameAr');
+  @override
+  late final GeneratedColumn<String> nameAr = GeneratedColumn<String>(
+    'name_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _styleMeta = const VerificationMeta('style');
+  @override
+  late final GeneratedColumn<String> style = GeneratedColumn<String>(
+    'style',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _folderUrlMeta = const VerificationMeta(
+    'folderUrl',
+  );
+  @override
+  late final GeneratedColumn<String> folderUrl = GeneratedColumn<String>(
+    'folder_url',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<int> sourceId = GeneratedColumn<int>(
+    'source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    nameAr,
+    nameEn,
+    style,
+    folderUrl,
+    sourceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reciter';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReciterRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name_ar')) {
+      context.handle(
+        _nameArMeta,
+        nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameArMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameEnMeta);
+    }
+    if (data.containsKey('style')) {
+      context.handle(
+        _styleMeta,
+        style.isAcceptableOrUnknown(data['style']!, _styleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_styleMeta);
+    }
+    if (data.containsKey('folder_url')) {
+      context.handle(
+        _folderUrlMeta,
+        folderUrl.isAcceptableOrUnknown(data['folder_url']!, _folderUrlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_folderUrlMeta);
+    }
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReciterRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReciterRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ar'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
+      style: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}style'],
+      )!,
+      folderUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_url'],
+      )!,
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_id'],
+      )!,
+    );
+  }
+
+  @override
+  $ReciterTable createAlias(String alias) {
+    return $ReciterTable(attachedDatabase, alias);
+  }
+}
+
+class ReciterRow extends DataClass implements Insertable<ReciterRow> {
+  final int id;
+  final String nameAr;
+  final String nameEn;
+
+  /// `murattal` or `mujawwad`.
+  final String style;
+
+  /// A surah's file is this URL followed by `NNN.mp3`.
+  final String folderUrl;
+  final int sourceId;
+  const ReciterRow({
+    required this.id,
+    required this.nameAr,
+    required this.nameEn,
+    required this.style,
+    required this.folderUrl,
+    required this.sourceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name_ar'] = Variable<String>(nameAr);
+    map['name_en'] = Variable<String>(nameEn);
+    map['style'] = Variable<String>(style);
+    map['folder_url'] = Variable<String>(folderUrl);
+    map['source_id'] = Variable<int>(sourceId);
+    return map;
+  }
+
+  ReciterCompanion toCompanion(bool nullToAbsent) {
+    return ReciterCompanion(
+      id: Value(id),
+      nameAr: Value(nameAr),
+      nameEn: Value(nameEn),
+      style: Value(style),
+      folderUrl: Value(folderUrl),
+      sourceId: Value(sourceId),
+    );
+  }
+
+  factory ReciterRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReciterRow(
+      id: serializer.fromJson<int>(json['id']),
+      nameAr: serializer.fromJson<String>(json['nameAr']),
+      nameEn: serializer.fromJson<String>(json['nameEn']),
+      style: serializer.fromJson<String>(json['style']),
+      folderUrl: serializer.fromJson<String>(json['folderUrl']),
+      sourceId: serializer.fromJson<int>(json['sourceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nameAr': serializer.toJson<String>(nameAr),
+      'nameEn': serializer.toJson<String>(nameEn),
+      'style': serializer.toJson<String>(style),
+      'folderUrl': serializer.toJson<String>(folderUrl),
+      'sourceId': serializer.toJson<int>(sourceId),
+    };
+  }
+
+  ReciterRow copyWith({
+    int? id,
+    String? nameAr,
+    String? nameEn,
+    String? style,
+    String? folderUrl,
+    int? sourceId,
+  }) => ReciterRow(
+    id: id ?? this.id,
+    nameAr: nameAr ?? this.nameAr,
+    nameEn: nameEn ?? this.nameEn,
+    style: style ?? this.style,
+    folderUrl: folderUrl ?? this.folderUrl,
+    sourceId: sourceId ?? this.sourceId,
+  );
+  ReciterRow copyWithCompanion(ReciterCompanion data) {
+    return ReciterRow(
+      id: data.id.present ? data.id.value : this.id,
+      nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+      style: data.style.present ? data.style.value : this.style,
+      folderUrl: data.folderUrl.present ? data.folderUrl.value : this.folderUrl,
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReciterRow(')
+          ..write('id: $id, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('style: $style, ')
+          ..write('folderUrl: $folderUrl, ')
+          ..write('sourceId: $sourceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, nameAr, nameEn, style, folderUrl, sourceId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReciterRow &&
+          other.id == this.id &&
+          other.nameAr == this.nameAr &&
+          other.nameEn == this.nameEn &&
+          other.style == this.style &&
+          other.folderUrl == this.folderUrl &&
+          other.sourceId == this.sourceId);
+}
+
+class ReciterCompanion extends UpdateCompanion<ReciterRow> {
+  final Value<int> id;
+  final Value<String> nameAr;
+  final Value<String> nameEn;
+  final Value<String> style;
+  final Value<String> folderUrl;
+  final Value<int> sourceId;
+  const ReciterCompanion({
+    this.id = const Value.absent(),
+    this.nameAr = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.style = const Value.absent(),
+    this.folderUrl = const Value.absent(),
+    this.sourceId = const Value.absent(),
+  });
+  ReciterCompanion.insert({
+    this.id = const Value.absent(),
+    required String nameAr,
+    required String nameEn,
+    required String style,
+    required String folderUrl,
+    required int sourceId,
+  }) : nameAr = Value(nameAr),
+       nameEn = Value(nameEn),
+       style = Value(style),
+       folderUrl = Value(folderUrl),
+       sourceId = Value(sourceId);
+  static Insertable<ReciterRow> custom({
+    Expression<int>? id,
+    Expression<String>? nameAr,
+    Expression<String>? nameEn,
+    Expression<String>? style,
+    Expression<String>? folderUrl,
+    Expression<int>? sourceId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nameAr != null) 'name_ar': nameAr,
+      if (nameEn != null) 'name_en': nameEn,
+      if (style != null) 'style': style,
+      if (folderUrl != null) 'folder_url': folderUrl,
+      if (sourceId != null) 'source_id': sourceId,
+    });
+  }
+
+  ReciterCompanion copyWith({
+    Value<int>? id,
+    Value<String>? nameAr,
+    Value<String>? nameEn,
+    Value<String>? style,
+    Value<String>? folderUrl,
+    Value<int>? sourceId,
+  }) {
+    return ReciterCompanion(
+      id: id ?? this.id,
+      nameAr: nameAr ?? this.nameAr,
+      nameEn: nameEn ?? this.nameEn,
+      style: style ?? this.style,
+      folderUrl: folderUrl ?? this.folderUrl,
+      sourceId: sourceId ?? this.sourceId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nameAr.present) {
+      map['name_ar'] = Variable<String>(nameAr.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (style.present) {
+      map['style'] = Variable<String>(style.value);
+    }
+    if (folderUrl.present) {
+      map['folder_url'] = Variable<String>(folderUrl.value);
+    }
+    if (sourceId.present) {
+      map['source_id'] = Variable<int>(sourceId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReciterCompanion(')
+          ..write('id: $id, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('style: $style, ')
+          ..write('folderUrl: $folderUrl, ')
+          ..write('sourceId: $sourceId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AyahTimingTable extends AyahTiming
+    with TableInfo<$AyahTimingTable, AyahTimingRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AyahTimingTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _reciterMeta = const VerificationMeta(
+    'reciter',
+  );
+  @override
+  late final GeneratedColumn<int> reciter = GeneratedColumn<int>(
+    'reciter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startMsMeta = const VerificationMeta(
+    'startMs',
+  );
+  @override
+  late final GeneratedColumn<int> startMs = GeneratedColumn<int>(
+    'start_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endMsMeta = const VerificationMeta('endMs');
+  @override
+  late final GeneratedColumn<int> endMs = GeneratedColumn<int>(
+    'end_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [reciter, surah, ayah, startMs, endMs];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ayah_timing';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AyahTimingRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('reciter')) {
+      context.handle(
+        _reciterMeta,
+        reciter.isAcceptableOrUnknown(data['reciter']!, _reciterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reciterMeta);
+    }
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('start_ms')) {
+      context.handle(
+        _startMsMeta,
+        startMs.isAcceptableOrUnknown(data['start_ms']!, _startMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startMsMeta);
+    }
+    if (data.containsKey('end_ms')) {
+      context.handle(
+        _endMsMeta,
+        endMs.isAcceptableOrUnknown(data['end_ms']!, _endMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endMsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {reciter, surah, ayah};
+  @override
+  AyahTimingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AyahTimingRow(
+      reciter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reciter'],
+      )!,
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      startMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_ms'],
+      )!,
+      endMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_ms'],
+      )!,
+    );
+  }
+
+  @override
+  $AyahTimingTable createAlias(String alias) {
+    return $AyahTimingTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class AyahTimingRow extends DataClass implements Insertable<AyahTimingRow> {
+  final int reciter;
+  final int surah;
+  final int ayah;
+  final int startMs;
+  final int endMs;
+  const AyahTimingRow({
+    required this.reciter,
+    required this.surah,
+    required this.ayah,
+    required this.startMs,
+    required this.endMs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['reciter'] = Variable<int>(reciter);
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['start_ms'] = Variable<int>(startMs);
+    map['end_ms'] = Variable<int>(endMs);
+    return map;
+  }
+
+  AyahTimingCompanion toCompanion(bool nullToAbsent) {
+    return AyahTimingCompanion(
+      reciter: Value(reciter),
+      surah: Value(surah),
+      ayah: Value(ayah),
+      startMs: Value(startMs),
+      endMs: Value(endMs),
+    );
+  }
+
+  factory AyahTimingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AyahTimingRow(
+      reciter: serializer.fromJson<int>(json['reciter']),
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      startMs: serializer.fromJson<int>(json['startMs']),
+      endMs: serializer.fromJson<int>(json['endMs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'reciter': serializer.toJson<int>(reciter),
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'startMs': serializer.toJson<int>(startMs),
+      'endMs': serializer.toJson<int>(endMs),
+    };
+  }
+
+  AyahTimingRow copyWith({
+    int? reciter,
+    int? surah,
+    int? ayah,
+    int? startMs,
+    int? endMs,
+  }) => AyahTimingRow(
+    reciter: reciter ?? this.reciter,
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    startMs: startMs ?? this.startMs,
+    endMs: endMs ?? this.endMs,
+  );
+  AyahTimingRow copyWithCompanion(AyahTimingCompanion data) {
+    return AyahTimingRow(
+      reciter: data.reciter.present ? data.reciter.value : this.reciter,
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      startMs: data.startMs.present ? data.startMs.value : this.startMs,
+      endMs: data.endMs.present ? data.endMs.value : this.endMs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AyahTimingRow(')
+          ..write('reciter: $reciter, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(reciter, surah, ayah, startMs, endMs);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AyahTimingRow &&
+          other.reciter == this.reciter &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.startMs == this.startMs &&
+          other.endMs == this.endMs);
+}
+
+class AyahTimingCompanion extends UpdateCompanion<AyahTimingRow> {
+  final Value<int> reciter;
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> startMs;
+  final Value<int> endMs;
+  const AyahTimingCompanion({
+    this.reciter = const Value.absent(),
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.startMs = const Value.absent(),
+    this.endMs = const Value.absent(),
+  });
+  AyahTimingCompanion.insert({
+    required int reciter,
+    required int surah,
+    required int ayah,
+    required int startMs,
+    required int endMs,
+  }) : reciter = Value(reciter),
+       surah = Value(surah),
+       ayah = Value(ayah),
+       startMs = Value(startMs),
+       endMs = Value(endMs);
+  static Insertable<AyahTimingRow> custom({
+    Expression<int>? reciter,
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? startMs,
+    Expression<int>? endMs,
+  }) {
+    return RawValuesInsertable({
+      if (reciter != null) 'reciter': reciter,
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (startMs != null) 'start_ms': startMs,
+      if (endMs != null) 'end_ms': endMs,
+    });
+  }
+
+  AyahTimingCompanion copyWith({
+    Value<int>? reciter,
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? startMs,
+    Value<int>? endMs,
+  }) {
+    return AyahTimingCompanion(
+      reciter: reciter ?? this.reciter,
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      startMs: startMs ?? this.startMs,
+      endMs: endMs ?? this.endMs,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (reciter.present) {
+      map['reciter'] = Variable<int>(reciter.value);
+    }
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (startMs.present) {
+      map['start_ms'] = Variable<int>(startMs.value);
+    }
+    if (endMs.present) {
+      map['end_ms'] = Variable<int>(endMs.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AyahTimingCompanion(')
+          ..write('reciter: $reciter, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -4913,6 +5653,8 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $CommentaryEditionTable commentaryEdition =
       $CommentaryEditionTable(this);
   late final $CommentaryTable commentary = $CommentaryTable(this);
+  late final $ReciterTable reciter = $ReciterTable(this);
+  late final $AyahTimingTable ayahTiming = $AyahTimingTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4928,6 +5670,8 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     lineOverflow1405,
     commentaryEdition,
     commentary,
+    reciter,
+    ayahTiming,
   ];
 }
 
@@ -7539,6 +8283,427 @@ typedef $$CommentaryTableProcessedTableManager =
       CommentaryRow,
       PrefetchHooks Function()
     >;
+typedef $$ReciterTableCreateCompanionBuilder = ReciterCompanion Function({
+  Value<int> id,
+  required String nameAr,
+  required String nameEn,
+  required String style,
+  required String folderUrl,
+  required int sourceId,
+});
+typedef $$ReciterTableUpdateCompanionBuilder = ReciterCompanion Function({
+  Value<int> id,
+  Value<String> nameAr,
+  Value<String> nameEn,
+  Value<String> style,
+  Value<String> folderUrl,
+  Value<int> sourceId,
+});
+
+class $$ReciterTableFilterComposer
+    extends Composer<_$ContentDatabase, $ReciterTable> {
+  $$ReciterTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get style => $composableBuilder(
+    column: $table.style,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get folderUrl => $composableBuilder(
+    column: $table.folderUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ReciterTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ReciterTable> {
+  $$ReciterTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get style => $composableBuilder(
+    column: $table.style,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get folderUrl => $composableBuilder(
+    column: $table.folderUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReciterTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ReciterTable> {
+  $$ReciterTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nameAr =>
+      $composableBuilder(column: $table.nameAr, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+
+  GeneratedColumn<String> get style =>
+      $composableBuilder(column: $table.style, builder: (column) => column);
+
+  GeneratedColumn<String> get folderUrl =>
+      $composableBuilder(column: $table.folderUrl, builder: (column) => column);
+
+  GeneratedColumn<int> get sourceId =>
+      $composableBuilder(column: $table.sourceId, builder: (column) => column);
+}
+
+class $$ReciterTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ReciterTable,
+          ReciterRow,
+          $$ReciterTableFilterComposer,
+          $$ReciterTableOrderingComposer,
+          $$ReciterTableAnnotationComposer,
+          $$ReciterTableCreateCompanionBuilder,
+          $$ReciterTableUpdateCompanionBuilder,
+          (
+            ReciterRow,
+            BaseReferences<_$ContentDatabase, $ReciterTable, ReciterRow>,
+          ),
+          ReciterRow,
+          PrefetchHooks Function()
+        > {
+  $$ReciterTableTableManager(_$ContentDatabase db, $ReciterTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReciterTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReciterTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReciterTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> nameAr = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<String> style = const Value.absent(),
+                Value<String> folderUrl = const Value.absent(),
+                Value<int> sourceId = const Value.absent(),
+              }) => ReciterCompanion(
+                id: id,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                style: style,
+                folderUrl: folderUrl,
+                sourceId: sourceId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String nameAr,
+                required String nameEn,
+                required String style,
+                required String folderUrl,
+                required int sourceId,
+              }) => ReciterCompanion.insert(
+                id: id,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                style: style,
+                folderUrl: folderUrl,
+                sourceId: sourceId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ReciterTable, ReciterRow>(table),
+                  BaseReferences<_$ContentDatabase, $ReciterTable, ReciterRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ReciterTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ReciterTable,
+      ReciterRow,
+      $$ReciterTableFilterComposer,
+      $$ReciterTableOrderingComposer,
+      $$ReciterTableAnnotationComposer,
+      $$ReciterTableCreateCompanionBuilder,
+      $$ReciterTableUpdateCompanionBuilder,
+      (
+        ReciterRow,
+        BaseReferences<_$ContentDatabase, $ReciterTable, ReciterRow>,
+      ),
+      ReciterRow,
+      PrefetchHooks Function()
+    >;
+typedef $$AyahTimingTableCreateCompanionBuilder = AyahTimingCompanion Function({
+  required int reciter,
+  required int surah,
+  required int ayah,
+  required int startMs,
+  required int endMs,
+});
+typedef $$AyahTimingTableUpdateCompanionBuilder = AyahTimingCompanion Function({
+  Value<int> reciter,
+  Value<int> surah,
+  Value<int> ayah,
+  Value<int> startMs,
+  Value<int> endMs,
+});
+
+class $$AyahTimingTableFilterComposer
+    extends Composer<_$ContentDatabase, $AyahTimingTable> {
+  $$AyahTimingTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get reciter => $composableBuilder(
+    column: $table.reciter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AyahTimingTableOrderingComposer
+    extends Composer<_$ContentDatabase, $AyahTimingTable> {
+  $$AyahTimingTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get reciter => $composableBuilder(
+    column: $table.reciter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AyahTimingTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $AyahTimingTable> {
+  $$AyahTimingTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get reciter =>
+      $composableBuilder(column: $table.reciter, builder: (column) => column);
+
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get startMs =>
+      $composableBuilder(column: $table.startMs, builder: (column) => column);
+
+  GeneratedColumn<int> get endMs =>
+      $composableBuilder(column: $table.endMs, builder: (column) => column);
+}
+
+class $$AyahTimingTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $AyahTimingTable,
+          AyahTimingRow,
+          $$AyahTimingTableFilterComposer,
+          $$AyahTimingTableOrderingComposer,
+          $$AyahTimingTableAnnotationComposer,
+          $$AyahTimingTableCreateCompanionBuilder,
+          $$AyahTimingTableUpdateCompanionBuilder,
+          (
+            AyahTimingRow,
+            BaseReferences<_$ContentDatabase, $AyahTimingTable, AyahTimingRow>,
+          ),
+          AyahTimingRow,
+          PrefetchHooks Function()
+        > {
+  $$AyahTimingTableTableManager(_$ContentDatabase db, $AyahTimingTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AyahTimingTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AyahTimingTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AyahTimingTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> reciter = const Value.absent(),
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> startMs = const Value.absent(),
+                Value<int> endMs = const Value.absent(),
+              }) => AyahTimingCompanion(
+                reciter: reciter,
+                surah: surah,
+                ayah: ayah,
+                startMs: startMs,
+                endMs: endMs,
+              ),
+          createCompanionCallback:
+              ({
+                required int reciter,
+                required int surah,
+                required int ayah,
+                required int startMs,
+                required int endMs,
+              }) => AyahTimingCompanion.insert(
+                reciter: reciter,
+                surah: surah,
+                ayah: ayah,
+                startMs: startMs,
+                endMs: endMs,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AyahTimingTable, AyahTimingRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $AyahTimingTable,
+                    AyahTimingRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AyahTimingTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $AyahTimingTable,
+      AyahTimingRow,
+      $$AyahTimingTableFilterComposer,
+      $$AyahTimingTableOrderingComposer,
+      $$AyahTimingTableAnnotationComposer,
+      $$AyahTimingTableCreateCompanionBuilder,
+      $$AyahTimingTableUpdateCompanionBuilder,
+      (
+        AyahTimingRow,
+        BaseReferences<_$ContentDatabase, $AyahTimingTable, AyahTimingRow>,
+      ),
+      AyahTimingRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -7562,4 +8727,8 @@ class $ContentDatabaseManager {
       $$CommentaryEditionTableTableManager(_db, _db.commentaryEdition);
   $$CommentaryTableTableManager get commentary =>
       $$CommentaryTableTableManager(_db, _db.commentary);
+  $$ReciterTableTableManager get reciter =>
+      $$ReciterTableTableManager(_db, _db.reciter);
+  $$AyahTimingTableTableManager get ayahTiming =>
+      $$AyahTimingTableTableManager(_db, _db.ayahTiming);
 }

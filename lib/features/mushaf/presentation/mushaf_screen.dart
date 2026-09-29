@@ -12,6 +12,8 @@ import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/theme_tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../audio/player_bar.dart';
+import '../../audio/recitation.dart';
 import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
@@ -184,6 +186,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     };
 
     final settings = ref.watch(settingsProvider);
+    final recitation = ref.watch(recitationProvider);
+    ref.listen(recitationProvider.select((r) => (r.surah, r.ayah)), (_, now) {
+      if (now.$2 != null) _follow((surah: now.$1, ayah: now.$2!));
+    });
     final markerImages = ref.watch(markerImagesProvider).value;
     final markerLook =
         settings.markerStyle == MarkerStyle.traditional &&
@@ -203,7 +209,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       final pg = i + _first;
       if (pg == 0) return CoverPage(onTap: () => _setChrome(!_chrome));
       final interaction = PageInteraction(
-        selection: pg == _page ? _selectionOn(pg) : const {},
+        // The reader's selection, or else the verse being recited.
+        selection: pg == _page && _selA != null
+            ? _selectionOn(pg)
+            : recitation.active && recitation.ayah != null
+            ? {(surah: recitation.surah, ayah: recitation.ayah!)}
+            : const {},
         marks: marks,
         onTap: () {
           if (_multi) return;
@@ -382,6 +393,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   _controller?.jumpToPage(p - _first);
                 },
                 onRecite: _startRecite,
+                onListen: _listenFromPage,
                 onGoTo: _goToPage,
                 onAutoScroll: _startAutoScroll,
               ),
@@ -423,6 +435,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 ),
               ),
             ),
+          if (recitation.active && range == null && !_multi && !_chrome)
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: const SafeArea(top: false, child: PlayerBar()),
+            ),
           if (_multi)
             Positioned(
               top: 0,
@@ -455,6 +474,19 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   _setChrome(false);
                   setState(() => _multi = true);
                 },
+                onListen: () {
+                  final one = range.length == 1;
+                  setState(() => _selA = _selB = null);
+                  ref
+                      .read(recitationProvider.notifier)
+                      .play(
+                        range.first.surah,
+                        from: range.first.ayah,
+                        // Several verses: that stretch, repeated as set.
+                        to: one ? null : range.last.ayah,
+                        repeat: one ? 1 : ref.read(recitationProvider).repeat,
+                      );
+                },
                 onTafsir: () => context.push(
                   '/mushaf/tafsir?s=${range.first.surah}&a=${range.first.ayah}',
                 ),
@@ -478,6 +510,30 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   Set<VerseKey> _selectionOn(int page) => {...?_range()};
+
+  /// Starts listening from the first verse on the current page.
+  void _listenFromPage() {
+    final a = ref.read(pageAyahsProvider(_page)).value?.firstOrNull;
+    if (a == null) return;
+    _setChrome(false);
+    ref.read(recitationProvider.notifier).play(a.surah, from: a.number);
+  }
+
+  /// Turns to the page of the verse being recited.
+  Future<void> _follow(VerseKey v) async {
+    if (!ref.read(settingsProvider).followRecitation || _autoScroll) return;
+    if (_selA != null || _multi) return;
+    final page =
+        (await ref.read(mushafRepositoryProvider).ayah(v.surah, v.ayah)).pageIn(
+          ref.read(editionProvider),
+        );
+    if (!mounted || page == _page) return;
+    _controller?.animateToPage(
+      page - _first,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOut,
+    );
+  }
 
   Future<void> _setMark(
     MarkKind kind,
@@ -682,6 +738,7 @@ class _BottomControls extends StatelessWidget {
     required this.onChanged,
     required this.onChangeEnd,
     required this.onRecite,
+    required this.onListen,
     required this.onGoTo,
     required this.onAutoScroll,
   });
@@ -691,6 +748,7 @@ class _BottomControls extends StatelessWidget {
   final ValueChanged<int> onChanged;
   final ValueChanged<int> onChangeEnd;
   final VoidCallback onRecite;
+  final VoidCallback onListen;
   final VoidCallback onGoTo;
   final VoidCallback onAutoScroll;
 
@@ -714,6 +772,12 @@ class _BottomControls extends StatelessWidget {
                     tooltip: l.reciteMode,
                     onPressed: onRecite,
                     icon: const Icon(Icons.visibility_outlined),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton.filledTonal(
+                    tooltip: l.listen,
+                    onPressed: onListen,
+                    icon: const Icon(Icons.headphones_outlined),
                   ),
                   const Spacer(),
                   FilledButton.tonalIcon(
