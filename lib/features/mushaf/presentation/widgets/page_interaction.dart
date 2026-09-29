@@ -226,7 +226,7 @@ class MarkerLook {
       text: TextSpan(
         text: digits,
         style: TextStyle(
-          fontFamily: 'KFGQPCAN',
+          fontFamily: 'UthmanTahaNaskh',
           fontWeight: FontWeight.w700,
           fontSize: fontSize,
           height: 1,
@@ -235,14 +235,14 @@ class MarkerLook {
       ),
       textDirection: TextDirection.rtl,
     )..layout();
-    // KFGQPC AN digits rise 0.63 em above the baseline and do not descend:
-    // centre that ink box, not the line box.
+    // Uthman Taha Naskh digits rise 0.515 em above the baseline and do not
+    // descend: centre that ink box, not the line box.
     final baseline = tp.computeDistanceToActualBaseline(
       TextBaseline.alphabetic,
     );
     tp.paint(
       canvas,
-      Offset(c.dx - tp.width / 2, c.dy - baseline + 0.315 * fontSize),
+      Offset(c.dx - tp.width / 2, c.dy - baseline + 0.2575 * fontSize),
     );
   }
 }
