@@ -65,8 +65,8 @@
   "readContinuousNow": "Open the continuous view",
   "readWhileDownloading": "Read now while the download finishes",
   "pagesCredit": "Madina Mushaf pages by the King Fahd Glorious Quran Printing Complex.",
-  "pagesCreditOld": "Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, downloaded directly from quran.com.",
-  "pagesCreditShamarly": "Shamarly mushaf pages from the Internet Archive (archive.org), downloaded from Tibyan's server.",
+  "pagesCreditOld": "Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, sourced from quran.com and downloaded from Tibyan's server.",
+  "pagesCreditShamarly": "Shamarly mushaf, calligraphy by Mohamed Saad Ibrahim (Haddad); pages from the Internet Archive (archive.org), downloaded from Tibyan's server.",
   "editionLabel": "Mushaf edition",
   "viewPage": "Page",
   "viewContinuous": "Continuous",
@@ -413,5 +413,45 @@
   },
   "audioCredit": "Recitations and verse timings: mp3quran.net",
   "touchReading": "Touch reading",
-  "touchReadingOn": "Touch reading: tap the verse you are reading"
+  "touchReadingOn": "Touch reading: tap the verse you are reading",
+  "editionOnDevice": "On this device",
+  "editionNotDownloaded": "Not downloaded · {size} MB",
+  "@editionNotDownloaded": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadAllEditions": "Download all editions ({size} MB)",
+  "@downloadAllEditions": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "allEditionsQueued": "All editions are downloading. You can keep reading or leave the app.",
+  "downloadInBackgroundNote": "You can leave the app: the download goes on in the background, and a notification tells you when it is done.",
+  "notifDownloading": "Downloading mushaf pages",
+  "notifComplete": "Mushaf download complete",
+  "notifFailed": "Mushaf download failed",
+  "notifPaused": "Download paused",
+  "readInMadinaWhileDownloading": "Read the new Madina edition until the download finishes",
+  "downloadingBanner": "Downloading {name}: {percent}%. Reading the new Madina edition meanwhile",
+  "@downloadingBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "versePauseLabel": "Pause between verses",
+  "versePauseAsRecorded": "As recorded",
+  "versePauseSecond": "1 second",
+  "versePauseHalf": "Half a second",
+  "versePauseHint": "Shortens the long silences between verses without touching the recitation itself"
 }

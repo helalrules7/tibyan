@@ -158,7 +158,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   /// In the Zakhrafa style the mushaf opens with a cover as page 0.
-  int get _first => _illuminated ? 0 : 1;
+  /// In the Zakhrafa style the Madina editions open with the app's cover as
+  /// page 0. The Shamarly edition has its own cover as page 1, shown in the
+  /// same frame, so it starts there.
+  int get _first =>
+      _illuminated && ref.read(editionProvider) != MushafEdition.shamarly
+      ? 0
+      : 1;
   bool get _illuminated =>
       ref
           .read(themeRegistryProvider)
@@ -223,6 +229,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     Widget pageAt(int i) {
       final pg = i + _first;
       if (pg == 0) return CoverPage(onTap: () => _setChrome(!_chrome));
+      if (edition == MushafEdition.shamarly && pg == 1) {
+        return CoverPage(onTap: () => _setChrome(!_chrome));
+      }
+      // The first two pages of the text (al-Fatiha, the opening of
+      // al-Baqarah) sit in the ornate opening frame.
+      final openingSurah = switch (edition) {
+        MushafEdition.shamarly => pg == 2 || pg == 3 ? pg - 1 : null,
+        _ => pg <= 2 ? pg : null,
+      };
       final interaction = PageInteraction(
         // The reader's selection, or else the verse being recited.
         selection: pg == _page && _selA != null
@@ -258,9 +273,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             setState(() => start ? _selA = v : _selB = v),
         markerLook: markerLook,
         hidden: _recite && pg == _page ? _hiddenOn(pg) : null,
+        hiddenWords: _recite && pg == _page
+            ? _wordsOf(_hiddenOn(pg), pg)
+            : const {},
         onHiddenTap: (v) => setState(() => _revealed.add(v)),
-        ornateOpening:
-            illuminated && edition != MushafEdition.shamarly && pg <= 2,
+        ornateOpening: illuminated && openingSurah != null,
         showHandles: _multi,
         divineNames: settings.highlightDivineNames
             ? ref.watch(divineNameBoxesProvider(pg)).value ?? const []
@@ -307,10 +324,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           interaction: interaction,
         ),
       };
-      // The Shamarly cover and opening pages (1-3) carry their own printed
-      // ornament: they are shown as printed, without the frame.
-      final printedOpening = edition == MushafEdition.shamarly && pg <= 3;
-      if (!illuminated || printedOpening) {
+      if (!illuminated) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Column(
@@ -322,11 +336,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         );
       }
       final info = ref.watch(frameInfoProvider(pg)).value;
-      if (pg <= 2) {
+      if (openingSurah != null) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
           child: OpeningPage(
             page: pg,
+            surah: openingSurah,
             catchword: info?.catchword,
             onPageTap: _goToPage,
             tools: tools,
@@ -515,6 +530,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               bottom: 12,
               child: const SafeArea(top: false, child: PlayerBar()),
             ),
+          // The chosen edition is still downloading: say so, and that the
+          // new Madina edition is read meanwhile.
+          if (ref.watch(chosenEditionProvider) != edition && !_chrome)
+            const Positioned(
+              top: 0,
+              left: 24,
+              right: 24,
+              child: SafeArea(child: DownloadingBanner()),
+            ),
           if (_multi)
             Positioned(
               top: 0,
@@ -583,6 +607,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   Set<VerseKey> _selectionOn(int page) => {...?_range()};
+
+  /// Word boxes of [verses] on [page], by verse (edition units).
+  Map<VerseKey, List<Rect>> _wordsOf(Set<VerseKey> verses, int page) {
+    final boxes = ref.watch(pageWordBoxesProvider(page)).value ?? const {};
+    final out = <VerseKey, List<Rect>>{};
+    for (final MapEntry(key: (s, a, _), value: pieces) in boxes.entries) {
+      final k = (surah: s, ayah: a);
+      if (verses.contains(k)) (out[k] ??= []).addAll(pieces);
+    }
+    return out;
+  }
 
   static Rect? _union(List<Rect>? pieces) =>
       pieces?.reduce((a, b) => a.expandToInclude(b));

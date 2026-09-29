@@ -37,6 +37,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kKashida = 'settings.tafsirKashida';
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
+  static const _kVersePause = 'settings.versePause';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -57,7 +58,8 @@ class SettingsController extends Notifier<AppSettings> {
           UiFont.kfgqpcAn,
       language:
           _enumByName(LanguageSetting.values, _prefs.getString(_kLanguage)) ??
-          LanguageSetting.system,
+          // Arabic unless the reader chooses otherwise, whatever the device.
+          LanguageSetting.ar,
       crashReportsOptIn: _prefs.getBool(_kCrash) ?? false,
       onboardingDone: _prefs.getBool(_kOnboarding) ?? false,
       edition:
@@ -81,6 +83,7 @@ class SettingsController extends Notifier<AppSettings> {
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       followRecitation: _prefs.getBool(_kFollow) ?? true,
+      versePause: _prefs.getInt(_kVersePause) ?? 0,
     );
   }
 
@@ -182,6 +185,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setFollowRecitation(bool value) async {
     state = state.copyWith(followRecitation: value);
     await _prefs.setBool(_kFollow, value);
+  }
+
+  Future<void> setVersePause(int ms) async {
+    state = state.copyWith(versePause: ms);
+    await _prefs.setInt(_kVersePause, ms);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

@@ -6201,6 +6201,353 @@ class WordTimingCompanion extends UpdateCompanion<WordTimingRow> {
   }
 }
 
+class $AyahSpeechTable extends AyahSpeech
+    with TableInfo<$AyahSpeechTable, AyahSpeechRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AyahSpeechTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _reciterMeta = const VerificationMeta(
+    'reciter',
+  );
+  @override
+  late final GeneratedColumn<int> reciter = GeneratedColumn<int>(
+    'reciter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startMsMeta = const VerificationMeta(
+    'startMs',
+  );
+  @override
+  late final GeneratedColumn<int> startMs = GeneratedColumn<int>(
+    'start_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endMsMeta = const VerificationMeta('endMs');
+  @override
+  late final GeneratedColumn<int> endMs = GeneratedColumn<int>(
+    'end_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [reciter, surah, ayah, startMs, endMs];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ayah_speech';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AyahSpeechRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('reciter')) {
+      context.handle(
+        _reciterMeta,
+        reciter.isAcceptableOrUnknown(data['reciter']!, _reciterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reciterMeta);
+    }
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('start_ms')) {
+      context.handle(
+        _startMsMeta,
+        startMs.isAcceptableOrUnknown(data['start_ms']!, _startMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startMsMeta);
+    }
+    if (data.containsKey('end_ms')) {
+      context.handle(
+        _endMsMeta,
+        endMs.isAcceptableOrUnknown(data['end_ms']!, _endMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endMsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {reciter, surah, ayah};
+  @override
+  AyahSpeechRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AyahSpeechRow(
+      reciter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reciter'],
+      )!,
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      startMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_ms'],
+      )!,
+      endMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_ms'],
+      )!,
+    );
+  }
+
+  @override
+  $AyahSpeechTable createAlias(String alias) {
+    return $AyahSpeechTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class AyahSpeechRow extends DataClass implements Insertable<AyahSpeechRow> {
+  final int reciter;
+  final int surah;
+  final int ayah;
+  final int startMs;
+  final int endMs;
+  const AyahSpeechRow({
+    required this.reciter,
+    required this.surah,
+    required this.ayah,
+    required this.startMs,
+    required this.endMs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['reciter'] = Variable<int>(reciter);
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['start_ms'] = Variable<int>(startMs);
+    map['end_ms'] = Variable<int>(endMs);
+    return map;
+  }
+
+  AyahSpeechCompanion toCompanion(bool nullToAbsent) {
+    return AyahSpeechCompanion(
+      reciter: Value(reciter),
+      surah: Value(surah),
+      ayah: Value(ayah),
+      startMs: Value(startMs),
+      endMs: Value(endMs),
+    );
+  }
+
+  factory AyahSpeechRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AyahSpeechRow(
+      reciter: serializer.fromJson<int>(json['reciter']),
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      startMs: serializer.fromJson<int>(json['startMs']),
+      endMs: serializer.fromJson<int>(json['endMs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'reciter': serializer.toJson<int>(reciter),
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'startMs': serializer.toJson<int>(startMs),
+      'endMs': serializer.toJson<int>(endMs),
+    };
+  }
+
+  AyahSpeechRow copyWith({
+    int? reciter,
+    int? surah,
+    int? ayah,
+    int? startMs,
+    int? endMs,
+  }) => AyahSpeechRow(
+    reciter: reciter ?? this.reciter,
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    startMs: startMs ?? this.startMs,
+    endMs: endMs ?? this.endMs,
+  );
+  AyahSpeechRow copyWithCompanion(AyahSpeechCompanion data) {
+    return AyahSpeechRow(
+      reciter: data.reciter.present ? data.reciter.value : this.reciter,
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      startMs: data.startMs.present ? data.startMs.value : this.startMs,
+      endMs: data.endMs.present ? data.endMs.value : this.endMs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AyahSpeechRow(')
+          ..write('reciter: $reciter, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(reciter, surah, ayah, startMs, endMs);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AyahSpeechRow &&
+          other.reciter == this.reciter &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.startMs == this.startMs &&
+          other.endMs == this.endMs);
+}
+
+class AyahSpeechCompanion extends UpdateCompanion<AyahSpeechRow> {
+  final Value<int> reciter;
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> startMs;
+  final Value<int> endMs;
+  const AyahSpeechCompanion({
+    this.reciter = const Value.absent(),
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.startMs = const Value.absent(),
+    this.endMs = const Value.absent(),
+  });
+  AyahSpeechCompanion.insert({
+    required int reciter,
+    required int surah,
+    required int ayah,
+    required int startMs,
+    required int endMs,
+  }) : reciter = Value(reciter),
+       surah = Value(surah),
+       ayah = Value(ayah),
+       startMs = Value(startMs),
+       endMs = Value(endMs);
+  static Insertable<AyahSpeechRow> custom({
+    Expression<int>? reciter,
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? startMs,
+    Expression<int>? endMs,
+  }) {
+    return RawValuesInsertable({
+      if (reciter != null) 'reciter': reciter,
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (startMs != null) 'start_ms': startMs,
+      if (endMs != null) 'end_ms': endMs,
+    });
+  }
+
+  AyahSpeechCompanion copyWith({
+    Value<int>? reciter,
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? startMs,
+    Value<int>? endMs,
+  }) {
+    return AyahSpeechCompanion(
+      reciter: reciter ?? this.reciter,
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      startMs: startMs ?? this.startMs,
+      endMs: endMs ?? this.endMs,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (reciter.present) {
+      map['reciter'] = Variable<int>(reciter.value);
+    }
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (startMs.present) {
+      map['start_ms'] = Variable<int>(startMs.value);
+    }
+    if (endMs.present) {
+      map['end_ms'] = Variable<int>(endMs.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AyahSpeechCompanion(')
+          ..write('reciter: $reciter, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ShamarlyPageTable extends ShamarlyPage
     with TableInfo<$ShamarlyPageTable, ShamarlyPageRow> {
   @override
@@ -9315,6 +9662,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $ReciterTable reciter = $ReciterTable(this);
   late final $AyahTimingTable ayahTiming = $AyahTimingTable(this);
   late final $WordTimingTable wordTiming = $WordTimingTable(this);
+  late final $AyahSpeechTable ayahSpeech = $AyahSpeechTable(this);
   late final $ShamarlyPageTable shamarlyPage = $ShamarlyPageTable(this);
   late final $ShamarlyLineTable shamarlyLine = $ShamarlyLineTable(this);
   late final $ShamarlyLineOverflowTable shamarlyLineOverflow =
@@ -9345,6 +9693,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     reciter,
     ayahTiming,
     wordTiming,
+    ayahSpeech,
     shamarlyPage,
     shamarlyLine,
     shamarlyLineOverflow,
@@ -12667,6 +13016,207 @@ typedef $$WordTimingTableProcessedTableManager =
       WordTimingRow,
       PrefetchHooks Function()
     >;
+typedef $$AyahSpeechTableCreateCompanionBuilder = AyahSpeechCompanion Function({
+  required int reciter,
+  required int surah,
+  required int ayah,
+  required int startMs,
+  required int endMs,
+});
+typedef $$AyahSpeechTableUpdateCompanionBuilder = AyahSpeechCompanion Function({
+  Value<int> reciter,
+  Value<int> surah,
+  Value<int> ayah,
+  Value<int> startMs,
+  Value<int> endMs,
+});
+
+class $$AyahSpeechTableFilterComposer
+    extends Composer<_$ContentDatabase, $AyahSpeechTable> {
+  $$AyahSpeechTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get reciter => $composableBuilder(
+    column: $table.reciter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AyahSpeechTableOrderingComposer
+    extends Composer<_$ContentDatabase, $AyahSpeechTable> {
+  $$AyahSpeechTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get reciter => $composableBuilder(
+    column: $table.reciter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AyahSpeechTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $AyahSpeechTable> {
+  $$AyahSpeechTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get reciter =>
+      $composableBuilder(column: $table.reciter, builder: (column) => column);
+
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get startMs =>
+      $composableBuilder(column: $table.startMs, builder: (column) => column);
+
+  GeneratedColumn<int> get endMs =>
+      $composableBuilder(column: $table.endMs, builder: (column) => column);
+}
+
+class $$AyahSpeechTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $AyahSpeechTable,
+          AyahSpeechRow,
+          $$AyahSpeechTableFilterComposer,
+          $$AyahSpeechTableOrderingComposer,
+          $$AyahSpeechTableAnnotationComposer,
+          $$AyahSpeechTableCreateCompanionBuilder,
+          $$AyahSpeechTableUpdateCompanionBuilder,
+          (
+            AyahSpeechRow,
+            BaseReferences<_$ContentDatabase, $AyahSpeechTable, AyahSpeechRow>,
+          ),
+          AyahSpeechRow,
+          PrefetchHooks Function()
+        > {
+  $$AyahSpeechTableTableManager(_$ContentDatabase db, $AyahSpeechTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AyahSpeechTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AyahSpeechTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AyahSpeechTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> reciter = const Value.absent(),
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> startMs = const Value.absent(),
+                Value<int> endMs = const Value.absent(),
+              }) => AyahSpeechCompanion(
+                reciter: reciter,
+                surah: surah,
+                ayah: ayah,
+                startMs: startMs,
+                endMs: endMs,
+              ),
+          createCompanionCallback:
+              ({
+                required int reciter,
+                required int surah,
+                required int ayah,
+                required int startMs,
+                required int endMs,
+              }) => AyahSpeechCompanion.insert(
+                reciter: reciter,
+                surah: surah,
+                ayah: ayah,
+                startMs: startMs,
+                endMs: endMs,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AyahSpeechTable, AyahSpeechRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $AyahSpeechTable,
+                    AyahSpeechRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AyahSpeechTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $AyahSpeechTable,
+      AyahSpeechRow,
+      $$AyahSpeechTableFilterComposer,
+      $$AyahSpeechTableOrderingComposer,
+      $$AyahSpeechTableAnnotationComposer,
+      $$AyahSpeechTableCreateCompanionBuilder,
+      $$AyahSpeechTableUpdateCompanionBuilder,
+      (
+        AyahSpeechRow,
+        BaseReferences<_$ContentDatabase, $AyahSpeechTable, AyahSpeechRow>,
+      ),
+      AyahSpeechRow,
+      PrefetchHooks Function()
+    >;
 typedef $$ShamarlyPageTableCreateCompanionBuilder =
     ShamarlyPageCompanion Function({
       Value<int> page,
@@ -14499,6 +15049,8 @@ class $ContentDatabaseManager {
       $$AyahTimingTableTableManager(_db, _db.ayahTiming);
   $$WordTimingTableTableManager get wordTiming =>
       $$WordTimingTableTableManager(_db, _db.wordTiming);
+  $$AyahSpeechTableTableManager get ayahSpeech =>
+      $$AyahSpeechTableTableManager(_db, _db.ayahSpeech);
   $$ShamarlyPageTableTableManager get shamarlyPage =>
       $$ShamarlyPageTableTableManager(_db, _db.shamarlyPage);
   $$ShamarlyLineTableTableManager get shamarlyLine =>

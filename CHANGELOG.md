@@ -6,6 +6,16 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (reading and downloads)
+- The new Madina edition ships with the app and opens on first launch; while another chosen edition downloads, it is read meanwhile, with a progress banner.
+- Editions download in the background (the system's downloader), with progress and completion notifications, and a "download all editions" button in settings and on the edition screen.
+- Listening: an option to shorten the long silences reciters leave between verses (as recorded, 1 second, or half a second), from each verse's measured speech span.
+
+### Changed
+- Arabic is the default language whatever the device's language.
+- Recitation mode covers only the words, so verse markers with their numbers and the hizb sign stay visible.
+- The continuous view is no longer offered on the first-launch and download screens.
+
 ### Added (listening)
 - Seven recitations from mp3quran.net: al-Minshawi, al-Husary, Abdul Basit, al-Banna and Mustafa Ismail (murattal), and al-Banna and Mustafa Ismail (mujawwad).
 - The recited verse is highlighted and pages turn with it, using mp3quran's published verse timings (five recitations; two surahs with a verse missing in the source play without highlighting).

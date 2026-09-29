@@ -6,6 +6,9 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../mushaf/mushaf_providers.dart';
+import '../mushaf/presentation/widgets/download_all_button.dart';
+import '../mushaf/presentation/widgets/edition_badge.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -70,24 +73,32 @@ class SettingsScreen extends ConsumerWidget {
               children: [
                 RadioGroup<MushafEdition>(
                   groupValue: settings.edition,
-                  onChanged: (v) => v == null ? null : controller.setEdition(v),
+                  onChanged: (v) async {
+                    if (v == null) return;
+                    await controller.setEdition(v);
+                    // An edition not on the device yet goes straight to
+                    // its download, which starts on its own.
+                    if (!ref.read(installedEditionsProvider).contains(v) &&
+                        context.mounted) {
+                      context.push('/mushaf/download');
+                    }
+                  },
                   child: Column(
                     children: [
-                      RadioListTile(
-                        value: MushafEdition.madina1441,
-                        title: Text(l.editionNew),
-                      ),
-                      RadioListTile(
-                        value: MushafEdition.madina1405,
-                        title: Text(l.editionOld),
-                      ),
-                      RadioListTile(
-                        value: MushafEdition.shamarly,
-                        title: Text(l.editionShamarly),
-                      ),
+                      for (final (e, name) in [
+                        (MushafEdition.madina1441, l.editionNew),
+                        (MushafEdition.madina1405, l.editionOld),
+                        (MushafEdition.shamarly, l.editionShamarly),
+                      ])
+                        RadioListTile(
+                          value: e,
+                          title: Text(name),
+                          subtitle: EditionBadge(edition: e),
+                        ),
                     ],
                   ),
                 ),
+                const DownloadAllButton(),
                 const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l.keepScreenOn),

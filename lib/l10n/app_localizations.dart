@@ -491,13 +491,13 @@ abstract class AppLocalizations {
   /// No description provided for @pagesCreditOld.
   ///
   /// In ar, this message translates to:
-  /// **'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.'**
+  /// **'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، ومصدرها موقع quran.com، وتُحمّل من خادم تبيان.'**
   String get pagesCreditOld;
 
   /// No description provided for @pagesCreditShamarly.
   ///
   /// In ar, this message translates to:
-  /// **'صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.'**
+  /// **'مصحف الشمرلي بخط محمد سعد إبراهيم الشهير بحداد، والصفحات من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.'**
   String get pagesCreditShamarly;
 
   /// No description provided for @editionLabel.
@@ -1363,6 +1363,102 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'القراءة اللمسية: المس الآية التي تقرؤها'**
   String get touchReadingOn;
+
+  /// No description provided for @editionOnDevice.
+  ///
+  /// In ar, this message translates to:
+  /// **'على الجهاز'**
+  String get editionOnDevice;
+
+  /// No description provided for @editionNotDownloaded.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير محمّل · {size} ميجا'**
+  String editionNotDownloaded(String size);
+
+  /// No description provided for @downloadAllEditions.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل كل المصاحف ({size} ميجا)'**
+  String downloadAllEditions(String size);
+
+  /// No description provided for @allEditionsQueued.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.'**
+  String get allEditionsQueued;
+
+  /// No description provided for @downloadInBackgroundNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.'**
+  String get downloadInBackgroundNote;
+
+  /// No description provided for @notifDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل صفحات المصحف'**
+  String get notifDownloading;
+
+  /// No description provided for @notifComplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمل تحميل المصحف'**
+  String get notifComplete;
+
+  /// No description provided for @notifFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل المصحف'**
+  String get notifFailed;
+
+  /// No description provided for @notifPaused.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحميل متوقف مؤقتا'**
+  String get notifPaused;
+
+  /// No description provided for @readInMadinaWhileDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ في مصحف المدينة (الطبعة الحديثة) حتى يكتمل التحميل'**
+  String get readInMadinaWhileDownloading;
+
+  /// No description provided for @downloadingBanner.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُحمَّل {name}: {percent}٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)'**
+  String downloadingBanner(String name, String percent);
+
+  /// No description provided for @versePauseLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'السكتة بين الآيات'**
+  String get versePauseLabel;
+
+  /// No description provided for @versePauseAsRecorded.
+  ///
+  /// In ar, this message translates to:
+  /// **'كما سُجّلت'**
+  String get versePauseAsRecorded;
+
+  /// No description provided for @versePauseSecond.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثانية'**
+  String get versePauseSecond;
+
+  /// No description provided for @versePauseHalf.
+  ///
+  /// In ar, this message translates to:
+  /// **'نصف ثانية'**
+  String get versePauseHalf;
+
+  /// No description provided for @versePauseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها'**
+  String get versePauseHint;
 }
 
 class _AppLocalizationsDelegate

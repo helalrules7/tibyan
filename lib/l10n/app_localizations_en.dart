@@ -222,11 +222,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pagesCreditOld =>
-      'Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, downloaded directly from quran.com.';
+      'Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, sourced from quran.com and downloaded from Tibyan\'s server.';
 
   @override
   String get pagesCreditShamarly =>
-      'Shamarly mushaf pages from the Internet Archive (archive.org), downloaded from Tibyan\'s server.';
+      'Shamarly mushaf, calligraphy by Mohamed Saad Ibrahim (Haddad); pages from the Internet Archive (archive.org), downloaded from Tibyan\'s server.';
 
   @override
   String get editionLabel => 'Mushaf edition';
@@ -739,4 +739,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get touchReadingOn => 'Touch reading: tap the verse you are reading';
+
+  @override
+  String get editionOnDevice => 'On this device';
+
+  @override
+  String editionNotDownloaded(String size) {
+    return 'Not downloaded · $size MB';
+  }
+
+  @override
+  String downloadAllEditions(String size) {
+    return 'Download all editions ($size MB)';
+  }
+
+  @override
+  String get allEditionsQueued =>
+      'All editions are downloading. You can keep reading or leave the app.';
+
+  @override
+  String get downloadInBackgroundNote =>
+      'You can leave the app: the download goes on in the background, and a notification tells you when it is done.';
+
+  @override
+  String get notifDownloading => 'Downloading mushaf pages';
+
+  @override
+  String get notifComplete => 'Mushaf download complete';
+
+  @override
+  String get notifFailed => 'Mushaf download failed';
+
+  @override
+  String get notifPaused => 'Download paused';
+
+  @override
+  String get readInMadinaWhileDownloading =>
+      'Read the new Madina edition until the download finishes';
+
+  @override
+  String downloadingBanner(String name, String percent) {
+    return 'Downloading $name: $percent%. Reading the new Madina edition meanwhile';
+  }
+
+  @override
+  String get versePauseLabel => 'Pause between verses';
+
+  @override
+  String get versePauseAsRecorded => 'As recorded';
+
+  @override
+  String get versePauseSecond => '1 second';
+
+  @override
+  String get versePauseHalf => 'Half a second';
+
+  @override
+  String get versePauseHint =>
+      'Shortens the long silences between verses without touching the recitation itself';
 }

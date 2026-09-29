@@ -96,8 +96,8 @@
   "readContinuousNow": "افتح العرض المتصل",
   "readWhileDownloading": "اقرأ الآن حتى يكتمل التحميل",
   "pagesCredit": "صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.",
-  "pagesCreditOld": "صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.",
-  "pagesCreditShamarly": "صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.",
+  "pagesCreditOld": "صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، ومصدرها موقع quran.com، وتُحمّل من خادم تبيان.",
+  "pagesCreditShamarly": "مصحف الشمرلي بخط محمد سعد إبراهيم الشهير بحداد، والصفحات من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.",
   "editionLabel": "طبعة المصحف",
   "viewPage": "الصفحة",
   "viewContinuous": "متصل",
@@ -547,5 +547,45 @@
   },
   "audioCredit": "التلاوات وتوقيت الآيات: mp3quran.net",
   "touchReading": "القراءة اللمسية",
-  "touchReadingOn": "القراءة اللمسية: المس الآية التي تقرؤها"
+  "touchReadingOn": "القراءة اللمسية: المس الآية التي تقرؤها",
+  "editionOnDevice": "على الجهاز",
+  "editionNotDownloaded": "غير محمّل · {size} ميجا",
+  "@editionNotDownloaded": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadAllEditions": "تحميل كل المصاحف ({size} ميجا)",
+  "@downloadAllEditions": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "allEditionsQueued": "بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.",
+  "downloadInBackgroundNote": "يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.",
+  "notifDownloading": "تحميل صفحات المصحف",
+  "notifComplete": "اكتمل تحميل المصحف",
+  "notifFailed": "تعذّر تحميل المصحف",
+  "notifPaused": "التحميل متوقف مؤقتا",
+  "readInMadinaWhileDownloading": "اقرأ في مصحف المدينة (الطبعة الحديثة) حتى يكتمل التحميل",
+  "downloadingBanner": "يُحمَّل {name}: {percent}٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)",
+  "@downloadingBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "versePauseLabel": "السكتة بين الآيات",
+  "versePauseAsRecorded": "كما سُجّلت",
+  "versePauseSecond": "ثانية",
+  "versePauseHalf": "نصف ثانية",
+  "versePauseHint": "يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها"
 }

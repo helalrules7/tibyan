@@ -267,12 +267,13 @@ class ImagePageData {
 /// A colour filter that draws the page's ink in [color].
 ColorFilter inkFilter(Color color, {required bool alphaInk}) => alphaInk
     ? ColorFilter.mode(color, BlendMode.srcIn)
-    // Opaque scan: dark = ink, light = paper (transparent).
+    // Opaque scan: dark = ink, light = paper (transparent). The ramp is
+    // steepened so the scan's tinted paper drops out completely.
     : ColorFilter.matrix([
         0, 0, 0, 0, color.r * 255, //
         0, 0, 0, 0, color.g * 255,
         0, 0, 0, 0, color.b * 255,
-        -0.299, -0.587, -0.114, 0, 255,
+        -0.299 * 1.5, -0.587 * 1.5, -0.114 * 1.5, 0, 255 * 1.5 - 25,
       ]);
 
 /// One page drawn from a page image (unchanged), coloured for the current
@@ -363,6 +364,16 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                 if (test(k)) r,
             ];
 
+            /// Recitation mode: a verse's words when known (so its marker
+            /// and the hizb sign stay), else the whole verse.
+            Iterable<Rect> coverOf(VerseKey v) {
+              final words = x.hiddenWords[v];
+              if (words != null && words.isNotEmpty) {
+                return layout.frames(words).map((r) => r.widen(6));
+              }
+              return piecesOf((k) => k == v).map(layout.toScreenRect);
+            }
+
             final selected = piecesOf(x.selection.contains).toList();
             final handles = <Widget>[];
             if (selected.isNotEmpty && x.showHandles) {
@@ -433,7 +444,9 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                           image: data.image,
                           alphaInk: data.alphaInk,
                           layout: layout,
-                          ink: tokens.mode == ThemeModeId.light
+                          // Opaque scans are always recoloured, so their
+                          // tinted paper never shows on ours.
+                          ink: tokens.mode == ThemeModeId.light && data.alphaInk
                               ? null
                               : tokens.colors.ink,
                           highlight: tokens.colors.highlight,
@@ -456,9 +469,12 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                           ],
                           hidden: x.hidden == null
                               ? const []
+                              : [for (final v in x.hidden!) ...coverOf(v)],
+                          markerPixels: x.hidden == null
+                              ? const []
                               : [
-                                  for (final r in piecesOf(x.hidden!.contains))
-                                    layout.toScreenRect(r),
+                                  for (final e in markers.entries)
+                                    (e.value, layout.toScreenRect(e.value)),
                                 ],
                           paper: tokens.colors.paper,
                           line: tokens.colors.border,
@@ -500,6 +516,7 @@ class _ImagePagePainter extends CustomPainter {
     required this.look,
     required this.markers,
     required this.hidden,
+    this.markerPixels = const [],
     required this.paper,
     required this.line,
     this.divineNames = const [],
@@ -517,8 +534,12 @@ class _ImagePagePainter extends CustomPainter {
   /// Verse-end marker boxes on screen, with their verse numbers.
   final List<(Rect, int, Color?)> markers;
 
-  /// Recitation mode: verse boxes to cover.
+  /// Recitation mode: boxes to cover (screen px).
   final List<Rect> hidden;
+
+  /// Recitation mode: each marker's image box and screen box, drawn again
+  /// over the covers so verse numbers stay visible.
+  final List<(Rect, Rect)> markerPixels;
   final Color paper;
   final Color line;
 
@@ -603,6 +624,23 @@ class _ImagePagePainter extends CustomPainter {
           Offset(r.left, r.center.dy),
           Offset(r.right, r.center.dy),
           stroke,
+        );
+      }
+      for (final (src, dst) in markerPixels) {
+        canvas.drawImageRect(
+          image,
+          src.inflate(3),
+          dst.inflate(3 * layout.scale),
+          paint,
+        );
+      }
+      for (final (r, n, marked) in markers) {
+        look?.paintOver(
+          canvas,
+          r.center,
+          r.shortestSide / 2,
+          n,
+          marked: marked,
         );
       }
     }

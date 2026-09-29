@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +14,10 @@ import 'core/db/user_database.dart';
 import 'core/flags/feature_flags.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
+import 'features/mushaf/data/background_packs.dart';
+import 'features/mushaf/data/bundled_pack.dart';
 import 'features/mushaf/mushaf_providers.dart';
+import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +52,31 @@ Future<void> main() async {
   container.listen(
     settingsProvider.select((s) => s.crashReportsOptIn),
     (_, optIn) => CrashReporting.apply(optIn: optIn),
+  );
+
+  // The new Madina edition ships with the app: install it on first launch.
+  try {
+    await installBundledPack(rootBundle, container.read(packsDirProvider));
+  } catch (_) {
+    // It can still be downloaded like the other editions.
+  }
+
+  // Pack downloads run in the background; finish any that ended while the
+  // app was closed. Notifications speak the interface language.
+  final l = lookupAppLocalizations(
+    container.read(settingsProvider).locale ?? const Locale('ar'),
+  );
+  BackgroundPacks.texts = (
+    running: l.notifDownloading,
+    complete: l.notifComplete,
+    error: l.notifFailed,
+    paused: l.notifPaused,
+  );
+  unawaited(
+    container
+        .read(backgroundPacksProvider)
+        .start()
+        .then((_) => container.read(packInstallsProvider.notifier).changed()),
   );
 
   runApp(

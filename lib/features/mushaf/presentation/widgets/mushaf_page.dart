@@ -558,11 +558,36 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 ..strokeWidth = 1.2;
                               for (final v in verses) {
                                 if (!hidden.contains(v.key)) continue;
-                                c.drawPath(v.path, cover);
-                                for (final r in v.rects) {
+                                final words = x.hiddenWords[v.key];
+                                if (words == null ||
+                                    words.isEmpty ||
+                                    widget.page <= 2) {
+                                  c.drawPath(v.path, cover);
+                                  for (final r in v.rects) {
+                                    c.drawLine(
+                                      Offset(r.left + 4, r.center.dy),
+                                      Offset(r.right - 4, r.center.dy),
+                                      line,
+                                    );
+                                  }
+                                  continue;
+                                }
+                                // Only the words: the marker and the hizb
+                                // sign stay.
+                                for (final r in lineBoxes(
+                                  words,
+                                  lineOf: (r) => layout._lineOf(r.center.dy),
+                                  centre: layout._centre,
+                                  halfHeight: _pitch * 0.5,
+                                  band: (j) => (
+                                    layout._bandTop(j),
+                                    layout._bandBottom(j),
+                                  ),
+                                )) {
+                                  c.drawRect(r.widen(2.5), cover);
                                   c.drawLine(
-                                    Offset(r.left + 4, r.center.dy),
-                                    Offset(r.right - 4, r.center.dy),
+                                    Offset(r.left + 2, r.center.dy),
+                                    Offset(r.right - 2, r.center.dy),
                                     line,
                                   );
                                 }

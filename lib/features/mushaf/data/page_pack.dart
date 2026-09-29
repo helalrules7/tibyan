@@ -202,33 +202,7 @@ class PagePackInstaller {
         received: received,
         total: spec.bytes,
       );
-      final partPath = _part.path;
-      // Hash in chunks so a 65 MB file never sits in memory at once.
-      final digest = (await sha256.bind(File(partPath).openRead()).first)
-          .toString();
-      if (digest != spec.sha256) {
-        _part.deleteSync();
-        throw const FormatException(
-          'The download is damaged. Please try again.',
-        );
-      }
-
-      yield PackProgress(
-        PackPhase.installing,
-        received: received,
-        total: spec.bytes,
-      );
-      final target = dir.path;
-      final format = spec.format;
-      await Isolate.run(
-        () => switch (format) {
-          PackFormat.svgXz => _extractAndVerify(partPath, target),
-          PackFormat.pngQuranCom => _extractQuranCom(partPath, target),
-          PackFormat.pngShamarly => _extractShamarly(partPath, target),
-        },
-      );
-      _done.writeAsStringSync(DateTime.now().toIso8601String());
-      _part.deleteSync();
+      await installFrom(_part);
       yield PackProgress(
         PackPhase.installed,
         received: spec.bytes,
@@ -237,6 +211,29 @@ class PagePackInstaller {
     } catch (e) {
       yield PackProgress(PackPhase.failed, error: e.toString());
     }
+  }
+
+  /// Checks a downloaded zip against the pack's SHA-256, then installs its
+  /// pages. The zip is deleted either way. Throws when it is damaged.
+  Future<void> installFrom(File zip) async {
+    final path = zip.path;
+    // Hash in chunks so a 200 MB file never sits in memory at once.
+    final digest = (await sha256.bind(File(path).openRead()).first).toString();
+    if (digest != spec.sha256) {
+      zip.deleteSync();
+      throw const FormatException('The download is damaged. Please try again.');
+    }
+    final target = dir.path;
+    final format = spec.format;
+    await Isolate.run(
+      () => switch (format) {
+        PackFormat.svgXz => _extractAndVerify(path, target),
+        PackFormat.pngQuranCom => _extractQuranCom(path, target),
+        PackFormat.pngShamarly => _extractShamarly(path, target),
+      },
+    );
+    _done.writeAsStringSync(DateTime.now().toIso8601String());
+    zip.deleteSync();
   }
 
   static void _extractAndVerify(String zipPath, String targetDir) {

@@ -222,11 +222,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pagesCreditOld =>
-      'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.';
+      'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، ومصدرها موقع quran.com، وتُحمّل من خادم تبيان.';
 
   @override
   String get pagesCreditShamarly =>
-      'صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.';
+      'مصحف الشمرلي بخط محمد سعد إبراهيم الشهير بحداد، والصفحات من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.';
 
   @override
   String get editionLabel => 'طبعة المصحف';
@@ -736,4 +736,62 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get touchReadingOn => 'القراءة اللمسية: المس الآية التي تقرؤها';
+
+  @override
+  String get editionOnDevice => 'على الجهاز';
+
+  @override
+  String editionNotDownloaded(String size) {
+    return 'غير محمّل · $size ميجا';
+  }
+
+  @override
+  String downloadAllEditions(String size) {
+    return 'تحميل كل المصاحف ($size ميجا)';
+  }
+
+  @override
+  String get allEditionsQueued =>
+      'بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.';
+
+  @override
+  String get downloadInBackgroundNote =>
+      'يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.';
+
+  @override
+  String get notifDownloading => 'تحميل صفحات المصحف';
+
+  @override
+  String get notifComplete => 'اكتمل تحميل المصحف';
+
+  @override
+  String get notifFailed => 'تعذّر تحميل المصحف';
+
+  @override
+  String get notifPaused => 'التحميل متوقف مؤقتا';
+
+  @override
+  String get readInMadinaWhileDownloading =>
+      'اقرأ في مصحف المدينة (الطبعة الحديثة) حتى يكتمل التحميل';
+
+  @override
+  String downloadingBanner(String name, String percent) {
+    return 'يُحمَّل $name: $percent٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)';
+  }
+
+  @override
+  String get versePauseLabel => 'السكتة بين الآيات';
+
+  @override
+  String get versePauseAsRecorded => 'كما سُجّلت';
+
+  @override
+  String get versePauseSecond => 'ثانية';
+
+  @override
+  String get versePauseHalf => 'نصف ثانية';
+
+  @override
+  String get versePauseHint =>
+      'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها';
 }

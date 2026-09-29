@@ -41,7 +41,7 @@ class AppSettings {
     required this.styleId,
     this.mode = ModeSetting.light,
     this.uiFont = UiFont.kfgqpcAn,
-    this.language = LanguageSetting.system,
+    this.language = LanguageSetting.ar,
     this.crashReportsOptIn = false,
     this.onboardingDone = false,
     this.edition = MushafEdition.madina1441,
@@ -56,6 +56,7 @@ class AppSettings {
     this.tafsirKashida = false,
     this.reciterId = 1,
     this.followRecitation = true,
+    this.versePause = 0,
   });
 
   final String styleId;
@@ -101,6 +102,10 @@ class AppSettings {
   /// Turn pages to follow the verse being recited.
   final bool followRecitation;
 
+  /// Longest pause kept between verses while listening, in ms; 0 plays
+  /// the recording as it is.
+  final int versePause;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -120,6 +125,7 @@ class AppSettings {
     bool? tafsirKashida,
     int? reciterId,
     bool? followRecitation,
+    int? versePause,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -139,6 +145,7 @@ class AppSettings {
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
     reciterId: reciterId ?? this.reciterId,
     followRecitation: followRecitation ?? this.followRecitation,
+    versePause: versePause ?? this.versePause,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure
