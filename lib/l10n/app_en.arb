@@ -320,5 +320,32 @@
   "tabMarks": "Reading marks",
   "noMarks": "No marks yet. Tap a verse marker to mark it.",
   "highlightDivineNames": "Highlight the divine name",
-  "highlightDivineNamesHint": "Colour «Allah», «Rabb» and «Rabbana» on the pages"
+  "highlightDivineNamesHint": "Colour «Allah», «Rabb» and «Rabbana» on the pages",
+  "tafsirTitle": "Tafsir and translation",
+  "tafsirSettings": "Tafsir settings",
+  "tafsirFontLabel": "Tafsir font",
+  "tafsirFontNaskh": "Uthman Taha Naskh",
+  "tafsirFontInterface": "Interface font",
+  "tafsirTextSize": "Text size",
+  "tafsirShown": "Texts shown",
+  "tafsirNoneShown": "All texts are hidden. Choose one in the tafsir settings.",
+  "tafsirFootnotes": "Footnotes",
+  "previousVerse": "Previous verse",
+  "nextVerse": "Next verse",
+  "sourceVersion": "Version {version}",
+  "@sourceVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceRetrieved": "Copy of {date}",
+  "@sourceRetrieved": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

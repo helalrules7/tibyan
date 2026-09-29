@@ -42,6 +42,23 @@ void main() {
     }
   });
 
+  test('every verse has al-Muyassar, Saheeh and Pickthall', () async {
+    final editions = await repo.commentaryEditions();
+    expect([for (final e in editions) e.sourceId], [7, 8, 9]);
+    expect(editions.first.kind, 'tafsir');
+    for (final (s, a) in [(1, 1), (2, 255), (9, 1), (114, 6)]) {
+      final entries = await repo.commentary(s, a);
+      expect(entries.keys.toSet(), {7, 8, 9}, reason: '$s:$a');
+      expect(entries.values.every((e) => e.body.isNotEmpty), isTrue);
+    }
+    // Footnotes come with Saheeh International only.
+    expect((await repo.commentary(1, 1))[8]!.footnotes, contains('[2]'));
+    // Each source row carries its credit.
+    final sources = {for (final s in await repo.sources()) s.id: s};
+    expect(sources[7]!.attribution, contains('QuranEnc'));
+    expect(sources[8]!.version, '1.1.2');
+  });
+
   test(
     'shown text is the KFGQPC text, split only at the verse number',
     () async {

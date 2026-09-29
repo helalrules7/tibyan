@@ -88,6 +88,33 @@
       "sha256": "401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85",
       "license": "NO WRITTEN LICENSE. Old 1405H edition page images (604 PNG) plus the same ayahinfo_1024.db. Used by Ahmed's decision (2026-09-28) until KFGQPC and Quran Foundation reply. Not re-hosted; the app downloads it from quran.com.",
       "evidence": "docs/outreach/PERMISSION_REQUESTS.md (letters 2 and 10)"
+    },
+    {
+      "id": "quranenc-arabic-moyassar",
+      "file": "qe_arabic_moyassar.sqlite",
+      "url": "https://quranenc.com/downloads/sqlite/arabic_moyassar.sqlite",
+      "method": "GET",
+      "sha256": "eb384e586487b089b826375d3f705d07e775e0019325da405e0337a9f6b3da04",
+      "license": "QuranEnc terms: republish without change; credit the publisher (KFGQPC) and QuranEnc.com; state the version; keep updated. No version number is published for this tafsir; the file hash and retrieval date stand in for it.",
+      "evidence": "docs/licenses/2026-09-28_quranenc_arabic_moyassar.pdf"
+    },
+    {
+      "id": "quranenc-english-saheeh-1.1.2",
+      "file": "qe_english_saheeh.sqlite",
+      "url": "https://quranenc.com/downloads/sqlite/english_saheeh.sqlite",
+      "method": "GET",
+      "sha256": "8e3feedb9b6735d60355c53aef9ebc4b86a8b995d118c0387e7e1bd93b67eddb",
+      "license": "QuranEnc terms: republish without change; credit Saheeh International and QuranEnc.com; state the version (1.1.2); keep updated.",
+      "evidence": "docs/licenses/2026-09-28_quranenc_english_saheeh.pdf, docs/licenses/2026-09-29_quranenc_sqlite_downloads.pdf"
+    },
+    {
+      "id": "tanzil-en-pickthall",
+      "file": "tanzil_en.pickthall.txt",
+      "url": "https://tanzil.net/trans/?transID=en.pickthall&type=txt-2",
+      "method": "GET",
+      "sha256": "4aabbfa9d96796f5a6b0217d2c39dce1a3084f772bf6f2650e37082a774e3cc7",
+      "license": "Pickthall (1930) is in the public domain. Tanzil's copy: non-commercial use (Tibyan is free and non-profit).",
+      "evidence": "docs/licenses/2026-09-29_tanzil_translations_terms.pdf"
     }
   ]
 }

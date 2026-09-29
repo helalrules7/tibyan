@@ -447,5 +447,32 @@
   "tabMarks": "فواصل القراءة",
   "noMarks": "لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.",
   "highlightDivineNames": "تمييز لفظ الجلالة",
-  "highlightDivineNamesHint": "تلوين «الله» و«رب» و«ربنا» في صفحات المصحف"
+  "highlightDivineNamesHint": "تلوين «الله» و«رب» و«ربنا» في صفحات المصحف",
+  "tafsirTitle": "التفسير والترجمة",
+  "tafsirSettings": "إعدادات التفسير",
+  "tafsirFontLabel": "خط التفسير",
+  "tafsirFontNaskh": "نسخ عثمان طه",
+  "tafsirFontInterface": "خط الواجهة",
+  "tafsirTextSize": "حجم النص",
+  "tafsirShown": "النصوص المعروضة",
+  "tafsirNoneShown": "كل النصوص مخفية. اختر نصا من إعدادات التفسير.",
+  "tafsirFootnotes": "الحواشي",
+  "previousVerse": "الآية السابقة",
+  "nextVerse": "الآية التالية",
+  "sourceVersion": "الإصدار {version}",
+  "@sourceVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "sourceRetrieved": "نسخة {date}",
+  "@sourceRetrieved": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }
