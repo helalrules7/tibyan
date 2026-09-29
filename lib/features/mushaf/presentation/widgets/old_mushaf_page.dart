@@ -59,14 +59,25 @@ class _PageLayout {
 
   bool get _hasCuts => cuts.length == _lineCount - 1;
 
-  /// The lines sit this far above the bottom, so the last line's marks
-  /// below the baseline are never cut.
-  static const _lift = 10.0;
-  double get _slot => (size.height - _lift) / _lineCount;
+  /// How far the ink of the first and last lines reaches beyond their
+  /// centres, over all 604 pages (image px; tools/measure_line_extents.py).
+  static const _inkAbove = 55.1;
+  static const _inkBelow = 83.1;
+
+  /// Room kept above the first line and below the last, so no line is cut.
+  late final double _padTop = _pad(_inkAbove);
+  late final double _padBottom = _pad(_inkBelow);
+  double _pad(double ink) {
+    final s0 = size.height / _lineCount;
+    final need = ink * scale - s0 / 2 + 3;
+    return need > 0 ? need : 0;
+  }
+
+  double get _slot => (size.height - _padTop - _padBottom) / _lineCount;
 
   /// Line centre on the image, and where it lands on screen.
   double _centre(int j) => ink.top + (j + 0.5) * _pitch;
-  double _slotCentre(int j) => (j + 0.5) * _slot;
+  double _slotCentre(int j) => _padTop + (j + 0.5) * _slot;
 
   double _bandTop(int j) =>
       j == 0 ? ink.top : (_hasCuts ? cuts[j - 1] : ink.top + j * _pitch);
@@ -96,7 +107,7 @@ class _PageLayout {
 
   Offset toImage(Offset p) {
     if (!strips) return (p - offset) / scale + ink.topLeft;
-    final j = (p.dy / _slot).floor().clamp(0, _lineCount - 1);
+    final j = ((p.dy - _padTop) / _slot).floor().clamp(0, _lineCount - 1);
     return Offset(
       p.dx / scale + ink.left,
       _centre(j) + (p.dy - _slotCentre(j)) / scale,
