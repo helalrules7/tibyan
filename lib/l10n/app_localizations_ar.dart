@@ -629,4 +629,92 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get copied => 'تم النسخ';
+
+  @override
+  String get listen => 'استماع';
+
+  @override
+  String get reciterLabel => 'القارئ';
+
+  @override
+  String get murattal => 'مرتل';
+
+  @override
+  String get mujawwad => 'مجود';
+
+  @override
+  String get repeatLabel => 'عدد مرات التكرار';
+
+  @override
+  String get repeatForever => 'بلا توقف';
+
+  @override
+  String repeatTimes(String n) {
+    return '×$n';
+  }
+
+  @override
+  String get silenceLabel => 'سكوت بين كل تكرار والتالي (للترديد خلف القارئ)';
+
+  @override
+  String get silenceNone => 'بلا';
+
+  @override
+  String seconds(String n) {
+    return '$n ث';
+  }
+
+  @override
+  String get repeatVerse => 'كرر هذه الآية';
+
+  @override
+  String get playToEnd => 'أكمل السورة';
+
+  @override
+  String get sleepLabel => 'مؤقت النوم';
+
+  @override
+  String get sleepOff => 'إيقاف';
+
+  @override
+  String minutes(String n) {
+    return '$n د';
+  }
+
+  @override
+  String get sleepSurahEnd => 'نهاية السورة';
+
+  @override
+  String get followRecitation => 'تقليب الصفحات مع التلاوة';
+
+  @override
+  String get audioDownloads => 'تحميل التلاوات';
+
+  @override
+  String get downloadAll => 'تحميل الكل';
+
+  @override
+  String get audioDownloaded => 'محملة على الجهاز';
+
+  @override
+  String get noTiming =>
+      'هذه التلاوة بلا توقيت للآيات في هذه السورة: تُسمع كاملة بلا تظليل ولا تكرار آية';
+
+  @override
+  String get playerError =>
+      'تعذر تشغيل التلاوة. تأكد من الاتصال بالإنترنت أو حمّل السورة.';
+
+  @override
+  String get playerSettings => 'إعدادات الاستماع';
+
+  @override
+  String get stopListening => 'إيقاف الاستماع';
+
+  @override
+  String repeatProgress(String done, String total) {
+    return 'التكرار $done من $total';
+  }
+
+  @override
+  String get audioCredit => 'التلاوات وتوقيت الآيات: mp3quran.net';
 }

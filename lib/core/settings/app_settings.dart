@@ -47,6 +47,8 @@ class AppSettings {
     this.tafsirFontScale = 1.0,
     this.hiddenCommentaries = const {},
     this.tafsirKashida = false,
+    this.reciterId = 1,
+    this.followRecitation = true,
   });
 
   final String styleId;
@@ -86,6 +88,12 @@ class AppSettings {
   /// Trial: justify Arabic tafsir with tatweel instead of wider spaces.
   final bool tafsirKashida;
 
+  /// Recitation chosen in the player (content.db `reciter.id`).
+  final int reciterId;
+
+  /// Turn pages to follow the verse being recited.
+  final bool followRecitation;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -103,6 +111,8 @@ class AppSettings {
     double? tafsirFontScale,
     Set<int>? hiddenCommentaries,
     bool? tafsirKashida,
+    int? reciterId,
+    bool? followRecitation,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -120,6 +130,8 @@ class AppSettings {
     tafsirFontScale: tafsirFontScale ?? this.tafsirFontScale,
     hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
+    reciterId: reciterId ?? this.reciterId,
+    followRecitation: followRecitation ?? this.followRecitation,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

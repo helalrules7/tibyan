@@ -35,6 +35,8 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kTafsirScale = 'settings.tafsirFontScale';
   static const _kHiddenCommentaries = 'settings.hiddenCommentaries';
   static const _kKashida = 'settings.tafsirKashida';
+  static const _kReciter = 'settings.reciterId';
+  static const _kFollow = 'settings.followRecitation';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -77,6 +79,8 @@ class SettingsController extends Notifier<AppSettings> {
           ?int.tryParse(id),
       },
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
+      reciterId: _prefs.getInt(_kReciter) ?? 1,
+      followRecitation: _prefs.getBool(_kFollow) ?? true,
     );
   }
 
@@ -168,6 +172,16 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setTafsirKashida(bool value) async {
     state = state.copyWith(tafsirKashida: value);
     await _prefs.setBool(_kKashida, value);
+  }
+
+  Future<void> setReciter(int id) async {
+    state = state.copyWith(reciterId: id);
+    await _prefs.setInt(_kReciter, id);
+  }
+
+  Future<void> setFollowRecitation(bool value) async {
+    state = state.copyWith(followRecitation: value);
+    await _prefs.setBool(_kFollow, value);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

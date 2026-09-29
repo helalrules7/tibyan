@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/mushaf/presentation/about_mushaf_screen.dart';
 import '../../features/mushaf/presentation/continuous_screen.dart';
@@ -109,6 +110,10 @@ final appRouterProvider = Provider<GoRouter>(
               surah: _int(state, 's') ?? 1,
               ayah: _int(state, 'a') ?? 1,
             ),
+          ),
+          GoRoute(
+            path: 'audio',
+            builder: (context, state) => const AudioDownloadsScreen(),
           ),
           GoRoute(
             path: 'about',

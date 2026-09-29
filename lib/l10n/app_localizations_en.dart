@@ -631,4 +631,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copied => 'Copied';
+
+  @override
+  String get listen => 'Listen';
+
+  @override
+  String get reciterLabel => 'Reciter';
+
+  @override
+  String get murattal => 'Murattal';
+
+  @override
+  String get mujawwad => 'Mujawwad';
+
+  @override
+  String get repeatLabel => 'Times to repeat';
+
+  @override
+  String get repeatForever => 'Until stopped';
+
+  @override
+  String repeatTimes(String n) {
+    return '×$n';
+  }
+
+  @override
+  String get silenceLabel =>
+      'Silence between repeats (to recite after the reciter)';
+
+  @override
+  String get silenceNone => 'None';
+
+  @override
+  String seconds(String n) {
+    return '$n s';
+  }
+
+  @override
+  String get repeatVerse => 'Repeat this verse';
+
+  @override
+  String get playToEnd => 'Play to the end';
+
+  @override
+  String get sleepLabel => 'Sleep timer';
+
+  @override
+  String get sleepOff => 'Off';
+
+  @override
+  String minutes(String n) {
+    return '$n min';
+  }
+
+  @override
+  String get sleepSurahEnd => 'End of surah';
+
+  @override
+  String get followRecitation => 'Turn pages with the recitation';
+
+  @override
+  String get audioDownloads => 'Download recitations';
+
+  @override
+  String get downloadAll => 'Download all';
+
+  @override
+  String get audioDownloaded => 'On this device';
+
+  @override
+  String get noTiming =>
+      'This recitation has no verse timing for this surah: it plays whole, without highlighting or verse repeat';
+
+  @override
+  String get playerError =>
+      'The recitation could not play. Check the connection or download the surah.';
+
+  @override
+  String get playerSettings => 'Listening settings';
+
+  @override
+  String get stopListening => 'Stop listening';
+
+  @override
+  String repeatProgress(String done, String total) {
+    return 'Repeat $done of $total';
+  }
+
+  @override
+  String get audioCredit => 'Recitations and verse timings: mp3quran.net';
 }

@@ -1177,6 +1177,162 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم النسخ'**
   String get copied;
+
+  /// No description provided for @listen.
+  ///
+  /// In ar, this message translates to:
+  /// **'استماع'**
+  String get listen;
+
+  /// No description provided for @reciterLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'القارئ'**
+  String get reciterLabel;
+
+  /// No description provided for @murattal.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرتل'**
+  String get murattal;
+
+  /// No description provided for @mujawwad.
+  ///
+  /// In ar, this message translates to:
+  /// **'مجود'**
+  String get mujawwad;
+
+  /// No description provided for @repeatLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدد مرات التكرار'**
+  String get repeatLabel;
+
+  /// No description provided for @repeatForever.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا توقف'**
+  String get repeatForever;
+
+  /// No description provided for @repeatTimes.
+  ///
+  /// In ar, this message translates to:
+  /// **'×{n}'**
+  String repeatTimes(String n);
+
+  /// No description provided for @silenceLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'سكوت بين كل تكرار والتالي (للترديد خلف القارئ)'**
+  String get silenceLabel;
+
+  /// No description provided for @silenceNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا'**
+  String get silenceNone;
+
+  /// No description provided for @seconds.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} ث'**
+  String seconds(String n);
+
+  /// No description provided for @repeatVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'كرر هذه الآية'**
+  String get repeatVerse;
+
+  /// No description provided for @playToEnd.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكمل السورة'**
+  String get playToEnd;
+
+  /// No description provided for @sleepLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'مؤقت النوم'**
+  String get sleepLabel;
+
+  /// No description provided for @sleepOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف'**
+  String get sleepOff;
+
+  /// No description provided for @minutes.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} د'**
+  String minutes(String n);
+
+  /// No description provided for @sleepSurahEnd.
+  ///
+  /// In ar, this message translates to:
+  /// **'نهاية السورة'**
+  String get sleepSurahEnd;
+
+  /// No description provided for @followRecitation.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقليب الصفحات مع التلاوة'**
+  String get followRecitation;
+
+  /// No description provided for @audioDownloads.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل التلاوات'**
+  String get audioDownloads;
+
+  /// No description provided for @downloadAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل الكل'**
+  String get downloadAll;
+
+  /// No description provided for @audioDownloaded.
+  ///
+  /// In ar, this message translates to:
+  /// **'محملة على الجهاز'**
+  String get audioDownloaded;
+
+  /// No description provided for @noTiming.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه التلاوة بلا توقيت للآيات في هذه السورة: تُسمع كاملة بلا تظليل ولا تكرار آية'**
+  String get noTiming;
+
+  /// No description provided for @playerError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تشغيل التلاوة. تأكد من الاتصال بالإنترنت أو حمّل السورة.'**
+  String get playerError;
+
+  /// No description provided for @playerSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الاستماع'**
+  String get playerSettings;
+
+  /// No description provided for @stopListening.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف الاستماع'**
+  String get stopListening;
+
+  /// No description provided for @repeatProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'التكرار {done} من {total}'**
+  String repeatProgress(String done, String total);
+
+  /// No description provided for @audioCredit.
+  ///
+  /// In ar, this message translates to:
+  /// **'التلاوات وتوقيت الآيات: mp3quran.net'**
+  String get audioCredit;
 }
 
 class _AppLocalizationsDelegate

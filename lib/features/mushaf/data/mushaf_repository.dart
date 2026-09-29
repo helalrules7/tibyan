@@ -151,6 +151,17 @@ class MushafRepository {
     return {for (final r in rows) r.sourceId: r};
   }
 
+  Future<List<ReciterRow>> reciters() =>
+      (_db.select(_db.reciter)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
+
+  /// Verse timings of one surah file, in order; empty when the source has
+  /// none for this reciter or surah.
+  Future<List<AyahTimingRow>> timings(int reciter, int surah) =>
+      (_db.select(_db.ayahTiming)
+            ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
+            ..orderBy([(t) => OrderingTerm.asc(t.ayah)]))
+          .get();
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }

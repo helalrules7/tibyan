@@ -8,9 +8,9 @@ import '../mushaf_screen.dart';
 import 'illuminated_frame.dart';
 import 'mushaf_page.dart';
 
-/// Services for the selected verses: tafsir and translation, the four
-/// one-tap marks and saving to a named fasil. Services whose data is not
-/// enabled yet (recitation, copy and share) are not shown.
+/// Services for the selected verses: listening, tafsir and translation,
+/// the four one-tap marks and saving to a named fasil. Services whose
+/// data is not enabled yet (copy and share) are not shown.
 class VerseServicesPanel extends StatelessWidget {
   const VerseServicesPanel({
     super.key,
@@ -21,6 +21,7 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onClose,
     required this.onMultiSelect,
     required this.onTafsir,
+    required this.onListen,
   });
 
   final List<VerseKey> verses;
@@ -30,6 +31,7 @@ class VerseServicesPanel extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback onMultiSelect;
   final VoidCallback onTafsir;
+  final VoidCallback onListen;
 
   @override
   Widget build(BuildContext context) {
@@ -113,13 +115,30 @@ class VerseServicesPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              FilledButton.icon(
-                onPressed: onTafsir,
-                icon: const Icon(Icons.menu_book_outlined),
-                label: Text(l.tafsirTitle),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: onListen,
+                      icon: const Icon(Icons.play_arrow),
+                      label: Text(l.listen),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: onTafsir,
+                      icon: const Icon(Icons.menu_book_outlined),
+                      label: Text(l.tafsirTitle),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               Row(
