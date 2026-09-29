@@ -2,18 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/page_pack.dart';
 import '../mushaf_providers.dart';
 
 /// One-time download of the chosen edition's pages (65 to 215 MB), with
-/// resume.
-class DownloadScreen extends ConsumerWidget {
+/// resume. It starts on its own: the reader got here by choosing an
+/// edition that is not on the device yet.
+class DownloadScreen extends ConsumerStatefulWidget {
   const DownloadScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DownloadScreen> createState() => _DownloadScreenState();
+}
+
+class _DownloadScreenState extends ConsumerState<DownloadScreen> {
+  MushafEdition? _started;
+
+  /// Starts (or resumes) the current edition's download once per edition.
+  void _autoStart() {
+    final edition = ref.read(editionProvider);
+    if (_started == edition) return;
+    _started = edition;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (ref.read(pageDownloadProvider).phase == PackPhase.idle) {
+        ref.read(pageDownloadProvider.notifier).start();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _autoStart();
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
     final p = ref.watch(pageDownloadProvider);

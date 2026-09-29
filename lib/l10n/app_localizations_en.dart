@@ -222,11 +222,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pagesCreditOld =>
-      'Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, downloaded directly from quran.com.';
+      'Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, sourced from quran.com and downloaded from Tibyan\'s server.';
 
   @override
   String get pagesCreditShamarly =>
-      'Shamarly mushaf pages from the Internet Archive (archive.org), downloaded from Tibyan\'s server.';
+      'Shamarly mushaf, calligraphy by Mohamed Saad Ibrahim (Haddad); pages from the Internet Archive (archive.org), downloaded from Tibyan\'s server.';
 
   @override
   String get editionLabel => 'Mushaf edition';
@@ -739,4 +739,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get touchReadingOn => 'Touch reading: tap the verse you are reading';
+
+  @override
+  String get editionOnDevice => 'On this device';
+
+  @override
+  String editionNotDownloaded(String size) {
+    return 'Not downloaded · $size MB';
+  }
 }

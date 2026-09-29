@@ -97,7 +97,9 @@ class PageDownloadController extends Notifier<PackProgress> {
   @override
   PackProgress build() {
     ref.onDispose(() => _sub?.cancel());
-    return ref.read(pageInstallerProvider).isInstalled
+    // Watched, not read: choosing another edition starts over with that
+    // edition's pack (a partial download of the old one is kept).
+    return ref.watch(pageInstallerProvider).isInstalled
         ? const PackProgress(PackPhase.installed)
         : const PackProgress(PackPhase.idle);
   }
@@ -122,6 +124,17 @@ class PageDownloadController extends Notifier<PackProgress> {
     );
   }
 }
+
+/// Editions whose pages are on this device.
+final installedEditionsProvider = Provider<Set<MushafEdition>>((ref) {
+  ref.watch(pagesInstalledProvider); // refresh after an install
+  final root = ref.watch(pageInstallerProvider).root;
+  return {
+    for (final e in MushafEdition.values)
+      if (PagePackInstaller(root: root, spec: PagePackSpec.of(e)).isInstalled)
+        e,
+  };
+});
 
 final pageDownloadProvider =
     NotifierProvider<PageDownloadController, PackProgress>(

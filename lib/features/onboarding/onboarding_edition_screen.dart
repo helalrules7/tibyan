@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
+import '../mushaf/presentation/widgets/edition_badge.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/data/page_pack.dart';
 
@@ -150,6 +151,7 @@ class _EditionCard extends StatelessWidget {
           children: [
             const SizedBox(height: 4),
             Text(body, style: TextStyle(color: t.muted, height: 1.5)),
+            EditionBadge(edition: value),
             if (tag != null) ...[
               const SizedBox(height: 6),
               Text(

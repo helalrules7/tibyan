@@ -222,11 +222,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pagesCreditOld =>
-      'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.';
+      'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، ومصدرها موقع quran.com، وتُحمّل من خادم تبيان.';
 
   @override
   String get pagesCreditShamarly =>
-      'صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.';
+      'مصحف الشمرلي بخط محمد سعد إبراهيم الشهير بحداد، والصفحات من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.';
 
   @override
   String get editionLabel => 'طبعة المصحف';
@@ -736,4 +736,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get touchReadingOn => 'القراءة اللمسية: المس الآية التي تقرؤها';
+
+  @override
+  String get editionOnDevice => 'على الجهاز';
+
+  @override
+  String editionNotDownloaded(String size) {
+    return 'غير محمّل · $size ميجا';
+  }
 }

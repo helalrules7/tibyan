@@ -491,13 +491,13 @@ abstract class AppLocalizations {
   /// No description provided for @pagesCreditOld.
   ///
   /// In ar, this message translates to:
-  /// **'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.'**
+  /// **'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، ومصدرها موقع quran.com، وتُحمّل من خادم تبيان.'**
   String get pagesCreditOld;
 
   /// No description provided for @pagesCreditShamarly.
   ///
   /// In ar, this message translates to:
-  /// **'صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.'**
+  /// **'مصحف الشمرلي بخط محمد سعد إبراهيم الشهير بحداد، والصفحات من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.'**
   String get pagesCreditShamarly;
 
   /// No description provided for @editionLabel.
@@ -1363,6 +1363,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'القراءة اللمسية: المس الآية التي تقرؤها'**
   String get touchReadingOn;
+
+  /// No description provided for @editionOnDevice.
+  ///
+  /// In ar, this message translates to:
+  /// **'على الجهاز'**
+  String get editionOnDevice;
+
+  /// No description provided for @editionNotDownloaded.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير محمّل · {size} ميجا'**
+  String editionNotDownloaded(String size);
 }
 
 class _AppLocalizationsDelegate

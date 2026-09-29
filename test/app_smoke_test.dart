@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'package:tibyan/app.dart';
 import 'package:tibyan/core/flags/feature_flags.dart';
 import 'package:tibyan/core/settings/settings_controller.dart';
 import 'package:tibyan/core/theme/theme_registry.dart';
+import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 
 void main() {
   testWidgets('app starts in Arabic, right-to-left, and opens settings', (
@@ -26,6 +29,9 @@ void main() {
           themeRegistryProvider.overrideWithValue(registry),
           featureFlagsProvider.overrideWithValue(flags),
           sharedPreferencesProvider.overrideWithValue(prefs),
+          packRootProvider.overrideWithValue(
+            Directory.systemTemp.createTempSync('packs'),
+          ),
         ],
         child: const TibyanApp(),
       ),
