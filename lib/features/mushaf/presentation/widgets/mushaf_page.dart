@@ -30,6 +30,9 @@ const _pitch = 35.75;
 /// Pages 1 and 2 draw a small centred block; this is its ink area.
 const _openingInk = Rect.fromLTRB(5, -68, 232, 236);
 
+/// The same block without its printed surah header.
+const _openingBody = Rect.fromLTRB(5, 12, 232, 236);
+
 /// Where the page is drawn on screen. Normal pages fill the width and their
 /// 15 lines are spread evenly over the full height, without stretching the
 /// calligraphy. Pages 1 and 2, and screens wider than the page, are scaled
@@ -41,8 +44,9 @@ class _PageLayout {
     required bool opening,
     this.cuts = const [],
     this.overflow = const {},
-  }) {
-    final area = opening ? _openingInk : viewBox;
+    bool withoutHeader = false,
+  }) : clip = opening && withoutHeader ? _openingBody : null {
+    final area = clip ?? (opening ? _openingInk : viewBox);
     final byWidth = size.width / area.width;
     final byHeight = size.height / area.height;
     scale = byWidth < byHeight ? byWidth : byHeight;
@@ -54,6 +58,9 @@ class _PageLayout {
   }
 
   final Size size;
+
+  /// Page-unit area to keep (pages 1 and 2 without their header).
+  final Rect? clip;
 
   /// The SVG's viewBox in user units (pages 1 and 2 have a shifted origin).
   final Rect viewBox;
@@ -142,6 +149,7 @@ class _PageLayout {
       canvas.save();
       canvas.translate(offset.dx, offset.dy);
       canvas.scale(scale);
+      if (clip != null) canvas.clipRect(clip!);
       draw(canvas);
       canvas.restore();
       return;
@@ -268,6 +276,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               opening: widget.page <= 2,
               cuts: cuts,
               overflow: overflow,
+              withoutHeader: x.ornateOpening,
             );
             final selected = [
               for (final v in verses)

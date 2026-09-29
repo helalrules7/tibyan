@@ -6,6 +6,16 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (Zakhrafa style)
+- New default style «Zakhrafa»: an illuminated turquoise, coral and navy frame, built from vector ornaments provided by Ahmed.
+- Page view: immersive reading with controls on touch; cartouches for juz, hizb and surah (each opens the index at the current place) and a centred page number (go to page); catchword under the frame; surah headers and hizb quarter marks in the frame's design; cover page; al-Fatiha and the opening of al-Baqarah in a fully ornate page; light and golden splash screens.
+- Verse services on long press, multi-verse selection with handles, four one-tap marks (reading, review, memorizing, reflection); tapping a verse marker sets the reading mark.
+- Recitation mode, auto-scroll with ten speeds, verse marker shape and colour settings, a hizb tab in the index.
+- Page packs fall back to the Tibyan mirror when the source fails.
+
+### Fixed
+- Both editions fill the frame's height; lines are split where no mark is clipped.
+
 ### Changed
 - Old edition (1405H) pages now fill the screen: the text takes the full width, and the 15 lines spread evenly over the full height, without stretching the calligraphy. Pages 1 and 2 are centred whole, so their ornament stays intact.
 

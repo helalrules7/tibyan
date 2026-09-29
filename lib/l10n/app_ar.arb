@@ -406,5 +406,38 @@
         "type": "String"
       }
     }
+  },
+  "coverTitle": "القرآن الكريم",
+  "coverSubtitle": "بالرسم العثماني",
+  "riwayaHafs": "رواية حفص عن عاصم",
+  "openingInfo": "{type} · آياتها {count} · ترتيبها {number}",
+  "@openingInfo": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedOrder": "ترتيبها في النزول {order}",
+  "@revealedOrder": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedAfter": "نزلت بعد {after}",
+  "@revealedAfter": {
+    "placeholders": {
+      "after": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -19,6 +19,9 @@ const _ink = Rect.fromLTRB(51, 8, 983, 1602);
 
 /// Pages 1 and 2 only use the upper half of their images.
 const _openingInk = Rect.fromLTRB(51, 6, 967, 814);
+
+/// The same block without its printed surah header.
+const _openingBody = Rect.fromLTRB(51, 200, 967, 814);
 const _lineCount = 15;
 const _pitch = 1594 / _lineCount;
 
@@ -28,8 +31,12 @@ const _pitch = 1594 / _lineCount;
 /// inside a round ornament) and screens wider than the page are scaled
 /// as a whole instead.
 class _PageLayout {
-  _PageLayout(this.size, {required bool opening, this.cuts = const []})
-    : ink = opening ? _openingInk : _ink {
+  _PageLayout(
+    this.size, {
+    required bool opening,
+    this.cuts = const [],
+    bool withoutHeader = false,
+  }) : ink = opening ? (withoutHeader ? _openingBody : _openingInk) : _ink {
     final byWidth = size.width / ink.width;
     final byHeight = size.height / ink.height;
     scale = byWidth < byHeight ? byWidth : byHeight;
@@ -216,6 +223,7 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
               box.biggest,
               opening: widget.page <= 2,
               cuts: _cuts,
+              withoutHeader: widget.interaction.ornateOpening,
             );
             VerseKey? verseAt(Offset local) {
               final point = layout.toImage(local);

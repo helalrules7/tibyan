@@ -525,4 +525,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String threeQuartersHizb(String number) {
     return 'Three quarters of hizb $number';
   }
+
+  @override
+  String get coverTitle => 'The Noble Quran';
+
+  @override
+  String get coverSubtitle => 'In the Uthmani script';
+
+  @override
+  String get riwayaHafs => 'Hafs from Asim';
+
+  @override
+  String openingInfo(String type, String count, String number) {
+    return '$type · $count verses · surah $number';
+  }
+
+  @override
+  String revealedOrder(String order) {
+    return 'Revealed ${order}th';
+  }
+
+  @override
+  String revealedAfter(String after) {
+    return 'After $after';
+  }
 }

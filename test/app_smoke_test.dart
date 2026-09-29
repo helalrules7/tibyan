@@ -30,6 +30,8 @@ void main() {
         child: const TibyanApp(),
       ),
     );
+    // Past the splash screen.
+    await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
 
     expect(find.text('تبيان'), findsOneWidget);

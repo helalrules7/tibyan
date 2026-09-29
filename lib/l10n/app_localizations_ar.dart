@@ -524,4 +524,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String threeQuartersHizb(String number) {
     return 'ثلاثة أرباع الحزب $number';
   }
+
+  @override
+  String get coverTitle => 'القرآن الكريم';
+
+  @override
+  String get coverSubtitle => 'بالرسم العثماني';
+
+  @override
+  String get riwayaHafs => 'رواية حفص عن عاصم';
+
+  @override
+  String openingInfo(String type, String count, String number) {
+    return '$type · آياتها $count · ترتيبها $number';
+  }
+
+  @override
+  String revealedOrder(String order) {
+    return 'ترتيبها في النزول $order';
+  }
+
+  @override
+  String revealedAfter(String after) {
+    return 'نزلت بعد $after';
+  }
 }

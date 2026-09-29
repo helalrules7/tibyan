@@ -458,13 +458,18 @@ class _FramePainter extends CustomPainter {
     required this.images,
     required this.rule,
     required this.paper,
+    this.band = IlluminatedFrame.band,
+    this.fillPaper = true,
   });
 
   final FrameImages images;
   final Color rule;
   final Color paper;
+  final double band;
 
-  static const band = IlluminatedFrame.band;
+  /// Paint the paper inside the band (off for the ornate pages, whose
+  /// mosaic shows through).
+  final bool fillPaper;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -474,10 +479,12 @@ class _FramePainter extends CustomPainter {
     final c = band * images.corner.width / images.edgeH.height;
 
     // Paper inside the band, and two fine rules along its inner edge.
-    canvas.drawRect(
-      Rect.fromLTRB(band, band, w - band, h - band),
-      Paint()..color = paper,
-    );
+    if (fillPaper) {
+      canvas.drawRect(
+        Rect.fromLTRB(band, band, w - band, h - band),
+        Paint()..color = paper,
+      );
+    }
     final inner = Rect.fromLTRB(band - 3, band - 3, w - band + 3, h - band + 3);
     canvas.drawRect(
       inner,
@@ -553,7 +560,11 @@ class _FramePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_FramePainter old) =>
-      old.images != images || old.rule != rule || old.paper != paper;
+      old.images != images ||
+      old.rule != rule ||
+      old.paper != paper ||
+      old.band != band ||
+      old.fillPaper != fillPaper;
 }
 
 /// A surah header over the page: the mosaic band, a cartouche with the
@@ -748,4 +759,165 @@ class _QuarterRosette extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The fully illuminated page used for the cover, al-Fatiha, the opening
+/// of al-Baqarah and the splash: mosaic ground, outer frame, a framed
+/// central panel, and a cartouche above and below it.
+class OrnateFrame extends ConsumerWidget {
+  const OrnateFrame({
+    super.key,
+    required this.top,
+    required this.bottom,
+    required this.child,
+    this.page,
+    this.onPageTap,
+    this.catchword,
+    this.catchwordSpace = true,
+  });
+
+  final Widget top;
+  final Widget bottom;
+  final Widget child;
+  final int? page;
+  final VoidCallback? onPageTap;
+  final String? catchword;
+  final bool catchwordSpace;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final images = ref.watch(frameImagesProvider).value;
+    final t = context.tokens.colors;
+    final l = AppLocalizations.of(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    const band = IlluminatedFrame.band;
+
+    final body = LayoutBuilder(
+      builder: (context, box) {
+        final w = box.maxWidth;
+        final h = box.maxHeight;
+        final panel = Rect.fromLTRB(44, h * 0.235, w - 44, h * 0.765);
+        const inner = 16.0;
+        final cartW = (w - 150).clamp(160.0, 320.0);
+        final cartH = (h * 0.085).clamp(52.0, 76.0);
+        Widget cartouche(double centreY, Widget c) => Positioned(
+          top: centreY - cartH / 2,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: _Cartouche(
+              width: cartW,
+              height: cartH,
+              fill: t.paper,
+              rosette: images?.rosette,
+              child: DefaultTextStyle.merge(
+                style: TextStyle(
+                  fontFamily: 'KFGQPCAN',
+                  color: t.ink,
+                  height: 1.3,
+                ),
+                textAlign: TextAlign.center,
+                child: c,
+              ),
+            ),
+          ),
+        );
+        return Stack(
+          children: [
+            if (images != null) ...[
+              Positioned.fill(
+                child: CustomPaint(painter: _MosaicPainter(images)),
+              ),
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _FramePainter(
+                    images: images,
+                    rule: t.marker,
+                    paper: t.paper,
+                    fillPaper: false,
+                  ),
+                ),
+              ),
+              Positioned.fromRect(
+                rect: panel.inflate(inner),
+                child: CustomPaint(
+                  painter: _FramePainter(
+                    images: images,
+                    rule: t.marker,
+                    paper: t.paper,
+                    band: inner,
+                  ),
+                ),
+              ),
+            ],
+            Positioned.fromRect(rect: panel.deflate(4), child: child),
+            cartouche((band + panel.top - inner) / 2, top),
+            cartouche((panel.bottom + inner + h - band) / 2, bottom),
+            if (page != null)
+              Positioned(
+                bottom: band / 2 - 15,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: _Cartouche(
+                    width: 74,
+                    height: 30,
+                    fill: t.paper,
+                    rosette: images?.margin,
+                    child: _Tap(
+                      label: digits(page!),
+                      bold: true,
+                      semanticLabel: l.pageOf('$page'),
+                      onTap: onPageTap,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+    if (!catchwordSpace) return body;
+    return Column(
+      children: [
+        Expanded(child: body),
+        SizedBox(
+          height: IlluminatedFrame.catchwordSpace,
+          child: Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: catchword == null
+                  ? null
+                  : Text(
+                      catchword!,
+                      semanticsLabel: l.catchwordLabel(catchword!),
+                      style: TextStyle(
+                        fontFamily: 'UthmanicHafs',
+                        fontSize: 15,
+                        height: 1.4,
+                        color: t.muted,
+                      ),
+                    ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MosaicPainter extends CustomPainter {
+  _MosaicPainter(this.images);
+
+  final FrameImages images;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, images.mosaicPaint());
+  }
+
+  @override
+  bool shouldRepaint(_MosaicPainter old) => old.images != images;
 }
