@@ -210,19 +210,34 @@ class MarkerLook {
         .split('')
         .map((d) => String.fromCharCode(0x0660 + int.parse(d)))
         .join();
+    final fontSize =
+        r *
+        (number < 10
+            ? 1.15
+            : number < 100
+            ? 1.0
+            : 0.78);
     final tp = TextPainter(
       text: TextSpan(
         text: digits,
         style: TextStyle(
-          fontFamily: 'Amiri',
+          fontFamily: 'KFGQPCAN',
           fontWeight: FontWeight.w700,
-          fontSize: r * (number < 100 ? 1.05 : 0.8),
+          fontSize: fontSize,
           height: 1,
           color: tint == null ? ink : const Color(0xFFFFFFFF),
         ),
       ),
       textDirection: TextDirection.rtl,
     )..layout();
-    tp.paint(canvas, c - Offset(tp.width / 2, tp.height / 2 + r * 0.08));
+    // KFGQPC AN digits rise 0.63 em above the baseline and do not descend:
+    // centre that ink box, not the line box.
+    final baseline = tp.computeDistanceToActualBaseline(
+      TextBaseline.alphabetic,
+    );
+    tp.paint(
+      canvas,
+      Offset(c.dx - tp.width / 2, c.dy - baseline + 0.315 * fontSize),
+    );
   }
 }

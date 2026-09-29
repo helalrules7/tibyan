@@ -102,6 +102,20 @@ class MushafRepository {
             ]))
           .get();
 
+  /// The 14 cuts between the lines of a page, top to bottom; empty for
+  /// pages 1 and 2.
+  Future<List<double>> lineCuts(String edition, int page) async {
+    final rows =
+        await (_db.select(_db.lineCut)
+              ..where((t) => t.edition.equals(edition) & t.page.equals(page))
+              ..orderBy([(t) => OrderingTerm.asc(t.gap)]))
+            .get();
+    return [for (final r in rows) r.y];
+  }
+
+  Future<List<LineOverflowRow>> lineOverflow(int page) =>
+      (_db.select(_db.lineOverflow)..where((t) => t.page.equals(page))).get();
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }

@@ -3149,6 +3149,563 @@ class WordBoxCompanion extends UpdateCompanion<WordBoxRow> {
   }
 }
 
+class $LineCutTable extends LineCut with TableInfo<$LineCutTable, LineCutRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LineCutTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _editionMeta = const VerificationMeta(
+    'edition',
+  );
+  @override
+  late final GeneratedColumn<String> edition = GeneratedColumn<String>(
+    'edition',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gapMeta = const VerificationMeta('gap');
+  @override
+  late final GeneratedColumn<int> gap = GeneratedColumn<int>(
+    'gap',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yMeta = const VerificationMeta('y');
+  @override
+  late final GeneratedColumn<double> y = GeneratedColumn<double>(
+    'y',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [edition, page, gap, y];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'line_cut';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LineCutRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('edition')) {
+      context.handle(
+        _editionMeta,
+        edition.isAcceptableOrUnknown(data['edition']!, _editionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_editionMeta);
+    }
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('gap')) {
+      context.handle(
+        _gapMeta,
+        gap.isAcceptableOrUnknown(data['gap']!, _gapMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gapMeta);
+    }
+    if (data.containsKey('y')) {
+      context.handle(_yMeta, y.isAcceptableOrUnknown(data['y']!, _yMeta));
+    } else if (isInserting) {
+      context.missing(_yMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {edition, page, gap};
+  @override
+  LineCutRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LineCutRow(
+      edition: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}edition'],
+      )!,
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      gap: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gap'],
+      )!,
+      y: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}y'],
+      )!,
+    );
+  }
+
+  @override
+  $LineCutTable createAlias(String alias) {
+    return $LineCutTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class LineCutRow extends DataClass implements Insertable<LineCutRow> {
+  final String edition;
+  final int page;
+
+  /// 0..13: the gap below line [gap].
+  final int gap;
+
+  /// Page units (1441) or image pixels (1405).
+  final double y;
+  const LineCutRow({
+    required this.edition,
+    required this.page,
+    required this.gap,
+    required this.y,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['edition'] = Variable<String>(edition);
+    map['page'] = Variable<int>(page);
+    map['gap'] = Variable<int>(gap);
+    map['y'] = Variable<double>(y);
+    return map;
+  }
+
+  LineCutCompanion toCompanion(bool nullToAbsent) {
+    return LineCutCompanion(
+      edition: Value(edition),
+      page: Value(page),
+      gap: Value(gap),
+      y: Value(y),
+    );
+  }
+
+  factory LineCutRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LineCutRow(
+      edition: serializer.fromJson<String>(json['edition']),
+      page: serializer.fromJson<int>(json['page']),
+      gap: serializer.fromJson<int>(json['gap']),
+      y: serializer.fromJson<double>(json['y']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'edition': serializer.toJson<String>(edition),
+      'page': serializer.toJson<int>(page),
+      'gap': serializer.toJson<int>(gap),
+      'y': serializer.toJson<double>(y),
+    };
+  }
+
+  LineCutRow copyWith({String? edition, int? page, int? gap, double? y}) =>
+      LineCutRow(
+        edition: edition ?? this.edition,
+        page: page ?? this.page,
+        gap: gap ?? this.gap,
+        y: y ?? this.y,
+      );
+  LineCutRow copyWithCompanion(LineCutCompanion data) {
+    return LineCutRow(
+      edition: data.edition.present ? data.edition.value : this.edition,
+      page: data.page.present ? data.page.value : this.page,
+      gap: data.gap.present ? data.gap.value : this.gap,
+      y: data.y.present ? data.y.value : this.y,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LineCutRow(')
+          ..write('edition: $edition, ')
+          ..write('page: $page, ')
+          ..write('gap: $gap, ')
+          ..write('y: $y')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(edition, page, gap, y);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LineCutRow &&
+          other.edition == this.edition &&
+          other.page == this.page &&
+          other.gap == this.gap &&
+          other.y == this.y);
+}
+
+class LineCutCompanion extends UpdateCompanion<LineCutRow> {
+  final Value<String> edition;
+  final Value<int> page;
+  final Value<int> gap;
+  final Value<double> y;
+  const LineCutCompanion({
+    this.edition = const Value.absent(),
+    this.page = const Value.absent(),
+    this.gap = const Value.absent(),
+    this.y = const Value.absent(),
+  });
+  LineCutCompanion.insert({
+    required String edition,
+    required int page,
+    required int gap,
+    required double y,
+  }) : edition = Value(edition),
+       page = Value(page),
+       gap = Value(gap),
+       y = Value(y);
+  static Insertable<LineCutRow> custom({
+    Expression<String>? edition,
+    Expression<int>? page,
+    Expression<int>? gap,
+    Expression<double>? y,
+  }) {
+    return RawValuesInsertable({
+      if (edition != null) 'edition': edition,
+      if (page != null) 'page': page,
+      if (gap != null) 'gap': gap,
+      if (y != null) 'y': y,
+    });
+  }
+
+  LineCutCompanion copyWith({
+    Value<String>? edition,
+    Value<int>? page,
+    Value<int>? gap,
+    Value<double>? y,
+  }) {
+    return LineCutCompanion(
+      edition: edition ?? this.edition,
+      page: page ?? this.page,
+      gap: gap ?? this.gap,
+      y: y ?? this.y,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (edition.present) {
+      map['edition'] = Variable<String>(edition.value);
+    }
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (gap.present) {
+      map['gap'] = Variable<int>(gap.value);
+    }
+    if (y.present) {
+      map['y'] = Variable<double>(y.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LineCutCompanion(')
+          ..write('edition: $edition, ')
+          ..write('page: $page, ')
+          ..write('gap: $gap, ')
+          ..write('y: $y')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LineOverflowTable extends LineOverflow
+    with TableInfo<$LineOverflowTable, LineOverflowRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LineOverflowTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lineMeta = const VerificationMeta('line');
+  @override
+  late final GeneratedColumn<int> line = GeneratedColumn<int>(
+    'line',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pathMeta = const VerificationMeta('path');
+  @override
+  late final GeneratedColumn<String> path = GeneratedColumn<String>(
+    'path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [page, line, path];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'line_overflow';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LineOverflowRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('line')) {
+      context.handle(
+        _lineMeta,
+        line.isAcceptableOrUnknown(data['line']!, _lineMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lineMeta);
+    }
+    if (data.containsKey('path')) {
+      context.handle(
+        _pathMeta,
+        path.isAcceptableOrUnknown(data['path']!, _pathMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pathMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {page, line, path};
+  @override
+  LineOverflowRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LineOverflowRow(
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      line: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line'],
+      )!,
+      path: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}path'],
+      )!,
+    );
+  }
+
+  @override
+  $LineOverflowTable createAlias(String alias) {
+    return $LineOverflowTable(attachedDatabase, alias);
+  }
+}
+
+class LineOverflowRow extends DataClass implements Insertable<LineOverflowRow> {
+  final int page;
+  final int line;
+  final String path;
+  const LineOverflowRow({
+    required this.page,
+    required this.line,
+    required this.path,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['page'] = Variable<int>(page);
+    map['line'] = Variable<int>(line);
+    map['path'] = Variable<String>(path);
+    return map;
+  }
+
+  LineOverflowCompanion toCompanion(bool nullToAbsent) {
+    return LineOverflowCompanion(
+      page: Value(page),
+      line: Value(line),
+      path: Value(path),
+    );
+  }
+
+  factory LineOverflowRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LineOverflowRow(
+      page: serializer.fromJson<int>(json['page']),
+      line: serializer.fromJson<int>(json['line']),
+      path: serializer.fromJson<String>(json['path']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'page': serializer.toJson<int>(page),
+      'line': serializer.toJson<int>(line),
+      'path': serializer.toJson<String>(path),
+    };
+  }
+
+  LineOverflowRow copyWith({int? page, int? line, String? path}) =>
+      LineOverflowRow(
+        page: page ?? this.page,
+        line: line ?? this.line,
+        path: path ?? this.path,
+      );
+  LineOverflowRow copyWithCompanion(LineOverflowCompanion data) {
+    return LineOverflowRow(
+      page: data.page.present ? data.page.value : this.page,
+      line: data.line.present ? data.line.value : this.line,
+      path: data.path.present ? data.path.value : this.path,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LineOverflowRow(')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('path: $path')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(page, line, path);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LineOverflowRow &&
+          other.page == this.page &&
+          other.line == this.line &&
+          other.path == this.path);
+}
+
+class LineOverflowCompanion extends UpdateCompanion<LineOverflowRow> {
+  final Value<int> page;
+  final Value<int> line;
+  final Value<String> path;
+  final Value<int> rowid;
+  const LineOverflowCompanion({
+    this.page = const Value.absent(),
+    this.line = const Value.absent(),
+    this.path = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LineOverflowCompanion.insert({
+    required int page,
+    required int line,
+    required String path,
+    this.rowid = const Value.absent(),
+  }) : page = Value(page),
+       line = Value(line),
+       path = Value(path);
+  static Insertable<LineOverflowRow> custom({
+    Expression<int>? page,
+    Expression<int>? line,
+    Expression<String>? path,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (page != null) 'page': page,
+      if (line != null) 'line': line,
+      if (path != null) 'path': path,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LineOverflowCompanion copyWith({
+    Value<int>? page,
+    Value<int>? line,
+    Value<String>? path,
+    Value<int>? rowid,
+  }) {
+    return LineOverflowCompanion(
+      page: page ?? this.page,
+      line: line ?? this.line,
+      path: path ?? this.path,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (line.present) {
+      map['line'] = Variable<int>(line.value);
+    }
+    if (path.present) {
+      map['path'] = Variable<String>(path.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LineOverflowCompanion(')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('path: $path, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -3157,6 +3714,8 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $AyahPolygonTable ayahPolygon = $AyahPolygonTable(this);
   late final $SourceTable source = $SourceTable(this);
   late final $WordBoxTable wordBox = $WordBoxTable(this);
+  late final $LineCutTable lineCut = $LineCutTable(this);
+  late final $LineOverflowTable lineOverflow = $LineOverflowTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3167,6 +3726,8 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     ayahPolygon,
     source,
     wordBox,
+    lineCut,
+    lineOverflow,
   ];
 }
 
@@ -4730,6 +5291,359 @@ typedef $$WordBoxTableProcessedTableManager =
       WordBoxRow,
       PrefetchHooks Function()
     >;
+typedef $$LineCutTableCreateCompanionBuilder = LineCutCompanion Function({
+  required String edition,
+  required int page,
+  required int gap,
+  required double y,
+});
+typedef $$LineCutTableUpdateCompanionBuilder = LineCutCompanion Function({
+  Value<String> edition,
+  Value<int> page,
+  Value<int> gap,
+  Value<double> y,
+});
+
+class $$LineCutTableFilterComposer
+    extends Composer<_$ContentDatabase, $LineCutTable> {
+  $$LineCutTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get edition => $composableBuilder(
+    column: $table.edition,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get gap => $composableBuilder(
+    column: $table.gap,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get y => $composableBuilder(
+    column: $table.y,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LineCutTableOrderingComposer
+    extends Composer<_$ContentDatabase, $LineCutTable> {
+  $$LineCutTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get edition => $composableBuilder(
+    column: $table.edition,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get gap => $composableBuilder(
+    column: $table.gap,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get y => $composableBuilder(
+    column: $table.y,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LineCutTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $LineCutTable> {
+  $$LineCutTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get edition =>
+      $composableBuilder(column: $table.edition, builder: (column) => column);
+
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get gap =>
+      $composableBuilder(column: $table.gap, builder: (column) => column);
+
+  GeneratedColumn<double> get y =>
+      $composableBuilder(column: $table.y, builder: (column) => column);
+}
+
+class $$LineCutTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $LineCutTable,
+          LineCutRow,
+          $$LineCutTableFilterComposer,
+          $$LineCutTableOrderingComposer,
+          $$LineCutTableAnnotationComposer,
+          $$LineCutTableCreateCompanionBuilder,
+          $$LineCutTableUpdateCompanionBuilder,
+          (
+            LineCutRow,
+            BaseReferences<_$ContentDatabase, $LineCutTable, LineCutRow>,
+          ),
+          LineCutRow,
+          PrefetchHooks Function()
+        > {
+  $$LineCutTableTableManager(_$ContentDatabase db, $LineCutTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LineCutTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LineCutTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LineCutTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> edition = const Value.absent(),
+            Value<int> page = const Value.absent(),
+            Value<int> gap = const Value.absent(),
+            Value<double> y = const Value.absent(),
+          }) => LineCutCompanion(edition: edition, page: page, gap: gap, y: y),
+          createCompanionCallback:
+              ({
+                required String edition,
+                required int page,
+                required int gap,
+                required double y,
+              }) => LineCutCompanion.insert(
+                edition: edition,
+                page: page,
+                gap: gap,
+                y: y,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LineCutTable, LineCutRow>(table),
+                  BaseReferences<_$ContentDatabase, $LineCutTable, LineCutRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LineCutTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $LineCutTable,
+      LineCutRow,
+      $$LineCutTableFilterComposer,
+      $$LineCutTableOrderingComposer,
+      $$LineCutTableAnnotationComposer,
+      $$LineCutTableCreateCompanionBuilder,
+      $$LineCutTableUpdateCompanionBuilder,
+      (
+        LineCutRow,
+        BaseReferences<_$ContentDatabase, $LineCutTable, LineCutRow>,
+      ),
+      LineCutRow,
+      PrefetchHooks Function()
+    >;
+typedef $$LineOverflowTableCreateCompanionBuilder =
+    LineOverflowCompanion Function({
+      required int page,
+      required int line,
+      required String path,
+      Value<int> rowid,
+    });
+typedef $$LineOverflowTableUpdateCompanionBuilder =
+    LineOverflowCompanion Function({
+      Value<int> page,
+      Value<int> line,
+      Value<String> path,
+      Value<int> rowid,
+    });
+
+class $$LineOverflowTableFilterComposer
+    extends Composer<_$ContentDatabase, $LineOverflowTable> {
+  $$LineOverflowTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LineOverflowTableOrderingComposer
+    extends Composer<_$ContentDatabase, $LineOverflowTable> {
+  $$LineOverflowTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LineOverflowTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $LineOverflowTable> {
+  $$LineOverflowTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get line =>
+      $composableBuilder(column: $table.line, builder: (column) => column);
+
+  GeneratedColumn<String> get path =>
+      $composableBuilder(column: $table.path, builder: (column) => column);
+}
+
+class $$LineOverflowTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $LineOverflowTable,
+          LineOverflowRow,
+          $$LineOverflowTableFilterComposer,
+          $$LineOverflowTableOrderingComposer,
+          $$LineOverflowTableAnnotationComposer,
+          $$LineOverflowTableCreateCompanionBuilder,
+          $$LineOverflowTableUpdateCompanionBuilder,
+          (
+            LineOverflowRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $LineOverflowTable,
+              LineOverflowRow
+            >,
+          ),
+          LineOverflowRow,
+          PrefetchHooks Function()
+        > {
+  $$LineOverflowTableTableManager(
+    _$ContentDatabase db,
+    $LineOverflowTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LineOverflowTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LineOverflowTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LineOverflowTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                Value<int> line = const Value.absent(),
+                Value<String> path = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LineOverflowCompanion(
+                page: page,
+                line: line,
+                path: path,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int page,
+                required int line,
+                required String path,
+                Value<int> rowid = const Value.absent(),
+              }) => LineOverflowCompanion.insert(
+                page: page,
+                line: line,
+                path: path,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LineOverflowTable, LineOverflowRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $LineOverflowTable,
+                    LineOverflowRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LineOverflowTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $LineOverflowTable,
+      LineOverflowRow,
+      $$LineOverflowTableFilterComposer,
+      $$LineOverflowTableOrderingComposer,
+      $$LineOverflowTableAnnotationComposer,
+      $$LineOverflowTableCreateCompanionBuilder,
+      $$LineOverflowTableUpdateCompanionBuilder,
+      (
+        LineOverflowRow,
+        BaseReferences<_$ContentDatabase, $LineOverflowTable, LineOverflowRow>,
+      ),
+      LineOverflowRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -4743,4 +5657,8 @@ class $ContentDatabaseManager {
       $$SourceTableTableManager(_db, _db.source);
   $$WordBoxTableTableManager get wordBox =>
       $$WordBoxTableTableManager(_db, _db.wordBox);
+  $$LineCutTableTableManager get lineCut =>
+      $$LineCutTableTableManager(_db, _db.lineCut);
+  $$LineOverflowTableTableManager get lineOverflow =>
+      $$LineOverflowTableTableManager(_db, _db.lineOverflow);
 }

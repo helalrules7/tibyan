@@ -140,13 +140,51 @@ class WordBox extends Table {
   bool get withoutRowId => true;
 }
 
-@DriftDatabase(tables: [Surah, Ayah, AyahPolygon, Source, WordBox])
+/// Where to split a page into its 15 lines (see tools/build_line_cuts.py).
+@DataClassName('LineCutRow')
+class LineCut extends Table {
+  @override
+  String get tableName => 'line_cut';
+
+  TextColumn get edition => text()();
+  IntColumn get page => integer()();
+
+  /// 0..13: the gap below line [gap].
+  IntColumn get gap => integer()();
+
+  /// Page units (1441) or image pixels (1405).
+  RealColumn get y => real()();
+
+  @override
+  Set<Column> get primaryKey => {edition, page, gap};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+/// New-edition marks that cross a cut, with the line they belong to.
+@DataClassName('LineOverflowRow')
+class LineOverflow extends Table {
+  @override
+  String get tableName => 'line_overflow';
+
+  IntColumn get page => integer()();
+  IntColumn get line => integer()();
+  TextColumn get path => text()();
+
+  @override
+  Set<Column> get primaryKey => {page, line, path};
+}
+
+@DriftDatabase(
+  tables: [Surah, Ayah, AyahPolygon, Source, WordBox, LineCut, LineOverflow],
+)
 class ContentDatabase extends _$ContentDatabase {
   ContentDatabase(super.executor);
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

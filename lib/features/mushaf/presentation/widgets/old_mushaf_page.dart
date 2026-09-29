@@ -28,7 +28,7 @@ const _pitch = 1594 / _lineCount;
 /// inside a round ornament) and screens wider than the page are scaled
 /// as a whole instead.
 class _PageLayout {
-  _PageLayout(this.size, {required bool opening})
+  _PageLayout(this.size, {required bool opening, this.cuts = const []})
     : ink = opening ? _openingInk : _ink {
     final byWidth = size.width / ink.width;
     final byHeight = size.height / ink.height;
@@ -42,23 +42,44 @@ class _PageLayout {
 
   final Size size;
   final Rect ink;
+
+  /// The 14 cuts between lines (image px), at the rows with least ink, so
+  /// marks above and below a line stay with it.
+  final List<double> cuts;
   late final double scale;
   late final bool strips;
   late final Offset offset;
 
+  bool get _hasCuts => cuts.length == _lineCount - 1;
   double get _slot => size.height / _lineCount;
 
-  double _stripTop(int line) => line * _slot + (_slot - _pitch * scale) / 2;
+  /// Line centre on the image, and where it lands on screen.
+  double _centre(int j) => ink.top + (j + 0.5) * _pitch;
+  double _slotCentre(int j) => (j + 0.5) * _slot;
 
-  int _lineOfImageY(double y) =>
-      ((y - ink.top) / _pitch).floor().clamp(0, _lineCount - 1);
+  double _bandTop(int j) =>
+      j == 0 ? ink.top : (_hasCuts ? cuts[j - 1] : ink.top + j * _pitch);
+  double _bandBottom(int j) => j == _lineCount - 1
+      ? ink.bottom
+      : (_hasCuts ? cuts[j] : ink.top + (j + 1) * _pitch);
+
+  int _lineOfImageY(double y) {
+    if (!_hasCuts) {
+      return ((y - ink.top) / _pitch).floor().clamp(0, _lineCount - 1);
+    }
+    var j = 0;
+    while (j < _lineCount - 1 && y > cuts[j]) {
+      j++;
+    }
+    return j;
+  }
 
   Offset toScreen(Offset p, {int? line}) {
     if (!strips) return (p - ink.topLeft) * scale + offset;
     final j = line ?? _lineOfImageY(p.dy);
     return Offset(
       (p.dx - ink.left) * scale,
-      _stripTop(j) + (p.dy - ink.top - j * _pitch) * scale,
+      _slotCentre(j) + (p.dy - _centre(j)) * scale,
     );
   }
 
@@ -67,7 +88,7 @@ class _PageLayout {
     final j = (p.dy / _slot).floor().clamp(0, _lineCount - 1);
     return Offset(
       p.dx / scale + ink.left,
-      ink.top + j * _pitch + (p.dy - _stripTop(j)) / scale,
+      _centre(j) + (p.dy - _slotCentre(j)) / scale,
     );
   }
 
@@ -95,10 +116,17 @@ class _PageLayout {
       return;
     }
     for (var j = 0; j < _lineCount; j++) {
+      final top = _bandTop(j);
+      final bottom = _bandBottom(j);
       canvas.drawImageRect(
         image,
-        Rect.fromLTWH(ink.left, ink.top + j * _pitch, ink.width, _pitch),
-        Rect.fromLTWH(0, _stripTop(j), size.width, _pitch * scale),
+        Rect.fromLTRB(ink.left, top, ink.right, bottom),
+        Rect.fromLTWH(
+          0,
+          _slotCentre(j) + (top - _centre(j)) * scale,
+          size.width,
+          (bottom - top) * scale,
+        ),
         paint,
       );
     }
@@ -125,6 +153,7 @@ class OldMushafPage extends ConsumerStatefulWidget {
 class _OldMushafPageState extends ConsumerState<OldMushafPage> {
   late Future<(ui.Image, List<GlyphRow>)> _load;
   ui.Image? _image;
+  List<double> _cuts = const [];
 
   @override
   void initState() {
@@ -156,6 +185,9 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
     final glyphs =
         await ref.read(ayahInfoDatabaseProvider)?.page(widget.page) ??
         const <GlyphRow>[];
+    _cuts = await ref
+        .read(mushafRepositoryProvider)
+        .lineCuts('madina1405', widget.page);
     return (image, glyphs);
   }
 
@@ -180,7 +212,11 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
         }
         return LayoutBuilder(
           builder: (context, box) {
-            final layout = _PageLayout(box.biggest, opening: widget.page <= 2);
+            final layout = _PageLayout(
+              box.biggest,
+              opening: widget.page <= 2,
+              cuts: _cuts,
+            );
             VerseKey? verseAt(Offset local) {
               final point = layout.toImage(local);
               for (final g in glyphs) {

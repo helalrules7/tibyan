@@ -641,7 +641,7 @@ class _BottomControls extends StatelessWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    fontFamily: 'Amiri',
+                    fontFamily: 'KFGQPCAN',
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
                     color: t.ink,

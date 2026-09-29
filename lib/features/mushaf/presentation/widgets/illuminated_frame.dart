@@ -138,7 +138,7 @@ class IlluminatedFrame extends ConsumerWidget {
                       rosette: images?.rosette,
                       child: DefaultTextStyle.merge(
                         style: TextStyle(
-                          fontFamily: 'Amiri',
+                          fontFamily: 'KFGQPCAN',
                           fontSize: 13,
                           color: t.ink,
                         ),

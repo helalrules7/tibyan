@@ -3,14 +3,160 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/db/content_database.dart';
+import '../../../../core/settings/app_settings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../mushaf_providers.dart';
 import 'page_interaction.dart';
 
+typedef _PageData = (
+  PictureInfo,
+  Rect,
+  List<AyahPolygonRow>,
+  List<double>,
+  Map<int, List<Path>>,
+);
+
 /// Identifies a verse.
 typedef VerseKey = ({int surah, int ayah});
+
+/// Line grid of the new edition's pages (user units): 15 lines, first
+/// line centred at [_firstLine], [_pitch] apart. Measured on the pages.
+const _lineCount = 15;
+const _firstLine = 26.2;
+const _pitch = 35.75;
+
+/// Pages 1 and 2 draw a small centred block; this is its ink area.
+const _openingInk = Rect.fromLTRB(5, -68, 232, 236);
+
+/// Where the page is drawn on screen. Normal pages fill the width and their
+/// 15 lines are spread evenly over the full height, without stretching the
+/// calligraphy. Pages 1 and 2, and screens wider than the page, are scaled
+/// as a whole instead.
+class _PageLayout {
+  _PageLayout(
+    this.size,
+    this.viewBox, {
+    required bool opening,
+    this.cuts = const [],
+    this.overflow = const {},
+  }) {
+    final area = opening ? _openingInk : viewBox;
+    final byWidth = size.width / area.width;
+    final byHeight = size.height / area.height;
+    scale = byWidth < byHeight ? byWidth : byHeight;
+    strips = !opening && byWidth < byHeight;
+    offset = Offset(
+      (size.width - area.width * scale) / 2 - area.left * scale,
+      (size.height - area.height * scale) / 2 - area.top * scale,
+    );
+  }
+
+  final Size size;
+
+  /// The SVG's viewBox in user units (pages 1 and 2 have a shifted origin).
+  final Rect viewBox;
+
+  /// The 14 cuts between lines (page units), chosen where no mark or the
+  /// fewest marks cross.
+  final List<double> cuts;
+
+  /// Marks crossing a cut, by the line they belong to.
+  final Map<int, List<Path>> overflow;
+  late final double scale;
+  late final bool strips;
+  late final Offset offset;
+
+  double get _slot => size.height / _lineCount;
+  double _centre(int j) => _firstLine + j * _pitch;
+  bool get _hasCuts => cuts.length == _lineCount - 1;
+  double _bandTop(int j) =>
+      j == 0 ? viewBox.top : (_hasCuts ? cuts[j - 1] : _centre(j) - _pitch / 2);
+  double _bandBottom(int j) => j == _lineCount - 1
+      ? viewBox.bottom
+      : (_hasCuts ? cuts[j] : _centre(j) + _pitch / 2);
+
+  /// Page-unit region that belongs to line [j]: its band, minus marks of
+  /// neighbouring lines that reach into it, plus its own marks that reach out.
+  late final List<Path> _clips = [
+    for (var j = 0; j < _lineCount; j++) _bandClip(j),
+  ];
+
+  Path _bandClip(int j) {
+    var clip = Path()
+      ..addRect(
+        Rect.fromLTRB(viewBox.left, _bandTop(j), viewBox.right, _bandBottom(j)),
+      );
+    for (final e in overflow.entries) {
+      for (final p in e.value) {
+        clip = Path.combine(
+          e.key == j ? PathOperation.union : PathOperation.difference,
+          clip,
+          p,
+        );
+      }
+    }
+    return clip;
+  }
+
+  double _slotCentre(int j) => (j + 0.5) * _slot;
+
+  int _lineOf(double y) {
+    if (!_hasCuts) {
+      return ((y - _firstLine + _pitch / 2) / _pitch).floor().clamp(
+        0,
+        _lineCount - 1,
+      );
+    }
+    var j = 0;
+    while (j < _lineCount - 1 && y > cuts[j]) {
+      j++;
+    }
+    return j;
+  }
+
+  /// Page units to screen pixels.
+  Offset toScreen(Offset p, {int? line}) {
+    if (!strips) return p * scale + offset;
+    final j = line ?? _lineOf(p.dy);
+    return Offset(
+      p.dx * scale + offset.dx,
+      _slotCentre(j) + (p.dy - _centre(j)) * scale,
+    );
+  }
+
+  /// Screen pixels to page units.
+  Offset toPage(Offset local) {
+    if (!strips) return (local - offset) / scale;
+    final j = (local.dy / _slot).floor().clamp(0, _lineCount - 1);
+    return Offset(
+      (local.dx - offset.dx) / scale,
+      _centre(j) + (local.dy - _slotCentre(j)) / scale,
+    );
+  }
+
+  /// Runs [draw] in page units once per line band, clipped to that band.
+  void paintBands(Canvas canvas, void Function(Canvas) draw) {
+    if (!strips) {
+      canvas.save();
+      canvas.translate(offset.dx, offset.dy);
+      canvas.scale(scale);
+      draw(canvas);
+      canvas.restore();
+      return;
+    }
+    for (var j = 0; j < _lineCount; j++) {
+      final dy = _slotCentre(j) - _centre(j) * scale;
+      canvas.save();
+      canvas.translate(offset.dx, dy);
+      canvas.scale(scale);
+      canvas.clipPath(_clips[j]);
+      draw(canvas);
+      canvas.restore();
+    }
+  }
+}
 
 /// One page of the new Madina edition: the KFGQPC page artwork (unchanged),
 /// coloured for the current mode, with the selection, marked verse
@@ -26,7 +172,8 @@ class MushafPage extends ConsumerStatefulWidget {
 }
 
 class _MushafPageState extends ConsumerState<MushafPage> {
-  late Future<(String, List<AyahPolygonRow>)> _load;
+  late Future<_PageData> _load;
+  PictureInfo? _picture;
 
   @override
   void initState() {
@@ -34,18 +181,45 @@ class _MushafPageState extends ConsumerState<MushafPage> {
     _load = _fetch();
   }
 
+  /// A rosette replaces the printed marker, so the printed one is removed.
+  bool get _hideMarkers {
+    final style = widget.interaction.markerLook?.style;
+    return style != null && style != MarkerStyle.traditional;
+  }
+
+  late bool _markersHidden = _hideMarkers;
+
   @override
   void didUpdateWidget(MushafPage old) {
     super.didUpdateWidget(old);
-    if (old.page != widget.page) _load = _fetch();
+    if (old.page != widget.page || _markersHidden != _hideMarkers) {
+      _markersHidden = _hideMarkers;
+      _load = _fetch();
+    }
   }
 
-  Future<(String, List<AyahPolygonRow>)> _fetch() async {
+  @override
+  void dispose() {
+    _picture?.picture.dispose();
+    super.dispose();
+  }
+
+  Future<_PageData> _fetch() async {
     final svg = await ref.read(pageStoreProvider).svg(widget.page);
-    final polys = await ref
-        .read(mushafRepositoryProvider)
-        .polygons(widget.page);
-    return (svg, polys);
+    final info = await vg.loadPicture(
+      SvgStringLoader(_markersHidden ? withoutMarkers(svg) : svg),
+      null,
+    );
+    _picture?.picture.dispose();
+    _picture = info;
+    final repo = ref.read(mushafRepositoryProvider);
+    final polys = await repo.polygons(widget.page);
+    final cuts = await repo.lineCuts('madina1441', widget.page);
+    final overflow = <int, List<Path>>{};
+    for (final o in await repo.lineOverflow(widget.page)) {
+      overflow.putIfAbsent(o.line, () => []).add(parseOutline(o.path));
+    }
+    return (info, _viewBox(svg), polys, cuts, overflow);
   }
 
   @override
@@ -59,8 +233,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
         if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        final (svg, polys) = snap.data!;
-        final viewBox = _viewBox(svg);
+        final (picture, viewBox, polys, cuts, overflow) = snap.data!;
         final verses = [
           for (final p in polys)
             (
@@ -80,151 +253,160 @@ class _MushafPageState extends ConsumerState<MushafPage> {
         VerseKey? markerAt(Offset point) {
           for (final v in verses) {
             final m = v.marker;
-            if (m != null && (m - point).distance <= _markerRadius + 3) {
+            if (m != null && (m - point).distance <= markerR + 3) {
               return v.key;
             }
           }
           return null;
         }
 
-        return Center(
-          child: AspectRatio(
-            aspectRatio: viewBox.width / viewBox.height,
-            child: LayoutBuilder(
-              builder: (context, box) {
-                final scale = box.maxWidth / viewBox.width;
-                final selected = [
-                  for (final v in verses)
-                    if (x.selection.contains(v.key)) v,
-                ];
-                final handles = <Widget>[];
-                if (selected.isNotEmpty) {
-                  // Right-to-left: the selection starts at the top right of
-                  // its first verse and ends at the bottom left of its last.
-                  final first = selected.first.rects.first;
-                  final last = selected.last.rects.last;
-                  final box0 = context.findRenderObject();
-                  void drag(bool start, Offset global) {
-                    final ro = box0 is RenderBox
-                        ? box0
-                        : context.findRenderObject() as RenderBox?;
-                    if (ro == null) return;
-                    final v = verseAt(ro.globalToLocal(global) / scale);
-                    if (v != null) x.onHandleDrag(start, v);
-                  }
+        return LayoutBuilder(
+          builder: (context, box) {
+            final layout = _PageLayout(
+              box.biggest,
+              viewBox,
+              opening: widget.page <= 2,
+              cuts: cuts,
+              overflow: overflow,
+            );
+            final selected = [
+              for (final v in verses)
+                if (x.selection.contains(v.key)) v,
+            ];
+            final handles = <Widget>[];
+            if (selected.isNotEmpty) {
+              // Right-to-left: the selection starts at the top right of its
+              // first verse and ends at the bottom left of its last.
+              final first = selected.first.rects.first;
+              final last = selected.last.rects.last;
+              final a = layout.toScreen(
+                first.topRight,
+                line: layout._lineOf(first.center.dy),
+              );
+              final b = layout.toScreen(
+                last.bottomLeft,
+                line: layout._lineOf(last.center.dy),
+              );
+              void drag(bool start, Offset global) {
+                final ro = context.findRenderObject();
+                if (ro is! RenderBox) return;
+                final v = verseAt(layout.toPage(ro.globalToLocal(global)));
+                if (v != null) x.onHandleDrag(start, v);
+              }
 
-                  handles
-                    ..add(
-                      Positioned(
-                        left: first.right * scale - 22,
-                        top: first.top * scale - 34,
-                        child: SelectionHandle(
-                          start: true,
-                          label: l.selectionStart,
-                          onDrag: (g) => drag(true, g),
-                        ),
-                      ),
-                    )
-                    ..add(
-                      Positioned(
-                        left: last.left * scale - 22,
-                        top: last.bottom * scale - 10,
-                        child: SelectionHandle(
-                          start: false,
-                          label: l.selectionEnd,
-                          onDrag: (g) => drag(false, g),
-                        ),
-                      ),
-                    );
-                }
-                final look = x.markerLook;
-                final transform = Matrix4.diagonal3Values(scale, scale, 1);
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    if (look != null)
-                      Positioned.fill(
-                        child: IgnorePointer(
-                          child: CustomPaint(
-                            painter: _CallbackPainter((canvas) {
-                              canvas.transform(transform.storage);
+              handles
+                ..add(
+                  Positioned(
+                    left: a.dx - 22,
+                    top: a.dy - 34,
+                    child: SelectionHandle(
+                      start: true,
+                      label: l.selectionStart,
+                      onDrag: (g) => drag(true, g),
+                    ),
+                  ),
+                )
+                ..add(
+                  Positioned(
+                    left: b.dx - 22,
+                    top: b.dy - 10,
+                    child: SelectionHandle(
+                      start: false,
+                      label: l.selectionEnd,
+                      onDrag: (g) => drag(false, g),
+                    ),
+                  ),
+                );
+            }
+            final look = x.markerLook;
+            final ink = tokens.mode == ThemeModeId.light
+                ? null
+                : tokens.colors.ink;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapUp: (d) {
+                      final point = layout.toPage(d.localPosition);
+                      if (x.hidden != null) {
+                        final v = verseAt(point);
+                        if (v != null && x.hidden!.contains(v)) {
+                          x.onHiddenTap?.call(v);
+                          return;
+                        }
+                      }
+                      final m = markerAt(point);
+                      m != null ? x.onMarkerTap(m) : x.onTap();
+                    },
+                    onLongPressStart: (d) {
+                      final v = verseAt(layout.toPage(d.localPosition));
+                      if (v != null) x.onVerseLongPress(v);
+                    },
+                    child: Semantics(
+                      label: l.pageOf('${widget.page}'),
+                      image: true,
+                      child: CustomPaint(
+                        size: box.biggest,
+                        painter: _CallbackPainter((canvas) {
+                          layout.paintBands(canvas, (c) {
+                            // Under the ink: marker tints and the selection.
+                            if (look != null) {
                               for (final v in verses) {
                                 if (v.marker != null) {
-                                  look.paintUnder(
-                                    canvas,
-                                    v.marker!,
-                                    _markerRadius,
-                                  );
+                                  look.paintUnder(c, v.marker!, markerR);
                                 }
                               }
-                            }),
-                          ),
-                        ),
-                      ),
-                    Positioned.fill(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTapUp: (d) {
-                          final point = d.localPosition / scale;
-                          if (x.hidden != null) {
-                            final v = verseAt(point);
-                            if (v != null && x.hidden!.contains(v)) {
-                              x.onHiddenTap?.call(v);
-                              return;
                             }
-                          }
-                          final m = markerAt(point);
-                          m != null ? x.onMarkerTap(m) : x.onTap();
-                        },
-                        onLongPressStart: (d) {
-                          final v = verseAt(d.localPosition / scale);
-                          if (v != null) x.onVerseLongPress(v);
-                        },
-                        child: Semantics(
-                          label: l.pageOf('${widget.page}'),
-                          image: true,
-                          child: SvgPicture.string(
-                            svg,
-                            fit: BoxFit.contain,
-                            colorFilter: tokens.mode == ThemeModeId.light
-                                ? null
-                                : ColorFilter.mode(
-                                    tokens.colors.ink,
+                            final fill = Paint()
+                              ..color = tokens.colors.highlight;
+                            for (final v in selected) {
+                              c.drawPath(v.path, fill);
+                            }
+                            for (final v in verses) {
+                              final colour = x.marks[v.key];
+                              if (v.marker == null || colour == null) continue;
+                              c.drawCircle(
+                                v.marker!,
+                                markerR,
+                                Paint()..color = colour.withValues(alpha: 0.35),
+                              );
+                              c.drawCircle(
+                                v.marker!,
+                                markerR,
+                                Paint()
+                                  ..style = PaintingStyle.stroke
+                                  ..strokeWidth = markerR * 0.22
+                                  ..color = colour,
+                              );
+                            }
+                            // The page itself, recoloured outside light mode.
+                            if (ink != null) {
+                              c.saveLayer(
+                                null,
+                                Paint()
+                                  ..colorFilter = ColorFilter.mode(
+                                    ink,
                                     BlendMode.srcIn,
                                   ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: CustomPaint(
-                          painter: SelectionPainter(
-                            paths: [for (final v in selected) v.path],
-                            rings: [
-                              for (final v in verses)
-                                if (v.marker != null &&
-                                    x.marks.containsKey(v.key))
-                                  (v.marker!, _markerRadius, x.marks[v.key]!),
-                            ],
-                            highlight: tokens.colors.highlight,
-                            transform: Matrix4.diagonal3Values(scale, scale, 1),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: CustomPaint(
-                          painter: _CallbackPainter((canvas) {
-                            canvas.transform(transform.storage);
+                              );
+                            }
+                            // The picture starts at the viewBox corner, not at
+                            // the origin (pages 1 and 2 have a shifted one).
+                            c.save();
+                            c.translate(viewBox.left, viewBox.top);
+                            c.drawPicture(picture.picture);
+                            c.restore();
+                            if (ink != null) c.restore();
+                            // Over the ink: rosettes and recitation covers.
                             if (look != null) {
                               for (final v in verses) {
                                 if (v.marker != null) {
                                   look.paintOver(
-                                    canvas,
+                                    c,
                                     v.marker!,
-                                    _markerRadius,
+                                    markerR,
                                     v.key.ayah,
                                   );
                                 }
@@ -239,9 +421,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 ..strokeWidth = 1.2;
                               for (final v in verses) {
                                 if (!hidden.contains(v.key)) continue;
-                                canvas.drawPath(v.path, cover);
+                                c.drawPath(v.path, cover);
                                 for (final r in v.rects) {
-                                  canvas.drawLine(
+                                  c.drawLine(
                                     Offset(r.left + 4, r.center.dy),
                                     Offset(r.right - 4, r.center.dy),
                                     line,
@@ -249,35 +431,67 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 }
                               }
                             }
-                          }),
-                        ),
+                          });
+                        }),
                       ),
                     ),
-                    ...handles,
-                  ],
-                );
-              },
-            ),
-          ),
+                  ),
+                ),
+                ...handles,
+              ],
+            );
+          },
         );
       },
     );
   }
 
-  /// Verse-end marker radius in page units.
-  static const _markerRadius = 7.5;
+  /// Verse-end marker radius in page units (smaller on pages 1 and 2).
+  double get markerR => widget.page <= 2 ? 6.6 : 8.4;
 
-  static Size _viewBox(String svg) {
+  static Rect _viewBox(String svg) {
     final m = RegExp(r'viewBox="([\d.\s-]+)"').firstMatch(svg);
-    if (m == null) return const Size(345, 550);
+    if (m == null) return const Rect.fromLTWH(0, 0, 345, 550);
     final v = m
         .group(1)!
         .trim()
         .split(RegExp(r'\s+'))
         .map(double.parse)
         .toList();
-    return Size(v[2], v[3]);
+    return Rect.fromLTWH(v[0], v[1], v[2], v[3]);
   }
+}
+
+/// The page without its printed verse-end markers. In these files the
+/// markers are one group that sits just before the page text.
+String withoutMarkers(String svg) {
+  final start = svg.indexOf('<g id="ayah_markers"');
+  final end = svg.indexOf('<g id="content"');
+  if (start < 0 || end < start) return svg;
+  return svg.substring(0, start) + svg.substring(end);
+}
+
+/// Parses the outline format of the verse polygons: "M x y L x y ... Z",
+/// possibly several sub-paths.
+Path parseOutline(String d) {
+  final path = Path();
+  final tokens = d.trim().split(RegExp(r'\s+'));
+  var i = 0;
+  while (i < tokens.length) {
+    final t = tokens[i];
+    if (t == 'M' || t == 'L') {
+      final x = double.parse(tokens[i + 1]);
+      final y = double.parse(tokens[i + 2]);
+      t == 'M' ? path.moveTo(x, y) : path.lineTo(x, y);
+      i += 3;
+    } else if (t == 'Z') {
+      path.close();
+      i += 1;
+    } else {
+      i += 1;
+    }
+  }
+  return path;
 }
 
 /// Bounds of each sub-path of a verse outline, in reading order.
@@ -314,29 +528,6 @@ List<Rect> outlineRects(String d) {
         a.top != b.top ? a.top.compareTo(b.top) : b.right.compareTo(a.right),
   );
   return rects;
-}
-
-/// Parses the outline format of the verse polygons: "M x y L x y ... Z",
-/// possibly several sub-paths.
-Path parseOutline(String d) {
-  final path = Path();
-  final tokens = d.trim().split(RegExp(r'\s+'));
-  var i = 0;
-  while (i < tokens.length) {
-    final t = tokens[i];
-    if (t == 'M' || t == 'L') {
-      final x = double.parse(tokens[i + 1]);
-      final y = double.parse(tokens[i + 2]);
-      t == 'M' ? path.moveTo(x, y) : path.lineTo(x, y);
-      i += 3;
-    } else if (t == 'Z') {
-      path.close();
-      i += 1;
-    } else {
-      i += 1;
-    }
-  }
-  return path;
 }
 
 class _CallbackPainter extends CustomPainter {
