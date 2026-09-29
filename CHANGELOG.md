@@ -6,6 +6,8 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-29
+
 ### Added (Zakhrafa style)
 - New default style «Zakhrafa»: an illuminated turquoise, coral and navy frame, built from vector ornaments provided by Ahmed.
 - Page view: immersive reading with controls on touch; cartouches for juz, hizb and surah (each opens the index at the current place) and a centred page number (go to page); catchword under the frame; surah headers and hizb quarter marks in the frame's design; cover page; al-Fatiha and the opening of al-Baqarah in a fully ornate page; light and golden splash screens.
@@ -86,7 +88,8 @@ Phase 0: foundation. No Quran or religious text appears in this release.
 4. Switch the language to English and back to Arabic; the layout should flip direction.
 5. Close and reopen the app: every choice should be kept.
 
-[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/helalrules7/tibyan/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/helalrules7/tibyan/releases/tag/v0.2.0
 [0.1.1]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.1
 [0.1.0]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.0
