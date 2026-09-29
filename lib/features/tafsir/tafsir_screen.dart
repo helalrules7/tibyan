@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/content_database.dart';
@@ -11,6 +12,7 @@ import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import '../mushaf/presentation/widgets/mushaf_page.dart';
+import 'kashida_text.dart';
 
 final commentaryEditionsProvider = FutureProvider<List<CommentaryEditionRow>>(
   (ref) => ref.watch(mushafRepositoryProvider).commentaryEditions(),
@@ -251,6 +253,12 @@ class _CommentaryCard extends ConsumerWidget {
         : settings.uiFont.family;
     final size = (rtl ? 19.0 : 16.0) * settings.tafsirFontScale;
     final dir = rtl ? TextDirection.rtl : TextDirection.ltr;
+    final bodyStyle = TextStyle(
+      fontFamily: family,
+      fontSize: size,
+      height: rtl ? 1.9 : 1.6,
+      color: t.ink,
+    );
     final s = source;
     final credit = s == null
         ? null
@@ -272,26 +280,45 @@ class _CommentaryCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            arabicUi ? edition.nameAr : edition.nameEn,
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-              color: t.ink,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  arabicUi ? edition.nameAr : edition.nameEn,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    color: t.ink,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: l.copyText,
+                visualDensity: VisualDensity.compact,
+                icon: Icon(Icons.copy, size: 18, color: t.muted),
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: entry.body));
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(l.copied)));
+                },
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            entry.body,
-            textDirection: dir,
-            textAlign: TextAlign.justify,
-            style: TextStyle(
-              fontFamily: family,
-              fontSize: size,
-              height: rtl ? 1.9 : 1.6,
-              color: t.ink,
+          const SizedBox(height: 4),
+          if (rtl && settings.tafsirKashida)
+            // Selection would copy the added tatweels; the copy button
+            // gives the original text instead.
+            SelectionContainer.disabled(
+              child: KashidaText(entry.body, style: bodyStyle),
+            )
+          else
+            Text(
+              entry.body,
+              textDirection: dir,
+              textAlign: TextAlign.justify,
+              style: bodyStyle,
             ),
-          ),
           if (entry.footnotes != null) ...[
             const SizedBox(height: 10),
             Text(
@@ -367,6 +394,13 @@ class _TafsirSettingsSheet extends ConsumerWidget {
             max: 1.8,
             divisions: 10,
             onChanged: controller.setTafsirFontScale,
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l.tafsirKashida),
+            subtitle: Text(l.tafsirKashidaHint),
+            value: settings.tafsirKashida,
+            onChanged: controller.setTafsirKashida,
           ),
           Text(l.tafsirShown, style: Theme.of(context).textTheme.titleSmall),
           for (final e in editions)
