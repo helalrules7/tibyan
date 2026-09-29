@@ -548,4 +548,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String revealedAfter(String after) {
     return 'نزلت بعد $after';
   }
+
+  @override
+  String get multiSelect => 'تحديد عدة آيات';
+
+  @override
+  String get multiSelectHint => 'اسحب المقبضين لتحديد الآيات';
+
+  @override
+  String get doneLabel => 'تم';
+
+  @override
+  String get markRemoved => 'أُزيل الفاصل';
+
+  @override
+  String get tabMarks => 'فواصل القراءة';
+
+  @override
+  String get noMarks => 'لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.';
 }

@@ -59,6 +59,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   VerseKey? _selA;
   VerseKey? _selB;
 
+  /// Multi-verse selection: the handles are shown and every other control
+  /// waits until the reader taps Done.
+  bool _multi = false;
+
   /// Recitation mode: verses stay covered until revealed.
   bool _recite = false;
   final Set<VerseKey> _revealed = {};
@@ -129,6 +133,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     setState(() {
       _page = index + _first;
       _selA = _selB = null;
+      _multi = false;
       _revealed.clear();
     });
     if (_page < 1) return;
@@ -200,6 +205,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         selection: pg == _page ? _selectionOn(pg) : const {},
         marks: marks,
         onTap: () {
+          if (_multi) return;
           if (_selA != null) {
             setState(() => _selA = _selB = null);
           } else {
@@ -211,13 +217,14 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           _setChrome(false);
           setState(() => _selA = _selB = v);
         },
-        onMarkerTap: (v) => _setMark(MarkKind.reading, v, pg, auto: true),
+        onMarkerTap: (v) => _toggleMark(v, pg),
         onHandleDrag: (start, v) =>
             setState(() => start ? _selA = v : _selB = v),
         markerLook: markerLook,
         hidden: _recite && pg == _page ? _hiddenOn(pg) : null,
         onHiddenTap: (v) => setState(() => _revealed.add(v)),
         ornateOpening: illuminated && pg <= 2,
+        showHandles: _multi,
       );
       final pageWidget = oldEdition
           ? OldMushafPage(page: pg, interaction: interaction)
@@ -401,7 +408,19 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 ),
               ),
             ),
-          if (range != null)
+          if (_multi)
+            Positioned(
+              top: 0,
+              left: 16,
+              right: 16,
+              child: SafeArea(
+                child: _MultiSelectBar(
+                  count: range?.length ?? 1,
+                  onDone: () => setState(() => _multi = false),
+                ),
+              ),
+            ),
+          if (range != null && !_multi)
             Positioned(
               left: 0,
               right: 0,
@@ -417,6 +436,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   page: _page,
                 ),
                 onClose: () => setState(() => _selA = _selB = null),
+                onMultiSelect: () {
+                  _setChrome(false);
+                  setState(() => _multi = true);
+                },
               ),
             ),
         ],
@@ -491,6 +514,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _recite = true;
       _revealed.clear();
       _selA = _selB = null;
+      _multi = false;
     });
   }
 
@@ -510,6 +534,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _paused = false;
       _recite = false;
       _selA = _selB = null;
+      _multi = false;
       _vertical?.dispose();
       _vertical = null;
     });
@@ -540,6 +565,33 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _controller?.dispose();
       _controller = PageController(initialPage: page - _first);
     });
+  }
+
+  /// Tapping a verse marker sets the reading mark there, or removes the
+  /// marks already on that verse.
+  Future<void> _toggleMark(VerseKey v, int page) async {
+    final db = ref.read(userDatabaseProvider);
+    final here = [
+      for (final m
+          in ref.read(bookmarkSetsProvider).value ?? const <BookmarkSetRow>[])
+        if (m.surah == v.surah && m.ayah == v.ayah) m,
+    ];
+    if (here.isEmpty) return _setMark(MarkKind.reading, v, page, auto: true);
+    HapticFeedback.lightImpact();
+    for (final m in here) {
+      await db.deleteBookmarkSet(m.id);
+    }
+    if (!mounted) return;
+    final l = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(milliseconds: 1400),
+          content: Text(l.markRemoved),
+        ),
+      );
   }
 
   Future<void> _goToPage() async {
@@ -700,6 +752,43 @@ class _BottomControls extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown while the reader drags the selection handles.
+class _MultiSelectBar extends StatelessWidget {
+  const _MultiSelectBar({required this.count, required this.onDone});
+
+  final int count;
+  final VoidCallback onDone;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    return Material(
+      color: t.paper,
+      elevation: 6,
+      borderRadius: BorderRadius.circular(28),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
+        child: Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                liveRegion: true,
+                child: Text(
+                  '${l.multiSelectHint} · ${count == 2 ? l.twoVerses : l.versesCount(digits(count))}',
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ),
+            ),
+            FilledButton(onPressed: onDone, child: Text(l.doneLabel)),
+          ],
         ),
       ),
     );

@@ -549,4 +549,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String revealedAfter(String after) {
     return 'After $after';
   }
+
+  @override
+  String get multiSelect => 'Select several verses';
+
+  @override
+  String get multiSelectHint => 'Drag the handles to select verses';
+
+  @override
+  String get doneLabel => 'Done';
+
+  @override
+  String get markRemoved => 'Mark removed';
+
+  @override
+  String get tabMarks => 'Reading marks';
+
+  @override
+  String get noMarks => 'No marks yet. Tap a verse marker to mark it.';
 }

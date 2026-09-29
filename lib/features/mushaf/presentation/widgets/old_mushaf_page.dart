@@ -267,7 +267,7 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                   g,
             ]..sort((a, b) => a.glyphId.compareTo(b.glyphId));
             final handles = <Widget>[];
-            if (selectedGlyphs.isNotEmpty) {
+            if (selectedGlyphs.isNotEmpty && widget.interaction.showHandles) {
               final first = layout.toScreenRect(_rect(selectedGlyphs.first));
               final last = layout.toScreenRect(_rect(selectedGlyphs.last));
               void drag(bool start, Offset global) {
@@ -341,7 +341,11 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                           look: x.markerLook,
                           markers: [
                             for (final e in markers.entries)
-                              (layout.toScreenRect(_rect(e.value)), e.key.ayah),
+                              (
+                                layout.toScreenRect(_rect(e.value)),
+                                e.key.ayah,
+                                x.marks[e.key],
+                              ),
                           ],
                           hidden: x.hidden == null
                               ? const []
@@ -403,7 +407,7 @@ class _OldPagePainter extends CustomPainter {
   final MarkerLook? look;
 
   /// Verse-end marker boxes on screen, with their verse numbers.
-  final List<(Rect, int)> markers;
+  final List<(Rect, int, Color?)> markers;
 
   /// Recitation mode: glyph boxes to cover.
   final List<Rect> hidden;
@@ -444,7 +448,7 @@ class _OldPagePainter extends CustomPainter {
           ..color = color,
       );
     }
-    for (final (r, _) in markers) {
+    for (final (r, _, _) in markers) {
       look?.paintUnder(canvas, r.center, r.shortestSide / 2);
     }
     final paint = Paint()..filterQuality = FilterQuality.medium;
@@ -452,8 +456,8 @@ class _OldPagePainter extends CustomPainter {
       paint.colorFilter = ColorFilter.mode(ink!, BlendMode.srcIn);
     }
     layout.paint(canvas, image, paint);
-    for (final (r, n) in markers) {
-      look?.paintOver(canvas, r.center, r.shortestSide / 2, n);
+    for (final (r, n, marked) in markers) {
+      look?.paintOver(canvas, r.center, r.shortestSide / 2, n, marked: marked);
     }
     if (hidden.isNotEmpty) {
       final cover = Paint()..color = paper;
