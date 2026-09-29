@@ -6,6 +6,8 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-29
+
 ### Added (tafsir and translation)
 - Tafsir and translation screen, opened from verse services: al-Tafsir al-Muyassar (KFGQPC, via QuranEnc), Saheeh International 1.1.2 with its footnotes (via QuranEnc), and Pickthall (public domain, via Tanzil). Every text is shown verbatim with its source's credit and version.
 - Swipe or use the arrows to move through the surah's verses; texts sit side by side on wide screens for comparison.
@@ -94,7 +96,8 @@ Phase 0: foundation. No Quran or religious text appears in this release.
 4. Switch the language to English and back to Arabic; the layout should flip direction.
 5. Close and reopen the app: every choice should be kept.
 
-[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/helalrules7/tibyan/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/helalrules7/tibyan/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/helalrules7/tibyan/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/helalrules7/tibyan/releases/tag/v0.2.0
 [0.1.1]: https://github.com/helalrules7/tibyan/releases/tag/v0.1.1
