@@ -12,6 +12,7 @@ import '../../core/db/user_database.dart';
 import 'data/mushaf_repository.dart';
 import 'data/page_pack.dart';
 import 'presentation/widgets/illuminated_frame.dart';
+import 'presentation/widgets/mushaf_page.dart' show outlineRects;
 
 /// Overridden in `main()` once the bundled database is copied and opened.
 final contentDatabaseProvider = Provider<ContentDatabase>(
@@ -159,6 +160,62 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
   if (ayahs.isEmpty) return null;
   final surahs = await ref.watch(surahsProvider.future);
   final first = ayahs.first;
+
+  // Line slot (0..14) where each verse starts, per edition.
+  final lineOf = <(int, int), int>{};
+  if (edition == MushafEdition.madina1405) {
+    final glyphs =
+        await ref.watch(ayahInfoDatabaseProvider)?.page(page) ?? const [];
+    for (final g in glyphs) {
+      final k = (g.suraNumber, g.ayahNumber);
+      final line = g.lineNumber - 1;
+      if (!lineOf.containsKey(k) || line < lineOf[k]!) lineOf[k] = line;
+    }
+  } else {
+    for (final p in await repo.polygons(page)) {
+      final top = outlineRects(p.path).first.top;
+      lineOf[(p.surah, p.number)] = ((top - 8.3) / 35.75).round().clamp(0, 14);
+    }
+  }
+
+  final banners = <SurahBanner>[];
+  if (page > 2) {
+    for (final a in ayahs.where((a) => a.number == 1)) {
+      final line = lineOf[(a.surah, 1)];
+      if (line == null) continue;
+      // The header, then the basmala line (none before at-Tawba).
+      final header = line - (a.surah == 9 ? 1 : 2);
+      if (header < 0) continue;
+      final s = surahs[a.surah - 1];
+      final before = surahs
+          .where((x) => x.revelationOrder == s.revelationOrder - 1)
+          .firstOrNull;
+      banners.add(
+        SurahBanner(
+          line: header,
+          number: s.id,
+          name: s.nameAr,
+          meccan: s.revelation == 'meccan',
+          ayahCount: s.ayahCount,
+          order: s.revelationOrder,
+          after: before?.nameAr,
+        ),
+      );
+    }
+  }
+
+  final quarters = <QuarterMark>[
+    if (page > 2)
+      for (final a in await repo.quarterStartsOnPage(page, edition))
+        if (lineOf[(a.surah, a.number)] != null)
+          QuarterMark(
+            line: lineOf[(a.surah, a.number)]!,
+            quarter: a.hizbQuarter,
+            surah: a.surah,
+            ayah: a.number,
+          ),
+  ];
+
   String? catchword;
   if (page < 604) {
     final next = (await repo.ayahsOnPage(page + 1, edition)).firstOrNull;
@@ -180,6 +237,9 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
     hizb: (first.hizbQuarter - 1) ~/ 4 + 1,
     surahName: surahs[first.surah - 1].nameAr,
     catchword: catchword,
+    banners: banners,
+    quarters: quarters,
+    outerRight: page.isOdd,
   );
 });
 

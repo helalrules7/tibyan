@@ -216,5 +216,68 @@
         "type": "String"
       }
     }
+  },
+  "surahBannerTitle": "({number}) Surah {name} · {type}",
+  "@surahBannerTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfo": "{count} verses · revealed {order}th · after {after}",
+  "@surahBannerInfo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfoFirst": "{count} verses · revealed {order}th",
+  "@surahBannerInfoFirst": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "quarterHizb": "Quarter of hizb {number}",
+  "@quarterHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "halfHizb": "Half of hizb {number}",
+  "@halfHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "threeQuartersHizb": "Three quarters of hizb {number}",
+  "@threeQuartersHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   }
 }

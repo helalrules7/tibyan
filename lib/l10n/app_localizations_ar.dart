@@ -494,4 +494,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String speedLabel(String speed) {
     return 'السرعة $speed';
   }
+
+  @override
+  String surahBannerTitle(String number, String name, String type) {
+    return '($number) سورة $name · $type';
+  }
+
+  @override
+  String surahBannerInfo(String count, String order, String after) {
+    return 'آياتها $count · ترتيبها في النزول $order · نزلت بعد $after';
+  }
+
+  @override
+  String surahBannerInfoFirst(String count, String order) {
+    return 'آياتها $count · ترتيبها في النزول $order';
+  }
+
+  @override
+  String quarterHizb(String number) {
+    return 'ربع الحزب $number';
+  }
+
+  @override
+  String halfHizb(String number) {
+    return 'نصف الحزب $number';
+  }
+
+  @override
+  String threeQuartersHizb(String number) {
+    return 'ثلاثة أرباع الحزب $number';
+  }
 }

@@ -15,6 +15,7 @@ class FrameImages {
     required this.edgeV,
     required this.rosette,
     required this.margin,
+    required this.mosaic,
   });
 
   /// Top-right corner; mirrored for the other corners.
@@ -27,6 +28,18 @@ class FrameImages {
   final ui.Image edgeV;
   final ui.Image rosette;
   final ui.Image margin;
+
+  /// Seamless mosaic tile, rendered at 3x.
+  final ui.Image mosaic;
+
+  /// Paint that fills with the mosaic at its natural size.
+  Paint mosaicPaint() => Paint()
+    ..shader = ui.ImageShader(
+      mosaic,
+      TileMode.repeated,
+      TileMode.repeated,
+      Matrix4.diagonal3Values(1 / 3, 1 / 3, 1).storage,
+    );
 }
 
 Future<ui.Image> _load(String name) async {
@@ -42,6 +55,7 @@ final frameImagesProvider = FutureProvider<FrameImages>((ref) async {
     _load('frame_edge_v.png'),
     _load('rosette_cartouche.png'),
     _load('rosette_margin.png'),
+    _load('mosaic_tile.png'),
   ]);
   return FrameImages(
     corner: images[0],
@@ -49,6 +63,7 @@ final frameImagesProvider = FutureProvider<FrameImages>((ref) async {
     edgeV: images[2],
     rosette: images[3],
     margin: images[4],
+    mosaic: images[5],
   );
 });
 
@@ -60,7 +75,19 @@ class FrameInfo {
     required this.hizb,
     required this.surahName,
     this.catchword,
+    this.banners = const [],
+    this.quarters = const [],
+    this.outerRight = true,
   });
+
+  /// Surahs that start on this page, drawn over their printed header line.
+  final List<SurahBanner> banners;
+
+  /// Hizb quarters that start on this page, marked in the margin.
+  final List<QuarterMark> quarters;
+
+  /// Margin marks go on the outer edge: right for odd pages.
+  final bool outerRight;
 
   final int page;
   final int juz;
@@ -69,6 +96,47 @@ class FrameInfo {
 
   /// First word of the next page, shown under the frame.
   final String? catchword;
+}
+
+/// A surah header in the frame's own design.
+class SurahBanner {
+  const SurahBanner({
+    required this.line,
+    required this.number,
+    required this.name,
+    required this.meccan,
+    required this.ayahCount,
+    required this.order,
+    this.after,
+  });
+
+  /// Line slot (0..14) of the printed header.
+  final int line;
+  final int number;
+  final String name;
+  final bool meccan;
+  final int ayahCount;
+
+  /// Place in the order of revelation, and the surah revealed just before.
+  final int order;
+  final String? after;
+}
+
+/// The start of a hizb quarter.
+class QuarterMark {
+  const QuarterMark({
+    required this.line,
+    required this.quarter,
+    required this.surah,
+    required this.ayah,
+  });
+
+  final int line;
+
+  /// 1..240 over the whole mushaf.
+  final int quarter;
+  final int surah;
+  final int ayah;
 }
 
 /// The illuminated page frame: an ornamental band, a cartouche with the
@@ -83,9 +151,11 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onHizbTap,
     this.onSurahTap,
     this.onPageTap,
+    this.onQuarterTap,
   });
 
   static const band = 30.0;
+  static const lines = 15;
   static const catchwordSpace = 26.0;
 
   final FrameInfo? info;
@@ -94,10 +164,41 @@ class IlluminatedFrame extends ConsumerWidget {
   final VoidCallback? onHizbTap;
   final VoidCallback? onSurahTap;
   final VoidCallback? onPageTap;
+  final ValueChanged<QuarterMark>? onQuarterTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final images = ref.watch(frameImagesProvider).value;
+    final overlays = LayoutBuilder(
+      builder: (context, box) {
+        const inset = band + 6;
+        final slot = (box.maxHeight - 2 * inset) / lines;
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            for (final b in info?.banners ?? const <SurahBanner>[])
+              Positioned(
+                top: inset + b.line * slot,
+                left: inset - 4,
+                right: inset - 4,
+                height: slot,
+                child: SurahBannerView(banner: b, images: images),
+              ),
+            for (final q in info?.quarters ?? const <QuarterMark>[])
+              Positioned(
+                top: inset + (q.line + 0.5) * slot - 17,
+                left: (info!.outerRight) ? null : band / 2 - 17,
+                right: (info!.outerRight) ? band / 2 - 17 : null,
+                child: _QuarterRosette(
+                  mark: q,
+                  image: images?.margin,
+                  onTap: onQuarterTap,
+                ),
+              ),
+          ],
+        );
+      },
+    );
     final tokens = context.tokens;
     final t = tokens.colors;
     final l = AppLocalizations.of(context);
@@ -125,6 +226,7 @@ class IlluminatedFrame extends ConsumerWidget {
                   child: child,
                 ),
               ),
+              Positioned.fill(child: overlays),
               if (info != null) ...[
                 Positioned(
                   top: band / 2 - 16,
@@ -452,4 +554,198 @@ class _FramePainter extends CustomPainter {
   @override
   bool shouldRepaint(_FramePainter old) =>
       old.images != images || old.rule != rule || old.paper != paper;
+}
+
+/// A surah header over the page: the mosaic band, a cartouche with the
+/// surah's number, name and type, its verse count and place in revelation.
+class SurahBannerView extends StatelessWidget {
+  const SurahBannerView({
+    super.key,
+    required this.banner,
+    required this.images,
+  });
+
+  final SurahBanner banner;
+  final FrameImages? images;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final b = banner;
+    final type = b.meccan ? l.meccan : l.medinan;
+    final info = b.after == null
+        ? l.surahBannerInfoFirst(digits(b.ayahCount), digits(b.order))
+        : l.surahBannerInfo(digits(b.ayahCount), digits(b.order), b.after!);
+    return Semantics(
+      header: true,
+      label: '${l.surahBannerTitle(digits(b.number), b.name, type)}. $info',
+      excludeSemantics: true,
+      child: CustomPaint(
+        painter: _BannerPainter(
+          images: images,
+          paper: t.paper,
+          navy: t.frame,
+          rule: t.marker,
+        ),
+        child: LayoutBuilder(
+          builder: (context, box) {
+            final h = box.maxHeight;
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: h * 0.95,
+                vertical: h * 0.1,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: t.paper,
+                  borderRadius: BorderRadius.circular(h),
+                  border: Border.all(color: t.frame, width: 2),
+                ),
+                foregroundDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(h),
+                  border: Border.all(color: t.marker, width: 0.8),
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l.surahBannerTitle(digits(b.number), b.name, type),
+                          style: TextStyle(
+                            fontFamily: 'KFGQPCAN',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            height: 1.2,
+                            color: t.ink,
+                          ),
+                        ),
+                        Text(
+                          info,
+                          style: TextStyle(
+                            fontFamily: 'KFGQPCAN',
+                            fontSize: 10.5,
+                            height: 1.3,
+                            color: t.ink,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _BannerPainter extends CustomPainter {
+  _BannerPainter({
+    required this.images,
+    required this.paper,
+    required this.navy,
+    required this.rule,
+  });
+
+  final FrameImages? images;
+  final Color paper;
+  final Color navy;
+  final Color rule;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = Offset.zero & size;
+    // Opaque first: the printed header underneath must not show.
+    canvas.drawRect(r, Paint()..color = paper);
+    final img = images;
+    if (img != null) canvas.drawRect(r, img.mosaicPaint());
+    canvas.drawRect(
+      r.deflate(1),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = navy,
+    );
+    canvas.drawRect(
+      r.deflate(4),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8
+        ..color = rule,
+    );
+    if (img != null) {
+      final d = size.height * 0.8;
+      final src = Rect.fromLTWH(
+        0,
+        0,
+        img.rosette.width.toDouble(),
+        img.rosette.height.toDouble(),
+      );
+      for (final cx in [size.height * 0.5, size.width - size.height * 0.5]) {
+        canvas.drawImageRect(
+          img.rosette,
+          src,
+          Rect.fromCenter(
+            center: Offset(cx, size.height / 2),
+            width: d,
+            height: d,
+          ),
+          Paint(),
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BannerPainter old) =>
+      old.images != images || old.paper != paper;
+}
+
+/// A hizb quarter mark in the margin; tapping it sets the reading mark.
+class _QuarterRosette extends StatelessWidget {
+  const _QuarterRosette({
+    required this.mark,
+    required this.image,
+    required this.onTap,
+  });
+
+  final QuarterMark mark;
+  final ui.Image? image;
+  final ValueChanged<QuarterMark>? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final q = (mark.quarter - 1) % 4;
+    final hizb = (mark.quarter - 1) ~/ 4 + 1;
+    final label = switch (q) {
+      0 => l.hizbLabel(digits(hizb)),
+      1 => l.quarterHizb(digits(hizb)),
+      2 => l.halfHizb(digits(hizb)),
+      _ => l.threeQuartersHizb(digits(hizb)),
+    };
+    return Semantics(
+      button: onTap != null,
+      label: label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onTap == null ? null : () => onTap!(mark),
+        child: SizedBox(
+          width: 34,
+          height: 34,
+          child: image == null
+              ? null
+              : RawImage(image: image, width: 34, height: 34),
+        ),
+      ),
+    );
+  }
 }

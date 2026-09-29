@@ -343,5 +343,68 @@
         "type": "String"
       }
     }
+  },
+  "surahBannerTitle": "({number}) سورة {name} · {type}",
+  "@surahBannerTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfo": "آياتها {count} · ترتيبها في النزول {order} · نزلت بعد {after}",
+  "@surahBannerInfo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfoFirst": "آياتها {count} · ترتيبها في النزول {order}",
+  "@surahBannerInfoFirst": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "quarterHizb": "ربع الحزب {number}",
+  "@quarterHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "halfHizb": "نصف الحزب {number}",
+  "@halfHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "threeQuartersHizb": "ثلاثة أرباع الحزب {number}",
+  "@threeQuartersHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   }
 }
