@@ -302,14 +302,9 @@ class IlluminatedFrame extends ConsumerWidget {
                 // Start side (right in Arabic): the quarter that begins on
                 // this page, so the reader notices it.
                 if (info != null && info!.quarters.isNotEmpty)
-                  Text(
-                    quarterName(l, digits, info!.quarters.last.quarter),
-                    style: TextStyle(
-                      fontFamily: 'UthmanTahaNaskh',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                      color: t.goldText,
-                    ),
+                  _QuarterLabel(
+                    text: quarterName(l, digits, info!.quarters.last.quarter),
+                    color: t.muted,
                   ),
                 const Spacer(),
                 if (info?.catchword != null)
@@ -949,4 +944,42 @@ String quarterName(AppLocalizations l, NumberFormatter digits, int quarter) {
     2 => l.halfHizb(hizb),
     _ => l.threeQuartersHizb(hizb),
   };
+}
+
+/// The quarter's name in the catchword's font, size and colour. Its words
+/// use the Quran font; its number the mushaf's Naskh, because the Quran
+/// font draws digits as verse-end markers.
+class _QuarterLabel extends StatelessWidget {
+  const _QuarterLabel({required this.text, required this.color});
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = TextStyle(
+      fontFamily: 'UthmanicHafs',
+      fontSize: 15,
+      height: 1.4,
+      color: color,
+    );
+    final digits = RegExp('[\u0660-\u0669]+');
+    final spans = <TextSpan>[];
+    var i = 0;
+    for (final m in digits.allMatches(text)) {
+      if (m.start > i) spans.add(TextSpan(text: text.substring(i, m.start)));
+      spans.add(
+        TextSpan(
+          text: m[0],
+          style: const TextStyle(fontFamily: 'UthmanTahaNaskh'),
+        ),
+      );
+      i = m.end;
+    }
+    if (i < text.length) spans.add(TextSpan(text: text.substring(i)));
+    return Text.rich(
+      TextSpan(style: base, children: spans),
+      semanticsLabel: text,
+    );
+  }
 }

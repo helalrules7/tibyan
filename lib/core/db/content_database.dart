@@ -176,15 +176,41 @@ class LineOverflow extends Table {
   Set<Column> get primaryKey => {page, line, path};
 }
 
+/// Old-edition ink that crosses a cut (image px), with the line it belongs to.
+@DataClassName('OldOverflowRow')
+class LineOverflow1405 extends Table {
+  @override
+  String get tableName => 'line_overflow_1405';
+
+  IntColumn get page => integer()();
+  IntColumn get line => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  @override
+  Set<Column> get primaryKey => {page, line, x0, y0};
+}
+
 @DriftDatabase(
-  tables: [Surah, Ayah, AyahPolygon, Source, WordBox, LineCut, LineOverflow],
+  tables: [
+    Surah,
+    Ayah,
+    AyahPolygon,
+    Source,
+    WordBox,
+    LineCut,
+    LineOverflow,
+    LineOverflow1405,
+  ],
 )
 class ContentDatabase extends _$ContentDatabase {
   ContentDatabase(super.executor);
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

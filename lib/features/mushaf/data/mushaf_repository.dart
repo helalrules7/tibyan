@@ -134,6 +134,10 @@ class MushafRepository {
     return (_db.select(_db.ayah)..where((t) => t.id.isIn(ids))).get();
   }
 
+  Future<List<OldOverflowRow>> oldLineOverflow(int page) => (_db.select(
+    _db.lineOverflow1405,
+  )..where((t) => t.page.equals(page))).get();
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }

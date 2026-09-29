@@ -180,23 +180,15 @@ class _PageLayout {
       canvas.scale(scale);
       final big = emphasis.contains(j);
       if (big) {
-        // Room for the larger line: its band plus a little above and below.
-        canvas.clipRect(
-          Rect.fromLTRB(
-            viewBox.left,
-            _bandTop(j) - 4,
-            viewBox.right,
-            _bandBottom(j) + 4,
-          ),
-        );
+        // The basmala line, 12% larger around its centre; its own region is
+        // scaled with it, so none of its marks is cut.
         final cx = viewBox.center.dx;
         final cy = _centre(j);
         canvas.translate(cx, cy);
         canvas.scale(1.12);
         canvas.translate(-cx, -cy);
-      } else {
-        canvas.clipPath(_clips[j]);
       }
+      canvas.clipPath(_clips[j]);
       draw(canvas, big);
       canvas.restore();
     }

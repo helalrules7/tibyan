@@ -15,7 +15,12 @@ import 'page_interaction.dart';
 
 /// Ink area shared by all quran.com page images (1024 x 1656), and the
 /// 15 line slots inside it.
-const _ink = Rect.fromLTRB(51, 8, 983, 1602);
+/// The ink of every page from 3 to 604 lies inside this rectangle
+/// (tools/measure_line_extents.py); cropping to it never cuts a mark.
+const _ink = Rect.fromLTRB(19, 6, 1011, 1632);
+
+/// Line grid of the page images: 15 lines from y = 8, 1594 px tall.
+const _gridTop = 8.0;
 
 /// Pages 1 and 2 only use the upper half of their images.
 const _openingInk = Rect.fromLTRB(51, 6, 967, 814);
@@ -35,6 +40,7 @@ class _PageLayout {
     this.size, {
     required bool opening,
     this.cuts = const [],
+    this.overflow = const {},
     bool withoutHeader = false,
   }) : ink = opening ? (withoutHeader ? _openingBody : _openingInk) : _ink {
     final byWidth = size.width / ink.width;
@@ -53,6 +59,29 @@ class _PageLayout {
   /// The 14 cuts between lines (image px), at the rows with least ink, so
   /// marks above and below a line stay with it.
   final List<double> cuts;
+
+  /// Ink crossing a cut (image px), by the line it belongs to.
+  final Map<int, List<Rect>> overflow;
+
+  /// Image region drawn by line [j]: its band, less neighbours' ink that
+  /// reaches in, plus its own ink that reaches out.
+  Path _region(int j) {
+    var p = Path()
+      ..addRect(
+        Rect.fromLTRB(ink.left, _bandTop(j), ink.right, _bandBottom(j)),
+      );
+    for (final e in overflow.entries) {
+      for (final r in e.value) {
+        p = Path.combine(
+          e.key == j ? PathOperation.union : PathOperation.difference,
+          p,
+          Path()..addRect(r),
+        );
+      }
+    }
+    return p;
+  }
+
   late final double scale;
   late final bool strips;
   late final Offset offset;
@@ -76,18 +105,18 @@ class _PageLayout {
   double get _slot => (size.height - _padTop - _padBottom) / _lineCount;
 
   /// Line centre on the image, and where it lands on screen.
-  double _centre(int j) => ink.top + (j + 0.5) * _pitch;
+  double _centre(int j) => _gridTop + (j + 0.5) * _pitch;
   double _slotCentre(int j) => _padTop + (j + 0.5) * _slot;
 
   double _bandTop(int j) =>
-      j == 0 ? ink.top : (_hasCuts ? cuts[j - 1] : ink.top + j * _pitch);
+      j == 0 ? ink.top : (_hasCuts ? cuts[j - 1] : _gridTop + j * _pitch);
   double _bandBottom(int j) => j == _lineCount - 1
       ? ink.bottom
-      : (_hasCuts ? cuts[j] : ink.top + (j + 1) * _pitch);
+      : (_hasCuts ? cuts[j] : _gridTop + (j + 1) * _pitch);
 
   int _lineOfImageY(double y) {
     if (!_hasCuts) {
-      return ((y - ink.top) / _pitch).floor().clamp(0, _lineCount - 1);
+      return ((y - _gridTop) / _pitch).floor().clamp(0, _lineCount - 1);
     }
     var j = 0;
     while (j < _lineCount - 1 && y > cuts[j]) {
@@ -144,27 +173,23 @@ class _PageLayout {
       return;
     }
     for (var j = 0; j < _lineCount; j++) {
-      final top = _bandTop(j);
-      final bottom = _bandBottom(j);
-      final dst = Rect.fromLTWH(
-        0,
-        _slotCentre(j) + (top - _centre(j)) * scale,
-        size.width,
-        (bottom - top) * scale,
-      );
-      final src = Rect.fromLTRB(ink.left, top, ink.right, bottom);
-      if (!emphasis.contains(j)) {
-        canvas.drawImageRect(image, src, dst, paint);
-        continue;
-      }
       canvas.save();
-      final c = Offset(size.width / 2, _slotCentre(j));
-      canvas.translate(c.dx, c.dy);
-      canvas.scale(1.12);
-      canvas.translate(-c.dx, -c.dy);
-      for (final dx in const [-0.6, 0.6, 0.0]) {
-        canvas.drawImageRect(image, src, dst.shift(Offset(dx, 0)), paint);
+      if (emphasis.contains(j)) {
+        final c = Offset(size.width / 2, _slotCentre(j));
+        canvas.translate(c.dx, c.dy);
+        canvas.scale(1.12);
+        canvas.translate(-c.dx, -c.dy);
       }
+      // Image pixels to screen, for this line.
+      canvas.translate(-ink.left * scale, _slotCentre(j) - _centre(j) * scale);
+      canvas.scale(scale);
+      canvas.clipPath(_region(j));
+      if (emphasis.contains(j)) {
+        for (final dx in const [-1.8, 1.8]) {
+          canvas.drawImage(image, Offset(dx, 0), paint);
+        }
+      }
+      canvas.drawImage(image, Offset.zero, paint);
       canvas.restore();
     }
   }
@@ -191,6 +216,7 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
   late Future<(ui.Image, List<GlyphRow>)> _load;
   ui.Image? _image;
   List<double> _cuts = const [];
+  Map<int, List<Rect>> _overflow = {};
 
   @override
   void initState() {
@@ -222,9 +248,21 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
     final glyphs =
         await ref.read(ayahInfoDatabaseProvider)?.page(widget.page) ??
         const <GlyphRow>[];
-    _cuts = await ref
-        .read(mushafRepositoryProvider)
-        .lineCuts('madina1405', widget.page);
+    final repo = ref.read(mushafRepositoryProvider);
+    _cuts = await repo.lineCuts('madina1405', widget.page);
+    _overflow = {};
+    for (final o in await repo.oldLineOverflow(widget.page)) {
+      _overflow
+          .putIfAbsent(o.line, () => [])
+          .add(
+            Rect.fromLTRB(
+              o.x0.toDouble(),
+              o.y0.toDouble(),
+              o.x1.toDouble(),
+              o.y1.toDouble(),
+            ),
+          );
+    }
     return (image, glyphs);
   }
 
@@ -253,6 +291,7 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
               box.biggest,
               opening: widget.page <= 2,
               cuts: _cuts,
+              overflow: _overflow,
               withoutHeader: widget.interaction.ornateOpening,
             );
             VerseKey? verseAt(Offset local) {
