@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "identifier": "shamerly",
+    "mediatype": "texts",
+    "description": "Quran Pages for Shamarly Mushaf, intended for software developers. Extracted from an PDF in <a href=\"https://quraankarem.files.wordpress.com/2015/06/shamarly_v3_crop_3.pdf\" rel=\"ugc nofollow\">quraankarem blog</a><br />",
+    "language": "ara",
+    "scanner": "Internet Archive HTML5 Uploader 1.6.3",
+    "subject": [
+      "quran",
+      "shamerly"
+    ],
+    "title": "Shamerly Mushaf",
+    "publicdate": "2015-09-29 06:46:09",
+    "uploader": "[redacted email]",
+    "addeddate": "2015-09-29 06:46:09",
+    "curation": "[redacted email]",
+    "identifier-access": "http://archive.org/details/shamerly",
+    "identifier-ark": "ark:/13960/t16m6wx08",
+    "repub_state": "4",
+    "backup_location": "ia905502_23",
+    "collection": [
+      "booksbylanguage_arabic",
+      "booksbylanguage"
+    ]
+  },
+  "file_count": 1049,
+  "retrieved": "2026-09-29"
+}
