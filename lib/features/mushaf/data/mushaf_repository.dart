@@ -66,6 +66,21 @@ class MushafRepository {
     return [for (final a in ayahs) JuzStart(juz: a.juz, ayah: a)];
   }
 
+  /// First verse of each of the 60 hizbs.
+  Future<List<AyahRow>> hizbStarts() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT MIN(id) AS id FROM ayah GROUP BY (hizb_quarter - 1) / 4 ORDER BY 1',
+        )
+        .get();
+    final ids = rows.map((r) => r.read<int>('id')).toList();
+    final ayahs = await (_db.select(
+      _db.ayah,
+    )..where((t) => t.id.isIn(ids))).get();
+    ayahs.sort((a, b) => a.id.compareTo(b.id));
+    return ayahs;
+  }
+
   /// Number of open questions awaiting a qualified reviewer.
   Future<int> reviewNoteCount() async {
     final row = await _db

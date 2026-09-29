@@ -238,5 +238,11 @@
   "hizbLabel": "الحزب {number}",
   "@hizbLabel": {"placeholders": {"number": {"type": "String"}}},
   "catchwordLabel": "الكلمة الأولى في الصفحة التالية: {word}",
-  "@catchwordLabel": {"placeholders": {"word": {"type": "String"}}}
+  "@catchwordLabel": {"placeholders": {"word": {"type": "String"}}},
+  "tabHizb": "الأحزاب",
+  "goToPage": "انتقال إلى صفحة",
+  "goToPageHint": "رقم الصفحة من ١ إلى ٦٠٤",
+  "goLabel": "انتقال",
+  "hizbStartsAt": "يبدأ من {surah} {ayah}",
+  "@hizbStartsAt": {"placeholders": {"surah": {"type": "String"}, "ayah": {"type": "String"}}}
 }

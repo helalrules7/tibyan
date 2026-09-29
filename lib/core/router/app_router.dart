@@ -80,7 +80,16 @@ final appRouterProvider = Provider<GoRouter>(
           ),
           GoRoute(
             path: 'index',
-            builder: (context, state) => const IndexScreen(),
+            builder: (context, state) => IndexScreen(
+              tab:
+                  IndexTab.values
+                      .asNameMap()[state.uri.queryParameters['tab']] ??
+                  IndexTab.surahs,
+              surah: _int(state, 's'),
+              juz: _int(state, 'j'),
+              hizb: _int(state, 'h'),
+              page: _int(state, 'p'),
+            ),
           ),
           GoRoute(
             path: 'fawasil',

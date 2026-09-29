@@ -757,6 +757,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الكلمة الأولى في الصفحة التالية: {word}'**
   String catchwordLabel(String word);
+
+  /// No description provided for @tabHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأحزاب'**
+  String get tabHizb;
+
+  /// No description provided for @goToPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتقال إلى صفحة'**
+  String get goToPage;
+
+  /// No description provided for @goToPageHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الصفحة من ١ إلى ٦٠٤'**
+  String get goToPageHint;
+
+  /// No description provided for @goLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتقال'**
+  String get goLabel;
+
+  /// No description provided for @hizbStartsAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'يبدأ من {surah} {ayah}'**
+  String hizbStartsAt(String surah, String ayah);
 }
 
 class _AppLocalizationsDelegate

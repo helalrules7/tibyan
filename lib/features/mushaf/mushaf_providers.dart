@@ -182,3 +182,7 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
     catchword: catchword,
   );
 });
+
+final hizbStartsProvider = FutureProvider<List<AyahRow>>(
+  (ref) => ref.watch(mushafRepositoryProvider).hizbStarts(),
+);
