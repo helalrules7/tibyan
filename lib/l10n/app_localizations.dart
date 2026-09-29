@@ -1153,6 +1153,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'نسخة {date}'**
   String sourceRetrieved(String date);
+
+  /// No description provided for @tafsirKashida.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشد بالكشيدة (تجربة)'**
+  String get tafsirKashida;
+
+  /// No description provided for @tafsirKashidaHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضبط سطور التفسير بمدّ الحروف بدل توسيع المسافات. لا يمس الكلمات القرآنية بين الأقواس، والنسخ يأخذ النص الأصلي'**
+  String get tafsirKashidaHint;
+
+  /// No description provided for @copyText.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ النص'**
+  String get copyText;
+
+  /// No description provided for @copied.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم النسخ'**
+  String get copied;
 }
 
 class _AppLocalizationsDelegate
