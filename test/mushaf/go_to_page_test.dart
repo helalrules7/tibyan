@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tibyan/core/settings/app_settings.dart';
 import 'package:tibyan/core/theme/app_theme.dart';
 import 'package:tibyan/core/theme/theme_registry.dart';
 import 'package:tibyan/core/theme/theme_tokens.dart';
@@ -48,5 +49,50 @@ void main() {
     await tester.tap(go);
     await tester.pumpAndSettle();
     expect(result, 604);
+  });
+
+  testWidgets('the Shamarly edition has 522 pages', (tester) async {
+    // The bundle caches loads made under the previous test's clock.
+    rootBundle.clear();
+    final registry = await ThemeRegistry.load(rootBundle);
+    int? result = -1;
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildTheme(
+            style: registry.byId('zakhrafa'),
+            mode: ThemeModeId.light,
+            uiFont: UiFont.plex,
+          ),
+          home: Builder(
+            builder: (context) => TextButton(
+              onPressed: () async => result = await showGoToPage(
+                context,
+                current: 50,
+                max: MushafEdition.shamarly.pageCount,
+              ),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.text('Page number, 1 to 522'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), '523');
+    await tester.pump();
+    final go = find.widgetWithText(FilledButton, 'Go');
+    expect(tester.widget<FilledButton>(go).onPressed, isNull);
+
+    await tester.enterText(find.byType(TextField), '522');
+    await tester.pump();
+    await tester.tap(go);
+    await tester.pumpAndSettle();
+    expect(result, 522);
   });
 }

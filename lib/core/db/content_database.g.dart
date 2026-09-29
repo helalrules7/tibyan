@@ -112,6 +112,17 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _startPageShamarlyMeta = const VerificationMeta(
+    'startPageShamarly',
+  );
+  @override
+  late final GeneratedColumn<int> startPageShamarly = GeneratedColumn<int>(
+    'start_page_shamarly',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -124,6 +135,7 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
     startPage,
     startPage1405,
     sourceId,
+    startPageShamarly,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -218,6 +230,17 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
     } else if (isInserting) {
       context.missing(_sourceIdMeta);
     }
+    if (data.containsKey('start_page_shamarly')) {
+      context.handle(
+        _startPageShamarlyMeta,
+        startPageShamarly.isAcceptableOrUnknown(
+          data['start_page_shamarly']!,
+          _startPageShamarlyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_startPageShamarlyMeta);
+    }
     return context;
   }
 
@@ -267,6 +290,10 @@ class $SurahTable extends Surah with TableInfo<$SurahTable, SurahRow> {
         DriftSqlType.int,
         data['${effectivePrefix}source_id'],
       )!,
+      startPageShamarly: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_page_shamarly'],
+      )!,
     );
   }
 
@@ -291,6 +318,9 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
   /// First page in the old edition (1405H).
   final int startPage1405;
   final int sourceId;
+
+  /// Page of verse 1 in the Shamarly (Egyptian) edition.
+  final int startPageShamarly;
   const SurahRow({
     required this.id,
     required this.nameAr,
@@ -302,6 +332,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     required this.startPage,
     required this.startPage1405,
     required this.sourceId,
+    required this.startPageShamarly,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -316,6 +347,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     map['start_page'] = Variable<int>(startPage);
     map['start_page_1405'] = Variable<int>(startPage1405);
     map['source_id'] = Variable<int>(sourceId);
+    map['start_page_shamarly'] = Variable<int>(startPageShamarly);
     return map;
   }
 
@@ -331,6 +363,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
       startPage: Value(startPage),
       startPage1405: Value(startPage1405),
       sourceId: Value(sourceId),
+      startPageShamarly: Value(startPageShamarly),
     );
   }
 
@@ -350,6 +383,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
       startPage: serializer.fromJson<int>(json['startPage']),
       startPage1405: serializer.fromJson<int>(json['startPage1405']),
       sourceId: serializer.fromJson<int>(json['sourceId']),
+      startPageShamarly: serializer.fromJson<int>(json['startPageShamarly']),
     );
   }
   @override
@@ -366,6 +400,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
       'startPage': serializer.toJson<int>(startPage),
       'startPage1405': serializer.toJson<int>(startPage1405),
       'sourceId': serializer.toJson<int>(sourceId),
+      'startPageShamarly': serializer.toJson<int>(startPageShamarly),
     };
   }
 
@@ -380,6 +415,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     int? startPage,
     int? startPage1405,
     int? sourceId,
+    int? startPageShamarly,
   }) => SurahRow(
     id: id ?? this.id,
     nameAr: nameAr ?? this.nameAr,
@@ -391,6 +427,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     startPage: startPage ?? this.startPage,
     startPage1405: startPage1405 ?? this.startPage1405,
     sourceId: sourceId ?? this.sourceId,
+    startPageShamarly: startPageShamarly ?? this.startPageShamarly,
   );
   SurahRow copyWithCompanion(SurahCompanion data) {
     return SurahRow(
@@ -410,6 +447,9 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
           ? data.startPage1405.value
           : this.startPage1405,
       sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      startPageShamarly: data.startPageShamarly.present
+          ? data.startPageShamarly.value
+          : this.startPageShamarly,
     );
   }
 
@@ -425,7 +465,8 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
           ..write('ayahCount: $ayahCount, ')
           ..write('startPage: $startPage, ')
           ..write('startPage1405: $startPage1405, ')
-          ..write('sourceId: $sourceId')
+          ..write('sourceId: $sourceId, ')
+          ..write('startPageShamarly: $startPageShamarly')
           ..write(')'))
         .toString();
   }
@@ -442,6 +483,7 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
     startPage,
     startPage1405,
     sourceId,
+    startPageShamarly,
   );
   @override
   bool operator ==(Object other) =>
@@ -456,7 +498,8 @@ class SurahRow extends DataClass implements Insertable<SurahRow> {
           other.ayahCount == this.ayahCount &&
           other.startPage == this.startPage &&
           other.startPage1405 == this.startPage1405 &&
-          other.sourceId == this.sourceId);
+          other.sourceId == this.sourceId &&
+          other.startPageShamarly == this.startPageShamarly);
 }
 
 class SurahCompanion extends UpdateCompanion<SurahRow> {
@@ -470,6 +513,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
   final Value<int> startPage;
   final Value<int> startPage1405;
   final Value<int> sourceId;
+  final Value<int> startPageShamarly;
   const SurahCompanion({
     this.id = const Value.absent(),
     this.nameAr = const Value.absent(),
@@ -481,6 +525,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     this.startPage = const Value.absent(),
     this.startPage1405 = const Value.absent(),
     this.sourceId = const Value.absent(),
+    this.startPageShamarly = const Value.absent(),
   });
   SurahCompanion.insert({
     this.id = const Value.absent(),
@@ -493,6 +538,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     required int startPage,
     required int startPage1405,
     required int sourceId,
+    required int startPageShamarly,
   }) : nameAr = Value(nameAr),
        nameEn = Value(nameEn),
        meaningEn = Value(meaningEn),
@@ -501,7 +547,8 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
        ayahCount = Value(ayahCount),
        startPage = Value(startPage),
        startPage1405 = Value(startPage1405),
-       sourceId = Value(sourceId);
+       sourceId = Value(sourceId),
+       startPageShamarly = Value(startPageShamarly);
   static Insertable<SurahRow> custom({
     Expression<int>? id,
     Expression<String>? nameAr,
@@ -513,6 +560,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     Expression<int>? startPage,
     Expression<int>? startPage1405,
     Expression<int>? sourceId,
+    Expression<int>? startPageShamarly,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -525,6 +573,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
       if (startPage != null) 'start_page': startPage,
       if (startPage1405 != null) 'start_page_1405': startPage1405,
       if (sourceId != null) 'source_id': sourceId,
+      if (startPageShamarly != null) 'start_page_shamarly': startPageShamarly,
     });
   }
 
@@ -539,6 +588,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     Value<int>? startPage,
     Value<int>? startPage1405,
     Value<int>? sourceId,
+    Value<int>? startPageShamarly,
   }) {
     return SurahCompanion(
       id: id ?? this.id,
@@ -551,6 +601,7 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
       startPage: startPage ?? this.startPage,
       startPage1405: startPage1405 ?? this.startPage1405,
       sourceId: sourceId ?? this.sourceId,
+      startPageShamarly: startPageShamarly ?? this.startPageShamarly,
     );
   }
 
@@ -587,6 +638,9 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
     if (sourceId.present) {
       map['source_id'] = Variable<int>(sourceId.value);
     }
+    if (startPageShamarly.present) {
+      map['start_page_shamarly'] = Variable<int>(startPageShamarly.value);
+    }
     return map;
   }
 
@@ -602,7 +656,8 @@ class SurahCompanion extends UpdateCompanion<SurahRow> {
           ..write('ayahCount: $ayahCount, ')
           ..write('startPage: $startPage, ')
           ..write('startPage1405: $startPage1405, ')
-          ..write('sourceId: $sourceId')
+          ..write('sourceId: $sourceId, ')
+          ..write('startPageShamarly: $startPageShamarly')
           ..write(')'))
         .toString();
   }
@@ -785,6 +840,28 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _pageShamarlyMeta = const VerificationMeta(
+    'pageShamarly',
+  );
+  @override
+  late final GeneratedColumn<int> pageShamarly = GeneratedColumn<int>(
+    'page_shamarly',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageShamarlyEndMeta = const VerificationMeta(
+    'pageShamarlyEnd',
+  );
+  @override
+  late final GeneratedColumn<int> pageShamarlyEnd = GeneratedColumn<int>(
+    'page_shamarly_end',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -804,6 +881,8 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     textSourceId,
     displaySourceId,
     pageSourceId,
+    pageShamarly,
+    pageShamarlyEnd,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -967,6 +1046,28 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
     } else if (isInserting) {
       context.missing(_pageSourceIdMeta);
     }
+    if (data.containsKey('page_shamarly')) {
+      context.handle(
+        _pageShamarlyMeta,
+        pageShamarly.isAcceptableOrUnknown(
+          data['page_shamarly']!,
+          _pageShamarlyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_pageShamarlyMeta);
+    }
+    if (data.containsKey('page_shamarly_end')) {
+      context.handle(
+        _pageShamarlyEndMeta,
+        pageShamarlyEnd.isAcceptableOrUnknown(
+          data['page_shamarly_end']!,
+          _pageShamarlyEndMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_pageShamarlyEndMeta);
+    }
     return context;
   }
 
@@ -1044,6 +1145,14 @@ class $AyahTable extends Ayah with TableInfo<$AyahTable, AyahRow> {
         DriftSqlType.int,
         data['${effectivePrefix}page_source_id'],
       )!,
+      pageShamarly: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page_shamarly'],
+      )!,
+      pageShamarlyEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page_shamarly_end'],
+      )!,
     );
   }
 
@@ -1083,6 +1192,13 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
   final int textSourceId;
   final int displaySourceId;
   final int pageSourceId;
+
+  /// Page where the verse starts in the Shamarly (Egyptian) edition.
+  final int pageShamarly;
+
+  /// Page of the verse's marker in the Shamarly edition: a verse may run
+  /// over a page break there.
+  final int pageShamarlyEnd;
   const AyahRow({
     required this.id,
     required this.surah,
@@ -1101,6 +1217,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     required this.textSourceId,
     required this.displaySourceId,
     required this.pageSourceId,
+    required this.pageShamarly,
+    required this.pageShamarlyEnd,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1124,6 +1242,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     map['text_source_id'] = Variable<int>(textSourceId);
     map['display_source_id'] = Variable<int>(displaySourceId);
     map['page_source_id'] = Variable<int>(pageSourceId);
+    map['page_shamarly'] = Variable<int>(pageShamarly);
+    map['page_shamarly_end'] = Variable<int>(pageShamarlyEnd);
     return map;
   }
 
@@ -1148,6 +1268,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       textSourceId: Value(textSourceId),
       displaySourceId: Value(displaySourceId),
       pageSourceId: Value(pageSourceId),
+      pageShamarly: Value(pageShamarly),
+      pageShamarlyEnd: Value(pageShamarlyEnd),
     );
   }
 
@@ -1176,6 +1298,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       textSourceId: serializer.fromJson<int>(json['textSourceId']),
       displaySourceId: serializer.fromJson<int>(json['displaySourceId']),
       pageSourceId: serializer.fromJson<int>(json['pageSourceId']),
+      pageShamarly: serializer.fromJson<int>(json['pageShamarly']),
+      pageShamarlyEnd: serializer.fromJson<int>(json['pageShamarlyEnd']),
     );
   }
   @override
@@ -1199,6 +1323,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       'textSourceId': serializer.toJson<int>(textSourceId),
       'displaySourceId': serializer.toJson<int>(displaySourceId),
       'pageSourceId': serializer.toJson<int>(pageSourceId),
+      'pageShamarly': serializer.toJson<int>(pageShamarly),
+      'pageShamarlyEnd': serializer.toJson<int>(pageShamarlyEnd),
     };
   }
 
@@ -1220,6 +1346,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     int? textSourceId,
     int? displaySourceId,
     int? pageSourceId,
+    int? pageShamarly,
+    int? pageShamarlyEnd,
   }) => AyahRow(
     id: id ?? this.id,
     surah: surah ?? this.surah,
@@ -1238,6 +1366,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     textSourceId: textSourceId ?? this.textSourceId,
     displaySourceId: displaySourceId ?? this.displaySourceId,
     pageSourceId: pageSourceId ?? this.pageSourceId,
+    pageShamarly: pageShamarly ?? this.pageShamarly,
+    pageShamarlyEnd: pageShamarlyEnd ?? this.pageShamarlyEnd,
   );
   AyahRow copyWithCompanion(AyahCompanion data) {
     return AyahRow(
@@ -1274,6 +1404,12 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
       pageSourceId: data.pageSourceId.present
           ? data.pageSourceId.value
           : this.pageSourceId,
+      pageShamarly: data.pageShamarly.present
+          ? data.pageShamarly.value
+          : this.pageShamarly,
+      pageShamarlyEnd: data.pageShamarlyEnd.present
+          ? data.pageShamarlyEnd.value
+          : this.pageShamarlyEnd,
     );
   }
 
@@ -1296,7 +1432,9 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           ..write('sajda: $sajda, ')
           ..write('textSourceId: $textSourceId, ')
           ..write('displaySourceId: $displaySourceId, ')
-          ..write('pageSourceId: $pageSourceId')
+          ..write('pageSourceId: $pageSourceId, ')
+          ..write('pageShamarly: $pageShamarly, ')
+          ..write('pageShamarlyEnd: $pageShamarlyEnd')
           ..write(')'))
         .toString();
   }
@@ -1320,6 +1458,8 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
     textSourceId,
     displaySourceId,
     pageSourceId,
+    pageShamarly,
+    pageShamarlyEnd,
   );
   @override
   bool operator ==(Object other) =>
@@ -1341,7 +1481,9 @@ class AyahRow extends DataClass implements Insertable<AyahRow> {
           other.sajda == this.sajda &&
           other.textSourceId == this.textSourceId &&
           other.displaySourceId == this.displaySourceId &&
-          other.pageSourceId == this.pageSourceId);
+          other.pageSourceId == this.pageSourceId &&
+          other.pageShamarly == this.pageShamarly &&
+          other.pageShamarlyEnd == this.pageShamarlyEnd);
 }
 
 class AyahCompanion extends UpdateCompanion<AyahRow> {
@@ -1362,6 +1504,8 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
   final Value<int> textSourceId;
   final Value<int> displaySourceId;
   final Value<int> pageSourceId;
+  final Value<int> pageShamarly;
+  final Value<int> pageShamarlyEnd;
   const AyahCompanion({
     this.id = const Value.absent(),
     this.surah = const Value.absent(),
@@ -1380,6 +1524,8 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     this.textSourceId = const Value.absent(),
     this.displaySourceId = const Value.absent(),
     this.pageSourceId = const Value.absent(),
+    this.pageShamarly = const Value.absent(),
+    this.pageShamarlyEnd = const Value.absent(),
   });
   AyahCompanion.insert({
     this.id = const Value.absent(),
@@ -1399,6 +1545,8 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     required int textSourceId,
     required int displaySourceId,
     required int pageSourceId,
+    required int pageShamarly,
+    required int pageShamarlyEnd,
   }) : surah = Value(surah),
        number = Value(number),
        verseText = Value(verseText),
@@ -1413,7 +1561,9 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
        page1405 = Value(page1405),
        textSourceId = Value(textSourceId),
        displaySourceId = Value(displaySourceId),
-       pageSourceId = Value(pageSourceId);
+       pageSourceId = Value(pageSourceId),
+       pageShamarly = Value(pageShamarly),
+       pageShamarlyEnd = Value(pageShamarlyEnd);
   static Insertable<AyahRow> custom({
     Expression<int>? id,
     Expression<int>? surah,
@@ -1432,6 +1582,8 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     Expression<int>? textSourceId,
     Expression<int>? displaySourceId,
     Expression<int>? pageSourceId,
+    Expression<int>? pageShamarly,
+    Expression<int>? pageShamarlyEnd,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1452,6 +1604,8 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       if (textSourceId != null) 'text_source_id': textSourceId,
       if (displaySourceId != null) 'display_source_id': displaySourceId,
       if (pageSourceId != null) 'page_source_id': pageSourceId,
+      if (pageShamarly != null) 'page_shamarly': pageShamarly,
+      if (pageShamarlyEnd != null) 'page_shamarly_end': pageShamarlyEnd,
     });
   }
 
@@ -1473,6 +1627,8 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     Value<int>? textSourceId,
     Value<int>? displaySourceId,
     Value<int>? pageSourceId,
+    Value<int>? pageShamarly,
+    Value<int>? pageShamarlyEnd,
   }) {
     return AyahCompanion(
       id: id ?? this.id,
@@ -1492,6 +1648,8 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
       textSourceId: textSourceId ?? this.textSourceId,
       displaySourceId: displaySourceId ?? this.displaySourceId,
       pageSourceId: pageSourceId ?? this.pageSourceId,
+      pageShamarly: pageShamarly ?? this.pageShamarly,
+      pageShamarlyEnd: pageShamarlyEnd ?? this.pageShamarlyEnd,
     );
   }
 
@@ -1549,6 +1707,12 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
     if (pageSourceId.present) {
       map['page_source_id'] = Variable<int>(pageSourceId.value);
     }
+    if (pageShamarly.present) {
+      map['page_shamarly'] = Variable<int>(pageShamarly.value);
+    }
+    if (pageShamarlyEnd.present) {
+      map['page_shamarly_end'] = Variable<int>(pageShamarlyEnd.value);
+    }
     return map;
   }
 
@@ -1571,7 +1735,9 @@ class AyahCompanion extends UpdateCompanion<AyahRow> {
           ..write('sajda: $sajda, ')
           ..write('textSourceId: $textSourceId, ')
           ..write('displaySourceId: $displaySourceId, ')
-          ..write('pageSourceId: $pageSourceId')
+          ..write('pageSourceId: $pageSourceId, ')
+          ..write('pageShamarly: $pageShamarly, ')
+          ..write('pageShamarlyEnd: $pageShamarlyEnd')
           ..write(')'))
         .toString();
   }
@@ -6035,6 +6201,3101 @@ class WordTimingCompanion extends UpdateCompanion<WordTimingRow> {
   }
 }
 
+class $ShamarlyPageTable extends ShamarlyPage
+    with TableInfo<$ShamarlyPageTable, ShamarlyPageRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyPageTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _linesMeta = const VerificationMeta('lines');
+  @override
+  late final GeneratedColumn<int> lines = GeneratedColumn<int>(
+    'lines',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _gridTopMeta = const VerificationMeta(
+    'gridTop',
+  );
+  @override
+  late final GeneratedColumn<double> gridTop = GeneratedColumn<double>(
+    'grid_top',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pitchMeta = const VerificationMeta('pitch');
+  @override
+  late final GeneratedColumn<double> pitch = GeneratedColumn<double>(
+    'pitch',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [page, kind, lines, gridTop, pitch];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_page';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyPageRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('lines')) {
+      context.handle(
+        _linesMeta,
+        lines.isAcceptableOrUnknown(data['lines']!, _linesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_linesMeta);
+    }
+    if (data.containsKey('grid_top')) {
+      context.handle(
+        _gridTopMeta,
+        gridTop.isAcceptableOrUnknown(data['grid_top']!, _gridTopMeta),
+      );
+    }
+    if (data.containsKey('pitch')) {
+      context.handle(
+        _pitchMeta,
+        pitch.isAcceptableOrUnknown(data['pitch']!, _pitchMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {page};
+  @override
+  ShamarlyPageRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyPageRow(
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      lines: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lines'],
+      )!,
+      gridTop: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}grid_top'],
+      ),
+      pitch: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}pitch'],
+      ),
+    );
+  }
+
+  @override
+  $ShamarlyPageTable createAlias(String alias) {
+    return $ShamarlyPageTable(attachedDatabase, alias);
+  }
+}
+
+class ShamarlyPageRow extends DataClass implements Insertable<ShamarlyPageRow> {
+  final int page;
+  final String kind;
+  final int lines;
+  final double? gridTop;
+  final double? pitch;
+  const ShamarlyPageRow({
+    required this.page,
+    required this.kind,
+    required this.lines,
+    this.gridTop,
+    this.pitch,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['page'] = Variable<int>(page);
+    map['kind'] = Variable<String>(kind);
+    map['lines'] = Variable<int>(lines);
+    if (!nullToAbsent || gridTop != null) {
+      map['grid_top'] = Variable<double>(gridTop);
+    }
+    if (!nullToAbsent || pitch != null) {
+      map['pitch'] = Variable<double>(pitch);
+    }
+    return map;
+  }
+
+  ShamarlyPageCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyPageCompanion(
+      page: Value(page),
+      kind: Value(kind),
+      lines: Value(lines),
+      gridTop: gridTop == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gridTop),
+      pitch: pitch == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pitch),
+    );
+  }
+
+  factory ShamarlyPageRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyPageRow(
+      page: serializer.fromJson<int>(json['page']),
+      kind: serializer.fromJson<String>(json['kind']),
+      lines: serializer.fromJson<int>(json['lines']),
+      gridTop: serializer.fromJson<double?>(json['gridTop']),
+      pitch: serializer.fromJson<double?>(json['pitch']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'page': serializer.toJson<int>(page),
+      'kind': serializer.toJson<String>(kind),
+      'lines': serializer.toJson<int>(lines),
+      'gridTop': serializer.toJson<double?>(gridTop),
+      'pitch': serializer.toJson<double?>(pitch),
+    };
+  }
+
+  ShamarlyPageRow copyWith({
+    int? page,
+    String? kind,
+    int? lines,
+    Value<double?> gridTop = const Value.absent(),
+    Value<double?> pitch = const Value.absent(),
+  }) => ShamarlyPageRow(
+    page: page ?? this.page,
+    kind: kind ?? this.kind,
+    lines: lines ?? this.lines,
+    gridTop: gridTop.present ? gridTop.value : this.gridTop,
+    pitch: pitch.present ? pitch.value : this.pitch,
+  );
+  ShamarlyPageRow copyWithCompanion(ShamarlyPageCompanion data) {
+    return ShamarlyPageRow(
+      page: data.page.present ? data.page.value : this.page,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      lines: data.lines.present ? data.lines.value : this.lines,
+      gridTop: data.gridTop.present ? data.gridTop.value : this.gridTop,
+      pitch: data.pitch.present ? data.pitch.value : this.pitch,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyPageRow(')
+          ..write('page: $page, ')
+          ..write('kind: $kind, ')
+          ..write('lines: $lines, ')
+          ..write('gridTop: $gridTop, ')
+          ..write('pitch: $pitch')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(page, kind, lines, gridTop, pitch);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyPageRow &&
+          other.page == this.page &&
+          other.kind == this.kind &&
+          other.lines == this.lines &&
+          other.gridTop == this.gridTop &&
+          other.pitch == this.pitch);
+}
+
+class ShamarlyPageCompanion extends UpdateCompanion<ShamarlyPageRow> {
+  final Value<int> page;
+  final Value<String> kind;
+  final Value<int> lines;
+  final Value<double?> gridTop;
+  final Value<double?> pitch;
+  const ShamarlyPageCompanion({
+    this.page = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.lines = const Value.absent(),
+    this.gridTop = const Value.absent(),
+    this.pitch = const Value.absent(),
+  });
+  ShamarlyPageCompanion.insert({
+    this.page = const Value.absent(),
+    required String kind,
+    required int lines,
+    this.gridTop = const Value.absent(),
+    this.pitch = const Value.absent(),
+  }) : kind = Value(kind),
+       lines = Value(lines);
+  static Insertable<ShamarlyPageRow> custom({
+    Expression<int>? page,
+    Expression<String>? kind,
+    Expression<int>? lines,
+    Expression<double>? gridTop,
+    Expression<double>? pitch,
+  }) {
+    return RawValuesInsertable({
+      if (page != null) 'page': page,
+      if (kind != null) 'kind': kind,
+      if (lines != null) 'lines': lines,
+      if (gridTop != null) 'grid_top': gridTop,
+      if (pitch != null) 'pitch': pitch,
+    });
+  }
+
+  ShamarlyPageCompanion copyWith({
+    Value<int>? page,
+    Value<String>? kind,
+    Value<int>? lines,
+    Value<double?>? gridTop,
+    Value<double?>? pitch,
+  }) {
+    return ShamarlyPageCompanion(
+      page: page ?? this.page,
+      kind: kind ?? this.kind,
+      lines: lines ?? this.lines,
+      gridTop: gridTop ?? this.gridTop,
+      pitch: pitch ?? this.pitch,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (lines.present) {
+      map['lines'] = Variable<int>(lines.value);
+    }
+    if (gridTop.present) {
+      map['grid_top'] = Variable<double>(gridTop.value);
+    }
+    if (pitch.present) {
+      map['pitch'] = Variable<double>(pitch.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyPageCompanion(')
+          ..write('page: $page, ')
+          ..write('kind: $kind, ')
+          ..write('lines: $lines, ')
+          ..write('gridTop: $gridTop, ')
+          ..write('pitch: $pitch')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ShamarlyLineTable extends ShamarlyLine
+    with TableInfo<$ShamarlyLineTable, ShamarlyLineRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyLineTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lineMeta = const VerificationMeta('line');
+  @override
+  late final GeneratedColumn<int> line = GeneratedColumn<int>(
+    'line',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [page, line, kind, surah, y0, y1];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_line';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyLineRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('line')) {
+      context.handle(
+        _lineMeta,
+        line.isAcceptableOrUnknown(data['line']!, _lineMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lineMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {page, line};
+  @override
+  ShamarlyLineRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyLineRow(
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      line: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      ),
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyLineTable createAlias(String alias) {
+    return $ShamarlyLineTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class ShamarlyLineRow extends DataClass implements Insertable<ShamarlyLineRow> {
+  final int page;
+  final int line;
+  final String kind;
+  final int? surah;
+  final int y0;
+  final int y1;
+  const ShamarlyLineRow({
+    required this.page,
+    required this.line,
+    required this.kind,
+    this.surah,
+    required this.y0,
+    required this.y1,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['page'] = Variable<int>(page);
+    map['line'] = Variable<int>(line);
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || surah != null) {
+      map['surah'] = Variable<int>(surah);
+    }
+    map['y0'] = Variable<int>(y0);
+    map['y1'] = Variable<int>(y1);
+    return map;
+  }
+
+  ShamarlyLineCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyLineCompanion(
+      page: Value(page),
+      line: Value(line),
+      kind: Value(kind),
+      surah: surah == null && nullToAbsent
+          ? const Value.absent()
+          : Value(surah),
+      y0: Value(y0),
+      y1: Value(y1),
+    );
+  }
+
+  factory ShamarlyLineRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyLineRow(
+      page: serializer.fromJson<int>(json['page']),
+      line: serializer.fromJson<int>(json['line']),
+      kind: serializer.fromJson<String>(json['kind']),
+      surah: serializer.fromJson<int?>(json['surah']),
+      y0: serializer.fromJson<int>(json['y0']),
+      y1: serializer.fromJson<int>(json['y1']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'page': serializer.toJson<int>(page),
+      'line': serializer.toJson<int>(line),
+      'kind': serializer.toJson<String>(kind),
+      'surah': serializer.toJson<int?>(surah),
+      'y0': serializer.toJson<int>(y0),
+      'y1': serializer.toJson<int>(y1),
+    };
+  }
+
+  ShamarlyLineRow copyWith({
+    int? page,
+    int? line,
+    String? kind,
+    Value<int?> surah = const Value.absent(),
+    int? y0,
+    int? y1,
+  }) => ShamarlyLineRow(
+    page: page ?? this.page,
+    line: line ?? this.line,
+    kind: kind ?? this.kind,
+    surah: surah.present ? surah.value : this.surah,
+    y0: y0 ?? this.y0,
+    y1: y1 ?? this.y1,
+  );
+  ShamarlyLineRow copyWithCompanion(ShamarlyLineCompanion data) {
+    return ShamarlyLineRow(
+      page: data.page.present ? data.page.value : this.page,
+      line: data.line.present ? data.line.value : this.line,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      surah: data.surah.present ? data.surah.value : this.surah,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      y1: data.y1.present ? data.y1.value : this.y1,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyLineRow(')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('kind: $kind, ')
+          ..write('surah: $surah, ')
+          ..write('y0: $y0, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(page, line, kind, surah, y0, y1);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyLineRow &&
+          other.page == this.page &&
+          other.line == this.line &&
+          other.kind == this.kind &&
+          other.surah == this.surah &&
+          other.y0 == this.y0 &&
+          other.y1 == this.y1);
+}
+
+class ShamarlyLineCompanion extends UpdateCompanion<ShamarlyLineRow> {
+  final Value<int> page;
+  final Value<int> line;
+  final Value<String> kind;
+  final Value<int?> surah;
+  final Value<int> y0;
+  final Value<int> y1;
+  const ShamarlyLineCompanion({
+    this.page = const Value.absent(),
+    this.line = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.surah = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.y1 = const Value.absent(),
+  });
+  ShamarlyLineCompanion.insert({
+    required int page,
+    required int line,
+    required String kind,
+    this.surah = const Value.absent(),
+    required int y0,
+    required int y1,
+  }) : page = Value(page),
+       line = Value(line),
+       kind = Value(kind),
+       y0 = Value(y0),
+       y1 = Value(y1);
+  static Insertable<ShamarlyLineRow> custom({
+    Expression<int>? page,
+    Expression<int>? line,
+    Expression<String>? kind,
+    Expression<int>? surah,
+    Expression<int>? y0,
+    Expression<int>? y1,
+  }) {
+    return RawValuesInsertable({
+      if (page != null) 'page': page,
+      if (line != null) 'line': line,
+      if (kind != null) 'kind': kind,
+      if (surah != null) 'surah': surah,
+      if (y0 != null) 'y0': y0,
+      if (y1 != null) 'y1': y1,
+    });
+  }
+
+  ShamarlyLineCompanion copyWith({
+    Value<int>? page,
+    Value<int>? line,
+    Value<String>? kind,
+    Value<int?>? surah,
+    Value<int>? y0,
+    Value<int>? y1,
+  }) {
+    return ShamarlyLineCompanion(
+      page: page ?? this.page,
+      line: line ?? this.line,
+      kind: kind ?? this.kind,
+      surah: surah ?? this.surah,
+      y0: y0 ?? this.y0,
+      y1: y1 ?? this.y1,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (line.present) {
+      map['line'] = Variable<int>(line.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyLineCompanion(')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('kind: $kind, ')
+          ..write('surah: $surah, ')
+          ..write('y0: $y0, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ShamarlyLineOverflowTable extends ShamarlyLineOverflow
+    with TableInfo<$ShamarlyLineOverflowTable, ShamarlyOverflowRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyLineOverflowTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lineMeta = const VerificationMeta('line');
+  @override
+  late final GeneratedColumn<int> line = GeneratedColumn<int>(
+    'line',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [page, line, x0, y0, x1, y1];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_line_overflow';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyOverflowRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('line')) {
+      context.handle(
+        _lineMeta,
+        line.isAcceptableOrUnknown(data['line']!, _lineMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lineMeta);
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {page, line, x0, y0};
+  @override
+  ShamarlyOverflowRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyOverflowRow(
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      line: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line'],
+      )!,
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyLineOverflowTable createAlias(String alias) {
+    return $ShamarlyLineOverflowTable(attachedDatabase, alias);
+  }
+}
+
+class ShamarlyOverflowRow extends DataClass
+    implements Insertable<ShamarlyOverflowRow> {
+  final int page;
+  final int line;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+  const ShamarlyOverflowRow({
+    required this.page,
+    required this.line,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['page'] = Variable<int>(page);
+    map['line'] = Variable<int>(line);
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    return map;
+  }
+
+  ShamarlyLineOverflowCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyLineOverflowCompanion(
+      page: Value(page),
+      line: Value(line),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+    );
+  }
+
+  factory ShamarlyOverflowRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyOverflowRow(
+      page: serializer.fromJson<int>(json['page']),
+      line: serializer.fromJson<int>(json['line']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'page': serializer.toJson<int>(page),
+      'line': serializer.toJson<int>(line),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+    };
+  }
+
+  ShamarlyOverflowRow copyWith({
+    int? page,
+    int? line,
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+  }) => ShamarlyOverflowRow(
+    page: page ?? this.page,
+    line: line ?? this.line,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+  );
+  ShamarlyOverflowRow copyWithCompanion(ShamarlyLineOverflowCompanion data) {
+    return ShamarlyOverflowRow(
+      page: data.page.present ? data.page.value : this.page,
+      line: data.line.present ? data.line.value : this.line,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyOverflowRow(')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(page, line, x0, y0, x1, y1);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyOverflowRow &&
+          other.page == this.page &&
+          other.line == this.line &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1);
+}
+
+class ShamarlyLineOverflowCompanion
+    extends UpdateCompanion<ShamarlyOverflowRow> {
+  final Value<int> page;
+  final Value<int> line;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  final Value<int> rowid;
+  const ShamarlyLineOverflowCompanion({
+    this.page = const Value.absent(),
+    this.line = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ShamarlyLineOverflowCompanion.insert({
+    required int page,
+    required int line,
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+    this.rowid = const Value.absent(),
+  }) : page = Value(page),
+       line = Value(line),
+       x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1);
+  static Insertable<ShamarlyOverflowRow> custom({
+    Expression<int>? page,
+    Expression<int>? line,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (page != null) 'page': page,
+      if (line != null) 'line': line,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ShamarlyLineOverflowCompanion copyWith({
+    Value<int>? page,
+    Value<int>? line,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+    Value<int>? rowid,
+  }) {
+    return ShamarlyLineOverflowCompanion(
+      page: page ?? this.page,
+      line: line ?? this.line,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (line.present) {
+      map['line'] = Variable<int>(line.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyLineOverflowCompanion(')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ShamarlyHeaderTable extends ShamarlyHeader
+    with TableInfo<$ShamarlyHeaderTable, ShamarlyHeaderRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyHeaderTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstLineMeta = const VerificationMeta(
+    'firstLine',
+  );
+  @override
+  late final GeneratedColumn<int> firstLine = GeneratedColumn<int>(
+    'first_line',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    surah,
+    page,
+    firstLine,
+    x0,
+    y0,
+    x1,
+    y1,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_header';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyHeaderRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    }
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('first_line')) {
+      context.handle(
+        _firstLineMeta,
+        firstLine.isAcceptableOrUnknown(data['first_line']!, _firstLineMeta),
+      );
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {surah};
+  @override
+  ShamarlyHeaderRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyHeaderRow(
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      firstLine: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}first_line'],
+      ),
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyHeaderTable createAlias(String alias) {
+    return $ShamarlyHeaderTable(attachedDatabase, alias);
+  }
+}
+
+class ShamarlyHeaderRow extends DataClass
+    implements Insertable<ShamarlyHeaderRow> {
+  final int surah;
+  final int page;
+  final int? firstLine;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+  const ShamarlyHeaderRow({
+    required this.surah,
+    required this.page,
+    this.firstLine,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['surah'] = Variable<int>(surah);
+    map['page'] = Variable<int>(page);
+    if (!nullToAbsent || firstLine != null) {
+      map['first_line'] = Variable<int>(firstLine);
+    }
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    return map;
+  }
+
+  ShamarlyHeaderCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyHeaderCompanion(
+      surah: Value(surah),
+      page: Value(page),
+      firstLine: firstLine == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstLine),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+    );
+  }
+
+  factory ShamarlyHeaderRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyHeaderRow(
+      surah: serializer.fromJson<int>(json['surah']),
+      page: serializer.fromJson<int>(json['page']),
+      firstLine: serializer.fromJson<int?>(json['firstLine']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'surah': serializer.toJson<int>(surah),
+      'page': serializer.toJson<int>(page),
+      'firstLine': serializer.toJson<int?>(firstLine),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+    };
+  }
+
+  ShamarlyHeaderRow copyWith({
+    int? surah,
+    int? page,
+    Value<int?> firstLine = const Value.absent(),
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+  }) => ShamarlyHeaderRow(
+    surah: surah ?? this.surah,
+    page: page ?? this.page,
+    firstLine: firstLine.present ? firstLine.value : this.firstLine,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+  );
+  ShamarlyHeaderRow copyWithCompanion(ShamarlyHeaderCompanion data) {
+    return ShamarlyHeaderRow(
+      surah: data.surah.present ? data.surah.value : this.surah,
+      page: data.page.present ? data.page.value : this.page,
+      firstLine: data.firstLine.present ? data.firstLine.value : this.firstLine,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyHeaderRow(')
+          ..write('surah: $surah, ')
+          ..write('page: $page, ')
+          ..write('firstLine: $firstLine, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(surah, page, firstLine, x0, y0, x1, y1);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyHeaderRow &&
+          other.surah == this.surah &&
+          other.page == this.page &&
+          other.firstLine == this.firstLine &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1);
+}
+
+class ShamarlyHeaderCompanion extends UpdateCompanion<ShamarlyHeaderRow> {
+  final Value<int> surah;
+  final Value<int> page;
+  final Value<int?> firstLine;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  const ShamarlyHeaderCompanion({
+    this.surah = const Value.absent(),
+    this.page = const Value.absent(),
+    this.firstLine = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+  });
+  ShamarlyHeaderCompanion.insert({
+    this.surah = const Value.absent(),
+    required int page,
+    this.firstLine = const Value.absent(),
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+  }) : page = Value(page),
+       x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1);
+  static Insertable<ShamarlyHeaderRow> custom({
+    Expression<int>? surah,
+    Expression<int>? page,
+    Expression<int>? firstLine,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+  }) {
+    return RawValuesInsertable({
+      if (surah != null) 'surah': surah,
+      if (page != null) 'page': page,
+      if (firstLine != null) 'first_line': firstLine,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+    });
+  }
+
+  ShamarlyHeaderCompanion copyWith({
+    Value<int>? surah,
+    Value<int>? page,
+    Value<int?>? firstLine,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+  }) {
+    return ShamarlyHeaderCompanion(
+      surah: surah ?? this.surah,
+      page: page ?? this.page,
+      firstLine: firstLine ?? this.firstLine,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (firstLine.present) {
+      map['first_line'] = Variable<int>(firstLine.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyHeaderCompanion(')
+          ..write('surah: $surah, ')
+          ..write('page: $page, ')
+          ..write('firstLine: $firstLine, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ShamarlyMarkerTable extends ShamarlyMarker
+    with TableInfo<$ShamarlyMarkerTable, ShamarlyMarkerRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyMarkerTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lineMeta = const VerificationMeta('line');
+  @override
+  late final GeneratedColumn<int> line = GeneratedColumn<int>(
+    'line',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    surah,
+    ayah,
+    page,
+    line,
+    x0,
+    y0,
+    x1,
+    y1,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_marker';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyMarkerRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('line')) {
+      context.handle(
+        _lineMeta,
+        line.isAcceptableOrUnknown(data['line']!, _lineMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lineMeta);
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {surah, ayah};
+  @override
+  ShamarlyMarkerRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyMarkerRow(
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      line: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line'],
+      )!,
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyMarkerTable createAlias(String alias) {
+    return $ShamarlyMarkerTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class ShamarlyMarkerRow extends DataClass
+    implements Insertable<ShamarlyMarkerRow> {
+  final int surah;
+  final int ayah;
+  final int page;
+  final int line;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+  const ShamarlyMarkerRow({
+    required this.surah,
+    required this.ayah,
+    required this.page,
+    required this.line,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['page'] = Variable<int>(page);
+    map['line'] = Variable<int>(line);
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    return map;
+  }
+
+  ShamarlyMarkerCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyMarkerCompanion(
+      surah: Value(surah),
+      ayah: Value(ayah),
+      page: Value(page),
+      line: Value(line),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+    );
+  }
+
+  factory ShamarlyMarkerRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyMarkerRow(
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      page: serializer.fromJson<int>(json['page']),
+      line: serializer.fromJson<int>(json['line']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'page': serializer.toJson<int>(page),
+      'line': serializer.toJson<int>(line),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+    };
+  }
+
+  ShamarlyMarkerRow copyWith({
+    int? surah,
+    int? ayah,
+    int? page,
+    int? line,
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+  }) => ShamarlyMarkerRow(
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    page: page ?? this.page,
+    line: line ?? this.line,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+  );
+  ShamarlyMarkerRow copyWithCompanion(ShamarlyMarkerCompanion data) {
+    return ShamarlyMarkerRow(
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      page: data.page.present ? data.page.value : this.page,
+      line: data.line.present ? data.line.value : this.line,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyMarkerRow(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(surah, ayah, page, line, x0, y0, x1, y1);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyMarkerRow &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.page == this.page &&
+          other.line == this.line &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1);
+}
+
+class ShamarlyMarkerCompanion extends UpdateCompanion<ShamarlyMarkerRow> {
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> page;
+  final Value<int> line;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  const ShamarlyMarkerCompanion({
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.page = const Value.absent(),
+    this.line = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+  });
+  ShamarlyMarkerCompanion.insert({
+    required int surah,
+    required int ayah,
+    required int page,
+    required int line,
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+  }) : surah = Value(surah),
+       ayah = Value(ayah),
+       page = Value(page),
+       line = Value(line),
+       x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1);
+  static Insertable<ShamarlyMarkerRow> custom({
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? page,
+    Expression<int>? line,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+  }) {
+    return RawValuesInsertable({
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (page != null) 'page': page,
+      if (line != null) 'line': line,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+    });
+  }
+
+  ShamarlyMarkerCompanion copyWith({
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? page,
+    Value<int>? line,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+  }) {
+    return ShamarlyMarkerCompanion(
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      page: page ?? this.page,
+      line: line ?? this.line,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (line.present) {
+      map['line'] = Variable<int>(line.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyMarkerCompanion(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ShamarlyVerseBoxTable extends ShamarlyVerseBox
+    with TableInfo<$ShamarlyVerseBoxTable, ShamarlyVerseBoxRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyVerseBoxTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _partMeta = const VerificationMeta('part');
+  @override
+  late final GeneratedColumn<int> part = GeneratedColumn<int>(
+    'part',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lineMeta = const VerificationMeta('line');
+  @override
+  late final GeneratedColumn<int> line = GeneratedColumn<int>(
+    'line',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    surah,
+    ayah,
+    part,
+    page,
+    line,
+    x0,
+    y0,
+    x1,
+    y1,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_verse_box';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyVerseBoxRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('part')) {
+      context.handle(
+        _partMeta,
+        part.isAcceptableOrUnknown(data['part']!, _partMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_partMeta);
+    }
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('line')) {
+      context.handle(
+        _lineMeta,
+        line.isAcceptableOrUnknown(data['line']!, _lineMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lineMeta);
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {surah, ayah, part};
+  @override
+  ShamarlyVerseBoxRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyVerseBoxRow(
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      part: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}part'],
+      )!,
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      line: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line'],
+      )!,
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyVerseBoxTable createAlias(String alias) {
+    return $ShamarlyVerseBoxTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class ShamarlyVerseBoxRow extends DataClass
+    implements Insertable<ShamarlyVerseBoxRow> {
+  final int surah;
+  final int ayah;
+
+  /// 0.. in reading order.
+  final int part;
+  final int page;
+  final int line;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+  const ShamarlyVerseBoxRow({
+    required this.surah,
+    required this.ayah,
+    required this.part,
+    required this.page,
+    required this.line,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['part'] = Variable<int>(part);
+    map['page'] = Variable<int>(page);
+    map['line'] = Variable<int>(line);
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    return map;
+  }
+
+  ShamarlyVerseBoxCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyVerseBoxCompanion(
+      surah: Value(surah),
+      ayah: Value(ayah),
+      part: Value(part),
+      page: Value(page),
+      line: Value(line),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+    );
+  }
+
+  factory ShamarlyVerseBoxRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyVerseBoxRow(
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      part: serializer.fromJson<int>(json['part']),
+      page: serializer.fromJson<int>(json['page']),
+      line: serializer.fromJson<int>(json['line']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'part': serializer.toJson<int>(part),
+      'page': serializer.toJson<int>(page),
+      'line': serializer.toJson<int>(line),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+    };
+  }
+
+  ShamarlyVerseBoxRow copyWith({
+    int? surah,
+    int? ayah,
+    int? part,
+    int? page,
+    int? line,
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+  }) => ShamarlyVerseBoxRow(
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    part: part ?? this.part,
+    page: page ?? this.page,
+    line: line ?? this.line,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+  );
+  ShamarlyVerseBoxRow copyWithCompanion(ShamarlyVerseBoxCompanion data) {
+    return ShamarlyVerseBoxRow(
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      part: data.part.present ? data.part.value : this.part,
+      page: data.page.present ? data.page.value : this.page,
+      line: data.line.present ? data.line.value : this.line,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyVerseBoxRow(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('part: $part, ')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(surah, ayah, part, page, line, x0, y0, x1, y1);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyVerseBoxRow &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.part == this.part &&
+          other.page == this.page &&
+          other.line == this.line &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1);
+}
+
+class ShamarlyVerseBoxCompanion extends UpdateCompanion<ShamarlyVerseBoxRow> {
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> part;
+  final Value<int> page;
+  final Value<int> line;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  const ShamarlyVerseBoxCompanion({
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.part = const Value.absent(),
+    this.page = const Value.absent(),
+    this.line = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+  });
+  ShamarlyVerseBoxCompanion.insert({
+    required int surah,
+    required int ayah,
+    required int part,
+    required int page,
+    required int line,
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+  }) : surah = Value(surah),
+       ayah = Value(ayah),
+       part = Value(part),
+       page = Value(page),
+       line = Value(line),
+       x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1);
+  static Insertable<ShamarlyVerseBoxRow> custom({
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? part,
+    Expression<int>? page,
+    Expression<int>? line,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+  }) {
+    return RawValuesInsertable({
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (part != null) 'part': part,
+      if (page != null) 'page': page,
+      if (line != null) 'line': line,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+    });
+  }
+
+  ShamarlyVerseBoxCompanion copyWith({
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? part,
+    Value<int>? page,
+    Value<int>? line,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+  }) {
+    return ShamarlyVerseBoxCompanion(
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      part: part ?? this.part,
+      page: page ?? this.page,
+      line: line ?? this.line,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (part.present) {
+      map['part'] = Variable<int>(part.value);
+    }
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (line.present) {
+      map['line'] = Variable<int>(line.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyVerseBoxCompanion(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('part: $part, ')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ShamarlyWordBoxTable extends ShamarlyWordBox
+    with TableInfo<$ShamarlyWordBoxTable, ShamarlyWordBoxRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyWordBoxTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordMeta = const VerificationMeta('word');
+  @override
+  late final GeneratedColumn<int> word = GeneratedColumn<int>(
+    'word',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lineMeta = const VerificationMeta('line');
+  @override
+  late final GeneratedColumn<int> line = GeneratedColumn<int>(
+    'line',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _levelMeta = const VerificationMeta('level');
+  @override
+  late final GeneratedColumn<int> level = GeneratedColumn<int>(
+    'level',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    surah,
+    ayah,
+    word,
+    page,
+    line,
+    x0,
+    y0,
+    x1,
+    y1,
+    level,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_word_box';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyWordBoxRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('word')) {
+      context.handle(
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordMeta);
+    }
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    if (data.containsKey('line')) {
+      context.handle(
+        _lineMeta,
+        line.isAcceptableOrUnknown(data['line']!, _lineMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_lineMeta);
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    if (data.containsKey('level')) {
+      context.handle(
+        _levelMeta,
+        level.isAcceptableOrUnknown(data['level']!, _levelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_levelMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {surah, ayah, word};
+  @override
+  ShamarlyWordBoxRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyWordBoxRow(
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}word'],
+      )!,
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      line: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line'],
+      )!,
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+      level: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}level'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyWordBoxTable createAlias(String alias) {
+    return $ShamarlyWordBoxTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class ShamarlyWordBoxRow extends DataClass
+    implements Insertable<ShamarlyWordBoxRow> {
+  final int surah;
+  final int ayah;
+
+  /// Numbered as in [WordBox].
+  final int word;
+  final int page;
+  final int line;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+
+  /// How sure the split into words is: 2 stable, 1 not yet reviewed.
+  final int level;
+  const ShamarlyWordBoxRow({
+    required this.surah,
+    required this.ayah,
+    required this.word,
+    required this.page,
+    required this.line,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+    required this.level,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['word'] = Variable<int>(word);
+    map['page'] = Variable<int>(page);
+    map['line'] = Variable<int>(line);
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    map['level'] = Variable<int>(level);
+    return map;
+  }
+
+  ShamarlyWordBoxCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyWordBoxCompanion(
+      surah: Value(surah),
+      ayah: Value(ayah),
+      word: Value(word),
+      page: Value(page),
+      line: Value(line),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+      level: Value(level),
+    );
+  }
+
+  factory ShamarlyWordBoxRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyWordBoxRow(
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      word: serializer.fromJson<int>(json['word']),
+      page: serializer.fromJson<int>(json['page']),
+      line: serializer.fromJson<int>(json['line']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+      level: serializer.fromJson<int>(json['level']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'word': serializer.toJson<int>(word),
+      'page': serializer.toJson<int>(page),
+      'line': serializer.toJson<int>(line),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+      'level': serializer.toJson<int>(level),
+    };
+  }
+
+  ShamarlyWordBoxRow copyWith({
+    int? surah,
+    int? ayah,
+    int? word,
+    int? page,
+    int? line,
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+    int? level,
+  }) => ShamarlyWordBoxRow(
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    word: word ?? this.word,
+    page: page ?? this.page,
+    line: line ?? this.line,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+    level: level ?? this.level,
+  );
+  ShamarlyWordBoxRow copyWithCompanion(ShamarlyWordBoxCompanion data) {
+    return ShamarlyWordBoxRow(
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      word: data.word.present ? data.word.value : this.word,
+      page: data.page.present ? data.page.value : this.page,
+      line: data.line.present ? data.line.value : this.line,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+      level: data.level.present ? data.level.value : this.level,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyWordBoxRow(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('level: $level')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(surah, ayah, word, page, line, x0, y0, x1, y1, level);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyWordBoxRow &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.word == this.word &&
+          other.page == this.page &&
+          other.line == this.line &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1 &&
+          other.level == this.level);
+}
+
+class ShamarlyWordBoxCompanion extends UpdateCompanion<ShamarlyWordBoxRow> {
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> word;
+  final Value<int> page;
+  final Value<int> line;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  final Value<int> level;
+  const ShamarlyWordBoxCompanion({
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.word = const Value.absent(),
+    this.page = const Value.absent(),
+    this.line = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+    this.level = const Value.absent(),
+  });
+  ShamarlyWordBoxCompanion.insert({
+    required int surah,
+    required int ayah,
+    required int word,
+    required int page,
+    required int line,
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+    required int level,
+  }) : surah = Value(surah),
+       ayah = Value(ayah),
+       word = Value(word),
+       page = Value(page),
+       line = Value(line),
+       x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1),
+       level = Value(level);
+  static Insertable<ShamarlyWordBoxRow> custom({
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? word,
+    Expression<int>? page,
+    Expression<int>? line,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+    Expression<int>? level,
+  }) {
+    return RawValuesInsertable({
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (word != null) 'word': word,
+      if (page != null) 'page': page,
+      if (line != null) 'line': line,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+      if (level != null) 'level': level,
+    });
+  }
+
+  ShamarlyWordBoxCompanion copyWith({
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? word,
+    Value<int>? page,
+    Value<int>? line,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+    Value<int>? level,
+  }) {
+    return ShamarlyWordBoxCompanion(
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      word: word ?? this.word,
+      page: page ?? this.page,
+      line: line ?? this.line,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+      level: level ?? this.level,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (word.present) {
+      map['word'] = Variable<int>(word.value);
+    }
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (line.present) {
+      map['line'] = Variable<int>(line.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    if (level.present) {
+      map['level'] = Variable<int>(level.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyWordBoxCompanion(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('page: $page, ')
+          ..write('line: $line, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('level: $level')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -6054,6 +9315,18 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $ReciterTable reciter = $ReciterTable(this);
   late final $AyahTimingTable ayahTiming = $AyahTimingTable(this);
   late final $WordTimingTable wordTiming = $WordTimingTable(this);
+  late final $ShamarlyPageTable shamarlyPage = $ShamarlyPageTable(this);
+  late final $ShamarlyLineTable shamarlyLine = $ShamarlyLineTable(this);
+  late final $ShamarlyLineOverflowTable shamarlyLineOverflow =
+      $ShamarlyLineOverflowTable(this);
+  late final $ShamarlyHeaderTable shamarlyHeader = $ShamarlyHeaderTable(this);
+  late final $ShamarlyMarkerTable shamarlyMarker = $ShamarlyMarkerTable(this);
+  late final $ShamarlyVerseBoxTable shamarlyVerseBox = $ShamarlyVerseBoxTable(
+    this,
+  );
+  late final $ShamarlyWordBoxTable shamarlyWordBox = $ShamarlyWordBoxTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6072,6 +9345,13 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     reciter,
     ayahTiming,
     wordTiming,
+    shamarlyPage,
+    shamarlyLine,
+    shamarlyLineOverflow,
+    shamarlyHeader,
+    shamarlyMarker,
+    shamarlyVerseBox,
+    shamarlyWordBox,
   ];
 }
 
@@ -6086,6 +9366,7 @@ typedef $$SurahTableCreateCompanionBuilder = SurahCompanion Function({
   required int startPage,
   required int startPage1405,
   required int sourceId,
+  required int startPageShamarly,
 });
 typedef $$SurahTableUpdateCompanionBuilder = SurahCompanion Function({
   Value<int> id,
@@ -6098,6 +9379,7 @@ typedef $$SurahTableUpdateCompanionBuilder = SurahCompanion Function({
   Value<int> startPage,
   Value<int> startPage1405,
   Value<int> sourceId,
+  Value<int> startPageShamarly,
 });
 
 class $$SurahTableFilterComposer
@@ -6156,6 +9438,11 @@ class $$SurahTableFilterComposer
 
   ColumnFilters<int> get sourceId => $composableBuilder(
     column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startPageShamarly => $composableBuilder(
+    column: $table.startPageShamarly,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6218,6 +9505,11 @@ class $$SurahTableOrderingComposer
     column: $table.sourceId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get startPageShamarly => $composableBuilder(
+    column: $table.startPageShamarly,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SurahTableAnnotationComposer
@@ -6264,6 +9556,11 @@ class $$SurahTableAnnotationComposer
 
   GeneratedColumn<int> get sourceId =>
       $composableBuilder(column: $table.sourceId, builder: (column) => column);
+
+  GeneratedColumn<int> get startPageShamarly => $composableBuilder(
+    column: $table.startPageShamarly,
+    builder: (column) => column,
+  );
 }
 
 class $$SurahTableTableManager
@@ -6304,6 +9601,7 @@ class $$SurahTableTableManager
                 Value<int> startPage = const Value.absent(),
                 Value<int> startPage1405 = const Value.absent(),
                 Value<int> sourceId = const Value.absent(),
+                Value<int> startPageShamarly = const Value.absent(),
               }) => SurahCompanion(
                 id: id,
                 nameAr: nameAr,
@@ -6315,6 +9613,7 @@ class $$SurahTableTableManager
                 startPage: startPage,
                 startPage1405: startPage1405,
                 sourceId: sourceId,
+                startPageShamarly: startPageShamarly,
               ),
           createCompanionCallback:
               ({
@@ -6328,6 +9627,7 @@ class $$SurahTableTableManager
                 required int startPage,
                 required int startPage1405,
                 required int sourceId,
+                required int startPageShamarly,
               }) => SurahCompanion.insert(
                 id: id,
                 nameAr: nameAr,
@@ -6339,6 +9639,7 @@ class $$SurahTableTableManager
                 startPage: startPage,
                 startPage1405: startPage1405,
                 sourceId: sourceId,
+                startPageShamarly: startPageShamarly,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -6389,6 +9690,8 @@ typedef $$AyahTableCreateCompanionBuilder = AyahCompanion Function({
   required int textSourceId,
   required int displaySourceId,
   required int pageSourceId,
+  required int pageShamarly,
+  required int pageShamarlyEnd,
 });
 typedef $$AyahTableUpdateCompanionBuilder = AyahCompanion Function({
   Value<int> id,
@@ -6408,6 +9711,8 @@ typedef $$AyahTableUpdateCompanionBuilder = AyahCompanion Function({
   Value<int> textSourceId,
   Value<int> displaySourceId,
   Value<int> pageSourceId,
+  Value<int> pageShamarly,
+  Value<int> pageShamarlyEnd,
 });
 
 class $$AyahTableFilterComposer
@@ -6501,6 +9806,16 @@ class $$AyahTableFilterComposer
 
   ColumnFilters<int> get pageSourceId => $composableBuilder(
     column: $table.pageSourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pageShamarly => $composableBuilder(
+    column: $table.pageShamarly,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pageShamarlyEnd => $composableBuilder(
+    column: $table.pageShamarlyEnd,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -6598,6 +9913,16 @@ class $$AyahTableOrderingComposer
     column: $table.pageSourceId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get pageShamarly => $composableBuilder(
+    column: $table.pageShamarly,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pageShamarlyEnd => $composableBuilder(
+    column: $table.pageShamarlyEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AyahTableAnnotationComposer
@@ -6675,6 +10000,16 @@ class $$AyahTableAnnotationComposer
     column: $table.pageSourceId,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get pageShamarly => $composableBuilder(
+    column: $table.pageShamarly,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get pageShamarlyEnd => $composableBuilder(
+    column: $table.pageShamarlyEnd,
+    builder: (column) => column,
+  );
 }
 
 class $$AyahTableTableManager
@@ -6722,6 +10057,8 @@ class $$AyahTableTableManager
                 Value<int> textSourceId = const Value.absent(),
                 Value<int> displaySourceId = const Value.absent(),
                 Value<int> pageSourceId = const Value.absent(),
+                Value<int> pageShamarly = const Value.absent(),
+                Value<int> pageShamarlyEnd = const Value.absent(),
               }) => AyahCompanion(
                 id: id,
                 surah: surah,
@@ -6740,6 +10077,8 @@ class $$AyahTableTableManager
                 textSourceId: textSourceId,
                 displaySourceId: displaySourceId,
                 pageSourceId: pageSourceId,
+                pageShamarly: pageShamarly,
+                pageShamarlyEnd: pageShamarlyEnd,
               ),
           createCompanionCallback:
               ({
@@ -6760,6 +10099,8 @@ class $$AyahTableTableManager
                 required int textSourceId,
                 required int displaySourceId,
                 required int pageSourceId,
+                required int pageShamarly,
+                required int pageShamarlyEnd,
               }) => AyahCompanion.insert(
                 id: id,
                 surah: surah,
@@ -6778,6 +10119,8 @@ class $$AyahTableTableManager
                 textSourceId: textSourceId,
                 displaySourceId: displaySourceId,
                 pageSourceId: pageSourceId,
+                pageShamarly: pageShamarly,
+                pageShamarlyEnd: pageShamarlyEnd,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -9324,6 +12667,1809 @@ typedef $$WordTimingTableProcessedTableManager =
       WordTimingRow,
       PrefetchHooks Function()
     >;
+typedef $$ShamarlyPageTableCreateCompanionBuilder =
+    ShamarlyPageCompanion Function({
+      Value<int> page,
+      required String kind,
+      required int lines,
+      Value<double?> gridTop,
+      Value<double?> pitch,
+    });
+typedef $$ShamarlyPageTableUpdateCompanionBuilder =
+    ShamarlyPageCompanion Function({
+      Value<int> page,
+      Value<String> kind,
+      Value<int> lines,
+      Value<double?> gridTop,
+      Value<double?> pitch,
+    });
+
+class $$ShamarlyPageTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyPageTable> {
+  $$ShamarlyPageTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lines => $composableBuilder(
+    column: $table.lines,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get gridTop => $composableBuilder(
+    column: $table.gridTop,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get pitch => $composableBuilder(
+    column: $table.pitch,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyPageTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyPageTable> {
+  $$ShamarlyPageTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lines => $composableBuilder(
+    column: $table.lines,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get gridTop => $composableBuilder(
+    column: $table.gridTop,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get pitch => $composableBuilder(
+    column: $table.pitch,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyPageTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyPageTable> {
+  $$ShamarlyPageTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<int> get lines =>
+      $composableBuilder(column: $table.lines, builder: (column) => column);
+
+  GeneratedColumn<double> get gridTop =>
+      $composableBuilder(column: $table.gridTop, builder: (column) => column);
+
+  GeneratedColumn<double> get pitch =>
+      $composableBuilder(column: $table.pitch, builder: (column) => column);
+}
+
+class $$ShamarlyPageTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyPageTable,
+          ShamarlyPageRow,
+          $$ShamarlyPageTableFilterComposer,
+          $$ShamarlyPageTableOrderingComposer,
+          $$ShamarlyPageTableAnnotationComposer,
+          $$ShamarlyPageTableCreateCompanionBuilder,
+          $$ShamarlyPageTableUpdateCompanionBuilder,
+          (
+            ShamarlyPageRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyPageTable,
+              ShamarlyPageRow
+            >,
+          ),
+          ShamarlyPageRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyPageTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyPageTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyPageTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyPageTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyPageTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<int> lines = const Value.absent(),
+                Value<double?> gridTop = const Value.absent(),
+                Value<double?> pitch = const Value.absent(),
+              }) => ShamarlyPageCompanion(
+                page: page,
+                kind: kind,
+                lines: lines,
+                gridTop: gridTop,
+                pitch: pitch,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                required String kind,
+                required int lines,
+                Value<double?> gridTop = const Value.absent(),
+                Value<double?> pitch = const Value.absent(),
+              }) => ShamarlyPageCompanion.insert(
+                page: page,
+                kind: kind,
+                lines: lines,
+                gridTop: gridTop,
+                pitch: pitch,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyPageTable, ShamarlyPageRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyPageTable,
+                    ShamarlyPageRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyPageTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyPageTable,
+      ShamarlyPageRow,
+      $$ShamarlyPageTableFilterComposer,
+      $$ShamarlyPageTableOrderingComposer,
+      $$ShamarlyPageTableAnnotationComposer,
+      $$ShamarlyPageTableCreateCompanionBuilder,
+      $$ShamarlyPageTableUpdateCompanionBuilder,
+      (
+        ShamarlyPageRow,
+        BaseReferences<_$ContentDatabase, $ShamarlyPageTable, ShamarlyPageRow>,
+      ),
+      ShamarlyPageRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ShamarlyLineTableCreateCompanionBuilder =
+    ShamarlyLineCompanion Function({
+      required int page,
+      required int line,
+      required String kind,
+      Value<int?> surah,
+      required int y0,
+      required int y1,
+    });
+typedef $$ShamarlyLineTableUpdateCompanionBuilder =
+    ShamarlyLineCompanion Function({
+      Value<int> page,
+      Value<int> line,
+      Value<String> kind,
+      Value<int?> surah,
+      Value<int> y0,
+      Value<int> y1,
+    });
+
+class $$ShamarlyLineTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyLineTable> {
+  $$ShamarlyLineTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyLineTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyLineTable> {
+  $$ShamarlyLineTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyLineTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyLineTable> {
+  $$ShamarlyLineTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get line =>
+      $composableBuilder(column: $table.line, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+}
+
+class $$ShamarlyLineTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyLineTable,
+          ShamarlyLineRow,
+          $$ShamarlyLineTableFilterComposer,
+          $$ShamarlyLineTableOrderingComposer,
+          $$ShamarlyLineTableAnnotationComposer,
+          $$ShamarlyLineTableCreateCompanionBuilder,
+          $$ShamarlyLineTableUpdateCompanionBuilder,
+          (
+            ShamarlyLineRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyLineTable,
+              ShamarlyLineRow
+            >,
+          ),
+          ShamarlyLineRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyLineTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyLineTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyLineTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyLineTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyLineTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                Value<int> line = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<int?> surah = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+              }) => ShamarlyLineCompanion(
+                page: page,
+                line: line,
+                kind: kind,
+                surah: surah,
+                y0: y0,
+                y1: y1,
+              ),
+          createCompanionCallback:
+              ({
+                required int page,
+                required int line,
+                required String kind,
+                Value<int?> surah = const Value.absent(),
+                required int y0,
+                required int y1,
+              }) => ShamarlyLineCompanion.insert(
+                page: page,
+                line: line,
+                kind: kind,
+                surah: surah,
+                y0: y0,
+                y1: y1,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyLineTable, ShamarlyLineRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyLineTable,
+                    ShamarlyLineRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyLineTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyLineTable,
+      ShamarlyLineRow,
+      $$ShamarlyLineTableFilterComposer,
+      $$ShamarlyLineTableOrderingComposer,
+      $$ShamarlyLineTableAnnotationComposer,
+      $$ShamarlyLineTableCreateCompanionBuilder,
+      $$ShamarlyLineTableUpdateCompanionBuilder,
+      (
+        ShamarlyLineRow,
+        BaseReferences<_$ContentDatabase, $ShamarlyLineTable, ShamarlyLineRow>,
+      ),
+      ShamarlyLineRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ShamarlyLineOverflowTableCreateCompanionBuilder =
+    ShamarlyLineOverflowCompanion Function({
+      required int page,
+      required int line,
+      required int x0,
+      required int y0,
+      required int x1,
+      required int y1,
+      Value<int> rowid,
+    });
+typedef $$ShamarlyLineOverflowTableUpdateCompanionBuilder =
+    ShamarlyLineOverflowCompanion Function({
+      Value<int> page,
+      Value<int> line,
+      Value<int> x0,
+      Value<int> y0,
+      Value<int> x1,
+      Value<int> y1,
+      Value<int> rowid,
+    });
+
+class $$ShamarlyLineOverflowTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyLineOverflowTable> {
+  $$ShamarlyLineOverflowTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyLineOverflowTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyLineOverflowTable> {
+  $$ShamarlyLineOverflowTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyLineOverflowTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyLineOverflowTable> {
+  $$ShamarlyLineOverflowTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get line =>
+      $composableBuilder(column: $table.line, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+}
+
+class $$ShamarlyLineOverflowTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyLineOverflowTable,
+          ShamarlyOverflowRow,
+          $$ShamarlyLineOverflowTableFilterComposer,
+          $$ShamarlyLineOverflowTableOrderingComposer,
+          $$ShamarlyLineOverflowTableAnnotationComposer,
+          $$ShamarlyLineOverflowTableCreateCompanionBuilder,
+          $$ShamarlyLineOverflowTableUpdateCompanionBuilder,
+          (
+            ShamarlyOverflowRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyLineOverflowTable,
+              ShamarlyOverflowRow
+            >,
+          ),
+          ShamarlyOverflowRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyLineOverflowTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyLineOverflowTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyLineOverflowTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyLineOverflowTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ShamarlyLineOverflowTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                Value<int> line = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ShamarlyLineOverflowCompanion(
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int page,
+                required int line,
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+                Value<int> rowid = const Value.absent(),
+              }) => ShamarlyLineOverflowCompanion.insert(
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyLineOverflowTable, ShamarlyOverflowRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyLineOverflowTable,
+                    ShamarlyOverflowRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyLineOverflowTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyLineOverflowTable,
+      ShamarlyOverflowRow,
+      $$ShamarlyLineOverflowTableFilterComposer,
+      $$ShamarlyLineOverflowTableOrderingComposer,
+      $$ShamarlyLineOverflowTableAnnotationComposer,
+      $$ShamarlyLineOverflowTableCreateCompanionBuilder,
+      $$ShamarlyLineOverflowTableUpdateCompanionBuilder,
+      (
+        ShamarlyOverflowRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $ShamarlyLineOverflowTable,
+          ShamarlyOverflowRow
+        >,
+      ),
+      ShamarlyOverflowRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ShamarlyHeaderTableCreateCompanionBuilder =
+    ShamarlyHeaderCompanion Function({
+      Value<int> surah,
+      required int page,
+      Value<int?> firstLine,
+      required int x0,
+      required int y0,
+      required int x1,
+      required int y1,
+    });
+typedef $$ShamarlyHeaderTableUpdateCompanionBuilder =
+    ShamarlyHeaderCompanion Function({
+      Value<int> surah,
+      Value<int> page,
+      Value<int?> firstLine,
+      Value<int> x0,
+      Value<int> y0,
+      Value<int> x1,
+      Value<int> y1,
+    });
+
+class $$ShamarlyHeaderTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyHeaderTable> {
+  $$ShamarlyHeaderTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get firstLine => $composableBuilder(
+    column: $table.firstLine,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyHeaderTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyHeaderTable> {
+  $$ShamarlyHeaderTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get firstLine => $composableBuilder(
+    column: $table.firstLine,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyHeaderTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyHeaderTable> {
+  $$ShamarlyHeaderTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get firstLine =>
+      $composableBuilder(column: $table.firstLine, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+}
+
+class $$ShamarlyHeaderTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyHeaderTable,
+          ShamarlyHeaderRow,
+          $$ShamarlyHeaderTableFilterComposer,
+          $$ShamarlyHeaderTableOrderingComposer,
+          $$ShamarlyHeaderTableAnnotationComposer,
+          $$ShamarlyHeaderTableCreateCompanionBuilder,
+          $$ShamarlyHeaderTableUpdateCompanionBuilder,
+          (
+            ShamarlyHeaderRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyHeaderTable,
+              ShamarlyHeaderRow
+            >,
+          ),
+          ShamarlyHeaderRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyHeaderTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyHeaderTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyHeaderTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyHeaderTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyHeaderTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                Value<int> page = const Value.absent(),
+                Value<int?> firstLine = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+              }) => ShamarlyHeaderCompanion(
+                surah: surah,
+                page: page,
+                firstLine: firstLine,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                required int page,
+                Value<int?> firstLine = const Value.absent(),
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+              }) => ShamarlyHeaderCompanion.insert(
+                surah: surah,
+                page: page,
+                firstLine: firstLine,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyHeaderTable, ShamarlyHeaderRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyHeaderTable,
+                    ShamarlyHeaderRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyHeaderTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyHeaderTable,
+      ShamarlyHeaderRow,
+      $$ShamarlyHeaderTableFilterComposer,
+      $$ShamarlyHeaderTableOrderingComposer,
+      $$ShamarlyHeaderTableAnnotationComposer,
+      $$ShamarlyHeaderTableCreateCompanionBuilder,
+      $$ShamarlyHeaderTableUpdateCompanionBuilder,
+      (
+        ShamarlyHeaderRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $ShamarlyHeaderTable,
+          ShamarlyHeaderRow
+        >,
+      ),
+      ShamarlyHeaderRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ShamarlyMarkerTableCreateCompanionBuilder =
+    ShamarlyMarkerCompanion Function({
+      required int surah,
+      required int ayah,
+      required int page,
+      required int line,
+      required int x0,
+      required int y0,
+      required int x1,
+      required int y1,
+    });
+typedef $$ShamarlyMarkerTableUpdateCompanionBuilder =
+    ShamarlyMarkerCompanion Function({
+      Value<int> surah,
+      Value<int> ayah,
+      Value<int> page,
+      Value<int> line,
+      Value<int> x0,
+      Value<int> y0,
+      Value<int> x1,
+      Value<int> y1,
+    });
+
+class $$ShamarlyMarkerTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyMarkerTable> {
+  $$ShamarlyMarkerTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyMarkerTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyMarkerTable> {
+  $$ShamarlyMarkerTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyMarkerTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyMarkerTable> {
+  $$ShamarlyMarkerTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get line =>
+      $composableBuilder(column: $table.line, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+}
+
+class $$ShamarlyMarkerTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyMarkerTable,
+          ShamarlyMarkerRow,
+          $$ShamarlyMarkerTableFilterComposer,
+          $$ShamarlyMarkerTableOrderingComposer,
+          $$ShamarlyMarkerTableAnnotationComposer,
+          $$ShamarlyMarkerTableCreateCompanionBuilder,
+          $$ShamarlyMarkerTableUpdateCompanionBuilder,
+          (
+            ShamarlyMarkerRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyMarkerTable,
+              ShamarlyMarkerRow
+            >,
+          ),
+          ShamarlyMarkerRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyMarkerTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyMarkerTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyMarkerTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyMarkerTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyMarkerTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> page = const Value.absent(),
+                Value<int> line = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+              }) => ShamarlyMarkerCompanion(
+                surah: surah,
+                ayah: ayah,
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+              ),
+          createCompanionCallback:
+              ({
+                required int surah,
+                required int ayah,
+                required int page,
+                required int line,
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+              }) => ShamarlyMarkerCompanion.insert(
+                surah: surah,
+                ayah: ayah,
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyMarkerTable, ShamarlyMarkerRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyMarkerTable,
+                    ShamarlyMarkerRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyMarkerTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyMarkerTable,
+      ShamarlyMarkerRow,
+      $$ShamarlyMarkerTableFilterComposer,
+      $$ShamarlyMarkerTableOrderingComposer,
+      $$ShamarlyMarkerTableAnnotationComposer,
+      $$ShamarlyMarkerTableCreateCompanionBuilder,
+      $$ShamarlyMarkerTableUpdateCompanionBuilder,
+      (
+        ShamarlyMarkerRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $ShamarlyMarkerTable,
+          ShamarlyMarkerRow
+        >,
+      ),
+      ShamarlyMarkerRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ShamarlyVerseBoxTableCreateCompanionBuilder =
+    ShamarlyVerseBoxCompanion Function({
+      required int surah,
+      required int ayah,
+      required int part,
+      required int page,
+      required int line,
+      required int x0,
+      required int y0,
+      required int x1,
+      required int y1,
+    });
+typedef $$ShamarlyVerseBoxTableUpdateCompanionBuilder =
+    ShamarlyVerseBoxCompanion Function({
+      Value<int> surah,
+      Value<int> ayah,
+      Value<int> part,
+      Value<int> page,
+      Value<int> line,
+      Value<int> x0,
+      Value<int> y0,
+      Value<int> x1,
+      Value<int> y1,
+    });
+
+class $$ShamarlyVerseBoxTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyVerseBoxTable> {
+  $$ShamarlyVerseBoxTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get part => $composableBuilder(
+    column: $table.part,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyVerseBoxTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyVerseBoxTable> {
+  $$ShamarlyVerseBoxTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get part => $composableBuilder(
+    column: $table.part,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyVerseBoxTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyVerseBoxTable> {
+  $$ShamarlyVerseBoxTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get part =>
+      $composableBuilder(column: $table.part, builder: (column) => column);
+
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get line =>
+      $composableBuilder(column: $table.line, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+}
+
+class $$ShamarlyVerseBoxTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyVerseBoxTable,
+          ShamarlyVerseBoxRow,
+          $$ShamarlyVerseBoxTableFilterComposer,
+          $$ShamarlyVerseBoxTableOrderingComposer,
+          $$ShamarlyVerseBoxTableAnnotationComposer,
+          $$ShamarlyVerseBoxTableCreateCompanionBuilder,
+          $$ShamarlyVerseBoxTableUpdateCompanionBuilder,
+          (
+            ShamarlyVerseBoxRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyVerseBoxTable,
+              ShamarlyVerseBoxRow
+            >,
+          ),
+          ShamarlyVerseBoxRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyVerseBoxTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyVerseBoxTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyVerseBoxTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyVerseBoxTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyVerseBoxTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> part = const Value.absent(),
+                Value<int> page = const Value.absent(),
+                Value<int> line = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+              }) => ShamarlyVerseBoxCompanion(
+                surah: surah,
+                ayah: ayah,
+                part: part,
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+              ),
+          createCompanionCallback:
+              ({
+                required int surah,
+                required int ayah,
+                required int part,
+                required int page,
+                required int line,
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+              }) => ShamarlyVerseBoxCompanion.insert(
+                surah: surah,
+                ayah: ayah,
+                part: part,
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyVerseBoxTable, ShamarlyVerseBoxRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyVerseBoxTable,
+                    ShamarlyVerseBoxRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyVerseBoxTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyVerseBoxTable,
+      ShamarlyVerseBoxRow,
+      $$ShamarlyVerseBoxTableFilterComposer,
+      $$ShamarlyVerseBoxTableOrderingComposer,
+      $$ShamarlyVerseBoxTableAnnotationComposer,
+      $$ShamarlyVerseBoxTableCreateCompanionBuilder,
+      $$ShamarlyVerseBoxTableUpdateCompanionBuilder,
+      (
+        ShamarlyVerseBoxRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $ShamarlyVerseBoxTable,
+          ShamarlyVerseBoxRow
+        >,
+      ),
+      ShamarlyVerseBoxRow,
+      PrefetchHooks Function()
+    >;
+typedef $$ShamarlyWordBoxTableCreateCompanionBuilder =
+    ShamarlyWordBoxCompanion Function({
+      required int surah,
+      required int ayah,
+      required int word,
+      required int page,
+      required int line,
+      required int x0,
+      required int y0,
+      required int x1,
+      required int y1,
+      required int level,
+    });
+typedef $$ShamarlyWordBoxTableUpdateCompanionBuilder =
+    ShamarlyWordBoxCompanion Function({
+      Value<int> surah,
+      Value<int> ayah,
+      Value<int> word,
+      Value<int> page,
+      Value<int> line,
+      Value<int> x0,
+      Value<int> y0,
+      Value<int> x1,
+      Value<int> y1,
+      Value<int> level,
+    });
+
+class $$ShamarlyWordBoxTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyWordBoxTable> {
+  $$ShamarlyWordBoxTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyWordBoxTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyWordBoxTable> {
+  $$ShamarlyWordBoxTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get line => $composableBuilder(
+    column: $table.line,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyWordBoxTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyWordBoxTable> {
+  $$ShamarlyWordBoxTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get word =>
+      $composableBuilder(column: $table.word, builder: (column) => column);
+
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get line =>
+      $composableBuilder(column: $table.line, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+
+  GeneratedColumn<int> get level =>
+      $composableBuilder(column: $table.level, builder: (column) => column);
+}
+
+class $$ShamarlyWordBoxTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyWordBoxTable,
+          ShamarlyWordBoxRow,
+          $$ShamarlyWordBoxTableFilterComposer,
+          $$ShamarlyWordBoxTableOrderingComposer,
+          $$ShamarlyWordBoxTableAnnotationComposer,
+          $$ShamarlyWordBoxTableCreateCompanionBuilder,
+          $$ShamarlyWordBoxTableUpdateCompanionBuilder,
+          (
+            ShamarlyWordBoxRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyWordBoxTable,
+              ShamarlyWordBoxRow
+            >,
+          ),
+          ShamarlyWordBoxRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyWordBoxTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyWordBoxTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyWordBoxTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyWordBoxTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyWordBoxTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> word = const Value.absent(),
+                Value<int> page = const Value.absent(),
+                Value<int> line = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+                Value<int> level = const Value.absent(),
+              }) => ShamarlyWordBoxCompanion(
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                level: level,
+              ),
+          createCompanionCallback:
+              ({
+                required int surah,
+                required int ayah,
+                required int word,
+                required int page,
+                required int line,
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+                required int level,
+              }) => ShamarlyWordBoxCompanion.insert(
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                page: page,
+                line: line,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                level: level,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyWordBoxTable, ShamarlyWordBoxRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyWordBoxTable,
+                    ShamarlyWordBoxRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyWordBoxTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyWordBoxTable,
+      ShamarlyWordBoxRow,
+      $$ShamarlyWordBoxTableFilterComposer,
+      $$ShamarlyWordBoxTableOrderingComposer,
+      $$ShamarlyWordBoxTableAnnotationComposer,
+      $$ShamarlyWordBoxTableCreateCompanionBuilder,
+      $$ShamarlyWordBoxTableUpdateCompanionBuilder,
+      (
+        ShamarlyWordBoxRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $ShamarlyWordBoxTable,
+          ShamarlyWordBoxRow
+        >,
+      ),
+      ShamarlyWordBoxRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -9353,4 +14499,18 @@ class $ContentDatabaseManager {
       $$AyahTimingTableTableManager(_db, _db.ayahTiming);
   $$WordTimingTableTableManager get wordTiming =>
       $$WordTimingTableTableManager(_db, _db.wordTiming);
+  $$ShamarlyPageTableTableManager get shamarlyPage =>
+      $$ShamarlyPageTableTableManager(_db, _db.shamarlyPage);
+  $$ShamarlyLineTableTableManager get shamarlyLine =>
+      $$ShamarlyLineTableTableManager(_db, _db.shamarlyLine);
+  $$ShamarlyLineOverflowTableTableManager get shamarlyLineOverflow =>
+      $$ShamarlyLineOverflowTableTableManager(_db, _db.shamarlyLineOverflow);
+  $$ShamarlyHeaderTableTableManager get shamarlyHeader =>
+      $$ShamarlyHeaderTableTableManager(_db, _db.shamarlyHeader);
+  $$ShamarlyMarkerTableTableManager get shamarlyMarker =>
+      $$ShamarlyMarkerTableTableManager(_db, _db.shamarlyMarker);
+  $$ShamarlyVerseBoxTableTableManager get shamarlyVerseBox =>
+      $$ShamarlyVerseBoxTableTableManager(_db, _db.shamarlyVerseBox);
+  $$ShamarlyWordBoxTableTableManager get shamarlyWordBox =>
+      $$ShamarlyWordBoxTableTableManager(_db, _db.shamarlyWordBox);
 }

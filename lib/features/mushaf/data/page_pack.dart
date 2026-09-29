@@ -8,6 +8,8 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
+import '../../../core/settings/app_settings.dart';
+
 /// How a pack's zip is laid out.
 enum PackFormat {
   /// Our pack: `NNN.svg.xz` pages and a manifest with per-page SHA-256.
@@ -16,6 +18,10 @@ enum PackFormat {
   /// quran.com's `images_1024.zip`: `width_1024/pageNNN.png` and
   /// `databases/ayahinfo_1024.db` (glyph boxes).
   pngQuranCom,
+
+  /// The Shamarly page images as archived: `001.png` … `522.png` at the
+  /// zip root. Their geometry is in content.db.
+  pngShamarly,
 }
 
 /// A downloadable set of mushaf pages.
@@ -65,6 +71,26 @@ class PagePackSpec {
     format: PackFormat.pngQuranCom,
     fallbacks: ['https://files.quran.app/hafs/madani/zips/images_1024.zip'],
   );
+
+  /// Shamarly (Egyptian) edition, Hafs: 522 PNG pages (886 x 1377) from
+  /// archive.org (details/shamerly), stored unchanged in one zip on
+  /// Tibyan's mirror.
+  static const shamarly = PagePackSpec(
+    id: 'pages-hafs-shamarly-v1',
+    url: 'https://tibyan.ahmedhelal.dev/mirror/sources/shamarly/shamarly-pages-archive-org.zip',
+    sha256: '03199bf95590458df94670d6d1ba5f17e56ec72413df51dd30087aa5beaa712d',
+    bytes: 214988080,
+    format: PackFormat.pngShamarly,
+    // No fallback: archive.org serves the pages one by one, never as this
+    // zip, so no other source has the same bytes and SHA-256.
+    fallbacks: [],
+  );
+
+  static PagePackSpec of(MushafEdition edition) => switch (edition) {
+    MushafEdition.madina1441 => madina1441,
+    MushafEdition.madina1405 => madina1405,
+    MushafEdition.shamarly => shamarly,
+  };
 }
 
 enum PackPhase { idle, downloading, verifying, installing, installed, failed }
@@ -195,9 +221,11 @@ class PagePackInstaller {
       final target = dir.path;
       final format = spec.format;
       await Isolate.run(
-        () => format == PackFormat.svgXz
-            ? _extractAndVerify(partPath, target)
-            : _extractQuranCom(partPath, target),
+        () => switch (format) {
+          PackFormat.svgXz => _extractAndVerify(partPath, target),
+          PackFormat.pngQuranCom => _extractQuranCom(partPath, target),
+          PackFormat.pngShamarly => _extractShamarly(partPath, target),
+        },
       );
       _done.writeAsStringSync(DateTime.now().toIso8601String());
       _part.deleteSync();
@@ -266,6 +294,29 @@ void _extractQuranCom(String zipPath, String targetDir) {
     throw const FormatException('The page pack is incomplete.');
   }
 }
+
+/// Keeps the 522 Shamarly page images as `NNN.png`. The whole zip was
+/// already checked against its SHA-256.
+void _extractShamarly(String zipPath, String targetDir) {
+  final input = InputFileStream(zipPath);
+  final archive = ZipDecoder().decodeStream(input);
+  final pageName = RegExp(r'^(\d{3})\.png$');
+  Directory(targetDir).createSync(recursive: true);
+  final pages = <String>{};
+  for (final entry in archive.files) {
+    if (!entry.isFile || pageName.firstMatch(entry.name) == null) continue;
+    File(p.join(targetDir, entry.name))
+        .writeAsBytesSync(entry.content, flush: true);
+    pages.add(entry.name);
+  }
+  input.closeSync();
+  if (pages.length != shamarlyPageCount) {
+    throw const FormatException('The page pack is incomplete.');
+  }
+}
+
+/// Pages in the Shamarly pack (page 1 is the cover).
+const shamarlyPageCount = 522;
 
 /// Reads one installed page as SVG text. Decompression runs off the UI
 /// thread; recent pages are kept in memory for fast page turns.

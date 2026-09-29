@@ -158,6 +158,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The well-known 1405H print used by older apps, with word highlighting.';
 
   @override
+  String get editionShamarly => 'Shamarly (Egyptian edition)';
+
+  @override
+  String get editionShamarlyDesc =>
+      'The well-known Egyptian Shamarly print, 522 pages, with verse highlighting and word highlighting in many verses.';
+
+  @override
   String get defaultTag => 'Default';
 
   @override
@@ -216,6 +223,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pagesCreditOld =>
       'Old edition (1405H) pages by the King Fahd Glorious Quran Printing Complex, downloaded directly from quran.com.';
+
+  @override
+  String get pagesCreditShamarly =>
+      'Shamarly mushaf pages from the Internet Archive (archive.org), downloaded from Tibyan\'s server.';
 
   @override
   String get editionLabel => 'Mushaf edition';
@@ -392,7 +403,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goToPage => 'Go to page';
 
   @override
-  String get goToPageHint => 'Page number, 1 to 604';
+  String goToPageHint(String max) {
+    return 'Page number, 1 to $max';
+  }
 
   @override
   String get goLabel => 'Go';

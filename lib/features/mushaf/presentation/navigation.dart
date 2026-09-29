@@ -23,3 +23,21 @@ Future<void> openVerse(
   // Navigation only turns the page; it never selects a verse.
   context.go('/mushaf?page=$page');
 }
+
+/// Opens a page of the chosen edition, or, while its pages are not
+/// installed, the first verse that starts on it in the continuous view.
+Future<void> openPage(BuildContext context, WidgetRef ref, int page) async {
+  if (ref.read(pagesInstalledProvider)) {
+    context.go('/mushaf?page=$page');
+    return;
+  }
+  final edition = ref.read(editionProvider);
+  final ayahs = await ref.read(pageAyahsProvider(page).future);
+  if (!context.mounted || ayahs.isEmpty) return;
+  // A Shamarly page can open with the end of a verse from the page before.
+  final a = ayahs.firstWhere(
+    (a) => a.pageIn(edition) == page,
+    orElse: () => ayahs.first,
+  );
+  context.go('/mushaf/continuous?s=${a.surah}&a=${a.number}');
+}

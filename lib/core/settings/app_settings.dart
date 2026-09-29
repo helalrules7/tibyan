@@ -9,8 +9,15 @@ enum ModeSetting { system, light, night, black }
 /// Interface language: follow the device, or fixed by the user.
 enum LanguageSetting { system, ar, en }
 
-/// Madina mushaf edition shown in the page view.
-enum MushafEdition { madina1441, madina1405 }
+/// Mushaf edition shown in the page view: the two Madina prints and the
+/// Shamarly (Egyptian) print.
+enum MushafEdition { madina1441, madina1405, shamarly }
+
+extension MushafEditionPages on MushafEdition {
+  /// Pages of the printed mushaf, numbered from 1. Shamarly: page 1 is the
+  /// cover and the text runs from page 2 to 522.
+  int get pageCount => this == MushafEdition.shamarly ? 522 : 604;
+}
 
 /// Shape of the verse-end markers in the page view: the mushaf's own
 /// (default) or one of three rosettes drawn over it.

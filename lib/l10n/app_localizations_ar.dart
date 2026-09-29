@@ -158,6 +158,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'طبعة 1405هـ المشهورة في التطبيقات القديمة، مع تظليل الكلمة.';
 
   @override
+  String get editionShamarly => 'مصحف الشمرلي (الطبعة المصرية)';
+
+  @override
+  String get editionShamarlyDesc =>
+      'طبعة الشمرلي المصرية المعروفة، 522 صفحة، مع تظليل الآية وتظليل الكلمة في كثير من الآيات.';
+
+  @override
   String get defaultTag => 'الافتراضية';
 
   @override
@@ -216,6 +223,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get pagesCreditOld =>
       'صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.';
+
+  @override
+  String get pagesCreditShamarly =>
+      'صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.';
 
   @override
   String get editionLabel => 'طبعة المصحف';
@@ -391,7 +402,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get goToPage => 'انتقال إلى صفحة';
 
   @override
-  String get goToPageHint => 'رقم الصفحة من ١ إلى ٦٠٤';
+  String goToPageHint(String max) {
+    return 'رقم الصفحة من ١ إلى $max';
+  }
 
   @override
   String get goLabel => 'انتقال';

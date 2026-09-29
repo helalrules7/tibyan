@@ -24,15 +24,14 @@ import 'widgets/mushaf_page.dart';
 import 'widgets/ornate_pages.dart';
 import 'widgets/old_mushaf_page.dart';
 import 'widgets/page_interaction.dart';
+import 'widgets/shamarly_page.dart';
 import 'widgets/verse_services.dart';
-
-const mushafPageCount = 604;
 
 /// Name of a surah in the interface language (names from Tanzil metadata).
 String surahName(BuildContext context, SurahRow s) =>
     Localizations.localeOf(context).languageCode == 'ar' ? s.nameAr : s.nameEn;
 
-/// The page view of the new Madina edition.
+/// The page view of the chosen edition.
 class MushafScreen extends ConsumerStatefulWidget {
   const MushafScreen({
     super.key,
@@ -119,7 +118,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     .ayah(saved.surah, saved.ayah))
                 .pageIn(edition);
     }
-    final start = (page ?? 1).clamp(_first, mushafPageCount);
+    final start = (page ?? 1).clamp(_first, edition.pageCount);
     if (!mounted) return;
     setState(() {
       _page = start;
@@ -175,7 +174,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final t = context.tokens.colors;
     final surahs = ref.watch(surahsProvider).value;
     final first = ref.watch(pageAyahsProvider(_page)).value?.firstOrNull;
-    final oldEdition = ref.watch(editionProvider) == MushafEdition.madina1405;
+    final edition = ref.watch(editionProvider);
+    final pageCount = edition.pageCount;
+    // Page numbers differ between editions: reopen at the same verse.
+    ref.listen(editionProvider, (_, _) => _open());
     final illuminated =
         ref
             .watch(themeRegistryProvider)
@@ -192,8 +194,16 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
     final settings = ref.watch(settingsProvider);
     final recitation = ref.watch(recitationProvider);
-    ref.listen(recitationProvider.select((r) => (r.surah, r.ayah)), (_, now) {
-      if (now.$2 != null) _follow((surah: now.$1, ayah: now.$2!));
+    ref.listen(recitationProvider.select((r) => (r.surah, r.ayah, r.word)), (
+      before,
+      now,
+    ) {
+      if (now.$2 == null) return;
+      // Words matter only where a verse can run over a page break.
+      final verse = before?.$1 != now.$1 || before?.$2 != now.$2;
+      if (verse || edition == MushafEdition.shamarly) {
+        _follow((surah: now.$1, ayah: now.$2!), now.$3);
+      }
     });
     final markerImages = ref.watch(markerImagesProvider).value;
     final markerLook =
@@ -249,7 +259,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         markerLook: markerLook,
         hidden: _recite && pg == _page ? _hiddenOn(pg) : null,
         onHiddenTap: (v) => setState(() => _revealed.add(v)),
-        ornateOpening: illuminated && pg <= 2,
+        ornateOpening:
+            illuminated && edition != MushafEdition.shamarly && pg <= 2,
         showHandles: _multi,
         divineNames: settings.highlightDivineNames
             ? ref.watch(divineNameBoxesProvider(pg)).value ?? const []
@@ -268,12 +279,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 )],
               )
             : null,
-        emphasisLines: {
-          for (final b
-              in ref.watch(frameInfoProvider(pg)).value?.banners ??
-                  const <SurahBanner>[])
-            if (b.number != 9) b.line + 1,
-        },
+        emphasisLines:
+            ref.watch(frameInfoProvider(pg)).value?.basmalaLines ?? const {},
       );
       final tools = _ReadingTools(
         touchReading: _touchReading,
@@ -286,10 +293,24 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               })
             : _startRecite(),
       );
-      final pageWidget = oldEdition
-          ? OldMushafPage(page: pg, interaction: interaction)
-          : MushafPage(page: pg, interaction: interaction);
-      if (!illuminated) {
+      final pageWidget = switch (edition) {
+        MushafEdition.madina1441 => MushafPage(
+          page: pg,
+          interaction: interaction,
+        ),
+        MushafEdition.madina1405 => OldMushafPage(
+          page: pg,
+          interaction: interaction,
+        ),
+        MushafEdition.shamarly => ShamarlyMushafPage(
+          page: pg,
+          interaction: interaction,
+        ),
+      };
+      // The Shamarly cover and opening pages (1-3) carry their own printed
+      // ornament: they are shown as printed, without the frame.
+      final printedOpening = edition == MushafEdition.shamarly && pg <= 3;
+      if (!illuminated || printedOpening) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Column(
@@ -331,6 +352,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onSurahTap: () => openIndex('surahs'),
           onPageTap: _goToPage,
           tools: tools,
+          linePadding: edition == MushafEdition.shamarly
+              ? shamarlyLinePadding
+              : null,
           onQuarterTap: (q) => _setMark(
             MarkKind.reading,
             (surah: q.surah, ayah: q.ayah),
@@ -366,7 +390,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       return ListView.builder(
                         controller: _vertical,
                         itemExtent: box.maxHeight,
-                        itemCount: mushafPageCount + 1 - _first,
+                        itemCount: pageCount + 1 - _first,
                         itemBuilder: (context, i) => pageAt(i),
                       );
                     },
@@ -378,7 +402,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     textDirection: TextDirection.rtl,
                     child: PageView.builder(
                       controller: _controller,
-                      itemCount: mushafPageCount + 1 - _first,
+                      itemCount: pageCount + 1 - _first,
                       onPageChanged: _onPageChanged,
                       itemBuilder: (context, i) => pageAt(i),
                     ),
@@ -434,6 +458,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               bottom: 0,
               child: _BottomControls(
                 page: scrubbing,
+                pageCount: pageCount,
                 label: _scrubLabel(context, scrubbing, surahs),
                 onChanged: (p) => setState(() => _scrubPage = p),
                 onChangeEnd: (p) {
@@ -570,14 +595,24 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     ref.read(recitationProvider.notifier).play(a.surah, from: a.number);
   }
 
-  /// Turns to the page of the verse being recited.
-  Future<void> _follow(VerseKey v) async {
+  /// Turns to the page of the verse being recited. A Shamarly verse may
+  /// run over a page break: the page then follows the recited [word] when
+  /// its box is known, and otherwise stays where the verse starts.
+  Future<void> _follow(VerseKey v, int? word) async {
     if (!ref.read(settingsProvider).followRecitation || _autoScroll) return;
     if (_selA != null || _multi) return;
-    final page =
-        (await ref.read(mushafRepositoryProvider).ayah(v.surah, v.ayah)).pageIn(
-          ref.read(editionProvider),
-        );
+    final edition = ref.read(editionProvider);
+    final repo = ref.read(mushafRepositoryProvider);
+    final row = await repo.ayah(v.surah, v.ayah);
+    var page = row.pageIn(edition);
+    if (edition == MushafEdition.shamarly && row.pageShamarlyEnd != page) {
+      final pages = await repo.shamarlyWordPages(v.surah, v.ayah);
+      if (word != null && pages[word] != null) {
+        page = pages[word]!;
+      } else if (_page >= row.pageShamarly && _page <= row.pageShamarlyEnd) {
+        return; // already on a page of this verse
+      }
+    }
     if (!mounted || page == _page) return;
     _controller?.animateToPage(
       page - _first,
@@ -740,7 +775,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   Future<void> _goToPage() async {
-    final page = await showGoToPage(context, current: _page);
+    final page = await showGoToPage(
+      context,
+      current: _page,
+      max: ref.read(editionProvider).pageCount,
+    );
     if (page != null) _controller?.jumpToPage(page - _first);
   }
 
@@ -865,6 +904,7 @@ class _TopControls extends StatelessWidget {
 class _BottomControls extends StatelessWidget {
   const _BottomControls({
     required this.page,
+    required this.pageCount,
     required this.label,
     required this.onChanged,
     required this.onChangeEnd,
@@ -875,6 +915,7 @@ class _BottomControls extends StatelessWidget {
   });
 
   final int page;
+  final int pageCount;
   final String label;
   final ValueChanged<int> onChanged;
   final ValueChanged<int> onChangeEnd;
@@ -954,9 +995,9 @@ class _BottomControls extends StatelessWidget {
                     activeColor: t.control,
                     inactiveColor: t.border,
                     min: 1,
-                    max: mushafPageCount.toDouble(),
-                    divisions: mushafPageCount - 1,
-                    value: page.toDouble(),
+                    max: pageCount.toDouble(),
+                    divisions: pageCount - 1,
+                    value: page.clamp(1, pageCount).toDouble(),
                     semanticFormatterCallback: (v) => l.pageOf('${v.round()}'),
                     onChanged: (v) => onChanged(v.round()),
                     onChangeEnd: (v) => onChangeEnd(v.round()),

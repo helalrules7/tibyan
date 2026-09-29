@@ -31,6 +31,9 @@ class Surah extends Table {
   IntColumn get startPage1405 => integer().named('start_page_1405')();
   IntColumn get sourceId => integer()();
 
+  /// Page of verse 1 in the Shamarly (Egyptian) edition.
+  IntColumn get startPageShamarly => integer()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -69,6 +72,13 @@ class Ayah extends Table {
   IntColumn get textSourceId => integer()();
   IntColumn get displaySourceId => integer()();
   IntColumn get pageSourceId => integer()();
+
+  /// Page where the verse starts in the Shamarly (Egyptian) edition.
+  IntColumn get pageShamarly => integer()();
+
+  /// Page of the verse's marker in the Shamarly edition: a verse may run
+  /// over a page break there.
+  IntColumn get pageShamarlyEnd => integer()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -193,6 +203,153 @@ class LineOverflow1405 extends Table {
   Set<Column> get primaryKey => {page, line, x0, y0};
 }
 
+/// A Shamarly page image (886 x 1377 px): `cover`, `ornate` or `text`.
+/// Baseline of line j = [gridTop] + j * [pitch].
+@DataClassName('ShamarlyPageRow')
+class ShamarlyPage extends Table {
+  @override
+  String get tableName => 'shamarly_page';
+
+  IntColumn get page => integer()();
+  TextColumn get kind => text()();
+  IntColumn get lines => integer()();
+  RealColumn get gridTop => real().nullable()();
+  RealColumn get pitch => real().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {page};
+}
+
+/// A line slot of a Shamarly page: `text`, `header` (a surah header takes
+/// two slots) or `basmala`; its band y0..y1 in image px.
+@DataClassName('ShamarlyLineRow')
+class ShamarlyLine extends Table {
+  @override
+  String get tableName => 'shamarly_line';
+
+  IntColumn get page => integer()();
+  IntColumn get line => integer()();
+  TextColumn get kind => text()();
+  IntColumn get surah => integer().nullable()();
+  IntColumn get y0 => integer()();
+  IntColumn get y1 => integer()();
+
+  @override
+  Set<Column> get primaryKey => {page, line};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+/// Shamarly ink crossing a band edge (image px), with the line it belongs to.
+@DataClassName('ShamarlyOverflowRow')
+class ShamarlyLineOverflow extends Table {
+  @override
+  String get tableName => 'shamarly_line_overflow';
+
+  IntColumn get page => integer()();
+  IntColumn get line => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  @override
+  Set<Column> get primaryKey => {page, line, x0, y0};
+}
+
+/// A printed surah-header frame; [firstLine] is null on the ornate pages.
+@DataClassName('ShamarlyHeaderRow')
+class ShamarlyHeader extends Table {
+  @override
+  String get tableName => 'shamarly_header';
+
+  IntColumn get surah => integer()();
+  IntColumn get page => integer()();
+  IntColumn get firstLine => integer().nullable()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  @override
+  Set<Column> get primaryKey => {surah};
+}
+
+/// A Shamarly box in image px: a verse-end marker ring ([ShamarlyMarker]),
+/// one verse on one line ([ShamarlyVerseBox]) or one word ([ShamarlyWordBox]).
+@DataClassName('ShamarlyMarkerRow')
+class ShamarlyMarker extends Table {
+  @override
+  String get tableName => 'shamarly_marker';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+  IntColumn get page => integer()();
+  IntColumn get line => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+@DataClassName('ShamarlyVerseBoxRow')
+class ShamarlyVerseBox extends Table {
+  @override
+  String get tableName => 'shamarly_verse_box';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+
+  /// 0.. in reading order.
+  IntColumn get part => integer()();
+  IntColumn get page => integer()();
+  IntColumn get line => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah, part};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+@DataClassName('ShamarlyWordBoxRow')
+class ShamarlyWordBox extends Table {
+  @override
+  String get tableName => 'shamarly_word_box';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+
+  /// Numbered as in [WordBox].
+  IntColumn get word => integer()();
+  IntColumn get page => integer()();
+  IntColumn get line => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  /// How sure the split into words is: 2 stable, 1 not yet reviewed.
+  IntColumn get level => integer()();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah, word};
+
+  @override
+  bool get withoutRowId => true;
+}
+
 /// A tafsir or translation shipped in the content database.
 @DataClassName('CommentaryEditionRow')
 class CommentaryEdition extends Table {
@@ -311,6 +468,13 @@ class WordTiming extends Table {
     Reciter,
     AyahTiming,
     WordTiming,
+    ShamarlyPage,
+    ShamarlyLine,
+    ShamarlyLineOverflow,
+    ShamarlyHeader,
+    ShamarlyMarker,
+    ShamarlyVerseBox,
+    ShamarlyWordBox,
   ],
 )
 class ContentDatabase extends _$ContentDatabase {
@@ -318,7 +482,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

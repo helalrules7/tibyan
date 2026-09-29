@@ -89,6 +89,81 @@ void main() {
     expect(onOldPage.any((a) => a.surah == 5 && a.number == 77), isTrue);
   });
 
+  test('Shamarly pages: every verse has one, in order', () async {
+    final all = [
+      for (final s in await repo.surahs()) ...await repo.ayahsOfSurah(s.id),
+    ]..sort((a, b) => a.id.compareTo(b.id));
+    expect(all.length, 6236);
+    var last = 2;
+    for (final a in all) {
+      final start = a.pageIn(MushafEdition.shamarly);
+      expect(start, inInclusiveRange(2, 522), reason: '${a.surah}:${a.number}');
+      expect(a.pageShamarlyEnd, inInclusiveRange(start, start + 1));
+      // A verse never starts before the one before it ends.
+      expect(start, greaterThanOrEqualTo(last));
+      last = a.pageShamarlyEnd;
+    }
+    expect(all.first.pageShamarly, 2);
+    expect(all.last.pageShamarlyEnd, 522);
+    final surahs = await repo.surahs();
+    expect(surahs.first.startPageIn(MushafEdition.shamarly), 2);
+    expect(surahs[1].startPageIn(MushafEdition.shamarly), 3);
+    expect(surahs.last.startPageIn(MushafEdition.shamarly), 522);
+    expect(MushafEdition.shamarly.pageCount, 522);
+  });
+
+  test('every Shamarly page 2..522 has verses and verse boxes', () async {
+    for (var page = 2; page <= 522; page++) {
+      final ayahs = await repo.ayahsOnPage(page, MushafEdition.shamarly);
+      expect(ayahs, isNotEmpty, reason: 'page $page');
+      final boxes = await repo.shamarlyVerseBoxes(page);
+      expect(
+        {for (final b in boxes) (b.surah, b.ayah)},
+        {for (final a in ayahs) (a.surah, a.number)},
+        reason: 'page $page',
+      );
+    }
+    expect(await repo.ayahsOnPage(1, MushafEdition.shamarly), isEmpty);
+  });
+
+  test('a Shamarly verse over a page break is on both pages', () async {
+    final v = await repo.ayah(2, 16);
+    expect((v.pageShamarly, v.pageShamarlyEnd), (4, 5));
+    for (final page in [4, 5]) {
+      final on = await repo.ayahsOnPage(page, MushafEdition.shamarly);
+      expect(on.any((a) => a.surah == 2 && a.number == 16), isTrue);
+    }
+    // Its marker is on the page where it ends.
+    final markers = await repo.shamarlyMarkers(5);
+    expect(markers.any((m) => m.surah == 2 && m.ayah == 16), isTrue);
+    // Quarter starts use the page where a verse starts.
+    final q = await repo.quarterStartsOnPage(5, MushafEdition.shamarly);
+    expect(q.every((a) => a.pageShamarly == 5), isTrue);
+  });
+
+  test('Shamarly geometry: 15 lines, two-slot headers, word levels', () async {
+    final page = (await repo.shamarlyPage(42))!;
+    expect(page.kind, 'text');
+    final lines = await repo.shamarlyLines(42);
+    expect(lines.length, 15);
+    final header = (await repo.shamarlyHeaders(42)).single;
+    expect((header.surah, header.firstLine), (3, 6));
+    expect(lines[6].kind, 'header');
+    expect(lines[7].kind, 'header');
+    expect(lines[8].kind, 'basmala');
+    expect((await repo.shamarlyPage(1))!.kind, 'cover');
+    expect((await repo.shamarlyLines(2)).length, 7);
+    // Only surely split verses by default.
+    for (final b in await repo.shamarlyWordBoxes(42)) {
+      expect(b.level, greaterThanOrEqualTo(shamarlyWordLevel));
+    }
+    final any = await repo.shamarlyWordBoxes(42, minLevel: 1);
+    expect(
+      any.length,
+      greaterThanOrEqualTo((await repo.shamarlyWordBoxes(42)).length),
+    );
+  });
+
   test('every word has a box; Ayat al-Kursi has 50 on page 42', () async {
     final boxes = await repo.wordBoxes(42);
     final kursi = boxes.where((b) => b.surah == 2 && b.ayah == 255).toList();

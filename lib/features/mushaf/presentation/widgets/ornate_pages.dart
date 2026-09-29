@@ -66,9 +66,11 @@ class CoverPage extends ConsumerWidget {
                   color: t.marker,
                 ),
                 Text(
-                  edition == MushafEdition.madina1405
-                      ? l.editionOld
-                      : l.editionNew,
+                  switch (edition) {
+                    MushafEdition.madina1441 => l.editionNew,
+                    MushafEdition.madina1405 => l.editionOld,
+                    MushafEdition.shamarly => l.editionShamarly,
+                  },
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: t.muted),
                 ),

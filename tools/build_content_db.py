@@ -19,6 +19,8 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quranlab_banna_timing.json QuranLab word timings, al-Banna (fetch_quranlab_timing.py)
   tools/.cache/quranlab_ayah_timing.json  al-Banna verse timings derived from it (build_quranlab_timing.py)
   tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
+  tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
+                                          lines, verse, marker and word boxes; no text
 
 Usage:
   python3 tools/fetch_sources.py
@@ -42,7 +44,8 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 9
+SCHEMA_VERSION = 10
+SHAMARLY = CACHE / 'shamarly_geometry.db'
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -243,7 +246,8 @@ def main():
       revelation_order INTEGER NOT NULL, ayah_count INTEGER NOT NULL,
       start_page INTEGER NOT NULL,          -- new edition (1441H)
       start_page_1405 INTEGER NOT NULL,     -- old edition (1405H)
-      source_id INTEGER NOT NULL);
+      source_id INTEGER NOT NULL,
+      start_page_shamarly INTEGER NOT NULL);  -- Shamarly (Egyptian) edition: page of verse 1
     CREATE TABLE ayah (
       id INTEGER PRIMARY KEY,               -- 1..6236 in mushaf order
       surah INTEGER NOT NULL REFERENCES surah(id),
@@ -260,6 +264,8 @@ def main():
       sajda TEXT,                           -- recommended | obligatory | NULL
       text_source_id INTEGER NOT NULL, display_source_id INTEGER NOT NULL,
       page_source_id INTEGER NOT NULL,
+      page_shamarly INTEGER NOT NULL,       -- Shamarly edition: page where the verse starts
+      page_shamarly_end INTEGER NOT NULL,   -- Shamarly edition: page of its marker (a verse may run over a page)
       UNIQUE (surah, number));
     CREATE TABLE ayah_polygon (             -- verse outline on a page (viewBox units)
       page INTEGER NOT NULL, surah INTEGER NOT NULL, number INTEGER NOT NULL,
@@ -305,6 +311,34 @@ def main():
       reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
       word INTEGER NOT NULL, start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
       PRIMARY KEY (reciter, surah, ayah, word)) WITHOUT ROWID;
+    CREATE TABLE shamarly_page (            -- Shamarly page images 1..522 (886x1377 px): cover, ornate, text
+      page INTEGER PRIMARY KEY, kind TEXT NOT NULL, lines INTEGER NOT NULL,
+      grid_top REAL, pitch REAL);           -- baseline of line j = grid_top + j * pitch (px)
+    CREATE TABLE shamarly_line (            -- line slots: text | header | basmala, band y0..y1 (px)
+      page INTEGER NOT NULL, line INTEGER NOT NULL, kind TEXT NOT NULL, surah INTEGER,
+      y0 INTEGER NOT NULL, y1 INTEGER NOT NULL,
+      PRIMARY KEY (page, line)) WITHOUT ROWID;
+    CREATE TABLE shamarly_line_overflow (   -- ink crossing a band edge (px), and its line
+      page INTEGER NOT NULL, line INTEGER NOT NULL,
+      x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL);
+    CREATE TABLE shamarly_header (          -- printed surah-header frames (two line slots)
+      surah INTEGER PRIMARY KEY, page INTEGER NOT NULL, first_line INTEGER,
+      x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL);
+    CREATE TABLE shamarly_marker (          -- verse-end marker rings (px)
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL, page INTEGER NOT NULL, line INTEGER NOT NULL,
+      x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
+      PRIMARY KEY (surah, ayah)) WITHOUT ROWID;
+    CREATE TABLE shamarly_verse_box (       -- one box per verse per line, reading order (px)
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL, part INTEGER NOT NULL,
+      page INTEGER NOT NULL, line INTEGER NOT NULL,
+      x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
+      PRIMARY KEY (surah, ayah, part)) WITHOUT ROWID;
+    CREATE TABLE shamarly_word_box (        -- word boxes (px); word as in word_box
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,
+      page INTEGER NOT NULL, line INTEGER NOT NULL,
+      x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
+      level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed
+      PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -390,6 +424,35 @@ def main():
                    json.loads(quranlab_word_path.read_text(encoding='utf-8')))
     for reciter, surah in gaps:
         print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
+    shamarly = sqlite3.connect(f'file:{SHAMARLY}?mode=ro', uri=True)
+    sh_meta = dict(shamarly.execute('SELECT key, value FROM meta'))
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
+        13, 'shamarly-archive-org', 'Shamarly (Egyptian) mushaf: page images; page geometry by Tibyan',
+        'archive.org (details/shamerly); geometry: Tibyan (tools/build_shamarly.py)', None,
+        'No licence stated; used with the owner\'s consent',
+        'https://archive.org/details/shamerly',
+        'صفحات مصحف الشمرلي: archive.org (details/shamerly)', None,
+        sh_meta['sha256_pages_zip'], today))
+    sh_pages = {(s, a): (p, e) for s, a, p, e in shamarly.execute(
+        'SELECT surah, ayah, page, end_page FROM ayah')}
+    assert set(sh_pages) == set(order), 'every verse must have a Shamarly page'
+    db.executemany('INSERT INTO shamarly_page VALUES (?,?,?,?,?)',
+                   shamarly.execute('SELECT page, kind, lines, grid_top, pitch FROM page ORDER BY page'))
+    db.executemany('INSERT INTO shamarly_line VALUES (?,?,?,?,?,?)', shamarly.execute(
+        'SELECT page, line, kind, surah, y0, y1 FROM line ORDER BY page, line'))
+    db.executemany('INSERT INTO shamarly_line_overflow VALUES (?,?,?,?,?,?)', shamarly.execute(
+        'SELECT page, line, x0, y0, x1, y1 FROM line_overflow ORDER BY page, line, y0, x0'))
+    db.executemany('INSERT INTO shamarly_header VALUES (?,?,?,?,?,?,?)', shamarly.execute(
+        'SELECT surah, page, first_line, x0, y0, x1, y1 FROM header ORDER BY surah'))
+    db.executemany('INSERT INTO shamarly_marker VALUES (?,?,?,?,?,?,?,?)', shamarly.execute(
+        'SELECT surah, ayah, page, line, x0, y0, x1, y1 FROM marker ORDER BY surah, ayah'))
+    db.executemany('INSERT INTO shamarly_verse_box VALUES (?,?,?,?,?,?,?,?,?)', shamarly.execute(
+        'SELECT surah, ayah, part, page, line, x0, y0, x1, y1 FROM verse_box ORDER BY surah, ayah, part'))
+    db.executemany('INSERT INTO shamarly_word_box VALUES (?,?,?,?,?,?,?,?,?,?)', shamarly.execute(
+        'SELECT w.surah, w.ayah, w.word, w.page, w.line, w.x0, w.y0, w.x1, w.y1, a.words_matched '
+        'FROM word_box w JOIN ayah a ON a.surah = w.surah AND a.ayah = w.ayah '
+        'WHERE a.words_matched >= 1 ORDER BY w.surah, w.ayah, w.word'))
+    shamarly.close()
     db.executemany('INSERT INTO commentary_edition VALUES (?,?,?,?,?,?,?)', [
         (7, 'tafsir', 'ar', 'rtl', 'التفسير الميسر', 'Al-Tafsir al-Muyassar', 1),
         (8, 'translation', 'en', 'ltr', 'الترجمة الإنجليزية: صحيح إنترناشونال', 'Saheeh International', 2),
@@ -402,10 +465,11 @@ def main():
         for entry in [texts[key]]
     ])
 
-    db.executemany('INSERT INTO surah VALUES (?,?,?,?,?,?,?,?,?,?)', [
+    db.executemany('INSERT INTO surah VALUES (?,?,?,?,?,?,?,?,?,?,?)', [
         (s['id'], s['name_ar'], s['name_en'], s['meaning_en'],
          'meccan' if s['type'] == 'Meccan' else 'medinan', s['revelation_order'],
-         s['ayas'], surah_meta[s['id']]['pageNumber'], page_old[(s['id'], 1)], 3)
+         s['ayas'], surah_meta[s['id']]['pageNumber'], page_old[(s['id'], 1)], 3,
+         sh_pages[(s['id'], 1)][0])
         for s in surahs
     ])
 
@@ -415,8 +479,9 @@ def main():
             i, key[0], key[1], uthmani[key], kfgqpc[key], basmala_prefix_length(uthmani, key),
             clean[key], basmala_prefix_length(clean, key),
             juz[key], quarter[key], manzil[key], pages[key], page_old[key], sajda.get(key), 1, 5, 4,
+            *sh_pages[key],
         ))
-    db.executemany('INSERT INTO ayah VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rows)
+    db.executemany('INSERT INTO ayah VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', rows)
     db.executemany('INSERT INTO ayah_polygon VALUES (?,?,?,?,?,?)', polygons)
     # Decisions of the reviewer (2026-09-28), recorded in docs/review/DECISIONS.md.
     db.executemany('INSERT INTO review_note (topic, surah, number, note, decision) VALUES (?,?,?,?,?)', [
@@ -462,6 +527,11 @@ def main():
     db.execute('CREATE INDEX ayah_page ON ayah(page)')
     db.execute('CREATE INDEX word_box_page ON word_box(page)')
     db.execute('CREATE INDEX ayah_juz ON ayah(juz)')
+    db.execute('CREATE INDEX ayah_page_shamarly ON ayah(page_shamarly)')
+    db.execute('CREATE INDEX shamarly_line_overflow_page ON shamarly_line_overflow(page)')
+    db.execute('CREATE INDEX shamarly_verse_box_page ON shamarly_verse_box(page)')
+    db.execute('CREATE INDEX shamarly_word_box_page ON shamarly_word_box(page)')
+    db.execute('CREATE INDEX shamarly_marker_page ON shamarly_marker(page)')
     db.commit()
     db.execute('VACUUM')
     db.close()
@@ -476,6 +546,13 @@ def main():
     assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
     assert check.execute('SELECT COUNT(*) FROM commentary').fetchone()[0] == 3 * 6236
     assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing').fetchone()[0] == 6
+    # Shamarly: every text page 2..522 carries verses; verses in order never go back a page.
+    covered = {p for s, e in check.execute('SELECT page_shamarly, page_shamarly_end FROM ayah')
+               for p in range(s, e + 1)}
+    assert covered == set(range(2, 523)), sorted(set(range(2, 523)) ^ covered)
+    ends = [r[0] for r in check.execute('SELECT page_shamarly_end FROM ayah ORDER BY id')]
+    assert ends == sorted(ends)
+    assert check.execute('SELECT COUNT(*) FROM shamarly_marker').fetchone()[0] == 6236
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0

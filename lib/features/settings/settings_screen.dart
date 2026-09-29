@@ -81,6 +81,10 @@ class SettingsScreen extends ConsumerWidget {
                         value: MushafEdition.madina1405,
                         title: Text(l.editionOld),
                       ),
+                      RadioListTile(
+                        value: MushafEdition.shamarly,
+                        title: Text(l.editionShamarly),
+                      ),
                     ],
                   ),
                 ),

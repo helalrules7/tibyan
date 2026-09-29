@@ -54,6 +54,8 @@
   "editionNewDesc": "طبعة 1441هـ من مجمع الملك فهد، مع تظليل الآية أثناء التلاوة.",
   "editionOld": "مصحف المدينة: الطبعة القديمة",
   "editionOldDesc": "طبعة 1405هـ المشهورة في التطبيقات القديمة، مع تظليل الكلمة.",
+  "editionShamarly": "مصحف الشمرلي (الطبعة المصرية)",
+  "editionShamarlyDesc": "طبعة الشمرلي المصرية المعروفة، 522 صفحة، مع تظليل الآية وتظليل الكلمة في كثير من الآيات.",
   "defaultTag": "الافتراضية",
   "pagesDownloadNote": "صفحات المصحف تُحمّل مرة واحدة (نحو {size} ميجا)، ثم تعمل دون اتصال. ويمكنك القراءة بالعرض المتصل فورا.",
   "@pagesDownloadNote": {
@@ -95,6 +97,7 @@
   "readWhileDownloading": "اقرأ الآن حتى يكتمل التحميل",
   "pagesCredit": "صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.",
   "pagesCreditOld": "صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، وتُحمّل من موقع quran.com مباشرة.",
+  "pagesCreditShamarly": "صفحات مصحف الشمرلي من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.",
   "editionLabel": "طبعة المصحف",
   "viewPage": "الصفحة",
   "viewContinuous": "متصل",
@@ -253,7 +256,14 @@
   },
   "tabHizb": "الأحزاب",
   "goToPage": "انتقال إلى صفحة",
-  "goToPageHint": "رقم الصفحة من ١ إلى ٦٠٤",
+  "goToPageHint": "رقم الصفحة من ١ إلى {max}",
+  "@goToPageHint": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
   "goLabel": "انتقال",
   "hizbStartsAt": "يبدأ من {surah} {ayah}",
   "@hizbStartsAt": {
