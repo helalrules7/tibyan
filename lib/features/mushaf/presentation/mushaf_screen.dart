@@ -70,6 +70,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   bool _recite = false;
   final Set<VerseKey> _revealed = {};
 
+  /// Touch reading: the verse the reader last tapped is shaded.
+  bool _touchReading = false;
+  VerseKey? _touched;
+
   /// Auto-scroll: pages stacked vertically, moving at [_speed].
   bool _autoScroll = false;
   bool _paused = false;
@@ -86,6 +90,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _selA = _selB = (surah: widget.selectSurah!, ayah: widget.selectAyah!);
     }
     _open();
+    _touchReading = true;
     if (ref.read(settingsProvider).keepScreenOn) WakelockPlus.enable();
     _applySystemBars();
   }
@@ -230,6 +235,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           setState(() => _selA = _selB = v);
         },
         onMarkerTap: (v) => _toggleMark(v, pg),
+        onVerseTap: _touchReading && !_multi
+            ? (v) => setState(() => _touched = v)
+            : null,
+        touched: _touchReading ? _touched : null,
+        touchColor: _touchReading
+            ? (context.tokens.mode == ThemeModeId.light
+                  ? const Color(0x33D0453B)
+                  : const Color(0x40FF8A80))
+            : null,
         onHandleDrag: (start, v) =>
             setState(() => start ? _selA = v : _selB = v),
         markerLook: markerLook,
@@ -245,6 +259,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   ? const Color(0xFFC62828)
                   : const Color(0xFFFF8A80))
             : null,
+        activeWord: recitation.active && recitation.word != null
+            ? _union(
+                ref.watch(pageWordBoxesProvider(pg)).value?[(
+                  recitation.surah,
+                  recitation.ayah!,
+                  recitation.word!,
+                )],
+              )
+            : null,
         emphasisLines: {
           for (final b
               in ref.watch(frameInfoProvider(pg)).value?.banners ??
@@ -252,13 +275,29 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             if (b.number != 9) b.line + 1,
         },
       );
+      final tools = _ReadingTools(
+        touchReading: _touchReading,
+        recite: _recite,
+        onTouchReading: _toggleTouchReading,
+        onRecite: () => _recite
+            ? setState(() {
+                _recite = false;
+                _revealed.clear();
+              })
+            : _startRecite(),
+      );
       final pageWidget = oldEdition
           ? OldMushafPage(page: pg, interaction: interaction)
           : MushafPage(page: pg, interaction: interaction);
       if (!illuminated) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: pageWidget,
+          child: Column(
+            children: [
+              Expanded(child: pageWidget),
+              SizedBox(height: 26, child: Center(child: tools)),
+            ],
+          ),
         );
       }
       final info = ref.watch(frameInfoProvider(pg)).value;
@@ -269,6 +308,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             page: pg,
             catchword: info?.catchword,
             onPageTap: _goToPage,
+            tools: tools,
             child: pageWidget,
           ),
         );
@@ -290,6 +330,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onHizbTap: () => openIndex('hizb'),
           onSurahTap: () => openIndex('surahs'),
           onPageTap: _goToPage,
+          tools: tools,
           onQuarterTap: (q) => _setMark(
             MarkKind.reading,
             (surah: q.surah, ayah: q.ayah),
@@ -308,6 +349,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       body: Stack(
         children: [
           SafeArea(
+            // While listening, the page sits above the player bar so the
+            // catchword and the reading tools stay visible.
+            minimum: EdgeInsets.only(
+              bottom: recitation.active && !_autoScroll
+                  ? MediaQuery.paddingOf(context).bottom + 80
+                  : 0,
+            ),
             child: _autoScroll
                 ? LayoutBuilder(
                     builder: (context, box) {
@@ -511,6 +559,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   Set<VerseKey> _selectionOn(int page) => {...?_range()};
 
+  static Rect? _union(List<Rect>? pieces) =>
+      pieces?.reduce((a, b) => a.expandToInclude(b));
+
   /// Starts listening from the first verse on the current page.
   void _listenFromPage() {
     final a = ref.read(pageAyahsProvider(_page)).value?.firstOrNull;
@@ -581,6 +632,26 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     for (final k in _pageKeys())
       if (!_revealed.contains(k)) k,
   };
+
+  void _toggleTouchReading() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _touchReading = !_touchReading;
+      _touched = null;
+    });
+    if (_touchReading) {
+      final l = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(milliseconds: 1800),
+            content: Text(l.touchReadingOn),
+          ),
+        );
+    }
+  }
 
   void _startRecite() {
     _setChrome(false);
@@ -678,6 +749,66 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final digits = NumberFormatter(Localizations.localeOf(context));
     if (first == null || surahs == null) return digits(page);
     return '${surahName(context, surahs[first.surah - 1])} : ${digits(page)}';
+  }
+}
+
+/// Touch reading and hiding the verses, just under the page number.
+class _ReadingTools extends StatelessWidget {
+  const _ReadingTools({
+    required this.touchReading,
+    required this.recite,
+    required this.onTouchReading,
+    required this.onRecite,
+  });
+
+  final bool touchReading;
+  final bool recite;
+  final VoidCallback onTouchReading;
+  final VoidCallback onRecite;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    Widget button(IconData icon, String label, bool on, VoidCallback onTap) =>
+        Semantics(
+          button: true,
+          toggled: on,
+          label: label,
+          child: Tooltip(
+            message: label,
+            child: InkResponse(
+              onTap: onTap,
+              radius: 18,
+              child: Container(
+                width: 30,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: on ? t.control.withValues(alpha: 0.15) : null,
+                  borderRadius: BorderRadius.circular(11),
+                  border: Border.all(
+                    color: on ? t.control : t.border,
+                    width: 0.8,
+                  ),
+                ),
+                child: Icon(icon, size: 15, color: on ? t.control : t.muted),
+              ),
+            ),
+          ),
+        );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        button(
+          Icons.touch_app_outlined,
+          l.touchReading,
+          touchReading,
+          onTouchReading,
+        ),
+        const SizedBox(width: 10),
+        button(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
+      ],
+    );
   }
 }
 

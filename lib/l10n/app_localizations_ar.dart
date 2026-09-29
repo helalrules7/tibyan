@@ -717,4 +717,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get audioCredit => 'التلاوات وتوقيت الآيات: mp3quran.net';
+
+  @override
+  String get touchReading => 'القراءة اللمسية';
+
+  @override
+  String get touchReadingOn => 'القراءة اللمسية: المس الآية التي تقرؤها';
 }

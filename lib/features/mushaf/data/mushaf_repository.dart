@@ -162,6 +162,13 @@ class MushafRepository {
             ..orderBy([(t) => OrderingTerm.asc(t.ayah)]))
           .get();
 
+  /// Word timings of one surah file, in order of time.
+  Future<List<WordTimingRow>> wordTimings(int reciter, int surah) =>
+      (_db.select(_db.wordTiming)
+            ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
+            ..orderBy([(t) => OrderingTerm.asc(t.startMs)]))
+          .get();
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }

@@ -152,6 +152,7 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onSurahTap,
     this.onPageTap,
     this.onQuarterTap,
+    this.tools,
   });
 
   static const band = 30.0;
@@ -165,6 +166,9 @@ class IlluminatedFrame extends ConsumerWidget {
   final VoidCallback? onSurahTap;
   final VoidCallback? onPageTap;
   final ValueChanged<QuarterMark>? onQuarterTap;
+
+  /// Small reading tools shown just under the page number.
+  final Widget? tools;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -295,31 +299,40 @@ class IlluminatedFrame extends ConsumerWidget {
         ),
         SizedBox(
           height: catchwordSpace,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                // Start side (right in Arabic): the quarter that begins on
-                // this page, so the reader notices it.
-                if (info != null && info!.quarters.isNotEmpty)
-                  _QuarterLabel(
-                    text: quarterName(l, digits, info!.quarters.last.quarter),
-                    color: t.muted,
-                  ),
-                const Spacer(),
-                if (info?.catchword != null)
-                  Text(
-                    info!.catchword!,
-                    semanticsLabel: l.catchwordLabel(info!.catchword!),
-                    style: TextStyle(
-                      fontFamily: 'UthmanicHafs',
-                      fontSize: 15,
-                      height: 1.4,
-                      color: t.muted,
-                    ),
-                  ),
-              ],
-            ),
+          child: Stack(
+            children: [
+              if (tools != null) Center(child: tools),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    // Start side (right in Arabic): the quarter that begins on
+                    // this page, so the reader notices it.
+                    if (info != null && info!.quarters.isNotEmpty)
+                      _QuarterLabel(
+                        text: quarterName(
+                          l,
+                          digits,
+                          info!.quarters.last.quarter,
+                        ),
+                        color: t.muted,
+                      ),
+                    const Spacer(),
+                    if (info?.catchword != null)
+                      Text(
+                        info!.catchword!,
+                        semanticsLabel: l.catchwordLabel(info!.catchword!),
+                        style: TextStyle(
+                          fontFamily: 'UthmanicHafs',
+                          fontSize: 15,
+                          height: 1.4,
+                          color: t.muted,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -786,8 +799,11 @@ class OrnateFrame extends ConsumerWidget {
     this.onPageTap,
     this.catchword,
     this.catchwordSpace = true,
+    this.tools,
   });
 
+  /// Small reading tools shown just under the page number.
+  final Widget? tools;
   final Widget top;
   final Widget bottom;
   final Widget child;
@@ -896,23 +912,28 @@ class OrnateFrame extends ConsumerWidget {
         Expanded(child: body),
         SizedBox(
           height: IlluminatedFrame.catchwordSpace,
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: catchword == null
-                  ? null
-                  : Text(
-                      catchword!,
-                      semanticsLabel: l.catchwordLabel(catchword!),
-                      style: TextStyle(
-                        fontFamily: 'UthmanicHafs',
-                        fontSize: 15,
-                        height: 1.4,
-                        color: t.muted,
-                      ),
-                    ),
-            ),
+          child: Stack(
+            children: [
+              if (tools != null) Center(child: tools),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: catchword == null
+                      ? null
+                      : Text(
+                          catchword!,
+                          semanticsLabel: l.catchwordLabel(catchword!),
+                          style: TextStyle(
+                            fontFamily: 'UthmanicHafs',
+                            fontSize: 15,
+                            height: 1.4,
+                            color: t.muted,
+                          ),
+                        ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

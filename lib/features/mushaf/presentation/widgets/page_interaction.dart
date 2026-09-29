@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -26,7 +27,20 @@ class PageInteraction {
     this.divineNames = const [],
     this.divineColor,
     this.emphasisLines = const {},
+    this.activeWord,
+    this.onVerseTap,
+    this.touched,
+    this.touchColor,
   });
+
+  /// Touch reading: a tap on a verse shades it (replacing the last one).
+  final ValueChanged<VerseKey>? onVerseTap;
+  final VerseKey? touched;
+  final Color? touchColor;
+
+  /// The word being recited (new edition, page units); drawn over the
+  /// verse highlight.
+  final Rect? activeWord;
 
   /// Boxes of the divine names to colour (edition units), and the colour.
   final List<Rect> divineNames;
@@ -75,6 +89,7 @@ List<Rect> lineBoxes(
   required int Function(Rect piece) lineOf,
   required double Function(int line) centre,
   required double halfHeight,
+  (double, double) Function(int line)? band,
 }) {
   final spans = <int, (double, double)>{};
   for (final r in pieces) {
@@ -86,8 +101,20 @@ List<Rect> lineBoxes(
   }
   return [
     for (final MapEntry(key: j, value: (l, r)) in spans.entries)
-      Rect.fromLTRB(l, centre(j) - halfHeight, r, centre(j) + halfHeight),
+      Rect.fromLTRB(
+        l,
+        // Stay inside the line's own band: a frame edge past it would show
+        // up as a stray line in the next band.
+        math.max(centre(j) - halfHeight, (band?.call(j).$1 ?? -1e9) + 1),
+        r,
+        math.min(centre(j) + halfHeight, (band?.call(j).$2 ?? 1e9) - 1),
+      ),
   ];
+}
+
+extension Widen on Rect {
+  /// Grows sideways only, so a box clamped to its line stays inside it.
+  Rect widen(double d) => Rect.fromLTRB(left - d, top, right + d, bottom);
 }
 
 /// Draws [boxes] as the verse highlight: a light frame over a faint fill.

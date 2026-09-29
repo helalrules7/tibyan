@@ -90,12 +90,14 @@ class OpeningPage extends ConsumerWidget {
     required this.child,
     this.catchword,
     this.onPageTap,
+    this.tools,
   });
 
   final int page;
   final Widget child;
   final String? catchword;
   final VoidCallback? onPageTap;
+  final Widget? tools;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -131,6 +133,7 @@ class OpeningPage extends ConsumerWidget {
       page: page,
       onPageTap: onPageTap,
       catchword: catchword,
+      tools: tools,
       top: s == null
           ? const SizedBox.shrink()
           : two(

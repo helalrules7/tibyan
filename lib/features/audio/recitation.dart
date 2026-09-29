@@ -25,6 +25,28 @@ int? ayahAt(List<AyahTimingRow> timings, int ms) {
   return found;
 }
 
+/// The word being recited at [ms] as (verse, word), or null in the
+/// silence before the first word. [words] is sorted by start time.
+(int, int)? wordAt(List<WordTimingRow> words, int ms) {
+  var lo = 0;
+  var hi = words.length - 1;
+  var found = -1;
+  while (lo <= hi) {
+    final mid = (lo + hi) >> 1;
+    if (words[mid].startMs <= ms) {
+      found = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  if (found < 0) return null;
+  final w = words[found];
+  // In the pause after a verse's last word, nothing is being recited.
+  if (ms > w.endMs + 400) return null;
+  return (w.ayah, w.word);
+}
+
 String surahFile(int surah) => '${surah.toString().padLeft(3, '0')}.mp3';
 
 /// Surah files kept on the device, under `<app support>/audio/<reciter>/`.
@@ -118,6 +140,7 @@ class RecitationState {
     this.loading = false,
     this.surah = 1,
     this.ayah,
+    this.word,
     this.timed = false,
     this.rangeFrom,
     this.rangeTo,
@@ -136,6 +159,10 @@ class RecitationState {
 
   /// The verse being recited; null when the file has no timing.
   final int? ayah;
+
+  /// The word being recited in [ayah] (1-based, as in the word boxes);
+  /// null when the recitation has no word timing.
+  final int? word;
 
   /// Whether this surah file has verse timings (highlight, repeat).
   final bool timed;
@@ -159,6 +186,7 @@ class RecitationState {
     bool? loading,
     int? surah,
     int? Function()? ayah,
+    int? Function()? word,
     bool? timed,
     int? Function()? rangeFrom,
     int? Function()? rangeTo,
@@ -173,6 +201,7 @@ class RecitationState {
     loading: loading ?? this.loading,
     surah: surah ?? this.surah,
     ayah: ayah == null ? this.ayah : ayah(),
+    word: word == null ? this.word : word(),
     timed: timed ?? this.timed,
     rangeFrom: rangeFrom == null ? this.rangeFrom : rangeFrom(),
     rangeTo: rangeTo == null ? this.rangeTo : rangeTo(),
@@ -195,6 +224,7 @@ final recitationProvider =
 class RecitationController extends Notifier<RecitationState> {
   AudioPlayer? _player;
   List<AyahTimingRow> _timings = const [];
+  List<WordTimingRow> _words = const [];
   final _subs = <StreamSubscription<Object?>>[];
   Timer? _sleepTimer;
   bool _inSilence = false;
@@ -244,9 +274,11 @@ class RecitationController extends Notifier<RecitationState> {
       (r) => r.id == _reciterId,
       orElse: () => reciters.first,
     );
-    _timings = await ref
-        .read(mushafRepositoryProvider)
-        .timings(reciter.id, surah);
+    final repo = ref.read(mushafRepositoryProvider);
+    _timings = await repo.timings(reciter.id, surah);
+    _words = _timings.isEmpty
+        ? const []
+        : await repo.wordTimings(reciter.id, surah);
     final timed = _timings.isNotEmpty;
     final surahRow = (await ref.read(surahsProvider.future))[surah - 1];
     state = state.copyWith(
@@ -254,6 +286,7 @@ class RecitationController extends Notifier<RecitationState> {
       loading: true,
       surah: surah,
       ayah: () => timed ? (from ?? 1) : null,
+      word: () => null,
       timed: timed,
       rangeFrom: () => timed && to != null ? from ?? 1 : null,
       rangeTo: () => timed ? to : null,
@@ -316,8 +349,14 @@ class RecitationController extends Notifier<RecitationState> {
       }
     }
     final ayah = ayahAt(_timings, ms);
-    if (ayah != null && ayah > 0 && ayah != state.ayah) {
-      state = state.copyWith(ayah: () => ayah);
+    final w = _words.isEmpty ? null : wordAt(_words, ms);
+    final word = w != null && w.$1 == ayah ? w.$2 : null;
+    if ((ayah != null && ayah > 0 && ayah != state.ayah) ||
+        word != state.word) {
+      state = state.copyWith(
+        ayah: () => ayah != null && ayah > 0 ? ayah : state.ayah,
+        word: () => word,
+      );
     }
   }
 

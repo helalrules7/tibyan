@@ -1333,6 +1333,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'التلاوات وتوقيت الآيات: mp3quran.net'**
   String get audioCredit;
+
+  /// No description provided for @touchReading.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراءة اللمسية'**
+  String get touchReading;
+
+  /// No description provided for @touchReadingOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراءة اللمسية: المس الآية التي تقرؤها'**
+  String get touchReadingOn;
 }
 
 class _AppLocalizationsDelegate

@@ -5637,6 +5637,404 @@ class AyahTimingCompanion extends UpdateCompanion<AyahTimingRow> {
   }
 }
 
+class $WordTimingTable extends WordTiming
+    with TableInfo<$WordTimingTable, WordTimingRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WordTimingTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _reciterMeta = const VerificationMeta(
+    'reciter',
+  );
+  @override
+  late final GeneratedColumn<int> reciter = GeneratedColumn<int>(
+    'reciter',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordMeta = const VerificationMeta('word');
+  @override
+  late final GeneratedColumn<int> word = GeneratedColumn<int>(
+    'word',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startMsMeta = const VerificationMeta(
+    'startMs',
+  );
+  @override
+  late final GeneratedColumn<int> startMs = GeneratedColumn<int>(
+    'start_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endMsMeta = const VerificationMeta('endMs');
+  @override
+  late final GeneratedColumn<int> endMs = GeneratedColumn<int>(
+    'end_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    reciter,
+    surah,
+    ayah,
+    word,
+    startMs,
+    endMs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'word_timing';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WordTimingRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('reciter')) {
+      context.handle(
+        _reciterMeta,
+        reciter.isAcceptableOrUnknown(data['reciter']!, _reciterMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reciterMeta);
+    }
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('word')) {
+      context.handle(
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordMeta);
+    }
+    if (data.containsKey('start_ms')) {
+      context.handle(
+        _startMsMeta,
+        startMs.isAcceptableOrUnknown(data['start_ms']!, _startMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startMsMeta);
+    }
+    if (data.containsKey('end_ms')) {
+      context.handle(
+        _endMsMeta,
+        endMs.isAcceptableOrUnknown(data['end_ms']!, _endMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endMsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {reciter, surah, ayah, word};
+  @override
+  WordTimingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WordTimingRow(
+      reciter: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reciter'],
+      )!,
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}word'],
+      )!,
+      startMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_ms'],
+      )!,
+      endMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_ms'],
+      )!,
+    );
+  }
+
+  @override
+  $WordTimingTable createAlias(String alias) {
+    return $WordTimingTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class WordTimingRow extends DataClass implements Insertable<WordTimingRow> {
+  final int reciter;
+  final int surah;
+  final int ayah;
+  final int word;
+  final int startMs;
+  final int endMs;
+  const WordTimingRow({
+    required this.reciter,
+    required this.surah,
+    required this.ayah,
+    required this.word,
+    required this.startMs,
+    required this.endMs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['reciter'] = Variable<int>(reciter);
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['word'] = Variable<int>(word);
+    map['start_ms'] = Variable<int>(startMs);
+    map['end_ms'] = Variable<int>(endMs);
+    return map;
+  }
+
+  WordTimingCompanion toCompanion(bool nullToAbsent) {
+    return WordTimingCompanion(
+      reciter: Value(reciter),
+      surah: Value(surah),
+      ayah: Value(ayah),
+      word: Value(word),
+      startMs: Value(startMs),
+      endMs: Value(endMs),
+    );
+  }
+
+  factory WordTimingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WordTimingRow(
+      reciter: serializer.fromJson<int>(json['reciter']),
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      word: serializer.fromJson<int>(json['word']),
+      startMs: serializer.fromJson<int>(json['startMs']),
+      endMs: serializer.fromJson<int>(json['endMs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'reciter': serializer.toJson<int>(reciter),
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'word': serializer.toJson<int>(word),
+      'startMs': serializer.toJson<int>(startMs),
+      'endMs': serializer.toJson<int>(endMs),
+    };
+  }
+
+  WordTimingRow copyWith({
+    int? reciter,
+    int? surah,
+    int? ayah,
+    int? word,
+    int? startMs,
+    int? endMs,
+  }) => WordTimingRow(
+    reciter: reciter ?? this.reciter,
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    word: word ?? this.word,
+    startMs: startMs ?? this.startMs,
+    endMs: endMs ?? this.endMs,
+  );
+  WordTimingRow copyWithCompanion(WordTimingCompanion data) {
+    return WordTimingRow(
+      reciter: data.reciter.present ? data.reciter.value : this.reciter,
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      word: data.word.present ? data.word.value : this.word,
+      startMs: data.startMs.present ? data.startMs.value : this.startMs,
+      endMs: data.endMs.present ? data.endMs.value : this.endMs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WordTimingRow(')
+          ..write('reciter: $reciter, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(reciter, surah, ayah, word, startMs, endMs);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WordTimingRow &&
+          other.reciter == this.reciter &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.word == this.word &&
+          other.startMs == this.startMs &&
+          other.endMs == this.endMs);
+}
+
+class WordTimingCompanion extends UpdateCompanion<WordTimingRow> {
+  final Value<int> reciter;
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> word;
+  final Value<int> startMs;
+  final Value<int> endMs;
+  const WordTimingCompanion({
+    this.reciter = const Value.absent(),
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.word = const Value.absent(),
+    this.startMs = const Value.absent(),
+    this.endMs = const Value.absent(),
+  });
+  WordTimingCompanion.insert({
+    required int reciter,
+    required int surah,
+    required int ayah,
+    required int word,
+    required int startMs,
+    required int endMs,
+  }) : reciter = Value(reciter),
+       surah = Value(surah),
+       ayah = Value(ayah),
+       word = Value(word),
+       startMs = Value(startMs),
+       endMs = Value(endMs);
+  static Insertable<WordTimingRow> custom({
+    Expression<int>? reciter,
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? word,
+    Expression<int>? startMs,
+    Expression<int>? endMs,
+  }) {
+    return RawValuesInsertable({
+      if (reciter != null) 'reciter': reciter,
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (word != null) 'word': word,
+      if (startMs != null) 'start_ms': startMs,
+      if (endMs != null) 'end_ms': endMs,
+    });
+  }
+
+  WordTimingCompanion copyWith({
+    Value<int>? reciter,
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? word,
+    Value<int>? startMs,
+    Value<int>? endMs,
+  }) {
+    return WordTimingCompanion(
+      reciter: reciter ?? this.reciter,
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      word: word ?? this.word,
+      startMs: startMs ?? this.startMs,
+      endMs: endMs ?? this.endMs,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (reciter.present) {
+      map['reciter'] = Variable<int>(reciter.value);
+    }
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (word.present) {
+      map['word'] = Variable<int>(word.value);
+    }
+    if (startMs.present) {
+      map['start_ms'] = Variable<int>(startMs.value);
+    }
+    if (endMs.present) {
+      map['end_ms'] = Variable<int>(endMs.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WordTimingCompanion(')
+          ..write('reciter: $reciter, ')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('startMs: $startMs, ')
+          ..write('endMs: $endMs')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -5655,6 +6053,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $CommentaryTable commentary = $CommentaryTable(this);
   late final $ReciterTable reciter = $ReciterTable(this);
   late final $AyahTimingTable ayahTiming = $AyahTimingTable(this);
+  late final $WordTimingTable wordTiming = $WordTimingTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5672,6 +6071,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     commentary,
     reciter,
     ayahTiming,
+    wordTiming,
   ];
 }
 
@@ -8704,6 +9104,226 @@ typedef $$AyahTimingTableProcessedTableManager =
       AyahTimingRow,
       PrefetchHooks Function()
     >;
+typedef $$WordTimingTableCreateCompanionBuilder = WordTimingCompanion Function({
+  required int reciter,
+  required int surah,
+  required int ayah,
+  required int word,
+  required int startMs,
+  required int endMs,
+});
+typedef $$WordTimingTableUpdateCompanionBuilder = WordTimingCompanion Function({
+  Value<int> reciter,
+  Value<int> surah,
+  Value<int> ayah,
+  Value<int> word,
+  Value<int> startMs,
+  Value<int> endMs,
+});
+
+class $$WordTimingTableFilterComposer
+    extends Composer<_$ContentDatabase, $WordTimingTable> {
+  $$WordTimingTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get reciter => $composableBuilder(
+    column: $table.reciter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WordTimingTableOrderingComposer
+    extends Composer<_$ContentDatabase, $WordTimingTable> {
+  $$WordTimingTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get reciter => $composableBuilder(
+    column: $table.reciter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMs => $composableBuilder(
+    column: $table.startMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endMs => $composableBuilder(
+    column: $table.endMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WordTimingTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $WordTimingTable> {
+  $$WordTimingTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get reciter =>
+      $composableBuilder(column: $table.reciter, builder: (column) => column);
+
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get word =>
+      $composableBuilder(column: $table.word, builder: (column) => column);
+
+  GeneratedColumn<int> get startMs =>
+      $composableBuilder(column: $table.startMs, builder: (column) => column);
+
+  GeneratedColumn<int> get endMs =>
+      $composableBuilder(column: $table.endMs, builder: (column) => column);
+}
+
+class $$WordTimingTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $WordTimingTable,
+          WordTimingRow,
+          $$WordTimingTableFilterComposer,
+          $$WordTimingTableOrderingComposer,
+          $$WordTimingTableAnnotationComposer,
+          $$WordTimingTableCreateCompanionBuilder,
+          $$WordTimingTableUpdateCompanionBuilder,
+          (
+            WordTimingRow,
+            BaseReferences<_$ContentDatabase, $WordTimingTable, WordTimingRow>,
+          ),
+          WordTimingRow,
+          PrefetchHooks Function()
+        > {
+  $$WordTimingTableTableManager(_$ContentDatabase db, $WordTimingTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WordTimingTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WordTimingTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WordTimingTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> reciter = const Value.absent(),
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> word = const Value.absent(),
+                Value<int> startMs = const Value.absent(),
+                Value<int> endMs = const Value.absent(),
+              }) => WordTimingCompanion(
+                reciter: reciter,
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                startMs: startMs,
+                endMs: endMs,
+              ),
+          createCompanionCallback:
+              ({
+                required int reciter,
+                required int surah,
+                required int ayah,
+                required int word,
+                required int startMs,
+                required int endMs,
+              }) => WordTimingCompanion.insert(
+                reciter: reciter,
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                startMs: startMs,
+                endMs: endMs,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WordTimingTable, WordTimingRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $WordTimingTable,
+                    WordTimingRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WordTimingTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $WordTimingTable,
+      WordTimingRow,
+      $$WordTimingTableFilterComposer,
+      $$WordTimingTableOrderingComposer,
+      $$WordTimingTableAnnotationComposer,
+      $$WordTimingTableCreateCompanionBuilder,
+      $$WordTimingTableUpdateCompanionBuilder,
+      (
+        WordTimingRow,
+        BaseReferences<_$ContentDatabase, $WordTimingTable, WordTimingRow>,
+      ),
+      WordTimingRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -8731,4 +9351,6 @@ class $ContentDatabaseManager {
       $$ReciterTableTableManager(_db, _db.reciter);
   $$AyahTimingTableTableManager get ayahTiming =>
       $$AyahTimingTableTableManager(_db, _db.ayahTiming);
+  $$WordTimingTableTableManager get wordTiming =>
+      $$WordTimingTableTableManager(_db, _db.wordTiming);
 }
