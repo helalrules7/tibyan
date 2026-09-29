@@ -249,6 +249,13 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (d) {
+                      if (x.hidden != null) {
+                        final v = verseAt(d.localPosition);
+                        if (v != null && x.hidden!.contains(v)) {
+                          x.onHiddenTap?.call(v);
+                          return;
+                        }
+                      }
                       final m = markerAt(d.localPosition);
                       m != null ? x.onMarkerTap(m) : x.onTap();
                     },
@@ -272,6 +279,23 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                             for (final g in selectedGlyphs)
                               layout.toScreenRect(_rect(g)),
                           ],
+                          look: x.markerLook,
+                          markers: [
+                            for (final e in markers.entries)
+                              (layout.toScreenRect(_rect(e.value)), e.key.ayah),
+                          ],
+                          hidden: x.hidden == null
+                              ? const []
+                              : [
+                                  for (final g in glyphs)
+                                    if (x.hidden!.contains((
+                                      surah: g.suraNumber,
+                                      ayah: g.ayahNumber,
+                                    )))
+                                      layout.toScreenRect(_rect(g)),
+                                ],
+                          paper: tokens.colors.paper,
+                          line: tokens.colors.border,
                           rings: [
                             for (final e in markers.entries)
                               if (x.marks.containsKey(e.key))
@@ -310,7 +334,22 @@ class _OldPagePainter extends CustomPainter {
     required this.highlight,
     required this.selected,
     required this.rings,
+    required this.look,
+    required this.markers,
+    required this.hidden,
+    required this.paper,
+    required this.line,
   });
+
+  final MarkerLook? look;
+
+  /// Verse-end marker boxes on screen, with their verse numbers.
+  final List<(Rect, int)> markers;
+
+  /// Recitation mode: glyph boxes to cover.
+  final List<Rect> hidden;
+  final Color paper;
+  final Color line;
 
   final ui.Image image;
   final _PageLayout layout;
@@ -346,11 +385,33 @@ class _OldPagePainter extends CustomPainter {
           ..color = color,
       );
     }
+    for (final (r, _) in markers) {
+      look?.paintUnder(canvas, r.center, r.shortestSide / 2);
+    }
     final paint = Paint()..filterQuality = FilterQuality.medium;
     if (ink != null) {
       paint.colorFilter = ColorFilter.mode(ink!, BlendMode.srcIn);
     }
     layout.paint(canvas, image, paint);
+    for (final (r, n) in markers) {
+      look?.paintOver(canvas, r.center, r.shortestSide / 2, n);
+    }
+    if (hidden.isNotEmpty) {
+      final cover = Paint()..color = paper;
+      final stroke = Paint()
+        ..color = line
+        ..strokeWidth = 1.2;
+      for (final r in hidden) {
+        canvas.drawRect(r.inflate(2), cover);
+      }
+      for (final r in hidden) {
+        canvas.drawLine(
+          Offset(r.left, r.center.dy),
+          Offset(r.right, r.center.dy),
+          stroke,
+        );
+      }
+    }
   }
 
   @override
@@ -361,5 +422,7 @@ class _OldPagePainter extends CustomPainter {
       old.highlight != highlight ||
       old.selected.length != selected.length ||
       old.rings.length != rings.length ||
+      old.hidden.length != hidden.length ||
+      old.look != look ||
       (selected.isNotEmpty && old.selected.first != selected.first);
 }

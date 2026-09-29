@@ -137,14 +137,43 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                       ),
                     );
                 }
+                final look = x.markerLook;
+                final transform = Matrix4.diagonal3Values(scale, scale, 1);
                 return Stack(
                   clipBehavior: Clip.none,
                   children: [
+                    if (look != null)
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: CustomPaint(
+                            painter: _CallbackPainter((canvas) {
+                              canvas.transform(transform.storage);
+                              for (final v in verses) {
+                                if (v.marker != null) {
+                                  look.paintUnder(
+                                    canvas,
+                                    v.marker!,
+                                    _markerRadius,
+                                  );
+                                }
+                              }
+                            }),
+                          ),
+                        ),
+                      ),
                     Positioned.fill(
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTapUp: (d) {
-                          final m = markerAt(d.localPosition / scale);
+                          final point = d.localPosition / scale;
+                          if (x.hidden != null) {
+                            final v = verseAt(point);
+                            if (v != null && x.hidden!.contains(v)) {
+                              x.onHiddenTap?.call(v);
+                              return;
+                            }
+                          }
+                          final m = markerAt(point);
                           m != null ? x.onMarkerTap(m) : x.onTap();
                         },
                         onLongPressStart: (d) {
@@ -181,6 +210,46 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                             highlight: tokens.colors.highlight,
                             transform: Matrix4.diagonal3Values(scale, scale, 1),
                           ),
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: _CallbackPainter((canvas) {
+                            canvas.transform(transform.storage);
+                            if (look != null) {
+                              for (final v in verses) {
+                                if (v.marker != null) {
+                                  look.paintOver(
+                                    canvas,
+                                    v.marker!,
+                                    _markerRadius,
+                                    v.key.ayah,
+                                  );
+                                }
+                              }
+                            }
+                            final hidden = x.hidden;
+                            if (hidden != null) {
+                              final cover = Paint()
+                                ..color = tokens.colors.paper;
+                              final line = Paint()
+                                ..color = tokens.colors.border
+                                ..strokeWidth = 1.2;
+                              for (final v in verses) {
+                                if (!hidden.contains(v.key)) continue;
+                                canvas.drawPath(v.path, cover);
+                                for (final r in v.rects) {
+                                  canvas.drawLine(
+                                    Offset(r.left + 4, r.center.dy),
+                                    Offset(r.right - 4, r.center.dy),
+                                    line,
+                                  );
+                                }
+                              }
+                            }
+                          }),
                         ),
                       ),
                     ),
@@ -268,4 +337,20 @@ Path parseOutline(String d) {
     }
   }
   return path;
+}
+
+class _CallbackPainter extends CustomPainter {
+  _CallbackPainter(this.draw);
+
+  final void Function(Canvas canvas) draw;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    draw(canvas);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_CallbackPainter old) => true;
 }

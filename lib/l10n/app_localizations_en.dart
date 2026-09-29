@@ -445,4 +445,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get twoVerses => '2 verses';
+
+  @override
+  String get markerStyleLabel => 'Verse marker shape';
+
+  @override
+  String get markerTraditional => 'Traditional marker';
+
+  @override
+  String get markerRosette => 'Rosette';
+
+  @override
+  String get markerTintLabel => 'Marker colour';
+
+  @override
+  String get markerTintNone => 'No colour';
+
+  @override
+  String get reciteMode => 'Recitation mode';
+
+  @override
+  String get revealNextVerse => 'Next verse';
+
+  @override
+  String get revealAll => 'All';
+
+  @override
+  String get endRecite => 'End recitation';
+
+  @override
+  String get autoScroll => 'Auto-scroll';
+
+  @override
+  String get resume => 'Resume';
+
+  @override
+  String get pause => 'Pause';
+
+  @override
+  String get slower => 'Slower';
+
+  @override
+  String get faster => 'Faster';
+
+  @override
+  String get stopAutoScroll => 'Stop scrolling';
+
+  @override
+  String speedLabel(String speed) {
+    return 'Speed $speed';
+  }
 }
