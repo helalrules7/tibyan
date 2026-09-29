@@ -347,5 +347,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "tafsirKashida": "Kashida justification (trial)",
+  "tafsirKashidaHint": "Justify tafsir lines by stretching letters instead of widening spaces. Quran words in brackets are never stretched, and copying gives the original text",
+  "copyText": "Copy text",
+  "copied": "Copied"
 }

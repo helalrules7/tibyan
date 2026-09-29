@@ -618,4 +618,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String sourceRetrieved(String date) {
     return 'Copy of $date';
   }
+
+  @override
+  String get tafsirKashida => 'Kashida justification (trial)';
+
+  @override
+  String get tafsirKashidaHint =>
+      'Justify tafsir lines by stretching letters instead of widening spaces. Quran words in brackets are never stretched, and copying gives the original text';
+
+  @override
+  String get copyText => 'Copy text';
+
+  @override
+  String get copied => 'Copied';
 }
