@@ -115,6 +115,16 @@
       "sha256": "4aabbfa9d96796f5a6b0217d2c39dce1a3084f772bf6f2650e37082a774e3cc7",
       "license": "Pickthall (1930) is in the public domain. Tanzil's copy: non-commercial use (Tibyan is free and non-profit).",
       "evidence": "docs/licenses/2026-09-29_tanzil_translations_terms.pdf"
+    },
+    {
+      "id": "mp3quran-ayat-timing",
+      "file": "mp3quran_ayat_timing.json",
+      "url": "https://www.mp3quran.net/api/v3/ayat_timing",
+      "method": "script",
+      "script": "tools/fetch_ayat_timing.py",
+      "sha256": "efe07ebd42374fcdcd772ec65629cc49a0d635e35ab6024df5b99ea0d6a8b5e4",
+      "license": "mp3quran.net general permission: «All rights are available to everyone, and we allow any visitor or developer to copy any material or use any link»",
+      "evidence": "docs/licenses/2026-09-28_mp3quran_privacy.pdf"
     }
   ]
 }

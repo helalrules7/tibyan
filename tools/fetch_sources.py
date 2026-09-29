@@ -10,6 +10,7 @@ and the manifest updated in its own data(...) commit.
 """
 import hashlib
 import json
+import subprocess
 import sys
 import urllib.parse
 import urllib.request
@@ -46,7 +47,10 @@ def main(wanted):
             continue
         target = CACHE / source['file']
         if not target.exists() or sha256(target) != source['sha256']:
-            download(source, target)
+            if source.get('method') == 'script':
+                subprocess.run([sys.executable, str(ROOT.parent / source['script'])], check=True)
+            else:
+                download(source, target)
         actual = sha256(target)
         if actual == source['sha256']:
             print(f"ok       {source['id']}")
