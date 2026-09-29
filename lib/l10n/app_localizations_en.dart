@@ -374,4 +374,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loadingLabel => 'Loading…';
+
+  @override
+  String hizbLabel(String number) {
+    return 'Hizb $number';
+  }
+
+  @override
+  String catchwordLabel(String word) {
+    return 'First word of the next page: $word';
+  }
 }

@@ -745,6 +745,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'جارٍ التحميل…'**
   String get loadingLabel;
+
+  /// No description provided for @hizbLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحزب {number}'**
+  String hizbLabel(String number);
+
+  /// No description provided for @catchwordLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكلمة الأولى في الصفحة التالية: {word}'**
+  String catchwordLabel(String word);
 }
 
 class _AppLocalizationsDelegate

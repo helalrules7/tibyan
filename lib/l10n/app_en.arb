@@ -107,5 +107,9 @@
   "reviewNotesTitle": "Questions under review",
   "reviewNotesBody": "{count} places where the two text sources differ (two juz boundaries and four spellings) are with a qualified reviewer. The app follows the Tanzil text until a decision is made.",
   "mushafOpen": "Open the mushaf",
-  "loadingLabel": "Loading…"
+  "loadingLabel": "Loading…",
+  "hizbLabel": "Hizb {number}",
+  "@hizbLabel": {"placeholders": {"number": {"type": "String"}}},
+  "catchwordLabel": "First word of the next page: {word}",
+  "@catchwordLabel": {"placeholders": {"word": {"type": "String"}}}
 }

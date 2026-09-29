@@ -234,5 +234,9 @@
     }
   },
   "mushafOpen": "افتح المصحف",
-  "loadingLabel": "جارٍ التحميل…"
+  "loadingLabel": "جارٍ التحميل…",
+  "hizbLabel": "الحزب {number}",
+  "@hizbLabel": {"placeholders": {"number": {"type": "String"}}},
+  "catchwordLabel": "الكلمة الأولى في الصفحة التالية: {word}",
+  "@catchwordLabel": {"placeholders": {"word": {"type": "String"}}}
 }
