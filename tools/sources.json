@@ -125,6 +125,15 @@
       "sha256": "efe07ebd42374fcdcd772ec65629cc49a0d635e35ab6024df5b99ea0d6a8b5e4",
       "license": "mp3quran.net general permission: «All rights are available to everyone, and we allow any visitor or developer to copy any material or use any link»",
       "evidence": "docs/licenses/2026-09-28_mp3quran_privacy.pdf"
+    },
+    {
+      "id": "cpfair-quran-align-2016-11-24",
+      "file": "quran-align-2016-11-24.zip",
+      "url": "https://github.com/cpfair/quran-align/releases/download/release-2016-11-24/quran-align-data-2016-11-24.zip",
+      "method": "GET",
+      "sha256": "5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7",
+      "license": "CC BY 4.0, (c) 2016 Collin Fair",
+      "evidence": "docs/licenses/2026-09-28_cpfair_quran-align.pdf"
     }
   ]
 }

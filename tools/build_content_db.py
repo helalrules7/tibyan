@@ -15,6 +15,7 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/qe_english_saheeh.sqlite   QuranEnc 1.1.2       (Saheeh International)
   tools/.cache/tanzil_en.pickthall.txt    Tanzil               (Pickthall, public domain)
   tools/.cache/mp3quran_ayat_timing.json  mp3quran.net         (verse timings, fetch_ayat_timing.py)
+  tools/.cache/word_timing.json           quran-align placed on mp3quran files (build_word_timing.py)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -38,7 +39,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 8
+SCHEMA_VERSION = 9
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -160,6 +161,7 @@ def main():
     saheeh_path = CACHE / 'qe_english_saheeh.sqlite'
     pickthall_path = CACHE / 'tanzil_en.pickthall.txt'
     timing_path = CACHE / 'mp3quran_ayat_timing.json'
+    word_timing_path = CACHE / 'word_timing.json'
 
     uthmani, notice = read_tanzil(uthmani_path)
     clean, clean_notice = read_tanzil(clean_path)
@@ -291,6 +293,10 @@ def main():
       reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
       start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
       PRIMARY KEY (reciter, surah, ayah)) WITHOUT ROWID;
+    CREATE TABLE word_timing (              -- ms in the surah file; word as in word_box
+      reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
+      word INTEGER NOT NULL, start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
+      PRIMARY KEY (reciter, surah, ayah, word)) WITHOUT ROWID;
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -355,6 +361,14 @@ def main():
     counts = {s['id']: s['ayas'] for s in surahs}
     timings, gaps = timing_rows(json.loads(timing_path.read_text(encoding='utf-8')), counts)
     db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)', timings)
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
+        11, 'quran-align-word-timing', 'Word timings (quran-align, placed on the mp3quran files)',
+        'Collin Fair (quran-align); placement by Tibyan', '2016-11-24',
+        'CC BY 4.0', 'https://github.com/cpfair/quran-align',
+        'توقيت الكلمات: quran-align © 2016 Collin Fair (CC BY 4.0)', None,
+        sha256(word_timing_path), today))
+    db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
+                   json.loads(word_timing_path.read_text(encoding='utf-8')))
     for reciter, surah in gaps:
         print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
     db.executemany('INSERT INTO commentary_edition VALUES (?,?,?,?,?,?,?)', [
