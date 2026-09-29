@@ -27,7 +27,6 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kOnboarding = 'settings.onboardingDone';
   static const _kEdition = 'settings.edition';
   static const _kKeepOn = 'settings.keepScreenOn';
-  static const _kFontScale = 'settings.quranFontScale';
   static const _kMarkerStyle = 'settings.markerStyle';
   static const _kMarkerTint = 'settings.markerTint';
   static const _kDivine = 'settings.highlightDivineNames';
@@ -66,7 +65,6 @@ class SettingsController extends Notifier<AppSettings> {
           _enumByName(MushafEdition.values, _prefs.getString(_kEdition)) ??
           MushafEdition.madina1441,
       keepScreenOn: _prefs.getBool(_kKeepOn) ?? true,
-      quranFontScale: _prefs.getDouble(_kFontScale) ?? 1.0,
       markerStyle:
           _enumByName(MarkerStyle.values, _prefs.getString(_kMarkerStyle)) ??
           MarkerStyle.traditional,
@@ -125,12 +123,6 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setKeepScreenOn(bool value) async {
     state = state.copyWith(keepScreenOn: value);
     await _prefs.setBool(_kKeepOn, value);
-  }
-
-  Future<void> setQuranFontScale(double value) async {
-    final clamped = value.clamp(0.8, 2.0).toDouble();
-    state = state.copyWith(quranFontScale: clamped);
-    await _prefs.setDouble(_kFontScale, clamped);
   }
 
   Future<void> setMarkerStyle(MarkerStyle style) async {

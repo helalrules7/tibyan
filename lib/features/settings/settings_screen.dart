@@ -42,6 +42,15 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () => context.go('/settings/appearance'),
             ),
           ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: Text(l.aboutMushafTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/mushaf/about'),
+            ),
+          ),
           const SizedBox(height: 16),
           _SectionTitle(l.languageLabel),
           Card(
@@ -104,17 +113,6 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(l.keepScreenOn),
                   value: settings.keepScreenOn,
                   onChanged: controller.setKeepScreenOn,
-                ),
-                ListTile(
-                  title: Text(l.quranFontSize),
-                  subtitle: Slider(
-                    value: settings.quranFontScale,
-                    min: 0.8,
-                    max: 2.0,
-                    divisions: 12,
-                    label: '${(settings.quranFontScale * 100).round()}%',
-                    onChanged: controller.setQuranFontScale,
-                  ),
                 ),
                 SwitchListTile(
                   title: Text(l.highlightDivineNames),

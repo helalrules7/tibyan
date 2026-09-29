@@ -169,7 +169,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String pagesDownloadNote(String size) {
-    return 'Mushaf pages download once (about $size MB), then work offline. You can read the continuous view right away.';
+    return 'This edition\'s pages download once (about $size MB), then work offline. Until then you read the new Madina edition, which comes with the app.';
   }
 
   @override
@@ -211,12 +211,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'The download continues where it stopped if the connection drops. Wi-Fi is recommended.';
 
   @override
-  String get readContinuousNow => 'Open the continuous view';
-
-  @override
-  String get readWhileDownloading => 'Read now while the download finishes';
-
-  @override
   String get pagesCredit =>
       'Madina Mushaf pages by the King Fahd Glorious Quran Printing Complex.';
 
@@ -233,9 +227,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewPage => 'Page';
-
-  @override
-  String get viewContinuous => 'Continuous';
 
   @override
   String get viewModeLabel => 'View';
@@ -354,9 +345,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keepScreenOn => 'Keep the screen on while reading';
-
-  @override
-  String get quranFontSize => 'Quran text size in the continuous view';
 
   @override
   String get aboutMushafIntro =>
@@ -797,4 +785,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get versePauseHint =>
       'Shortens the long silences between verses without touching the recitation itself';
+
+  @override
+  String get homeTitle => 'Home';
 }

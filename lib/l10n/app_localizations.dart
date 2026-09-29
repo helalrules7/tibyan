@@ -401,7 +401,7 @@ abstract class AppLocalizations {
   /// No description provided for @pagesDownloadNote.
   ///
   /// In ar, this message translates to:
-  /// **'صفحات المصحف تُحمّل مرة واحدة (نحو {size} ميجا)، ثم تعمل دون اتصال. ويمكنك القراءة بالعرض المتصل فورا.'**
+  /// **'صفحات هذا المصحف تُحمّل مرة واحدة (نحو {size} ميجا)، ثم تعمل دون اتصال. وحتى يكتمل التحميل تقرأ في مصحف المدينة (الطبعة الحديثة) المدمج في التطبيق.'**
   String pagesDownloadNote(String size);
 
   /// No description provided for @downloadTitle.
@@ -470,18 +470,6 @@ abstract class AppLocalizations {
   /// **'يكمل التحميل من حيث توقف إذا انقطع الاتصال. يُفضّل الاتصال بشبكة Wi-Fi.'**
   String get downloadWifiHint;
 
-  /// No description provided for @readContinuousNow.
-  ///
-  /// In ar, this message translates to:
-  /// **'افتح العرض المتصل'**
-  String get readContinuousNow;
-
-  /// No description provided for @readWhileDownloading.
-  ///
-  /// In ar, this message translates to:
-  /// **'اقرأ الآن حتى يكتمل التحميل'**
-  String get readWhileDownloading;
-
   /// No description provided for @pagesCredit.
   ///
   /// In ar, this message translates to:
@@ -511,12 +499,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الصفحة'**
   String get viewPage;
-
-  /// No description provided for @viewContinuous.
-  ///
-  /// In ar, this message translates to:
-  /// **'متصل'**
-  String get viewContinuous;
 
   /// No description provided for @viewModeLabel.
   ///
@@ -715,12 +697,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إبقاء الشاشة مضاءة أثناء القراءة'**
   String get keepScreenOn;
-
-  /// No description provided for @quranFontSize.
-  ///
-  /// In ar, this message translates to:
-  /// **'حجم خط القرآن في العرض المتصل'**
-  String get quranFontSize;
 
   /// No description provided for @aboutMushafIntro.
   ///
@@ -1459,6 +1435,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها'**
   String get versePauseHint;
+
+  /// No description provided for @homeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرئيسية'**
+  String get homeTitle;
 }
 
 class _AppLocalizationsDelegate

@@ -179,7 +179,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
     final surahs = ref.watch(surahsProvider).value;
-    final first = ref.watch(pageAyahsProvider(_page)).value?.firstOrNull;
     final edition = ref.watch(editionProvider);
     final pageCount = edition.pageCount;
     // Page numbers differ between editions: reopen at the same verse.
@@ -447,18 +446,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     l.fawasilTitle,
                     () => context.push('/mushaf/fawasil'),
                   ),
-                  (
-                    Icons.notes,
-                    l.viewContinuous,
-                    () => context.go(
-                      '/mushaf/continuous?s=${first?.surah ?? 1}&a=${first?.number ?? 1}',
-                    ),
-                  ),
-                  (
-                    Icons.info_outline,
-                    l.aboutMushafTitle,
-                    () => context.push('/mushaf/about'),
-                  ),
+                  (Icons.home_outlined, l.homeTitle, () => context.go('/')),
                   (
                     Icons.tune,
                     l.settingsTitle,

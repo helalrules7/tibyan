@@ -439,7 +439,7 @@ def main():
     db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
         13, 'shamarly-archive-org', 'Shamarly (Egyptian) mushaf: page images; page geometry by Tibyan',
         'archive.org (details/shamerly); geometry: Tibyan (tools/build_shamarly.py)', None,
-        'No licence stated; used with the owner\'s consent',
+        'Free; may be copied and circulated if treated with respect, not for commercial use (cover text)',
         'https://archive.org/details/shamerly',
         'صفحات مصحف الشمرلي: archive.org (details/shamerly)', None,
         sh_meta['sha256_pages_zip'], today))

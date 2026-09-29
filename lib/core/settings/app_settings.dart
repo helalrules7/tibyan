@@ -46,7 +46,6 @@ class AppSettings {
     this.onboardingDone = false,
     this.edition = MushafEdition.madina1441,
     this.keepScreenOn = true,
-    this.quranFontScale = 1.0,
     this.markerStyle = MarkerStyle.traditional,
     this.markerTint,
     this.highlightDivineNames = true,
@@ -73,9 +72,6 @@ class AppSettings {
 
   /// Keep the screen awake while the mushaf is open.
   final bool keepScreenOn;
-
-  /// Quran text size in the continuous view (1.0 = default).
-  final double quranFontScale;
 
   final MarkerStyle markerStyle;
 
@@ -115,7 +111,6 @@ class AppSettings {
     bool? onboardingDone,
     MushafEdition? edition,
     bool? keepScreenOn,
-    double? quranFontScale,
     MarkerStyle? markerStyle,
     int? Function()? markerTint,
     bool? highlightDivineNames,
@@ -135,7 +130,6 @@ class AppSettings {
     onboardingDone: onboardingDone ?? this.onboardingDone,
     edition: edition ?? this.edition,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
-    quranFontScale: quranFontScale ?? this.quranFontScale,
     markerStyle: markerStyle ?? this.markerStyle,
     markerTint: markerTint == null ? this.markerTint : markerTint(),
     highlightDivineNames: highlightDivineNames ?? this.highlightDivineNames,

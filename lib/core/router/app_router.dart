@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/mushaf/presentation/about_mushaf_screen.dart';
-import '../../features/mushaf/presentation/continuous_screen.dart';
 import '../../features/mushaf/presentation/download_screen.dart';
 import '../../features/mushaf/presentation/fawasil_screen.dart';
 import '../../features/mushaf/presentation/index_screen.dart';
@@ -78,14 +77,6 @@ final appRouterProvider = Provider<GoRouter>(
           GoRoute(
             path: 'download',
             builder: (context, state) => const DownloadScreen(),
-          ),
-          GoRoute(
-            path: 'continuous',
-            builder: (context, state) => ContinuousScreen(
-              key: ValueKey(state.uri.toString()),
-              surah: _int(state, 's') ?? 1,
-              ayah: _int(state, 'a'),
-            ),
           ),
           GoRoute(
             path: 'index',

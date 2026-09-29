@@ -169,7 +169,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String pagesDownloadNote(String size) {
-    return 'صفحات المصحف تُحمّل مرة واحدة (نحو $size ميجا)، ثم تعمل دون اتصال. ويمكنك القراءة بالعرض المتصل فورا.';
+    return 'صفحات هذا المصحف تُحمّل مرة واحدة (نحو $size ميجا)، ثم تعمل دون اتصال. وحتى يكتمل التحميل تقرأ في مصحف المدينة (الطبعة الحديثة) المدمج في التطبيق.';
   }
 
   @override
@@ -211,12 +211,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'يكمل التحميل من حيث توقف إذا انقطع الاتصال. يُفضّل الاتصال بشبكة Wi-Fi.';
 
   @override
-  String get readContinuousNow => 'افتح العرض المتصل';
-
-  @override
-  String get readWhileDownloading => 'اقرأ الآن حتى يكتمل التحميل';
-
-  @override
   String get pagesCredit =>
       'صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.';
 
@@ -233,9 +227,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get viewPage => 'الصفحة';
-
-  @override
-  String get viewContinuous => 'متصل';
 
   @override
   String get viewModeLabel => 'طريقة العرض';
@@ -353,9 +344,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get keepScreenOn => 'إبقاء الشاشة مضاءة أثناء القراءة';
-
-  @override
-  String get quranFontSize => 'حجم خط القرآن في العرض المتصل';
 
   @override
   String get aboutMushafIntro =>
@@ -794,4 +782,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get versePauseHint =>
       'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها';
+
+  @override
+  String get homeTitle => 'الرئيسية';
 }
