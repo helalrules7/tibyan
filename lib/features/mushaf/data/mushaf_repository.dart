@@ -226,6 +226,13 @@ class MushafRepository {
             ..orderBy([(t) => OrderingTerm.asc(t.ayah)]))
           .get();
 
+  /// Speech spans of one surah file's verses, in order.
+  Future<List<AyahSpeechRow>> speech(int reciter, int surah) =>
+      (_db.select(_db.ayahSpeech)
+            ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
+            ..orderBy([(t) => OrderingTerm.asc(t.ayah)]))
+          .get();
+
   /// Word timings of one surah file, in order of time.
   Future<List<WordTimingRow>> wordTimings(int reciter, int surah) =>
       (_db.select(_db.wordTiming)

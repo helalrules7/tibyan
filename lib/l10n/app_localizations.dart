@@ -1429,6 +1429,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'يُحمَّل {name}: {percent}٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)'**
   String downloadingBanner(String name, String percent);
+
+  /// No description provided for @versePauseLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'السكتة بين الآيات'**
+  String get versePauseLabel;
+
+  /// No description provided for @versePauseAsRecorded.
+  ///
+  /// In ar, this message translates to:
+  /// **'كما سُجّلت'**
+  String get versePauseAsRecorded;
+
+  /// No description provided for @versePauseSecond.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثانية'**
+  String get versePauseSecond;
+
+  /// No description provided for @versePauseHalf.
+  ///
+  /// In ar, this message translates to:
+  /// **'نصف ثانية'**
+  String get versePauseHalf;
+
+  /// No description provided for @versePauseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها'**
+  String get versePauseHint;
 }
 
 class _AppLocalizationsDelegate

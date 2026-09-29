@@ -778,4 +778,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String downloadingBanner(String name, String percent) {
     return 'يُحمَّل $name: $percent٪. تقرأ الآن في مصحف المدينة (الطبعة الحديثة)';
   }
+
+  @override
+  String get versePauseLabel => 'السكتة بين الآيات';
+
+  @override
+  String get versePauseAsRecorded => 'كما سُجّلت';
+
+  @override
+  String get versePauseSecond => 'ثانية';
+
+  @override
+  String get versePauseHalf => 'نصف ثانية';
+
+  @override
+  String get versePauseHint =>
+      'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها';
 }

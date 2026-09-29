@@ -448,5 +448,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "versePauseLabel": "Pause between verses",
+  "versePauseAsRecorded": "As recorded",
+  "versePauseSecond": "1 second",
+  "versePauseHalf": "Half a second",
+  "versePauseHint": "Shortens the long silences between verses without touching the recitation itself"
 }

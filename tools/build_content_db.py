@@ -44,7 +44,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 SHAMARLY = CACHE / 'shamarly_geometry.db'
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
@@ -311,6 +311,10 @@ def main():
       reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
       word INTEGER NOT NULL, start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
       PRIMARY KEY (reciter, surah, ayah, word)) WITHOUT ROWID;
+    CREATE TABLE ayah_speech (              -- where a verse's recited speech starts and ends (ms in the surah file)
+      reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
+      start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
+      PRIMARY KEY (reciter, surah, ayah)) WITHOUT ROWID;
     CREATE TABLE shamarly_page (            -- Shamarly page images 1..522 (886x1377 px): cover, ornate, text
       page INTEGER PRIMARY KEY, kind TEXT NOT NULL, lines INTEGER NOT NULL,
       grid_top REAL, pitch REAL);           -- baseline of line j = grid_top + j * pitch (px)
@@ -424,6 +428,12 @@ def main():
                    json.loads(quranlab_word_path.read_text(encoding='utf-8')))
     for reciter, surah in gaps:
         print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
+    # Speech spans measured by tools/build_ayah_speech.py, which reads the
+    # timings above from the previous build; absent on a first build.
+    speech_path = CACHE / 'ayah_speech.json'
+    if speech_path.exists():
+        db.executemany('INSERT INTO ayah_speech VALUES (?,?,?,?,?)',
+                       json.loads(speech_path.read_text(encoding='utf-8')))
     shamarly = sqlite3.connect(f'file:{SHAMARLY}?mode=ro', uri=True)
     sh_meta = dict(shamarly.execute('SELECT key, value FROM meta'))
     db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (

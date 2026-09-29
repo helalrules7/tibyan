@@ -120,4 +120,18 @@ void main() {
       const Rect.fromLTRB(5, 33, 25, 57),
     ]);
   });
+
+  test('long pauses between verses are shortened to about the kept pause', () {
+    // Verse 1 speaks 0..4000 ms, verse 2 from 7000 ms: a 3-second pause.
+    final speech = {1: (0, 4000), 2: (7000, 9000)};
+    // During verse 1's speech: nothing.
+    expect(pauseJump(speech, 1, 3000, 500), isNull);
+    // Past its speech by half the kept pause: to 250 ms before verse 2.
+    expect(pauseJump(speech, 1, 4250, 500), 6750);
+    // Off, or a pause already short enough: nothing.
+    expect(pauseJump(speech, 1, 4250, 0), isNull);
+    expect(pauseJump({1: (0, 4000), 2: (4600, 9000)}, 1, 4300, 500), isNull);
+    // The last verse has no next one.
+    expect(pauseJump(speech, 2, 9500, 500), isNull);
+  });
 }

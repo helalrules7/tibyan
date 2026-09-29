@@ -781,4 +781,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String downloadingBanner(String name, String percent) {
     return 'Downloading $name: $percent%. Reading the new Madina edition meanwhile';
   }
+
+  @override
+  String get versePauseLabel => 'Pause between verses';
+
+  @override
+  String get versePauseAsRecorded => 'As recorded';
+
+  @override
+  String get versePauseSecond => '1 second';
+
+  @override
+  String get versePauseHalf => 'Half a second';
+
+  @override
+  String get versePauseHint =>
+      'Shortens the long silences between verses without touching the recitation itself';
 }

@@ -47,6 +47,20 @@ int? ayahAt(List<AyahTimingRow> timings, int ms) {
   return (w.ayah, w.word);
 }
 
+/// Where to jump to shorten the pause after [ayah], or null: once playback
+/// ([ms]) is past the verse's speech by half of [keep], it goes to half of
+/// [keep] before the next verse's speech, leaving a pause of about [keep]
+/// ms. Pauses already that short are left alone. [speech] holds each
+/// verse's speech span in ms.
+int? pauseJump(Map<int, (int, int)> speech, int ayah, int ms, int keep) {
+  final here = speech[ayah];
+  final next = speech[ayah + 1];
+  if (keep <= 0 || here == null || next == null) return null;
+  if (next.$1 - here.$2 <= keep + 250) return null;
+  if (ms < here.$2 + keep ~/ 2 || ms >= next.$1 - keep ~/ 2) return null;
+  return next.$1 - keep ~/ 2;
+}
+
 String surahFile(int surah) => '${surah.toString().padLeft(3, '0')}.mp3';
 
 /// Tibyan's mirror of the recitations, laid out like mp3quran's servers.
@@ -246,6 +260,12 @@ class RecitationController extends Notifier<RecitationState> {
   AudioPlayer? _player;
   List<AyahTimingRow> _timings = const [];
   List<WordTimingRow> _words = const [];
+
+  /// Speech span of each verse (ms), for shortening the pauses.
+  Map<int, (int, int)> _speech = const {};
+
+  /// A jump over a long pause is under way, to [_jumpTo] ms.
+  int? _jumpTo;
   final _subs = <StreamSubscription<Object?>>[];
   Timer? _sleepTimer;
   bool _inSilence = false;
@@ -300,6 +320,11 @@ class RecitationController extends Notifier<RecitationState> {
     _words = _timings.isEmpty
         ? const []
         : await repo.wordTimings(reciter.id, surah);
+    _speech = {
+      for (final s in await repo.speech(reciter.id, surah))
+        s.ayah: (s.startMs, s.endMs),
+    };
+    _jumpTo = null;
     final timed = _timings.isNotEmpty;
     final surahRow = (await ref.read(surahsProvider.future))[surah - 1];
     state = state.copyWith(
@@ -365,15 +390,19 @@ class RecitationController extends Notifier<RecitationState> {
   void _onPosition(Duration position) {
     if (!state.active || _inSilence || _timings.isEmpty) return;
     final ms = position.inMilliseconds;
+    final keep = ref.read(settingsProvider).versePause;
     final to = state.rangeTo;
     if (to != null) {
-      final end = _endOf(to);
+      // With shorter pauses, a stretch ends a moment after its speech.
+      final spoken = keep > 0 ? _speech[to] : null;
+      final end = spoken == null ? _endOf(to) : spoken.$2 + keep;
       if (end != null && ms >= end - 40) {
         _endOfRange();
         return;
       }
     }
     final ayah = ayahAt(_timings, ms);
+    if (keep > 0) _shortenPause(ayah, ms, keep);
     final w = _words.isEmpty ? null : wordAt(_words, ms);
     final word = w != null && w.$1 == ayah ? w.$2 : null;
     if ((ayah != null && ayah > 0 && ayah != state.ayah) ||
@@ -383,6 +412,22 @@ class RecitationController extends Notifier<RecitationState> {
         word: () => word,
       );
     }
+  }
+
+  /// Reciters leave long silences between verses. Past the end of a
+  /// verse's speech, jump to just before the next verse's speech, leaving a
+  /// pause of about [keep] ms.
+  void _shortenPause(int? ayah, int ms, int keep) {
+    final jump = _jumpTo;
+    if (jump != null) {
+      if (ms >= jump - 50) _jumpTo = null;
+      return;
+    }
+    if (ayah == null || ayah <= 0 || state.rangeTo == ayah) return;
+    final target = pauseJump(_speech, ayah, ms, keep);
+    if (target == null) return;
+    _jumpTo = target;
+    unawaited(_p.seek(Duration(milliseconds: target)));
   }
 
   Future<void> _endOfRange() async {

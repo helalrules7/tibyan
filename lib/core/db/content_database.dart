@@ -453,6 +453,27 @@ class WordTiming extends Table {
   bool get withoutRowId => true;
 }
 
+/// Where a verse's recited speech starts and ends in its surah file, in
+/// milliseconds (tools/build_ayah_speech.py), for shortening the silences
+/// between verses.
+@DataClassName('AyahSpeechRow')
+class AyahSpeech extends Table {
+  @override
+  String get tableName => 'ayah_speech';
+
+  IntColumn get reciter => integer()();
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+  IntColumn get startMs => integer()();
+  IntColumn get endMs => integer()();
+
+  @override
+  Set<Column> get primaryKey => {reciter, surah, ayah};
+
+  @override
+  bool get withoutRowId => true;
+}
+
 @DriftDatabase(
   tables: [
     Surah,
@@ -468,6 +489,7 @@ class WordTiming extends Table {
     Reciter,
     AyahTiming,
     WordTiming,
+    AyahSpeech,
     ShamarlyPage,
     ShamarlyLine,
     ShamarlyLineOverflow,
@@ -482,7 +504,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

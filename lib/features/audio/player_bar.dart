@@ -298,6 +298,22 @@ class _PlayerSheet extends ConsumerWidget {
                     : SleepAfter(Duration(minutes: n)),
               ),
             ),
+            const SizedBox(height: 12),
+            Text(l.versePauseLabel, style: title),
+            Text(
+              l.versePauseHint,
+              style: TextStyle(color: t.muted, fontSize: 12),
+            ),
+            const SizedBox(height: 6),
+            chips<int>(
+              [
+                (0, l.versePauseAsRecorded),
+                (1000, l.versePauseSecond),
+                (500, l.versePauseHalf),
+              ],
+              settings.versePause,
+              ref.read(settingsProvider.notifier).setVersePause,
+            ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l.followRecitation),

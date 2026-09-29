@@ -582,5 +582,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "versePauseLabel": "السكتة بين الآيات",
+  "versePauseAsRecorded": "كما سُجّلت",
+  "versePauseSecond": "ثانية",
+  "versePauseHalf": "نصف ثانية",
+  "versePauseHint": "يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها"
 }
