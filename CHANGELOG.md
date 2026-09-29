@@ -15,6 +15,7 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ### Changed
 - The verse highlight is a framed box per line instead of following every letter.
+- Page packs and recitations are fetched from the Tibyan mirror first, with the original source as the fallback (the mirror was only a fallback before, and the sources were slow).
 
 ### Fixed
 - Android release builds now declare the INTERNET permission needed to download pages and recitations.

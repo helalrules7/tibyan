@@ -26,42 +26,44 @@ class PagePackSpec {
     required this.sha256,
     required this.bytes,
     required this.format,
-    this.mirrors = const [],
+    this.fallbacks = const [],
   });
 
   final String id;
+
+  /// Tried first: Tibyan's mirror, which is the fastest.
   final String url;
 
-  /// Copies tried in order when [url] fails (same bytes, same SHA-256).
-  final List<String> mirrors;
+  /// The original sources, tried in order when [url] fails (same bytes,
+  /// same SHA-256).
+  final List<String> fallbacks;
   final String sha256;
   final int bytes;
   final PackFormat format;
 
   /// New Madina edition (1441H), Hafs: 604 SVG pages, each xz-compressed.
-  /// Built by tools/build_page_pack.py; published as a GitHub release.
+  /// Built by tools/build_page_pack.py; on Tibyan's mirror and as a GitHub
+  /// release.
   static const madina1441 = PagePackSpec(
     id: 'pages-hafs-1441-v1',
-    url: 'https://github.com/helalrules7/tibyan/releases/download/pages-hafs-1441-v1/pages-hafs-1441-v1.zip',
+    url: 'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1441-v1.zip',
     sha256: '9013b4c47c96eb36b5c9b7ad2b25b43a5d09c939879d85f8976147fce9d4580e',
     bytes: 65649525,
     format: PackFormat.svgXz,
-    mirrors: [
-      'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1441-v1.zip',
+    fallbacks: [
+      'https://github.com/helalrules7/tibyan/releases/download/pages-hafs-1441-v1/pages-hafs-1441-v1.zip',
     ],
   );
 
   /// Old Madina edition (1405H), Hafs: 604 PNG pages and glyph boxes,
-  /// downloaded from quran.com, with our mirror as a fallback.
+  /// from Tibyan's mirror, with quran.com as the fallback.
   static const madina1405 = PagePackSpec(
     id: 'pages-hafs-1405-qurancom-1024',
-    url: 'https://files.quran.app/hafs/madani/zips/images_1024.zip',
+    url: 'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1405-qurancom-1024.zip',
     sha256: '401b432deb2c7415818116d9b36db34c31e405f652b0206926da851943286b85',
     bytes: 63441877,
     format: PackFormat.pngQuranCom,
-    mirrors: [
-      'https://tibyan.ahmedhelal.dev/mirror/packs/pages-hafs-1405-qurancom-1024.zip',
-    ],
+    fallbacks: ['https://files.quran.app/hafs/madani/zips/images_1024.zip'],
   );
 }
 
@@ -118,10 +120,11 @@ class PagePackInstaller {
     try {
       var received = _part.existsSync() ? _part.lengthSync() : 0;
       if (received < spec.bytes) {
-        // The source first, then each mirror, until one answers.
+        // Tibyan's mirror first, then each original source, until one
+        // answers.
         http.StreamedResponse? response;
         Object? lastError;
-        for (final url in [spec.url, ...spec.mirrors]) {
+        for (final url in [spec.url, ...spec.fallbacks]) {
           try {
             final request = http.Request('GET', Uri.parse(url));
             if (received > 0) request.headers['Range'] = 'bytes=$received-';

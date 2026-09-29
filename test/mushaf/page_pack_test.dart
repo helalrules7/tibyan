@@ -110,24 +110,31 @@ void main() {
     }
   });
 
-  test('falls back to a mirror when the source fails', () async {
+  test('falls back to the original source when the mirror fails', () async {
     final zip = buildPack();
     final installer = PagePackInstaller(
       root: tmp,
       spec: PagePackSpec(
         id: 'mirror-pack',
-        url: 'https://source.invalid/pack.zip',
-        mirrors: const ['https://mirror.invalid/pack.zip'],
+        url: 'https://mirror.invalid/pack.zip',
+        fallbacks: const ['https://source.invalid/pack.zip'],
         sha256: sha256.convert(zip).toString(),
         bytes: zip.length,
         format: PackFormat.svgXz,
       ),
       client: MockClient(
-        (request) async => request.url.host == 'mirror.invalid'
+        (request) async => request.url.host == 'source.invalid'
             ? http.Response.bytes(zip, 200)
             : http.Response('down', 503),
       ),
     );
     expect((await installer.install().last).phase, PackPhase.installed);
+  });
+
+  test('page packs come from the mirror first', () {
+    for (final spec in [PagePackSpec.madina1441, PagePackSpec.madina1405]) {
+      expect(spec.url, startsWith('https://tibyan.ahmedhelal.dev/mirror/'));
+      expect(spec.fallbacks, isNotEmpty);
+    }
   });
 }

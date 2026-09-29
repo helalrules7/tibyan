@@ -29,6 +29,12 @@ void main() {
     expect(reciters.every((r) => r.folderUrl.startsWith('https://')), isTrue);
     expect(reciters.every((r) => r.folderUrl.endsWith('/')), isTrue);
     expect(surahFile(2), '002.mp3');
+    // The mirror first, then mp3quran, with the same path.
+    final mujawwad = reciters.firstWhere((r) => r.id == 6);
+    expect(surahUrls(mujawwad, 2).map((u) => u.toString()), [
+      'https://tibyan.ahmedhelal.dev/mirror/sources/recitations/bna/Almusshaf-Al-Mojawwad/002.mp3',
+      'https://server8.mp3quran.net/bna/Almusshaf-Al-Mojawwad/002.mp3',
+    ]);
   });
 
   test('timings cover every verse, in order, where they exist', () async {
