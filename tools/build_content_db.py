@@ -14,6 +14,7 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/qe_arabic_moyassar.sqlite  QuranEnc             (al-Tafsir al-Muyassar)
   tools/.cache/qe_english_saheeh.sqlite   QuranEnc 1.1.2       (Saheeh International)
   tools/.cache/tanzil_en.pickthall.txt    Tanzil               (Pickthall, public domain)
+  tools/.cache/mp3quran_ayat_timing.json  mp3quran.net         (verse timings, fetch_ayat_timing.py)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -37,7 +38,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 7
+SCHEMA_VERSION = 8
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -92,6 +93,45 @@ def read_tanzil_translation(path):
     return verses, '\n'.join(notice).strip()
 
 
+# Recitations streamed from mp3quran.net: (id, name_ar, name_en, style,
+# folder URL, mp3quran timing read id or None). al-Banna and Mustafa Ismail
+# have no published timing for their murattal, so their mujawwad is added.
+RECITERS = [
+    (1, 'محمد صديق المنشاوي', 'Mohamed Siddiq al-Minshawi', 'murattal',
+     'https://server10.mp3quran.net/minsh/', 112),
+    (2, 'محمود خليل الحصري', 'Mahmoud Khalil al-Husary', 'murattal',
+     'https://server13.mp3quran.net/husr/', 118),
+    (3, 'عبد الباسط عبد الصمد', 'Abdul Basit Abdul Samad', 'murattal',
+     'https://server7.mp3quran.net/basit/', 53),
+    (4, 'محمود علي البنا', 'Mahmoud Ali al-Banna', 'murattal',
+     'https://server8.mp3quran.net/bna/', None),
+    (5, 'مصطفى إسماعيل', 'Mustafa Ismail', 'murattal',
+     'https://server8.mp3quran.net/mustafa/', None),
+    (6, 'محمود علي البنا', 'Mahmoud Ali al-Banna', 'mujawwad',
+     'https://server8.mp3quran.net/bna/Almusshaf-Al-Mojawwad/', 122),
+    (7, 'مصطفى إسماعيل', 'Mustafa Ismail', 'mujawwad',
+     'https://server8.mp3quran.net/mustafa/Almusshaf-Al-Mojawwad/', 288),
+]
+
+
+def timing_rows(timing, counts):
+    """Verse timings as published, for surahs where every verse has one.
+    A surah with a missing verse gets no rows (it plays without
+    highlighting) and is returned in the gaps list."""
+    rows, gaps = [], []
+    for reciter, *_, read in RECITERS:
+        if read is None:
+            continue
+        for surah, entries in timing[str(read)].items():
+            surah = int(surah)
+            numbers = [a for a, _, _ in entries if a > 0]
+            if numbers != list(range(1, counts[surah] + 1)):
+                gaps.append((reciter, surah))
+                continue
+            rows += [(reciter, surah, a, start, end) for a, start, end in entries]
+    return rows, gaps
+
+
 def basmala_prefix_length(verses, key):
     """Tanzil's text files put the basmala before verse 1 of 112 surahs.
     The text is stored verbatim; the app hides this prefix when it shows
@@ -119,6 +159,7 @@ def main():
     moyassar_path = CACHE / 'qe_arabic_moyassar.sqlite'
     saheeh_path = CACHE / 'qe_english_saheeh.sqlite'
     pickthall_path = CACHE / 'tanzil_en.pickthall.txt'
+    timing_path = CACHE / 'mp3quran_ayat_timing.json'
 
     uthmani, notice = read_tanzil(uthmani_path)
     clean, clean_notice = read_tanzil(clean_path)
@@ -241,6 +282,15 @@ def main():
       source_id INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
       text TEXT NOT NULL, footnotes TEXT,
       PRIMARY KEY (source_id, surah, ayah)) WITHOUT ROWID;
+    CREATE TABLE reciter (                  -- recitations streamed or downloaded per surah
+      id INTEGER PRIMARY KEY, name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
+      style TEXT NOT NULL,                  -- murattal | mujawwad
+      folder_url TEXT NOT NULL,             -- surah file = folder_url + NNN.mp3
+      source_id INTEGER NOT NULL);
+    CREATE TABLE ayah_timing (              -- ms from the start of the surah file; ayah 0 = opening before verse 1
+      reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
+      start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
+      PRIMARY KEY (reciter, surah, ayah)) WITHOUT ROWID;
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -295,6 +345,18 @@ def main():
          'https://tanzil.net/trans/en.pickthall',
          'Pickthall (1930), text from Tanzil.net', pickthall_notice, sha256(pickthall_path), today),
     ])
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
+        10, 'mp3quran', 'Recitations and verse timings', 'mp3quran.net', None,
+        'mp3quran.net general permission to copy any material or use any link',
+        'https://mp3quran.net', 'التلاوات وتوقيت الآيات: mp3quran.net', None,
+        sha256(timing_path), today))
+    db.executemany('INSERT INTO reciter VALUES (?,?,?,?,?,?)',
+                   [(i, ar, en, style, url, 10) for i, ar, en, style, url, _ in RECITERS])
+    counts = {s['id']: s['ayas'] for s in surahs}
+    timings, gaps = timing_rows(json.loads(timing_path.read_text(encoding='utf-8')), counts)
+    db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)', timings)
+    for reciter, surah in gaps:
+        print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
     db.executemany('INSERT INTO commentary_edition VALUES (?,?,?,?,?,?,?)', [
         (7, 'tafsir', 'ar', 'rtl', 'التفسير الميسر', 'Al-Tafsir al-Muyassar', 1),
         (8, 'translation', 'en', 'ltr', 'الترجمة الإنجليزية: صحيح إنترناشونال', 'Saheeh International', 2),
@@ -380,6 +442,7 @@ def main():
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
     assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
     assert check.execute('SELECT COUNT(*) FROM commentary').fetchone()[0] == 3 * 6236
+    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing').fetchone()[0] == 5
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0
