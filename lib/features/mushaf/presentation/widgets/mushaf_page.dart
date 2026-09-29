@@ -75,10 +75,21 @@ class _PageLayout {
   late final bool strips;
   late final Offset offset;
 
-  /// The lines sit this far above the bottom, so the last line's marks
-  /// below the baseline are never cut.
-  static const _lift = 10.0;
-  double get _slot => (size.height - _lift) / _lineCount;
+  /// How far the ink of the first and last lines reaches beyond their
+  /// centres, over all 604 pages (page units; tools/measure_line_extents.py).
+  static const _inkAbove = 22.2;
+  static const _inkBelow = 21.4;
+
+  /// Room kept above the first line and below the last, so no line is cut.
+  late final double _padTop = _pad(_inkAbove);
+  late final double _padBottom = _pad(_inkBelow);
+  double _pad(double ink) {
+    final s0 = size.height / _lineCount;
+    final need = ink * scale - s0 / 2 + 3;
+    return need > 0 ? need : 0;
+  }
+
+  double get _slot => (size.height - _padTop - _padBottom) / _lineCount;
   double _centre(int j) => _firstLine + j * _pitch;
   bool get _hasCuts => cuts.length == _lineCount - 1;
   double _bandTop(int j) =>
@@ -110,7 +121,7 @@ class _PageLayout {
     return clip;
   }
 
-  double _slotCentre(int j) => (j + 0.5) * _slot;
+  double _slotCentre(int j) => _padTop + (j + 0.5) * _slot;
 
   int _lineOf(double y) {
     if (!_hasCuts) {
@@ -139,7 +150,7 @@ class _PageLayout {
   /// Screen pixels to page units.
   Offset toPage(Offset local) {
     if (!strips) return (local - offset) / scale;
-    final j = (local.dy / _slot).floor().clamp(0, _lineCount - 1);
+    final j = ((local.dy - _padTop) / _slot).floor().clamp(0, _lineCount - 1);
     return Offset(
       (local.dx - offset.dx) / scale,
       _centre(j) + (local.dy - _slotCentre(j)) / scale,
@@ -486,6 +497,8 @@ String withoutMarkers(String svg) {
 /// Parses the outline format of the verse polygons: "M x y L x y ... Z",
 /// possibly several sub-paths.
 Path parseOutline(String d) {
+  final pairs = _pointPairs(d);
+  if (pairs != null) return Path()..addPolygon(pairs, true);
   final path = Path();
   final tokens = d.trim().split(RegExp(r'\s+'));
   var i = 0;
@@ -508,6 +521,11 @@ Path parseOutline(String d) {
 
 /// Bounds of each sub-path of a verse outline, in reading order.
 List<Rect> outlineRects(String d) {
+  final pairs = _pointPairs(d);
+  if (pairs != null) {
+    // Point lists are single polygons; use their bounds.
+    return [(Path()..addPolygon(pairs, true)).getBounds()];
+  }
   final rects = <Rect>[];
   final tokens = d.trim().split(RegExp(r'\s+'));
   var xs = <double>[];
@@ -535,6 +553,17 @@ List<Rect> outlineRects(String d) {
       i += 1;
     }
   }
+  // Some outlines (pages 1 and 2) do not end with Z.
+  if (xs.isNotEmpty) {
+    rects.add(
+      Rect.fromLTRB(
+        xs.reduce((a, b) => a < b ? a : b),
+        ys.reduce((a, b) => a < b ? a : b),
+        xs.reduce((a, b) => a > b ? a : b),
+        ys.reduce((a, b) => a > b ? a : b),
+      ),
+    );
+  }
   rects.sort(
     (a, b) =>
         a.top != b.top ? a.top.compareTo(b.top) : b.right.compareTo(a.right),
@@ -556,4 +585,17 @@ class _CallbackPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CallbackPainter old) => true;
+}
+
+/// Pages 1 and 2 store their outlines as "x,y x,y ..." point lists.
+List<Offset>? _pointPairs(String d) {
+  final t = d.trim();
+  if (!t.contains(',') || t.startsWith('M')) return null;
+  final pts = <Offset>[];
+  for (final pair in t.split(RegExp(r'\s+'))) {
+    final xy = pair.split(',');
+    if (xy.length != 2) return null;
+    pts.add(Offset(double.parse(xy[0]), double.parse(xy[1])));
+  }
+  return pts.isEmpty ? null : pts;
 }
