@@ -279,5 +279,38 @@
         "type": "String"
       }
     }
+  },
+  "coverTitle": "The Noble Quran",
+  "coverSubtitle": "In the Uthmani script",
+  "riwayaHafs": "Hafs from Asim",
+  "openingInfo": "{type} · {count} verses · surah {number}",
+  "@openingInfo": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedOrder": "Revealed {order}th",
+  "@revealedOrder": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedAfter": "After {after}",
+  "@revealedAfter": {
+    "placeholders": {
+      "after": {
+        "type": "String"
+      }
+    }
   }
 }

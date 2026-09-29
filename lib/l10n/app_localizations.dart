@@ -991,6 +991,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ثلاثة أرباع الحزب {number}'**
   String threeQuartersHizb(String number);
+
+  /// No description provided for @coverTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القرآن الكريم'**
+  String get coverTitle;
+
+  /// No description provided for @coverSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالرسم العثماني'**
+  String get coverSubtitle;
+
+  /// No description provided for @riwayaHafs.
+  ///
+  /// In ar, this message translates to:
+  /// **'رواية حفص عن عاصم'**
+  String get riwayaHafs;
+
+  /// No description provided for @openingInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'{type} · آياتها {count} · ترتيبها {number}'**
+  String openingInfo(String type, String count, String number);
+
+  /// No description provided for @revealedOrder.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيبها في النزول {order}'**
+  String revealedOrder(String order);
+
+  /// No description provided for @revealedAfter.
+  ///
+  /// In ar, this message translates to:
+  /// **'نزلت بعد {after}'**
+  String revealedAfter(String after);
 }
 
 class _AppLocalizationsDelegate

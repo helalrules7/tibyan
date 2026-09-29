@@ -18,6 +18,7 @@ import 'widgets/fasil_sheet.dart';
 import 'widgets/go_to_page.dart';
 import 'widgets/illuminated_frame.dart';
 import 'widgets/mushaf_page.dart';
+import 'widgets/ornate_pages.dart';
 import 'widgets/old_mushaf_page.dart';
 import 'widgets/page_interaction.dart';
 import 'widgets/verse_services.dart';
@@ -106,11 +107,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     .ayah(saved.surah, saved.ayah))
                 .pageIn(edition);
     }
-    final start = (page ?? 1).clamp(1, mushafPageCount);
+    final start = (page ?? 1).clamp(_first, mushafPageCount);
     if (!mounted) return;
     setState(() {
       _page = start;
-      _controller = PageController(initialPage: start - 1);
+      _controller = PageController(initialPage: start - _first);
     });
   }
 
@@ -126,11 +127,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   Future<void> _onPageChanged(int index) async {
     setState(() {
-      _page = index + 1;
+      _page = index + _first;
       _selA = _selB = null;
       _revealed.clear();
     });
-    final ayahs = await ref.read(pageAyahsProvider(index + 1).future);
+    if (_page < 1) return;
+    final ayahs = await ref.read(pageAyahsProvider(_page).future);
     if (ayahs.isEmpty) return;
     await ref
         .read(userDatabaseProvider)
@@ -139,9 +141,19 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           view: 'page',
           surah: ayahs.first.surah,
           ayah: ayahs.first.number,
-          page: index + 1,
+          page: _page,
         );
   }
+
+  /// In the Zakhrafa style the mushaf opens with a cover as page 0.
+  int get _first => _illuminated ? 0 : 1;
+  bool get _illuminated =>
+      ref
+          .read(themeRegistryProvider)
+          .byId(ref.read(settingsProvider).styleId)
+          .frame
+          .outerStyle ==
+      'illuminated';
 
   @override
   Widget build(BuildContext context) {
@@ -182,8 +194,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           );
 
     Widget pageAt(int i) {
+      final pg = i + _first;
+      if (pg == 0) return CoverPage(onTap: () => _setChrome(!_chrome));
       final interaction = PageInteraction(
-        selection: i + 1 == _page ? _selectionOn(i + 1) : const {},
+        selection: pg == _page ? _selectionOn(pg) : const {},
         marks: marks,
         onTap: () {
           if (_selA != null) {
@@ -197,27 +211,39 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           _setChrome(false);
           setState(() => _selA = _selB = v);
         },
-        onMarkerTap: (v) => _setMark(MarkKind.reading, v, i + 1, auto: true),
+        onMarkerTap: (v) => _setMark(MarkKind.reading, v, pg, auto: true),
         onHandleDrag: (start, v) =>
             setState(() => start ? _selA = v : _selB = v),
         markerLook: markerLook,
-        hidden: _recite && i + 1 == _page ? _hiddenOn(i + 1) : null,
+        hidden: _recite && pg == _page ? _hiddenOn(pg) : null,
         onHiddenTap: (v) => setState(() => _revealed.add(v)),
+        ornateOpening: illuminated && pg <= 2,
       );
       final pageWidget = oldEdition
-          ? OldMushafPage(page: i + 1, interaction: interaction)
-          : MushafPage(page: i + 1, interaction: interaction);
+          ? OldMushafPage(page: pg, interaction: interaction)
+          : MushafPage(page: pg, interaction: interaction);
       if (!illuminated) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: pageWidget,
         );
       }
-      final info = ref.watch(frameInfoProvider(i + 1)).value;
+      final info = ref.watch(frameInfoProvider(pg)).value;
+      if (pg <= 2) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
+          child: OpeningPage(
+            page: pg,
+            catchword: info?.catchword,
+            onPageTap: _goToPage,
+            child: pageWidget,
+          ),
+        );
+      }
       void openIndex(String tab) {
-        final a = ref.read(pageAyahsProvider(i + 1)).value?.firstOrNull;
+        final a = ref.read(pageAyahsProvider(pg)).value?.firstOrNull;
         context.push(
-          '/mushaf/index?tab=$tab&p=${i + 1}'
+          '/mushaf/index?tab=$tab&p=$pg'
           '${a == null ? '' : '&s=${a.surah}'}'
           '${info == null ? '' : '&j=${info.juz}&h=${info.hizb}'}',
         );
@@ -234,7 +260,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onQuarterTap: (q) => _setMark(
             MarkKind.reading,
             (surah: q.surah, ayah: q.ayah),
-            i + 1,
+            pg,
             auto: true,
           ),
           child: pageWidget,
@@ -254,12 +280,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     builder: (context, box) {
                       _pageExtent = box.maxHeight;
                       _vertical ??= ScrollController(
-                        initialScrollOffset: (_page - 1) * box.maxHeight,
+                        initialScrollOffset: (_page - _first) * box.maxHeight,
                       );
                       return ListView.builder(
                         controller: _vertical,
                         itemExtent: box.maxHeight,
-                        itemCount: mushafPageCount,
+                        itemCount: mushafPageCount + 1 - _first,
                         itemBuilder: (context, i) => pageAt(i),
                       );
                     },
@@ -271,7 +297,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     textDirection: TextDirection.rtl,
                     child: PageView.builder(
                       controller: _controller,
-                      itemCount: mushafPageCount,
+                      itemCount: mushafPageCount + 1 - _first,
                       onPageChanged: _onPageChanged,
                       itemBuilder: (context, i) => pageAt(i),
                     ),
@@ -331,7 +357,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 onChanged: (p) => setState(() => _scrubPage = p),
                 onChangeEnd: (p) {
                   setState(() => _scrubPage = null);
-                  _controller?.jumpToPage(p - 1);
+                  _controller?.jumpToPage(p - _first);
                 },
                 onRecite: _startRecite,
                 onGoTo: _goToPage,
@@ -502,8 +528,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       c.position.maxScrollExtent,
     );
     c.jumpTo(next);
-    final page = (next / _pageExtent + 0.5).floor() + 1;
-    if (page != _page) _onPageChanged(page - 1);
+    final page = (next / _pageExtent + 0.5).floor() + _first;
+    if (page != _page) _onPageChanged(page - _first);
   }
 
   void _stopAutoScroll() {
@@ -512,13 +538,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     setState(() {
       _autoScroll = false;
       _controller?.dispose();
-      _controller = PageController(initialPage: page - 1);
+      _controller = PageController(initialPage: page - _first);
     });
   }
 
   Future<void> _goToPage() async {
     final page = await showGoToPage(context, current: _page);
-    if (page != null) _controller?.jumpToPage(page - 1);
+    if (page != null) _controller?.jumpToPage(page - _first);
   }
 
   String _scrubLabel(BuildContext context, int page, List<SurahRow>? surahs) {

@@ -21,7 +21,12 @@ class PageInteraction {
     this.markerLook,
     this.hidden,
     this.onHiddenTap,
+    this.ornateOpening = false,
   });
+
+  /// Pages 1 and 2 inside the ornate frame: the printed surah header is
+  /// left out, since the frame's cartouche names the surah.
+  final bool ornateOpening;
 
   /// How verse-end markers are drawn; null = as printed.
   final MarkerLook? markerLook;
