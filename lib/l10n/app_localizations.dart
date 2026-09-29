@@ -1375,6 +1375,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'غير محمّل · {size} ميجا'**
   String editionNotDownloaded(String size);
+
+  /// No description provided for @downloadAllEditions.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل كل المصاحف ({size} ميجا)'**
+  String downloadAllEditions(String size);
+
+  /// No description provided for @allEditionsQueued.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.'**
+  String get allEditionsQueued;
+
+  /// No description provided for @downloadInBackgroundNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.'**
+  String get downloadInBackgroundNote;
+
+  /// No description provided for @notifDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل صفحات المصحف'**
+  String get notifDownloading;
+
+  /// No description provided for @notifComplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمل تحميل المصحف'**
+  String get notifComplete;
+
+  /// No description provided for @notifFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل المصحف'**
+  String get notifFailed;
+
+  /// No description provided for @notifPaused.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحميل متوقف مؤقتا'**
+  String get notifPaused;
 }
 
 class _AppLocalizationsDelegate

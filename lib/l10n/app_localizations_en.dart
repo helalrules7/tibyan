@@ -747,4 +747,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String editionNotDownloaded(String size) {
     return 'Not downloaded · $size MB';
   }
+
+  @override
+  String downloadAllEditions(String size) {
+    return 'Download all editions ($size MB)';
+  }
+
+  @override
+  String get allEditionsQueued =>
+      'All editions are downloading. You can keep reading or leave the app.';
+
+  @override
+  String get downloadInBackgroundNote =>
+      'You can leave the app: the download goes on in the background, and a notification tells you when it is done.';
+
+  @override
+  String get notifDownloading => 'Downloading mushaf pages';
+
+  @override
+  String get notifComplete => 'Mushaf download complete';
+
+  @override
+  String get notifFailed => 'Mushaf download failed';
+
+  @override
+  String get notifPaused => 'Download paused';
 }

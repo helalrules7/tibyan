@@ -744,4 +744,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String editionNotDownloaded(String size) {
     return 'غير محمّل · $size ميجا';
   }
+
+  @override
+  String downloadAllEditions(String size) {
+    return 'تحميل كل المصاحف ($size ميجا)';
+  }
+
+  @override
+  String get allEditionsQueued =>
+      'بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.';
+
+  @override
+  String get downloadInBackgroundNote =>
+      'يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.';
+
+  @override
+  String get notifDownloading => 'تحميل صفحات المصحف';
+
+  @override
+  String get notifComplete => 'اكتمل تحميل المصحف';
+
+  @override
+  String get notifFailed => 'تعذّر تحميل المصحف';
+
+  @override
+  String get notifPaused => 'التحميل متوقف مؤقتا';
 }

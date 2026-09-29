@@ -422,5 +422,19 @@
         "type": "String"
       }
     }
-  }
+  },
+  "downloadAllEditions": "Download all editions ({size} MB)",
+  "@downloadAllEditions": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "allEditionsQueued": "All editions are downloading. You can keep reading or leave the app.",
+  "downloadInBackgroundNote": "You can leave the app: the download goes on in the background, and a notification tells you when it is done.",
+  "notifDownloading": "Downloading mushaf pages",
+  "notifComplete": "Mushaf download complete",
+  "notifFailed": "Mushaf download failed",
+  "notifPaused": "Download paused"
 }

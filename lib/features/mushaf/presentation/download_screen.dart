@@ -112,6 +112,14 @@ class _DownloadScreenState extends ConsumerState<DownloadScreen> {
                 ),
               ),
             },
+            if (p.phase == PackPhase.downloading) ...[
+              const SizedBox(height: 12),
+              Text(
+                l.downloadInBackgroundNote,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: t.muted, fontSize: 13, height: 1.6),
+              ),
+            ],
             const SizedBox(height: 8),
             if (p.phase != PackPhase.installed)
               TextButton(

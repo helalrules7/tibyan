@@ -556,5 +556,19 @@
         "type": "String"
       }
     }
-  }
+  },
+  "downloadAllEditions": "تحميل كل المصاحف ({size} ميجا)",
+  "@downloadAllEditions": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "allEditionsQueued": "بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.",
+  "downloadInBackgroundNote": "يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.",
+  "notifDownloading": "تحميل صفحات المصحف",
+  "notifComplete": "اكتمل تحميل المصحف",
+  "notifFailed": "تعذّر تحميل المصحف",
+  "notifPaused": "التحميل متوقف مؤقتا"
 }

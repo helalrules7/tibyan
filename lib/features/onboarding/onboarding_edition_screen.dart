@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
+import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/data/page_pack.dart';
@@ -100,7 +101,9 @@ class OnboardingEditionScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 12),
+            const DownloadAllButton(),
+            const SizedBox(height: 10),
             FilledButton(
               onPressed: () => finish('/mushaf/download'),
               child: Text(l.continueLabel),

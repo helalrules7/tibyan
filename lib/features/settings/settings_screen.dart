@@ -7,6 +7,7 @@ import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/mushaf_providers.dart';
+import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -97,6 +98,7 @@ class SettingsScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+                const DownloadAllButton(),
                 const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l.keepScreenOn),

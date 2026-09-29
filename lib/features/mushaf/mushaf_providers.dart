@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui' show Rect;
+import 'dart:ui' show Locale, Rect;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
@@ -10,6 +10,8 @@ import '../../core/db/content_database.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/db/user_database.dart';
+import '../../l10n/app_localizations.dart';
+import 'data/background_packs.dart';
 import 'data/divine_names.dart';
 import 'data/mushaf_repository.dart';
 import 'data/page_pack.dart';
@@ -89,39 +91,76 @@ final pagesInstalledProvider = Provider<bool>(
   (ref) => ref.watch(pageInstallerProvider).isInstalled,
 );
 
-/// The page pack download. Lives in a provider so it keeps running while
-/// the reader uses the continuous view.
+/// System-managed pack downloads (they go on in the background).
+final backgroundPacksProvider = Provider<BackgroundPacks>(
+  (ref) => BackgroundPacks(
+    root: Directory(p.join(ref.watch(packRootProvider).path, 'packs')),
+  ),
+);
+
+/// An edition's name in the interface language, for notifications.
+String editionName(AppLocalizations l, MushafEdition e) => switch (e) {
+  MushafEdition.madina1441 => l.editionNew,
+  MushafEdition.madina1405 => l.editionOld,
+  MushafEdition.shamarly => l.editionShamarly,
+};
+
+/// The current edition's page download. The system runs it, so it goes on
+/// when the reader leaves the screen or the app; this follows its progress.
 class PageDownloadController extends Notifier<PackProgress> {
-  StreamSubscription<PackProgress>? _sub;
+  StreamSubscription<(String, PackProgress)>? _sub;
 
   @override
   PackProgress build() {
     ref.onDispose(() => _sub?.cancel());
-    // Watched, not read: choosing another edition starts over with that
-    // edition's pack (a partial download of the old one is kept).
-    return ref.watch(pageInstallerProvider).isInstalled
-        ? const PackProgress(PackPhase.installed)
-        : const PackProgress(PackPhase.idle);
-  }
-
-  void start() {
-    _sub?.cancel();
-    _sub = ref.read(pageInstallerProvider).install().listen((p) {
-      state = p;
-      if (p.phase == PackPhase.installed) {
+    // Watched, not read: choosing another edition follows that edition's
+    // pack (a download of the old one goes on by itself).
+    final spec = ref.watch(pageInstallerProvider).spec;
+    if (ref.read(pageInstallerProvider).isInstalled) {
+      return const PackProgress(PackPhase.installed);
+    }
+    final packs = ref.read(backgroundPacksProvider);
+    _sub = packs.progress.where((e) => e.$1 == spec.id).listen((e) {
+      state = e.$2;
+      if (e.$2.phase == PackPhase.installed) {
         ref.invalidate(pagesInstalledProvider);
       }
     });
+    // Pick up a download that was already running or paused.
+    unawaited(
+      packs.stateOf(spec).then((s) => state = s).catchError((_) => state),
+    );
+    return const PackProgress(PackPhase.idle);
   }
 
-  void pause() {
-    ref.read(pageInstallerProvider).pause();
-    _sub?.cancel();
+  AppLocalizations get _l => lookupAppLocalizations(
+    ref.read(settingsProvider).locale ?? const Locale('ar'),
+  );
+
+  Future<void> start() async {
+    final edition = ref.read(editionProvider);
     state = PackProgress(
-      PackPhase.idle,
+      PackPhase.downloading,
       received: state.received,
       total: state.total,
     );
+    await ref
+        .read(backgroundPacksProvider)
+        .enqueue(PagePackSpec.of(edition), editionName(_l, edition));
+  }
+
+  /// Queues every edition that is not on the device yet.
+  Future<void> startAll() async {
+    final packs = ref.read(backgroundPacksProvider);
+    for (final e in MushafEdition.values) {
+      await packs.enqueue(PagePackSpec.of(e), editionName(_l, e));
+    }
+  }
+
+  Future<void> pause() async {
+    await ref
+        .read(backgroundPacksProvider)
+        .pause(PagePackSpec.of(ref.read(editionProvider)));
   }
 }
 
