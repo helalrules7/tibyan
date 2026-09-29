@@ -320,5 +320,28 @@
       }
     }
   },
-  "twoVerses": "آيتان"
+  "twoVerses": "آيتان",
+  "markerStyleLabel": "شكل فواصل الآيات",
+  "markerTraditional": "الفاصل التقليدي",
+  "markerRosette": "وردة",
+  "markerTintLabel": "لون الفواصل",
+  "markerTintNone": "بلا لون",
+  "reciteMode": "وضع التسميع",
+  "revealNextVerse": "الآية التالية",
+  "revealAll": "الكل",
+  "endRecite": "إنهاء التسميع",
+  "autoScroll": "التمرير التلقائي",
+  "resume": "متابعة",
+  "pause": "إيقاف مؤقت",
+  "slower": "أبطأ",
+  "faster": "أسرع",
+  "stopAutoScroll": "إيقاف التمرير",
+  "speedLabel": "السرعة {speed}",
+  "@speedLabel": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -193,5 +193,28 @@
       }
     }
   },
-  "twoVerses": "2 verses"
+  "twoVerses": "2 verses",
+  "markerStyleLabel": "Verse marker shape",
+  "markerTraditional": "Traditional marker",
+  "markerRosette": "Rosette",
+  "markerTintLabel": "Marker colour",
+  "markerTintNone": "No colour",
+  "reciteMode": "Recitation mode",
+  "revealNextVerse": "Next verse",
+  "revealAll": "All",
+  "endRecite": "End recitation",
+  "autoScroll": "Auto-scroll",
+  "resume": "Resume",
+  "pause": "Pause",
+  "slower": "Slower",
+  "faster": "Faster",
+  "stopAutoScroll": "Stop scrolling",
+  "speedLabel": "Speed {speed}",
+  "@speedLabel": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  }
 }

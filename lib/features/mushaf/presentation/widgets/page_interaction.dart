@@ -1,4 +1,10 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/settings/app_settings.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import 'mushaf_page.dart';
@@ -12,7 +18,19 @@ class PageInteraction {
     required this.onVerseLongPress,
     required this.onMarkerTap,
     required this.onHandleDrag,
+    this.markerLook,
+    this.hidden,
+    this.onHiddenTap,
   });
+
+  /// How verse-end markers are drawn; null = as printed.
+  final MarkerLook? markerLook;
+
+  /// Recitation mode: verses covered on this page; null = mode off.
+  final Set<VerseKey>? hidden;
+
+  /// Recitation mode: a covered verse was tapped.
+  final ValueChanged<VerseKey>? onHiddenTap;
 
   /// Verses highlighted on this page (the current selection).
   final Set<VerseKey> selection;
@@ -118,4 +136,93 @@ class SelectionPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(SelectionPainter old) => true;
+}
+
+/// Rosette images for the optional marker shapes.
+final markerImagesProvider = FutureProvider<Map<MarkerStyle, ui.Image>>((
+  ref,
+) async {
+  Future<ui.Image> load(String name) async {
+    final data = await rootBundle.load('assets/ornaments/$name');
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    return (await codec.getNextFrame()).image;
+  }
+
+  return {
+    MarkerStyle.rosette7: await load('marker_7.png'),
+    MarkerStyle.rosette9: await load('marker_9.png'),
+    MarkerStyle.rosette16: await load('marker_16.png'),
+  };
+});
+
+/// How verse-end markers are drawn on a page.
+class MarkerLook {
+  const MarkerLook({
+    required this.style,
+    required this.image,
+    required this.tint,
+    required this.paper,
+    required this.ink,
+  });
+
+  final MarkerStyle style;
+
+  /// The rosette for [style]; null for the traditional marker.
+  final ui.Image? image;
+  final Color? tint;
+  final Color paper;
+  final Color ink;
+
+  /// Under the page ink: a tint that shows inside the printed marker.
+  void paintUnder(Canvas canvas, Offset c, double r) {
+    if (tint == null || image != null) return;
+    canvas.drawCircle(
+      c,
+      r * 0.95,
+      Paint()..color = tint!.withValues(alpha: 0.45),
+    );
+  }
+
+  /// Over the page ink: a rosette with the verse number, covering the
+  /// printed marker.
+  void paintOver(Canvas canvas, Offset c, double r, int number) {
+    final img = image;
+    if (img == null) return;
+    canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
+    final size = r * 2.7;
+    canvas.drawImageRect(
+      img,
+      Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
+      Rect.fromCenter(center: c, width: size, height: size),
+      Paint()..filterQuality = FilterQuality.medium,
+    );
+    canvas.drawCircle(c, r * 0.86, Paint()..color = tint ?? paper);
+    canvas.drawCircle(
+      c,
+      r * 0.86,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = r * 0.1
+        ..color = const Color(0xFF1C2F45),
+    );
+    final digits = number
+        .toString()
+        .split('')
+        .map((d) => String.fromCharCode(0x0660 + int.parse(d)))
+        .join();
+    final tp = TextPainter(
+      text: TextSpan(
+        text: digits,
+        style: TextStyle(
+          fontFamily: 'Amiri',
+          fontWeight: FontWeight.w700,
+          fontSize: r * (number < 100 ? 1.05 : 0.8),
+          height: 1,
+          color: tint == null ? ink : const Color(0xFFFFFFFF),
+        ),
+      ),
+      textDirection: TextDirection.rtl,
+    )..layout();
+    tp.paint(canvas, c - Offset(tp.width / 2, tp.height / 2 + r * 0.08));
+  }
 }

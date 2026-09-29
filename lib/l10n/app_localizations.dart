@@ -859,6 +859,102 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'آيتان'**
   String get twoVerses;
+
+  /// No description provided for @markerStyleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكل فواصل الآيات'**
+  String get markerStyleLabel;
+
+  /// No description provided for @markerTraditional.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفاصل التقليدي'**
+  String get markerTraditional;
+
+  /// No description provided for @markerRosette.
+  ///
+  /// In ar, this message translates to:
+  /// **'وردة'**
+  String get markerRosette;
+
+  /// No description provided for @markerTintLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'لون الفواصل'**
+  String get markerTintLabel;
+
+  /// No description provided for @markerTintNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا لون'**
+  String get markerTintNone;
+
+  /// No description provided for @reciteMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع التسميع'**
+  String get reciteMode;
+
+  /// No description provided for @revealNextVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية التالية'**
+  String get revealNextVerse;
+
+  /// No description provided for @revealAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get revealAll;
+
+  /// No description provided for @endRecite.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنهاء التسميع'**
+  String get endRecite;
+
+  /// No description provided for @autoScroll.
+  ///
+  /// In ar, this message translates to:
+  /// **'التمرير التلقائي'**
+  String get autoScroll;
+
+  /// No description provided for @resume.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة'**
+  String get resume;
+
+  /// No description provided for @pause.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف مؤقت'**
+  String get pause;
+
+  /// No description provided for @slower.
+  ///
+  /// In ar, this message translates to:
+  /// **'أبطأ'**
+  String get slower;
+
+  /// No description provided for @faster.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسرع'**
+  String get faster;
+
+  /// No description provided for @stopAutoScroll.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف التمرير'**
+  String get stopAutoScroll;
+
+  /// No description provided for @speedLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'السرعة {speed}'**
+  String speedLabel(String speed);
 }
 
 class _AppLocalizationsDelegate

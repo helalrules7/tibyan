@@ -444,4 +444,54 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get twoVerses => 'آيتان';
+
+  @override
+  String get markerStyleLabel => 'شكل فواصل الآيات';
+
+  @override
+  String get markerTraditional => 'الفاصل التقليدي';
+
+  @override
+  String get markerRosette => 'وردة';
+
+  @override
+  String get markerTintLabel => 'لون الفواصل';
+
+  @override
+  String get markerTintNone => 'بلا لون';
+
+  @override
+  String get reciteMode => 'وضع التسميع';
+
+  @override
+  String get revealNextVerse => 'الآية التالية';
+
+  @override
+  String get revealAll => 'الكل';
+
+  @override
+  String get endRecite => 'إنهاء التسميع';
+
+  @override
+  String get autoScroll => 'التمرير التلقائي';
+
+  @override
+  String get resume => 'متابعة';
+
+  @override
+  String get pause => 'إيقاف مؤقت';
+
+  @override
+  String get slower => 'أبطأ';
+
+  @override
+  String get faster => 'أسرع';
+
+  @override
+  String get stopAutoScroll => 'إيقاف التمرير';
+
+  @override
+  String speedLabel(String speed) {
+    return 'السرعة $speed';
+  }
 }

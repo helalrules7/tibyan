@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -44,7 +45,8 @@ class MushafScreen extends ConsumerStatefulWidget {
   ConsumerState<MushafScreen> createState() => _MushafScreenState();
 }
 
-class _MushafScreenState extends ConsumerState<MushafScreen> {
+class _MushafScreenState extends ConsumerState<MushafScreen>
+    with SingleTickerProviderStateMixin {
   PageController? _controller;
   int _page = 1;
 
@@ -55,6 +57,19 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   /// The selection: two ends on the current page, in either order.
   VerseKey? _selA;
   VerseKey? _selB;
+
+  /// Recitation mode: verses stay covered until revealed.
+  bool _recite = false;
+  final Set<VerseKey> _revealed = {};
+
+  /// Auto-scroll: pages stacked vertically, moving at [_speed].
+  bool _autoScroll = false;
+  bool _paused = false;
+  int _speed = 3;
+  ScrollController? _vertical;
+  Ticker? _ticker;
+  Duration _lastTick = Duration.zero;
+  double _pageExtent = 1;
 
   @override
   void initState() {
@@ -103,6 +118,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
   void dispose() {
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    _ticker?.dispose();
+    _vertical?.dispose();
     _controller?.dispose();
     super.dispose();
   }
@@ -111,6 +128,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
     setState(() {
       _page = index + 1;
       _selA = _selB = null;
+      _revealed.clear();
     });
     final ayahs = await ref.read(pageAyahsProvider(index + 1).future);
     if (ayahs.isEmpty) return;
@@ -147,6 +165,22 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
         (surah: m.surah, ayah: m.ayah): Color(m.color),
     };
 
+    final settings = ref.watch(settingsProvider);
+    final markerImages = ref.watch(markerImagesProvider).value;
+    final markerLook =
+        settings.markerStyle == MarkerStyle.traditional &&
+            settings.markerTint == null
+        ? null
+        : MarkerLook(
+            style: settings.markerStyle,
+            image: markerImages?[settings.markerStyle],
+            tint: settings.markerTint == null
+                ? null
+                : Color(settings.markerTint!),
+            paper: t.paper,
+            ink: t.ink,
+          );
+
     Widget pageAt(int i) {
       final interaction = PageInteraction(
         selection: i + 1 == _page ? _selectionOn(i + 1) : const {},
@@ -166,6 +200,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
         onMarkerTap: (v) => _setMark(MarkKind.reading, v, i + 1, auto: true),
         onHandleDrag: (start, v) =>
             setState(() => start ? _selA = v : _selB = v),
+        markerLook: markerLook,
+        hidden: _recite && i + 1 == _page ? _hiddenOn(i + 1) : null,
+        onHiddenTap: (v) => setState(() => _revealed.add(v)),
       );
       final pageWidget = oldEdition
           ? OldMushafPage(page: i + 1, interaction: interaction)
@@ -206,7 +243,22 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
       body: Stack(
         children: [
           SafeArea(
-            child: _controller == null
+            child: _autoScroll
+                ? LayoutBuilder(
+                    builder: (context, box) {
+                      _pageExtent = box.maxHeight;
+                      _vertical ??= ScrollController(
+                        initialScrollOffset: (_page - 1) * box.maxHeight,
+                      );
+                      return ListView.builder(
+                        controller: _vertical,
+                        itemExtent: box.maxHeight,
+                        itemCount: mushafPageCount,
+                        itemBuilder: (context, i) => pageAt(i),
+                      );
+                    },
+                  )
+                : _controller == null
                 ? const Center(child: CircularProgressIndicator())
                 // The mushaf opens from the right in every interface language.
                 : Directionality(
@@ -275,9 +327,48 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
                   setState(() => _scrubPage = null);
                   _controller?.jumpToPage(p - 1);
                 },
+                onRecite: _startRecite,
+                onGoTo: _goToPage,
+                onAutoScroll: _startAutoScroll,
               ),
             ),
           ],
+          if (_recite)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: SafeArea(
+                top: false,
+                child: _ReciteBar(
+                  onNextVerse: _revealNext,
+                  onAll: () => setState(() => _revealed.addAll(_pageKeys())),
+                  onClose: () => setState(() {
+                    _recite = false;
+                    _revealed.clear();
+                  }),
+                ),
+              ),
+            ),
+          if (_autoScroll)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: SafeArea(
+                top: false,
+                child: _AutoScrollBar(
+                  paused: _paused,
+                  speed: _speed,
+                  onPause: () => setState(() => _paused = !_paused),
+                  onSlower: () =>
+                      setState(() => _speed = (_speed - 1).clamp(1, 10)),
+                  onFaster: () =>
+                      setState(() => _speed = (_speed + 1).clamp(1, 10)),
+                  onClose: _stopAutoScroll,
+                ),
+              ),
+            ),
           if (range != null)
             Positioned(
               left: 0,
@@ -351,6 +442,74 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
       );
   }
 
+  List<VerseKey> _pageKeys() => [
+    for (final a
+        in ref.read(pageAyahsProvider(_page)).value ?? const <AyahRow>[])
+      (surah: a.surah, ayah: a.number),
+  ];
+
+  Set<VerseKey> _hiddenOn(int page) => {
+    for (final k in _pageKeys())
+      if (!_revealed.contains(k)) k,
+  };
+
+  void _startRecite() {
+    _setChrome(false);
+    setState(() {
+      _recite = true;
+      _revealed.clear();
+      _selA = _selB = null;
+    });
+  }
+
+  void _revealNext() {
+    for (final k in _pageKeys()) {
+      if (!_revealed.contains(k)) {
+        setState(() => _revealed.add(k));
+        return;
+      }
+    }
+  }
+
+  void _startAutoScroll() {
+    _setChrome(false);
+    setState(() {
+      _autoScroll = true;
+      _paused = false;
+      _recite = false;
+      _selA = _selB = null;
+      _vertical?.dispose();
+      _vertical = null;
+    });
+    _ticker ??= createTicker(_tick);
+    _lastTick = Duration.zero;
+    _ticker!.start();
+  }
+
+  void _tick(Duration elapsed) {
+    final dt = (elapsed - _lastTick).inMicroseconds / 1e6;
+    _lastTick = elapsed;
+    final c = _vertical;
+    if (_paused || c == null || !c.hasClients) return;
+    final next = (c.offset + dt * 7.0 * _speed).clamp(
+      0.0,
+      c.position.maxScrollExtent,
+    );
+    c.jumpTo(next);
+    final page = (next / _pageExtent + 0.5).floor() + 1;
+    if (page != _page) _onPageChanged(page - 1);
+  }
+
+  void _stopAutoScroll() {
+    _ticker?.stop();
+    final page = _page;
+    setState(() {
+      _autoScroll = false;
+      _controller?.dispose();
+      _controller = PageController(initialPage: page - 1);
+    });
+  }
+
   Future<void> _goToPage() async {
     final page = await showGoToPage(context, current: _page);
     if (page != null) _controller?.jumpToPage(page - 1);
@@ -420,12 +579,18 @@ class _BottomControls extends StatelessWidget {
     required this.label,
     required this.onChanged,
     required this.onChangeEnd,
+    required this.onRecite,
+    required this.onGoTo,
+    required this.onAutoScroll,
   });
 
   final int page;
   final String label;
   final ValueChanged<int> onChanged;
   final ValueChanged<int> onChangeEnd;
+  final VoidCallback onRecite;
+  final VoidCallback onGoTo;
+  final VoidCallback onAutoScroll;
 
   @override
   Widget build(BuildContext context) {
@@ -441,6 +606,28 @@ class _BottomControls extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Row(
+                children: [
+                  IconButton.filledTonal(
+                    tooltip: l.reciteMode,
+                    onPressed: onRecite,
+                    icon: const Icon(Icons.visibility_outlined),
+                  ),
+                  const Spacer(),
+                  FilledButton.tonalIcon(
+                    onPressed: onGoTo,
+                    icon: const Icon(Icons.menu_book_outlined, size: 18),
+                    label: Text(l.goToPage),
+                  ),
+                  const Spacer(),
+                  IconButton.filledTonal(
+                    tooltip: l.autoScroll,
+                    onPressed: onAutoScroll,
+                    icon: const Icon(Icons.keyboard_double_arrow_down),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -481,6 +668,127 @@ class _BottomControls extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Recitation mode toolbar.
+class _ReciteBar extends StatelessWidget {
+  const _ReciteBar({
+    required this.onNextVerse,
+    required this.onAll,
+    required this.onClose,
+  });
+
+  final VoidCallback onNextVerse;
+  final VoidCallback onAll;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    return Material(
+      color: t.paper,
+      elevation: 6,
+      borderRadius: BorderRadius.circular(30),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Icon(
+                Icons.visibility_outlined,
+                color: t.control,
+                semanticLabel: l.reciteMode,
+              ),
+            ),
+            Expanded(
+              child: FilledButton(
+                onPressed: onNextVerse,
+                child: Text(l.revealNextVerse),
+              ),
+            ),
+            const SizedBox(width: 6),
+            OutlinedButton(onPressed: onAll, child: Text(l.revealAll)),
+            IconButton(
+              tooltip: l.endRecite,
+              onPressed: onClose,
+              icon: const Icon(Icons.close),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Auto-scroll toolbar.
+class _AutoScrollBar extends StatelessWidget {
+  const _AutoScrollBar({
+    required this.paused,
+    required this.speed,
+    required this.onPause,
+    required this.onSlower,
+    required this.onFaster,
+    required this.onClose,
+  });
+
+  final bool paused;
+  final int speed;
+  final VoidCallback onPause;
+  final VoidCallback onSlower;
+  final VoidCallback onFaster;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    return Material(
+      color: t.paper,
+      elevation: 6,
+      borderRadius: BorderRadius.circular(32),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Row(
+          children: [
+            IconButton.filled(
+              tooltip: paused ? l.resume : l.pause,
+              onPressed: onPause,
+              icon: Icon(paused ? Icons.play_arrow : Icons.pause),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Semantics(
+                liveRegion: true,
+                child: Text(
+                  l.speedLabel(digits(speed)),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            IconButton.filledTonal(
+              tooltip: l.slower,
+              onPressed: onSlower,
+              icon: const Icon(Icons.remove),
+            ),
+            const SizedBox(width: 4),
+            IconButton.filledTonal(
+              tooltip: l.faster,
+              onPressed: onFaster,
+              icon: const Icon(Icons.add),
+            ),
+            IconButton(
+              tooltip: l.stopAutoScroll,
+              onPressed: onClose,
+              icon: const Icon(Icons.close),
+            ),
+          ],
         ),
       ),
     );
