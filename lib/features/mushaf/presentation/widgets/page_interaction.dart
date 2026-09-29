@@ -22,7 +22,11 @@ class PageInteraction {
     this.hidden,
     this.onHiddenTap,
     this.ornateOpening = false,
+    this.showHandles = false,
   });
+
+  /// Multi-verse selection is on: show the two drag handles.
+  final bool showHandles;
 
   /// Pages 1 and 2 inside the ornate frame: the printed surah header is
   /// left out, since the frame's cartouche names the surah.
@@ -190,7 +194,14 @@ class MarkerLook {
 
   /// Over the page ink: a rosette with the verse number, covering the
   /// printed marker.
-  void paintOver(Canvas canvas, Offset c, double r, int number) {
+  /// [marked] fills the centre with a mark's colour.
+  void paintOver(
+    Canvas canvas,
+    Offset c,
+    double r,
+    int number, {
+    Color? marked,
+  }) {
     final img = image;
     if (img == null) return;
     canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
@@ -201,7 +212,8 @@ class MarkerLook {
       Rect.fromCenter(center: c, width: size, height: size),
       Paint()..filterQuality = FilterQuality.medium,
     );
-    canvas.drawCircle(c, r * 0.86, Paint()..color = tint ?? paper);
+    final fill = marked ?? tint;
+    canvas.drawCircle(c, r * 0.86, Paint()..color = fill ?? paper);
     canvas.drawCircle(
       c,
       r * 0.86,
@@ -230,7 +242,7 @@ class MarkerLook {
           fontWeight: FontWeight.w700,
           fontSize: fontSize,
           height: 1,
-          color: tint == null ? ink : const Color(0xFFFFFFFF),
+          color: fill == null ? ink : const Color(0xFFFFFFFF),
         ),
       ),
       textDirection: TextDirection.rtl,

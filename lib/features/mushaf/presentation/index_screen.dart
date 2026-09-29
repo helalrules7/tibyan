@@ -29,7 +29,7 @@ String _fold(String s) => s
   return (surah: int.parse(m[1]!), ayah: int.parse(m[2]!));
 }
 
-enum IndexTab { surahs, juz, hizb, pages }
+enum IndexTab { surahs, juz, hizb, pages, marks }
 
 /// Row height in the index lists, fixed so the current row can be
 /// scrolled into view before it is built.
@@ -81,11 +81,14 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
         appBar: AppBar(
           title: Text(l.indexTitle),
           bottom: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
             tabs: [
               Tab(text: l.tabSurahs),
               Tab(text: l.tabJuz),
               Tab(text: l.tabHizb),
               Tab(text: l.tabPages),
+              Tab(text: l.tabMarks),
             ],
           ),
         ),
@@ -111,6 +114,7 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
                     title: (n) => l.hizbLabel('$n'),
                   ),
                   _PagesTab(current: widget.page),
+                  _MarksTab(surahs: surahs),
                 ],
               ),
       ),
@@ -432,6 +436,56 @@ class _PagesTabState extends ConsumerState<_PagesTab> {
           },
         );
       },
+    );
+  }
+}
+
+/// The reader's marks: the four fixed marks and named fawasil, updated as
+/// they are set from the page view.
+class _MarksTab extends ConsumerWidget {
+  const _MarksTab({required this.surahs});
+
+  final List<SurahRow> surahs;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final marks = ref.watch(bookmarkSetsProvider).value;
+    if (marks == null) return Center(child: Text(l.loadingLabel));
+    if (marks.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Text(
+            l.noMarks,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: t.muted, height: 1.7),
+          ),
+        ),
+      );
+    }
+    return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      children: [
+        for (final m in marks)
+          ListTile(
+            leading: Icon(Icons.bookmark, color: Color(m.color), size: 30),
+            title: Text(
+              m.name,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(
+              l.fasilLastAt(
+                surahName(context, surahs[m.surah - 1]),
+                '${m.ayah}',
+                '${m.page}',
+              ),
+              style: TextStyle(color: t.muted),
+            ),
+            onTap: () => openVerse(context, ref, surah: m.surah, ayah: m.ayah),
+          ),
+      ],
     );
   }
 }

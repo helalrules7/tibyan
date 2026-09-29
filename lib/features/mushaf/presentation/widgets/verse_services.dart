@@ -19,6 +19,7 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onMark,
     required this.onSaveToFasil,
     required this.onClose,
+    required this.onMultiSelect,
   });
 
   final List<VerseKey> verses;
@@ -26,6 +27,7 @@ class VerseServicesPanel extends StatelessWidget {
   final ValueChanged<MarkKind> onMark;
   final VoidCallback onSaveToFasil;
   final VoidCallback onClose;
+  final VoidCallback onMultiSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +125,15 @@ class VerseServicesPanel extends StatelessWidget {
                       ),
                     ),
                 ],
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: onMultiSelect,
+                icon: const Icon(Icons.format_line_spacing),
+                label: Text(l.multiSelect),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(44),
+                ),
               ),
               const SizedBox(height: 8),
               FilledButton.tonalIcon(

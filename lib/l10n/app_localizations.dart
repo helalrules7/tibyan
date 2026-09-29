@@ -1027,6 +1027,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'نزلت بعد {after}'**
   String revealedAfter(String after);
+
+  /// No description provided for @multiSelect.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد عدة آيات'**
+  String get multiSelect;
+
+  /// No description provided for @multiSelectHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسحب المقبضين لتحديد الآيات'**
+  String get multiSelectHint;
+
+  /// No description provided for @doneLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم'**
+  String get doneLabel;
+
+  /// No description provided for @markRemoved.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُزيل الفاصل'**
+  String get markRemoved;
+
+  /// No description provided for @tabMarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'فواصل القراءة'**
+  String get tabMarks;
+
+  /// No description provided for @noMarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.'**
+  String get noMarks;
 }
 
 class _AppLocalizationsDelegate

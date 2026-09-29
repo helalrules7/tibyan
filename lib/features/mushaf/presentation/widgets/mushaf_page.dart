@@ -297,7 +297,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                 if (x.selection.contains(v.key)) v,
             ];
             final handles = <Widget>[];
-            if (selected.isNotEmpty) {
+            if (selected.isNotEmpty && x.showHandles) {
               // Right-to-left: the selection starts at the top right of its
               // first verse and ends at the bottom left of its last.
               final first = selected.first.rects.first;
@@ -431,6 +431,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                     v.marker!,
                                     markerR,
                                     v.key.ayah,
+                                    marked: x.marks[v.key],
                                   );
                                 }
                               }

@@ -295,22 +295,35 @@ class IlluminatedFrame extends ConsumerWidget {
         ),
         SizedBox(
           height: catchwordSpace,
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: info?.catchword == null
-                  ? null
-                  : Text(
-                      info!.catchword!,
-                      semanticsLabel: l.catchwordLabel(info!.catchword!),
-                      style: TextStyle(
-                        fontFamily: 'UthmanicHafs',
-                        fontSize: 15,
-                        height: 1.4,
-                        color: t.muted,
-                      ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                // Start side (right in Arabic): the quarter that begins on
+                // this page, so the reader notices it.
+                if (info != null && info!.quarters.isNotEmpty)
+                  Text(
+                    quarterName(l, digits, info!.quarters.last.quarter),
+                    style: TextStyle(
+                      fontFamily: 'UthmanTahaNaskh',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: t.goldText,
                     ),
+                  ),
+                const Spacer(),
+                if (info?.catchword != null)
+                  Text(
+                    info!.catchword!,
+                    semanticsLabel: l.catchwordLabel(info!.catchword!),
+                    style: TextStyle(
+                      fontFamily: 'UthmanicHafs',
+                      fontSize: 15,
+                      height: 1.4,
+                      color: t.muted,
+                    ),
+                  ),
+              ],
             ),
           ),
         ),
@@ -746,14 +759,7 @@ class _QuarterRosette extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final digits = NumberFormatter(Localizations.localeOf(context));
-    final q = (mark.quarter - 1) % 4;
-    final hizb = (mark.quarter - 1) ~/ 4 + 1;
-    final label = switch (q) {
-      0 => l.hizbLabel(digits(hizb)),
-      1 => l.quarterHizb(digits(hizb)),
-      2 => l.halfHizb(digits(hizb)),
-      _ => l.threeQuartersHizb(digits(hizb)),
-    };
+    final label = quarterName(l, digits, mark.quarter);
     return Semantics(
       button: onTap != null,
       label: label,
@@ -931,4 +937,16 @@ class _MosaicPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_MosaicPainter old) => old.images != images;
+}
+
+/// "Hizb 5", "Quarter of hizb 5", "Half of hizb 5" or "Three quarters of
+/// hizb 5" for a quarter numbered 1..240.
+String quarterName(AppLocalizations l, NumberFormatter digits, int quarter) {
+  final hizb = digits((quarter - 1) ~/ 4 + 1);
+  return switch ((quarter - 1) % 4) {
+    0 => l.hizbLabel(hizb),
+    1 => l.quarterHizb(hizb),
+    2 => l.halfHizb(hizb),
+    _ => l.threeQuartersHizb(hizb),
+  };
 }

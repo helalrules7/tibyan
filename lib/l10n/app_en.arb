@@ -312,5 +312,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "multiSelect": "Select several verses",
+  "multiSelectHint": "Drag the handles to select verses",
+  "doneLabel": "Done",
+  "markRemoved": "Mark removed",
+  "tabMarks": "Reading marks",
+  "noMarks": "No marks yet. Tap a verse marker to mark it."
 }
