@@ -34,6 +34,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kTafsirFont = 'settings.tafsirFont';
   static const _kTafsirScale = 'settings.tafsirFontScale';
   static const _kHiddenCommentaries = 'settings.hiddenCommentaries';
+  static const _kKashida = 'settings.tafsirKashida';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -75,6 +76,7 @@ class SettingsController extends Notifier<AppSettings> {
         for (final id in _prefs.getStringList(_kHiddenCommentaries) ?? [])
           ?int.tryParse(id),
       },
+      tafsirKashida: _prefs.getBool(_kKashida) ?? false,
     );
   }
 
@@ -161,6 +163,11 @@ class SettingsController extends Notifier<AppSettings> {
     await _prefs.setStringList(_kHiddenCommentaries, [
       for (final id in hidden) '$id',
     ]);
+  }
+
+  Future<void> setTafsirKashida(bool value) async {
+    state = state.copyWith(tafsirKashida: value);
+    await _prefs.setBool(_kKashida, value);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

@@ -616,4 +616,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String sourceRetrieved(String date) {
     return 'نسخة $date';
   }
+
+  @override
+  String get tafsirKashida => 'الشد بالكشيدة (تجربة)';
+
+  @override
+  String get tafsirKashidaHint =>
+      'ضبط سطور التفسير بمدّ الحروف بدل توسيع المسافات. لا يمس الكلمات القرآنية بين الأقواس، والنسخ يأخذ النص الأصلي';
+
+  @override
+  String get copyText => 'نسخ النص';
+
+  @override
+  String get copied => 'تم النسخ';
 }

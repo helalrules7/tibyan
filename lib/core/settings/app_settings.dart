@@ -46,6 +46,7 @@ class AppSettings {
     this.tafsirFont = TafsirFont.naskh,
     this.tafsirFontScale = 1.0,
     this.hiddenCommentaries = const {},
+    this.tafsirKashida = false,
   });
 
   final String styleId;
@@ -82,6 +83,9 @@ class AppSettings {
   /// Source ids of tafsirs and translations the reader turned off.
   final Set<int> hiddenCommentaries;
 
+  /// Trial: justify Arabic tafsir with tatweel instead of wider spaces.
+  final bool tafsirKashida;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -98,6 +102,7 @@ class AppSettings {
     TafsirFont? tafsirFont,
     double? tafsirFontScale,
     Set<int>? hiddenCommentaries,
+    bool? tafsirKashida,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -114,6 +119,7 @@ class AppSettings {
     tafsirFont: tafsirFont ?? this.tafsirFont,
     tafsirFontScale: tafsirFontScale ?? this.tafsirFontScale,
     hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
+    tafsirKashida: tafsirKashida ?? this.tafsirKashida,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure
