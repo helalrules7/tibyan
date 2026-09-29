@@ -101,6 +101,17 @@ class SettingsScreen extends ConsumerWidget {
                     onChanged: controller.setQuranFontScale,
                   ),
                 ),
+                SwitchListTile(
+                  title: Text(l.highlightDivineNames),
+                  subtitle: Text(
+                    l.highlightDivineNamesHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  value: settings.highlightDivineNames,
+                  onChanged: controller.setHighlightDivineNames,
+                ),
+                const Divider(height: 1),
+                const _MarkerSettings(),
               ],
             ),
           ),
@@ -160,4 +171,116 @@ class _SectionTitle extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Verse-end marker shape and tint.
+class _MarkerSettings extends ConsumerWidget {
+  const _MarkerSettings();
+
+  static const _images = {
+    MarkerStyle.rosette7: 'assets/ornaments/marker_7.png',
+    MarkerStyle.rosette9: 'assets/ornaments/marker_9.png',
+    MarkerStyle.rosette16: 'assets/ornaments/marker_16.png',
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
+    Widget choice({
+      required bool selected,
+      required String label,
+      required Widget child,
+      required VoidCallback onTap,
+    }) {
+      return Semantics(
+        selected: selected,
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: selected ? t.control : t.border,
+                width: selected ? 2.5 : 1,
+              ),
+            ),
+            child: Center(child: child),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l.markerStyleLabel),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final style in MarkerStyle.values)
+                choice(
+                  selected: settings.markerStyle == style,
+                  label: style == MarkerStyle.traditional
+                      ? l.markerTraditional
+                      : l.markerRosette,
+                  onTap: () => controller.setMarkerStyle(style),
+                  child: style == MarkerStyle.traditional
+                      ? Text(
+                          '\u06DD',
+                          style: TextStyle(
+                            fontFamily: 'UthmanicHafs',
+                            fontSize: 30,
+                            color: t.ink,
+                          ),
+                        )
+                      : Image.asset(_images[style]!, width: 40, height: 40),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(l.markerTintLabel),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              choice(
+                selected: settings.markerTint == null,
+                label: l.markerTintNone,
+                onTap: () => controller.setMarkerTint(null),
+                child: Icon(Icons.block, color: t.muted),
+              ),
+              for (final c in markerTints)
+                choice(
+                  selected: settings.markerTint == c,
+                  label: l.markerTintLabel,
+                  onTap: () => controller.setMarkerTint(c),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Color(c),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

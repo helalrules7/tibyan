@@ -31,11 +31,13 @@ void main() {
           child: const TibyanApp(),
         ),
       );
+      // Past the splash screen.
+      await tester.pump(const Duration(seconds: 2));
       await tester.pumpAndSettle();
 
       // Defaults: Calm style, Light mode, new edition.
       final settings = container.read(settingsProvider);
-      expect(settings.styleId, 'calm');
+      expect(settings.styleId, 'zakhrafa');
       expect(settings.mode, ModeSetting.light);
       expect(settings.edition, MushafEdition.madina1441);
 

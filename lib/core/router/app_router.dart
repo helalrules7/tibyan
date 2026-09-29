@@ -13,6 +13,7 @@ import '../../features/onboarding/onboarding_edition_screen.dart';
 import '../../features/onboarding/onboarding_language_screen.dart';
 import '../../features/onboarding/onboarding_style_screen.dart';
 import '../../features/settings/appearance_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../settings/settings_controller.dart';
 
@@ -21,14 +22,20 @@ int? _int(GoRouterState s, String key) =>
 
 final appRouterProvider = Provider<GoRouter>(
   (ref) => GoRouter(
+    initialLocation: '/splash',
     // First launch: language, then style and colours, then the edition.
     redirect: (context, state) {
       final done = ref.read(settingsProvider).onboardingDone;
+      if (state.matchedLocation == '/splash') return null;
       final inOnboarding = state.matchedLocation.startsWith('/onboarding');
       if (!done && !inOnboarding) return '/onboarding/language';
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: '/onboarding/language',
         builder: (context, state) => const OnboardingLanguageScreen(),
@@ -80,7 +87,16 @@ final appRouterProvider = Provider<GoRouter>(
           ),
           GoRoute(
             path: 'index',
-            builder: (context, state) => const IndexScreen(),
+            builder: (context, state) => IndexScreen(
+              tab:
+                  IndexTab.values
+                      .asNameMap()[state.uri.queryParameters['tab']] ??
+                  IndexTab.surahs,
+              surah: _int(state, 's'),
+              juz: _int(state, 'j'),
+              hizb: _int(state, 'h'),
+              page: _int(state, 'p'),
+            ),
           ),
           GoRoute(
             path: 'fawasil',

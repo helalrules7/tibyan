@@ -88,3 +88,13 @@ Thumbs.db
 __pycache__/
 *.pyc
 .venv/
+
+# Server access: keys and connection notes never enter this public repo
+*.pem
+*.key
+id_*
+*_deploy
+*_deploy.pub
+deploy.local*
+.ssh/
+server*.local*

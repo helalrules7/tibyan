@@ -109,4 +109,25 @@ void main() {
       expect(installer.isInstalled, isFalse);
     }
   });
+
+  test('falls back to a mirror when the source fails', () async {
+    final zip = buildPack();
+    final installer = PagePackInstaller(
+      root: tmp,
+      spec: PagePackSpec(
+        id: 'mirror-pack',
+        url: 'https://source.invalid/pack.zip',
+        mirrors: const ['https://mirror.invalid/pack.zip'],
+        sha256: sha256.convert(zip).toString(),
+        bytes: zip.length,
+        format: PackFormat.svgXz,
+      ),
+      client: MockClient(
+        (request) async => request.url.host == 'mirror.invalid'
+            ? http.Response.bytes(zip, 200)
+            : http.Response('down', 503),
+      ),
+    );
+    expect((await installer.install().last).phase, PackPhase.installed);
+  });
 }

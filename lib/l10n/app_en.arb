@@ -107,5 +107,218 @@
   "reviewNotesTitle": "Questions under review",
   "reviewNotesBody": "{count} places where the two text sources differ (two juz boundaries and four spellings) are with a qualified reviewer. The app follows the Tanzil text until a decision is made.",
   "mushafOpen": "Open the mushaf",
-  "loadingLabel": "Loading…"
+  "loadingLabel": "Loading…",
+  "hizbLabel": "Hizb {number}",
+  "@hizbLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "catchwordLabel": "First word of the next page: {word}",
+  "@catchwordLabel": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "tabHizb": "Hizbs",
+  "goToPage": "Go to page",
+  "goToPageHint": "Page number, 1 to 604",
+  "goLabel": "Go",
+  "hizbStartsAt": "Starts at {surah} {ayah}",
+  "@hizbStartsAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "selectionStart": "Start of selection",
+  "selectionEnd": "End of selection",
+  "servicesTitle": "Verse services",
+  "markReading": "Reading",
+  "markReview": "Review",
+  "markHifz": "Memorizing",
+  "markTadabbur": "Reflection",
+  "autoFasil": "Reading mark set at {surah} {ayah}",
+  "@autoFasil": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "markMoved": "{mark}: {surah} {ayah}",
+  "@markMoved": {
+    "placeholders": {
+      "mark": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "verseRange": "{surah} {from}–{to}",
+  "@verseRange": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "versesCount": "{count} verses",
+  "@versesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "twoVerses": "2 verses",
+  "markerStyleLabel": "Verse marker shape",
+  "markerTraditional": "Traditional marker",
+  "markerRosette": "Rosette",
+  "markerTintLabel": "Marker colour",
+  "markerTintNone": "No colour",
+  "reciteMode": "Recitation mode",
+  "revealNextVerse": "Next verse",
+  "revealAll": "All",
+  "endRecite": "End recitation",
+  "autoScroll": "Auto-scroll",
+  "resume": "Resume",
+  "pause": "Pause",
+  "slower": "Slower",
+  "faster": "Faster",
+  "stopAutoScroll": "Stop scrolling",
+  "speedLabel": "Speed {speed}",
+  "@speedLabel": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerTitle": "({number}) Surah {name} · {type}",
+  "@surahBannerTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfo": "{count} verses · revealed {order}th · after {after}",
+  "@surahBannerInfo": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "surahBannerInfoFirst": "{count} verses · revealed {order}th",
+  "@surahBannerInfoFirst": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "quarterHizb": "Quarter of hizb {number}",
+  "@quarterHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "halfHizb": "Half of hizb {number}",
+  "@halfHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "threeQuartersHizb": "Three quarters of hizb {number}",
+  "@threeQuartersHizb": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "coverTitle": "The Noble Quran",
+  "coverSubtitle": "In the Uthmani script",
+  "riwayaHafs": "Hafs from Asim",
+  "openingInfo": "{type} · {count} verses · surah {number}",
+  "@openingInfo": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedOrder": "Revealed {order}th",
+  "@revealedOrder": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "revealedAfter": "After {after}",
+  "@revealedAfter": {
+    "placeholders": {
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "multiSelect": "Select several verses",
+  "multiSelectHint": "Drag the handles to select verses",
+  "doneLabel": "Done",
+  "markRemoved": "Mark removed",
+  "tabMarks": "Reading marks",
+  "noMarks": "No marks yet. Tap a verse marker to mark it.",
+  "highlightDivineNames": "Highlight the divine name",
+  "highlightDivineNamesHint": "Colour «Allah», «Rabb» and «Rabbana» on the pages"
 }

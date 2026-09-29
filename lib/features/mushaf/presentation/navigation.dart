@@ -20,5 +20,6 @@ Future<void> openVerse(
   final row = await ref.read(mushafRepositoryProvider).ayah(surah, ayah);
   if (!context.mounted) return;
   final page = row.pageIn(ref.read(editionProvider));
-  context.go('/mushaf?page=$page&s=$surah&a=$ayah');
+  // Navigation only turns the page; it never selects a verse.
+  context.go('/mushaf?page=$page');
 }

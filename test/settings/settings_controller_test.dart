@@ -24,10 +24,10 @@ void main() {
     );
   }
 
-  test('defaults: Calm, Light, KFGQPC AN, crash reports off', () async {
+  test('defaults: Zakhrafa, Light, KFGQPC AN, crash reports off', () async {
     final c = await containerWith({});
     final s = c.read(settingsProvider);
-    expect(s.styleId, 'calm');
+    expect(s.styleId, 'zakhrafa');
     expect(s.mode, ModeSetting.light);
     expect(s.uiFont, UiFont.kfgqpcAn);
     expect(s.crashReportsOptIn, isFalse);
@@ -54,7 +54,7 @@ void main() {
 
   test('unknown stored style falls back to the default', () async {
     final c = await containerWith({'settings.style': 'removed-style'});
-    expect(c.read(settingsProvider).styleId, 'calm');
+    expect(c.read(settingsProvider).styleId, 'zakhrafa');
   });
 
   test('system mode: dark device gives Night, never Black', () {

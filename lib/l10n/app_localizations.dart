@@ -745,6 +745,336 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'جارٍ التحميل…'**
   String get loadingLabel;
+
+  /// No description provided for @hizbLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحزب {number}'**
+  String hizbLabel(String number);
+
+  /// No description provided for @catchwordLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكلمة الأولى في الصفحة التالية: {word}'**
+  String catchwordLabel(String word);
+
+  /// No description provided for @tabHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأحزاب'**
+  String get tabHizb;
+
+  /// No description provided for @goToPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتقال إلى صفحة'**
+  String get goToPage;
+
+  /// No description provided for @goToPageHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الصفحة من ١ إلى ٦٠٤'**
+  String get goToPageHint;
+
+  /// No description provided for @goLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتقال'**
+  String get goLabel;
+
+  /// No description provided for @hizbStartsAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'يبدأ من {surah} {ayah}'**
+  String hizbStartsAt(String surah, String ayah);
+
+  /// No description provided for @selectionStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'بداية التحديد'**
+  String get selectionStart;
+
+  /// No description provided for @selectionEnd.
+  ///
+  /// In ar, this message translates to:
+  /// **'نهاية التحديد'**
+  String get selectionEnd;
+
+  /// No description provided for @servicesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'خدمات الآيات'**
+  String get servicesTitle;
+
+  /// No description provided for @markReading.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة'**
+  String get markReading;
+
+  /// No description provided for @markReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراجعة'**
+  String get markReview;
+
+  /// No description provided for @markHifz.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get markHifz;
+
+  /// No description provided for @markTadabbur.
+  ///
+  /// In ar, this message translates to:
+  /// **'تدبر'**
+  String get markTadabbur;
+
+  /// No description provided for @autoFasil.
+  ///
+  /// In ar, this message translates to:
+  /// **'فاصل تلقائي عند {surah} {ayah}'**
+  String autoFasil(String surah, String ayah);
+
+  /// No description provided for @markMoved.
+  ///
+  /// In ar, this message translates to:
+  /// **'{mark}: {surah} {ayah}'**
+  String markMoved(String mark, String surah, String ayah);
+
+  /// No description provided for @verseRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'{surah} {from}–{to}'**
+  String verseRange(String surah, String from, String to);
+
+  /// No description provided for @versesCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} آيات'**
+  String versesCount(String count);
+
+  /// No description provided for @twoVerses.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيتان'**
+  String get twoVerses;
+
+  /// No description provided for @markerStyleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكل فواصل الآيات'**
+  String get markerStyleLabel;
+
+  /// No description provided for @markerTraditional.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفاصل التقليدي'**
+  String get markerTraditional;
+
+  /// No description provided for @markerRosette.
+  ///
+  /// In ar, this message translates to:
+  /// **'وردة'**
+  String get markerRosette;
+
+  /// No description provided for @markerTintLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'لون الفواصل'**
+  String get markerTintLabel;
+
+  /// No description provided for @markerTintNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا لون'**
+  String get markerTintNone;
+
+  /// No description provided for @reciteMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع التسميع'**
+  String get reciteMode;
+
+  /// No description provided for @revealNextVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية التالية'**
+  String get revealNextVerse;
+
+  /// No description provided for @revealAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get revealAll;
+
+  /// No description provided for @endRecite.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنهاء التسميع'**
+  String get endRecite;
+
+  /// No description provided for @autoScroll.
+  ///
+  /// In ar, this message translates to:
+  /// **'التمرير التلقائي'**
+  String get autoScroll;
+
+  /// No description provided for @resume.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة'**
+  String get resume;
+
+  /// No description provided for @pause.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف مؤقت'**
+  String get pause;
+
+  /// No description provided for @slower.
+  ///
+  /// In ar, this message translates to:
+  /// **'أبطأ'**
+  String get slower;
+
+  /// No description provided for @faster.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسرع'**
+  String get faster;
+
+  /// No description provided for @stopAutoScroll.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف التمرير'**
+  String get stopAutoScroll;
+
+  /// No description provided for @speedLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'السرعة {speed}'**
+  String speedLabel(String speed);
+
+  /// No description provided for @surahBannerTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'({number}) سورة {name} · {type}'**
+  String surahBannerTitle(String number, String name, String type);
+
+  /// No description provided for @surahBannerInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'آياتها {count} · ترتيبها في النزول {order} · نزلت بعد {after}'**
+  String surahBannerInfo(String count, String order, String after);
+
+  /// No description provided for @surahBannerInfoFirst.
+  ///
+  /// In ar, this message translates to:
+  /// **'آياتها {count} · ترتيبها في النزول {order}'**
+  String surahBannerInfoFirst(String count, String order);
+
+  /// No description provided for @quarterHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربع الحزب {number}'**
+  String quarterHizb(String number);
+
+  /// No description provided for @halfHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'نصف الحزب {number}'**
+  String halfHizb(String number);
+
+  /// No description provided for @threeQuartersHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثلاثة أرباع الحزب {number}'**
+  String threeQuartersHizb(String number);
+
+  /// No description provided for @coverTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القرآن الكريم'**
+  String get coverTitle;
+
+  /// No description provided for @coverSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالرسم العثماني'**
+  String get coverSubtitle;
+
+  /// No description provided for @riwayaHafs.
+  ///
+  /// In ar, this message translates to:
+  /// **'رواية حفص عن عاصم'**
+  String get riwayaHafs;
+
+  /// No description provided for @openingInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'{type} · آياتها {count} · ترتيبها {number}'**
+  String openingInfo(String type, String count, String number);
+
+  /// No description provided for @revealedOrder.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيبها في النزول {order}'**
+  String revealedOrder(String order);
+
+  /// No description provided for @revealedAfter.
+  ///
+  /// In ar, this message translates to:
+  /// **'نزلت بعد {after}'**
+  String revealedAfter(String after);
+
+  /// No description provided for @multiSelect.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد عدة آيات'**
+  String get multiSelect;
+
+  /// No description provided for @multiSelectHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسحب المقبضين لتحديد الآيات'**
+  String get multiSelectHint;
+
+  /// No description provided for @doneLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم'**
+  String get doneLabel;
+
+  /// No description provided for @markRemoved.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُزيل الفاصل'**
+  String get markRemoved;
+
+  /// No description provided for @tabMarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'فواصل القراءة'**
+  String get tabMarks;
+
+  /// No description provided for @noMarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.'**
+  String get noMarks;
+
+  /// No description provided for @highlightDivineNames.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمييز لفظ الجلالة'**
+  String get highlightDivineNames;
+
+  /// No description provided for @highlightDivineNamesHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلوين «الله» و«رب» و«ربنا» في صفحات المصحف'**
+  String get highlightDivineNamesHint;
 }
 
 class _AppLocalizationsDelegate

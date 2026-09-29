@@ -1,6 +1,7 @@
 {
-  "default": "calm",
+  "default": "zakhrafa",
   "styles": [
+    "zakhrafa",
     "classic",
     "manuscript",
     "royal",
