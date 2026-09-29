@@ -955,6 +955,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'السرعة {speed}'**
   String speedLabel(String speed);
+
+  /// No description provided for @surahBannerTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'({number}) سورة {name} · {type}'**
+  String surahBannerTitle(String number, String name, String type);
+
+  /// No description provided for @surahBannerInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'آياتها {count} · ترتيبها في النزول {order} · نزلت بعد {after}'**
+  String surahBannerInfo(String count, String order, String after);
+
+  /// No description provided for @surahBannerInfoFirst.
+  ///
+  /// In ar, this message translates to:
+  /// **'آياتها {count} · ترتيبها في النزول {order}'**
+  String surahBannerInfoFirst(String count, String order);
+
+  /// No description provided for @quarterHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربع الحزب {number}'**
+  String quarterHizb(String number);
+
+  /// No description provided for @halfHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'نصف الحزب {number}'**
+  String halfHizb(String number);
+
+  /// No description provided for @threeQuartersHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثلاثة أرباع الحزب {number}'**
+  String threeQuartersHizb(String number);
 }
 
 class _AppLocalizationsDelegate

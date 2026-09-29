@@ -116,6 +116,24 @@ class MushafRepository {
   Future<List<LineOverflowRow>> lineOverflow(int page) =>
       (_db.select(_db.lineOverflow)..where((t) => t.page.equals(page))).get();
 
+  /// Verses on a page that start a new hizb quarter.
+  Future<List<AyahRow>> quarterStartsOnPage(
+    int page,
+    MushafEdition edition,
+  ) async {
+    final col = edition == MushafEdition.madina1405 ? 'page_1405' : 'page';
+    final rows = await _db
+        .customSelect(
+          'SELECT a.id AS id FROM ayah a LEFT JOIN ayah b ON b.id = a.id - 1 '
+          'WHERE a.$col = ? AND (b.id IS NULL OR b.hizb_quarter <> a.hizb_quarter)',
+          variables: [Variable.withInt(page)],
+        )
+        .get();
+    final ids = [for (final r in rows) r.read<int>('id')];
+    if (ids.isEmpty) return const [];
+    return (_db.select(_db.ayah)..where((t) => t.id.isIn(ids))).get();
+  }
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }

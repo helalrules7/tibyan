@@ -231,6 +231,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onHizbTap: () => openIndex('hizb'),
           onSurahTap: () => openIndex('surahs'),
           onPageTap: _goToPage,
+          onQuarterTap: (q) => _setMark(
+            MarkKind.reading,
+            (surah: q.surah, ayah: q.ayah),
+            i + 1,
+            auto: true,
+          ),
           child: pageWidget,
         ),
       );
