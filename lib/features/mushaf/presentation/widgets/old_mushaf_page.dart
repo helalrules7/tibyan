@@ -21,7 +21,7 @@ const _ink = Rect.fromLTRB(51, 8, 983, 1602);
 const _openingInk = Rect.fromLTRB(51, 6, 967, 814);
 
 /// The same block without its printed surah header.
-const _openingBody = Rect.fromLTRB(51, 200, 967, 814);
+const _openingBody = Rect.fromLTRB(204, 204, 824, 816);
 const _lineCount = 15;
 const _pitch = 1594 / _lineCount;
 
@@ -122,7 +122,13 @@ class _PageLayout {
     );
   }
 
-  void paint(Canvas canvas, ui.Image image, Paint paint) {
+  /// [emphasis] lines (the basmala) are drawn a little larger and bolder.
+  void paint(
+    Canvas canvas,
+    ui.Image image,
+    Paint paint, {
+    Set<int> emphasis = const {},
+  }) {
     if (!strips) {
       canvas.drawImageRect(
         image,
@@ -140,17 +146,26 @@ class _PageLayout {
     for (var j = 0; j < _lineCount; j++) {
       final top = _bandTop(j);
       final bottom = _bandBottom(j);
-      canvas.drawImageRect(
-        image,
-        Rect.fromLTRB(ink.left, top, ink.right, bottom),
-        Rect.fromLTWH(
-          0,
-          _slotCentre(j) + (top - _centre(j)) * scale,
-          size.width,
-          (bottom - top) * scale,
-        ),
-        paint,
+      final dst = Rect.fromLTWH(
+        0,
+        _slotCentre(j) + (top - _centre(j)) * scale,
+        size.width,
+        (bottom - top) * scale,
       );
+      final src = Rect.fromLTRB(ink.left, top, ink.right, bottom);
+      if (!emphasis.contains(j)) {
+        canvas.drawImageRect(image, src, dst, paint);
+        continue;
+      }
+      canvas.save();
+      final c = Offset(size.width / 2, _slotCentre(j));
+      canvas.translate(c.dx, c.dy);
+      canvas.scale(1.12);
+      canvas.translate(-c.dx, -c.dy);
+      for (final dx in const [-0.6, 0.6, 0.0]) {
+        canvas.drawImageRect(image, src, dst.shift(Offset(dx, 0)), paint);
+      }
+      canvas.restore();
     }
   }
 }
@@ -359,6 +374,9 @@ class _OldMushafPageState extends ConsumerState<OldMushafPage> {
                                 ],
                           paper: tokens.colors.paper,
                           line: tokens.colors.border,
+                          divineNames: x.divineNames,
+                          divineColor: x.divineColor,
+                          emphasis: x.emphasisLines,
                           rings: [
                             for (final e in markers.entries)
                               if (x.marks.containsKey(e.key))
@@ -402,7 +420,15 @@ class _OldPagePainter extends CustomPainter {
     required this.hidden,
     required this.paper,
     required this.line,
+    this.divineNames = const [],
+    this.divineColor,
+    this.emphasis = const {},
   });
+
+  /// Divine-name glyph boxes (image px) and their colour.
+  final List<Rect> divineNames;
+  final Color? divineColor;
+  final Set<int> emphasis;
 
   final MarkerLook? look;
 
@@ -455,7 +481,16 @@ class _OldPagePainter extends CustomPainter {
     if (ink != null) {
       paint.colorFilter = ColorFilter.mode(ink!, BlendMode.srcIn);
     }
-    layout.paint(canvas, image, paint);
+    layout.paint(canvas, image, paint, emphasis: emphasis);
+    final divine = divineColor;
+    if (divine != null) {
+      final tintPaint = Paint()
+        ..filterQuality = FilterQuality.medium
+        ..colorFilter = ColorFilter.mode(divine, BlendMode.srcIn);
+      for (final r in divineNames) {
+        canvas.drawImageRect(image, r, layout.toScreenRect(r), tintPaint);
+      }
+    }
     for (final (r, n, marked) in markers) {
       look?.paintOver(canvas, r.center, r.shortestSide / 2, n, marked: marked);
     }

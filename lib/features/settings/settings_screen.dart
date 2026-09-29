@@ -101,6 +101,15 @@ class SettingsScreen extends ConsumerWidget {
                     onChanged: controller.setQuranFontScale,
                   ),
                 ),
+                SwitchListTile(
+                  title: Text(l.highlightDivineNames),
+                  subtitle: Text(
+                    l.highlightDivineNamesHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  value: settings.highlightDivineNames,
+                  onChanged: controller.setHighlightDivineNames,
+                ),
                 const Divider(height: 1),
                 const _MarkerSettings(),
               ],

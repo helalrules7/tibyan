@@ -813,8 +813,8 @@ class OrnateFrame extends ConsumerWidget {
       builder: (context, box) {
         final w = box.maxWidth;
         final h = box.maxHeight;
-        final panel = Rect.fromLTRB(44, h * 0.235, w - 44, h * 0.765);
-        const inner = 16.0;
+        final panel = Rect.fromLTRB(26, h * 0.215, w - 26, h * 0.785);
+        const inner = 12.0;
         final cartW = (w - 150).clamp(160.0, 320.0);
         final cartH = (h * 0.085).clamp(52.0, 76.0);
         Widget cartouche(double centreY, Widget c) => Positioned(

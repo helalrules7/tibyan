@@ -39,6 +39,7 @@ class AppSettings {
     this.quranFontScale = 1.0,
     this.markerStyle = MarkerStyle.traditional,
     this.markerTint,
+    this.highlightDivineNames = true,
   });
 
   final String styleId;
@@ -64,6 +65,9 @@ class AppSettings {
   /// ARGB tint behind verse-end markers; null leaves them as printed.
   final int? markerTint;
 
+  /// Colour «الله» and «رب» / «ربنا» on the page (on by default).
+  final bool highlightDivineNames;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -76,6 +80,7 @@ class AppSettings {
     double? quranFontScale,
     MarkerStyle? markerStyle,
     int? Function()? markerTint,
+    bool? highlightDivineNames,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -88,6 +93,7 @@ class AppSettings {
     quranFontScale: quranFontScale ?? this.quranFontScale,
     markerStyle: markerStyle ?? this.markerStyle,
     markerTint: markerTint == null ? this.markerTint : markerTint(),
+    highlightDivineNames: highlightDivineNames ?? this.highlightDivineNames,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

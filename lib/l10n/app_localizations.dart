@@ -1063,6 +1063,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لا توجد فواصل بعد. اضغط على فاصل أي آية لتعليمها.'**
   String get noMarks;
+
+  /// No description provided for @highlightDivineNames.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمييز لفظ الجلالة'**
+  String get highlightDivineNames;
+
+  /// No description provided for @highlightDivineNamesHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلوين «الله» و«رب» و«ربنا» في صفحات المصحف'**
+  String get highlightDivineNamesHint;
 }
 
 class _AppLocalizationsDelegate

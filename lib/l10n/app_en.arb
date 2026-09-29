@@ -318,5 +318,7 @@
   "doneLabel": "Done",
   "markRemoved": "Mark removed",
   "tabMarks": "Reading marks",
-  "noMarks": "No marks yet. Tap a verse marker to mark it."
+  "noMarks": "No marks yet. Tap a verse marker to mark it.",
+  "highlightDivineNames": "Highlight the divine name",
+  "highlightDivineNamesHint": "Colour «Allah», «Rabb» and «Rabbana» on the pages"
 }

@@ -31,7 +31,7 @@ const _pitch = 35.75;
 const _openingInk = Rect.fromLTRB(5, -68, 232, 236);
 
 /// The same block without its printed surah header.
-const _openingBody = Rect.fromLTRB(5, 12, 232, 236);
+const _openingBody = Rect.fromLTRB(10, 15, 228, 217);
 
 /// Where the page is drawn on screen. Normal pages fill the width and their
 /// 15 lines are spread evenly over the full height, without stretching the
@@ -158,13 +158,18 @@ class _PageLayout {
   }
 
   /// Runs [draw] in page units once per line band, clipped to that band.
-  void paintBands(Canvas canvas, void Function(Canvas) draw) {
+  /// [emphasis] lines (the basmala) are drawn a little larger and bolder.
+  void paintBands(
+    Canvas canvas,
+    void Function(Canvas, bool emphasis) draw, {
+    Set<int> emphasis = const {},
+  }) {
     if (!strips) {
       canvas.save();
       canvas.translate(offset.dx, offset.dy);
       canvas.scale(scale);
       if (clip != null) canvas.clipRect(clip!);
-      draw(canvas);
+      draw(canvas, false);
       canvas.restore();
       return;
     }
@@ -173,8 +178,26 @@ class _PageLayout {
       canvas.save();
       canvas.translate(offset.dx, dy);
       canvas.scale(scale);
-      canvas.clipPath(_clips[j]);
-      draw(canvas);
+      final big = emphasis.contains(j);
+      if (big) {
+        // Room for the larger line: its band plus a little above and below.
+        canvas.clipRect(
+          Rect.fromLTRB(
+            viewBox.left,
+            _bandTop(j) - 4,
+            viewBox.right,
+            _bandBottom(j) + 4,
+          ),
+        );
+        final cx = viewBox.center.dx;
+        final cy = _centre(j);
+        canvas.translate(cx, cy);
+        canvas.scale(1.12);
+        canvas.translate(-cx, -cy);
+      } else {
+        canvas.clipPath(_clips[j]);
+      }
+      draw(canvas, big);
       canvas.restore();
     }
   }
@@ -373,7 +396,10 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                       child: CustomPaint(
                         size: box.biggest,
                         painter: _CallbackPainter((canvas) {
-                          layout.paintBands(canvas, (c) {
+                          layout.paintBands(canvas, emphasis: x.emphasisLines, (
+                            c,
+                            bold,
+                          ) {
                             // Under the ink: marker tints and the selection.
                             if (look != null) {
                               for (final v in verses) {
@@ -417,11 +443,44 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                             }
                             // The picture starts at the viewBox corner, not at
                             // the origin (pages 1 and 2 have a shifted one).
-                            c.save();
-                            c.translate(viewBox.left, viewBox.top);
-                            c.drawPicture(picture.picture);
-                            c.restore();
+                            void page() {
+                              c.save();
+                              c.translate(viewBox.left, viewBox.top);
+                              c.drawPicture(picture.picture);
+                              c.restore();
+                            }
+
+                            if (bold) {
+                              // Faux bold: the same line drawn three times,
+                              // a hair apart.
+                              for (final dx in const [-0.32, 0.32]) {
+                                c.save();
+                                c.translate(dx, 0);
+                                page();
+                                c.restore();
+                              }
+                            }
+                            page();
                             if (ink != null) c.restore();
+                            // The divine names, recoloured in place.
+                            final divine = x.divineColor;
+                            if (divine != null) {
+                              for (final r in x.divineNames) {
+                                c.save();
+                                c.clipRect(r);
+                                c.saveLayer(
+                                  r,
+                                  Paint()
+                                    ..colorFilter = ColorFilter.mode(
+                                      divine,
+                                      BlendMode.srcIn,
+                                    ),
+                                );
+                                page();
+                                c.restore();
+                                c.restore();
+                              }
+                            }
                             // Over the ink: rosettes and recitation covers.
                             if (look != null) {
                               for (final v in verses) {

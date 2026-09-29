@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' show Rect;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
@@ -9,6 +10,7 @@ import '../../core/db/content_database.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/db/user_database.dart';
+import 'data/divine_names.dart';
 import 'data/mushaf_repository.dart';
 import 'data/page_pack.dart';
 import 'presentation/widgets/illuminated_frame.dart';
@@ -246,3 +248,73 @@ final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
 final hizbStartsProvider = FutureProvider<List<AyahRow>>(
   (ref) => ref.watch(mushafRepositoryProvider).hizbStarts(),
 );
+
+/// Boxes of the divine names on a page: page units (1441) or image pixels
+/// (1405). New-edition boxes come from tools/build_word_boxes.py; old-edition
+/// ones from quran.com's glyph boxes, matched to the words of each verse.
+final divineNameBoxesProvider = FutureProvider.family<List<Rect>, int>((
+  ref,
+  page,
+) async {
+  final edition = ref.watch(editionProvider);
+  final repo = ref.watch(mushafRepositoryProvider);
+  final ayahs = await repo.ayahsOnPage(page, edition);
+  final words = <(int, int), List<String>>{
+    for (final a in ayahs)
+      (a.surah, a.number): [
+        for (final w in a.displayBody.split(RegExp('[  ]')))
+          if (w.isNotEmpty && w != '۞') w,
+      ],
+  };
+  final out = <Rect>[];
+  if (edition == MushafEdition.madina1405) {
+    final glyphs =
+        await ref.watch(ayahInfoDatabaseProvider)?.page(page) ?? const [];
+    final byVerse = <(int, int), Map<int, List<GlyphRow>>>{};
+    for (final g in glyphs) {
+      byVerse
+          .putIfAbsent((g.suraNumber, g.ayahNumber), () => {})
+          .putIfAbsent(g.position, () => [])
+          .add(g);
+    }
+    for (final e in byVerse.entries) {
+      final w = words[e.key];
+      if (w == null) continue;
+      final positions = e.value.keys.toList()..sort();
+      positions.removeLast(); // the verse-end marker
+      // Pause signs are separate, very narrow (even negative-width)
+      // positions. Keep the rest, and only use verses whose count then
+      // matches the words exactly (6017 of 6236); others stay uncoloured
+      // rather than risk colouring the wrong word.
+      double width(int p) =>
+          e.value[p]!.fold(0.0, (s, g) => s + g.maxX - g.minX);
+      final kept = [
+        for (final p in positions)
+          if (width(p) >= 20) p,
+      ];
+      if (kept.length != w.length) continue;
+      for (var i = 0; i < kept.length; i++) {
+        if (!isDivineName(w[i])) continue;
+        for (final g in e.value[kept[i]]!) {
+          out.add(
+            Rect.fromLTRB(
+              g.minX.toDouble(),
+              g.minY.toDouble(),
+              g.maxX.toDouble(),
+              g.maxY.toDouble(),
+            ),
+          );
+        }
+      }
+    }
+  } else {
+    for (final b in await repo.wordBoxes(page)) {
+      final w = words[(b.surah, b.ayah)];
+      if (w == null || b.word > w.length || !isDivineName(w[b.word - 1])) {
+        continue;
+      }
+      out.add(Rect.fromLTRB(b.x0 / 10, b.y0 / 10, b.x1 / 10, b.y1 / 10));
+    }
+  }
+  return out;
+});
