@@ -16,6 +16,9 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/tanzil_en.pickthall.txt    Tanzil               (Pickthall, public domain)
   tools/.cache/mp3quran_ayat_timing.json  mp3quran.net         (verse timings, fetch_ayat_timing.py)
   tools/.cache/word_timing.json           quran-align placed on mp3quran files (build_word_timing.py)
+  tools/.cache/quranlab_banna_timing.json QuranLab word timings, al-Banna (fetch_quranlab_timing.py)
+  tools/.cache/quranlab_ayah_timing.json  al-Banna verse timings derived from it (build_quranlab_timing.py)
+  tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -97,6 +100,8 @@ def read_tanzil_translation(path):
 # Recitations streamed from mp3quran.net: (id, name_ar, name_en, style,
 # folder URL, mp3quran timing read id or None). al-Banna and Mustafa Ismail
 # have no published timing for their murattal, so their mujawwad is added.
+# al-Banna's murattal (4) gets verse timings derived by
+# build_quranlab_timing.py instead.
 RECITERS = [
     (1, 'محمد صديق المنشاوي', 'Mohamed Siddiq al-Minshawi', 'murattal',
      'https://server10.mp3quran.net/minsh/', 112),
@@ -162,6 +167,9 @@ def main():
     pickthall_path = CACHE / 'tanzil_en.pickthall.txt'
     timing_path = CACHE / 'mp3quran_ayat_timing.json'
     word_timing_path = CACHE / 'word_timing.json'
+    quranlab_path = CACHE / 'quranlab_banna_timing.json'
+    quranlab_ayah_path = CACHE / 'quranlab_ayah_timing.json'
+    quranlab_word_path = CACHE / 'quranlab_word_timing.json'
 
     uthmani, notice = read_tanzil(uthmani_path)
     clean, clean_notice = read_tanzil(clean_path)
@@ -369,6 +377,17 @@ def main():
         sha256(word_timing_path), today))
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(word_timing_path.read_text(encoding='utf-8')))
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
+        12, 'quranlab-word-timing',
+        'Word timings for al-Banna (murattal), QuranLab; verse boundaries derived by Tibyan',
+        'QuranLab (quranlab/quran-audio); placement and verse boundaries by Tibyan', None,
+        'CC BY 4.0', 'https://huggingface.co/datasets/quranlab/quran-audio',
+        'توقيت الكلمات للبنا: QuranLab (CC BY 4.0)، وحدود الآيات مستخرجة في تبيان', None,
+        sha256(quranlab_path), today))
+    db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)',
+                   json.loads(quranlab_ayah_path.read_text(encoding='utf-8')))
+    db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
+                   json.loads(quranlab_word_path.read_text(encoding='utf-8')))
     for reciter, surah in gaps:
         print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
     db.executemany('INSERT INTO commentary_edition VALUES (?,?,?,?,?,?,?)', [
@@ -456,7 +475,7 @@ def main():
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
     assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
     assert check.execute('SELECT COUNT(*) FROM commentary').fetchone()[0] == 3 * 6236
-    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing').fetchone()[0] == 5
+    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing').fetchone()[0] == 6
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0

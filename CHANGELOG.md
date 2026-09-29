@@ -10,6 +10,7 @@ All notable changes to Tibyan are recorded here. The format follows
 - Seven recitations from mp3quran.net: al-Minshawi, al-Husary, Abdul Basit, al-Banna and Mustafa Ismail (murattal), and al-Banna and Mustafa Ismail (mujawwad).
 - The recited verse is highlighted and pages turn with it, using mp3quran's published verse timings (five recitations; two surahs with a verse missing in the source play without highlighting).
 - The recited word is highlighted too, in both editions, for al-Minshawi, al-Husary and Abdul Basit: quran-align's word timings (CC BY 4.0) placed on the mp3quran files using the speech and pauses heard in each verse (99.8% of verses; under 0.2% of words fall in a pause).
+- Verse and word highlighting for al-Banna (murattal) in 100 of 114 surahs: QuranLab's word timings (CC BY 4.0) placed on the mp3quran files, with verse boundaries found by matching each verse's sound (0.16% of words fall in a pause); the other 14 surahs play without highlighting.
 - Touch reading: tap the verse you are reading and it is shaded in red, replacing the last one. Its button and the hide-verses button sit just under the page number.
 - Repeat a verse or a selected stretch 1 to 10 times or until stopped, with silence between repeats; sleep timer; background playback with lock-screen controls; per-surah downloads that resume.
 

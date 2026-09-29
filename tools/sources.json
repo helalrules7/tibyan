@@ -134,6 +134,16 @@
       "sha256": "5eeb045d8a7895208c94d2d7ec243567f8f550728835411527c4ffa1e789c9b7",
       "license": "CC BY 4.0, (c) 2016 Collin Fair",
       "evidence": "docs/licenses/2026-09-28_cpfair_quran-align.pdf"
+    },
+    {
+      "id": "quranlab-quran-audio-banna",
+      "file": "quranlab_banna_timing.json",
+      "url": "https://huggingface.co/datasets/quranlab/quran-audio (config mahmoud-ali-al-banna, read through datasets-server.huggingface.co/rows)",
+      "method": "script",
+      "script": "tools/fetch_quranlab_timing.py",
+      "sha256": "a636c2976548d527f2ba4d76687ea8006a8126725f40dd2074fca1bb744c7b35",
+      "license": "Word timings CC BY 4.0 (QuranLab); the dataset hosts no audio. Upstream Parquet: mahmoud-ali-al-banna/train-00000-of-00001.parquet, SHA-256 f91ea421924b8b6c90e26c51ca79f04a90ffb3641df1805fd35341853375e1d2 (2026-09-29). Measured on everyayah's per-verse files (no license; used by the owner's decision for building and checking only, not shipped)",
+      "evidence": "docs/licenses/2026-09-28_quranlab_quran-audio_LICENSES.pdf; docs/licenses/2026-09-28_everyayah_disclaimer_no-license.pdf"
     }
   ]
 }

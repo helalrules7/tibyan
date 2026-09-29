@@ -39,7 +39,7 @@ void main() {
 
   test('timings cover every verse, in order, where they exist', () async {
     final surahs = await repo.surahs();
-    for (final reciter in [1, 2, 3, 6, 7]) {
+    for (final reciter in [1, 2, 3, 4, 6, 7]) {
       for (final s in [1, 2, 9, 114]) {
         final t = await repo.timings(reciter, s);
         if (t.isEmpty) continue;
@@ -56,8 +56,13 @@ void main() {
     // The two surahs with a verse missing in the source have no timing.
     expect(await repo.timings(1, 9), isEmpty);
     expect(await repo.timings(2, 1), isEmpty);
-    // al-Banna and Mustafa Ismail murattal: no published timing.
-    expect(await repo.timings(4, 1), isEmpty);
+    // al-Banna murattal: verse timings derived from QuranLab's word
+    // timings, except in the surahs that failed the checks.
+    for (final s in [1, 2, 9, 114]) {
+      expect(await repo.timings(4, s), isNotEmpty, reason: 'surah $s');
+    }
+    expect(await repo.timings(4, 55), isEmpty);
+    // Mustafa Ismail murattal: no timing.
     expect(await repo.timings(5, 1), isEmpty);
   });
 
@@ -73,9 +78,10 @@ void main() {
   test(
     'word timings: most verses, words in order, the word at a time',
     () async {
-      for (final reciter in [1, 2, 3]) {
+      for (final reciter in [1, 2, 3, 4]) {
         final words = await repo.wordTimings(reciter, 2);
-        expect(words.length, greaterThan(6000), reason: 'reciter $reciter');
+        final least = reciter == 4 ? 5500 : 6000;
+        expect(words.length, greaterThan(least), reason: 'reciter $reciter');
         for (var i = 1; i < words.length; i++) {
           expect(words[i].startMs, greaterThanOrEqualTo(words[i - 1].startMs));
         }
@@ -84,8 +90,16 @@ void main() {
       final third = w.firstWhere((r) => r.ayah == 7 && r.word == 3);
       expect(wordAt(w, third.startMs + 1), (7, 3));
       expect(wordAt(w, 0), isNull);
+      // Every al-Banna word lies inside its verse.
+      final verses = await repo.timings(4, 2);
+      final banna = await repo.wordTimings(4, 2);
+      for (final r in banna) {
+        final v = verses.firstWhere((t) => t.ayah == r.ayah);
+        expect(r.startMs, greaterThanOrEqualTo(v.startMs));
+        expect(r.endMs, lessThanOrEqualTo(v.endMs));
+      }
       // No word timing where the recitation has none.
-      expect(await repo.wordTimings(4, 2), isEmpty);
+      expect(await repo.wordTimings(5, 2), isEmpty);
     },
   );
 
