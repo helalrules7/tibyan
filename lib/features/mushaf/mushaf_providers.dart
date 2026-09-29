@@ -11,6 +11,7 @@ import '../../core/settings/settings_controller.dart';
 import '../../core/db/user_database.dart';
 import 'data/mushaf_repository.dart';
 import 'data/page_pack.dart';
+import 'presentation/widgets/illuminated_frame.dart';
 
 /// Overridden in `main()` once the bundled database is copied and opened.
 final contentDatabaseProvider = Provider<ContentDatabase>(
@@ -146,3 +147,38 @@ final basmalaProvider = FutureProvider<String>(
   (ref) async =>
       (await ref.watch(mushafRepositoryProvider).ayah(1, 1)).displayBody,
 );
+
+/// Juz, hizb, surah and catchword for the frame around a page.
+final frameInfoProvider = FutureProvider.family<FrameInfo?, int>((
+  ref,
+  page,
+) async {
+  final edition = ref.watch(editionProvider);
+  final repo = ref.watch(mushafRepositoryProvider);
+  final ayahs = await repo.ayahsOnPage(page, edition);
+  if (ayahs.isEmpty) return null;
+  final surahs = await ref.watch(surahsProvider.future);
+  final first = ayahs.first;
+  String? catchword;
+  if (page < 604) {
+    final next = (await repo.ayahsOnPage(page + 1, edition)).firstOrNull;
+    if (next != null) {
+      if (next.number == 1 && next.surah != 1 && next.surah != 9) {
+        // A new surah starts: its basmala comes first.
+        final basmala = await ref.watch(basmalaProvider.future);
+        catchword = basmala.split(' ').take(2).join(' ');
+      } else {
+        catchword = next.displayBody
+            .split(' ')
+            .firstWhere((w) => w != '۞', orElse: () => '');
+      }
+    }
+  }
+  return FrameInfo(
+    page: page,
+    juz: first.juz,
+    hizb: (first.hizbQuarter - 1) ~/ 4 + 1,
+    surahName: surahs[first.surah - 1].nameAr,
+    catchword: catchword,
+  );
+});

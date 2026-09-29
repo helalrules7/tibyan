@@ -12,6 +12,7 @@ import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'widgets/fasil_sheet.dart';
+import 'widgets/illuminated_frame.dart';
 import 'widgets/mushaf_page.dart';
 import 'widgets/old_mushaf_page.dart';
 
@@ -110,6 +111,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
         ? ''
         : l.surahWord(surahName(context, surahs[first.surah - 1]));
     final oldEdition = ref.watch(editionProvider) == MushafEdition.madina1405;
+    final illuminated =
+        ref
+            .watch(themeRegistryProvider)
+            .byId(ref.watch(settingsProvider).styleId)
+            .frame
+            .outerStyle ==
+        'illuminated';
 
     return Scaffold(
       backgroundColor: t.paper,
@@ -178,24 +186,38 @@ class _MushafScreenState extends ConsumerState<MushafScreen> {
                               _chrome = !_chrome;
                             }
                           });
+                          final pageWidget = oldEdition
+                              ? OldMushafPage(
+                                  page: i + 1,
+                                  selected: selected,
+                                  onVerseTap: onVerseTap,
+                                  onBackgroundTap: onBackgroundTap,
+                                )
+                              : MushafPage(
+                                  page: i + 1,
+                                  selected: selected,
+                                  onVerseTap: onVerseTap,
+                                  onBackgroundTap: onBackgroundTap,
+                                );
+                          if (illuminated) {
+                            void openIndex() => context.push('/mushaf/index');
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
+                              child: IlluminatedFrame(
+                                info: ref.watch(frameInfoProvider(i + 1)).value,
+                                onJuzTap: openIndex,
+                                onHizbTap: openIndex,
+                                onSurahTap: openIndex,
+                                child: pageWidget,
+                              ),
+                            );
+                          }
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
                             ),
-                            child: oldEdition
-                                ? OldMushafPage(
-                                    page: i + 1,
-                                    selected: selected,
-                                    onVerseTap: onVerseTap,
-                                    onBackgroundTap: onBackgroundTap,
-                                  )
-                                : MushafPage(
-                                    page: i + 1,
-                                    selected: selected,
-                                    onVerseTap: onVerseTap,
-                                    onBackgroundTap: onBackgroundTap,
-                                  ),
+                            child: pageWidget,
                           );
                         },
                       ),

@@ -373,4 +373,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loadingLabel => 'جارٍ التحميل…';
+
+  @override
+  String hizbLabel(String number) {
+    return 'الحزب $number';
+  }
+
+  @override
+  String catchwordLabel(String word) {
+    return 'الكلمة الأولى في الصفحة التالية: $word';
+  }
 }
