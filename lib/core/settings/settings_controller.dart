@@ -46,10 +46,11 @@ class SettingsController extends Notifier<AppSettings> {
     final registry = ref.read(themeRegistryProvider);
     final storedStyle = _prefs.getString(_kStyle);
     final styleIds = registry.styles.map((s) => s.id).toSet();
+    final styleId = storedStyle != null && styleIds.contains(storedStyle)
+        ? storedStyle
+        : registry.defaultStyleId;
     return AppSettings(
-      styleId: storedStyle != null && styleIds.contains(storedStyle)
-          ? storedStyle
-          : registry.defaultStyleId,
+      styleId: styleId,
       mode:
           _enumByName(ModeSetting.values, _prefs.getString(_kMode)) ??
           ModeSetting.light,
@@ -68,7 +69,7 @@ class SettingsController extends Notifier<AppSettings> {
       keepScreenOn: _prefs.getBool(_kKeepOn) ?? true,
       markerStyle:
           _enumByName(MarkerStyle.values, _prefs.getString(_kMarkerStyle)) ??
-          MarkerStyle.rosette16,
+          _defaultMarker(styleId),
       markerTint: _prefs.getInt(_kMarkerTint),
       highlightDivineNames: _prefs.getBool(_kDivine) ?? true,
       tafsirFont:
@@ -87,8 +88,20 @@ class SettingsController extends Notifier<AppSettings> {
     );
   }
 
+  /// Until the reader picks a marker shape, a heritage theme draws its own
+  /// marker and Zakhrafa its 16-point rosette.
+  MarkerStyle _defaultMarker(String styleId) =>
+      ref.read(themeRegistryProvider).byId(styleId).art != null
+      ? MarkerStyle.theme
+      : MarkerStyle.rosette16;
+
   Future<void> setStyle(String styleId) async {
-    state = state.copyWith(styleId: styleId);
+    state = state.copyWith(
+      styleId: styleId,
+      markerStyle: _prefs.containsKey(_kMarkerStyle)
+          ? null
+          : _defaultMarker(styleId),
+    );
     await _prefs.setString(_kStyle, styleId);
   }
 

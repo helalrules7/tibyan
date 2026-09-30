@@ -18,6 +18,7 @@ import '../../word_study/word_study_sheet.dart';
 import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
+import 'widgets/art_frame.dart';
 import 'widgets/fasil_sheet.dart';
 import 'widgets/go_to_page.dart';
 import 'widgets/illuminated_frame.dart';
@@ -214,13 +215,22 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       }
     });
     final markerImages = ref.watch(markerImagesProvider).value;
+    // «Follows the theme»: the theme's own marker, or Zakhrafa's rosette.
+    final themeArt = settings.markerStyle == MarkerStyle.theme
+        ? watchThemeArt(context, ref)
+        : null;
+    final markerStyle = settings.markerStyle != MarkerStyle.theme
+        ? settings.markerStyle
+        : context.tokens.style.art != null
+        ? MarkerStyle.theme
+        : MarkerStyle.rosette16;
     final markerLook =
-        settings.markerStyle == MarkerStyle.traditional &&
-            settings.markerTint == null
+        markerStyle == MarkerStyle.traditional && settings.markerTint == null
         ? null
         : MarkerLook(
-            style: settings.markerStyle,
-            image: markerImages?[settings.markerStyle],
+            style: markerStyle,
+            image: markerImages?[markerStyle],
+            art: themeArt?.marker,
             tint: settings.markerTint == null
                 ? null
                 : Color(settings.markerTint!),

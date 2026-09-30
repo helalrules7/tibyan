@@ -76,6 +76,36 @@ class AboutMushafScreen extends ConsumerWidget {
                 },
               ),
             ),
+          for (final s in bundledSources)
+            Card(
+              child: Builder(
+                builder: (context) {
+                  final named = sourceText(
+                    s.key,
+                    Localizations.localeOf(context).languageCode,
+                  )!;
+                  return ExpansionTile(
+                    title: Text(named.title),
+                    subtitle: Text(
+                      named.publisher,
+                      style: TextStyle(color: t.muted),
+                    ),
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    children: [
+                      Text(l.versionShort(s.version.substring(0, 7))),
+                      Text(l.licenseLabel(named.license)),
+                      SelectableText(
+                        s.url,
+                        style: TextStyle(color: t.goldText),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(named.credit, style: TextStyle(color: t.muted)),
+                    ],
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );

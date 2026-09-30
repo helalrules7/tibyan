@@ -1,6 +1,14 @@
 {
   "default": "zakhrafa",
   "styles": [
-    "zakhrafa"
+    "zakhrafa",
+    "seljuk",
+    "umayyad",
+    "timurid",
+    "hijazi",
+    "fatimid",
+    "andalusi",
+    "mamluk",
+    "abbasid"
   ]
 }

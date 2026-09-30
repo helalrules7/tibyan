@@ -866,6 +866,24 @@ abstract class AppLocalizations {
   /// **'وردة'**
   String get markerRosette;
 
+  /// No description provided for @markerTheme.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسب الثيم'**
+  String get markerTheme;
+
+  /// No description provided for @markerThemeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «زخرفة» وردتها.'**
+  String get markerThemeHint;
+
+  /// No description provided for @themeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الثيم'**
+  String get themeLabel;
+
   /// No description provided for @markerTintLabel.
   ///
   /// In ar, this message translates to:

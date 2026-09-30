@@ -454,6 +454,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markerRosette => 'Rosette';
 
   @override
+  String get markerTheme => 'Follows the theme';
+
+  @override
+  String get markerThemeHint =>
+      '“Follows the theme” draws the theme\'s own marker; in Zakhrafa, its rosette.';
+
+  @override
+  String get themeLabel => 'Theme';
+
+  @override
   String get markerTintLabel => 'Marker colour';
 
   @override

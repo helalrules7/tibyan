@@ -5,6 +5,9 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../mushaf/presentation/widgets/art_frame.dart';
+import '../mushaf/presentation/widgets/theme_art.dart';
+import 'theme_picker.dart';
 
 class AppearanceScreen extends ConsumerWidget {
   const AppearanceScreen({super.key});
@@ -15,12 +18,31 @@ class AppearanceScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
     final t = context.tokens.colors;
+    final lang = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.appearanceTitle)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          _Title(l.themeLabel),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const ThemePicker(),
+                  const SizedBox(height: 10),
+                  Text(
+                    context.tokens.style.localizedDescription(lang),
+                    style: TextStyle(color: t.muted, height: 1.5),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           _Title(l.markerStyleLabel),
           const Card(child: _MarkerSettings()),
           const SizedBox(height: 20),
@@ -135,6 +157,7 @@ class _MarkerSettings extends ConsumerWidget {
     final t = context.tokens.colors;
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
+    final art = watchThemeArt(context, ref);
     Widget choice({
       required bool selected,
       required String label,
@@ -177,11 +200,28 @@ class _MarkerSettings extends ConsumerWidget {
               for (final style in MarkerStyle.values)
                 choice(
                   selected: settings.markerStyle == style,
-                  label: style == MarkerStyle.traditional
-                      ? l.markerTraditional
-                      : l.markerRosette,
+                  label: switch (style) {
+                    MarkerStyle.theme => l.markerTheme,
+                    MarkerStyle.traditional => l.markerTraditional,
+                    _ => l.markerRosette,
+                  },
                   onTap: () => controller.setMarkerStyle(style),
-                  child: style == MarkerStyle.traditional
+                  child: style == MarkerStyle.theme
+                      // The theme's own marker; Zakhrafa's is its rosette.
+                      ? art == null
+                            ? Image.asset(
+                                _images[MarkerStyle.rosette16]!,
+                                width: 40,
+                                height: 40,
+                              )
+                            : SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: CustomPaint(
+                                  painter: ArtPicturePainter(art.marker),
+                                ),
+                              )
+                      : style == MarkerStyle.traditional
                       ? Text(
                           '\u06DD',
                           style: TextStyle(
@@ -193,6 +233,11 @@ class _MarkerSettings extends ConsumerWidget {
                       : Image.asset(_images[style]!, width: 40, height: 40),
                 ),
             ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l.markerThemeHint,
+            style: TextStyle(color: t.muted, fontSize: 12.5),
           ),
           const SizedBox(height: 16),
           Text(l.markerTintLabel),

@@ -12,6 +12,7 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `verify_shamarly.py` | Checks that geometry against the images, `shamerly.db` and the first-word index; `--preview PAGES` draws overlays |
 | `fetch_gharib.py` | Downloads «الميسر في غريب القرآن» from Nuqayah's reader (read.tafsir.one), page by page, into `.cache/nuqayah_almuyassar_gharib.json` |
 | `build_word_study.py` | Roots and lemmas (Quranic Arabic Corpus 0.4) and the book's entries, mapped to our word numbers for `content.db` (`word_root`, `gharib`); prints the coverage |
+| `build_themes.py` | Copies the eight heritage themes' frame, header and marker SVGs unchanged from a quran-assets checkout into `assets/themes/`, and writes each theme's JSON (interface colours checked against the contrast rules, art class colours per mode) |
 | `verify_text/compare_tanzil_kfgqpc.py` | Lists verses whose base letters differ between Tanzil and the KFGQPC text. Every listed verse goes to a human reviewer |
 
 Rules:

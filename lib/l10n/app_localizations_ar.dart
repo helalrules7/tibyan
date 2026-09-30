@@ -453,6 +453,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get markerRosette => 'وردة';
 
   @override
+  String get markerTheme => 'حسب الثيم';
+
+  @override
+  String get markerThemeHint =>
+      '«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «زخرفة» وردتها.';
+
+  @override
+  String get themeLabel => 'الثيم';
+
+  @override
   String get markerTintLabel => 'لون الفواصل';
 
   @override

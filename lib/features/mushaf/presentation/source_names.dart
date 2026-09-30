@@ -102,6 +102,12 @@ const _ar = <String, SourceText>{
     license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
     credit: 'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
   ),
+  'quran-assets': (
+    title: 'إطارات الثيمات وترويساتها وفواصلها (quran-assets)',
+    publisher: 'مشروع quran-assets (Quran.ws)؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
+    license: 'المنقول من المصاحف: المشاع الإبداعي غير التجاري 4.0 (CC BY-NC-SA 4.0)، مبدئي ولم يُحصل على إذن الناشرين بعد؛ فواصل الخطوط: رخصة الخطوط المفتوحة (OFL 1.1)',
+    credit: 'زخارف الثيمات: quran-assets (github.com/quran-ws/quran-assets)، عن مصاحف مجمع الملك فهد وغيره، وخطوط Noto وScheherazade New وKufam وMirza',
+  ),
 };
 
 const _en = <String, SourceText>{
@@ -196,7 +202,23 @@ const _en = <String, SourceText>{
     license: 'Written permission from Nuqayah: no ads and no profit',
     credit: 'Al-Muyassar fi Gharib al-Quran: from Nuqayah\'s read.tafsir.one, by permission',
   ),
+  'quran-assets': (
+    title: 'Theme frames, surah headers and verse markers (quran-assets)',
+    publisher: 'quran-assets (Quran.ws); frames and headers traced from printed mushafs, designs by the King Fahd Complex and other publishers; some markers from open fonts',
+    license: 'Traced from mushafs: CC BY-NC-SA 4.0, provisional, publishers\' permission not yet obtained; font markers: SIL Open Font License 1.1',
+    credit: 'Theme ornaments: quran-assets (github.com/quran-ws/quran-assets), from mushafs of the King Fahd Complex and others, and the Noto, Scheherazade New, Kufam and Mirza fonts',
+  ),
 };
+
+/// Sources that are not in content.db (bundled with the app), listed after
+/// the database's own: key, link and version.
+const bundledSources = [
+  (
+    key: 'quran-assets',
+    url: 'https://github.com/quran-ws/quran-assets',
+    version: 'd4cae845c9aae1fbe56ee69d04bc7d8964419373',
+  ),
+];
 
 /// The interface text of a source, or null for one not listed here (it is
 /// then shown as stored).

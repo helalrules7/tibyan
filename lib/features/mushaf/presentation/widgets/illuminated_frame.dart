@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'art_frame.dart';
 
 /// Ornament images for the Zakhrafa frame (built by tools/build_ornaments.py).
 class FrameImages {
@@ -189,6 +190,22 @@ class IlluminatedFrame extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // A heritage theme draws its own frame from its art.
+    if (context.tokens.style.art != null) {
+      return ArtPageFrame(
+        art: watchThemeArt(context, ref),
+        info: info,
+        onJuzTap: onJuzTap,
+        onHizbTap: onHizbTap,
+        onSurahTap: onSurahTap,
+        onPageTap: onPageTap,
+        onQuarterTap: onQuarterTap,
+        tools: tools,
+        linePadding: linePadding,
+        showCatchword: showCatchword,
+        child: child,
+      );
+    }
     final images = ref.watch(frameImagesProvider).value;
     final overlays = LayoutBuilder(
       builder: (context, box) {
@@ -273,17 +290,17 @@ class IlluminatedFrame extends ConsumerWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _Tap(
+                            FrameTap(
                               label: l.juzLabel(digits(info!.juz)),
                               onTap: onJuzTap,
                             ),
-                            _Star(color: t.marker),
-                            _Tap(
+                            FrameStar(color: t.marker),
+                            FrameTap(
                               label: l.hizbLabel(digits(info!.hizb)),
                               onTap: onHizbTap,
                             ),
-                            _Star(color: t.marker),
-                            _Tap(
+                            FrameStar(color: t.marker),
+                            FrameTap(
                               label: info!.surahName,
                               bold: true,
                               onTap: onSurahTap,
@@ -305,7 +322,7 @@ class IlluminatedFrame extends ConsumerWidget {
                       height: 30,
                       fill: cartoucheFill,
                       rosette: images?.margin,
-                      child: _Tap(
+                      child: FrameTap(
                         label: digits(info!.page),
                         bold: true,
                         semanticLabel: l.pageOf('${info!.page}'),
@@ -331,7 +348,7 @@ class IlluminatedFrame extends ConsumerWidget {
                     // Start side (right in Arabic): the quarter that begins on
                     // this page, so the reader notices it.
                     if (info != null && info!.quarters.isNotEmpty)
-                      _QuarterLabel(
+                      QuarterLabel(
                         text: quarterName(
                           l,
                           digits,
@@ -377,8 +394,8 @@ class NumberFormatter {
       : '$n';
 }
 
-class _Star extends StatelessWidget {
-  const _Star({required this.color});
+class FrameStar extends StatelessWidget {
+  const FrameStar({super.key, required this.color});
 
   final Color color;
 
@@ -391,8 +408,10 @@ class _Star extends StatelessWidget {
   );
 }
 
-class _Tap extends StatelessWidget {
-  const _Tap({
+/// A label on the frame that opens something when tapped.
+class FrameTap extends StatelessWidget {
+  const FrameTap({
+    super.key,
     required this.label,
     this.onTap,
     this.bold = false,
@@ -634,7 +653,7 @@ class _FramePainter extends CustomPainter {
 
 /// A surah header over the page: the mosaic band, a cartouche with the
 /// surah's number, name and type, its verse count and place in revelation.
-class SurahBannerView extends StatelessWidget {
+class SurahBannerView extends ConsumerWidget {
   const SurahBannerView({
     super.key,
     required this.banner,
@@ -645,7 +664,11 @@ class SurahBannerView extends StatelessWidget {
   final FrameImages? images;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // A heritage theme writes the surah in its own header art.
+    if (context.tokens.style.art != null) {
+      return ArtSurahBanner(banner: banner, art: watchThemeArt(context, ref));
+    }
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
     final digits = NumberFormatter(Localizations.localeOf(context));
@@ -850,6 +873,19 @@ class OrnateFrame extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (context.tokens.style.art != null) {
+      return ArtOrnateFrame(
+        art: watchThemeArt(context, ref),
+        top: top,
+        bottom: bottom,
+        page: page,
+        onPageTap: onPageTap,
+        catchword: catchword,
+        catchwordSpace: catchwordSpace,
+        tools: tools,
+        child: child,
+      );
+    }
     final images = ref.watch(frameImagesProvider).value;
     final t = context.tokens.colors;
     final l = AppLocalizations.of(context);
@@ -866,7 +902,7 @@ class OrnateFrame extends ConsumerWidget {
           height: 30,
           fill: t.paper,
           rosette: images?.margin,
-          child: _Tap(
+          child: FrameTap(
             label: digits(page!),
             bold: true,
             semanticLabel: l.pageOf('$page'),
@@ -1006,8 +1042,8 @@ String quarterName(AppLocalizations l, NumberFormatter digits, int quarter) {
 /// The quarter's name in the catchword's font, size and colour. Its words
 /// use the Quran font; its number the mushaf's Naskh, because the Quran
 /// font draws digits as verse-end markers.
-class _QuarterLabel extends StatelessWidget {
-  const _QuarterLabel({required this.text, required this.color});
+class QuarterLabel extends StatelessWidget {
+  const QuarterLabel({super.key, required this.text, required this.color});
 
   final String text;
   final Color color;

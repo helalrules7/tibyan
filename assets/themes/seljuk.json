@@ -1,0 +1,221 @@
+{
+  "id": "seljuk",
+  "version": 1,
+  "name": {
+    "ar": "سلجوقي",
+    "en": "Seljuk"
+  },
+  "description": {
+    "ar": "إطار بني وفيروزي كزخارف السلاجقة، من مصحف الدوري",
+    "en": "A brown and turquoise frame in the Seljuk manner, from the Douri mushaf"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCAN"
+  },
+  "frame": {
+    "outerWidth": 20,
+    "outerStyle": "art",
+    "innerWidth": 0,
+    "gap": 0,
+    "radius": 0,
+    "innerRadius": 0,
+    "corner": "art"
+  },
+  "ornaments": {
+    "surahHeader": "art",
+    "ayahMarker": "theme",
+    "density": "rich"
+  },
+  "radii": {
+    "card": 14,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 0
+  },
+  "art": {
+    "source": {
+      "repo": "https://github.com/quran-ws/quran-assets",
+      "commit": "d4cae845c9aae1fbe56ee69d04bc7d8964419373",
+      "frame": {
+        "id": "page-frames/mushaf-douri",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "header": {
+        "id": "surah-headers/mushaf-douri",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "marker": {
+        "id": "ayah-markers/font-010-regular-bold",
+        "license": "OFL-1.1"
+      }
+    },
+    "frame": {
+      "corner": "seljuk_frame_corner.svg",
+      "edgeH": "seljuk_frame_edge_h.svg",
+      "edgeV": "seljuk_frame_edge_v.svg",
+      "band": 20
+    },
+    "header": "seljuk_header.svg",
+    "marker": "seljuk_marker.svg",
+    "modes": {
+      "light": {
+        "frame": {},
+        "header": {},
+        "marker": {
+          "c1": "#FFFCF6",
+          "c2": "#D9EEF7",
+          "c3": "#1DACEC",
+          "c4": "#5D3325"
+        }
+      },
+      "white": {
+        "frame": {
+          "c1": "#FFFFFF"
+        },
+        "header": {
+          "c1": "#FFFFFF"
+        },
+        "marker": {
+          "c1": "#FFFFFF",
+          "c2": "#D9EEF7",
+          "c3": "#1DACEC",
+          "c4": "#5D3325"
+        }
+      },
+      "night": {
+        "frame": {
+          "c1": "#2C221C",
+          "c2": "#174C6B",
+          "c3": "#584539",
+          "c4": "#21668A",
+          "c5": "#2A85AE",
+          "c6": "#B4816E",
+          "c7": "#BA8C7D",
+          "line": "#D7CAC1"
+        },
+        "header": {
+          "c1": "#2C221C",
+          "c2": "#144662",
+          "c3": "#1A5373",
+          "c4": "#584539",
+          "c5": "#27749B",
+          "c6": "#B4816E",
+          "c7": "#BA8C7C",
+          "line": "#D7CAC1"
+        },
+        "marker": {
+          "c1": "#1C1612",
+          "c2": "#193744",
+          "c3": "#2A85AE",
+          "c4": "#BA8C7D"
+        }
+      },
+      "black": {
+        "frame": {
+          "c1": "#1A1510",
+          "c2": "#123A50",
+          "c3": "#46382A",
+          "c4": "#1B526F",
+          "c5": "#247092",
+          "c6": "#A66C57",
+          "c7": "#AD7764",
+          "line": "#C9B8A6"
+        },
+        "header": {
+          "c1": "#1A1510",
+          "c2": "#0F3348",
+          "c3": "#144058",
+          "c4": "#46382A",
+          "c5": "#206080",
+          "c6": "#A66C57",
+          "c7": "#AC7664",
+          "line": "#C9B8A6"
+        },
+        "marker": {
+          "c1": "#0A0806",
+          "c2": "#10252E",
+          "c3": "#247092",
+          "c4": "#AD7764"
+        }
+      }
+    }
+  },
+  "modes": {
+    "light": {
+      "bg": "#F4EFE8",
+      "paper": "#FFFCF6",
+      "ink": "#2B1E18",
+      "frame": "#6E3C29",
+      "goldText": "#5D3325",
+      "border": "#DCD6CF",
+      "headBg": "#6E3C29",
+      "headFg": "#FFFFFF",
+      "marker": "#1A7FAE",
+      "player": "#6E3C29",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#6E3C29",
+      "muted": "#706660",
+      "highlight": "#1A7FAE33",
+      "control": "#6E3C29",
+      "onControl": "#FFFFFF"
+    },
+    "white": {
+      "bg": "#FFFFFF",
+      "paper": "#FFFFFF",
+      "ink": "#2B1E18",
+      "frame": "#6E3C29",
+      "goldText": "#5D3325",
+      "border": "#D8D5D1",
+      "headBg": "#6E3C29",
+      "headFg": "#FFFFFF",
+      "marker": "#1A7FAE",
+      "player": "#6E3C29",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#6E3C29",
+      "muted": "#786F6B",
+      "highlight": "#1A7FAE33",
+      "control": "#6E3C29",
+      "onControl": "#FFFFFF"
+    },
+    "night": {
+      "bg": "#15100D",
+      "paper": "#1C1612",
+      "ink": "#ECE3D6",
+      "frame": "#3A2419",
+      "goldText": "#7FCBEB",
+      "border": "#39332D",
+      "headBg": "#3A2419",
+      "headFg": "#ECE3D6",
+      "marker": "#3C9DCB",
+      "player": "#3A2419",
+      "playerFg": "#ECE3D6",
+      "accent": "#ECE3D6",
+      "accentFg": "#1C1612",
+      "muted": "#A1998F",
+      "highlight": "#3C9DCB40",
+      "control": "#7FCBEB",
+      "onControl": "#15100D"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#0A0806",
+      "ink": "#E6DDD0",
+      "frame": "#2A1A12",
+      "goldText": "#6FBFE3",
+      "border": "#292622",
+      "headBg": "#2A1A12",
+      "headFg": "#E6DDD0",
+      "marker": "#2F8DBA",
+      "player": "#2A1A12",
+      "playerFg": "#E6DDD0",
+      "accent": "#E6DDD0",
+      "accentFg": "#0A0806",
+      "muted": "#979087",
+      "highlight": "#2F8DBA40",
+      "control": "#6FBFE3",
+      "onControl": "#000000"
+    }
+  }
+}

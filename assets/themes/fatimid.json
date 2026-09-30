@@ -1,0 +1,223 @@
+{
+  "id": "fatimid",
+  "version": 1,
+  "name": {
+    "ar": "فاطمي",
+    "en": "Fatimid"
+  },
+  "description": {
+    "ar": "زمردي وذهبي رملي كزخارف القاهرة الفاطمية",
+    "en": "Emerald and sandy gold, like Fatimid Cairo"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCAN"
+  },
+  "frame": {
+    "outerWidth": 20,
+    "outerStyle": "art",
+    "innerWidth": 0,
+    "gap": 0,
+    "radius": 0,
+    "innerRadius": 0,
+    "corner": "art"
+  },
+  "ornaments": {
+    "surahHeader": "art",
+    "ayahMarker": "theme",
+    "density": "rich"
+  },
+  "radii": {
+    "card": 14,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 0
+  },
+  "art": {
+    "source": {
+      "repo": "https://github.com/quran-ws/quran-assets",
+      "commit": "d4cae845c9aae1fbe56ee69d04bc7d8964419373",
+      "frame": {
+        "id": "page-frames/mushaf-sousi",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "header": {
+        "id": "surah-headers/mushaf-sousi",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "marker": {
+        "id": "ayah-markers/font-007-regular",
+        "license": "OFL-1.1"
+      }
+    },
+    "frame": {
+      "corner": "fatimid_frame_corner.svg",
+      "edgeH": "fatimid_frame_edge_h.svg",
+      "edgeV": "fatimid_frame_edge_v.svg",
+      "band": 20
+    },
+    "header": "fatimid_header.svg",
+    "marker": "fatimid_marker.svg",
+    "modes": {
+      "light": {
+        "frame": {
+          "c2": "#E6CF9A",
+          "c3": "#C3CCC4",
+          "c4": "#0E5847",
+          "line": "#23302A"
+        },
+        "header": {
+          "c2": "#E6CF9A",
+          "c3": "#C3CCC4",
+          "c4": "#0E5847",
+          "line": "#23302A"
+        },
+        "marker": {
+          "c1": "#FEFCF5",
+          "c2": "#0E5847",
+          "c3": "#B08D4E"
+        }
+      },
+      "white": {
+        "frame": {
+          "c1": "#FFFFFF",
+          "c2": "#E6CF9A",
+          "c3": "#C3CCC4",
+          "c4": "#0E5847",
+          "line": "#23302A"
+        },
+        "header": {
+          "c1": "#FFFFFF",
+          "c2": "#E6CF9A",
+          "c3": "#C3CCC4",
+          "c4": "#0E5847",
+          "line": "#23302A"
+        },
+        "marker": {
+          "c1": "#FFFFFF",
+          "c2": "#0E5847",
+          "c3": "#B08D4E"
+        }
+      },
+      "night": {
+        "frame": {
+          "c1": "#192F28",
+          "c2": "#645127",
+          "c3": "#2D5549",
+          "c4": "#77D4BF",
+          "line": "#C7D1CC"
+        },
+        "header": {
+          "c1": "#192F28",
+          "c2": "#645127",
+          "c3": "#2D5549",
+          "c4": "#77D4BF",
+          "line": "#C7D1CC"
+        },
+        "marker": {
+          "c1": "#101E1A",
+          "c2": "#77D4BF",
+          "c3": "#8F7951"
+        }
+      },
+      "black": {
+        "frame": {
+          "c1": "#0D1D17",
+          "c2": "#4D3F1E",
+          "c3": "#1F4337",
+          "c4": "#5ACBB1",
+          "line": "#B1BEB8"
+        },
+        "header": {
+          "c1": "#0D1D17",
+          "c2": "#4D3F1E",
+          "c3": "#1F4337",
+          "c4": "#5ACBB1",
+          "line": "#B1BEB8"
+        },
+        "marker": {
+          "c1": "#050B09",
+          "c2": "#5ACBB1",
+          "c3": "#796644"
+        }
+      }
+    }
+  },
+  "modes": {
+    "light": {
+      "bg": "#EEF2EE",
+      "paper": "#FEFCF5",
+      "ink": "#15261F",
+      "frame": "#0E5847",
+      "goldText": "#0E5847",
+      "border": "#D4DAD5",
+      "headBg": "#0E5847",
+      "headFg": "#FFFFFF",
+      "marker": "#1B7A63",
+      "player": "#0E5847",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#0E5847",
+      "muted": "#606C65",
+      "highlight": "#1B7A6333",
+      "control": "#0E5847",
+      "onControl": "#FFFFFF"
+    },
+    "white": {
+      "bg": "#FFFFFF",
+      "paper": "#FFFFFF",
+      "ink": "#15261F",
+      "frame": "#0E5847",
+      "goldText": "#0E5847",
+      "border": "#D6D6D2",
+      "headBg": "#0E5847",
+      "headFg": "#FFFFFF",
+      "marker": "#1B7A63",
+      "player": "#0E5847",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#0E5847",
+      "muted": "#697470",
+      "highlight": "#1B7A6333",
+      "control": "#0E5847",
+      "onControl": "#FFFFFF"
+    },
+    "night": {
+      "bg": "#0A1411",
+      "paper": "#101E1A",
+      "ink": "#E6EEE9",
+      "frame": "#123F34",
+      "goldText": "#7FD1B8",
+      "border": "#2E3B37",
+      "headBg": "#123F34",
+      "headFg": "#E6EEE9",
+      "marker": "#3FA588",
+      "player": "#123F34",
+      "playerFg": "#E6EEE9",
+      "accent": "#E6EEE9",
+      "accentFg": "#101E1A",
+      "muted": "#99A39E",
+      "highlight": "#3FA58840",
+      "control": "#7FD1B8",
+      "onControl": "#0A1411"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#050B09",
+      "ink": "#E0E9E4",
+      "frame": "#0C2E26",
+      "goldText": "#72C4AB",
+      "border": "#242A28",
+      "headBg": "#0C2E26",
+      "headFg": "#E0E9E4",
+      "marker": "#2F9578",
+      "player": "#0C2E26",
+      "playerFg": "#E0E9E4",
+      "accent": "#E0E9E4",
+      "accentFg": "#050B09",
+      "muted": "#919995",
+      "highlight": "#2F957840",
+      "control": "#72C4AB",
+      "onControl": "#000000"
+    }
+  }
+}

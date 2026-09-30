@@ -9,6 +9,7 @@ import '../../../../core/settings/app_settings.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import 'mushaf_page.dart';
+import 'theme_art.dart';
 
 /// What the reader can do on a page; shared by both editions.
 class PageInteraction {
@@ -266,19 +267,24 @@ class MarkerLook {
     required this.tint,
     required this.paper,
     required this.ink,
+    this.art,
   });
 
+  /// The shape drawn: [MarkerStyle.theme] only with [art].
   final MarkerStyle style;
 
   /// The rosette for [style]; null for the traditional marker.
   final ui.Image? image;
+
+  /// The theme's marker, coloured for the mode (style [MarkerStyle.theme]).
+  final ArtPiece? art;
   final Color? tint;
   final Color paper;
   final Color ink;
 
   /// Under the page ink: a tint that shows inside the printed marker.
   void paintUnder(Canvas canvas, Offset c, double r) {
-    if (tint == null || image != null) return;
+    if (tint == null || image != null || art != null) return;
     canvas.drawCircle(
       c,
       r * 0.95,
@@ -296,6 +302,22 @@ class MarkerLook {
     int number, {
     Color? marked,
   }) {
+    final art = this.art;
+    if (art != null) {
+      // The printed marker goes under the paper (the new edition leaves it
+      // out; the page images have it), then the theme's marker with the
+      // number in its number box.
+      canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
+      paintArtMarker(
+        canvas,
+        art,
+        markerBox(c, r, art.size),
+        number: number,
+        digits: ink,
+        fill: marked ?? tint,
+      );
+      return;
+    }
     final img = image;
     if (img == null) return;
     canvas.drawCircle(c, r * 1.12, Paint()..color = paper);

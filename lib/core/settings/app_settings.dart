@@ -19,9 +19,11 @@ extension MushafEditionPages on MushafEdition {
   int get pageCount => this == MushafEdition.shamarly ? 522 : 604;
 }
 
-/// Shape of the verse-end markers in the page view: the mushaf's own
-/// (default) or one of three rosettes drawn over it.
-enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
+/// Shape of the verse-end markers in the page view: the theme's own marker
+/// (the default in the heritage themes; Zakhrafa's own is the 16-point
+/// rosette), the mushaf's printed marker, or one of three rosettes drawn
+/// over it.
+enum MarkerStyle { theme, traditional, rosette7, rosette9, rosette16 }
 
 /// Font of tafsir and translation texts.
 enum TafsirFont { naskh, interface }
