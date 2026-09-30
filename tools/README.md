@@ -10,6 +10,8 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `verify_word_timing.py` | Checks word timings against pauses heard in the audio, and verse boundaries against quiet points |
 | `build_shamarly.py` | Shamarly mushaf page geometry from its page images (lines, cuts, verse markers, verse and word boxes, headers) into `.cache/shamarly_geometry.db`; `shamarly_image.py` holds its image helpers |
 | `verify_shamarly.py` | Checks that geometry against the images, `shamerly.db` and the first-word index; `--preview PAGES` draws overlays |
+| `fetch_gharib.py` | Downloads «الميسر في غريب القرآن» from Nuqayah's reader (read.tafsir.one), page by page, into `.cache/nuqayah_almuyassar_gharib.json` |
+| `build_word_study.py` | Roots and lemmas (Quranic Arabic Corpus 0.4) and the book's entries, mapped to our word numbers for `content.db` (`word_root`, `gharib`); prints the coverage |
 | `verify_text/compare_tanzil_kfgqpc.py` | Lists verses whose base letters differ between Tanzil and the KFGQPC text. Every listed verse goes to a human reviewer |
 
 Rules:

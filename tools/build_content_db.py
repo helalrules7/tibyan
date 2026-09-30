@@ -21,6 +21,10 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
   tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
                                           lines, verse, marker and word boxes; no text
+  tools/.cache/quranic-corpus-morphology-0.4.txt  Quranic Arabic Corpus 0.4 (roots, lemmas;
+                                          build_word_study.py)
+  tools/.cache/nuqayah_almuyassar_gharib.json  al-Muyassar fi Gharib al-Quran, Nuqayah
+                                          (fetch_gharib.py, build_word_study.py)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -39,12 +43,13 @@ from pathlib import Path
 
 import build_line_cuts
 import build_word_boxes
+import build_word_study
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 12
 SHAMARLY = CACHE / 'shamarly_geometry.db'
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
@@ -343,6 +348,18 @@ def main():
       x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
       level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed
       PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
+    CREATE TABLE word_root (                -- Quranic Arabic Corpus 0.4; word as in word_box
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,
+      root TEXT,                            -- Arabic letters with spaces («ر ح م»); NULL if none
+      lemma TEXT,                           -- Arabic, from the corpus transliteration
+      pos TEXT NOT NULL,                    -- corpus part-of-speech tag (N, V, PN, ADJ...)
+      PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
+    CREATE TABLE gharib (                   -- «الميسر في غريب القرآن», verbatim, in the book's order
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL, ord INTEGER NOT NULL,
+      word_from INTEGER, word_to INTEGER,   -- words explained (as in word_box); NULL: the verse only
+      phrase TEXT NOT NULL,                 -- the words as the book quotes them between ﴿ ﴾
+      text TEXT NOT NULL,                   -- the book's explanation
+      PRIMARY KEY (surah, ayah, ord)) WITHOUT ROWID;
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -463,6 +480,30 @@ def main():
         'FROM word_box w JOIN ayah a ON a.surah = w.surah AND a.ayah = w.ayah '
         'WHERE a.words_matched >= 1 ORDER BY w.surah, w.ayah, w.word'))
     shamarly.close()
+    corpus_path = build_word_study.CORPUS
+    gharib_path = build_word_study.GHARIB
+    corpus_lines = corpus_path.read_text(encoding='utf-8').splitlines()
+    corpus_notice = '\n'.join(corpus_lines[:corpus_lines.index('')]).strip()
+    assert 'Quranic Arabic Corpus (morphology, version 0.4)' in corpus_notice
+    db.executemany('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', [
+        (14, 'quranic-corpus', 'Quranic Arabic Corpus: morphology (roots and lemmas)',
+         'Kais Dukes (Quranic Arabic Corpus, University of Leeds)', '0.4',
+         'GNU GPL; verbatim copies only; credit the corpus and link to corpus.quran.com',
+         'https://corpus.quran.com',
+         'الجذور والصرف: المدونة القرآنية Quranic Arabic Corpus (corpus.quran.com)',
+         corpus_notice, sha256(corpus_path), today),
+        (15, 'nuqayah-almuyassar-gharib', 'الميسر في غريب القرآن',
+         'Nuqayah (read.tafsir.one), by written permission', None,
+         'Written permission from Nuqayah: no ads and no profit',
+         'https://read.tafsir.one/almuyassar-g',
+         'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
+         None, sha256(gharib_path), today),
+    ])
+    word_roots, skipped, gharib, odd = build_word_study.build()
+    build_word_study.report(word_roots, skipped, gharib, odd)
+    assert not odd, odd
+    db.executemany('INSERT INTO word_root VALUES (?,?,?,?,?,?)', word_roots)
+    db.executemany('INSERT INTO gharib VALUES (?,?,?,?,?,?,?)', gharib)
     db.executemany('INSERT INTO commentary_edition VALUES (?,?,?,?,?,?,?)', [
         (7, 'tafsir', 'ar', 'rtl', 'التفسير الميسر', 'Al-Tafsir al-Muyassar', 1),
         (8, 'translation', 'en', 'ltr', 'الترجمة الإنجليزية: صحيح إنترناشونال', 'Saheeh International', 2),
@@ -542,6 +583,7 @@ def main():
     db.execute('CREATE INDEX shamarly_verse_box_page ON shamarly_verse_box(page)')
     db.execute('CREATE INDEX shamarly_word_box_page ON shamarly_word_box(page)')
     db.execute('CREATE INDEX shamarly_marker_page ON shamarly_marker(page)')
+    db.execute('CREATE INDEX word_root_root ON word_root(root)')
     db.commit()
     db.execute('VACUUM')
     db.close()
@@ -563,6 +605,14 @@ def main():
     ends = [r[0] for r in check.execute('SELECT page_shamarly_end FROM ayah ORDER BY id')]
     assert ends == sorted(ends)
     assert check.execute('SELECT COUNT(*) FROM shamarly_marker').fetchone()[0] == 6236
+    # Word study: the corpus maps every verse but 7; 20 more are only
+    # disjoined letters (الٓمٓ...), which have no root or lemma. al-Rahman is ر ح م.
+    assert len(skipped) == 7, skipped
+    assert check.execute('SELECT COUNT(DISTINCT surah * 1000 + ayah) FROM word_root').fetchone()[0] == 6209
+    assert check.execute('SELECT root FROM word_root WHERE surah = 1 AND ayah = 1 AND word = 3'
+                         ).fetchone()[0] == 'ر ح م'
+    assert check.execute('SELECT COUNT(*) FROM word_root w LEFT JOIN word_box b USING (surah, ayah, word) '
+                         'WHERE b.page IS NULL').fetchone()[0] == 0
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0

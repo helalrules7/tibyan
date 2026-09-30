@@ -474,6 +474,59 @@ class AyahSpeech extends Table {
   bool get withoutRowId => true;
 }
 
+/// A word's root, lemma and part of speech from the Quranic Arabic Corpus
+/// 0.4 (tools/build_word_study.py). Words are numbered as in [WordBox];
+/// verses whose word count differs from the corpus have no rows.
+@DataClassName('WordRootRow')
+class WordRoot extends Table {
+  @override
+  String get tableName => 'word_root';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+  IntColumn get word => integer()();
+
+  /// Arabic letters separated by spaces, as the corpus shows them
+  /// («ر ح م»); null for words without a root.
+  TextColumn get root => text().nullable()();
+  TextColumn get lemma => text().nullable()();
+
+  /// The corpus's part-of-speech tag (N, V, PN, ADJ, ...).
+  TextColumn get pos => text()();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah, word};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+/// An entry of «الميسر في غريب القرآن», verbatim: the words the book
+/// quotes and its explanation. [wordFrom]..[wordTo] are the words it
+/// explains when that is certain; null when the entry belongs to the verse
+/// only (its words occur more than once, or were not found).
+@DataClassName('GharibRow')
+class Gharib extends Table {
+  @override
+  String get tableName => 'gharib';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+
+  /// Order of the entry within its verse, as in the book.
+  IntColumn get ord => integer()();
+  IntColumn get wordFrom => integer().nullable()();
+  IntColumn get wordTo => integer().nullable()();
+  TextColumn get phrase => text()();
+  TextColumn get body => text().named('text')();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah, ord};
+
+  @override
+  bool get withoutRowId => true;
+}
+
 @DriftDatabase(
   tables: [
     Surah,
@@ -497,6 +550,8 @@ class AyahSpeech extends Table {
     ShamarlyMarker,
     ShamarlyVerseBox,
     ShamarlyWordBox,
+    WordRoot,
+    Gharib,
   ],
 )
 class ContentDatabase extends _$ContentDatabase {
@@ -504,7 +559,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

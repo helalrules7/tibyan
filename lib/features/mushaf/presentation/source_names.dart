@@ -90,6 +90,18 @@ const _ar = <String, SourceText>{
     license: 'مجاني، يجوز نسخه وتداوله على أن يعامل بكل احترام، ولا يجوز استخدامه في الأغراض التجارية (نص الغلاف)',
     credit: 'صفحات مصحف الشمرلي: أرشيف الإنترنت (archive.org)',
   ),
+  'quranic-corpus': (
+    title: 'المدونة القرآنية: الجذور والصرف',
+    publisher: 'كايس دوكس (المدونة القرآنية Quranic Arabic Corpus، جامعة ليدز)',
+    license: 'رخصة جنو العمومية (GPL)، بشرط نقل الملف حرفيا دون تعديل',
+    credit: 'الجذور والصرف: المدونة القرآنية Quranic Arabic Corpus (corpus.quran.com)',
+  ),
+  'nuqayah-almuyassar-gharib': (
+    title: 'الميسر في غريب القرآن',
+    publisher: 'نقاية (التفسير التفاعلي read.tafsir.one)، بإذن مكتوب',
+    license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
+    credit: 'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
+  ),
 };
 
 const _en = <String, SourceText>{
@@ -171,6 +183,18 @@ const _en = <String, SourceText>{
     publisher: 'Calligraphy by Mohamed Saad Ibrahim (Haddad); images from the Internet Archive',
     license: 'Free; may be copied and circulated if treated with respect, not for commercial use (cover text)',
     credit: 'Shamarly mushaf pages: Internet Archive (archive.org)',
+  ),
+  'quranic-corpus': (
+    title: 'Quranic Arabic Corpus: roots and morphology',
+    publisher: 'Kais Dukes (Quranic Arabic Corpus, University of Leeds)',
+    license: 'GNU GPL; verbatim copies only',
+    credit: 'Roots and morphology: Quranic Arabic Corpus (corpus.quran.com)',
+  ),
+  'nuqayah-almuyassar-gharib': (
+    title: 'Al-Muyassar fi Gharib al-Quran',
+    publisher: 'Nuqayah (read.tafsir.one), by written permission',
+    license: 'Written permission from Nuqayah: no ads and no profit',
+    credit: 'Al-Muyassar fi Gharib al-Quran: from Nuqayah\'s read.tafsir.one, by permission',
   ),
 };
 
