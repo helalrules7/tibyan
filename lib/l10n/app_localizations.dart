@@ -875,7 +875,7 @@ abstract class AppLocalizations {
   /// No description provided for @markerThemeHint.
   ///
   /// In ar, this message translates to:
-  /// **'«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «زخرفة» وردتها.'**
+  /// **'«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «تبيان» وردتها.'**
   String get markerThemeHint;
 
   /// No description provided for @themeLabel.
@@ -1591,6 +1591,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'اكتمل {done} من {total}'**
   String downloadAllCount(String done, String total);
+
+  /// No description provided for @themeArtCredit.
+  ///
+  /// In ar, this message translates to:
+  /// **'الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.'**
+  String get themeArtCredit;
 }
 
 class _AppLocalizationsDelegate

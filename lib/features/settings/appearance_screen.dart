@@ -38,6 +38,19 @@ class AppearanceScreen extends ConsumerWidget {
                     context.tokens.style.localizedDescription(lang),
                     style: TextStyle(color: t.muted, height: 1.5),
                   ),
+                  // Whose ornaments these are, for the themes drawn from
+                  // quran-assets.
+                  if (context.tokens.style.art != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l.themeArtCredit,
+                      style: TextStyle(
+                        color: t.muted,
+                        fontSize: 12,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

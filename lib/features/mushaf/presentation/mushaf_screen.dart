@@ -280,10 +280,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         onHandleDrag: (start, v) =>
             setState(() => start ? _selA = v : _selB = v),
         markerLook: markerLook,
-        hidden: _recite && pg == _page ? _hiddenOn(pg) : null,
-        hiddenWords: _recite && pg == _page
-            ? _wordsOf(_hiddenOn(pg), pg)
-            : const {},
+        // Recitation mode covers the page being drawn, whatever the page
+        // count says: after an edition change the two can differ for a
+        // moment (turning the page ends the mode anyway).
+        hidden: _recite ? _hiddenOn(pg) : null,
+        hiddenWords: _recite ? _wordsOf(_hiddenOn(pg), pg) : const {},
         // A tap shows a covered verse, or covers it again.
         onHiddenTap: (v) => setState(
           () => _revealed.contains(v) ? _revealed.remove(v) : _revealed.add(v),
@@ -723,14 +724,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       );
   }
 
-  List<VerseKey> _pageKeys() => [
+  /// The verses of [page]; watched, so the page rebuilds when they arrive.
+  List<VerseKey> _pageKeys(int page) => [
     for (final a
-        in ref.read(pageAyahsProvider(_page)).value ?? const <AyahRow>[])
+        in ref.watch(pageAyahsProvider(page)).value ?? const <AyahRow>[])
       (surah: a.surah, ayah: a.number),
   ];
 
   Set<VerseKey> _hiddenOn(int page) => {
-    for (final k in _pageKeys())
+    for (final k in _pageKeys(page))
       if (!_revealed.contains(k)) k,
   };
 

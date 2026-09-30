@@ -196,7 +196,7 @@
   "markerTraditional": "Traditional marker",
   "markerRosette": "Rosette",
   "markerTheme": "Follows the theme",
-  "markerThemeHint": "“Follows the theme” draws the theme's own marker; in Zakhrafa, its rosette.",
+  "markerThemeHint": "“Follows the theme” draws the theme's own marker; in Tibyan, its rosette.",
   "themeLabel": "Theme",
   "markerTintLabel": "Marker colour",
   "markerTintNone": "No colour",
@@ -511,5 +511,6 @@
       "done": { "type": "String" },
       "total": { "type": "String" }
     }
-  }
+  },
+  "themeArtCredit": "Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers."
 }

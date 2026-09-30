@@ -330,7 +330,7 @@
   "markerTraditional": "الفاصل التقليدي",
   "markerRosette": "وردة",
   "markerTheme": "حسب الثيم",
-  "markerThemeHint": "«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «زخرفة» وردتها.",
+  "markerThemeHint": "«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «تبيان» وردتها.",
   "themeLabel": "الثيم",
   "markerTintLabel": "لون الفواصل",
   "markerTintNone": "بلا لون",
@@ -665,5 +665,6 @@
       "done": { "type": "String" },
       "total": { "type": "String" }
     }
-  }
+  },
+  "themeArtCredit": "الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين."
 }

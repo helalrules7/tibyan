@@ -457,7 +457,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get markerThemeHint =>
-      '«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «زخرفة» وردتها.';
+      '«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «تبيان» وردتها.';
 
   @override
   String get themeLabel => 'الثيم';
@@ -874,4 +874,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String downloadAllCount(String done, String total) {
     return 'اكتمل $done من $total';
   }
+
+  @override
+  String get themeArtCredit =>
+      'الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.';
 }

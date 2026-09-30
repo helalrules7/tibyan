@@ -458,7 +458,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get markerThemeHint =>
-      '“Follows the theme” draws the theme\'s own marker; in Zakhrafa, its rosette.';
+      '“Follows the theme” draws the theme\'s own marker; in Tibyan, its rosette.';
 
   @override
   String get themeLabel => 'Theme';
@@ -880,4 +880,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String downloadAllCount(String done, String total) {
     return '$done of $total done';
   }
+
+  @override
+  String get themeArtCredit =>
+      'Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers.';
 }

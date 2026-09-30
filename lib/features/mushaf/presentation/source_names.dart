@@ -104,9 +104,9 @@ const _ar = <String, SourceText>{
   ),
   'quran-assets': (
     title: 'إطارات الثيمات وترويساتها وفواصلها (quran-assets)',
-    publisher: 'مشروع quran-assets (Quran.ws)؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
+    publisher: 'مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
     license: 'المنقول من المصاحف: المشاع الإبداعي غير التجاري 4.0 (CC BY-NC-SA 4.0)، مبدئي ولم يُحصل على إذن الناشرين بعد؛ فواصل الخطوط: رخصة الخطوط المفتوحة (OFL 1.1)',
-    credit: 'زخارف الثيمات: quran-assets (github.com/quran-ws/quran-assets)، عن مصاحف مجمع الملك فهد وغيره، وخطوط Noto وScheherazade New وKufam وMirza',
+    credit: 'زخارف الثيمات: quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets)، عن مصاحف مجمع الملك فهد وغيره، وخطوط Noto وScheherazade New وKufam وMirza',
   ),
 };
 
@@ -204,9 +204,9 @@ const _en = <String, SourceText>{
   ),
   'quran-assets': (
     title: 'Theme frames, surah headers and verse markers (quran-assets)',
-    publisher: 'quran-assets (Quran.ws); frames and headers traced from printed mushafs, designs by the King Fahd Complex and other publishers; some markers from open fonts',
+    publisher: 'quran-assets by Quran.ws, developed by Abdullah Ibeid; frames and headers traced from printed mushafs, designs by the King Fahd Complex and other publishers; some markers from open fonts',
     license: 'Traced from mushafs: CC BY-NC-SA 4.0, provisional, publishers\' permission not yet obtained; font markers: SIL Open Font License 1.1',
-    credit: 'Theme ornaments: quran-assets (github.com/quran-ws/quran-assets), from mushafs of the King Fahd Complex and others, and the Noto, Scheherazade New, Kufam and Mirza fonts',
+    credit: 'Theme ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets), from mushafs of the King Fahd Complex and others, and the Noto, Scheherazade New, Kufam and Mirza fonts',
   ),
 };
 
