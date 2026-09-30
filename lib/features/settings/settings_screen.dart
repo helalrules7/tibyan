@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
+import '../mushaf/presentation/widgets/illuminated_frame.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -40,6 +41,15 @@ class SettingsScreen extends ConsumerWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go('/settings/appearance'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: Text(l.aboutMushafTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/mushaf/about'),
             ),
           ),
           const SizedBox(height: 16),
@@ -100,21 +110,41 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const DownloadAllButton(),
                 const Divider(height: 1),
+                ListTile(
+                  title: Text(l.frameDesignLabel),
+                  trailing: const FramePreview(width: 56),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        for (final (design, name) in [
+                          (null, l.frameByStyle),
+                          (FrameDesign.zakhrafa, l.frameZakhrafa),
+                          (FrameDesign.plain, l.framePlain),
+                          (FrameDesign.abbasid, l.frameAbbasid),
+                          (FrameDesign.umayyad, l.frameUmayyad),
+                          (FrameDesign.andalusian, l.frameAndalusian),
+                          (FrameDesign.ottoman, l.frameOttoman),
+                          (FrameDesign.egyptian, l.frameEgyptian),
+                          (FrameDesign.modernIslamic, l.frameModernIslamic),
+                        ])
+                          ChoiceChip(
+                            label: Text(name),
+                            selected: settings.frameDesign == design,
+                            onSelected: (_) =>
+                                controller.setFrameDesign(design),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l.keepScreenOn),
                   value: settings.keepScreenOn,
                   onChanged: controller.setKeepScreenOn,
-                ),
-                ListTile(
-                  title: Text(l.quranFontSize),
-                  subtitle: Slider(
-                    value: settings.quranFontScale,
-                    min: 0.8,
-                    max: 2.0,
-                    divisions: 12,
-                    label: '${(settings.quranFontScale * 100).round()}%',
-                    onChanged: controller.setQuranFontScale,
-                  ),
                 ),
                 SwitchListTile(
                   title: Text(l.highlightDivineNames),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../mushaf_providers.dart';
+import 'source_names.dart';
 
 /// Where the text and pages come from, their licences, and open review notes.
 class AboutMushafScreen extends ConsumerWidget {
@@ -36,29 +37,43 @@ class AboutMushafScreen extends ConsumerWidget {
             ),
           for (final s in sources ?? const [])
             Card(
-              child: ExpansionTile(
-                title: Text(s.title),
-                subtitle: Text(s.publisher, style: TextStyle(color: t.muted)),
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                children: [
-                  if (s.version != null) Text(l.versionShort(s.version!)),
-                  Text(l.licenseLabel(s.license)),
-                  SelectableText(s.url, style: TextStyle(color: t.accent)),
-                  const SizedBox(height: 6),
-                  Text(s.attribution, style: TextStyle(color: t.muted)),
-                  if (s.notice != null) ...[
-                    const SizedBox(height: 8),
-                    // The source's notice, shown exactly as published.
-                    Directionality(
-                      textDirection: TextDirection.ltr,
-                      child: SelectableText(
-                        s.notice!,
-                        style: const TextStyle(fontSize: 12, height: 1.5),
-                      ),
+              child: Builder(
+                builder: (context) {
+                  final named = sourceText(
+                    s.key,
+                    Localizations.localeOf(context).languageCode,
+                  );
+                  return ExpansionTile(
+                    title: Text(named?.title ?? s.title),
+                    subtitle: Text(
+                      named?.publisher ?? s.publisher,
+                      style: TextStyle(color: t.muted),
                     ),
-                  ],
-                ],
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    children: [
+                      if (s.version != null) Text(l.versionShort(s.version!)),
+                      Text(l.licenseLabel(named?.license ?? s.license)),
+                      SelectableText(s.url, style: TextStyle(color: t.accent)),
+                      const SizedBox(height: 6),
+                      Text(
+                        named?.credit ?? s.attribution,
+                        style: TextStyle(color: t.muted),
+                      ),
+                      if (s.notice != null) ...[
+                        const SizedBox(height: 8),
+                        // The source's notice, shown exactly as published.
+                        Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: SelectableText(
+                            s.notice!,
+                            style: const TextStyle(fontSize: 12, height: 1.5),
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
             ),
         ],

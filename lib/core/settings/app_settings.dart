@@ -23,6 +23,31 @@ extension MushafEditionPages on MushafEdition {
 /// (default) or one of three rosettes drawn over it.
 enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
 
+/// The page frame's design. Every style frames its pages; this chooses
+/// the ornament: the Zakhrafa images, the plain rules, or one of the six
+/// drawn designs (`assets/config/frame_<name>.json`).
+enum FrameDesign {
+  zakhrafa,
+  plain,
+  abbasid,
+  umayyad,
+  andalusian,
+  ottoman,
+  egyptian,
+  modernIslamic,
+}
+
+/// Each style's own frame: Zakhrafa's illuminated frame, and a drawn
+/// design for the others (the plain frame for a style not listed).
+FrameDesign defaultFrameFor(String styleId) => switch (styleId) {
+  'zakhrafa' => FrameDesign.zakhrafa,
+  'royal' => FrameDesign.abbasid,
+  'classic' => FrameDesign.ottoman,
+  'manuscript' => FrameDesign.andalusian,
+  'calm' => FrameDesign.modernIslamic,
+  _ => FrameDesign.plain,
+};
+
 /// Font of tafsir and translation texts.
 enum TafsirFont { naskh, interface }
 
@@ -46,7 +71,6 @@ class AppSettings {
     this.onboardingDone = false,
     this.edition = MushafEdition.madina1441,
     this.keepScreenOn = true,
-    this.quranFontScale = 1.0,
     this.markerStyle = MarkerStyle.traditional,
     this.markerTint,
     this.highlightDivineNames = true,
@@ -57,6 +81,7 @@ class AppSettings {
     this.reciterId = 1,
     this.followRecitation = true,
     this.versePause = 0,
+    this.frameDesign,
   });
 
   final String styleId;
@@ -73,9 +98,6 @@ class AppSettings {
 
   /// Keep the screen awake while the mushaf is open.
   final bool keepScreenOn;
-
-  /// Quran text size in the continuous view (1.0 = default).
-  final double quranFontScale;
 
   final MarkerStyle markerStyle;
 
@@ -106,6 +128,9 @@ class AppSettings {
   /// the recording as it is.
   final int versePause;
 
+  /// The frame chosen by the reader; null uses the style's own.
+  final FrameDesign? frameDesign;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -115,7 +140,6 @@ class AppSettings {
     bool? onboardingDone,
     MushafEdition? edition,
     bool? keepScreenOn,
-    double? quranFontScale,
     MarkerStyle? markerStyle,
     int? Function()? markerTint,
     bool? highlightDivineNames,
@@ -126,6 +150,7 @@ class AppSettings {
     int? reciterId,
     bool? followRecitation,
     int? versePause,
+    FrameDesign? Function()? frameDesign,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -135,7 +160,6 @@ class AppSettings {
     onboardingDone: onboardingDone ?? this.onboardingDone,
     edition: edition ?? this.edition,
     keepScreenOn: keepScreenOn ?? this.keepScreenOn,
-    quranFontScale: quranFontScale ?? this.quranFontScale,
     markerStyle: markerStyle ?? this.markerStyle,
     markerTint: markerTint == null ? this.markerTint : markerTint(),
     highlightDivineNames: highlightDivineNames ?? this.highlightDivineNames,
@@ -146,6 +170,7 @@ class AppSettings {
     reciterId: reciterId ?? this.reciterId,
     followRecitation: followRecitation ?? this.followRecitation,
     versePause: versePause ?? this.versePause,
+    frameDesign: frameDesign == null ? this.frameDesign : frameDesign(),
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

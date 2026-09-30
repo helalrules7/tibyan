@@ -223,6 +223,7 @@ class OpeningPage extends ConsumerWidget {
       ],
     );
     return OrnateFrame(
+      openingSurah: surah,
       page: page,
       onPageTap: onPageTap,
       catchword: catchword,

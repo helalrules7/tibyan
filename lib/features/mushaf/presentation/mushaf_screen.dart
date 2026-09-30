@@ -158,20 +158,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   /// In the Zakhrafa style the mushaf opens with a cover as page 0.
-  /// In the Zakhrafa style the Madina editions open with the app's cover as
-  /// page 0. The Shamarly edition has its own cover as page 1, shown in the
-  /// same frame, so it starts there.
-  int get _first =>
-      _illuminated && ref.read(editionProvider) != MushafEdition.shamarly
-      ? 0
-      : 1;
-  bool get _illuminated =>
-      ref
-          .read(themeRegistryProvider)
-          .byId(ref.read(settingsProvider).styleId)
-          .frame
-          .outerStyle ==
-      'illuminated';
+  /// The Madina editions open with the app's cover as page 0. The
+  /// Shamarly edition has its own cover as page 1, shown in the same frame,
+  /// so it starts there.
+  int get _first => ref.read(editionProvider) == MushafEdition.shamarly ? 1 : 0;
 
   @override
   Widget build(BuildContext context) {
@@ -179,18 +169,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
     final surahs = ref.watch(surahsProvider).value;
-    final first = ref.watch(pageAyahsProvider(_page)).value?.firstOrNull;
     final edition = ref.watch(editionProvider);
     final pageCount = edition.pageCount;
     // Page numbers differ between editions: reopen at the same verse.
     ref.listen(editionProvider, (_, _) => _open());
-    final illuminated =
-        ref
-            .watch(themeRegistryProvider)
-            .byId(ref.watch(settingsProvider).styleId)
-            .frame
-            .outerStyle ==
-        'illuminated';
 
     final marks = <VerseKey, Color>{
       for (final m
@@ -277,7 +259,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             ? _wordsOf(_hiddenOn(pg), pg)
             : const {},
         onHiddenTap: (v) => setState(() => _revealed.add(v)),
-        ornateOpening: illuminated && openingSurah != null,
+        ornateOpening: openingSurah != null,
         showHandles: _multi,
         divineNames: settings.highlightDivineNames
             ? ref.watch(divineNameBoxesProvider(pg)).value ?? const []
@@ -324,17 +306,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           interaction: interaction,
         ),
       };
-      if (!illuminated) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Column(
-            children: [
-              Expanded(child: pageWidget),
-              SizedBox(height: 26, child: Center(child: tools)),
-            ],
-          ),
-        );
-      }
       final info = ref.watch(frameInfoProvider(pg)).value;
       if (openingSurah != null) {
         return Padding(
@@ -447,18 +418,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     l.fawasilTitle,
                     () => context.push('/mushaf/fawasil'),
                   ),
-                  (
-                    Icons.notes,
-                    l.viewContinuous,
-                    () => context.go(
-                      '/mushaf/continuous?s=${first?.surah ?? 1}&a=${first?.number ?? 1}',
-                    ),
-                  ),
-                  (
-                    Icons.info_outline,
-                    l.aboutMushafTitle,
-                    () => context.push('/mushaf/about'),
-                  ),
+                  (Icons.home_outlined, l.homeTitle, () => context.go('/')),
                   (
                     Icons.tune,
                     l.settingsTitle,

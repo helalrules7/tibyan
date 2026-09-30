@@ -27,7 +27,6 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kOnboarding = 'settings.onboardingDone';
   static const _kEdition = 'settings.edition';
   static const _kKeepOn = 'settings.keepScreenOn';
-  static const _kFontScale = 'settings.quranFontScale';
   static const _kMarkerStyle = 'settings.markerStyle';
   static const _kMarkerTint = 'settings.markerTint';
   static const _kDivine = 'settings.highlightDivineNames';
@@ -38,6 +37,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
   static const _kVersePause = 'settings.versePause';
+  static const _kFrame = 'settings.frameDesign';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -66,7 +66,6 @@ class SettingsController extends Notifier<AppSettings> {
           _enumByName(MushafEdition.values, _prefs.getString(_kEdition)) ??
           MushafEdition.madina1441,
       keepScreenOn: _prefs.getBool(_kKeepOn) ?? true,
-      quranFontScale: _prefs.getDouble(_kFontScale) ?? 1.0,
       markerStyle:
           _enumByName(MarkerStyle.values, _prefs.getString(_kMarkerStyle)) ??
           MarkerStyle.traditional,
@@ -84,6 +83,7 @@ class SettingsController extends Notifier<AppSettings> {
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       followRecitation: _prefs.getBool(_kFollow) ?? true,
       versePause: _prefs.getInt(_kVersePause) ?? 0,
+      frameDesign: _enumByName(FrameDesign.values, _prefs.getString(_kFrame)),
     );
   }
 
@@ -125,12 +125,6 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setKeepScreenOn(bool value) async {
     state = state.copyWith(keepScreenOn: value);
     await _prefs.setBool(_kKeepOn, value);
-  }
-
-  Future<void> setQuranFontScale(double value) async {
-    final clamped = value.clamp(0.8, 2.0).toDouble();
-    state = state.copyWith(quranFontScale: clamped);
-    await _prefs.setDouble(_kFontScale, clamped);
   }
 
   Future<void> setMarkerStyle(MarkerStyle style) async {
@@ -190,6 +184,16 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setVersePause(int ms) async {
     state = state.copyWith(versePause: ms);
     await _prefs.setInt(_kVersePause, ms);
+  }
+
+  /// Null goes back to the style's own frame.
+  Future<void> setFrameDesign(FrameDesign? design) async {
+    state = state.copyWith(frameDesign: () => design);
+    if (design == null) {
+      await _prefs.remove(_kFrame);
+    } else {
+      await _prefs.setString(_kFrame, design.name);
+    }
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

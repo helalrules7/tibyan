@@ -57,7 +57,7 @@
   "editionShamarly": "مصحف الشمرلي (الطبعة المصرية)",
   "editionShamarlyDesc": "طبعة الشمرلي المصرية المعروفة، 522 صفحة، مع تظليل الآية وتظليل الكلمة في كثير من الآيات.",
   "defaultTag": "الافتراضية",
-  "pagesDownloadNote": "صفحات المصحف تُحمّل مرة واحدة (نحو {size} ميجا)، ثم تعمل دون اتصال. ويمكنك القراءة بالعرض المتصل فورا.",
+  "pagesDownloadNote": "صفحات هذا المصحف تُحمّل مرة واحدة (نحو {size} ميجا)، ثم تعمل دون اتصال. وحتى يكتمل التحميل تقرأ في مصحف المدينة (الطبعة الحديثة) المدمج في التطبيق.",
   "@pagesDownloadNote": {
     "placeholders": {
       "size": {
@@ -93,14 +93,11 @@
     }
   },
   "downloadWifiHint": "يكمل التحميل من حيث توقف إذا انقطع الاتصال. يُفضّل الاتصال بشبكة Wi-Fi.",
-  "readContinuousNow": "افتح العرض المتصل",
-  "readWhileDownloading": "اقرأ الآن حتى يكتمل التحميل",
   "pagesCredit": "صفحات مصحف المدينة من مجمع الملك فهد لطباعة المصحف الشريف.",
   "pagesCreditOld": "صفحات الطبعة القديمة (1405هـ) من مجمع الملك فهد لطباعة المصحف الشريف، ومصدرها موقع quran.com، وتُحمّل من خادم تبيان.",
   "pagesCreditShamarly": "مصحف الشمرلي بخط محمد سعد إبراهيم الشهير بحداد، والصفحات من أرشيف الإنترنت (archive.org)، وتُحمّل من خادم تبيان.",
   "editionLabel": "طبعة المصحف",
   "viewPage": "الصفحة",
-  "viewContinuous": "متصل",
   "viewModeLabel": "طريقة العرض",
   "indexTitle": "الفهرس",
   "fawasilTitle": "الفواصل",
@@ -209,7 +206,6 @@
   "noFawasil": "لا توجد فواصل بعد",
   "readingTitle": "القراءة",
   "keepScreenOn": "إبقاء الشاشة مضاءة أثناء القراءة",
-  "quranFontSize": "حجم خط القرآن في العرض المتصل",
   "aboutMushafIntro": "كل نص في تبيان منقول من مصدر موثق، ولا يُعدَّل بأيدينا. وهذه مصادر المصحف في التطبيق:",
   "licenseLabel": "الرخصة: {license}",
   "@licenseLabel": {
@@ -587,5 +583,17 @@
   "versePauseAsRecorded": "كما سُجّلت",
   "versePauseSecond": "ثانية",
   "versePauseHalf": "نصف ثانية",
-  "versePauseHint": "يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها"
+  "versePauseHint": "يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها",
+  "homeTitle": "الرئيسية",
+  "frameDesignLabel": "إطار الصفحة",
+  "frameByStyle": "حسب الشكل",
+  "frameZakhrafa": "زخرفة",
+  "framePlain": "بسيط",
+  "frameAbbasid": "عباسي",
+  "frameUmayyad": "أموي",
+  "frameAndalusian": "أندلسي",
+  "frameOttoman": "عثماني",
+  "frameEgyptian": "مصري",
+  "frameModernIslamic": "إسلامي حديث",
+  "framePreviewLabel": "معاينة الإطار"
 }
