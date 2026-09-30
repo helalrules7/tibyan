@@ -16,6 +16,7 @@ class TibyanStyle {
     required this.radii,
     required this.modes,
     this.art,
+    this.opening,
   });
 
   final String id;
@@ -31,6 +32,11 @@ class TibyanStyle {
   /// The theme's frame, surah header and verse marker; null for Zakhrafa,
   /// which keeps its own illuminated frame.
   final ThemeArt? art;
+
+  /// Asset of the frame drawn around the opening pages (al-Fatiha, the
+  /// start of al-Baqarah) and the cover: a picture with a transparent
+  /// panel for the page and two cartouches; see [OpeningArtLayout].
+  final String? opening;
 
   String localizedName(String languageCode) =>
       name[languageCode] ?? name['ar'] ?? id;
@@ -60,6 +66,7 @@ class TibyanStyle {
       art: json['art'] == null
           ? null
           : ThemeArt.fromJson(json['art'] as Map<String, dynamic>),
+      opening: json['opening'] as String?,
     );
   }
 }

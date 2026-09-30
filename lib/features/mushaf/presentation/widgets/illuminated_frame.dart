@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'art_frame.dart';
+import 'opening_art.dart';
 
 /// Ornament images for the Zakhrafa frame (built by tools/build_ornaments.py).
 class FrameImages {
@@ -843,92 +844,101 @@ class OrnateFrame extends ConsumerWidget {
     final digits = NumberFormatter(Localizations.localeOf(context));
     const band = IlluminatedFrame.band;
 
+    Widget pageNumber() => _Cartouche(
+      width: 74,
+      height: 30,
+      fill: t.paper,
+      rosette: images?.margin,
+      child: FrameTap(
+        label: digits(page!),
+        bold: true,
+        semanticLabel: l.pageOf('$page'),
+        onTap: onPageTap,
+        fontSize: 15,
+      ),
+    );
+
     Widget pageCartouche() => Positioned(
       bottom: band / 2 - 15,
       left: 0,
       right: 0,
-      child: Center(
-        child: _Cartouche(
-          width: 74,
-          height: 30,
-          fill: t.paper,
-          rosette: images?.margin,
-          child: FrameTap(
-            label: digits(page!),
-            bold: true,
-            semanticLabel: l.pageOf('$page'),
-            onTap: onPageTap,
-            fontSize: 15,
-          ),
-        ),
-      ),
+      child: Center(child: pageNumber()),
     );
 
-    final body = LayoutBuilder(
-      builder: (context, box) {
-        final w = box.maxWidth;
-        final h = box.maxHeight;
-        final panel = Rect.fromLTRB(26, h * 0.215, w - 26, h * 0.785);
-        const inner = 12.0;
-        final cartW = (w - 150).clamp(160.0, 320.0);
-        final cartH = (h * 0.085).clamp(52.0, 76.0);
-        Widget cartouche(double centreY, Widget c) => Positioned(
-          top: centreY - cartH / 2,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: _Cartouche(
-              width: cartW,
-              height: cartH,
-              fill: t.paper,
-              rosette: images?.rosette,
-              child: DefaultTextStyle.merge(
-                style: TextStyle(
-                  fontFamily: 'KFGQPCAN',
-                  color: t.ink,
-                  height: 1.3,
+    final opening = context.tokens.style.opening;
+    final body = opening != null
+        ? OpeningArtBody(
+            asset: opening,
+            top: top,
+            bottom: bottom,
+            pageNumber: page == null ? null : pageNumber(),
+            child: child,
+          )
+        : LayoutBuilder(
+            builder: (context, box) {
+              final w = box.maxWidth;
+              final h = box.maxHeight;
+              final panel = Rect.fromLTRB(26, h * 0.215, w - 26, h * 0.785);
+              const inner = 12.0;
+              final cartW = (w - 150).clamp(160.0, 320.0);
+              final cartH = (h * 0.085).clamp(52.0, 76.0);
+              Widget cartouche(double centreY, Widget c) => Positioned(
+                top: centreY - cartH / 2,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: _Cartouche(
+                    width: cartW,
+                    height: cartH,
+                    fill: t.paper,
+                    rosette: images?.rosette,
+                    child: DefaultTextStyle.merge(
+                      style: TextStyle(
+                        fontFamily: 'KFGQPCAN',
+                        color: t.ink,
+                        height: 1.3,
+                      ),
+                      textAlign: TextAlign.center,
+                      child: c,
+                    ),
+                  ),
                 ),
-                textAlign: TextAlign.center,
-                child: c,
-              ),
-            ),
-          ),
-        );
-        return Stack(
-          children: [
-            if (images != null)
-              Positioned.fill(
-                child: CustomPaint(painter: _MosaicPainter(images)),
-              ),
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _FramePainter(
-                  images: images,
-                  rule: t.marker,
-                  paper: t.paper,
-                  fillPaper: images == null,
-                ),
-              ),
-            ),
-            Positioned.fromRect(
-              rect: panel.inflate(inner),
-              child: CustomPaint(
-                painter: _FramePainter(
-                  images: images,
-                  rule: t.marker,
-                  paper: t.paper,
-                  band: inner,
-                ),
-              ),
-            ),
-            Positioned.fromRect(rect: panel.deflate(4), child: child),
-            cartouche((band + panel.top - inner) / 2, top),
-            cartouche((panel.bottom + inner + h - band) / 2, bottom),
-            if (page != null) pageCartouche(),
-          ],
-        );
-      },
-    );
+              );
+              return Stack(
+                children: [
+                  if (images != null)
+                    Positioned.fill(
+                      child: CustomPaint(painter: _MosaicPainter(images)),
+                    ),
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: _FramePainter(
+                        images: images,
+                        rule: t.marker,
+                        paper: t.paper,
+                        fillPaper: images == null,
+                      ),
+                    ),
+                  ),
+                  Positioned.fromRect(
+                    rect: panel.inflate(inner),
+                    child: CustomPaint(
+                      painter: _FramePainter(
+                        images: images,
+                        rule: t.marker,
+                        paper: t.paper,
+                        band: inner,
+                      ),
+                    ),
+                  ),
+                  Positioned.fromRect(rect: panel.deflate(4), child: child),
+                  cartouche((band + panel.top - inner) / 2, top),
+                  cartouche((panel.bottom + inner + h - band) / 2, bottom),
+                  if (page != null) pageCartouche(),
+                ],
+              );
+            },
+          );
     if (!catchwordSpace) return body;
     return Column(
       children: [

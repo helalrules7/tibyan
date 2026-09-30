@@ -32,6 +32,7 @@
     "chip": 18,
     "surahHeader": 0
   },
+  "opening": "assets/themes/opening_seljuk.webp",
   "art": {
     "source": {
       "repo": "https://github.com/quran-ws/quran-assets",

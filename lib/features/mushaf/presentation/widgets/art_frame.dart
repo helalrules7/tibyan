@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'illuminated_frame.dart';
 import 'theme_art.dart';
+import 'opening_art.dart';
 
 /// The page in a heritage theme, laid out as approved: the juz ✦ hizb ✦
 /// surah cartouche above the frame, the theme's frame around the page,
@@ -28,7 +29,7 @@ class ArtPageFrame extends StatelessWidget {
     this.showCatchword = true,
   });
 
-  static const cartoucheSpace = 38.0;
+  static const cartoucheSpace = 50.0;
   static const numberSpace = 40.0;
   static const toolsSpace = 26.0;
 
@@ -98,26 +99,41 @@ class ArtPageFrame extends StatelessWidget {
           height: cartoucheSpace,
           child: info == null
               ? null
-              : Center(
-                  // Long surah names shrink rather than run off the screen.
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: _TopCartouche(
+              // The theme's own surah header: the surah on top, the juz
+              // and hizb under it, in its name box.
+              : ArtHeader(
+                  art: art,
+                  inset: 0.05,
+                  content: DefaultTextStyle.merge(
+                    style: TextStyle(
+                      fontFamily: 'UthmanTahaNaskh',
+                      color: t.ink,
+                      height: 1.25,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        FrameTap(
-                          label: l.juzLabel(digits(info.juz)),
-                          onTap: onJuzTap,
-                        ),
-                        FrameStar(color: t.marker),
-                        FrameTap(
-                          label: l.hizbLabel(digits(info.hizb)),
-                          onTap: onHizbTap,
-                        ),
-                        FrameStar(color: t.marker),
-                        FrameTap(
+                        _SmallTap(
                           label: info.surahName,
                           bold: true,
+                          fontSize: 16,
                           onTap: onSurahTap,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _SmallTap(
+                              label: l.juzLabel(digits(info.juz)),
+                              fontSize: 12.5,
+                              onTap: onJuzTap,
+                            ),
+                            FrameStar(color: t.marker),
+                            _SmallTap(
+                              label: l.hizbLabel(digits(info.hizb)),
+                              fontSize: 12.5,
+                              onTap: onHizbTap,
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -188,32 +204,41 @@ class _Catchword extends StatelessWidget {
   );
 }
 
-/// The capsule above the frame: juz, hizb and surah.
-class _TopCartouche extends StatelessWidget {
-  const _TopCartouche({required this.children});
+/// A label in the header above the frame that opens its index. Kept
+/// tight: the header's name box holds two lines of them.
+class _SmallTap extends StatelessWidget {
+  const _SmallTap({
+    required this.label,
+    required this.fontSize,
+    this.onTap,
+    this.bold = false,
+  });
 
-  final List<Widget> children;
+  final String label;
+  final double fontSize;
+  final VoidCallback? onTap;
+  final bool bold;
 
   @override
-  Widget build(BuildContext context) {
-    final t = context.tokens.colors;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: t.paper,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: t.marker, width: 1.5),
-      ),
-      child: DefaultTextStyle.merge(
-        style: TextStyle(
-          fontFamily: 'UthmanTahaNaskh',
-          fontSize: 15,
-          color: t.ink,
+  Widget build(BuildContext context) => Semantics(
+    button: onTap != null,
+    label: label,
+    excludeSemantics: true,
+    child: GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: bold ? FontWeight.w700 : FontWeight.w400,
+          ),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: children),
       ),
-    );
-  }
+    ),
+  );
 }
 
 /// The page number in the theme's verse marker; a tap opens «go to page».
@@ -276,10 +301,14 @@ class ArtHeader extends StatelessWidget {
     required this.art,
     required this.content,
     this.background,
+    this.inset = 0.15,
   });
 
   final ThemeArtPictures? art;
   final Widget content;
+
+  /// Share of the name box's width kept clear at each end.
+  final double inset;
 
   /// Fills the whole box first (hides a printed header underneath).
   final Color? background;
@@ -311,9 +340,9 @@ class ArtHeader extends StatelessWidget {
               // The name box's ends are curved or notched: keep the text
               // clear of them.
               rect: Rect.fromLTRB(
-                slot.left + slot.width * 0.15,
+                slot.left + slot.width * inset,
                 slot.top + 1,
-                slot.right - slot.width * 0.15,
+                slot.right - slot.width * inset,
                 slot.bottom - 1,
               ),
               child: Center(
@@ -430,58 +459,64 @@ class ArtOrnateFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens.colors;
-    final body = LayoutBuilder(
-      builder: (context, box) {
-        final w = box.maxWidth;
-        final h = box.maxHeight;
-        final inset = art?.layout(box.biggest).inset ?? 20;
-        final pad = inset + ArtPageFrame.gap;
-        final header = art?.header;
-        final headerW = w - 2 * pad;
-        final aspect = header == null
-            ? 8.0
-            : header.size.width / header.size.height;
-        final headerH = math.max(34.0, math.min(headerW / aspect, h * 0.12));
-        Widget cartouche(double y, Widget content) => Positioned(
-          top: y,
-          left: pad,
-          width: headerW,
-          height: headerH,
-          child: ArtHeader(
-            art: art,
-            content: DefaultTextStyle.merge(
-              style: TextStyle(
-                fontFamily: 'KFGQPCAN',
-                color: t.ink,
-                height: 1.3,
-              ),
-              textAlign: TextAlign.center,
-              child: content,
-            ),
-          ),
-        );
-        return Stack(
-          children: [
-            Positioned.fill(
-              child: CustomPaint(
-                painter: ArtFramePainter(art: art, paper: t.paper),
-              ),
-            ),
-            Positioned.fromRect(
-              rect: Rect.fromLTRB(
-                pad,
-                pad + headerH + 8,
-                w - pad,
-                h - pad - headerH - 8,
-              ),
-              child: child,
-            ),
-            cartouche(pad, top),
-            cartouche(h - pad - headerH, bottom),
-          ],
-        );
-      },
-    );
+    final opening = context.tokens.style.opening;
+    final body = opening != null
+        ? OpeningArtBody(asset: opening, top: top, bottom: bottom, child: child)
+        : LayoutBuilder(
+            builder: (context, box) {
+              final w = box.maxWidth;
+              final h = box.maxHeight;
+              final inset = art?.layout(box.biggest).inset ?? 20;
+              final pad = inset + ArtPageFrame.gap;
+              final header = art?.header;
+              final headerW = w - 2 * pad;
+              final aspect = header == null
+                  ? 8.0
+                  : header.size.width / header.size.height;
+              final headerH = math.max(
+                34.0,
+                math.min(headerW / aspect, h * 0.12),
+              );
+              Widget cartouche(double y, Widget content) => Positioned(
+                top: y,
+                left: pad,
+                width: headerW,
+                height: headerH,
+                child: ArtHeader(
+                  art: art,
+                  content: DefaultTextStyle.merge(
+                    style: TextStyle(
+                      fontFamily: 'KFGQPCAN',
+                      color: t.ink,
+                      height: 1.3,
+                    ),
+                    textAlign: TextAlign.center,
+                    child: content,
+                  ),
+                ),
+              );
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: ArtFramePainter(art: art, paper: t.paper),
+                    ),
+                  ),
+                  Positioned.fromRect(
+                    rect: Rect.fromLTRB(
+                      pad,
+                      pad + headerH + 8,
+                      w - pad,
+                      h - pad - headerH - 8,
+                    ),
+                    child: child,
+                  ),
+                  cartouche(pad, top),
+                  cartouche(h - pad - headerH, bottom),
+                ],
+              );
+            },
+          );
     final catchwordText = catchword == null ? null : _Catchword(catchword!);
     return Column(
       children: [

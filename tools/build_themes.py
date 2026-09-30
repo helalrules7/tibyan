@@ -125,6 +125,16 @@ THEMES = [
 
 # ── Colours ──────────────────────────────────────────────────────────────
 
+# The opening-page frame of each theme, in assets/themes/opening_<name>.webp
+# (from docs/design/fateha-themes; tools/recolor_opening.py made the ones
+# the folder lacked).
+OPENING = {
+    'seljuk': 'seljuk', 'umayyad': 'umayyad', 'timurid': 'timurid',
+    'hijazi': 'hijazi', 'fatimid': 'andalusi_fatimid',
+    'andalusi': 'andalusi_fatimid', 'mamluk': 'mamluk', 'abbasid': 'abbasid',
+}
+
+
 def rgb(h):
     h = h.lstrip('#')
     if len(h) == 3:
@@ -512,6 +522,8 @@ def build(qa):
             },
             'ornaments': {'surahHeader': 'art', 'ayahMarker': 'theme', 'density': 'rich'},
             'radii': {'card': 14, 'sheet': 24, 'chip': 18, 'surahHeader': 0},
+            # The opening pages' and cover's frame (docs/design/fateha-themes).
+            'opening': f'assets/themes/opening_{OPENING[tid]}.webp',
             'art': {
                 'source': {
                     'repo': 'https://github.com/quran-ws/quran-assets',
