@@ -10,7 +10,8 @@ import '../../l10n/app_localizations.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 
 /// Shown briefly at launch: the ornate page in light mode, the golden arch
-/// in night and black modes.
+/// in night and black modes; with a drawn frame design, its own splash in
+/// every mode.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({
     super.key,
@@ -46,6 +47,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final tokens = context.tokens;
     final t = tokens.colors;
     final dark = tokens.mode != ThemeModeId.light;
+    // A drawn design shows its own splash in every mode; otherwise the
+    // golden arch in the dark modes.
+    final look = FrameLook.of(context, ref);
+    final gold = dark && look == null;
     final title = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -56,7 +61,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             fontWeight: FontWeight.w700,
             fontSize: 64,
             height: 1.3,
-            color: dark ? const Color(0xFFF2D48A) : t.ink,
+            color: look?.ink ?? (gold ? const Color(0xFFF2D48A) : t.ink),
           ),
         ),
         Text(
@@ -64,16 +69,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           style: TextStyle(
             fontFamily: 'KFGQPCAN',
             fontSize: 17,
-            color: dark ? const Color(0xFFE9E1CF) : t.ink,
+            color: look?.ink ?? (gold ? const Color(0xFFE9E1CF) : t.ink),
           ),
         ),
       ],
     );
     return Scaffold(
-      backgroundColor: dark ? Colors.black : t.bg,
+      backgroundColor: gold ? Colors.black : t.bg,
       body: Semantics(
         label: l.appTitle,
-        child: dark
+        child: gold
             ? Stack(
                 fit: StackFit.expand,
                 children: [

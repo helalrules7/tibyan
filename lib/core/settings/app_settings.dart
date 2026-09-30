@@ -25,7 +25,8 @@ enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
 
 /// The page frame's design. Every style frames its pages; this chooses
 /// the ornament: the Zakhrafa images, the plain rules, or one of the six
-/// drawn designs (`assets/config/frame_<name>.json`).
+/// designs drawn from the owner's SVGs
+/// (`assets/ornaments/frame_<set>_<piece>.svg`).
 enum FrameDesign {
   zakhrafa,
   plain,

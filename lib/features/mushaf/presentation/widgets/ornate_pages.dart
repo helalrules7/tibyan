@@ -32,6 +32,11 @@ class CoverPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
+    // Over a drawn design's splash: the art's own ink and gold.
+    final look = FrameLook.of(context, ref);
+    final ink = look?.ink ?? t.ink;
+    final muted = look?.ink.withValues(alpha: 0.8) ?? t.muted;
+    final rule = look?.gold ?? t.marker;
     final basmala = ref.watch(basmalaProvider).value ?? '';
     final edition = ref.watch(editionProvider);
     return GestureDetector(
@@ -52,7 +57,7 @@ class CoverPage extends ConsumerWidget {
           child: Semantics(
             header: true,
             child: edition == MushafEdition.shamarly
-                ? _ShamarlyCover(ink: t.ink, muted: t.muted, rule: t.marker)
+                ? _ShamarlyCover(ink: ink, muted: muted, rule: rule)
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -64,7 +69,7 @@ class CoverPage extends ConsumerWidget {
                             fontWeight: FontWeight.w700,
                             fontSize: 54,
                             height: 1.4,
-                            color: t.ink,
+                            color: ink,
                           ),
                         ),
                       ),
@@ -73,14 +78,14 @@ class CoverPage extends ConsumerWidget {
                         style: TextStyle(
                           fontFamily: 'KFGQPCAN',
                           fontSize: 18,
-                          color: t.ink,
+                          color: ink,
                         ),
                       ),
                       Container(
                         width: 180,
                         height: 1,
                         margin: const EdgeInsets.symmetric(vertical: 18),
-                        color: t.marker,
+                        color: rule,
                       ),
                       Text(
                         switch (edition) {
@@ -89,7 +94,7 @@ class CoverPage extends ConsumerWidget {
                           MushafEdition.shamarly => l.editionShamarly,
                         },
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: t.muted),
+                        style: TextStyle(fontSize: 12, color: muted),
                       ),
                     ],
                   ),
