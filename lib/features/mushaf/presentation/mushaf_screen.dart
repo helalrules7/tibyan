@@ -156,6 +156,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _selA = _selB = null;
       _multi = false;
       _pickWord = false;
+      // Recitation mode is for one page: turning the page ends it.
+      _recite = false;
       _revealed.clear();
     });
     if (_page < 1) return;
