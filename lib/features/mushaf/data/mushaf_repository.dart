@@ -240,6 +240,10 @@ class MushafRepository {
             ..orderBy([(t) => OrderingTerm.asc(t.startMs)]))
           .get();
 
+  /// Every verse in mushaf order, for search.
+  Future<List<AyahRow>> searchRows() =>
+      (_db.select(_db.ayah)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
+
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 }

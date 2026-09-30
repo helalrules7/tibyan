@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/search/search_screen.dart';
 import '../../features/mushaf/presentation/about_mushaf_screen.dart';
 import '../../features/mushaf/presentation/download_screen.dart';
 import '../../features/mushaf/presentation/fawasil_screen.dart';
@@ -53,6 +54,10 @@ final appRouterProvider = Provider<GoRouter>(
         path: '/',
         builder: (context, state) => const HomeScreen(),
         routes: [
+          GoRoute(
+            path: 'search',
+            builder: (context, state) => const SearchScreen(),
+          ),
           GoRoute(
             path: 'settings',
             builder: (context, state) => const SettingsScreen(),

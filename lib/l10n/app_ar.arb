@@ -595,5 +595,46 @@
   "frameOttoman": "عثماني",
   "frameEgyptian": "مصري",
   "frameModernIslamic": "إسلامي حديث",
-  "framePreviewLabel": "معاينة الإطار"
+  "framePreviewLabel": "معاينة الإطار",
+  "searchHint": "ابحث في القرآن، أو اكتب «البقرة ٢٥٥»",
+  "searchIntro": "اكتب كلمة أو أكثر من القرآن، بتشكيل أو دونه، أو اكتب موضعا مثل «٢:٢٥٥» أو «البقرة ٢٥٥».",
+  "searchGoTo": "اذهب إلى الموضع",
+  "searchNothing": "لا نتائج",
+  "searchCount": "{count} موضعا في {verses} آية",
+  "@searchCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "verses": {
+        "type": "String"
+      }
+    }
+  },
+  "searchMore": "و{count} آية أخرى، ضيّق البحث لرؤيتها",
+  "@searchMore": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "searchHistory": "عمليات البحث السابقة",
+  "searchClearHistory": "مسح",
+  "continueReading": "متابعة القراءة",
+  "continueReadingAt": "{surah} · الآية {ayah} · صفحة {page}",
+  "@continueReadingAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "openLabel": "افتح"
 }

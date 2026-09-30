@@ -420,6 +420,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   ),
                   (Icons.home_outlined, l.homeTitle, () => context.go('/')),
                   (
+                    Icons.search_outlined,
+                    l.sectionSearch,
+                    () => context.push('/search'),
+                  ),
+                  (
                     Icons.tune,
                     l.settingsTitle,
                     () => context.push('/settings'),

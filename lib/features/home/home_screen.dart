@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../mushaf/mushaf_providers.dart';
+import '../mushaf/presentation/mushaf_screen.dart';
+import '../mushaf/presentation/widgets/illuminated_frame.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
-    final sections = <(IconData, String)>[
-      (Icons.auto_stories_outlined, l.sectionTafsir),
-      (Icons.headphones_outlined, l.sectionListen),
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final position = ref.watch(readingPositionProvider).value;
+    final surahs = ref.watch(surahsProvider).value;
+    final surah = position == null || surahs == null ? 1 : position.surah;
+    final ayah = position?.ayah ?? 1;
+    final soon = <(IconData, String)>[
       (Icons.task_alt_outlined, l.sectionHifz),
       (Icons.groups_outlined, l.sectionKhatma),
-      (Icons.search_outlined, l.sectionSearch),
     ];
 
     return Scaffold(
@@ -57,24 +63,28 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l.homeComingTitle,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: t.goldText,
-                        fontWeight: FontWeight.w600,
+              child: ListTile(
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
+                leading: Icon(Icons.menu_book, color: t.goldText, size: 30),
+                title: Text(
+                  l.continueReading,
+                  style: TextStyle(
+                    color: t.goldText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: position == null || surahs == null
+                    ? null
+                    : Text(
+                        l.continueReadingAt(
+                          surahName(context, surahs[position.surah - 1]),
+                          digits(position.ayah),
+                          digits(position.page),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      l.homeComingBody,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                trailing: FilledButton(
+                  onPressed: () => context.go('/mushaf'),
+                  child: Text(l.openLabel),
                 ),
               ),
             ),
@@ -93,7 +103,25 @@ class HomeScreen extends StatelessWidget {
                   note: l.mushafOpen,
                   onTap: () => context.go('/mushaf'),
                 ),
-                for (final (icon, label) in sections)
+                _SectionTile(
+                  icon: Icons.search_outlined,
+                  label: l.sectionSearch,
+                  note: l.openLabel,
+                  onTap: () => context.go('/search'),
+                ),
+                _SectionTile(
+                  icon: Icons.auto_stories_outlined,
+                  label: l.sectionTafsir,
+                  note: l.openLabel,
+                  onTap: () => context.push('/mushaf/tafsir?s=$surah&a=$ayah'),
+                ),
+                _SectionTile(
+                  icon: Icons.headphones_outlined,
+                  label: l.sectionListen,
+                  note: l.openLabel,
+                  onTap: () => context.push('/mushaf/audio'),
+                ),
+                for (final (icon, label) in soon)
                   _ComingSoonTile(icon: icon, label: label, note: l.comingSoon),
               ],
             ),

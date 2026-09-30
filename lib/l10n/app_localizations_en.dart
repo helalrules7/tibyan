@@ -821,4 +821,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get framePreviewLabel => 'Frame preview';
+
+  @override
+  String get searchHint => 'Search the Quran, or type “2:255”';
+
+  @override
+  String get searchIntro =>
+      'Type one or more words of the Quran, with or without diacritics, or a place such as “2:255” or “al-Baqara 255”.';
+
+  @override
+  String get searchGoTo => 'Go to this place';
+
+  @override
+  String get searchNothing => 'No results';
+
+  @override
+  String searchCount(String count, String verses) {
+    return '$count matches in $verses verses';
+  }
+
+  @override
+  String searchMore(String count) {
+    return 'and $count more verses; narrow the search to see them';
+  }
+
+  @override
+  String get searchHistory => 'Recent searches';
+
+  @override
+  String get searchClearHistory => 'Clear';
+
+  @override
+  String get continueReading => 'Continue reading';
+
+  @override
+  String continueReadingAt(String surah, String ayah, String page) {
+    return '$surah · verse $ayah · page $page';
+  }
+
+  @override
+  String get openLabel => 'Open';
 }

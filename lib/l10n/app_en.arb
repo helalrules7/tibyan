@@ -461,5 +461,46 @@
   "frameOttoman": "Ottoman",
   "frameEgyptian": "Egyptian",
   "frameModernIslamic": "Modern Islamic",
-  "framePreviewLabel": "Frame preview"
+  "framePreviewLabel": "Frame preview",
+  "searchHint": "Search the Quran, or type “2:255”",
+  "searchIntro": "Type one or more words of the Quran, with or without diacritics, or a place such as “2:255” or “al-Baqara 255”.",
+  "searchGoTo": "Go to this place",
+  "searchNothing": "No results",
+  "searchCount": "{count} matches in {verses} verses",
+  "@searchCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "verses": {
+        "type": "String"
+      }
+    }
+  },
+  "searchMore": "and {count} more verses; narrow the search to see them",
+  "@searchMore": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "searchHistory": "Recent searches",
+  "searchClearHistory": "Clear",
+  "continueReading": "Continue reading",
+  "continueReadingAt": "{surah} · verse {ayah} · page {page}",
+  "@continueReadingAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "openLabel": "Open"
 }

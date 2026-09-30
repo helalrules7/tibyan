@@ -818,4 +818,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get framePreviewLabel => 'معاينة الإطار';
+
+  @override
+  String get searchHint => 'ابحث في القرآن، أو اكتب «البقرة ٢٥٥»';
+
+  @override
+  String get searchIntro =>
+      'اكتب كلمة أو أكثر من القرآن، بتشكيل أو دونه، أو اكتب موضعا مثل «٢:٢٥٥» أو «البقرة ٢٥٥».';
+
+  @override
+  String get searchGoTo => 'اذهب إلى الموضع';
+
+  @override
+  String get searchNothing => 'لا نتائج';
+
+  @override
+  String searchCount(String count, String verses) {
+    return '$count موضعا في $verses آية';
+  }
+
+  @override
+  String searchMore(String count) {
+    return 'و$count آية أخرى، ضيّق البحث لرؤيتها';
+  }
+
+  @override
+  String get searchHistory => 'عمليات البحث السابقة';
+
+  @override
+  String get searchClearHistory => 'مسح';
+
+  @override
+  String get continueReading => 'متابعة القراءة';
+
+  @override
+  String continueReadingAt(String surah, String ayah, String page) {
+    return '$surah · الآية $ayah · صفحة $page';
+  }
+
+  @override
+  String get openLabel => 'افتح';
 }

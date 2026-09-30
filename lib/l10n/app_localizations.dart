@@ -1507,6 +1507,72 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'معاينة الإطار'**
   String get framePreviewLabel;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في القرآن، أو اكتب «البقرة ٢٥٥»'**
+  String get searchHint;
+
+  /// No description provided for @searchIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب كلمة أو أكثر من القرآن، بتشكيل أو دونه، أو اكتب موضعا مثل «٢:٢٥٥» أو «البقرة ٢٥٥».'**
+  String get searchIntro;
+
+  /// No description provided for @searchGoTo.
+  ///
+  /// In ar, this message translates to:
+  /// **'اذهب إلى الموضع'**
+  String get searchGoTo;
+
+  /// No description provided for @searchNothing.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا نتائج'**
+  String get searchNothing;
+
+  /// No description provided for @searchCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} موضعا في {verses} آية'**
+  String searchCount(String count, String verses);
+
+  /// No description provided for @searchMore.
+  ///
+  /// In ar, this message translates to:
+  /// **'و{count} آية أخرى، ضيّق البحث لرؤيتها'**
+  String searchMore(String count);
+
+  /// No description provided for @searchHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'عمليات البحث السابقة'**
+  String get searchHistory;
+
+  /// No description provided for @searchClearHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح'**
+  String get searchClearHistory;
+
+  /// No description provided for @continueReading.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة القراءة'**
+  String get continueReading;
+
+  /// No description provided for @continueReadingAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'{surah} · الآية {ayah} · صفحة {page}'**
+  String continueReadingAt(String surah, String ayah, String page);
+
+  /// No description provided for @openLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح'**
+  String get openLabel;
 }
 
 class _AppLocalizationsDelegate
