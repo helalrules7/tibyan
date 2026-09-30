@@ -4,7 +4,7 @@ import '../theme/app_theme.dart';
 import '../theme/theme_tokens.dart';
 
 /// How the colour mode is chosen: by the device, or fixed by the user.
-enum ModeSetting { system, light, night, black }
+enum ModeSetting { system, light, white, night, black }
 
 /// Interface language: follow the device, or fixed by the user.
 enum LanguageSetting { system, ar, en }
@@ -22,32 +22,6 @@ extension MushafEditionPages on MushafEdition {
 /// Shape of the verse-end markers in the page view: the mushaf's own
 /// (default) or one of three rosettes drawn over it.
 enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
-
-/// The page frame's design. Every style frames its pages; this chooses
-/// the ornament: the Zakhrafa images, the plain rules, or one of the six
-/// designs drawn from the owner's SVGs
-/// (`assets/ornaments/frame_<set>_<piece>.svg`).
-enum FrameDesign {
-  zakhrafa,
-  plain,
-  abbasid,
-  umayyad,
-  andalusian,
-  ottoman,
-  egyptian,
-  modernIslamic,
-}
-
-/// Each style's own frame: Zakhrafa's illuminated frame, and a drawn
-/// design for the others (the plain frame for a style not listed).
-FrameDesign defaultFrameFor(String styleId) => switch (styleId) {
-  'zakhrafa' => FrameDesign.zakhrafa,
-  'royal' => FrameDesign.abbasid,
-  'classic' => FrameDesign.ottoman,
-  'manuscript' => FrameDesign.andalusian,
-  'calm' => FrameDesign.modernIslamic,
-  _ => FrameDesign.plain,
-};
 
 /// Font of tafsir and translation texts.
 enum TafsirFont { naskh, interface }
@@ -82,7 +56,6 @@ class AppSettings {
     this.reciterId = 1,
     this.followRecitation = true,
     this.versePause = 0,
-    this.frameDesign,
   });
 
   final String styleId;
@@ -129,9 +102,6 @@ class AppSettings {
   /// the recording as it is.
   final int versePause;
 
-  /// The frame chosen by the reader; null uses the style's own.
-  final FrameDesign? frameDesign;
-
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -151,7 +121,6 @@ class AppSettings {
     int? reciterId,
     bool? followRecitation,
     int? versePause,
-    FrameDesign? Function()? frameDesign,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -171,13 +140,14 @@ class AppSettings {
     reciterId: reciterId ?? this.reciterId,
     followRecitation: followRecitation ?? this.followRecitation,
     versePause: versePause ?? this.versePause,
-    frameDesign: frameDesign == null ? this.frameDesign : frameDesign(),
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure
-  /// white text); Black is only used when the user picks it.
+  /// white text); Bright white and Black are only used when the user picks
+  /// them.
   ThemeModeId resolveMode(Brightness platformBrightness) => switch (mode) {
     ModeSetting.light => ThemeModeId.light,
+    ModeSetting.white => ThemeModeId.white,
     ModeSetting.night => ThemeModeId.night,
     ModeSetting.black => ThemeModeId.black,
     ModeSetting.system =>

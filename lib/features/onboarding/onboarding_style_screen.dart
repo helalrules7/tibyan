@@ -8,8 +8,8 @@ import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import 'page_preview.dart';
 
-/// First launch, screen 1: style and colour mode, with a live preview of
-/// a real mushaf page.
+/// First launch, screen 1: the colour mode, with a live preview of a real
+/// mushaf page in the app's (single) style.
 class OnboardingStyleScreen extends ConsumerWidget {
   const OnboardingStyleScreen({super.key});
 
@@ -23,8 +23,13 @@ class OnboardingStyleScreen extends ConsumerWidget {
     final style = registry.byId(settings.styleId);
     final mode = settings.resolveMode(MediaQuery.platformBrightnessOf(context));
     final t = context.tokens.colors;
-    const modes = [ModeSetting.light, ModeSetting.night, ModeSetting.black];
-    final modeNames = [l.modeLight, l.modeNight, l.modeBlack];
+    const modes = [
+      ModeSetting.light,
+      ModeSetting.white,
+      ModeSetting.night,
+      ModeSetting.black,
+    ];
+    final modeNames = [l.modeLight, l.modeWhite, l.modeNight, l.modeBlack];
 
     return Scaffold(
       body: SafeArea(
@@ -68,30 +73,6 @@ class OnboardingStyleScreen extends ConsumerWidget {
               style: TextStyle(color: t.muted, fontSize: 12),
             ),
             const SizedBox(height: 14),
-            Semantics(
-              label: l.styleLabel,
-              child: Row(
-                children: [
-                  for (final s in registry.styles)
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: _Choice(
-                          label: s.localizedName(lang),
-                          selected: s.id == settings.styleId,
-                          onTap: () => ctrl.setStyle(s.id),
-                          swatches: [
-                            s.modes[mode]!.paper,
-                            s.modes[mode]!.headBg,
-                            s.modes[mode]!.frame,
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
             SegmentedButton<ModeSetting>(
               segments: [
                 for (var i = 0; i < modes.length; i++)
@@ -111,75 +92,6 @@ class OnboardingStyleScreen extends ConsumerWidget {
               child: Text(l.continueLabel),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Choice extends StatelessWidget {
-  const _Choice({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    required this.swatches,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  final List<Color> swatches;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens.colors;
-    return Semantics(
-      selected: selected,
-      button: true,
-      label: label,
-      excludeSemantics: true,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 64),
-          decoration: BoxDecoration(
-            color: t.paper,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: selected ? t.control : t.border,
-              width: selected ? 2 : 1,
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (final c in swatches)
-                    Container(
-                      width: 12,
-                      height: 12,
-                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: t.border),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

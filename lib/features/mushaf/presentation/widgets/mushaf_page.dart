@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/db/content_database.dart';
 import '../../../../core/settings/app_settings.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../mushaf_providers.dart';
 import 'page_interaction.dart';
@@ -395,9 +394,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                 );
             }
             final look = x.markerLook;
-            final ink = tokens.mode == ThemeModeId.light
-                ? null
-                : tokens.colors.ink;
+            final ink = tokens.mode.isLight ? null : tokens.colors.ink;
             return Stack(
               clipBehavior: Clip.none,
               children: [

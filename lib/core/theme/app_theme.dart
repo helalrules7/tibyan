@@ -52,9 +52,7 @@ ThemeData buildTheme({
   required UiFont uiFont,
 }) {
   final t = style.modes[mode]!;
-  final brightness = mode == ThemeModeId.light
-      ? Brightness.light
-      : Brightness.dark;
+  final brightness = mode.isLight ? Brightness.light : Brightness.dark;
 
   final scheme = ColorScheme(
     brightness: brightness,

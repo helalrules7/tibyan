@@ -53,9 +53,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appearanceTitle => 'شكل المصحف';
 
   @override
-  String get styleLabel => 'الشكل';
-
-  @override
   String get modeLabel => 'وضع الإضاءة';
 
   @override
@@ -66,6 +63,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get modeLight => 'فاتح';
+
+  @override
+  String get modeWhite => 'أبيض زاهي';
 
   @override
   String get modeNight => 'ليلي';
@@ -118,9 +118,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String versionLabel(String version) {
     return 'الإصدار $version';
   }
-
-  @override
-  String get previewLabel => 'معاينة';
 
   @override
   String get selected => 'محدد';
@@ -781,39 +778,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get homeTitle => 'الرئيسية';
-
-  @override
-  String get frameDesignLabel => 'إطار الصفحة';
-
-  @override
-  String get frameByStyle => 'حسب الشكل';
-
-  @override
-  String get frameZakhrafa => 'زخرفة';
-
-  @override
-  String get framePlain => 'بسيط';
-
-  @override
-  String get frameAbbasid => 'عباسي';
-
-  @override
-  String get frameUmayyad => 'أموي';
-
-  @override
-  String get frameAndalusian => 'أندلسي';
-
-  @override
-  String get frameOttoman => 'عثماني';
-
-  @override
-  String get frameEgyptian => 'مصري';
-
-  @override
-  String get frameModernIslamic => 'إسلامي حديث';
-
-  @override
-  String get framePreviewLabel => 'معاينة الإطار';
 
   @override
   String get searchHint => 'ابحث في القرآن، أو اكتب «البقرة ٢٥٥»';

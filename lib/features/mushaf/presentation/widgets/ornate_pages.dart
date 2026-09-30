@@ -32,11 +32,9 @@ class CoverPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
-    // Over a drawn design's splash: the art's own ink and gold.
-    final look = FrameLook.of(context, ref);
-    final ink = look?.ink ?? t.ink;
-    final muted = look?.ink.withValues(alpha: 0.8) ?? t.muted;
-    final rule = look?.gold ?? t.marker;
+    final ink = t.ink;
+    final muted = t.muted;
+    final rule = t.marker;
     final basmala = ref.watch(basmalaProvider).value ?? '';
     final edition = ref.watch(editionProvider);
     return GestureDetector(
@@ -228,7 +226,6 @@ class OpeningPage extends ConsumerWidget {
       ],
     );
     return OrnateFrame(
-      openingSurah: surah,
       page: page,
       onPageTap: onPageTap,
       catchword: catchword,

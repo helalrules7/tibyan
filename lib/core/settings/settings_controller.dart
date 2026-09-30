@@ -37,7 +37,6 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
   static const _kVersePause = 'settings.versePause';
-  static const _kFrame = 'settings.frameDesign';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -83,7 +82,6 @@ class SettingsController extends Notifier<AppSettings> {
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       followRecitation: _prefs.getBool(_kFollow) ?? true,
       versePause: _prefs.getInt(_kVersePause) ?? 0,
-      frameDesign: _enumByName(FrameDesign.values, _prefs.getString(_kFrame)),
     );
   }
 
@@ -184,16 +182,6 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setVersePause(int ms) async {
     state = state.copyWith(versePause: ms);
     await _prefs.setInt(_kVersePause, ms);
-  }
-
-  /// Null goes back to the style's own frame.
-  Future<void> setFrameDesign(FrameDesign? design) async {
-    state = state.copyWith(frameDesign: () => design);
-    if (design == null) {
-      await _prefs.remove(_kFrame);
-    } else {
-      await _prefs.setString(_kFrame, design.name);
-    }
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'mushaf_page.dart';
 import 'page_interaction.dart';
@@ -452,7 +451,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                           layout: layout,
                           // Opaque scans are always recoloured, so their
                           // tinted paper never shows on ours.
-                          ink: tokens.mode == ThemeModeId.light && data.alphaInk
+                          ink: tokens.mode.isLight && data.alphaInk
                               ? null
                               : tokens.colors.ink,
                           highlight: tokens.colors.highlight,

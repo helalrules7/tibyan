@@ -182,12 +182,6 @@ abstract class AppLocalizations {
   /// **'شكل المصحف'**
   String get appearanceTitle;
 
-  /// No description provided for @styleLabel.
-  ///
-  /// In ar, this message translates to:
-  /// **'الشكل'**
-  String get styleLabel;
-
   /// No description provided for @modeLabel.
   ///
   /// In ar, this message translates to:
@@ -211,6 +205,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'فاتح'**
   String get modeLight;
+
+  /// No description provided for @modeWhite.
+  ///
+  /// In ar, this message translates to:
+  /// **'أبيض زاهي'**
+  String get modeWhite;
 
   /// No description provided for @modeNight.
   ///
@@ -307,12 +307,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الإصدار {version}'**
   String versionLabel(String version);
-
-  /// No description provided for @previewLabel.
-  ///
-  /// In ar, this message translates to:
-  /// **'معاينة'**
-  String get previewLabel;
 
   /// No description provided for @selected.
   ///
@@ -1435,72 +1429,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الرئيسية'**
   String get homeTitle;
-
-  /// No description provided for @frameDesignLabel.
-  ///
-  /// In ar, this message translates to:
-  /// **'إطار الصفحة'**
-  String get frameDesignLabel;
-
-  /// No description provided for @frameByStyle.
-  ///
-  /// In ar, this message translates to:
-  /// **'حسب الشكل'**
-  String get frameByStyle;
-
-  /// No description provided for @frameZakhrafa.
-  ///
-  /// In ar, this message translates to:
-  /// **'زخرفة'**
-  String get frameZakhrafa;
-
-  /// No description provided for @framePlain.
-  ///
-  /// In ar, this message translates to:
-  /// **'بسيط'**
-  String get framePlain;
-
-  /// No description provided for @frameAbbasid.
-  ///
-  /// In ar, this message translates to:
-  /// **'عباسي'**
-  String get frameAbbasid;
-
-  /// No description provided for @frameUmayyad.
-  ///
-  /// In ar, this message translates to:
-  /// **'أموي'**
-  String get frameUmayyad;
-
-  /// No description provided for @frameAndalusian.
-  ///
-  /// In ar, this message translates to:
-  /// **'أندلسي'**
-  String get frameAndalusian;
-
-  /// No description provided for @frameOttoman.
-  ///
-  /// In ar, this message translates to:
-  /// **'عثماني'**
-  String get frameOttoman;
-
-  /// No description provided for @frameEgyptian.
-  ///
-  /// In ar, this message translates to:
-  /// **'مصري'**
-  String get frameEgyptian;
-
-  /// No description provided for @frameModernIslamic.
-  ///
-  /// In ar, this message translates to:
-  /// **'إسلامي حديث'**
-  String get frameModernIslamic;
-
-  /// No description provided for @framePreviewLabel.
-  ///
-  /// In ar, this message translates to:
-  /// **'معاينة الإطار'**
-  String get framePreviewLabel;
 
   /// No description provided for @searchHint.
   ///

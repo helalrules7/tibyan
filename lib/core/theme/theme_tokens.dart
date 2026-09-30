@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-/// A visual style (Classic, Manuscript, Royal, Calm) loaded from
+/// A visual style (today only Zakhrafa) loaded from
 /// `assets/themes/<id>.json`. Adding a style means adding a JSON file,
 /// not code.
 class TibyanStyle {
@@ -55,8 +55,17 @@ class TibyanStyle {
   }
 }
 
-/// The three colour modes every style must define.
-enum ThemeModeId { light, night, black }
+/// The colour modes every style must define. Bright white is a light mode
+/// whose screen and paper are pure white.
+enum ThemeModeId {
+  light,
+  white,
+  night,
+  black;
+
+  /// Dark ink on a light paper (light and bright white).
+  bool get isLight => this == light || this == white;
+}
 
 class ModeTokens {
   const ModeTokens({

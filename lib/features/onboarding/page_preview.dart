@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -39,7 +37,7 @@ class RealPagePreview extends StatelessWidget {
             child: SvgPicture.asset(
               'assets/themes/preview_page001.svg',
               fit: BoxFit.contain,
-              colorFilter: mode == ThemeModeId.light
+              colorFilter: mode.isLight
                   ? null
                   : ColorFilter.mode(t.ink, BlendMode.srcIn),
             ),
@@ -67,15 +65,8 @@ class _FramePainter extends CustomPainter {
     final stroke = Paint()
       ..style = PaintingStyle.stroke
       ..color = colors.frame;
-    if (f.outerStyle == 'double') {
-      final w = f.outerWidth / 3;
-      stroke.strokeWidth = w;
-      canvas.drawRRect(outer.deflate(w / 2), stroke);
-      canvas.drawRRect(outer.deflate(f.outerWidth - w / 2), stroke);
-    } else {
-      stroke.strokeWidth = f.outerWidth;
-      canvas.drawRRect(outer.deflate(f.outerWidth / 2), stroke);
-    }
+    stroke.strokeWidth = f.outerWidth;
+    canvas.drawRRect(outer.deflate(f.outerWidth / 2), stroke);
     if (f.innerWidth > 0) {
       final inner = RRect.fromRectAndRadius(
         (Offset.zero & size).deflate(f.outerWidth + f.gap),
@@ -83,29 +74,6 @@ class _FramePainter extends CustomPainter {
       );
       stroke.strokeWidth = f.innerWidth;
       canvas.drawRRect(inner.deflate(f.innerWidth / 2), stroke);
-      if (f.corner == 'star8') {
-        final r = inner.outerRect;
-        for (final c in [r.topLeft, r.topRight, r.bottomLeft, r.bottomRight]) {
-          _star(canvas, c);
-        }
-      }
-    }
-  }
-
-  void _star(Canvas canvas, Offset c) {
-    final fill = Paint()..color = colors.paper;
-    final line = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = colors.frame;
-    for (final a in [0.0, math.pi / 4]) {
-      canvas.save();
-      canvas.translate(c.dx, c.dy);
-      canvas.rotate(a);
-      final sq = Rect.fromCenter(center: Offset.zero, width: 12, height: 12);
-      canvas.drawRect(sq, fill);
-      canvas.drawRect(sq, line);
-      canvas.restore();
     }
   }
 

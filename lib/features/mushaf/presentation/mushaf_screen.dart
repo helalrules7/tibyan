@@ -10,7 +10,6 @@ import '../../../core/db/user_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/theme/theme_tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
@@ -256,7 +255,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             : null,
         touched: _touchReading ? _touched : null,
         touchColor: _touchReading
-            ? (context.tokens.mode == ThemeModeId.light
+            ? (context.tokens.mode.isLight
                   ? const Color(0x33D0453B)
                   : const Color(0x40FF8A80))
             : null,
@@ -274,7 +273,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             ? ref.watch(divineNameBoxesProvider(pg)).value ?? const []
             : const [],
         divineColor: settings.highlightDivineNames
-            ? (context.tokens.mode == ThemeModeId.light
+            ? (context.tokens.mode.isLight
                   ? const Color(0xFFC62828)
                   : const Color(0xFFFF8A80))
             : null,

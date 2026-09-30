@@ -12,7 +12,7 @@ void main() {
   late ThemeRegistry registry;
   setUpAll(() async => registry = await ThemeRegistry.load(rootBundle));
 
-  test('every style defines all three modes', () {
+  test('every style defines every mode', () {
     expect(registry.styles, isNotEmpty);
     for (final style in registry.styles) {
       expect(

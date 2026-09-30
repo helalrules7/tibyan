@@ -53,9 +53,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceTitle => 'Mushaf look';
 
   @override
-  String get styleLabel => 'Style';
-
-  @override
   String get modeLabel => 'Mode';
 
   @override
@@ -66,6 +63,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get modeLight => 'Light';
+
+  @override
+  String get modeWhite => 'Bright white';
 
   @override
   String get modeNight => 'Night';
@@ -118,9 +118,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String versionLabel(String version) {
     return 'Version $version';
   }
-
-  @override
-  String get previewLabel => 'Preview';
 
   @override
   String get selected => 'Selected';
@@ -784,39 +781,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeTitle => 'Home';
-
-  @override
-  String get frameDesignLabel => 'Page frame';
-
-  @override
-  String get frameByStyle => 'Style\'s own';
-
-  @override
-  String get frameZakhrafa => 'Zakhrafa';
-
-  @override
-  String get framePlain => 'Plain';
-
-  @override
-  String get frameAbbasid => 'Abbasid';
-
-  @override
-  String get frameUmayyad => 'Umayyad';
-
-  @override
-  String get frameAndalusian => 'Andalusian';
-
-  @override
-  String get frameOttoman => 'Ottoman';
-
-  @override
-  String get frameEgyptian => 'Egyptian';
-
-  @override
-  String get frameModernIslamic => 'Modern Islamic';
-
-  @override
-  String get framePreviewLabel => 'Frame preview';
 
   @override
   String get searchHint => 'Search the Quran, or type “2:255”';

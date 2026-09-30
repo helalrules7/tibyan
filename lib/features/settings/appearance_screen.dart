@@ -5,8 +5,6 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
-import '../mushaf/presentation/widgets/illuminated_frame.dart';
-import 'widgets/style_preview.dart';
 
 class AppearanceScreen extends ConsumerWidget {
   const AppearanceScreen({super.key});
@@ -16,9 +14,6 @@ class AppearanceScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
-    final registry = ref.watch(themeRegistryProvider);
-    final lang = Localizations.localeOf(context).languageCode;
-    final mode = settings.resolveMode(MediaQuery.platformBrightnessOf(context));
     final t = context.tokens.colors;
 
     return Scaffold(
@@ -26,94 +21,6 @@ class AppearanceScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          _Title(l.styleLabel),
-          SizedBox(
-            height: 290,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: registry.styles.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (context, i) {
-                final style = registry.styles[i];
-                final selected = style.id == settings.styleId;
-                final name = style.localizedName(lang);
-                return Semantics(
-                  selected: selected,
-                  button: true,
-                  label: '$name. ${style.localizedDescription(lang)}',
-                  excludeSemantics: true,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => controller.setStyle(style.id),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: selected ? t.goldText : t.border,
-                          width: selected ? 2 : 1,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          StylePreview(
-                            style: style,
-                            mode: mode,
-                            headerLabel: l.previewLabel,
-                            semanticLabel: name,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            name,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            selected
-                                ? l.selected
-                                : style.localizedDescription(lang),
-                            style: TextStyle(color: t.muted, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 20),
-          _Title(l.frameDesignLabel),
-          Card(
-            child: ListTile(
-              trailing: const FramePreview(width: 56),
-              title: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: [
-                    for (final (design, name) in [
-                      (null, l.frameByStyle),
-                      (FrameDesign.zakhrafa, l.frameZakhrafa),
-                      (FrameDesign.plain, l.framePlain),
-                      (FrameDesign.abbasid, l.frameAbbasid),
-                      (FrameDesign.umayyad, l.frameUmayyad),
-                      (FrameDesign.andalusian, l.frameAndalusian),
-                      (FrameDesign.ottoman, l.frameOttoman),
-                      (FrameDesign.egyptian, l.frameEgyptian),
-                      (FrameDesign.modernIslamic, l.frameModernIslamic),
-                    ])
-                      ChoiceChip(
-                        label: Text(name),
-                        selected: settings.frameDesign == design,
-                        onSelected: (_) => controller.setFrameDesign(design),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
           _Title(l.markerStyleLabel),
           const Card(child: _MarkerSettings()),
           const SizedBox(height: 20),
@@ -135,6 +42,10 @@ class AppearanceScreen extends ConsumerWidget {
                   RadioListTile(
                     value: ModeSetting.light,
                     title: Text(l.modeLight),
+                  ),
+                  RadioListTile(
+                    value: ModeSetting.white,
+                    title: Text(l.modeWhite),
                   ),
                   RadioListTile(
                     value: ModeSetting.night,
