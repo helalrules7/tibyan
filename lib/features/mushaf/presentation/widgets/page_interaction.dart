@@ -70,12 +70,12 @@ class PageInteraction {
   final Set<VerseKey>? hidden;
 
   /// Recitation mode: the word boxes of each covered verse, where known
-  /// (edition units). Only the words are covered, so verse-end markers and
-  /// the hizb sign stay visible; verses without word boxes are covered
-  /// whole and their markers drawn again on top.
+  /// (edition units), which place its lines. A covered verse is hidden
+  /// line by line, band high, from marker to marker, with every mark it
+  /// has; only the verse-end markers and their numbers stay.
   final Map<VerseKey, List<Rect>> hiddenWords;
 
-  /// Recitation mode: a covered verse was tapped.
+  /// Recitation mode: a verse was tapped (to show or cover it).
   final ValueChanged<VerseKey>? onHiddenTap;
 
   /// Verses highlighted on this page (the current selection).

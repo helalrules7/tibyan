@@ -40,13 +40,13 @@ class AppSettings {
   const AppSettings({
     required this.styleId,
     this.mode = ModeSetting.light,
-    this.uiFont = UiFont.kfgqpcAn,
+    this.uiFont = UiFont.changa,
     this.language = LanguageSetting.ar,
     this.crashReportsOptIn = false,
     this.onboardingDone = false,
     this.edition = MushafEdition.madina1441,
     this.keepScreenOn = true,
-    this.markerStyle = MarkerStyle.traditional,
+    this.markerStyle = MarkerStyle.rosette16,
     this.markerTint,
     this.highlightDivineNames = true,
     this.tafsirFont = TafsirFont.naskh,
@@ -55,6 +55,7 @@ class AppSettings {
     this.tafsirKashida = false,
     this.reciterId = 1,
     this.followRecitation = true,
+    this.touchReading = true,
     this.versePause = 0,
   });
 
@@ -98,6 +99,9 @@ class AppSettings {
   /// Turn pages to follow the verse being recited.
   final bool followRecitation;
 
+  /// Touch reading: tapping a verse shades it. Kept for the whole mushaf.
+  final bool touchReading;
+
   /// Longest pause kept between verses while listening, in ms; 0 plays
   /// the recording as it is.
   final int versePause;
@@ -120,6 +124,7 @@ class AppSettings {
     bool? tafsirKashida,
     int? reciterId,
     bool? followRecitation,
+    bool? touchReading,
     int? versePause,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
@@ -139,6 +144,7 @@ class AppSettings {
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
     reciterId: reciterId ?? this.reciterId,
     followRecitation: followRecitation ?? this.followRecitation,
+    touchReading: touchReading ?? this.touchReading,
     versePause: versePause ?? this.versePause,
   );
 

@@ -162,6 +162,7 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onQuarterTap,
     this.tools,
     this.linePadding,
+    this.showCatchword = true,
   });
 
   /// Room the page keeps above its first line and below its last, for a
@@ -182,6 +183,9 @@ class IlluminatedFrame extends ConsumerWidget {
 
   /// Small reading tools shown just under the page number.
   final Widget? tools;
+
+  /// The next page's first word under the frame (off in recitation mode).
+  final bool showCatchword;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -336,7 +340,7 @@ class IlluminatedFrame extends ConsumerWidget {
                         color: t.muted,
                       ),
                     const Spacer(),
-                    if (info?.catchword != null)
+                    if (showCatchword && info?.catchword != null)
                       Text(
                         info!.catchword!,
                         semanticsLabel: l.catchwordLabel(info!.catchword!),

@@ -884,24 +884,6 @@ abstract class AppLocalizations {
   /// **'وضع التسميع'**
   String get reciteMode;
 
-  /// No description provided for @revealNextVerse.
-  ///
-  /// In ar, this message translates to:
-  /// **'الآية التالية'**
-  String get revealNextVerse;
-
-  /// No description provided for @revealAll.
-  ///
-  /// In ar, this message translates to:
-  /// **'الكل'**
-  String get revealAll;
-
-  /// No description provided for @endRecite.
-  ///
-  /// In ar, this message translates to:
-  /// **'إنهاء التسميع'**
-  String get endRecite;
-
   /// No description provided for @autoScroll.
   ///
   /// In ar, this message translates to:

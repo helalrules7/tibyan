@@ -74,7 +74,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   bool _pickWord = false;
 
   /// Touch reading: the verse the reader last tapped is shaded.
-  bool _touchReading = false;
+  bool get _touchReading => ref.read(settingsProvider).touchReading;
   VerseKey? _touched;
 
   /// Auto-scroll: pages stacked vertically, moving at [_speed].
@@ -93,7 +93,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _selA = _selB = (surah: widget.selectSurah!, ayah: widget.selectAyah!);
     }
     _open();
-    _touchReading = true;
     if (ref.read(settingsProvider).keepScreenOn) WakelockPlus.enable();
     _applySystemBars();
   }
@@ -102,6 +101,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     SystemChrome.setEnabledSystemUIMode(
       _chrome ? SystemUiMode.edgeToEdge : SystemUiMode.immersiveSticky,
     );
+  }
+
+  /// A tap on the page, its frame or the space around it: clears the
+  /// selection, or shows and hides the menus.
+  void _onPageTap() {
+    if (_multi) return;
+    if (_selA != null) {
+      setState(() => _selA = _selB = null);
+    } else {
+      _setChrome(!_chrome);
+    }
   }
 
   void _setChrome(bool on) {
@@ -233,14 +243,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             ? {(surah: recitation.surah, ayah: recitation.ayah!)}
             : const {},
         marks: marks,
-        onTap: () {
-          if (_multi) return;
-          if (_selA != null) {
-            setState(() => _selA = _selB = null);
-          } else {
-            _setChrome(!_chrome);
-          }
-        },
+        onTap: _onPageTap,
         onVerseLongPress: (v) {
           HapticFeedback.selectionClick();
           _setChrome(false);
@@ -266,7 +269,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         hiddenWords: _recite && pg == _page
             ? _wordsOf(_hiddenOn(pg), pg)
             : const {},
-        onHiddenTap: (v) => setState(() => _revealed.add(v)),
+        // A tap shows a covered verse, or covers it again.
+        onHiddenTap: (v) => setState(
+          () => _revealed.contains(v) ? _revealed.remove(v) : _revealed.add(v),
+        ),
         ornateOpening: openingSurah != null,
         showHandles: _multi,
         divineNames: settings.highlightDivineNames
@@ -324,7 +330,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           child: OpeningPage(
             page: pg,
             surah: openingSurah,
-            catchword: info?.catchword,
+            // Recitation mode: the next page's first word would give it away.
+            catchword: _recite ? null : info?.catchword,
             onPageTap: _goToPage,
             tools: tools,
             child: pageWidget,
@@ -349,6 +356,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onSurahTap: () => openIndex('surahs'),
           onPageTap: _goToPage,
           tools: tools,
+          showCatchword: !_recite,
           linePadding: edition == MushafEdition.shamarly
               ? shamarlyLinePadding
               : null,
@@ -369,41 +377,48 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       backgroundColor: t.bg,
       body: Stack(
         children: [
-          SafeArea(
-            // While listening, the page sits above the player bar so the
-            // catchword and the reading tools stay visible.
-            minimum: EdgeInsets.only(
-              bottom: recitation.active && !_autoScroll
-                  ? MediaQuery.paddingOf(context).bottom + 80
-                  : 0,
-            ),
-            child: _autoScroll
-                ? LayoutBuilder(
-                    builder: (context, box) {
-                      _pageExtent = box.maxHeight;
-                      _vertical ??= ScrollController(
-                        initialScrollOffset: (_page - _first) * box.maxHeight,
-                      );
-                      return ListView.builder(
-                        controller: _vertical,
-                        itemExtent: box.maxHeight,
+          // The frame and the space above and below the page open the
+          // menus too; a tap on the page itself or on a frame label is
+          // taken by that (deeper) widget first.
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _onPageTap,
+            child: SafeArea(
+              // While listening, the page sits above the player bar so the
+              // catchword and the reading tools stay visible.
+              minimum: EdgeInsets.only(
+                bottom: recitation.active && !_autoScroll
+                    ? MediaQuery.paddingOf(context).bottom + 80
+                    : 0,
+              ),
+              child: _autoScroll
+                  ? LayoutBuilder(
+                      builder: (context, box) {
+                        _pageExtent = box.maxHeight;
+                        _vertical ??= ScrollController(
+                          initialScrollOffset: (_page - _first) * box.maxHeight,
+                        );
+                        return ListView.builder(
+                          controller: _vertical,
+                          itemExtent: box.maxHeight,
+                          itemCount: pageCount + 1 - _first,
+                          itemBuilder: (context, i) => pageAt(i),
+                        );
+                      },
+                    )
+                  : _controller == null
+                  ? const Center(child: CircularProgressIndicator())
+                  // The mushaf opens from the right in every interface language.
+                  : Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: PageView.builder(
+                        controller: _controller,
                         itemCount: pageCount + 1 - _first,
+                        onPageChanged: _onPageChanged,
                         itemBuilder: (context, i) => pageAt(i),
-                      );
-                    },
-                  )
-                : _controller == null
-                ? const Center(child: CircularProgressIndicator())
-                // The mushaf opens from the right in every interface language.
-                : Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: PageView.builder(
-                      controller: _controller,
-                      itemCount: pageCount + 1 - _first,
-                      onPageChanged: _onPageChanged,
-                      itemBuilder: (context, i) => pageAt(i),
+                      ),
                     ),
-                  ),
+            ),
           ),
           if (_chrome) ...[
             // A light veil so the controls read as a layer over the page.
@@ -463,23 +478,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               ),
             ),
           ],
-          if (_recite)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: SafeArea(
-                top: false,
-                child: _ReciteBar(
-                  onNextVerse: _revealNext,
-                  onAll: () => setState(() => _revealed.addAll(_pageKeys())),
-                  onClose: () => setState(() {
-                    _recite = false;
-                    _revealed.clear();
-                  }),
-                ),
-              ),
-            ),
           if (_autoScroll)
             Positioned(
               left: 16,
@@ -727,11 +725,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   void _toggleTouchReading() {
     HapticFeedback.selectionClick();
-    setState(() {
-      _touchReading = !_touchReading;
-      _touched = null;
-    });
-    if (_touchReading) {
+    final on = !_touchReading;
+    ref.read(settingsProvider.notifier).setTouchReading(on);
+    setState(() => _touched = null);
+    if (on) {
       final l = AppLocalizations.of(context);
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -753,15 +750,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _selA = _selB = null;
       _multi = false;
     });
-  }
-
-  void _revealNext() {
-    for (final k in _pageKeys()) {
-      if (!_revealed.contains(k)) {
-        setState(() => _revealed.add(k));
-        return;
-      }
-    }
   }
 
   void _startAutoScroll() {
@@ -1136,58 +1124,6 @@ class _WordPickBar extends StatelessWidget {
               ),
             ),
             TextButton(onPressed: onCancel, child: Text(l.cancel)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Recitation mode toolbar.
-class _ReciteBar extends StatelessWidget {
-  const _ReciteBar({
-    required this.onNextVerse,
-    required this.onAll,
-    required this.onClose,
-  });
-
-  final VoidCallback onNextVerse;
-  final VoidCallback onAll;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    return Material(
-      color: t.paper,
-      elevation: 6,
-      borderRadius: BorderRadius.circular(30),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Icon(
-                Icons.visibility_outlined,
-                color: t.control,
-                semanticLabel: l.reciteMode,
-              ),
-            ),
-            Expanded(
-              child: FilledButton(
-                onPressed: onNextVerse,
-                child: Text(l.revealNextVerse),
-              ),
-            ),
-            const SizedBox(width: 6),
-            OutlinedButton(onPressed: onAll, child: Text(l.revealAll)),
-            IconButton(
-              tooltip: l.endRecite,
-              onPressed: onClose,
-              icon: const Icon(Icons.close),
-            ),
           ],
         ),
       ),

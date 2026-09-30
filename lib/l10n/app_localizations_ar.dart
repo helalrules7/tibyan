@@ -462,15 +462,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reciteMode => 'وضع التسميع';
 
   @override
-  String get revealNextVerse => 'الآية التالية';
-
-  @override
-  String get revealAll => 'الكل';
-
-  @override
-  String get endRecite => 'إنهاء التسميع';
-
-  @override
   String get autoScroll => 'التمرير التلقائي';
 
   @override

@@ -363,14 +363,26 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                 if (test(k)) r,
             ];
 
-            /// Recitation mode: a verse's words when known (so its marker
-            /// and the hizb sign stay), else the whole verse.
+            /// Recitation mode: the verse's own boxes, line by line and band
+            /// high, so none of its marks is left (the markers are drawn
+            /// again on top).
             Iterable<Rect> coverOf(VerseKey v) {
-              final words = x.hiddenWords[v];
-              if (words != null && words.isNotEmpty) {
-                return layout.frames(words).map((r) => r.widen(6));
+              final pieces = piecesOf((k) => k == v);
+              if (pieces.isEmpty) {
+                final words = x.hiddenWords[v];
+                return words == null ? const [] : layout.frames(words);
               }
-              return piecesOf((k) => k == v).map(layout.toScreenRect);
+              return [
+                for (final r in pieces)
+                  () {
+                    final (top, bottom) = layout.band(
+                      layout.lineOfImageY(r.center.dy),
+                    );
+                    return layout.toScreenRect(
+                      Rect.fromLTRB(r.left, top, r.right, bottom),
+                    );
+                  }(),
+              ];
             }
 
             final selected = piecesOf(x.selection.contains).toList();
@@ -424,7 +436,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                       }
                       if (x.hidden != null) {
                         final v = verseAt(d.localPosition);
-                        if (v != null && x.hidden!.contains(v)) {
+                        if (v != null) {
                           x.onHiddenTap?.call(v);
                           return;
                         }
@@ -618,18 +630,8 @@ class _ImagePagePainter extends CustomPainter {
     }
     if (hidden.isNotEmpty) {
       final cover = Paint()..color = paper;
-      final stroke = Paint()
-        ..color = line
-        ..strokeWidth = 1.2;
       for (final r in hidden) {
         canvas.drawRect(r.inflate(2), cover);
-      }
-      for (final r in hidden) {
-        canvas.drawLine(
-          Offset(r.left, r.center.dy),
-          Offset(r.right, r.center.dy),
-          stroke,
-        );
       }
       for (final (src, dst) in markerPixels) {
         canvas.drawImageRect(

@@ -463,15 +463,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reciteMode => 'Recitation mode';
 
   @override
-  String get revealNextVerse => 'Next verse';
-
-  @override
-  String get revealAll => 'All';
-
-  @override
-  String get endRecite => 'End recitation';
-
-  @override
   String get autoScroll => 'Auto-scroll';
 
   @override

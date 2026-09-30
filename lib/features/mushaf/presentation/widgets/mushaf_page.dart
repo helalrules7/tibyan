@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,6 +17,7 @@ typedef _PageData = (
   List<AyahPolygonRow>,
   List<double>,
   Map<int, List<Path>>,
+  PictureInfo?,
 );
 
 /// Identifies a verse.
@@ -210,6 +213,7 @@ class MushafPage extends ConsumerStatefulWidget {
 class _MushafPageState extends ConsumerState<MushafPage> {
   late Future<_PageData> _load;
   PictureInfo? _picture;
+  PictureInfo? _markerPicture;
 
   @override
   void initState() {
@@ -237,6 +241,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
   @override
   void dispose() {
     _picture?.picture.dispose();
+    _markerPicture?.picture.dispose();
     super.dispose();
   }
 
@@ -246,8 +251,20 @@ class _MushafPageState extends ConsumerState<MushafPage> {
       SvgStringLoader(_markersHidden ? withoutMarkers(svg) : svg),
       null,
     );
-    _picture?.picture.dispose();
+    // The printed markers alone, drawn again over the recitation covers.
+    final markers = _markersHidden
+        ? null
+        : await vg.loadPicture(SvgStringLoader(markersOnly(svg)), null);
+    // The old pictures are still on screen until the new ones are built:
+    // they go after the next frame, not now.
+    final old = [_picture, _markerPicture];
     _picture = info;
+    _markerPicture = markers;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      for (final p in old) {
+        p?.picture.dispose();
+      }
+    });
     final repo = ref.read(mushafRepositoryProvider);
     final polys = await repo.polygons(widget.page);
     final cuts = await repo.lineCuts('madina1441', widget.page);
@@ -255,7 +272,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
     for (final o in await repo.lineOverflow(widget.page)) {
       overflow.putIfAbsent(o.line, () => []).add(parseOutline(o.path));
     }
-    return (info, _viewBox(svg), polys, cuts, overflow);
+    return (info, _viewBox(svg), polys, cuts, overflow, markers);
   }
 
   @override
@@ -269,7 +286,8 @@ class _MushafPageState extends ConsumerState<MushafPage> {
         if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        final (picture, viewBox, polys, cuts, overflow) = snap.data!;
+        final (picture, viewBox, polys, cuts, overflow, markerPicture) =
+            snap.data!;
         final verses = [
           for (final p in polys)
             (
@@ -408,7 +426,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                       }
                       if (x.hidden != null) {
                         final v = verseAt(point);
-                        if (v != null && x.hidden!.contains(v)) {
+                        if (v != null) {
                           x.onHiddenTap?.call(v);
                           return;
                         }
@@ -535,7 +553,77 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 c.restore();
                               }
                             }
-                            // Over the ink: rosettes and recitation covers.
+                            // Recitation mode: the covered verses' lines,
+                            // band high, from one verse marker to the
+                            // next, so no mark of theirs is left; then the
+                            // markers are drawn again on top.
+                            final hidden = x.hidden;
+                            if (hidden != null) {
+                              final cover = Paint()
+                                ..color = tokens.colors.paper;
+                              final markersOn = <int, List<double>>{};
+                              for (final v in verses) {
+                                final m = v.marker;
+                                if (m == null) continue;
+                                (markersOn[layout._lineOf(m.dy)] ??= []).add(
+                                  m.dx,
+                                );
+                              }
+                              for (final v in verses) {
+                                if (!hidden.contains(v.key)) continue;
+                                final words = x.hiddenWords[v.key];
+                                if (words == null ||
+                                    words.isEmpty ||
+                                    widget.page <= 2) {
+                                  c.drawPath(v.path, cover);
+                                  continue;
+                                }
+                                for (final b in lineBoxes(
+                                  words,
+                                  lineOf: (r) => layout._lineOf(r.center.dy),
+                                  centre: layout._centre,
+                                  halfHeight: _pitch * 0.5,
+                                )) {
+                                  final j = layout._lineOf(b.center.dy);
+                                  final xs = markersOn[j] ?? const <double>[];
+                                  // The markers on either side of the words,
+                                  // or the text's edge.
+                                  final left = xs
+                                      .where((m) => m < b.left)
+                                      .fold(viewBox.left, math.max);
+                                  final right = xs
+                                      .where((m) => m > b.right)
+                                      .fold(viewBox.right, math.min);
+                                  c.drawRect(
+                                    Rect.fromLTRB(
+                                      left,
+                                      layout._bandTop(j),
+                                      right,
+                                      layout._bandBottom(j),
+                                    ),
+                                    cover,
+                                  );
+                                }
+                              }
+                              if (markerPicture != null) {
+                                if (ink != null) {
+                                  c.saveLayer(
+                                    null,
+                                    Paint()
+                                      ..colorFilter = ColorFilter.mode(
+                                        ink,
+                                        BlendMode.srcIn,
+                                      ),
+                                  );
+                                }
+                                c.save();
+                                c.translate(viewBox.left, viewBox.top);
+                                c.drawPicture(markerPicture.picture);
+                                c.restore();
+                                if (ink != null) c.restore();
+                              }
+                            }
+                            // Over the ink: the chosen rosettes.
                             if (look != null) {
                               for (final v in verses) {
                                 if (v.marker != null) {
@@ -545,50 +633,6 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                     markerR,
                                     v.key.ayah,
                                     marked: x.marks[v.key],
-                                  );
-                                }
-                              }
-                            }
-                            final hidden = x.hidden;
-                            if (hidden != null) {
-                              final cover = Paint()
-                                ..color = tokens.colors.paper;
-                              final line = Paint()
-                                ..color = tokens.colors.border
-                                ..strokeWidth = 1.2;
-                              for (final v in verses) {
-                                if (!hidden.contains(v.key)) continue;
-                                final words = x.hiddenWords[v.key];
-                                if (words == null ||
-                                    words.isEmpty ||
-                                    widget.page <= 2) {
-                                  c.drawPath(v.path, cover);
-                                  for (final r in v.rects) {
-                                    c.drawLine(
-                                      Offset(r.left + 4, r.center.dy),
-                                      Offset(r.right - 4, r.center.dy),
-                                      line,
-                                    );
-                                  }
-                                  continue;
-                                }
-                                // Only the words: the marker and the hizb
-                                // sign stay.
-                                for (final r in lineBoxes(
-                                  words,
-                                  lineOf: (r) => layout._lineOf(r.center.dy),
-                                  centre: layout._centre,
-                                  halfHeight: _pitch * 0.5,
-                                  band: (j) => (
-                                    layout._bandTop(j),
-                                    layout._bandBottom(j),
-                                  ),
-                                )) {
-                                  c.drawRect(r.widen(2.5), cover);
-                                  c.drawLine(
-                                    Offset(r.left + 2, r.center.dy),
-                                    Offset(r.right - 2, r.center.dy),
-                                    line,
                                   );
                                 }
                               }
@@ -631,6 +675,13 @@ String withoutMarkers(String svg) {
   final end = svg.indexOf('<g id="content"');
   if (start < 0 || end < start) return svg;
   return svg.substring(0, start) + svg.substring(end);
+}
+
+/// Only the page's printed verse-end markers (the group before the text).
+String markersOnly(String svg) {
+  final end = svg.indexOf('<g id="content"');
+  if (end < 0) return svg;
+  return '${svg.substring(0, end)}</svg>';
 }
 
 /// Parses the outline format of the verse polygons: "M x y L x y ... Z",

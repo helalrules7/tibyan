@@ -36,6 +36,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kKashida = 'settings.tafsirKashida';
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
+  static const _kTouchReading = 'settings.touchReading';
   static const _kVersePause = 'settings.versePause';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
@@ -54,7 +55,7 @@ class SettingsController extends Notifier<AppSettings> {
           ModeSetting.light,
       uiFont:
           _enumByName(UiFont.values, _prefs.getString(_kUiFont)) ??
-          UiFont.kfgqpcAn,
+          UiFont.changa,
       language:
           _enumByName(LanguageSetting.values, _prefs.getString(_kLanguage)) ??
           // Arabic unless the reader chooses otherwise, whatever the device.
@@ -67,7 +68,7 @@ class SettingsController extends Notifier<AppSettings> {
       keepScreenOn: _prefs.getBool(_kKeepOn) ?? true,
       markerStyle:
           _enumByName(MarkerStyle.values, _prefs.getString(_kMarkerStyle)) ??
-          MarkerStyle.traditional,
+          MarkerStyle.rosette16,
       markerTint: _prefs.getInt(_kMarkerTint),
       highlightDivineNames: _prefs.getBool(_kDivine) ?? true,
       tafsirFont:
@@ -81,6 +82,7 @@ class SettingsController extends Notifier<AppSettings> {
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       followRecitation: _prefs.getBool(_kFollow) ?? true,
+      touchReading: _prefs.getBool(_kTouchReading) ?? true,
       versePause: _prefs.getInt(_kVersePause) ?? 0,
     );
   }
@@ -177,6 +179,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setFollowRecitation(bool value) async {
     state = state.copyWith(followRecitation: value);
     await _prefs.setBool(_kFollow, value);
+  }
+
+  Future<void> setTouchReading(bool value) async {
+    state = state.copyWith(touchReading: value);
+    await _prefs.setBool(_kTouchReading, value);
   }
 
   Future<void> setVersePause(int ms) async {
