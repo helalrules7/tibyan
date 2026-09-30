@@ -6,6 +6,7 @@ import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/mushaf/presentation/about_mushaf_screen.dart';
+import '../../features/mushaf/presentation/download_all_screen.dart';
 import '../../features/mushaf/presentation/download_screen.dart';
 import '../../features/mushaf/presentation/fawasil_screen.dart';
 import '../../features/mushaf/presentation/index_screen.dart';
@@ -30,10 +31,16 @@ final appRouterProvider = Provider<GoRouter>(
       final done = ref.read(settingsProvider).onboardingDone;
       if (state.matchedLocation == '/splash') return null;
       final inOnboarding = state.matchedLocation.startsWith('/onboarding');
-      if (!done && !inOnboarding) return '/onboarding/language';
+      // «Download all» is offered on the edition step too.
+      final downloads = state.matchedLocation == '/downloads';
+      if (!done && !inOnboarding && !downloads) return '/onboarding/language';
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/downloads',
+        builder: (context, state) => const DownloadAllScreen(),
+      ),
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),

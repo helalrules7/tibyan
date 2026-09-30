@@ -209,6 +209,59 @@ final pageDownloadProvider =
       PageDownloadController.new,
     );
 
+/// One edition's page download, whichever edition is chosen: the
+/// «download all» screen follows each edition with one of these.
+class EditionDownload extends Notifier<PackProgress> {
+  EditionDownload(this.edition);
+
+  final MushafEdition edition;
+
+  PagePackSpec get _spec => PagePackSpec.of(edition);
+
+  @override
+  PackProgress build() {
+    final packs = ref.read(backgroundPacksProvider);
+    final sub = packs.progress.listen((e) {
+      if (e.$1 == _spec.id) state = e.$2;
+    });
+    ref.onDispose(sub.cancel);
+    if (ref.watch(installedEditionsProvider).contains(edition)) {
+      return const PackProgress(PackPhase.installed);
+    }
+    unawaited(
+      packs
+          .stateOf(_spec)
+          .then((s) {
+            if (ref.mounted) state = s;
+          })
+          .catchError((_) {}),
+    );
+    return const PackProgress(PackPhase.idle);
+  }
+
+  /// Starts the download, or resumes it where it paused.
+  Future<void> start() async {
+    state = PackProgress(
+      PackPhase.downloading,
+      received: state.received,
+      total: state.total,
+    );
+    final l = lookupAppLocalizations(
+      ref.read(settingsProvider).locale ?? const Locale('ar'),
+    );
+    await ref
+        .read(backgroundPacksProvider)
+        .enqueue(_spec, editionName(l, edition));
+  }
+
+  Future<void> pause() => ref.read(backgroundPacksProvider).pause(_spec);
+}
+
+final editionDownloadProvider =
+    NotifierProvider.family<EditionDownload, PackProgress, MushafEdition>(
+      EditionDownload.new,
+    );
+
 final pageAyahsProvider = FutureProvider.family<List<AyahRow>, int>(
   (ref, page) => ref
       .watch(mushafRepositoryProvider)
