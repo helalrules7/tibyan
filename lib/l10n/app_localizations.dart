@@ -179,7 +179,7 @@ abstract class AppLocalizations {
   /// No description provided for @appearanceTitle.
   ///
   /// In ar, this message translates to:
-  /// **'الشكل'**
+  /// **'شكل المصحف'**
   String get appearanceTitle;
 
   /// No description provided for @styleLabel.
@@ -1358,12 +1358,6 @@ abstract class AppLocalizations {
   /// **'تحميل كل المصاحف ({size} ميجا)'**
   String downloadAllEditions(String size);
 
-  /// No description provided for @allEditionsQueued.
-  ///
-  /// In ar, this message translates to:
-  /// **'بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.'**
-  String get allEditionsQueued;
-
   /// No description provided for @downloadInBackgroundNote.
   ///
   /// In ar, this message translates to:
@@ -1657,6 +1651,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{surah}، الآية {ayah}'**
   String wordStudyVerse(String surah, String ayah);
+
+  /// No description provided for @downloadAllTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل كل المصاحف'**
+  String get downloadAllTitle;
+
+  /// No description provided for @downloadAllCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمل {done} من {total}'**
+  String downloadAllCount(String done, String total);
 }
 
 class _AppLocalizationsDelegate

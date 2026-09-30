@@ -50,7 +50,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openSettings => 'Open settings';
 
   @override
-  String get appearanceTitle => 'Appearance';
+  String get appearanceTitle => 'Mushaf look';
 
   @override
   String get styleLabel => 'Style';
@@ -742,10 +742,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get allEditionsQueued =>
-      'All editions are downloading. You can keep reading or leave the app.';
-
-  @override
   String get downloadInBackgroundNote =>
       'You can leave the app: the download goes on in the background, and a notification tells you when it is done.';
 
@@ -910,5 +906,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String wordStudyVerse(String surah, String ayah) {
     return '$surah, verse $ayah';
+  }
+
+  @override
+  String get downloadAllTitle => 'Download all editions';
+
+  @override
+  String downloadAllCount(String done, String total) {
+    return '$done of $total done';
   }
 }

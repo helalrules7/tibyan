@@ -50,7 +50,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get openSettings => 'فتح الإعدادات';
 
   @override
-  String get appearanceTitle => 'الشكل';
+  String get appearanceTitle => 'شكل المصحف';
 
   @override
   String get styleLabel => 'الشكل';
@@ -739,10 +739,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get allEditionsQueued =>
-      'بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.';
-
-  @override
   String get downloadInBackgroundNote =>
       'يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.';
 
@@ -904,5 +900,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String wordStudyVerse(String surah, String ayah) {
     return '$surah، الآية $ayah';
+  }
+
+  @override
+  String get downloadAllTitle => 'تحميل كل المصاحف';
+
+  @override
+  String downloadAllCount(String done, String total) {
+    return 'اكتمل $done من $total';
   }
 }

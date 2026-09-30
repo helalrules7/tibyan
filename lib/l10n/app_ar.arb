@@ -13,7 +13,7 @@
   "comingSoon": "قريبا",
   "settingsTitle": "الإعدادات",
   "openSettings": "فتح الإعدادات",
-  "appearanceTitle": "الشكل",
+  "appearanceTitle": "شكل المصحف",
   "styleLabel": "الشكل",
   "modeLabel": "وضع الإضاءة",
   "modeSystem": "تلقائي",
@@ -561,7 +561,6 @@
       }
     }
   },
-  "allEditionsQueued": "بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.",
   "downloadInBackgroundNote": "يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.",
   "notifDownloading": "تحميل صفحات المصحف",
   "notifComplete": "اكتمل تحميل المصحف",
@@ -669,6 +668,14 @@
       "ayah": {
         "type": "String"
       }
+    }
+  },
+  "downloadAllTitle": "تحميل كل المصاحف",
+  "downloadAllCount": "اكتمل {done} من {total}",
+  "@downloadAllCount": {
+    "placeholders": {
+      "done": { "type": "String" },
+      "total": { "type": "String" }
     }
   }
 }
