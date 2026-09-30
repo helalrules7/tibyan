@@ -12,6 +12,7 @@ import '../mushaf/presentation/source_names.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'data/word_study_repository.dart';
 import 'word_study_providers.dart';
+import '../mushaf/presentation/navigation.dart';
 
 /// Opens «دراسة الكلمة» for a word of a verse; [word] null lets the reader
 /// choose one of the verse's words first.
@@ -377,7 +378,7 @@ class _Occurrence extends ConsumerWidget {
           final page = a.pageIn(ref.read(editionProvider));
           final router = GoRouter.of(context);
           Navigator.of(context).pop();
-          router.go('/mushaf?page=$page&s=${a.surah}&a=${a.number}');
+          router.go(mushafLocation(page, surah: a.surah, ayah: a.number));
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),

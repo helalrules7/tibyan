@@ -13,6 +13,7 @@ import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'search_engine.dart';
+import '../mushaf/presentation/navigation.dart';
 
 /// Every verse's searchable text, loaded once.
 final searchVersesProvider = FutureProvider<List<SearchVerse>>((ref) async {
@@ -78,7 +79,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final row = await ref.read(mushafRepositoryProvider).ayah(surah, ayah);
     if (!mounted) return;
     final page = row.pageIn(ref.read(editionProvider));
-    context.go('/mushaf?page=$page&s=$surah&a=$ayah');
+    context.go(mushafLocation(page, surah: surah, ayah: ayah));
   }
 
   @override
