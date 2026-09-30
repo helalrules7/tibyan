@@ -8,10 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/app_settings.dart';
 import '../../../../core/settings/settings_controller.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
-import 'frame_design_painters.dart';
-import 'frame_design_spec.dart';
+import 'frame_art.dart';
 
 /// Ornament images for the Zakhrafa frame (built by tools/build_ornaments.py).
 class FrameImages {
@@ -82,27 +80,33 @@ final frameImagesProvider = FutureProvider<FrameImages?>((ref) async {
   );
 });
 
-/// The spec of the drawn design in use; null for Zakhrafa and plain, and
-/// while it loads (the plain frame shows meanwhile).
-final frameSpecProvider = Provider<FrameDesignSpec?>(
-  (ref) => ref.watch(frameSpecFamily(ref.watch(frameDesignProvider))).value,
-);
-
-/// A drawn design with its colours for the current theme mode.
+/// A drawn design's pictures for the current theme mode, and the theme's
+/// paper. Null for Zakhrafa and plain, and while the pictures load (the
+/// plain frame shows meanwhile).
 class FrameLook {
-  const FrameLook(this.spec, this.palette);
+  const FrameLook(this.art, this.paper);
 
-  final FrameDesignSpec spec;
-  final FramePalette palette;
+  final FrameArt art;
+  final Color paper;
+
+  /// Text drawn over the art: the art's own ink.
+  Color get ink => art.ink;
+  Color get gold => art.gold;
+
+  /// Opaque ground under a banner (it hides the printed header).
+  Color get ground => art.ownGround ? art.ground : paper;
 
   static FrameLook? of(BuildContext context, WidgetRef ref) {
-    final spec = ref.watch(frameSpecProvider);
-    if (spec == null) return null;
+    final set = frameArtSet(ref.watch(frameDesignProvider));
+    if (set == null) return null;
+    final src = ref.watch(frameSourcesFamily(set)).value;
+    if (src == null) return null;
     final tokens = context.tokens;
-    return FrameLook(
-      spec,
-      FramePalette.resolve(spec, tokens.colors, tokens.mode),
-    );
+    final swap = darkModeSwap(src.colours, tokens.mode, tokens.colors);
+    final art = ref
+        .watch(frameArtFamily((set: set, paper: swap?.paper, ink: swap?.ink)))
+        .value;
+    return art == null ? null : FrameLook(art, tokens.colors.paper);
   }
 }
 
@@ -276,10 +280,7 @@ class IlluminatedFrame extends ConsumerWidget {
               Positioned.fill(
                 child: CustomPaint(
                   painter: look != null
-                      ? DesignFramePainter(
-                          spec: look.spec,
-                          palette: look.palette,
-                        )
+                      ? ArtBandPainter(art: look.art, paper: t.paper)
                       : _FramePainter(
                           images: images,
                           rule: t.marker,
@@ -311,7 +312,7 @@ class IlluminatedFrame extends ConsumerWidget {
                         style: TextStyle(
                           fontFamily: 'UthmanTahaNaskh',
                           fontSize: 15,
-                          color: t.ink,
+                          color: look?.ink ?? t.ink,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -320,12 +321,12 @@ class IlluminatedFrame extends ConsumerWidget {
                               label: l.juzLabel(digits(info!.juz)),
                               onTap: onJuzTap,
                             ),
-                            _Star(color: look?.palette.gold ?? t.marker),
+                            _Star(color: look?.gold ?? t.marker),
                             _Tap(
                               label: l.hizbLabel(digits(info!.hizb)),
                               onTap: onHizbTap,
                             ),
-                            _Star(color: look?.palette.gold ?? t.marker),
+                            _Star(color: look?.gold ?? t.marker),
                             _Tap(
                               label: info!.surahName,
                               bold: true,
@@ -436,10 +437,7 @@ class FramePreview extends ConsumerWidget {
                   Positioned.fill(
                     child: CustomPaint(
                       painter: look != null
-                          ? DesignFramePainter(
-                              spec: look.spec,
-                              palette: look.palette,
-                            )
+                          ? ArtBandPainter(art: look.art, paper: t.paper)
                           : _FramePainter(
                               images: images,
                               rule: t.marker,
@@ -552,7 +550,7 @@ class _Tap extends StatelessWidget {
 }
 
 /// A rounded capsule with a rosette on each end; in a drawn design, the
-/// design's pointed cartouche and rosettes.
+/// owner's surah divider (or, for the page number, his medallion).
 class _Cartouche extends StatelessWidget {
   const _Cartouche({
     required this.width,
@@ -580,23 +578,9 @@ class _Cartouche extends StatelessWidget {
     final r = height * 0.9;
     final look = this.look;
     if (look != null) {
-      return SizedBox(
-        width: width + r * 1.2,
-        height: height,
-        child: CustomPaint(
-          painter: DesignCartouchePainter(
-            spec: look.spec,
-            palette: look.palette,
-            bodyWidth: width + r * 0.4,
-            rosette: r,
-            group: medallion ? look.spec.medallion : null,
-          ),
-          child: DefaultTextStyle.merge(
-            style: TextStyle(color: t.ink),
-            child: Center(child: child),
-          ),
-        ),
-      );
+      return medallion
+          ? ArtMedal(look: look, size: IlluminatedFrame.band + 6, child: child)
+          : _ArtCartouche(look: look, height: height, child: child);
     }
     return SizedBox(
       width: width + r * 1.2,
@@ -633,6 +617,113 @@ class _Cartouche extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// The owner's surah divider at [height] (or narrower, to stay between the
+/// corners), with [child] over its central cartouche.
+class _ArtCartouche extends StatelessWidget {
+  const _ArtCartouche({
+    required this.look,
+    required this.height,
+    required this.child,
+  });
+
+  final FrameLook look;
+  final double height;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final divider = look.art[FramePiece.divider];
+    final aspect = divider.size.width / divider.size.height;
+    return LayoutBuilder(
+      builder: (context, box) {
+        const inset = IlluminatedFrame.band + 6;
+        final w = math.min(aspect * height, box.maxWidth - 2 * inset);
+        final h = w / aspect;
+        final panel = look.art.dividerPanel;
+        return SizedBox(
+          width: w,
+          height: h,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned.fill(
+                child: CustomPaint(painter: ArtPicturePainter(divider)),
+              ),
+              // The whole height (the tap targets are 32 high); the text
+              // itself stays inside the cartouche.
+              Positioned(
+                left: panel.left * w,
+                width: panel.width * w,
+                top: 0,
+                bottom: 0,
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(color: look.ink),
+                  child: FittedBox(fit: BoxFit.scaleDown, child: child),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// The owner's medallion, [size] square, with [child] (the page number)
+/// over it. A disc of paper under it keeps the band's rules out of the
+/// number's way.
+class ArtMedal extends StatelessWidget {
+  const ArtMedal({
+    super.key,
+    required this.look,
+    required this.size,
+    this.child,
+    this.ground,
+  });
+
+  final FrameLook look;
+  final double size;
+  final Widget? child;
+
+  /// The disc's colour (default: the page's ground).
+  final Color? ground;
+
+  @override
+  Widget build(BuildContext context) {
+    final disc = ground ?? look.ground;
+    return SizedBox.square(
+      dimension: size,
+      child: CustomPaint(
+        painter: ArtPicturePainter(
+          look.art[FramePiece.medal],
+          disc: (disc, 0.8),
+        ),
+        child: child == null
+            ? null
+            : DefaultTextStyle.merge(
+                // A halo of the disc's colour lifts the number off the
+                // medallion's lines.
+                style: TextStyle(
+                  color: look.ink,
+                  shadows: [
+                    for (final o in const [
+                      Offset(1, 0),
+                      Offset(-1, 0),
+                      Offset(0, 1),
+                      Offset(0, -1),
+                    ])
+                      Shadow(color: disc, offset: o, blurRadius: 1.5),
+                  ],
+                ),
+                child: Center(
+                  child: FittedBox(fit: BoxFit.scaleDown, child: child),
+                ),
+              ),
       ),
     );
   }
@@ -830,7 +921,7 @@ class SurahBannerView extends StatelessWidget {
   final SurahBanner banner;
   final FrameImages? images;
 
-  /// A drawn design: its divider (bar, cartouche, rosettes) instead.
+  /// A drawn design: the owner's surah divider instead.
   final FrameLook? look;
 
   @override
@@ -844,73 +935,100 @@ class SurahBannerView extends StatelessWidget {
         ? l.surahBannerInfoFirst(digits(b.ayahCount), digits(b.order))
         : l.surahBannerInfo(digits(b.ayahCount), digits(b.order), b.after!);
     final look = this.look;
+    final ink = look?.ink ?? t.ink;
+    final text = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: look != null ? 2 : 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l.surahBannerTitle(digits(b.number), b.name, type),
+              style: TextStyle(
+                fontFamily: 'UthmanTahaNaskh',
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                height: look != null ? 1.05 : 1.2,
+                color: ink,
+              ),
+            ),
+            Text(
+              info,
+              style: TextStyle(
+                fontFamily: 'KFGQPCAN',
+                fontSize: 10.5,
+                height: look != null ? 1.1 : 1.3,
+                color: ink,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (look != null) {
+      final divider = look.art[FramePiece.divider];
+      return Semantics(
+        header: true,
+        label: '${l.surahBannerTitle(digits(b.number), b.name, type)}. $info',
+        excludeSemantics: true,
+        child: CustomPaint(
+          // Opaque first: the printed header underneath must not show.
+          painter: ArtPicturePainter(divider, background: look.ground),
+          child: LayoutBuilder(
+            builder: (context, box) {
+              final at = fittedRect(
+                divider.size,
+                Offset.zero & box.biggest,
+                BoxFit.contain,
+              );
+              final p = look.art.dividerPanel;
+              return Stack(
+                children: [
+                  Positioned(
+                    left: at.left + p.left * at.width,
+                    top: at.top + p.top * at.height,
+                    width: p.width * at.width,
+                    height: p.height * at.height,
+                    child: text,
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+    }
     return Semantics(
       header: true,
       label: '${l.surahBannerTitle(digits(b.number), b.name, type)}. $info',
       excludeSemantics: true,
       child: CustomPaint(
-        painter: look != null
-            ? DesignBannerPainter(spec: look.spec, palette: look.palette)
-            : _BannerPainter(
-                images: images,
-                paper: t.paper,
-                navy: t.frame,
-                rule: t.marker,
-              ),
+        painter: _BannerPainter(
+          images: images,
+          paper: t.paper,
+          navy: t.frame,
+          rule: t.marker,
+        ),
         child: LayoutBuilder(
           builder: (context, box) {
             final h = box.maxHeight;
             return Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: look != null
-                    ? bannerTextInset(box.biggest)
-                    : h * 0.95,
-                vertical: look != null ? h * 0.16 : h * 0.1,
+                horizontal: h * 0.95,
+                vertical: h * 0.1,
               ),
               child: Container(
-                decoration: look != null
-                    ? null
-                    : BoxDecoration(
-                        color: t.paper,
-                        borderRadius: BorderRadius.circular(h),
-                        border: Border.all(color: t.frame, width: 2),
-                      ),
-                foregroundDecoration: look != null
-                    ? null
-                    : BoxDecoration(
-                        borderRadius: BorderRadius.circular(h),
-                        border: Border.all(color: t.marker, width: 0.8),
-                      ),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          l.surahBannerTitle(digits(b.number), b.name, type),
-                          style: TextStyle(
-                            fontFamily: 'UthmanTahaNaskh',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            height: 1.2,
-                            color: t.ink,
-                          ),
-                        ),
-                        Text(
-                          info,
-                          style: TextStyle(
-                            fontFamily: 'KFGQPCAN',
-                            fontSize: 10.5,
-                            height: 1.3,
-                            color: t.ink,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                decoration: BoxDecoration(
+                  color: t.paper,
+                  borderRadius: BorderRadius.circular(h),
+                  border: Border.all(color: t.frame, width: 2),
                 ),
+                foregroundDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(h),
+                  border: Border.all(color: t.marker, width: 0.8),
+                ),
+                child: text,
               ),
             );
           },
@@ -994,7 +1112,7 @@ class _QuarterRosette extends StatelessWidget {
   final QuarterMark mark;
   final ui.Image? image;
 
-  /// A drawn design: its signature ornament on a rosette.
+  /// A drawn design: the owner's medallion.
   final FrameLook? look;
   final ValueChanged<QuarterMark>? onTap;
 
@@ -1013,13 +1131,7 @@ class _QuarterRosette extends StatelessWidget {
           width: 34,
           height: 34,
           child: look != null
-              ? CustomPaint(
-                  painter: DesignRosettePainter(
-                    spec: look!.spec,
-                    palette: look!.palette,
-                    group: look!.spec.signature,
-                  ),
-                )
+              ? ArtMedal(look: look!, size: 34)
               : image == null
               ? null
               : RawImage(image: image, width: 34, height: 34),
@@ -1101,15 +1213,7 @@ class OrnateFrame extends ConsumerWidget {
         final cartW = (w - 150).clamp(160.0, 320.0);
         final cartH = (h * 0.085).clamp(52.0, 76.0);
         if (look != null) {
-          return _designBody(
-            look,
-            Size(w, h),
-            panel,
-            cartW,
-            cartH,
-            t,
-            page == null ? null : pageCartouche(),
-          );
+          return _artBody(look, Size(w, h), panel, cartW, cartH, l, digits);
         }
         Widget cartouche(double centreY, Widget c) => Positioned(
           top: centreY - cartH / 2,
@@ -1206,103 +1310,110 @@ class OrnateFrame extends ConsumerWidget {
 }
 
 extension on OrnateFrame {
-  /// A drawn design's ornate page: the band, an arch over the page with
-  /// the design's tiles in its spandrels, the title cartouches from the
-  /// opening-page design, and on the cover the splash's radial motif.
-  Widget _designBody(
+  /// A drawn design's ornate page. The cover and the splash: the owner's
+  /// splash behind the titles. An opening page: the owner's opening page
+  /// fitted into the box, the mushaf page in its text panel, the surah's
+  /// details in its title box and under the panel, and the page number on
+  /// its bottom band.
+  Widget _artBody(
     FrameLook look,
     Size size,
     Rect panel,
     double cartW,
     double cartH,
-    ModeTokens t,
-    Widget? pageCartouche,
+    AppLocalizations l,
+    NumberFormatter digits,
   ) {
     const band = IlluminatedFrame.band;
-    final layout = OrnateLayout(size, panel, band, look.spec.look.arch);
-    // The top title sits in the arch: lowered, if the arch is narrow at
-    // the top, until it is wide enough or reaches the springing line.
-    var topY = (band + layout.spring) / 2 + 2;
-    final wanted = math.min(cartW, 230.0);
-    while (layout.fitWidth(topY, cartH) < wanted &&
-        topY + cartH / 2 < layout.spring - 6) {
-      topY += 2;
-    }
-    final foot = layout.foot;
-    final bottomY = (foot.bottom + size.height - band) / 2;
-    final topW = math.min(cartW, layout.fitWidth(topY, cartH));
-    final bottomH = math.min(cartH, size.height - band - foot.bottom - 10);
-    Widget title(
-      double centreY,
-      double width,
-      double height,
-      Widget c, {
-      ShapeGroup? ornament,
-    }) => Positioned(
-      top: centreY - height / 2,
-      left: 0,
-      right: 0,
-      child: Center(
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: CustomPaint(
-            painter: DesignTitlePainter(
-              spec: look.spec,
-              palette: look.palette,
-              ornament: ornament,
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: ornament != null ? height * 0.72 : 10,
-                vertical: 4,
-              ),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: DefaultTextStyle.merge(
-                  style: TextStyle(
-                    fontFamily: 'KFGQPCAN',
-                    color: t.ink,
-                    height: 1.3,
-                  ),
-                  textAlign: TextAlign.center,
-                  child: c,
-                ),
+    Widget text(Widget c) => FittedBox(
+      fit: BoxFit.scaleDown,
+      child: DefaultTextStyle.merge(
+        style: TextStyle(fontFamily: 'KFGQPCAN', color: look.ink, height: 1.3),
+        textAlign: TextAlign.center,
+        child: c,
+      ),
+    );
+    final surah = openingSurah;
+    if (surah == null) {
+      Widget title(double centreY, Widget c) => Positioned(
+        top: centreY - cartH / 2,
+        height: cartH,
+        left: (size.width - cartW) / 2,
+        width: cartW,
+        child: Center(child: text(c)),
+      );
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: ArtPicturePainter(
+                look.art[FramePiece.splash],
+                fit: BoxFit.cover,
               ),
             ),
           ),
-        ),
-      ),
-    );
+          Positioned.fromRect(
+            rect: panel.deflate(4),
+            child: DefaultTextStyle.merge(
+              style: TextStyle(color: look.ink),
+              child: child,
+            ),
+          ),
+          title((band + panel.top) / 2, top),
+          title((panel.bottom + size.height - band) / 2, bottom),
+        ],
+      );
+    }
+    final picture = look.art[surah == 1 ? FramePiece.openA : FramePiece.openB];
+    final at = fittedRect(picture.size, Offset.zero & size, BoxFit.contain);
+    Rect place(Rect r) => mapRect(r, picture.size, at);
+    final pageRect = place(OpeningPlaces.page);
+    final k = at.width / picture.size.width;
+    final medal = 60 * k;
+    final centre = at.topLeft + OpeningPlaces.pageNumber * k;
+    // The mushaf's ink follows the theme: on a ground of the other
+    // lightness (the Egyptian design in light mode) its panel takes the
+    // theme's paper.
+    bool darkColour(Color c) => c.computeLuminance() < 0.2;
+    final panelPaper = darkColour(look.art.ground) != darkColour(look.paper);
     return Stack(
       children: [
         Positioned.fill(
           child: CustomPaint(
-            painter: DesignOrnatePainter(
-              spec: look.spec,
-              palette: look.palette,
-              layout: layout,
-              cover: openingSurah == null,
-            ),
+            painter: ArtPicturePainter(picture, background: look.art.ground),
           ),
         ),
-        Positioned.fromRect(rect: panel.deflate(4), child: child),
-        title(
-          topY,
-          topW,
-          cartH,
-          top,
-          ornament: topW > cartH * 3.4
-              ? look.spec.openings[openingSurah]?.ornament
-              : null,
+        if (panelPaper)
+          Positioned.fromRect(
+            rect: pageRect,
+            child: ColoredBox(color: look.paper),
+          ),
+        Positioned.fromRect(rect: pageRect, child: child),
+        Positioned.fromRect(
+          rect: place(OpeningPlaces.title).deflate(4 * k),
+          child: Center(child: text(top)),
         ),
-        title(
-          bottomY,
-          math.min(cartW, size.width - 2 * band - 24),
-          bottomH,
-          bottom,
+        Positioned.fromRect(
+          rect: place(OpeningPlaces.foot),
+          child: Center(child: text(bottom)),
         ),
-        ?pageCartouche,
+        if (page != null)
+          Positioned(
+            left: centre.dx - medal / 2,
+            top: centre.dy - medal / 2,
+            child: ArtMedal(
+              look: look,
+              size: medal,
+              ground: look.art.ground,
+              child: _Tap(
+                label: digits(page!),
+                bold: true,
+                semanticLabel: l.pageOf('$page'),
+                onTap: onPageTap,
+                fontSize: 15,
+              ),
+            ),
+          ),
       ],
     );
   }
