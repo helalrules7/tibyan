@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -7,7 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/app_settings.dart';
 import '../../../../core/settings/settings_controller.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'frame_design_painters.dart';
+import 'frame_design_spec.dart';
 
 /// Ornament images for the Zakhrafa frame (built by tools/build_ornaments.py).
 class FrameImages {
@@ -50,21 +54,16 @@ Future<ui.Image> _load(String name) async {
   return (await codec.getNextFrame()).image;
 }
 
-/// The frame in use: the reader's choice, else the style's own (the
-/// Zakhrafa style's illuminated frame, the plain frame for the others).
+/// The frame in use: the reader's choice, else the style's own (see
+/// [defaultFrameFor]).
 final frameDesignProvider = Provider<FrameDesign>((ref) {
   final settings = ref.watch(settingsProvider);
-  final style = ref.watch(themeRegistryProvider).byId(settings.styleId);
-  return settings.frameDesign ??
-      (style.frame.outerStyle == 'illuminated'
-          ? FrameDesign.zakhrafa
-          : FrameDesign.plain);
+  return settings.frameDesign ?? defaultFrameFor(settings.styleId);
 });
 
-/// The page frame's design: ornament images, or none for the plain frame
-/// drawn in the style's own colours.
+/// The Zakhrafa frame's ornament images; null for every other frame.
 final frameImagesProvider = FutureProvider<FrameImages?>((ref) async {
-  if (ref.watch(frameDesignProvider) == FrameDesign.plain) return null;
+  if (ref.watch(frameDesignProvider) != FrameDesign.zakhrafa) return null;
   final images = await Future.wait([
     _load('frame_corner.png'),
     _load('frame_edge_h.png'),
@@ -82,6 +81,30 @@ final frameImagesProvider = FutureProvider<FrameImages?>((ref) async {
     mosaic: images[5],
   );
 });
+
+/// The spec of the drawn design in use; null for Zakhrafa and plain, and
+/// while it loads (the plain frame shows meanwhile).
+final frameSpecProvider = Provider<FrameDesignSpec?>(
+  (ref) => ref.watch(frameSpecFamily(ref.watch(frameDesignProvider))).value,
+);
+
+/// A drawn design with its colours for the current theme mode.
+class FrameLook {
+  const FrameLook(this.spec, this.palette);
+
+  final FrameDesignSpec spec;
+  final FramePalette palette;
+
+  static FrameLook? of(BuildContext context, WidgetRef ref) {
+    final spec = ref.watch(frameSpecProvider);
+    if (spec == null) return null;
+    final tokens = context.tokens;
+    return FrameLook(
+      spec,
+      FramePalette.resolve(spec, tokens.colors, tokens.mode),
+    );
+  }
+}
 
 /// What the frame shows around one page.
 class FrameInfo {
@@ -201,6 +224,7 @@ class IlluminatedFrame extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final images = ref.watch(frameImagesProvider).value;
+    final look = FrameLook.of(context, ref);
     final overlays = LayoutBuilder(
       builder: (context, box) {
         const inset = band + 6;
@@ -220,7 +244,7 @@ class IlluminatedFrame extends ConsumerWidget {
                 left: inset - 4,
                 right: inset - 4,
                 height: slot * b.slots,
-                child: SurahBannerView(banner: b, images: images),
+                child: SurahBannerView(banner: b, images: images, look: look),
               ),
             for (final q in info?.quarters ?? const <QuarterMark>[])
               Positioned(
@@ -230,6 +254,7 @@ class IlluminatedFrame extends ConsumerWidget {
                 child: _QuarterRosette(
                   mark: q,
                   image: images?.margin,
+                  look: look,
                   onTap: onQuarterTap,
                 ),
               ),
@@ -250,12 +275,17 @@ class IlluminatedFrame extends ConsumerWidget {
             children: [
               Positioned.fill(
                 child: CustomPaint(
-                  painter: _FramePainter(
-                    images: images,
-                    rule: t.marker,
-                    paper: t.paper,
-                    ink: t.frame,
-                  ),
+                  painter: look != null
+                      ? DesignFramePainter(
+                          spec: look.spec,
+                          palette: look.palette,
+                        )
+                      : _FramePainter(
+                          images: images,
+                          rule: t.marker,
+                          paper: t.paper,
+                          ink: t.frame,
+                        ),
                 ),
               ),
               Positioned.fill(
@@ -276,6 +306,7 @@ class IlluminatedFrame extends ConsumerWidget {
                       height: 32,
                       fill: cartoucheFill,
                       rosette: images?.rosette,
+                      look: look,
                       child: DefaultTextStyle.merge(
                         style: TextStyle(
                           fontFamily: 'UthmanTahaNaskh',
@@ -289,12 +320,12 @@ class IlluminatedFrame extends ConsumerWidget {
                               label: l.juzLabel(digits(info!.juz)),
                               onTap: onJuzTap,
                             ),
-                            _Star(color: t.marker),
+                            _Star(color: look?.palette.gold ?? t.marker),
                             _Tap(
                               label: l.hizbLabel(digits(info!.hizb)),
                               onTap: onHizbTap,
                             ),
-                            _Star(color: t.marker),
+                            _Star(color: look?.palette.gold ?? t.marker),
                             _Tap(
                               label: info!.surahName,
                               bold: true,
@@ -317,6 +348,8 @@ class IlluminatedFrame extends ConsumerWidget {
                       height: 30,
                       fill: cartoucheFill,
                       rosette: images?.margin,
+                      look: look,
+                      medallion: true,
                       child: _Tap(
                         label: digits(info!.page),
                         bold: true,
@@ -370,6 +403,75 @@ class IlluminatedFrame extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// A small picture of the frame in use (settings): the band, corners and
+/// cartouches drawn on a page of 300 × 440 and scaled down.
+class FramePreview extends ConsumerWidget {
+  const FramePreview({super.key, this.width = 84});
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final images = ref.watch(frameImagesProvider).value;
+    final look = FrameLook.of(context, ref);
+    final t = context.tokens.colors;
+    const band = IlluminatedFrame.band;
+    return Semantics(
+      image: true,
+      label: AppLocalizations.of(context).framePreviewLabel,
+      child: ExcludeSemantics(
+        child: SizedBox(
+          width: width,
+          height: width * 440 / 300,
+          child: FittedBox(
+            child: SizedBox(
+              width: 300,
+              height: 440,
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: look != null
+                          ? DesignFramePainter(
+                              spec: look.spec,
+                              palette: look.palette,
+                            )
+                          : _FramePainter(
+                              images: images,
+                              rule: t.marker,
+                              paper: t.paper,
+                              ink: t.frame,
+                            ),
+                    ),
+                  ),
+                  for (final top in [true, false])
+                    Positioned(
+                      top: top ? band / 2 - 15 : null,
+                      bottom: top ? null : band / 2 - 15,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: _Cartouche(
+                          width: top ? 150 : 60,
+                          height: 30,
+                          fill: t.paper,
+                          rosette: top ? images?.rosette : images?.margin,
+                          look: look,
+                          medallion: !top,
+                          child: const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -449,7 +551,8 @@ class _Tap extends StatelessWidget {
   }
 }
 
-/// A rounded capsule with a rosette on each end.
+/// A rounded capsule with a rosette on each end; in a drawn design, the
+/// design's pointed cartouche and rosettes.
 class _Cartouche extends StatelessWidget {
   const _Cartouche({
     required this.width,
@@ -457,6 +560,8 @@ class _Cartouche extends StatelessWidget {
     required this.fill,
     required this.rosette,
     required this.child,
+    this.look,
+    this.medallion = false,
   });
 
   final double width;
@@ -464,11 +569,35 @@ class _Cartouche extends StatelessWidget {
   final Color fill;
   final ui.Image? rosette;
   final Widget child;
+  final FrameLook? look;
+
+  /// Rosettes from the design's medallion (the page number's).
+  final bool medallion;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens.colors;
     final r = height * 0.9;
+    final look = this.look;
+    if (look != null) {
+      return SizedBox(
+        width: width + r * 1.2,
+        height: height,
+        child: CustomPaint(
+          painter: DesignCartouchePainter(
+            spec: look.spec,
+            palette: look.palette,
+            bodyWidth: width + r * 0.4,
+            rosette: r,
+            group: medallion ? look.spec.medallion : null,
+          ),
+          child: DefaultTextStyle.merge(
+            style: TextStyle(color: t.ink),
+            child: Center(child: child),
+          ),
+        ),
+      );
+    }
     return SizedBox(
       width: width + r * 1.2,
       height: height,
@@ -695,10 +824,14 @@ class SurahBannerView extends StatelessWidget {
     super.key,
     required this.banner,
     required this.images,
+    this.look,
   });
 
   final SurahBanner banner;
   final FrameImages? images;
+
+  /// A drawn design: its divider (bar, cartouche, rosettes) instead.
+  final FrameLook? look;
 
   @override
   Widget build(BuildContext context) {
@@ -710,35 +843,44 @@ class SurahBannerView extends StatelessWidget {
     final info = b.after == null
         ? l.surahBannerInfoFirst(digits(b.ayahCount), digits(b.order))
         : l.surahBannerInfo(digits(b.ayahCount), digits(b.order), b.after!);
+    final look = this.look;
     return Semantics(
       header: true,
       label: '${l.surahBannerTitle(digits(b.number), b.name, type)}. $info',
       excludeSemantics: true,
       child: CustomPaint(
-        painter: _BannerPainter(
-          images: images,
-          paper: t.paper,
-          navy: t.frame,
-          rule: t.marker,
-        ),
+        painter: look != null
+            ? DesignBannerPainter(spec: look.spec, palette: look.palette)
+            : _BannerPainter(
+                images: images,
+                paper: t.paper,
+                navy: t.frame,
+                rule: t.marker,
+              ),
         child: LayoutBuilder(
           builder: (context, box) {
             final h = box.maxHeight;
             return Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: h * 0.95,
-                vertical: h * 0.1,
+                horizontal: look != null
+                    ? bannerTextInset(box.biggest)
+                    : h * 0.95,
+                vertical: look != null ? h * 0.16 : h * 0.1,
               ),
               child: Container(
-                decoration: BoxDecoration(
-                  color: t.paper,
-                  borderRadius: BorderRadius.circular(h),
-                  border: Border.all(color: t.frame, width: 2),
-                ),
-                foregroundDecoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(h),
-                  border: Border.all(color: t.marker, width: 0.8),
-                ),
+                decoration: look != null
+                    ? null
+                    : BoxDecoration(
+                        color: t.paper,
+                        borderRadius: BorderRadius.circular(h),
+                        border: Border.all(color: t.frame, width: 2),
+                      ),
+                foregroundDecoration: look != null
+                    ? null
+                    : BoxDecoration(
+                        borderRadius: BorderRadius.circular(h),
+                        border: Border.all(color: t.marker, width: 0.8),
+                      ),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Padding(
@@ -846,10 +988,14 @@ class _QuarterRosette extends StatelessWidget {
     required this.mark,
     required this.image,
     required this.onTap,
+    this.look,
   });
 
   final QuarterMark mark;
   final ui.Image? image;
+
+  /// A drawn design: its signature ornament on a rosette.
+  final FrameLook? look;
   final ValueChanged<QuarterMark>? onTap;
 
   @override
@@ -866,7 +1012,15 @@ class _QuarterRosette extends StatelessWidget {
         child: SizedBox(
           width: 34,
           height: 34,
-          child: image == null
+          child: look != null
+              ? CustomPaint(
+                  painter: DesignRosettePainter(
+                    spec: look!.spec,
+                    palette: look!.palette,
+                    group: look!.spec.signature,
+                  ),
+                )
+              : image == null
               ? null
               : RawImage(image: image, width: 34, height: 34),
         ),
@@ -889,10 +1043,15 @@ class OrnateFrame extends ConsumerWidget {
     this.catchword,
     this.catchwordSpace = true,
     this.tools,
+    this.openingSurah,
   });
 
   /// Small reading tools shown just under the page number.
   final Widget? tools;
+
+  /// The opening page of this surah (1 or 2); null for the cover and the
+  /// splash. Drawn designs put the surah's ornament in its title.
+  final int? openingSurah;
   final Widget top;
   final Widget bottom;
   final Widget child;
@@ -904,10 +1063,34 @@ class OrnateFrame extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final images = ref.watch(frameImagesProvider).value;
+    final look = FrameLook.of(context, ref);
     final t = context.tokens.colors;
     final l = AppLocalizations.of(context);
     final digits = NumberFormatter(Localizations.localeOf(context));
     const band = IlluminatedFrame.band;
+
+    Widget pageCartouche() => Positioned(
+      bottom: band / 2 - 15,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: _Cartouche(
+          width: 74,
+          height: 30,
+          fill: t.paper,
+          rosette: images?.margin,
+          look: look,
+          medallion: true,
+          child: _Tap(
+            label: digits(page!),
+            bold: true,
+            semanticLabel: l.pageOf('$page'),
+            onTap: onPageTap,
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
 
     final body = LayoutBuilder(
       builder: (context, box) {
@@ -917,6 +1100,17 @@ class OrnateFrame extends ConsumerWidget {
         const inner = 12.0;
         final cartW = (w - 150).clamp(160.0, 320.0);
         final cartH = (h * 0.085).clamp(52.0, 76.0);
+        if (look != null) {
+          return _designBody(
+            look,
+            Size(w, h),
+            panel,
+            cartW,
+            cartH,
+            t,
+            page == null ? null : pageCartouche(),
+          );
+        }
         Widget cartouche(double centreY, Widget c) => Positioned(
           top: centreY - cartH / 2,
           left: 0,
@@ -971,27 +1165,7 @@ class OrnateFrame extends ConsumerWidget {
             Positioned.fromRect(rect: panel.deflate(4), child: child),
             cartouche((band + panel.top - inner) / 2, top),
             cartouche((panel.bottom + inner + h - band) / 2, bottom),
-            if (page != null)
-              Positioned(
-                bottom: band / 2 - 15,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: _Cartouche(
-                    width: 74,
-                    height: 30,
-                    fill: t.paper,
-                    rosette: images?.margin,
-                    child: _Tap(
-                      label: digits(page!),
-                      bold: true,
-                      semanticLabel: l.pageOf('$page'),
-                      onTap: onPageTap,
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-              ),
+            if (page != null) pageCartouche(),
           ],
         );
       },
@@ -1026,6 +1200,109 @@ class OrnateFrame extends ConsumerWidget {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+extension on OrnateFrame {
+  /// A drawn design's ornate page: the band, an arch over the page with
+  /// the design's tiles in its spandrels, the title cartouches from the
+  /// opening-page design, and on the cover the splash's radial motif.
+  Widget _designBody(
+    FrameLook look,
+    Size size,
+    Rect panel,
+    double cartW,
+    double cartH,
+    ModeTokens t,
+    Widget? pageCartouche,
+  ) {
+    const band = IlluminatedFrame.band;
+    final layout = OrnateLayout(size, panel, band, look.spec.look.arch);
+    // The top title sits in the arch: lowered, if the arch is narrow at
+    // the top, until it is wide enough or reaches the springing line.
+    var topY = (band + layout.spring) / 2 + 2;
+    final wanted = math.min(cartW, 230.0);
+    while (layout.fitWidth(topY, cartH) < wanted &&
+        topY + cartH / 2 < layout.spring - 6) {
+      topY += 2;
+    }
+    final foot = layout.foot;
+    final bottomY = (foot.bottom + size.height - band) / 2;
+    final topW = math.min(cartW, layout.fitWidth(topY, cartH));
+    final bottomH = math.min(cartH, size.height - band - foot.bottom - 10);
+    Widget title(
+      double centreY,
+      double width,
+      double height,
+      Widget c, {
+      ShapeGroup? ornament,
+    }) => Positioned(
+      top: centreY - height / 2,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: SizedBox(
+          width: width,
+          height: height,
+          child: CustomPaint(
+            painter: DesignTitlePainter(
+              spec: look.spec,
+              palette: look.palette,
+              ornament: ornament,
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: ornament != null ? height * 0.72 : 10,
+                vertical: 4,
+              ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(
+                    fontFamily: 'KFGQPCAN',
+                    color: t.ink,
+                    height: 1.3,
+                  ),
+                  textAlign: TextAlign.center,
+                  child: c,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: CustomPaint(
+            painter: DesignOrnatePainter(
+              spec: look.spec,
+              palette: look.palette,
+              layout: layout,
+              cover: openingSurah == null,
+            ),
+          ),
+        ),
+        Positioned.fromRect(rect: panel.deflate(4), child: child),
+        title(
+          topY,
+          topW,
+          cartH,
+          top,
+          ornament: topW > cartH * 3.4
+              ? look.spec.openings[openingSurah]?.ornament
+              : null,
+        ),
+        title(
+          bottomY,
+          math.min(cartW, size.width - 2 * band - 24),
+          bottomH,
+          bottom,
+        ),
+        ?pageCartouche,
       ],
     );
   }

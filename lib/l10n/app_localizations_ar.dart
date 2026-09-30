@@ -797,4 +797,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get framePlain => 'بسيط';
+
+  @override
+  String get frameAbbasid => 'عباسي';
+
+  @override
+  String get frameUmayyad => 'أموي';
+
+  @override
+  String get frameAndalusian => 'أندلسي';
+
+  @override
+  String get frameOttoman => 'عثماني';
+
+  @override
+  String get frameEgyptian => 'مصري';
+
+  @override
+  String get frameModernIslamic => 'إسلامي حديث';
+
+  @override
+  String get framePreviewLabel => 'معاينة الإطار';
 }

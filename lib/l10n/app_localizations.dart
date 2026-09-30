@@ -1465,6 +1465,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'بسيط'**
   String get framePlain;
+
+  /// No description provided for @frameAbbasid.
+  ///
+  /// In ar, this message translates to:
+  /// **'عباسي'**
+  String get frameAbbasid;
+
+  /// No description provided for @frameUmayyad.
+  ///
+  /// In ar, this message translates to:
+  /// **'أموي'**
+  String get frameUmayyad;
+
+  /// No description provided for @frameAndalusian.
+  ///
+  /// In ar, this message translates to:
+  /// **'أندلسي'**
+  String get frameAndalusian;
+
+  /// No description provided for @frameOttoman.
+  ///
+  /// In ar, this message translates to:
+  /// **'عثماني'**
+  String get frameOttoman;
+
+  /// No description provided for @frameEgyptian.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصري'**
+  String get frameEgyptian;
+
+  /// No description provided for @frameModernIslamic.
+  ///
+  /// In ar, this message translates to:
+  /// **'إسلامي حديث'**
+  String get frameModernIslamic;
+
+  /// No description provided for @framePreviewLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'معاينة الإطار'**
+  String get framePreviewLabel;
 }
 
 class _AppLocalizationsDelegate

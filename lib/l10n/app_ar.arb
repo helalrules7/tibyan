@@ -588,5 +588,12 @@
   "frameDesignLabel": "إطار الصفحة",
   "frameByStyle": "حسب الشكل",
   "frameZakhrafa": "زخرفة",
-  "framePlain": "بسيط"
+  "framePlain": "بسيط",
+  "frameAbbasid": "عباسي",
+  "frameUmayyad": "أموي",
+  "frameAndalusian": "أندلسي",
+  "frameOttoman": "عثماني",
+  "frameEgyptian": "مصري",
+  "frameModernIslamic": "إسلامي حديث",
+  "framePreviewLabel": "معاينة الإطار"
 }

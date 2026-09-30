@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
+import '../mushaf/presentation/widgets/illuminated_frame.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -111,15 +112,23 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(height: 1),
                 ListTile(
                   title: Text(l.frameDesignLabel),
+                  trailing: const FramePreview(width: 56),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Wrap(
                       spacing: 8,
+                      runSpacing: 4,
                       children: [
                         for (final (design, name) in [
                           (null, l.frameByStyle),
                           (FrameDesign.zakhrafa, l.frameZakhrafa),
                           (FrameDesign.plain, l.framePlain),
+                          (FrameDesign.abbasid, l.frameAbbasid),
+                          (FrameDesign.umayyad, l.frameUmayyad),
+                          (FrameDesign.andalusian, l.frameAndalusian),
+                          (FrameDesign.ottoman, l.frameOttoman),
+                          (FrameDesign.egyptian, l.frameEgyptian),
+                          (FrameDesign.modernIslamic, l.frameModernIslamic),
                         ])
                           ChoiceChip(
                             label: Text(name),

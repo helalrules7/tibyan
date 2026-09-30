@@ -24,8 +24,29 @@ extension MushafEditionPages on MushafEdition {
 enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
 
 /// The page frame's design. Every style frames its pages; this chooses
-/// the ornament.
-enum FrameDesign { zakhrafa, plain }
+/// the ornament: the Zakhrafa images, the plain rules, or one of the six
+/// drawn designs (`assets/config/frame_<name>.json`).
+enum FrameDesign {
+  zakhrafa,
+  plain,
+  abbasid,
+  umayyad,
+  andalusian,
+  ottoman,
+  egyptian,
+  modernIslamic,
+}
+
+/// Each style's own frame: Zakhrafa's illuminated frame, and a drawn
+/// design for the others (the plain frame for a style not listed).
+FrameDesign defaultFrameFor(String styleId) => switch (styleId) {
+  'zakhrafa' => FrameDesign.zakhrafa,
+  'royal' => FrameDesign.abbasid,
+  'classic' => FrameDesign.ottoman,
+  'manuscript' => FrameDesign.andalusian,
+  'calm' => FrameDesign.modernIslamic,
+  _ => FrameDesign.plain,
+};
 
 /// Font of tafsir and translation texts.
 enum TafsirFont { naskh, interface }

@@ -454,5 +454,12 @@
   "frameDesignLabel": "Page frame",
   "frameByStyle": "Style's own",
   "frameZakhrafa": "Zakhrafa",
-  "framePlain": "Plain"
+  "framePlain": "Plain",
+  "frameAbbasid": "Abbasid",
+  "frameUmayyad": "Umayyad",
+  "frameAndalusian": "Andalusian",
+  "frameOttoman": "Ottoman",
+  "frameEgyptian": "Egyptian",
+  "frameModernIslamic": "Modern Islamic",
+  "framePreviewLabel": "Frame preview"
 }
