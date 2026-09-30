@@ -1,7 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
-<defs>
- <filter id="none"><feGaussianBlur stdDeviation="0"/></filter>
-</defs>
 <rect width="1080" height="1920" fill="#F4EBD0"/>
 <title>Tibyan Abbasid Splash</title>
 <desc>Textless full-screen ornament</desc>
