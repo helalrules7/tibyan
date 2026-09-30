@@ -23,7 +23,6 @@ class ArtPageFrame extends StatelessWidget {
     this.onHizbTap,
     this.onSurahTap,
     this.onPageTap,
-    this.onQuarterTap,
     this.tools,
     this.linePadding,
     this.showCatchword = true,
@@ -44,7 +43,7 @@ class ArtPageFrame extends StatelessWidget {
   final VoidCallback? onHizbTap;
   final VoidCallback? onSurahTap;
   final VoidCallback? onPageTap;
-  final ValueChanged<QuarterMark>? onQuarterTap;
+
   final Widget? tools;
   final EdgeInsets Function(Size page)? linePadding;
   final bool showCatchword;
@@ -69,7 +68,6 @@ class ArtPageFrame extends StatelessWidget {
             (box.maxHeight - 2 * pad - linePad.vertical) /
             IlluminatedFrame.lines;
         final top = pad + linePad.top;
-        const mark = 28.0;
         return Stack(
           clipBehavior: Clip.none,
           children: [
@@ -88,18 +86,6 @@ class ArtPageFrame extends StatelessWidget {
                 right: pad - 4,
                 height: slot * b.slots,
                 child: ArtSurahBanner(banner: b, art: art),
-              ),
-            for (final q in info?.quarters ?? const <QuarterMark>[])
-              Positioned(
-                top: top + (q.line + 0.5) * slot - mark / 2,
-                left: info!.outerRight ? null : inset / 2 - mark / 2,
-                right: info.outerRight ? inset / 2 - mark / 2 : null,
-                child: _ArtQuarterMark(
-                  mark: q,
-                  art: art,
-                  size: mark,
-                  onTap: onQuarterTap,
-                ),
               ),
           ],
         );
@@ -237,7 +223,7 @@ class ArtPageNumber extends StatelessWidget {
     required this.art,
     required this.page,
     this.onTap,
-    this.height = 38,
+    this.height = 46,
   });
 
   final ThemeArtPictures? art;
@@ -277,44 +263,6 @@ class ArtPageNumber extends StatelessWidget {
               digits: t.ink,
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A hizb quarter mark in the margin (the theme's marker, without a
-/// number); tapping it sets the reading mark.
-class _ArtQuarterMark extends StatelessWidget {
-  const _ArtQuarterMark({
-    required this.mark,
-    required this.art,
-    required this.size,
-    required this.onTap,
-  });
-
-  final QuarterMark mark;
-  final ThemeArtPictures? art;
-  final double size;
-  final ValueChanged<QuarterMark>? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final digits = NumberFormatter(Localizations.localeOf(context));
-    final marker = art?.marker;
-    return Semantics(
-      button: onTap != null,
-      label: quarterName(l, digits, mark.quarter),
-      excludeSemantics: true,
-      child: GestureDetector(
-        onTap: onTap == null ? null : () => onTap!(mark),
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: marker == null
-              ? null
-              : CustomPaint(painter: ArtPicturePainter(marker)),
         ),
       ),
     );

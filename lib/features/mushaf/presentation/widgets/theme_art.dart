@@ -406,8 +406,9 @@ String arabicDigits(int n) => n
     .map((d) => String.fromCharCode(0x0660 + int.parse(d)))
     .join();
 
-/// [number] centred in [box] (a marker's number box), as large as the box
-/// allows.
+/// [number] centred in [box] (a marker's number box): half as tall again
+/// as the box, which the designs keep small, and no wider than it allows
+/// (so three digits still fit).
 void paintNumberIn(Canvas canvas, Rect box, int number, Color color) {
   TextPainter layout(double size) => TextPainter(
     text: TextSpan(
@@ -422,10 +423,10 @@ void paintNumberIn(Canvas canvas, Rect box, int number, Color color) {
     ),
     textDirection: TextDirection.rtl,
   )..layout();
-  var fontSize = box.height * 1.05;
+  var fontSize = box.height * 1.6;
   var tp = layout(fontSize);
-  if (tp.width > box.width * 1.05) {
-    fontSize *= box.width * 1.05 / tp.width;
+  if (tp.width > box.width * 1.1) {
+    fontSize *= box.width * 1.1 / tp.width;
     tp = layout(fontSize);
   }
   // Uthman Taha Naskh digits rise 0.515 em above the baseline and do not

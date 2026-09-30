@@ -160,7 +160,6 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onHizbTap,
     this.onSurahTap,
     this.onPageTap,
-    this.onQuarterTap,
     this.tools,
     this.linePadding,
     this.showCatchword = true,
@@ -180,7 +179,6 @@ class IlluminatedFrame extends ConsumerWidget {
   final VoidCallback? onHizbTap;
   final VoidCallback? onSurahTap;
   final VoidCallback? onPageTap;
-  final ValueChanged<QuarterMark>? onQuarterTap;
 
   /// Small reading tools shown just under the page number.
   final Widget? tools;
@@ -199,7 +197,6 @@ class IlluminatedFrame extends ConsumerWidget {
         onHizbTap: onHizbTap,
         onSurahTap: onSurahTap,
         onPageTap: onPageTap,
-        onQuarterTap: onQuarterTap,
         tools: tools,
         linePadding: linePadding,
         showCatchword: showCatchword,
@@ -227,17 +224,6 @@ class IlluminatedFrame extends ConsumerWidget {
                 right: inset - 4,
                 height: slot * b.slots,
                 child: SurahBannerView(banner: b, images: images),
-              ),
-            for (final q in info?.quarters ?? const <QuarterMark>[])
-              Positioned(
-                top: top + (q.line + 0.5) * slot - 17,
-                left: (info!.outerRight) ? null : band / 2 - 17,
-                right: (info!.outerRight) ? band / 2 - 17 : null,
-                child: _QuarterRosette(
-                  mark: q,
-                  image: images?.margin,
-                  onTap: onQuarterTap,
-                ),
               ),
           ],
         );
@@ -807,41 +793,6 @@ class _BannerPainter extends CustomPainter {
   @override
   bool shouldRepaint(_BannerPainter old) =>
       old.images != images || old.paper != paper;
-}
-
-/// A hizb quarter mark in the margin; tapping it sets the reading mark.
-class _QuarterRosette extends StatelessWidget {
-  const _QuarterRosette({
-    required this.mark,
-    required this.image,
-    required this.onTap,
-  });
-
-  final QuarterMark mark;
-  final ui.Image? image;
-  final ValueChanged<QuarterMark>? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final digits = NumberFormatter(Localizations.localeOf(context));
-    final label = quarterName(l, digits, mark.quarter);
-    return Semantics(
-      button: onTap != null,
-      label: label,
-      excludeSemantics: true,
-      child: GestureDetector(
-        onTap: onTap == null ? null : () => onTap!(mark),
-        child: SizedBox(
-          width: 34,
-          height: 34,
-          child: image == null
-              ? null
-              : RawImage(image: image, width: 34, height: 34),
-        ),
-      ),
-    );
-  }
 }
 
 /// The fully illuminated page used for the cover, al-Fatiha, the opening

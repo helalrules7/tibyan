@@ -377,12 +377,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           linePadding: edition == MushafEdition.shamarly
               ? shamarlyLinePadding
               : null,
-          onQuarterTap: (q) => _setMark(
-            MarkKind.reading,
-            (surah: q.surah, ayah: q.ayah),
-            pg,
-            auto: true,
-          ),
           child: pageWidget,
         ),
       );
