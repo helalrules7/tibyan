@@ -38,6 +38,8 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kFollow = 'settings.followRecitation';
   static const _kTouchReading = 'settings.touchReading';
   static const _kVersePause = 'settings.versePause';
+  static const _kRepeat = 'settings.repeat';
+  static const _kRepeatSilence = 'settings.repeatSilence';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -84,7 +86,9 @@ class SettingsController extends Notifier<AppSettings> {
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       followRecitation: _prefs.getBool(_kFollow) ?? true,
       touchReading: _prefs.getBool(_kTouchReading) ?? true,
-      versePause: _prefs.getInt(_kVersePause) ?? 0,
+      versePause: _prefs.getInt(_kVersePause) ?? 500,
+      repeat: _prefs.getInt(_kRepeat) ?? 1,
+      repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
     );
   }
 
@@ -202,6 +206,16 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setVersePause(int ms) async {
     state = state.copyWith(versePause: ms);
     await _prefs.setInt(_kVersePause, ms);
+  }
+
+  Future<void> setRepeat(int times) async {
+    state = state.copyWith(repeat: times);
+    await _prefs.setInt(_kRepeat, times);
+  }
+
+  Future<void> setRepeatSilence(int seconds) async {
+    state = state.copyWith(repeatSilence: seconds);
+    await _prefs.setInt(_kRepeatSilence, seconds);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

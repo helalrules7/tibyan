@@ -15,6 +15,7 @@ import '../../features/onboarding/onboarding_edition_screen.dart';
 import '../../features/onboarding/onboarding_language_screen.dart';
 import '../../features/onboarding/onboarding_style_screen.dart';
 import '../../features/settings/appearance_screen.dart';
+import '../../features/settings/player_settings_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
 import '../../features/settings/settings_screen.dart';
@@ -72,6 +73,10 @@ final appRouterProvider = Provider<GoRouter>(
               GoRoute(
                 path: 'appearance',
                 builder: (context, state) => const AppearanceScreen(),
+              ),
+              GoRoute(
+                path: 'player',
+                builder: (context, state) => const PlayerSettingsScreen(),
               ),
             ],
           ),

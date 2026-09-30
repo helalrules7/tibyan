@@ -778,6 +778,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها';
 
   @override
+  String get listenFromPage => 'استمع من أول الصفحة';
+
+  @override
+  String get repeatHint =>
+      'إن لم تحدد مقطعًا تتكرر كل آية بهذا العدد ثم تليها التالية';
+
+  @override
   String get homeTitle => 'الرئيسية';
 
   @override

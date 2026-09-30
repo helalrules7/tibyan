@@ -11,7 +11,8 @@ import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'player_bar.dart';
 import 'recitation.dart';
 
-/// Download the chosen reciter's surahs for listening offline.
+/// Download the chosen reciter's surahs for listening offline. Surahs
+/// saved while listening are listed here too, as downloaded.
 class AudioDownloadsScreen extends ConsumerStatefulWidget {
   const AudioDownloadsScreen({super.key});
 
@@ -31,7 +32,14 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
       _failed.remove(surah);
     });
     try {
-      await ref.read(audioFilesProvider).download(r, surah);
+      await ref
+          .read(audioFilesProvider)
+          .download(
+            r,
+            surah,
+            client: ref.read(audioHttpClientProvider),
+            urls: ref.read(audioHostsProvider.notifier).urls(r, surah),
+          );
     } catch (_) {
       _failed.add(surah);
     }
@@ -49,9 +57,6 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    final digits = NumberFormatter(Localizations.localeOf(context));
     final reciterId = ref.watch(settingsProvider.select((s) => s.reciterId));
     final reciters = ref.watch(recitersProvider).value;
     final surahs = ref.watch(surahsProvider).value;
@@ -60,8 +65,25 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final files = ref.watch(audioFilesProvider);
-    final have = files.downloaded(reciter.id);
 
+    // Saving while listening also ends here: follow it.
+    return ValueListenableBuilder<int>(
+      valueListenable: files.changes,
+      builder: (context, _, _) =>
+          _build(context, reciter, surahs, files.downloaded(reciter.id)),
+    );
+  }
+
+  Widget _build(
+    BuildContext context,
+    ReciterRow reciter,
+    List<SurahRow> surahs,
+    Set<int> have,
+  ) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final files = ref.read(audioFilesProvider);
     return Scaffold(
       appBar: AppBar(title: Text(l.audioDownloads)),
       body: Column(
@@ -94,7 +116,8 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
                   dense: true,
                   leading: Text(digits(n), style: TextStyle(color: t.muted)),
                   title: Text(surahName(context, surahs[i])),
-                  trailing: _busy.contains(n)
+                  trailing:
+                      _busy.contains(n) || files.downloading(reciter.id, n)
                       ? const SizedBox.square(
                           dimension: 22,
                           child: CircularProgressIndicator(strokeWidth: 2),

@@ -6,6 +6,8 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../audio/player_bar.dart';
+import '../audio/recitation.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
@@ -40,6 +42,25 @@ class SettingsScreen extends ConsumerWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go('/settings/appearance'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.headphones_outlined),
+              title: Text(l.playerSettings),
+              subtitle: Text(
+                ref
+                        .watch(recitersProvider)
+                        .value
+                        ?.where((r) => r.id == settings.reciterId)
+                        .map((r) => reciterLabel(context, r))
+                        .firstOrNull ??
+                    '',
+                style: TextStyle(color: t.muted),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go('/settings/player'),
             ),
           ),
           const SizedBox(height: 8),

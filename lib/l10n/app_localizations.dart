@@ -1424,6 +1424,18 @@ abstract class AppLocalizations {
   /// **'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها'**
   String get versePauseHint;
 
+  /// No description provided for @listenFromPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمع من أول الصفحة'**
+  String get listenFromPage;
+
+  /// No description provided for @repeatHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'إن لم تحدد مقطعًا تتكرر كل آية بهذا العدد ثم تليها التالية'**
+  String get repeatHint;
+
   /// No description provided for @homeTitle.
   ///
   /// In ar, this message translates to:

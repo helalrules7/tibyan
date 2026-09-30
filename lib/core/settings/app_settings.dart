@@ -58,7 +58,9 @@ class AppSettings {
     this.reciterId = 1,
     this.followRecitation = true,
     this.touchReading = true,
-    this.versePause = 0,
+    this.versePause = 500,
+    this.repeat = 1,
+    this.repeatSilence = 0,
   });
 
   final String styleId;
@@ -108,6 +110,13 @@ class AppSettings {
   /// the recording as it is.
   final int versePause;
 
+  /// Times the player plays each verse, or the chosen stretch; 0 repeats
+  /// until stopped.
+  final int repeat;
+
+  /// Seconds of silence between repetitions, to repeat after the reciter.
+  final int repeatSilence;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -128,6 +137,8 @@ class AppSettings {
     bool? followRecitation,
     bool? touchReading,
     int? versePause,
+    int? repeat,
+    int? repeatSilence,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -148,6 +159,8 @@ class AppSettings {
     followRecitation: followRecitation ?? this.followRecitation,
     touchReading: touchReading ?? this.touchReading,
     versePause: versePause ?? this.versePause,
+    repeat: repeat ?? this.repeat,
+    repeatSilence: repeatSilence ?? this.repeatSilence,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

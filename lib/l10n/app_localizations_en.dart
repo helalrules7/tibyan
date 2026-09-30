@@ -781,6 +781,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shortens the long silences between verses without touching the recitation itself';
 
   @override
+  String get listenFromPage => 'Listen from the top of the page';
+
+  @override
+  String get repeatHint =>
+      'With no stretch chosen, each verse repeats this many times before the next';
+
+  @override
   String get homeTitle => 'Home';
 
   @override

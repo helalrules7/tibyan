@@ -318,6 +318,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         touchReading: _touchReading,
         recite: _recite,
         onTouchReading: _toggleTouchReading,
+        listening: recitation.active,
+        onListen: _listenFromPage,
         onRecite: () => _recite
             ? setState(() {
                 _recite = false;
@@ -578,7 +580,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                         from: range.first.ayah,
                         // Several verses: that stretch, repeated as set.
                         to: one ? null : range.last.ayah,
-                        repeat: one ? 1 : ref.read(recitationProvider).repeat,
                       );
                 },
                 onTafsir: () => context.push(
@@ -849,18 +850,23 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 }
 
-/// Touch reading and hiding the verses, just under the page number.
+/// Touch reading, listening from the top of the page and hiding the
+/// verses, just under the page number.
 class _ReadingTools extends StatelessWidget {
   const _ReadingTools({
     required this.touchReading,
     required this.recite,
+    required this.listening,
     required this.onTouchReading,
+    required this.onListen,
     required this.onRecite,
   });
 
   final bool touchReading;
   final bool recite;
+  final bool listening;
   final VoidCallback onTouchReading;
+  final VoidCallback onListen;
   final VoidCallback onRecite;
 
   @override
@@ -901,6 +907,13 @@ class _ReadingTools extends StatelessWidget {
           l.touchReading,
           touchReading,
           onTouchReading,
+        ),
+        const SizedBox(width: 10),
+        button(
+          Icons.headphones_outlined,
+          l.listenFromPage,
+          listening,
+          onListen,
         ),
         const SizedBox(width: 10),
         button(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),

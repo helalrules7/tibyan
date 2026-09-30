@@ -14,6 +14,7 @@ import 'core/db/user_database.dart';
 import 'core/flags/feature_flags.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
+import 'features/audio/recitation.dart';
 import 'features/mushaf/data/background_packs.dart';
 import 'features/mushaf/data/bundled_pack.dart';
 import 'features/mushaf/mushaf_providers.dart';
@@ -82,4 +83,7 @@ Future<void> main() async {
   runApp(
     UncontrolledProviderScope(container: container, child: const TibyanApp()),
   );
+
+  // Which audio host is faster for this reader, measured in the background.
+  unawaited(measureAudioHosts(container));
 }
