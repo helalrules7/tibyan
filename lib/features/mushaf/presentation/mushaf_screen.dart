@@ -198,6 +198,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     };
 
     final settings = ref.watch(settingsProvider);
+    // The current page's verses: recitation mode hides them, and after an
+    // edition change they arrive later, so the page must rebuild then.
+    ref.watch(pageAyahsProvider(_page));
     final recitation = ref.watch(recitationProvider);
     ref.listen(recitationProvider.select((r) => (r.surah, r.ayah, r.word)), (
       before,

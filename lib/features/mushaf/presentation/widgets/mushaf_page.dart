@@ -693,16 +693,29 @@ String withoutMarkers(String svg) {
   return svg.substring(0, start) + svg.substring(end);
 }
 
-/// Word boxes gathered into one box per line of text, top to bottom.
+/// Boxes (words, glyphs or verse pieces) gathered into one box per line
+/// of text, top to bottom. A box joins the row whose average centre is
+/// within half the typical box height of its own.
 List<Rect> wordRows(List<Rect> pieces) {
+  if (pieces.isEmpty) return const [];
+  final heights = [for (final r in pieces) r.height]..sort();
+  final tolerance = heights[heights.length ~/ 2] * 0.5;
   final rows = <Rect>[];
+  final centres = <double>[];
+  final counts = <int>[];
   for (final r in [
     ...pieces,
   ]..sort((a, b) => a.center.dy.compareTo(b.center.dy))) {
-    final i = rows.indexWhere(
-      (row) => (row.center.dy - r.center.dy).abs() < row.height * 0.6,
-    );
-    i < 0 ? rows.add(r) : rows[i] = rows[i].expandToInclude(r);
+    final i = centres.indexWhere((c) => (c - r.center.dy).abs() < tolerance);
+    if (i < 0) {
+      rows.add(r);
+      centres.add(r.center.dy);
+      counts.add(1);
+    } else {
+      rows[i] = rows[i].expandToInclude(r);
+      centres[i] = (centres[i] * counts[i] + r.center.dy) / (counts[i] + 1);
+      counts[i]++;
+    }
   }
   return rows;
 }

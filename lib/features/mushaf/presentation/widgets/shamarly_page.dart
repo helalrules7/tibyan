@@ -128,6 +128,7 @@ Future<ImagePageData> _loadShamarlyPage(WidgetRef ref, int page) async {
   for (final o in await repo.shamarlyOverflow(page)) {
     overflow.putIfAbsent(o.line, () => []).add(_rect(o.x0, o.y0, o.x1, o.y1));
   }
+  final boxes = await repo.shamarlyVerseBoxes(page);
   return ImagePageData(
     image: image,
     geometry: shamarlyGeometry(
@@ -137,9 +138,10 @@ Future<ImagePageData> _loadShamarlyPage(WidgetRef ref, int page) async {
       overflow: overflow,
     ),
     pieces: [
-      for (final b in await repo.shamarlyVerseBoxes(page))
+      for (final b in boxes)
         ((surah: b.surah, ayah: b.ayah), _rect(b.x0, b.y0, b.x1, b.y1)),
     ],
+    pieceLines: [for (final b in boxes) b.line],
     markers: {
       for (final m in await repo.shamarlyMarkers(page))
         (surah: m.surah, ayah: m.ayah): _rect(m.x0, m.y0, m.x1, m.y1),

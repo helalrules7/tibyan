@@ -138,5 +138,7 @@ Future<ImagePageData> _loadOldPage(WidgetRef ref, int page) async {
     ],
     markers: {for (final e in markers.entries) e.key: rect(e.value)},
     hitSlop: 6,
+    pieceLines: [for (final g in glyphs) g.lineNumber],
+    rowReach: 0,
   );
 }

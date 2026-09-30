@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -243,6 +244,8 @@ class ImagePageData {
     required this.pieces,
     required this.markers,
     this.hitSlop = 0,
+    this.rowReach = 0,
+    this.pieceLines = const [],
     this.alphaInk = true,
   });
 
@@ -257,6 +260,16 @@ class ImagePageData {
 
   /// How far around a piece a touch still selects its verse.
   final double hitSlop;
+
+  /// The printed line of each piece, in the order of [pieces]; empty
+  /// when unknown (lines are then found from the boxes' positions).
+  final List<int> pieceLines;
+
+  /// Recitation mode: how far a cover reaches above the first row of text
+  /// and below the last, as a share of the row's height. Boxes that are
+  /// single glyphs need it for the marks around them; boxes as tall as
+  /// the line do not (and reaching up would cover the basmala).
+  final double rowReach;
 
   /// The ink is the image's alpha (transparent paper). False for opaque
   /// scans, whose ink is taken from their darkness instead.
@@ -358,31 +371,135 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               return null;
             }
 
+            // Recitation mode: the page's rows of text, and its column.
+            // By the printed line where it is known: small glyphs (a dot, a
+            // sign) would otherwise make rows of their own.
+            final known = data.pieceLines.length == data.pieces.length;
+            final byLine = <int, Rect>{};
+            if (known) {
+              for (final (i, (_, r)) in data.pieces.indexed) {
+                final l = data.pieceLines[i];
+                byLine[l] = byLine[l]?.expandToInclude(r) ?? r;
+              }
+            }
+            final rows =
+                (known
+                      ? byLine.values.toList()
+                      : wordRows([for (final (_, r) in data.pieces) r]))
+                  ..sort((a, b) => a.top.compareTo(b.top));
+            // Across the whole drawn image: marks can reach past the boxes.
+            final column = layout.ink;
+            int rowOf(Rect r) {
+              var best = 0;
+              for (var i = 1; i < rows.length; i++) {
+                if ((rows[i].center.dy - r.center.dy).abs() <
+                    (rows[best].center.dy - r.center.dy).abs()) {
+                  best = i;
+                }
+              }
+              return best;
+            }
+
+            (double, double) rowSpan(int i) {
+              final r = rows[i];
+              final pad = r.height * data.rowReach;
+              var top = i == 0 ? r.top - pad : (rows[i - 1].bottom + r.top) / 2;
+              var bottom = i == rows.length - 1
+                  ? r.bottom + pad
+                  : (r.bottom + rows[i + 1].top) / 2;
+              if (!data.geometry.whole) {
+                // Lines drawn one by one, each spread to its own slot: the
+                // line's band is exactly what it draws (its overflow is
+                // covered on its own), and the neighbours are elsewhere.
+                return layout.band(layout.lineOfImageY(r.center.dy));
+              }
+              return (top, bottom);
+            }
+
             Iterable<Rect> piecesOf(bool Function(VerseKey) test) => [
               for (final (k, r) in data.pieces)
                 if (test(k)) r,
             ];
 
-            /// Recitation mode: the verse's own boxes, line by line and band
-            /// high, so none of its marks is left (the markers are drawn
-            /// again on top).
+            /// Recitation mode: each row of the verse, across from the
+            /// verse marker on one side to the next on the other (or the
+            /// text's edge), and from halfway to the row above to halfway
+            /// to the row below, so no mark of it is left. The markers are
+            /// drawn again on top. Rows come from the boxes themselves, not
+            /// the line grid, which the opening pages do not follow.
             Iterable<Rect> coverOf(VerseKey v) {
-              final pieces = piecesOf((k) => k == v);
-              if (pieces.isEmpty) {
+              final own = markers[v];
+              final mine = [
+                for (final (k, r) in data.pieces)
+                  if (k == v && r != own) r,
+              ];
+              if (mine.isEmpty) {
                 final words = x.hiddenWords[v];
                 return words == null ? const [] : layout.frames(words);
               }
-              return [
-                for (final r in pieces)
-                  () {
-                    final (top, bottom) = layout.band(
-                      layout.lineOfImageY(r.center.dy),
-                    );
-                    return layout.toScreenRect(
-                      Rect.fromLTRB(r.left, top, r.right, bottom),
-                    );
-                  }(),
+              final others = [
+                for (final e in markers.entries)
+                  if (e.key != v) e.value,
               ];
+              // The verse's boxes, one per row of the page.
+              final spans = <int, Rect>{};
+              for (final (j, (k, r)) in data.pieces.indexed) {
+                if (k != v || r == own) continue;
+                final i = known
+                    ? rows.indexOf(byLine[data.pieceLines[j]]!)
+                    : rowOf(r);
+                spans[i] = spans[i]?.expandToInclude(r) ?? r;
+              }
+              return [
+                for (final MapEntry(key: i, value: span) in spans.entries)
+                  () {
+                    final (top, bottom) = rowSpan(i);
+                    bool inRow(Rect m) => rowOf(m) == i;
+                    // Past the verse's own marker only when another verse
+                    // follows it on the row; else on to the text's edge,
+                    // where the ink of the rows around may hang.
+                    bool followed(Rect m) => data.pieces.any(
+                      (p) =>
+                          p.$1 != v &&
+                          inRow(p.$2) &&
+                          p.$2.center.dx < m.center.dx,
+                    );
+                    final left = own != null && inRow(own)
+                        ? (followed(own) ? own.center.dx : column.left)
+                        : others
+                              .where((m) => inRow(m) && m.center.dx < span.left)
+                              .fold(
+                                column.left,
+                                (a, m) => math.max(a, m.center.dx),
+                              );
+                    final right = others
+                        .where((m) => inRow(m) && m.center.dx > span.right)
+                        .fold(column.right, (a, m) => math.min(a, m.center.dx));
+                    final line = layout.lineOfImageY(rows[i].center.dy);
+                    Rect screen(Rect r) => Rect.fromPoints(
+                      layout.toScreen(r.topLeft, line: line),
+                      layout.toScreen(r.bottomRight, line: line),
+                    );
+                    final box = Rect.fromLTRB(left, top, right, bottom);
+                    return [
+                      screen(box),
+                      // Ink of this line that crosses into a neighbour's
+                      // band is drawn with this line: cover it the same way.
+                      if (!data.geometry.whole)
+                        for (final o
+                            in data.geometry.overflow[line] ?? const <Rect>[])
+                          if (o.right > left && o.left < right)
+                            screen(
+                              Rect.fromLTRB(
+                                math.max(o.left, left),
+                                o.top,
+                                math.min(o.right, right),
+                                o.bottom,
+                              ),
+                            ),
+                    ];
+                  }(),
+              ].expand((e) => e);
             }
 
             final selected = piecesOf(x.selection.contains).toList();
@@ -634,12 +751,18 @@ class _ImagePagePainter extends CustomPainter {
         canvas.drawRect(r.inflate(2), cover);
       }
       for (final (src, dst) in markerPixels) {
-        canvas.drawImageRect(
-          image,
-          src.inflate(3),
-          dst.inflate(3 * layout.scale),
-          paint,
-        );
+        // Just the round marker: its square box would bring back the
+        // neighbours' ink in its corners.
+        canvas
+          ..save()
+          ..clipPath(Path()..addOval(dst.inflate(layout.scale)))
+          ..drawImageRect(
+            image,
+            src.inflate(1),
+            dst.inflate(layout.scale),
+            paint,
+          )
+          ..restore();
       }
       for (final (r, n, marked) in markers) {
         look?.paintOver(
