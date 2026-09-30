@@ -788,4 +788,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeTitle => 'Home';
+
+  @override
+  String get frameDesignLabel => 'Page frame';
+
+  @override
+  String get frameByStyle => 'Style\'s own';
+
+  @override
+  String get frameZakhrafa => 'Zakhrafa';
+
+  @override
+  String get framePlain => 'Plain';
 }

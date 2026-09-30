@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/settings/app_settings.dart';
+import '../../../../core/settings/settings_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -48,7 +50,21 @@ Future<ui.Image> _load(String name) async {
   return (await codec.getNextFrame()).image;
 }
 
-final frameImagesProvider = FutureProvider<FrameImages>((ref) async {
+/// The frame in use: the reader's choice, else the style's own (the
+/// Zakhrafa style's illuminated frame, the plain frame for the others).
+final frameDesignProvider = Provider<FrameDesign>((ref) {
+  final settings = ref.watch(settingsProvider);
+  final style = ref.watch(themeRegistryProvider).byId(settings.styleId);
+  return settings.frameDesign ??
+      (style.frame.outerStyle == 'illuminated'
+          ? FrameDesign.zakhrafa
+          : FrameDesign.plain);
+});
+
+/// The page frame's design: ornament images, or none for the plain frame
+/// drawn in the style's own colours.
+final frameImagesProvider = FutureProvider<FrameImages?>((ref) async {
+  if (ref.watch(frameDesignProvider) == FrameDesign.plain) return null;
   final images = await Future.wait([
     _load('frame_corner.png'),
     _load('frame_edge_h.png'),
@@ -232,16 +248,16 @@ class IlluminatedFrame extends ConsumerWidget {
         Expanded(
           child: Stack(
             children: [
-              if (images != null)
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _FramePainter(
-                      images: images,
-                      rule: t.marker,
-                      paper: t.paper,
-                    ),
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _FramePainter(
+                    images: images,
+                    rule: t.marker,
+                    paper: t.paper,
+                    ink: t.frame,
                   ),
                 ),
+              ),
               Positioned.fill(
                 child: Padding(
                   padding: const EdgeInsets.all(band + 6),
@@ -498,13 +514,18 @@ class _FramePainter extends CustomPainter {
     required this.images,
     required this.rule,
     required this.paper,
+    required this.ink,
     this.band = IlluminatedFrame.band,
     this.fillPaper = true,
   });
 
-  final FrameImages images;
+  /// Null for the plain frame, drawn with rules in the style's colours.
+  final FrameImages? images;
   final Color rule;
   final Color paper;
+
+  /// The style's frame colour (the plain frame's band).
+  final Color ink;
   final double band;
 
   /// Paint the paper inside the band (off for the ornate pages, whose
@@ -515,6 +536,8 @@ class _FramePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
+    final images = this.images;
+    if (images == null) return _paintPlain(canvas, size);
     final paint = Paint()..filterQuality = FilterQuality.medium;
     final c = band * images.corner.width / images.edgeH.height;
 
@@ -608,8 +631,56 @@ class _FramePainter extends CustomPainter {
     canvas.restore();
   }
 
+  /// The plain frame: a tinted band between a strong outer rule and a fine
+  /// inner one, with a small lozenge at each corner.
+  void _paintPlain(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final outer = Offset.zero & size;
+    final inner = Rect.fromLTRB(band, band, w - band, h - band);
+    canvas.drawPath(
+      Path()
+        ..fillType = PathFillType.evenOdd
+        ..addRect(outer)
+        ..addRect(inner),
+      Paint()..color = ink.withValues(alpha: 0.2),
+    );
+    if (fillPaper) canvas.drawRect(inner, Paint()..color = paper);
+    final strong = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.4
+      ..color = ink;
+    final fine = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = rule;
+    canvas
+      ..drawRect(outer.deflate(3), strong)
+      ..drawRect(outer.deflate(7), fine)
+      ..drawRect(inner.inflate(3), fine)
+      ..drawRect(inner, strong..strokeWidth = 1.4);
+    final d = band * 0.32;
+    for (final c in [
+      Offset(band / 2, band / 2),
+      Offset(w - band / 2, band / 2),
+      Offset(band / 2, h - band / 2),
+      Offset(w - band / 2, h - band / 2),
+    ]) {
+      canvas.drawPath(
+        Path()
+          ..moveTo(c.dx, c.dy - d)
+          ..lineTo(c.dx + d, c.dy)
+          ..lineTo(c.dx, c.dy + d)
+          ..lineTo(c.dx - d, c.dy)
+          ..close(),
+        Paint()..color = rule,
+      );
+    }
+  }
+
   @override
   bool shouldRepaint(_FramePainter old) =>
+      old.ink != ink ||
       old.images != images ||
       old.rule != rule ||
       old.paper != paper ||
@@ -870,32 +941,33 @@ class OrnateFrame extends ConsumerWidget {
         );
         return Stack(
           children: [
-            if (images != null) ...[
+            if (images != null)
               Positioned.fill(
                 child: CustomPaint(painter: _MosaicPainter(images)),
               ),
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _FramePainter(
-                    images: images,
-                    rule: t.marker,
-                    paper: t.paper,
-                    fillPaper: false,
-                  ),
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _FramePainter(
+                  images: images,
+                  rule: t.marker,
+                  paper: t.paper,
+                  ink: t.frame,
+                  fillPaper: images == null,
                 ),
               ),
-              Positioned.fromRect(
-                rect: panel.inflate(inner),
-                child: CustomPaint(
-                  painter: _FramePainter(
-                    images: images,
-                    rule: t.marker,
-                    paper: t.paper,
-                    band: inner,
-                  ),
+            ),
+            Positioned.fromRect(
+              rect: panel.inflate(inner),
+              child: CustomPaint(
+                painter: _FramePainter(
+                  images: images,
+                  rule: t.marker,
+                  paper: t.paper,
+                  ink: t.frame,
+                  band: inner,
                 ),
               ),
-            ],
+            ),
             Positioned.fromRect(rect: panel.deflate(4), child: child),
             cartouche((band + panel.top - inner) / 2, top),
             cartouche((panel.bottom + inner + h - band) / 2, bottom),

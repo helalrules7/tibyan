@@ -450,5 +450,9 @@
   "versePauseSecond": "1 second",
   "versePauseHalf": "Half a second",
   "versePauseHint": "Shortens the long silences between verses without touching the recitation itself",
-  "homeTitle": "Home"
+  "homeTitle": "Home",
+  "frameDesignLabel": "Page frame",
+  "frameByStyle": "Style's own",
+  "frameZakhrafa": "Zakhrafa",
+  "framePlain": "Plain"
 }

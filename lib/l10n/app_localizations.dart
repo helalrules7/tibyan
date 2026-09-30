@@ -1441,6 +1441,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الرئيسية'**
   String get homeTitle;
+
+  /// No description provided for @frameDesignLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إطار الصفحة'**
+  String get frameDesignLabel;
+
+  /// No description provided for @frameByStyle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسب الشكل'**
+  String get frameByStyle;
+
+  /// No description provided for @frameZakhrafa.
+  ///
+  /// In ar, this message translates to:
+  /// **'زخرفة'**
+  String get frameZakhrafa;
+
+  /// No description provided for @framePlain.
+  ///
+  /// In ar, this message translates to:
+  /// **'بسيط'**
+  String get framePlain;
 }
 
 class _AppLocalizationsDelegate

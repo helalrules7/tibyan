@@ -785,4 +785,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get homeTitle => 'الرئيسية';
+
+  @override
+  String get frameDesignLabel => 'إطار الصفحة';
+
+  @override
+  String get frameByStyle => 'حسب الشكل';
+
+  @override
+  String get frameZakhrafa => 'زخرفة';
+
+  @override
+  String get framePlain => 'بسيط';
 }

@@ -584,5 +584,9 @@
   "versePauseSecond": "ثانية",
   "versePauseHalf": "نصف ثانية",
   "versePauseHint": "يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها",
-  "homeTitle": "الرئيسية"
+  "homeTitle": "الرئيسية",
+  "frameDesignLabel": "إطار الصفحة",
+  "frameByStyle": "حسب الشكل",
+  "frameZakhrafa": "زخرفة",
+  "framePlain": "بسيط"
 }

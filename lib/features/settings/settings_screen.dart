@@ -109,6 +109,29 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const DownloadAllButton(),
                 const Divider(height: 1),
+                ListTile(
+                  title: Text(l.frameDesignLabel),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Wrap(
+                      spacing: 8,
+                      children: [
+                        for (final (design, name) in [
+                          (null, l.frameByStyle),
+                          (FrameDesign.zakhrafa, l.frameZakhrafa),
+                          (FrameDesign.plain, l.framePlain),
+                        ])
+                          ChoiceChip(
+                            label: Text(name),
+                            selected: settings.frameDesign == design,
+                            onSelected: (_) =>
+                                controller.setFrameDesign(design),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l.keepScreenOn),
                   value: settings.keepScreenOn,

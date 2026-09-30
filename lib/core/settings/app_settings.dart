@@ -23,6 +23,10 @@ extension MushafEditionPages on MushafEdition {
 /// (default) or one of three rosettes drawn over it.
 enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
 
+/// The page frame's design. Every style frames its pages; this chooses
+/// the ornament.
+enum FrameDesign { zakhrafa, plain }
+
 /// Font of tafsir and translation texts.
 enum TafsirFont { naskh, interface }
 
@@ -56,6 +60,7 @@ class AppSettings {
     this.reciterId = 1,
     this.followRecitation = true,
     this.versePause = 0,
+    this.frameDesign,
   });
 
   final String styleId;
@@ -102,6 +107,9 @@ class AppSettings {
   /// the recording as it is.
   final int versePause;
 
+  /// The frame chosen by the reader; null uses the style's own.
+  final FrameDesign? frameDesign;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -121,6 +129,7 @@ class AppSettings {
     int? reciterId,
     bool? followRecitation,
     int? versePause,
+    FrameDesign? Function()? frameDesign,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -140,6 +149,7 @@ class AppSettings {
     reciterId: reciterId ?? this.reciterId,
     followRecitation: followRecitation ?? this.followRecitation,
     versePause: versePause ?? this.versePause,
+    frameDesign: frameDesign == null ? this.frameDesign : frameDesign(),
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure
