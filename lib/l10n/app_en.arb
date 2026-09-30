@@ -502,5 +502,19 @@
       }
     }
   },
-  "openLabel": "Open"
+  "openLabel": "Open",
+  "wordStudy": "Word study",
+  "wordMeanings": "Word meanings",
+  "wordPickHint": "Tap the word you want to study",
+  "wordStudyChoose": "Choose one of the verse's words",
+  "wordMeaningTitle": "Meaning",
+  "wordNoMeaning": "Al-Muyassar fi Gharib al-Quran has no entry for this word.",
+  "wordRootTitle": "Root",
+  "wordLemma": "Lemma",
+  "wordNoRoot": "The Quranic Arabic Corpus gives no root for this word.",
+  "wordNoCorpusData": "The Quranic Arabic Corpus has no data for this word.",
+  "rootOccurrencesTitle": "Where the root occurs",
+  "rootOccurrencesCount": "Words: {words}, verses: {verses}",
+  "verseNoMeanings": "Al-Muyassar fi Gharib al-Quran has no entries for this verse.",
+  "wordStudyVerse": "{surah}, verse {ayah}"
 }

@@ -858,4 +858,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get openLabel => 'افتح';
+
+  @override
+  String get wordStudy => 'دراسة الكلمة';
+
+  @override
+  String get wordMeanings => 'معاني الكلمات';
+
+  @override
+  String get wordPickHint => 'اضغط على الكلمة التي تريد دراستها';
+
+  @override
+  String get wordStudyChoose => 'اختر كلمة من كلمات الآية';
+
+  @override
+  String get wordMeaningTitle => 'المعنى';
+
+  @override
+  String get wordNoMeaning => 'لا شرح لهذه الكلمة في «الميسر في غريب القرآن».';
+
+  @override
+  String get wordRootTitle => 'الجذر';
+
+  @override
+  String get wordLemma => 'المدخل المعجمي';
+
+  @override
+  String get wordNoRoot => 'لا جذر لهذه الكلمة في المدونة القرآنية.';
+
+  @override
+  String get wordNoCorpusData => 'لا بيانات لهذه الكلمة في المدونة القرآنية.';
+
+  @override
+  String get rootOccurrencesTitle => 'مواضع الجذر';
+
+  @override
+  String rootOccurrencesCount(String words, String verses) {
+    return 'الكلمات: $words، الآيات: $verses';
+  }
+
+  @override
+  String get verseNoMeanings =>
+      'لا شرح لكلمات هذه الآية في «الميسر في غريب القرآن».';
+
+  @override
+  String wordStudyVerse(String surah, String ayah) {
+    return '$surah، الآية $ayah';
+  }
 }

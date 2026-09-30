@@ -1573,6 +1573,90 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'افتح'**
   String get openLabel;
+
+  /// No description provided for @wordStudy.
+  ///
+  /// In ar, this message translates to:
+  /// **'دراسة الكلمة'**
+  String get wordStudy;
+
+  /// No description provided for @wordMeanings.
+  ///
+  /// In ar, this message translates to:
+  /// **'معاني الكلمات'**
+  String get wordMeanings;
+
+  /// No description provided for @wordPickHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط على الكلمة التي تريد دراستها'**
+  String get wordPickHint;
+
+  /// No description provided for @wordStudyChoose.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر كلمة من كلمات الآية'**
+  String get wordStudyChoose;
+
+  /// No description provided for @wordMeaningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعنى'**
+  String get wordMeaningTitle;
+
+  /// No description provided for @wordNoMeaning.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا شرح لهذه الكلمة في «الميسر في غريب القرآن».'**
+  String get wordNoMeaning;
+
+  /// No description provided for @wordRootTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجذر'**
+  String get wordRootTitle;
+
+  /// No description provided for @wordLemma.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدخل المعجمي'**
+  String get wordLemma;
+
+  /// No description provided for @wordNoRoot.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا جذر لهذه الكلمة في المدونة القرآنية.'**
+  String get wordNoRoot;
+
+  /// No description provided for @wordNoCorpusData.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا بيانات لهذه الكلمة في المدونة القرآنية.'**
+  String get wordNoCorpusData;
+
+  /// No description provided for @rootOccurrencesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مواضع الجذر'**
+  String get rootOccurrencesTitle;
+
+  /// No description provided for @rootOccurrencesCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكلمات: {words}، الآيات: {verses}'**
+  String rootOccurrencesCount(String words, String verses);
+
+  /// No description provided for @verseNoMeanings.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا شرح لكلمات هذه الآية في «الميسر في غريب القرآن».'**
+  String get verseNoMeanings;
+
+  /// No description provided for @wordStudyVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'{surah}، الآية {ayah}'**
+  String wordStudyVerse(String surah, String ayah);
 }
 
 class _AppLocalizationsDelegate

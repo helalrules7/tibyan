@@ -14,6 +14,8 @@ import '../../../core/theme/theme_tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
+import '../../word_study/word_pick.dart';
+import '../../word_study/word_study_sheet.dart';
 import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
@@ -68,6 +70,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Recitation mode: verses stay covered until revealed.
   bool _recite = false;
   final Set<VerseKey> _revealed = {};
+
+  /// Word study: the next tap on the page picks a word to study.
+  bool _pickWord = false;
 
   /// Touch reading: the verse the reader last tapped is shaded.
   bool _touchReading = false;
@@ -141,6 +146,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _page = index + _first;
       _selA = _selB = null;
       _multi = false;
+      _pickWord = false;
       _revealed.clear();
     });
     if (_page < 1) return;
@@ -239,7 +245,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         onVerseLongPress: (v) {
           HapticFeedback.selectionClick();
           _setChrome(false);
-          setState(() => _selA = _selB = v);
+          setState(() {
+            _selA = _selB = v;
+            _pickWord = false;
+          });
         },
         onMarkerTap: (v) => _toggleMark(v, pg),
         onVerseTap: _touchReading && !_multi
@@ -280,6 +289,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             : null,
         emphasisLines:
             ref.watch(frameInfoProvider(pg)).value?.basmalaLines ?? const {},
+        onPick: _pickWord && pg == _page
+            ? (point, verse) => _pickAt(pg, point, verse)
+            : null,
       );
       final tools = _ReadingTools(
         touchReading: _touchReading,
@@ -516,6 +528,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 ),
               ),
             ),
+          if (_pickWord)
+            Positioned(
+              top: 0,
+              left: 16,
+              right: 16,
+              child: SafeArea(
+                child: _WordPickBar(
+                  onCancel: () => setState(() => _pickWord = false),
+                ),
+              ),
+            ),
           if (range != null && !_multi)
             Positioned(
               left: 0,
@@ -552,6 +575,19 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 onTafsir: () => context.push(
                   '/mushaf/tafsir?s=${range.first.surah}&a=${range.first.ayah}',
                 ),
+                onWordStudy: () {
+                  _setChrome(false);
+                  setState(() {
+                    _selA = _selB = null;
+                    _pickWord = true;
+                  });
+                },
+                onWordMeanings: () => showVerseMeanings(
+                  context,
+                  verses: [
+                    for (final v in range) (surah: v.surah, ayah: v.ayah),
+                  ],
+                ),
               ),
             ),
         ],
@@ -572,6 +608,28 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   Set<VerseKey> _selectionOn(int page) => {...?_range()};
+
+  /// Word study: the word under [point] (edition units) on [page]. A verse
+  /// without word boxes there opens with its words to choose from; a tap
+  /// outside any verse keeps waiting for a word.
+  void _pickAt(int page, Offset point, VerseKey? verse) {
+    final boxes = ref.read(pageWordBoxesProvider(page)).value ?? const {};
+    final slop = ref.read(editionProvider) == MushafEdition.madina1441
+        ? 2.0
+        : 6.0;
+    final hit =
+        wordUnder(boxes, point, verse: verse, slop: slop) ??
+        wordUnder(boxes, point, slop: slop);
+    if (hit == null && verse == null) return;
+    HapticFeedback.selectionClick();
+    setState(() => _pickWord = false);
+    showWordStudy(
+      context,
+      surah: hit?.$1 ?? verse!.surah,
+      ayah: hit?.$2 ?? verse!.ayah,
+      word: hit?.$3,
+    );
+  }
 
   /// Word boxes of [verses] on [page], by verse (edition units).
   Map<VerseKey, List<Rect>> _wordsOf(Set<VerseKey> verses, int page) {
@@ -1042,6 +1100,43 @@ class _MultiSelectBar extends StatelessWidget {
               ),
             ),
             FilledButton(onPressed: onDone, child: Text(l.doneLabel)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Word study: asks for a word to be tapped.
+class _WordPickBar extends StatelessWidget {
+  const _WordPickBar({required this.onCancel});
+
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    return Material(
+      color: t.paper,
+      elevation: 6,
+      borderRadius: BorderRadius.circular(28),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
+        child: Row(
+          children: [
+            Icon(Icons.touch_app_outlined, color: t.goldText),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Semantics(
+                liveRegion: true,
+                child: Text(
+                  l.wordPickHint,
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ),
+            ),
+            TextButton(onPressed: onCancel, child: Text(l.cancel)),
           ],
         ),
       ),

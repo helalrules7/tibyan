@@ -406,6 +406,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (d) {
                       final point = layout.toPage(d.localPosition);
+                      if (x.onPick != null) {
+                        return x.onPick!(point, verseAt(point));
+                      }
                       if (x.hidden != null) {
                         final v = verseAt(point);
                         if (v != null && x.hidden!.contains(v)) {

@@ -636,5 +636,39 @@
       }
     }
   },
-  "openLabel": "افتح"
+  "openLabel": "افتح",
+  "wordStudy": "دراسة الكلمة",
+  "wordMeanings": "معاني الكلمات",
+  "wordPickHint": "اضغط على الكلمة التي تريد دراستها",
+  "wordStudyChoose": "اختر كلمة من كلمات الآية",
+  "wordMeaningTitle": "المعنى",
+  "wordNoMeaning": "لا شرح لهذه الكلمة في «الميسر في غريب القرآن».",
+  "wordRootTitle": "الجذر",
+  "wordLemma": "المدخل المعجمي",
+  "wordNoRoot": "لا جذر لهذه الكلمة في المدونة القرآنية.",
+  "wordNoCorpusData": "لا بيانات لهذه الكلمة في المدونة القرآنية.",
+  "rootOccurrencesTitle": "مواضع الجذر",
+  "rootOccurrencesCount": "الكلمات: {words}، الآيات: {verses}",
+  "@rootOccurrencesCount": {
+    "placeholders": {
+      "words": {
+        "type": "String"
+      },
+      "verses": {
+        "type": "String"
+      }
+    }
+  },
+  "verseNoMeanings": "لا شرح لكلمات هذه الآية في «الميسر في غريب القرآن».",
+  "wordStudyVerse": "{surah}، الآية {ayah}",
+  "@wordStudyVerse": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -861,4 +861,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openLabel => 'Open';
+
+  @override
+  String get wordStudy => 'Word study';
+
+  @override
+  String get wordMeanings => 'Word meanings';
+
+  @override
+  String get wordPickHint => 'Tap the word you want to study';
+
+  @override
+  String get wordStudyChoose => 'Choose one of the verse\'s words';
+
+  @override
+  String get wordMeaningTitle => 'Meaning';
+
+  @override
+  String get wordNoMeaning =>
+      'Al-Muyassar fi Gharib al-Quran has no entry for this word.';
+
+  @override
+  String get wordRootTitle => 'Root';
+
+  @override
+  String get wordLemma => 'Lemma';
+
+  @override
+  String get wordNoRoot =>
+      'The Quranic Arabic Corpus gives no root for this word.';
+
+  @override
+  String get wordNoCorpusData =>
+      'The Quranic Arabic Corpus has no data for this word.';
+
+  @override
+  String get rootOccurrencesTitle => 'Where the root occurs';
+
+  @override
+  String rootOccurrencesCount(String words, String verses) {
+    return 'Words: $words, verses: $verses';
+  }
+
+  @override
+  String get verseNoMeanings =>
+      'Al-Muyassar fi Gharib al-Quran has no entries for this verse.';
+
+  @override
+  String wordStudyVerse(String surah, String ayah) {
+    return '$surah, verse $ayah';
+  }
 }

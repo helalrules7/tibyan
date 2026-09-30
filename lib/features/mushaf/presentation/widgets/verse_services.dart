@@ -22,6 +22,8 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onMultiSelect,
     required this.onTafsir,
     required this.onListen,
+    required this.onWordStudy,
+    required this.onWordMeanings,
   });
 
   final List<VerseKey> verses;
@@ -32,6 +34,12 @@ class VerseServicesPanel extends StatelessWidget {
   final VoidCallback onMultiSelect;
   final VoidCallback onTafsir;
   final VoidCallback onListen;
+
+  /// Word study: the next tap on the page picks the word.
+  final VoidCallback onWordStudy;
+
+  /// The meanings of the selected verses' words («الميسر في غريب القرآن»).
+  final VoidCallback onWordMeanings;
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +143,32 @@ class VerseServicesPanel extends StatelessWidget {
                       label: Text(l.tafsirTitle),
                       style: FilledButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onWordStudy,
+                      icon: const Icon(Icons.touch_app_outlined),
+                      label: Text(l.wordStudy),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(44),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onWordMeanings,
+                      icon: const Icon(Icons.notes),
+                      label: Text(l.wordMeanings),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(44),
                       ),
                     ),
                   ),

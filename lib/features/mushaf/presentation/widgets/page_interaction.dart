@@ -32,7 +32,13 @@ class PageInteraction {
     this.onVerseTap,
     this.touched,
     this.touchColor,
+    this.onPick,
   });
+
+  /// Word picking («دراسة الكلمة»): while set, a tap goes here instead,
+  /// with the point in edition units (page units in the new edition, image
+  /// px in the others) and the verse under it, if any.
+  final void Function(Offset point, VerseKey? verse)? onPick;
 
   /// Touch reading: a tap on a verse shades it (replacing the last one).
   final ValueChanged<VerseKey>? onVerseTap;

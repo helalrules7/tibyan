@@ -417,6 +417,12 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (d) {
+                      if (x.onPick != null) {
+                        return x.onPick!(
+                          layout.toImage(d.localPosition),
+                          verseAt(d.localPosition),
+                        );
+                      }
                       if (x.hidden != null) {
                         final v = verseAt(d.localPosition);
                         if (v != null && x.hidden!.contains(v)) {
