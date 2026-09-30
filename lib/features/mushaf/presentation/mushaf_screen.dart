@@ -326,6 +326,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         ),
       };
       final info = ref.watch(frameInfoProvider(pg)).value;
+      void openIndex(String tab) {
+        final a = ref.read(pageAyahsProvider(pg)).value?.firstOrNull;
+        context.push(
+          '/mushaf/index?tab=$tab&p=$pg'
+          '${a == null ? '' : '&s=${a.surah}'}'
+          '${info == null ? '' : '&j=${info.juz}&h=${info.hizb}'}',
+        );
+      }
+
       if (openingSurah != null) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
@@ -335,17 +344,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             // Recitation mode: the next page's first word would give it away.
             catchword: _recite ? null : info?.catchword,
             onPageTap: _goToPage,
+            onSurahTap: () => openIndex('surahs'),
             tools: tools,
             child: pageWidget,
           ),
-        );
-      }
-      void openIndex(String tab) {
-        final a = ref.read(pageAyahsProvider(pg)).value?.firstOrNull;
-        context.push(
-          '/mushaf/index?tab=$tab&p=$pg'
-          '${a == null ? '' : '&s=${a.surah}'}'
-          '${info == null ? '' : '&j=${info.juz}&h=${info.hizb}'}',
         );
       }
 

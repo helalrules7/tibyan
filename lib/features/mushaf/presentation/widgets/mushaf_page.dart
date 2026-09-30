@@ -328,13 +328,29 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               for (final v in verses)
                 if (x.selection.contains(v.key)) v,
             ];
-            // Pages 1 and 2 keep their own layout; their verses are drawn
-            // as whole outlines there.
+            // Pages 1 and 2 keep their own layout. A verse's outline there
+            // is one polygon over several lines, so its lines come from its
+            // word boxes.
+            final openingWords = widget.page <= 2
+                ? ref.watch(pageWordBoxesProvider(widget.page)).value
+                : null;
+            List<Rect> openingRects(
+              ({VerseKey key, List<Rect> rects, Path path, Offset? marker}) v,
+            ) {
+              final rows = openingWords == null
+                  ? const <Rect>[]
+                  : wordRows([
+                      for (final MapEntry(key: (s, a, _), value: pieces)
+                          in openingWords.entries)
+                        if (s == v.key.surah && a == v.key.ayah) ...pieces,
+                    ]);
+              return [
+                for (final r in rows.isEmpty ? v.rects : rows) r.inflate(1),
+              ];
+            }
+
             final boxes = widget.page <= 2
-                ? [
-                    for (final v in selected)
-                      for (final r in v.rects) r.inflate(1),
-                  ]
+                ? [for (final v in selected) ...openingRects(v)]
                 : lineBoxes(
                     [for (final v in selected) ...v.rects],
                     lineOf: (r) => layout._lineOf(r.center.dy),
@@ -346,7 +362,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               for (final v in verses)
                 if (v.key == x.touched)
                   ...widget.page <= 2
-                      ? [for (final r in v.rects) r.inflate(1)]
+                      ? openingRects(v)
                       : lineBoxes(
                           v.rects,
                           lineOf: (r) => layout._lineOf(r.center.dy),
@@ -675,6 +691,20 @@ String withoutMarkers(String svg) {
   final end = svg.indexOf('<g id="content"');
   if (start < 0 || end < start) return svg;
   return svg.substring(0, start) + svg.substring(end);
+}
+
+/// Word boxes gathered into one box per line of text, top to bottom.
+List<Rect> wordRows(List<Rect> pieces) {
+  final rows = <Rect>[];
+  for (final r in [
+    ...pieces,
+  ]..sort((a, b) => a.center.dy.compareTo(b.center.dy))) {
+    final i = rows.indexWhere(
+      (row) => (row.center.dy - r.center.dy).abs() < row.height * 0.6,
+    );
+    i < 0 ? rows.add(r) : rows[i] = rows[i].expandToInclude(r);
+  }
+  return rows;
 }
 
 /// Only the page's printed verse-end markers (the group before the text).

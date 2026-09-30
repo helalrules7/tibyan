@@ -183,6 +183,7 @@ class OpeningPage extends ConsumerWidget {
     required this.child,
     this.catchword,
     this.onPageTap,
+    this.onSurahTap,
     this.tools,
   });
 
@@ -193,6 +194,9 @@ class OpeningPage extends ConsumerWidget {
   final Widget child;
   final String? catchword;
   final VoidCallback? onPageTap;
+
+  /// The surah's name was tapped (opens the index, as on other pages).
+  final VoidCallback? onSurahTap;
   final Widget? tools;
 
   @override
@@ -232,12 +236,19 @@ class OpeningPage extends ConsumerWidget {
       tools: tools,
       top: s == null
           ? const SizedBox.shrink()
-          : two(
-              l.surahWord(s.nameAr),
-              l.openingInfo(
-                s.revelation == 'meccan' ? l.meccan : l.medinan,
-                digits(s.ayahCount),
-                digits(s.id),
+          : Semantics(
+              button: onSurahTap != null,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onSurahTap,
+                child: two(
+                  l.surahWord(s.nameAr),
+                  l.openingInfo(
+                    s.revelation == 'meccan' ? l.meccan : l.medinan,
+                    digits(s.ayahCount),
+                    digits(s.id),
+                  ),
+                ),
               ),
             ),
       bottom: s == null
