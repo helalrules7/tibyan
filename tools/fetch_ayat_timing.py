@@ -18,8 +18,12 @@ OUT = ROOT / '.cache' / 'mp3quran_ayat_timing.json'
 API = 'https://www.mp3quran.net/api/v3/ayat_timing?surah={surah}&read={read}'
 
 # mp3quran "read" ids with timing: Minshawi, Husary, Abdul Basit (murattal),
-# al-Banna and Mustafa Ismail (mujawwad; their murattal has no timing).
-READS = [112, 118, 53, 122, 288]
+# and the imams of the two Harams whose word timings were checked (see
+# build_content_db.RECITERS). al-Banna's and Mustafa Ismail's murattal have
+# no published timing (tools/build_quranlab_timing.py derives it).
+# Candidates: Sudais 54, Shuraim 31, Yasser al-Dosari 92, Abdullah
+# al-Juhani 62, Ali al-Hudhaify 74, Salah al-Budair 43, Muhsin al-Qasim 67.
+READS = [112, 118, 53, 54, 31, 92, 62, 74, 43, 67]
 
 
 def fetch(url):
@@ -36,7 +40,7 @@ def fetch(url):
 
 def main():
     out = {}
-    for read in READS:
+    for read in [int(a) for a in sys.argv[1:]] or READS:
         out[str(read)] = {}
         for surah in range(1, 115):
             rows = fetch(API.format(surah=surah, read=read))

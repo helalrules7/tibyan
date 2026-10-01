@@ -11,6 +11,7 @@ Nothing here touches the Quran text; it only measures the audio.
 
 Usage:
   python3 tools/build_ayah_speech.py     # needs tools/.cache/audio/<reciter>/NNN.mp3
+A verse whose surah file is not cached keeps the row of the last build.
 Writes tools/.cache/ayah_speech.json: [[reciter, surah, ayah, start_ms, end_ms], ...]
 """
 import json
@@ -65,6 +66,17 @@ def main():
     with ProcessPoolExecutor() as pool:
         for part in pool.map(surah_rows, jobs):
             rows += part
+    # A verse measured in an earlier build whose surah file is not cached
+    # now keeps its row, when its verse window is unchanged.
+    old = json.loads(OUT.read_text(encoding='utf-8')) if OUT.exists() else []
+    have = {tuple(r[:3]) for r in rows}
+    window = {(r, s, a): (st, en) for (r, s), w in windows.items() for a, st, en in w}
+    for r, s, a, st, en in old:
+        audio = CACHE / 'audio' / str(r) / f'{s:03d}.mp3'
+        span = window.get((r, s, a))
+        if (r, s, a) not in have and not audio.exists() and span and span[0] <= st and en <= span[1]:
+            rows.append((r, s, a, st, en))
+    rows.sort()
     per = {}
     for r, *_ in rows:
         per[r] = per.get(r, 0) + 1

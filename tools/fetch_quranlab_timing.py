@@ -1,19 +1,22 @@
-"""Download QuranLab's word timings for Mahmoud Ali al-Banna (murattal).
+"""Download QuranLab's word timings for the murattal recitations Tibyan
+places on the mp3quran surah files.
 
-Source: https://huggingface.co/datasets/quranlab/quran-audio, config
-`mahmoud-ali-al-banna` (word timings CC BY 4.0; the dataset hosts no
-audio). The rows are read through the Hugging Face datasets-server API,
-so no Parquet library is needed.
+Source: https://huggingface.co/datasets/quranlab/quran-audio, one config
+per recitation (word timings CC BY 4.0; the dataset hosts no audio). The
+rows are read through the Hugging Face datasets-server API, so no Parquet
+library is needed.
 
-Each row is one verse, aligned on everyayah's per-verse file
-(mahmoud_ali_al_banna_32kbps/SSSAAA.mp3). `segments` hold one entry per
-word: word_start/word_end are 0-based word indices [start, end) of the
-Tanzil Uthmani text, start_ms/end_ms are times in the per-verse file.
+Each row is one verse, aligned on everyayah's per-verse file (for
+example mahmoud_ali_al_banna_32kbps/SSSAAA.mp3; the row's audio_url
+names it). `segments` hold one entry per word: word_start/word_end are
+0-based word indices [start, end) of the Tanzil Uthmani text,
+start_ms/end_ms are times in the per-verse file.
 
 Usage:
-  python3 tools/fetch_quranlab_timing.py
+  python3 tools/fetch_quranlab_timing.py [config ...]   # default: all in CONFIGS
 
-Writes tools/.cache/quranlab_banna_timing.json:
+Writes tools/.cache/quranlab_<name>_timing.json per config (names in
+CONFIGS; al-Banna's keeps its first name, quranlab_banna_timing.json):
   {surah: {ayah: [[word_start, word_end, start_ms, end_ms], ...]}}
 Verses without timing are left out. Keys are sorted so the file's
 SHA-256 is stable. Only the timing fields are kept, copied as published.
@@ -25,10 +28,26 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-OUT = ROOT / '.cache' / 'quranlab_banna_timing.json'
-CONFIG = 'mahmoud-ali-al-banna'
+CACHE = ROOT / '.cache'
+# QuranLab config -> cache file name part
+CONFIGS = {
+    'mahmoud-ali-al-banna': 'banna',
+    'mustafa-ismail': 'mustafa-ismail',
+    'abdul-rahman-al-sudais': 'abdul-rahman-al-sudais',
+    'saud-al-shuraim': 'saud-al-shuraim',
+    'yasser-al-dosari': 'yasser-al-dosari',
+    'abdullah-al-juhani': 'abdullah-al-juhani',
+    'ali-al-hudhaify': 'ali-al-hudhaify',
+    'salah-al-budair': 'salah-al-budair',
+    'muhsin-al-qasim': 'muhsin-al-qasim',
+    'maher-al-muaiqly': 'maher-al-muaiqly',
+}
 API = ('https://datasets-server.huggingface.co/rows?dataset=quranlab/quran-audio'
-       f'&config={CONFIG}&split=train&offset={{offset}}&length=100')
+       '&config={config}&split=train&offset={offset}&length=100')
+
+
+def path(config):
+    return CACHE / f'quranlab_{CONFIGS[config]}_timing.json'
 
 
 def fetch(url):
@@ -45,15 +64,15 @@ def fetch(url):
             time.sleep(10 * (attempt + 1))
 
 
-def main():
+def download(config):
     out, offset, total = {}, 0, None
     while total is None or offset < total:
-        page = fetch(API.format(offset=offset))
+        page = fetch(API.format(config=config, offset=offset))
         total = page['num_rows_total']
         for item in page['rows']:
             assert not item.get('truncated_cells'), item['row']['verse_key']
             row = item['row']
-            assert row['recitation_id'] == CONFIG and row['riwayah'] == 'hafs-asim'
+            assert row['recitation_id'] == config and row['riwayah'] == 'hafs-asim'
             if not row['has_word_timing']:
                 continue
             out.setdefault(str(row['surah']), {})[str(row['ayah'])] = [
@@ -61,9 +80,15 @@ def main():
                 for s in row['segments']
             ]
         offset += len(page['rows'])
-    OUT.parent.mkdir(exist_ok=True)
-    OUT.write_text(json.dumps(out, sort_keys=True, separators=(',', ':')), encoding='utf-8')
-    print(f'{sum(len(v) for v in out.values())} of {total} verses timed -> {OUT}')
+    out_path = path(config)
+    out_path.parent.mkdir(exist_ok=True)
+    out_path.write_text(json.dumps(out, sort_keys=True, separators=(',', ':')), encoding='utf-8')
+    print(f'{config}: {sum(len(v) for v in out.values())} of {total} verses timed -> {out_path.name}')
+
+
+def main():
+    for config in sys.argv[1:] or CONFIGS:
+        download(config)
     return 0
 
 

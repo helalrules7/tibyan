@@ -16,8 +16,9 @@ Only verses whose aligned word count equals our word boxes are kept.
 Nothing here touches the Quran text.
 
 Usage:
-  python3 tools/build_word_timing.py      # needs tools/.cache/audio/<reciter>/NNN.mp3
-Writes tools/.cache/word_timing.json and prints coverage.
+  python3 tools/build_word_timing.py [reciter ...]   # needs tools/.cache/audio/<reciter>/NNN.mp3
+Writes tools/.cache/word_timing.json (rows of surahs not built, or
+without cached audio, are kept) and prints coverage.
 """
 import json
 import re
@@ -27,28 +28,81 @@ import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parent
 CACHE = ROOT / '.cache'
 DB = ROOT.parent / 'assets' / 'db' / 'content.db'
 OUT = CACHE / 'word_timing.json'
 
-# content.db reciter id -> (quran-align file, mp3quran timing read id)
+# content.db reciter id -> (word segments file in tools/.cache, mp3quran
+# timing read id). quran-align files are lists of verses; QuranLab's
+# (fetch_quranlab_timing.py) are {surah: {ayah: segments}}; both hold
+# [word_start, word_end, start_ms, end_ms] segments in the per-verse file.
 RECITERS = {
-    1: ('Minshawy_Murattal_128kbps', 112),
-    2: ('Husary_64kbps', 118),
-    3: ('Abdul_Basit_Murattal_64kbps', 53),
+    1: ('quran-align/Minshawy_Murattal_128kbps.json', 112),
+    2: ('quran-align/Husary_64kbps.json', 118),
+    3: ('quran-align/Abdul_Basit_Murattal_64kbps.json', 53),
 }
-NOISE = '-35dB'
+# Tried 2026-09-30 for the imams of the two Harams and rejected: the
+# mp3quran verse timings do not fall on the pauses of these recordings,
+# so the words cannot be placed by them (docs/DATA_SOURCES.md):
+# Sudais ('quran-align/Abdurrahmaan_As-Sudais_192kbps.json', 54),
+# Abdullah al-Juhani ('quranlab_abdullah-al-juhani_timing.json', 62),
+# Salah al-Budair ('quranlab_salah-al-budair_timing.json', 43),
+# Muhsin al-Qasim ('quranlab_muhsin-al-qasim_timing.json', 67).
+NOISE_DB = -35      # silence threshold for silencedetect
+# A recording whose quietest 2% of 10 ms frames stay above RAISED_FLOOR dB
+# never falls silent (mastered loud over a noise floor near -30 dB, as some
+# Haram recordings are): its pauses are frames FLOOR_BELOW dB under its
+# median loudness instead.
+RAISED_FLOOR = -45
+FLOOR_BELOW = 16
 MIN_SILENCE = 0.2   # seconds, for silencedetect
 PAUSE_MS = 250      # a gap this long between aligned words is a pause
 SNAP_MS = 1500      # farthest a heard pause may be from the boundary it pins
 
 
+def frames_db(path):
+    """Loudness of an audio file in dB per 10 ms frame (8 kHz mono)."""
+    raw = subprocess.run(
+        ['ffmpeg', '-v', 'error', '-i', str(path), '-map', '0:a:0', '-ac', '1',
+         '-ar', '8000', '-f', 's16le', '-'], capture_output=True, check=True).stdout
+    a = np.frombuffer(raw, dtype=np.int16).astype(np.float64) / 32768
+    n = len(a) // 80
+    power = (a[:n * 80].reshape(n, 80) ** 2).mean(axis=1)
+    return 10 * np.log10(power + 1e-12)
+
+
+def raised_quiet(env):
+    """The quiet level of a recording that never falls silent, else None."""
+    if np.percentile(env, 2) <= RAISED_FLOOR:
+        return None
+    return round(float(np.median(env))) - FLOOR_BELOW
+
+
+def quiet_db(path, base):
+    """The level under which a frame counts as quiet: base, or the raised
+    level of a recording that never falls silent."""
+    raised = raised_quiet(frames_db(path))
+    return base if raised is None else raised
+
+
 def silences(path):
-    """[(start_ms, end_ms)] of silence in an audio file."""
+    """[(start_ms, end_ms)] of silence in an audio file: ffmpeg
+    silencedetect at NOISE_DB. In a recording that never falls silent
+    (see raised_quiet) silencedetect, which looks at every sample, never fires:
+    there a silence is a run of 10 ms frames whose mean power is under
+    the raised level, MIN_SILENCE or longer."""
+    env = frames_db(path)
+    noise = raised_quiet(env)
+    if noise is not None:
+        edges = np.flatnonzero(np.diff(np.concatenate([[0], (env < noise).astype(int), [0]])))
+        return [(int(a) * 10, int(e) * 10) for a, e in zip(edges[::2], edges[1::2])
+                if (e - a) * 10 >= MIN_SILENCE * 1000]
     out = subprocess.run(
         ['ffmpeg', '-hide_banner', '-nostats', '-i', str(path), '-map', '0:a:0', '-af',
-         f'silencedetect=noise={NOISE}:d={MIN_SILENCE}', '-f', 'null', '-'],
+         f'silencedetect=noise={NOISE_DB}dB:d={MIN_SILENCE}', '-f', 'null', '-'],
         capture_output=True, encoding='utf-8', errors='replace').stderr
     starts = [float(x) for x in re.findall(r'silence_start: ([\d.]+)', out)]
     ends = [float(x) for x in re.findall(r'silence_end: ([\d.]+)', out)]
@@ -162,18 +216,34 @@ def build_surah(job):
     return rows, stats
 
 
+def load_segments(name):
+    """{surah: {ayah: (word count, segments)}} from a quran-align or QuranLab file."""
+    text = (CACHE / name).read_text(encoding='utf-8')
+    if text[:1] not in '[{':
+        # Some quran-align files start with the aligner's crash log line.
+        text = text[text.index('\n[') + 1:]
+    data = json.loads(text)
+    if isinstance(data, dict):
+        data = [{'surah': int(s), 'ayah': int(a), 'segments': segs}
+                for s, verses in data.items() for a, segs in verses.items()]
+    aligned = {}
+    for e in data:
+        words = max((seg[1] for seg in e['segments']), default=0)
+        aligned.setdefault(e['surah'], {})[e['ayah']] = (words, e['segments'])
+    return aligned
+
+
 def main():
     db = sqlite3.connect(DB)
     counts = {}
     for s, a, n in db.execute('SELECT surah, ayah, COUNT(*) FROM word_box GROUP BY surah, ayah'):
         counts.setdefault(s, {})[a] = n
     timing = json.loads((CACHE / 'mp3quran_ayat_timing.json').read_text(encoding='utf-8'))
+    built = [int(a) for a in sys.argv[1:]] or list(RECITERS)
     jobs = []
-    for reciter, (align_name, read) in RECITERS.items():
-        aligned = {}
-        for e in json.loads((CACHE / 'quran-align' / f'{align_name}.json').read_text()):
-            words = max((seg[1] for seg in e['segments']), default=0)
-            aligned.setdefault(e['surah'], {})[e['ayah']] = (words, e['segments'])
+    for reciter in built:
+        align_name, read = RECITERS[reciter]
+        aligned = load_segments(align_name)
         for surah in range(1, 115):
             audio = CACHE / 'audio' / str(reciter) / f'{surah:03d}.mp3'
             windows = timing[str(read)][str(surah)]
@@ -181,7 +251,11 @@ def main():
             if not audio.exists() or numbers != sorted(counts[surah]):
                 continue
             jobs.append((reciter, surah, audio, windows, aligned.get(surah, {}), counts[surah]))
-    rows, totals = [], {}
+    # Rows of surahs not built this time (reciter not asked for, or surah
+    # file not cached) are kept, for reciters still in RECITERS.
+    have = {(j[0], j[1]) for j in jobs}
+    old = json.loads(OUT.read_text(encoding='utf-8')) if OUT.exists() else []
+    rows, totals = [r for r in old if (r[0], r[1]) not in have and r[0] in RECITERS], {}
     with ProcessPoolExecutor() as pool:
         for (reciter, *_), (r, stats) in zip(jobs, pool.map(build_surah, jobs)):
             rows += r
