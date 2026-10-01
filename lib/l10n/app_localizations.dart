@@ -1190,12 +1190,6 @@ abstract class AppLocalizations {
   /// **'مرتل'**
   String get murattal;
 
-  /// No description provided for @mujawwad.
-  ///
-  /// In ar, this message translates to:
-  /// **'مجود'**
-  String get mujawwad;
-
   /// No description provided for @repeatLabel.
   ///
   /// In ar, this message translates to:

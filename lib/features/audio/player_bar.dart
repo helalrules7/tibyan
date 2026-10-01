@@ -15,8 +15,9 @@ import 'recitation.dart';
 String reciterLabel(BuildContext context, ReciterRow r) {
   final l = AppLocalizations.of(context);
   final ar = Localizations.localeOf(context).languageCode == 'ar';
-  final style = r.style == 'mujawwad' ? l.mujawwad : l.murattal;
-  return '${ar ? r.nameAr : r.nameEn} · $style';
+  // Every recitation offered is murattal: the mujawwad readings were removed
+  // and their ids are never reused, so there is nothing to branch on.
+  return '${ar ? r.nameAr : r.nameEn} · ${l.murattal}';
 }
 
 /// The recitation controls shown over the mushaf while listening.

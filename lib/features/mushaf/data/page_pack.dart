@@ -323,7 +323,13 @@ class PageStore {
   final Directory dir;
   final _cache = <int, String>{};
   final _order = <int>[];
-  static const _capacity = 6;
+
+  /// Twelve pages: about 8 MB of text, and enough that turning back through
+  /// a surah does not decompress again. The page's *picture* is not kept —
+  /// that is the GPU's, and a caller disposes it — so a revisited page still
+  /// compiles once more, which on a warm worker is 26 ms for 12 ms of it on
+  /// the UI isolate.
+  static const _capacity = 12;
 
   Future<String> svg(int page) async {
     final hit = _cache[page];

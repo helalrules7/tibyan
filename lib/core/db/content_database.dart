@@ -426,7 +426,7 @@ class Reciter extends Table {
   TextColumn get nameAr => text()();
   TextColumn get nameEn => text()();
 
-  /// `murattal` or `mujawwad`.
+  /// `murattal`, and only that: the mujawwad readings are not offered.
   TextColumn get style => text()();
 
   /// A surah's file is this URL followed by `NNN.mp3`.

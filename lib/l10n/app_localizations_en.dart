@@ -644,9 +644,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get murattal => 'Murattal';
 
   @override
-  String get mujawwad => 'Mujawwad';
-
-  @override
   String get repeatLabel => 'Times to repeat';
 
   @override

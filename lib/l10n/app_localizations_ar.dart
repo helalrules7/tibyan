@@ -642,9 +642,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get murattal => 'مرتل';
 
   @override
-  String get mujawwad => 'مجود';
-
-  @override
   String get repeatLabel => 'عدد مرات التكرار';
 
   @override

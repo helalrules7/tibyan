@@ -145,6 +145,20 @@ RECITERS = [
 ]
 
 
+def check_reciters():
+    """Every reading offered is murattal, and no id is reused.
+
+    The mujawwad readings are not offered at all, and ids are never
+    reassigned: a choice saved on a device must never turn into another
+    reader. Both are checked here because the list above is the only place
+    that decides.
+    """
+    ids = [r[0] for r in RECITERS]
+    assert len(ids) == len(set(ids)), f'two reciters share an id: {ids}'
+    styles = {r[3] for r in RECITERS}
+    assert styles == {'murattal'}, f'only murattal is offered, found {styles}'
+
+
 def surah_url(folder_url, surah):
     """A surah file's URL: folder_url + NNN.mp3, or, when folder_url holds
     {surah}, folder_url with the surah number (not zero-padded) in its place."""
@@ -190,6 +204,7 @@ def basmala_prefix_length(verses, key):
 
 
 def main():
+    check_reciters()
     uthmani_path = CACHE / 'quran-uthmani.txt'
     clean_path = CACHE / 'quran-simple-clean.txt'
     meta_path = CACHE / 'quran-data.xml'

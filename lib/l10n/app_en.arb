@@ -354,7 +354,6 @@
   "listen": "Listen",
   "reciterLabel": "Reciter",
   "murattal": "Murattal",
-  "mujawwad": "Mujawwad",
   "repeatLabel": "Times to repeat",
   "repeatForever": "Until stopped",
   "repeatTimes": "×{n}",
