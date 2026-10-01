@@ -249,6 +249,7 @@
       }
     }
   },
+  "catchwordImageLabel": "الكلمة الأولى في الصفحة التالية",
   "tabHizb": "الأحزاب",
   "goToPage": "انتقال إلى صفحة",
   "goToPageHint": "رقم الصفحة من ١ إلى {max}",

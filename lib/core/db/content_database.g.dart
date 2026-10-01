@@ -9643,6 +9643,422 @@ class ShamarlyWordBoxCompanion extends UpdateCompanion<ShamarlyWordBoxRow> {
   }
 }
 
+class $ShamarlyCatchwordTable extends ShamarlyCatchword
+    with TableInfo<$ShamarlyCatchwordTable, ShamarlyCatchwordRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyCatchwordTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordsMeta = const VerificationMeta('words');
+  @override
+  late final GeneratedColumn<int> words = GeneratedColumn<int>(
+    'words',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eraseMeta = const VerificationMeta('erase');
+  @override
+  late final GeneratedColumn<String> erase = GeneratedColumn<String>(
+    'erase',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [page, x0, y0, x1, y1, words, erase];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_catchword';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyCatchwordRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    if (data.containsKey('words')) {
+      context.handle(
+        _wordsMeta,
+        words.isAcceptableOrUnknown(data['words']!, _wordsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordsMeta);
+    }
+    if (data.containsKey('erase')) {
+      context.handle(
+        _eraseMeta,
+        erase.isAcceptableOrUnknown(data['erase']!, _eraseMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eraseMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {page};
+  @override
+  ShamarlyCatchwordRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyCatchwordRow(
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+      words: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}words'],
+      )!,
+      erase: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}erase'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyCatchwordTable createAlias(String alias) {
+    return $ShamarlyCatchwordTable(attachedDatabase, alias);
+  }
+}
+
+class ShamarlyCatchwordRow extends DataClass
+    implements Insertable<ShamarlyCatchwordRow> {
+  final int page;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+
+  /// Whole words in the box: 1 or 2.
+  final int words;
+  final String erase;
+  const ShamarlyCatchwordRow({
+    required this.page,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+    required this.words,
+    required this.erase,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['page'] = Variable<int>(page);
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    map['words'] = Variable<int>(words);
+    map['erase'] = Variable<String>(erase);
+    return map;
+  }
+
+  ShamarlyCatchwordCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyCatchwordCompanion(
+      page: Value(page),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+      words: Value(words),
+      erase: Value(erase),
+    );
+  }
+
+  factory ShamarlyCatchwordRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyCatchwordRow(
+      page: serializer.fromJson<int>(json['page']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+      words: serializer.fromJson<int>(json['words']),
+      erase: serializer.fromJson<String>(json['erase']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'page': serializer.toJson<int>(page),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+      'words': serializer.toJson<int>(words),
+      'erase': serializer.toJson<String>(erase),
+    };
+  }
+
+  ShamarlyCatchwordRow copyWith({
+    int? page,
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+    int? words,
+    String? erase,
+  }) => ShamarlyCatchwordRow(
+    page: page ?? this.page,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+    words: words ?? this.words,
+    erase: erase ?? this.erase,
+  );
+  ShamarlyCatchwordRow copyWithCompanion(ShamarlyCatchwordCompanion data) {
+    return ShamarlyCatchwordRow(
+      page: data.page.present ? data.page.value : this.page,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+      words: data.words.present ? data.words.value : this.words,
+      erase: data.erase.present ? data.erase.value : this.erase,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyCatchwordRow(')
+          ..write('page: $page, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('words: $words, ')
+          ..write('erase: $erase')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(page, x0, y0, x1, y1, words, erase);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyCatchwordRow &&
+          other.page == this.page &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1 &&
+          other.words == this.words &&
+          other.erase == this.erase);
+}
+
+class ShamarlyCatchwordCompanion extends UpdateCompanion<ShamarlyCatchwordRow> {
+  final Value<int> page;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  final Value<int> words;
+  final Value<String> erase;
+  const ShamarlyCatchwordCompanion({
+    this.page = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+    this.words = const Value.absent(),
+    this.erase = const Value.absent(),
+  });
+  ShamarlyCatchwordCompanion.insert({
+    this.page = const Value.absent(),
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+    required int words,
+    required String erase,
+  }) : x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1),
+       words = Value(words),
+       erase = Value(erase);
+  static Insertable<ShamarlyCatchwordRow> custom({
+    Expression<int>? page,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+    Expression<int>? words,
+    Expression<String>? erase,
+  }) {
+    return RawValuesInsertable({
+      if (page != null) 'page': page,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+      if (words != null) 'words': words,
+      if (erase != null) 'erase': erase,
+    });
+  }
+
+  ShamarlyCatchwordCompanion copyWith({
+    Value<int>? page,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+    Value<int>? words,
+    Value<String>? erase,
+  }) {
+    return ShamarlyCatchwordCompanion(
+      page: page ?? this.page,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+      words: words ?? this.words,
+      erase: erase ?? this.erase,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    if (words.present) {
+      map['words'] = Variable<int>(words.value);
+    }
+    if (erase.present) {
+      map['erase'] = Variable<String>(erase.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyCatchwordCompanion(')
+          ..write('page: $page, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('words: $words, ')
+          ..write('erase: $erase')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $WordRootTable extends WordRoot
     with TableInfo<$WordRootTable, WordRootRow> {
   @override
@@ -10512,6 +10928,8 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $ShamarlyWordBoxTable shamarlyWordBox = $ShamarlyWordBoxTable(
     this,
   );
+  late final $ShamarlyCatchwordTable shamarlyCatchword =
+      $ShamarlyCatchwordTable(this);
   late final $WordRootTable wordRoot = $WordRootTable(this);
   late final $GharibTable gharib = $GharibTable(this);
   @override
@@ -10540,6 +10958,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     shamarlyMarker,
     shamarlyVerseBox,
     shamarlyWordBox,
+    shamarlyCatchword,
     wordRoot,
     gharib,
   ];
@@ -15861,6 +16280,262 @@ typedef $$ShamarlyWordBoxTableProcessedTableManager =
       ShamarlyWordBoxRow,
       PrefetchHooks Function()
     >;
+typedef $$ShamarlyCatchwordTableCreateCompanionBuilder =
+    ShamarlyCatchwordCompanion Function({
+      Value<int> page,
+      required int x0,
+      required int y0,
+      required int x1,
+      required int y1,
+      required int words,
+      required String erase,
+    });
+typedef $$ShamarlyCatchwordTableUpdateCompanionBuilder =
+    ShamarlyCatchwordCompanion Function({
+      Value<int> page,
+      Value<int> x0,
+      Value<int> y0,
+      Value<int> x1,
+      Value<int> y1,
+      Value<int> words,
+      Value<String> erase,
+    });
+
+class $$ShamarlyCatchwordTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyCatchwordTable> {
+  $$ShamarlyCatchwordTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get words => $composableBuilder(
+    column: $table.words,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get erase => $composableBuilder(
+    column: $table.erase,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyCatchwordTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyCatchwordTable> {
+  $$ShamarlyCatchwordTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get words => $composableBuilder(
+    column: $table.words,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get erase => $composableBuilder(
+    column: $table.erase,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyCatchwordTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyCatchwordTable> {
+  $$ShamarlyCatchwordTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+
+  GeneratedColumn<int> get words =>
+      $composableBuilder(column: $table.words, builder: (column) => column);
+
+  GeneratedColumn<String> get erase =>
+      $composableBuilder(column: $table.erase, builder: (column) => column);
+}
+
+class $$ShamarlyCatchwordTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyCatchwordTable,
+          ShamarlyCatchwordRow,
+          $$ShamarlyCatchwordTableFilterComposer,
+          $$ShamarlyCatchwordTableOrderingComposer,
+          $$ShamarlyCatchwordTableAnnotationComposer,
+          $$ShamarlyCatchwordTableCreateCompanionBuilder,
+          $$ShamarlyCatchwordTableUpdateCompanionBuilder,
+          (
+            ShamarlyCatchwordRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyCatchwordTable,
+              ShamarlyCatchwordRow
+            >,
+          ),
+          ShamarlyCatchwordRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyCatchwordTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyCatchwordTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyCatchwordTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyCatchwordTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyCatchwordTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+                Value<int> words = const Value.absent(),
+                Value<String> erase = const Value.absent(),
+              }) => ShamarlyCatchwordCompanion(
+                page: page,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                words: words,
+                erase: erase,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+                required int words,
+                required String erase,
+              }) => ShamarlyCatchwordCompanion.insert(
+                page: page,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                words: words,
+                erase: erase,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyCatchwordTable, ShamarlyCatchwordRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyCatchwordTable,
+                    ShamarlyCatchwordRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyCatchwordTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyCatchwordTable,
+      ShamarlyCatchwordRow,
+      $$ShamarlyCatchwordTableFilterComposer,
+      $$ShamarlyCatchwordTableOrderingComposer,
+      $$ShamarlyCatchwordTableAnnotationComposer,
+      $$ShamarlyCatchwordTableCreateCompanionBuilder,
+      $$ShamarlyCatchwordTableUpdateCompanionBuilder,
+      (
+        ShamarlyCatchwordRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $ShamarlyCatchwordTable,
+          ShamarlyCatchwordRow
+        >,
+      ),
+      ShamarlyCatchwordRow,
+      PrefetchHooks Function()
+    >;
 typedef $$WordRootTableCreateCompanionBuilder = WordRootCompanion Function({
   required int surah,
   required int ayah,
@@ -16362,6 +17037,8 @@ class $ContentDatabaseManager {
       $$ShamarlyVerseBoxTableTableManager(_db, _db.shamarlyVerseBox);
   $$ShamarlyWordBoxTableTableManager get shamarlyWordBox =>
       $$ShamarlyWordBoxTableTableManager(_db, _db.shamarlyWordBox);
+  $$ShamarlyCatchwordTableTableManager get shamarlyCatchword =>
+      $$ShamarlyCatchwordTableTableManager(_db, _db.shamarlyCatchword);
   $$WordRootTableTableManager get wordRoot =>
       $$WordRootTableTableManager(_db, _db.wordRoot);
   $$GharibTableTableManager get gharib =>

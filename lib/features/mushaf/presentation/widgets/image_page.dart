@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show listEquals, setEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -108,15 +109,29 @@ class StripLayout {
 
   /// Image region drawn by line [j]: its band, less neighbours' ink that
   /// reaches in, plus its own ink that reaches out.
+  ///
+  /// A neighbour's box that cannot reach this line's area cannot change
+  /// it, so it is skipped: on the Shamarly pages that is most of the
+  /// boxes, and [Path.combine] is costly.
   Path _region(int j) {
-    var p = Path()
-      ..addRect(
-        Rect.fromLTRB(ink.left, g.bandTops[j], ink.right, g.bandBottoms[j]),
-      );
+    final band = Rect.fromLTRB(
+      ink.left,
+      g.bandTops[j],
+      ink.right,
+      g.bandBottoms[j],
+    );
+    var area = band;
+    for (final r in g.overflow[j] ?? const <Rect>[]) {
+      area = area.expandToInclude(r);
+    }
+    if (!area.isFinite) area = band;
+    var p = Path()..addRect(band);
     for (final e in g.overflow.entries) {
+      final own = e.key == j;
       for (final r in e.value) {
+        if (!own && !r.overlaps(area)) continue;
         p = Path.combine(
-          e.key == j ? PathOperation.union : PathOperation.difference,
+          own ? PathOperation.union : PathOperation.difference,
           p,
           Path()..addRect(r),
         );
@@ -124,6 +139,10 @@ class StripLayout {
     }
     return p;
   }
+
+  /// The clip path of each line, built once. Building them inside
+  /// [paint] cost milliseconds on every repaint.
+  late final List<Path> _regions = List.generate(_lines, _region);
 
   /// Room kept above the first line and below the last, so no line is cut.
   late final EdgeInsets _pads = stripPadding(
@@ -224,7 +243,7 @@ class StripLayout {
       // Image pixels to screen, for this line.
       canvas.translate(-ink.left * scale, at - g.centres[j] * scale);
       canvas.scale(scale);
-      canvas.clipPath(_region(j));
+      canvas.clipPath(_regions[j]);
       if (emphasis.contains(j)) {
         for (final dx in const [-1.8, 1.8]) {
           canvas.drawImage(image, Offset(dx, 0), paint);
@@ -779,14 +798,23 @@ class _ImagePagePainter extends CustomPainter {
   @override
   bool shouldRepaint(_ImagePagePainter old) =>
       old.image != image ||
+      old.alphaInk != alphaInk ||
       old.layout.size != layout.size ||
+      old.layout.ink != layout.ink ||
       old.ink != ink ||
       old.highlight != highlight ||
       old.word != word ||
-      old.touched != touched ||
-      old.selected.length != selected.length ||
-      old.rings.length != rings.length ||
-      old.hidden.length != hidden.length ||
+      old.paper != paper ||
+      old.line != line ||
+      old.touchColor != touchColor ||
+      old.divineColor != divineColor ||
       old.look != look ||
-      (selected.isNotEmpty && old.selected.first != selected.first);
+      !listEquals(old.touched, touched) ||
+      !listEquals(old.selected, selected) ||
+      !listEquals(old.rings, rings) ||
+      !listEquals(old.hidden, hidden) ||
+      !listEquals(old.markers, markers) ||
+      !listEquals(old.divineNames, divineNames) ||
+      !listEquals(old.markerPixels, markerPixels) ||
+      !setEquals(old.emphasis, emphasis);
 }

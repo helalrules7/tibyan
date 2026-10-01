@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'catchword_view.dart';
 import 'illuminated_frame.dart';
 import 'theme_art.dart';
 import 'opening_art.dart';
@@ -169,8 +170,8 @@ class ArtPageFrame extends StatelessWidget {
                         color: t.muted,
                       ),
                     const Spacer(),
-                    if (showCatchword && info?.catchword != null)
-                      _Catchword(info!.catchword!),
+                    if (showCatchword && (info?.hasCatchword ?? false))
+                      _Catchword(info!.catchword, page: info.page),
                   ],
                 ),
               ),
@@ -187,21 +188,31 @@ class ArtPageFrame extends StatelessWidget {
 }
 
 class _Catchword extends StatelessWidget {
-  const _Catchword(this.text);
+  const _Catchword(this.text, {this.page});
 
-  final String text;
+  final String? text;
+
+  /// The page it stands under; with it, the Shamarly catchword is cut
+  /// from the next page's image ([CatchwordView]).
+  final int? page;
 
   @override
-  Widget build(BuildContext context) => Text(
-    text,
-    semanticsLabel: AppLocalizations.of(context).catchwordLabel(text),
-    style: TextStyle(
+  Widget build(BuildContext context) {
+    final style = TextStyle(
       fontFamily: 'UthmanicHafs',
       fontSize: 15,
       height: 1.4,
       color: context.tokens.colors.muted,
-    ),
-  );
+    );
+    if (page != null) {
+      return CatchwordView(page: page!, text: text, style: style);
+    }
+    return Text(
+      text!,
+      semanticsLabel: AppLocalizations.of(context).catchwordLabel(text!),
+      style: style,
+    );
+  }
 }
 
 /// A label in the header above the frame that opens its index. Kept
@@ -517,7 +528,9 @@ class ArtOrnateFrame extends StatelessWidget {
               );
             },
           );
-    final catchwordText = catchword == null ? null : _Catchword(catchword!);
+    final catchwordText = catchword == null
+        ? null
+        : _Catchword(catchword, page: page);
     return Column(
       children: [
         Expanded(child: body),

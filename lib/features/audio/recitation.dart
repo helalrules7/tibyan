@@ -64,6 +64,15 @@ int? pauseJump(Map<int, (int, int)> speech, int ayah, int ms, int keep) {
 
 String surahFile(int surah) => '${surah.toString().padLeft(3, '0')}.mp3';
 
+/// Where a reciter's surah files are: [ReciterRow.folderUrl] with `NNN.mp3`
+/// after it, or, when it holds `{surah}`, that replaced by the number
+/// (quranicaudio names them `1.mp3`..`114.mp3`). See `surah_url` in
+/// `tools/build_content_db.py`, which writes the column.
+String surahUrl(ReciterRow reciter, int surah) =>
+    reciter.folderUrl.contains('{surah}')
+    ? reciter.folderUrl.replaceAll('{surah}', '$surah')
+    : '${reciter.folderUrl}${surahFile(surah)}';
+
 /// Tibyan's mirror of the recitations, laid out like mp3quran's servers.
 const recitationMirror =
     'https://tibyan.ahmedhelal.dev/mirror/sources/recitations';
@@ -71,7 +80,7 @@ const recitationMirror =
 /// Where a surah file can be fetched: Tibyan's mirror, then the source
 /// (mp3quran itself); the source first when [sourceFirst].
 List<Uri> surahUrls(ReciterRow reciter, int surah, {bool sourceFirst = false}) {
-  final source = Uri.parse('${reciter.folderUrl}${surahFile(surah)}');
+  final source = Uri.parse(surahUrl(reciter, surah));
   final mirror = Uri.parse('$recitationMirror${source.path}');
   return sourceFirst ? [source, mirror] : [mirror, source];
 }
@@ -261,7 +270,10 @@ class AudioHosts extends Notifier<Map<String, AudioHost>> {
     sourceFirst: state[_host(reciter)] == AudioHost.source,
   );
 
-  static String _host(ReciterRow r) => Uri.parse(r.folderUrl).host;
+  static String _host(ReciterRow r) =>
+      // The folder may carry the `{surah}` placeholder: give it a value so
+      // the URL parses.
+      Uri.parse(surahUrl(r, 1)).host;
 
   /// Measures the hosts of [reciter] unless already known or under way.
   /// Nothing waits for it; a failed or timed-out test is tried again the

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'art_frame.dart';
+import 'catchword_view.dart';
 import 'opening_art.dart';
 
 /// Ornament images for the Zakhrafa frame (built by tools/build_ornaments.py).
@@ -78,6 +79,7 @@ class FrameInfo {
     required this.hizb,
     required this.surahName,
     this.catchword,
+    this.catchwordImage = false,
     this.banners = const [],
     this.quarters = const [],
     this.basmalaLines = const {},
@@ -103,6 +105,13 @@ class FrameInfo {
 
   /// First word of the next page, shown under the frame.
   final String? catchword;
+
+  /// The catchword is cut from the next page's image (Shamarly), even
+  /// where [catchword] is not known as text; see [CatchwordView].
+  final bool catchwordImage;
+
+  /// Whether there is a catchword to show.
+  bool get hasCatchword => catchword != null || catchwordImage;
 }
 
 /// A surah header in the frame's own design.
@@ -344,10 +353,10 @@ class IlluminatedFrame extends ConsumerWidget {
                         color: t.muted,
                       ),
                     const Spacer(),
-                    if (showCatchword && info?.catchword != null)
-                      Text(
-                        info!.catchword!,
-                        semanticsLabel: l.catchwordLabel(info!.catchword!),
+                    if (showCatchword && (info?.hasCatchword ?? false))
+                      CatchwordView(
+                        page: info!.page,
+                        text: info!.catchword,
                         style: TextStyle(
                           fontFamily: 'UthmanicHafs',
                           fontSize: 15,
@@ -501,6 +510,34 @@ class _Cartouche extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The Zakhrafa frame alone (its ornament band, rules and paper) around
+/// [child], in the given colours: for the theme previews.
+class ZakhrafaFramePreview extends ConsumerWidget {
+  const ZakhrafaFramePreview({
+    super.key,
+    required this.paper,
+    required this.rule,
+    required this.child,
+  });
+
+  final Color paper;
+  final Color rule;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => CustomPaint(
+    painter: _FramePainter(
+      images: ref.watch(frameImagesProvider).value,
+      rule: rule,
+      paper: paper,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(IlluminatedFrame.band + 6),
+      child: child,
+    ),
+  );
 }
 
 class _FramePainter extends CustomPainter {
@@ -954,9 +991,20 @@ class OrnateFrame extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: catchword == null
                       ? null
-                      : Text(
+                      : page == null
+                      ? Text(
                           catchword!,
                           semanticsLabel: l.catchwordLabel(catchword!),
+                          style: TextStyle(
+                            fontFamily: 'UthmanicHafs',
+                            fontSize: 15,
+                            height: 1.4,
+                            color: t.muted,
+                          ),
+                        )
+                      : CatchwordView(
+                          page: page!,
+                          text: catchword,
                           style: TextStyle(
                             fontFamily: 'UthmanicHafs',
                             fontSize: 15,

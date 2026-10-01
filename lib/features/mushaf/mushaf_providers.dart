@@ -342,8 +342,14 @@ Future<FrameInfo?> _shamarlyFrameInfo(Ref ref, int page) async {
   ];
 
   String? catchword;
+  var catchwordImage = false;
   if (page < edition.pageCount) {
     final next = (await repo.ayahsOnPage(page + 1, edition)).firstOrNull;
+    // A next page opening with a text line: its first word is cut from
+    // its image (shamarly_catchword); the text below, when known, labels it.
+    catchwordImage =
+        (await repo.shamarlyLines(page + 1)).firstOrNull?.kind == 'text' &&
+        await repo.shamarlyCatchword(page) != null;
     if (next != null && next.pageShamarly <= page) {
       // The verse runs over the page: its first word there, when the
       // verse's words are placed surely enough; otherwise none.
@@ -371,6 +377,7 @@ Future<FrameInfo?> _shamarlyFrameInfo(Ref ref, int page) async {
     hizb: (first.hizbQuarter - 1) ~/ 4 + 1,
     surahName: surahs[first.surah - 1].nameAr,
     catchword: catchword,
+    catchwordImage: catchwordImage,
     banners: banners,
     quarters: quarters,
     basmalaLines: {

@@ -38,8 +38,15 @@ All notable changes to Tibyan are recorded here. The format follows
 - The verse highlight is a framed box per line instead of following every letter.
 - Page packs and recitations are fetched from the Tibyan mirror first, with the original source as the fallback (the mirror was only a fallback before, and the sources were slow).
 
+### Changed (recitations)
+- Only murattal recitations are offered: the two mujawwad ones (al-Banna and Mustafa Ismail) are removed.
+- New recitation: Yasser al-Dosari (murattal), from quranicaudio.com, with verse and word highlighting from quran.com's QDC timings (110 surahs, 95.7% of words). Two other imams of the Haram were fetched but are not offered: their published timings no longer match the audio files the host serves, so no verse of theirs could be placed.
+- Mustafa Ismail (murattal) now has verse timing for nearly all the Quran, derived from the recitation itself, so changing to him no longer restarts the surah.
+
 ### Fixed
 - Android release builds now declare the INTERNET permission needed to download pages and recitations.
+- Changing the reciter while listening no longer turns the page to the first page of the surah: the page no longer follows the verse reported while the new file is still loading.
+- The page clips of the new Madina edition are built once per page instead of on every rebuild, and the divine names are drawn once per line instead of redrawing the whole page for every one of them; the Shamarly catchword is cut from a page decoded at the size it is drawn; the bundled database is no longer read and hashed on every launch. Pages either side of the one being read are now built ahead, so turning a page does not wait.
 
 ## [0.4.0] - 2026-09-29
 

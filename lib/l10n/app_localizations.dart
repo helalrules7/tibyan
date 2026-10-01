@@ -746,6 +746,12 @@ abstract class AppLocalizations {
   /// **'الكلمة الأولى في الصفحة التالية: {word}'**
   String catchwordLabel(String word);
 
+  /// No description provided for @catchwordImageLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكلمة الأولى في الصفحة التالية'**
+  String get catchwordImageLabel;
+
   /// No description provided for @tabHizb.
   ///
   /// In ar, this message translates to:

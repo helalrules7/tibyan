@@ -208,6 +208,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       now,
     ) {
       if (now.$2 == null) return;
+      // While a file loads, the verse reported is the new file's start
+      // until it is placed at the verse: following it turned the page to
+      // the surah's first page whenever the reader changed reciter.
+      if (ref.read(recitationProvider).loading) return;
       // Words matter only where a verse can run over a page break.
       final verse = before?.$1 != now.$1 || before?.$2 != now.$2;
       if (verse || edition == MushafEdition.shamarly) {
@@ -428,6 +432,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       child: PageView.builder(
                         controller: _controller,
                         itemCount: pageCount + 1 - _first,
+                        // The pages either side are built and their images
+                        // decoded before they are turned to, so a page turn
+                        // does not stop on a spinner.
+                        allowImplicitScrolling: true,
                         onPageChanged: _onPageChanged,
                         itemBuilder: (context, i) => pageAt(i),
                       ),

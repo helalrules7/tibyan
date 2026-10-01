@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -350,6 +352,29 @@ class ShamarlyWordBox extends Table {
   bool get withoutRowId => true;
 }
 
+/// The catchword of a Shamarly page, cut from the next page's image
+/// (tools/build_shamarly_catchword.py): the box of the next page's first
+/// word(s) in image px, and [erase], the rectangles of other ink inside
+/// it ("x0,y0,x1,y1" separated by spaces), which are not drawn.
+@DataClassName('ShamarlyCatchwordRow')
+class ShamarlyCatchword extends Table {
+  @override
+  String get tableName => 'shamarly_catchword';
+
+  IntColumn get page => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  /// Whole words in the box: 1 or 2.
+  IntColumn get words => integer()();
+  TextColumn get erase => text()();
+
+  @override
+  Set<Column> get primaryKey => {page};
+}
+
 /// A tafsir or translation shipped in the content database.
 @DataClassName('CommentaryEditionRow')
 class CommentaryEdition extends Table {
@@ -550,6 +575,7 @@ class Gharib extends Table {
     ShamarlyMarker,
     ShamarlyVerseBox,
     ShamarlyWordBox,
+    ShamarlyCatchword,
     WordRoot,
     Gharib,
   ],
@@ -559,7 +585,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override
@@ -569,28 +595,45 @@ class ContentDatabase extends _$ContentDatabase {
   );
 
   /// Copies the bundled database to app storage when missing or when the
-  /// bundled copy changed, then opens it read-only in a background isolate.
+  /// app changed, then opens it read-only in a background isolate.
+  ///
+  /// The copy is stamped with the app's build number, so a launch that
+  /// already holds this build's copy neither reads nor hashes the 31 MB
+  /// asset again: doing that on every launch cost the app a few hundred
+  /// milliseconds before the first frame, on a phone.
   static Future<ContentDatabase> openBundled(AssetBundle bundle) async {
     final dir = await getApplicationSupportDirectory();
     final file = File(p.join(dir.path, 'content.db'));
     final stamp = File(p.join(dir.path, 'content.db.stamp'));
+    // Under a debug build the asset can change without the build number
+    // changing, so there the copy is checked by its checksum as before.
+    final build = kDebugMode
+        ? null
+        : (await PackageInfo.fromPlatform()).buildNumber;
+    final installed = file.existsSync() && stamp.existsSync();
+    if (installed && build != null && stamp.readAsStringSync() == 'b$build') {
+      return _open(file);
+    }
     final data = await bundle.load('assets/db/content.db');
     final bytes = data.buffer.asUint8List(
       data.offsetInBytes,
       data.lengthInBytes,
     );
-    final fingerprint = sha256.convert(bytes).toString();
-    if (!file.existsSync() ||
-        !stamp.existsSync() ||
-        stamp.readAsStringSync() != fingerprint) {
+    final mark = build == null
+        ? 's${sha256.convert(bytes)}'
+        : 'b$build';
+    if (!installed || stamp.readAsStringSync() != mark) {
       await file.writeAsBytes(bytes, flush: true);
-      await stamp.writeAsString(fingerprint);
+      await stamp.writeAsString(mark);
     }
-    return ContentDatabase(
-      NativeDatabase.createInBackground(
-        file,
-        setup: (db) => db.execute('PRAGMA query_only = ON'),
-      ),
-    );
+    return _open(file);
   }
+
+  /// Opens [file] read-only, off the main isolate.
+  static ContentDatabase _open(File file) => ContentDatabase(
+    NativeDatabase.createInBackground(
+      file,
+      setup: (db) => db.execute('PRAGMA query_only = ON'),
+    ),
+  );
 }

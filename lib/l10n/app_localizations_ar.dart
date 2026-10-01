@@ -381,6 +381,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get catchwordImageLabel => 'الكلمة الأولى في الصفحة التالية';
+
+  @override
   String get tabHizb => 'الأحزاب';
 
   @override

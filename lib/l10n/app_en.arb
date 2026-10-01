@@ -122,6 +122,7 @@
       }
     }
   },
+  "catchwordImageLabel": "The first word of the next page",
   "tabHizb": "Hizbs",
   "goToPage": "Go to page",
   "goToPageHint": "Page number, 1 to {max}",

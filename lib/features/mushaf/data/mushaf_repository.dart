@@ -162,6 +162,11 @@ class MushafRepository {
   Future<List<ShamarlyMarkerRow>> shamarlyMarkers(int page) =>
       (_db.select(_db.shamarlyMarker)..where((t) => t.page.equals(page))).get();
 
+  /// The Shamarly catchword of [page]: its box on the next page's image.
+  Future<ShamarlyCatchwordRow?> shamarlyCatchword(int page) => (_db.select(
+    _db.shamarlyCatchword,
+  )..where((t) => t.page.equals(page))).getSingleOrNull();
+
   /// One box per verse per line on a Shamarly page, in reading order.
   Future<List<ShamarlyVerseBoxRow>> shamarlyVerseBoxes(int page) =>
       (_db.select(_db.shamarlyVerseBox)

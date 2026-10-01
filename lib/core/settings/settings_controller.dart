@@ -99,14 +99,16 @@ class SettingsController extends Notifier<AppSettings> {
       ? MarkerStyle.theme
       : MarkerStyle.rosette16;
 
+  /// A new theme brings its own marker shape, over any shape chosen
+  /// before; the reader can pick another one afterwards.
   Future<void> setStyle(String styleId) async {
+    final changed = styleId != state.styleId;
     state = state.copyWith(
       styleId: styleId,
-      markerStyle: _prefs.containsKey(_kMarkerStyle)
-          ? null
-          : _defaultMarker(styleId),
+      markerStyle: changed ? _defaultMarker(styleId) : null,
     );
     await _prefs.setString(_kStyle, styleId);
+    if (changed) await _prefs.remove(_kMarkerStyle);
   }
 
   Future<void> setMode(ModeSetting mode) async {

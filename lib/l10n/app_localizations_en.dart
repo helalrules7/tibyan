@@ -382,6 +382,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get catchwordImageLabel => 'The first word of the next page';
+
+  @override
   String get tabHizb => 'Hizbs';
 
   @override

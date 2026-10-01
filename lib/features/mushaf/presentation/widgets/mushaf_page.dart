@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ typedef _PageData = (
   List<double>,
   Map<int, List<Path>>,
   PictureInfo?,
+  /// The clip region of each line, built once per page by [pageLineClips].
+  List<Path>,
 );
 
 /// Identifies a verse.
@@ -35,6 +38,58 @@ const _openingInk = Rect.fromLTRB(5, -68, 232, 236);
 /// The same block without its printed surah header.
 const _openingBody = Rect.fromLTRB(10, 15, 228, 217);
 
+/// The page-unit region that belongs to each line: its band, less the marks
+/// of neighbouring lines that reach into it, plus its own marks that reach
+/// out.
+///
+/// Built once per loaded page, never per build: each clip costs
+/// [Path.combine] calls against the marks' outlines, which run to hundreds
+/// of points, and the layout is made again on every build.
+List<Path> pageLineClips(
+  Rect viewBox,
+  List<double> cuts,
+  Map<int, List<Path>> overflow,
+) {
+  final hasCuts = cuts.length == _lineCount - 1;
+  double centre(int j) => _firstLine + j * _pitch;
+  double bandTop(int j) =>
+      j == 0 ? viewBox.top : (hasCuts ? cuts[j - 1] : centre(j) - _pitch / 2);
+  double bandBottom(int j) => j == _lineCount - 1
+      ? viewBox.bottom
+      : (hasCuts ? cuts[j] : centre(j) + _pitch / 2);
+  final marks = <(int, Path, Rect)>[
+    for (final e in overflow.entries)
+      for (final p in e.value) (e.key, p, p.getBounds()),
+  ];
+  return [
+    for (var j = 0; j < _lineCount; j++)
+      () {
+        final band = Rect.fromLTRB(
+          viewBox.left,
+          bandTop(j),
+          viewBox.right,
+          bandBottom(j),
+        );
+        var clip = Path()..addRect(band);
+        // Only the line's own marks and the neighbours that reach its band
+        // can change it; the rest are skipped, and on these pages that is
+        // most of them.
+        var reached = band;
+        for (final (line, path, bounds) in marks) {
+          final own = line == j;
+          if (!own && !bounds.overlaps(reached)) continue;
+          clip = Path.combine(
+            own ? PathOperation.union : PathOperation.difference,
+            clip,
+            path,
+          );
+          if (own && bounds.isFinite) reached = reached.expandToInclude(bounds);
+        }
+        return clip;
+      }(),
+  ];
+}
+
 /// Where the page is drawn on screen. Normal pages fill the width and their
 /// 15 lines are spread evenly over the full height, without stretching the
 /// calligraphy. Pages 1 and 2, and screens wider than the page, are scaled
@@ -44,8 +99,8 @@ class _PageLayout {
     this.size,
     this.viewBox, {
     required bool opening,
+    required this.clips,
     this.cuts = const [],
-    this.overflow = const {},
     bool withoutHeader = false,
   }) : clip = opening && withoutHeader ? _openingBody : null {
     final area = clip ?? (opening ? _openingInk : viewBox);
@@ -71,8 +126,12 @@ class _PageLayout {
   /// fewest marks cross.
   final List<double> cuts;
 
-  /// Marks crossing a cut, by the line they belong to.
-  final Map<int, List<Path>> overflow;
+  /// The clip region of each line, built once per loaded page by
+  /// [pageLineClips]. It is not built here because this layout is made
+  /// again on every build, and each clip costs [Path.combine] calls on the
+  /// marks' outlines, which run to hundreds of points.
+  final List<Path> clips;
+
   late final double scale;
   late final bool strips;
   late final Offset offset;
@@ -99,29 +158,6 @@ class _PageLayout {
   double _bandBottom(int j) => j == _lineCount - 1
       ? viewBox.bottom
       : (_hasCuts ? cuts[j] : _centre(j) + _pitch / 2);
-
-  /// Page-unit region that belongs to line [j]: its band, minus marks of
-  /// neighbouring lines that reach into it, plus its own marks that reach out.
-  late final List<Path> _clips = [
-    for (var j = 0; j < _lineCount; j++) _bandClip(j),
-  ];
-
-  Path _bandClip(int j) {
-    var clip = Path()
-      ..addRect(
-        Rect.fromLTRB(viewBox.left, _bandTop(j), viewBox.right, _bandBottom(j)),
-      );
-    for (final e in overflow.entries) {
-      for (final p in e.value) {
-        clip = Path.combine(
-          e.key == j ? PathOperation.union : PathOperation.difference,
-          clip,
-          p,
-        );
-      }
-    }
-    return clip;
-  }
 
   double _slotCentre(int j) => _padTop + (j + 0.5) * _slot;
 
@@ -160,10 +196,13 @@ class _PageLayout {
   }
 
   /// Runs [draw] in page units once per line band, clipped to that band.
+  /// [draw] is told the band's line, or -1 when the page is drawn whole
+  /// (no bands), so a band can skip what belongs to the other lines:
+  /// whatever it draws for them is clipped away here anyway.
   /// [emphasis] lines (the basmala) are drawn a little larger and bolder.
   void paintBands(
     Canvas canvas,
-    void Function(Canvas, bool emphasis) draw, {
+    void Function(Canvas, bool emphasis, int line) draw, {
     Set<int> emphasis = const {},
   }) {
     if (!strips) {
@@ -171,7 +210,7 @@ class _PageLayout {
       canvas.translate(offset.dx, offset.dy);
       canvas.scale(scale);
       if (clip != null) canvas.clipRect(clip!);
-      draw(canvas, false);
+      draw(canvas, false, -1);
       canvas.restore();
       return;
     }
@@ -190,8 +229,8 @@ class _PageLayout {
         canvas.scale(1.12);
         canvas.translate(-cx, -cy);
       }
-      canvas.clipPath(_clips[j]);
-      draw(canvas, big);
+      canvas.clipPath(clips[j]);
+      draw(canvas, big, j);
       canvas.restore();
     }
   }
@@ -266,13 +305,27 @@ class _MushafPageState extends ConsumerState<MushafPage> {
       }
     });
     final repo = ref.read(mushafRepositoryProvider);
-    final polys = await repo.polygons(widget.page);
-    final cuts = await repo.lineCuts('madina1441', widget.page);
+    // The three queries do not depend on each other, so they are asked for
+    // together: one wait instead of three.
+    final (polys, cuts, overflowRows) = await (
+      repo.polygons(widget.page),
+      repo.lineCuts('madina1441', widget.page),
+      repo.lineOverflow(widget.page),
+    ).wait;
     final overflow = <int, List<Path>>{};
-    for (final o in await repo.lineOverflow(widget.page)) {
+    for (final o in overflowRows) {
       overflow.putIfAbsent(o.line, () => []).add(parseOutline(o.path));
     }
-    return (info, _viewBox(svg), polys, cuts, overflow, markers);
+    final viewBox = _viewBox(svg);
+    return (
+      info,
+      viewBox,
+      polys,
+      cuts,
+      overflow,
+      markers,
+      pageLineClips(viewBox, cuts, overflow),
+    );
   }
 
   @override
@@ -286,8 +339,15 @@ class _MushafPageState extends ConsumerState<MushafPage> {
         if (!snap.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        final (picture, viewBox, polys, cuts, overflow, markerPicture) =
-            snap.data!;
+        final (
+          picture,
+          viewBox,
+          polys,
+          cuts,
+          overflow,
+          markerPicture,
+          clips,
+        ) = snap.data!;
         final verses = [
           for (final p in polys)
             (
@@ -321,7 +381,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               viewBox,
               opening: widget.page <= 2,
               cuts: cuts,
-              overflow: overflow,
+              clips: clips,
               withoutHeader: x.ornateOpening,
             );
             final selected = [
@@ -429,6 +489,16 @@ class _MushafPageState extends ConsumerState<MushafPage> {
             }
             final look = x.markerLook;
             final ink = tokens.mode.isLight ? null : tokens.colors.ink;
+            // The divine names, grouped by the line each falls on, so a
+            // line draws only its own: the others are clipped away here,
+            // and drawing them redrew the whole page once per name per
+            // line (up to sixteen names on a page, fifteen lines).
+            final divineByLine = <int, List<Rect>>{};
+            if (x.divineColor != null) {
+              for (final r in x.divineNames) {
+                (divineByLine[layout._lineOf(r.center.dy)] ??= []).add(r);
+              }
+            }
             return Stack(
               clipBehavior: Clip.none,
               children: [
@@ -465,6 +535,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                           layout.paintBands(canvas, emphasis: x.emphasisLines, (
                             c,
                             bold,
+                            line,
                           ) {
                             // Under the ink: marker tints and the selection.
                             if (look != null) {
@@ -550,10 +621,15 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                             }
                             page();
                             if (ink != null) c.restore();
-                            // The divine names, recoloured in place.
+                            // The divine names, recoloured in place. Only
+                            // this line's, or all of them when the page is
+                            // not split into bands.
                             final divine = x.divineColor;
                             if (divine != null) {
-                              for (final r in x.divineNames) {
+                              final names = line < 0
+                                  ? x.divineNames
+                                  : divineByLine[line] ?? const <Rect>[];
+                              for (final r in names) {
                                 c.save();
                                 c.clipRect(r);
                                 c.saveLayer(

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:tibyan/core/settings/settings_controller.dart';
 import 'package:tibyan/core/theme/app_theme.dart';
 import 'package:tibyan/core/theme/theme_registry.dart';
 import 'package:tibyan/core/theme/theme_tokens.dart';
+import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/illuminated_frame.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/page_interaction.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/theme_art.dart';
@@ -324,10 +326,10 @@ void main() {
       expect(c.read(settingsProvider).markerStyle, MarkerStyle.rosette16);
     });
 
-    test('a chosen marker shape stays when the theme changes', () async {
+    test('a new theme replaces a chosen marker shape with its own', () async {
       final c = await container({'settings.markerStyle': 'rosette7'});
       await c.read(settingsProvider.notifier).setStyle('seljuk');
-      expect(c.read(settingsProvider).markerStyle, MarkerStyle.rosette7);
+      expect(c.read(settingsProvider).markerStyle, MarkerStyle.theme);
     });
 
     test('a stored heritage theme starts with its marker', () async {
@@ -337,8 +339,21 @@ void main() {
   });
 
   group('the page frame in a heritage theme', () {
+    // The frame draws the catchword, which reads the reader's settings.
+    late SharedPreferences prefs;
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      prefs = await SharedPreferences.getInstance();
+    });
+
     Widget app(TibyanStyle style, Widget child) => ProviderScope(
-      overrides: [themeRegistryProvider.overrideWithValue(registry)],
+      overrides: [
+        themeRegistryProvider.overrideWithValue(registry),
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        // Nothing is installed here, so the edition falls back to the
+        // bundled one and the catchword is drawn as text.
+        packRootProvider.overrideWithValue(Directory.systemTemp),
+      ],
       child: MaterialApp(
         theme: buildTheme(
           style: style,
