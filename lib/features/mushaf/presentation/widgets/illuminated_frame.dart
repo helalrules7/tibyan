@@ -622,48 +622,79 @@ class _FramePainter extends CustomPainter {
 
     // Everything below stays inside the band: the corner pieces are larger
     // than the band and would otherwise show as squares inside the page.
-    canvas.save();
-    canvas.clipPath(
-      Path()
-        ..fillType = PathFillType.evenOdd
-        ..addRect(Offset.zero & size)
-        ..addRect(Rect.fromLTRB(band, band, w - band, h - band)),
-    );
+    //
+    // The band is four rectangles, not one even-odd ring path: a path clip
+    // over the whole page costs the raster thread a stencil that it builds
+    // again every frame, and with three pages in the view this was some
+    // sixty milliseconds a frame on a phone. A rectangle clip is a
+    // scissor, which is free.
+    final topStrip = Rect.fromLTRB(0, 0, w, band);
+    final bottomStrip = Rect.fromLTRB(0, h - band, w, band);
+    final leftStrip = Rect.fromLTRB(0, band, band, h - 2 * band);
+    final rightStrip = Rect.fromLTRB(w - band, band, band, h - 2 * band);
+    void inRect(Rect r, void Function() body) {
+      if (r.height <= 0 || r.width <= 0) return;
+      canvas.save();
+      canvas.clipRect(r);
+      body();
+      canvas.restore();
+    }
+
     // Edges: whole repeats, stretched a little so they fit exactly.
     final spanX = w - 2 * c;
     final tileW = band * images.edgeH.width / images.edgeH.height;
     final nx = (spanX / tileW).round().clamp(1, 1000);
     final stepX = spanX / nx;
-    for (var i = 0; i < nx; i++) {
-      final x = c + i * stepX;
-      draw(images.edgeH, Rect.fromLTWH(x, 0, stepX + 0.5, band));
-      draw(
-        images.edgeH,
-        Rect.fromLTWH(x, h - band, stepX + 0.5, band),
-        flipY: true,
-      );
-    }
     final spanY = h - 2 * c;
     final tileH = band * images.edgeV.height / images.edgeV.width;
     final ny = (spanY / tileH).round().clamp(1, 1000);
     final stepY = spanY / ny;
-    for (var i = 0; i < ny; i++) {
-      final y = c + i * stepY;
-      draw(images.edgeV, Rect.fromLTWH(w - band, y, band, stepY + 0.5));
-      draw(images.edgeV, Rect.fromLTWH(0, y, band, stepY + 0.5), flipX: true);
-    }
-
-    // Corners.
-    draw(images.corner, Rect.fromLTWH(w - c, 0, c, c));
-    draw(images.corner, Rect.fromLTWH(0, 0, c, c), flipX: true);
-    draw(images.corner, Rect.fromLTWH(w - c, h - c, c, c), flipY: true);
-    draw(
-      images.corner,
-      Rect.fromLTWH(0, h - c, c, c),
-      flipX: true,
-      flipY: true,
-    );
-    canvas.restore();
+    inRect(topStrip, () {
+      for (var i = 0; i < nx; i++) {
+        final x = c + i * stepX;
+        draw(images.edgeH, Rect.fromLTWH(x, 0, stepX + 0.5, band));
+      }
+      draw(images.corner, Rect.fromLTWH(w - c, 0, c, c));
+      draw(images.corner, Rect.fromLTWH(0, 0, c, c), flipX: true);
+    });
+    inRect(bottomStrip, () {
+      for (var i = 0; i < nx; i++) {
+        final x = c + i * stepX;
+        draw(
+          images.edgeH,
+          Rect.fromLTWH(x, h - band, stepX + 0.5, band),
+          flipY: true,
+        );
+      }
+      draw(images.corner, Rect.fromLTWH(w - c, h - c, c, c), flipY: true);
+      draw(
+        images.corner,
+        Rect.fromLTWH(0, h - c, c, c),
+        flipX: true,
+        flipY: true,
+      );
+    });
+    inRect(leftStrip, () {
+      for (var i = 0; i < ny; i++) {
+        final y = c + i * stepY;
+        draw(images.edgeV, Rect.fromLTWH(0, y, band, stepY + 0.5), flipX: true);
+      }
+      draw(images.corner, Rect.fromLTWH(0, 0, c, c), flipX: true);
+      draw(
+        images.corner,
+        Rect.fromLTWH(0, h - c, c, c),
+        flipX: true,
+        flipY: true,
+      );
+    });
+    inRect(rightStrip, () {
+      for (var i = 0; i < ny; i++) {
+        final y = c + i * stepY;
+        draw(images.edgeV, Rect.fromLTWH(w - band, y, band, stepY + 0.5));
+      }
+      draw(images.corner, Rect.fromLTWH(w - c, 0, c, c));
+      draw(images.corner, Rect.fromLTWH(w - c, h - c, c, c), flipY: true);
+    });
   }
 
   @override

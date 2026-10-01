@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -196,6 +197,38 @@ class _PageLayout {
     );
   }
 
+  /// Runs [draw] in the page units of line [j]'s band, without clipping:
+  /// what [paintBands] does for one band, for one element of that band.
+  ///
+  /// [paintBands] clips each band with a path that runs to hundreds of
+  /// points, which Impeller turns into geometry on the raster thread: a
+  /// frame that drew its marks through it paid that cost thirty times over.
+  /// An element belongs to one line, so it is drawn once, at that line's
+  /// transform, and nothing of a neighbour's can reach it.
+  void atBand(Canvas canvas, int j, bool emphasis, void Function(Canvas) draw) {
+    if (!strips) {
+      canvas.save();
+      canvas.translate(offset.dx, offset.dy);
+      canvas.scale(scale);
+      draw(canvas);
+      canvas.restore();
+      return;
+    }
+    final dy = _slotCentre(j) - _centre(j) * scale;
+    canvas.save();
+    canvas.translate(offset.dx, dy);
+    canvas.scale(scale);
+    if (emphasis) {
+      final cx = viewBox.center.dx;
+      final cy = _centre(j);
+      canvas.translate(cx, cy);
+      canvas.scale(1.12);
+      canvas.translate(-cx, -cy);
+    }
+    draw(canvas);
+    canvas.restore();
+  }
+
   /// Runs [draw] in page units once per line band, clipped to that band.
   /// [draw] is told the band's line, or -1 when the page is drawn whole
   /// (no bands), so a band can skip what belongs to the other lines:
@@ -255,6 +288,75 @@ class _MushafPageState extends ConsumerState<MushafPage> {
   PictureInfo? _picture;
   PictureInfo? _markerPicture;
 
+  /// The page's ink, drawn once at the screen's pixel size and blitted. See
+  /// [_bakeArt].
+  ui.Image? _art;
+  ui.Image? _markerArt;
+
+  /// What [_art] was drawn for, and which load it came from. A bake for
+  /// anything else replaces it.
+  String? _artKey;
+
+  /// Bumped on every load, so a re-fetched page is drawn again.
+  int _loadId = 0;
+
+  /// Draws the page's ink once into an image, so that a frame only blits it.
+  ///
+  /// The pages carry thousands of paths (their printed frame alone is most
+  /// of them) and Impeller turns paths into geometry on the raster thread,
+  /// which is one core there: painting them once per line band, fifteen
+  /// times a frame, held that thread at three quarters of a core on a
+  /// phone. Baking them costs the same work once per page, off the frame.
+  void _bakeArt(
+    String key,
+    _PageLayout layout,
+    double dpr, {
+    required void Function(Canvas, bool, int) ink,
+    void Function(Canvas, bool, int)? markers,
+    required Set<int> emphasis,
+  }) {
+    if (_artKey == key) return;
+    _artKey = key;
+    final width = (layout.size.width * dpr).ceil();
+    final height = (layout.size.height * dpr).ceil();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      Future<ui.Image> render(void Function(Canvas, bool, int) draw) async {
+        final recorder = ui.PictureRecorder();
+        final canvas = Canvas(recorder)..scale(dpr);
+        layout.paintBands(
+          canvas,
+          emphasis: emphasis,
+          (c, bold, line) => draw(c, bold, line),
+        );
+        final picture = recorder.endRecording();
+        try {
+          return await picture.toImage(width, height);
+        } finally {
+          picture.dispose();
+        }
+      }
+
+      final art = await render(ink);
+      final markerArt = markers == null ? null : await render(markers);
+      if (!mounted || _artKey != key) {
+        art.dispose();
+        markerArt?.dispose();
+        return;
+      }
+      final old = [_art, _markerArt];
+      setState(() {
+        _art = art;
+        _markerArt = markerArt;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        for (final i in old) {
+          i?.dispose();
+        }
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -282,10 +384,13 @@ class _MushafPageState extends ConsumerState<MushafPage> {
   void dispose() {
     _picture?.picture.dispose();
     _markerPicture?.picture.dispose();
+    _art?.dispose();
+    _markerArt?.dispose();
     super.dispose();
   }
 
   Future<_PageData> _fetch() async {
+    _loadId += 1;
     final svg = await ref.read(pageStoreProvider).svg(widget.page);
     // Compiling these on the main isolate cost a few hundred milliseconds a
     // page; see [compiledSvgPicture]. The page and its markers do not depend
@@ -508,6 +613,38 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                 (divineByLine[layout._lineOf(r.center.dy)] ??= []).add(r);
               }
             }
+            // The ink is drawn once at the screen's pixel size; a frame
+            // only blits it. Everything the drawing depends on is in the
+            // key, so a change to any of it re-bakes.
+            final dpr = MediaQuery.devicePixelRatioOf(context);
+            final emphasisLines = x.emphasisLines.toList()..sort();
+            _bakeArt(
+              '${widget.page}|${box.biggest.width}x${box.biggest.height}'
+              '|$dpr|$ink|${x.divineColor}|${x.divineNames.length}'
+              '|$_markersHidden|$_loadId|${emphasisLines.join(',')}',
+              layout,
+              dpr,
+              emphasis: x.emphasisLines,
+              ink: (c, bold, line) => _paintInk(
+                c,
+                picture: picture.picture,
+                viewBox: viewBox,
+                ink: ink,
+                bold: bold,
+                line: line,
+                divineColor: x.divineColor,
+                divineNames: x.divineNames,
+                divineByLine: divineByLine,
+              ),
+              markers: markerPicture == null
+                  ? null
+                  : (c, bold, line) => _paintMarkers(
+                      c,
+                      picture: markerPicture.picture,
+                      viewBox: viewBox,
+                      ink: ink,
+                    ),
+            );
             return Stack(
               clipBehavior: Clip.none,
               children: [
@@ -541,37 +678,107 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                       child: CustomPaint(
                         size: box.biggest,
                         painter: _CallbackPainter((canvas) {
-                          layout.paintBands(canvas, emphasis: x.emphasisLines, (
-                            c,
-                            bold,
-                            line,
-                          ) {
-                            // Under the ink: marker tints and the selection.
-                            if (look != null) {
-                              for (final v in verses) {
-                                if (v.marker != null) {
-                                  look.paintUnder(c, v.marker!, markerR);
-                                }
-                              }
+                          // Three passes, so the page's ink can be drawn in
+                          // one blit (see [_bakeArt]): what lies under it,
+                          // the ink, then what lies over it.
+                          final art = _art;
+                          final markerArt = _markerArt;
+                          // Each element belongs to one line, so it is
+                          // drawn once, at that line's band transform, and
+                          // no clip path is built for it.
+                          final underItems = <(int, void Function(Canvas))>[];
+                          final overItems = <(int, void Function(Canvas))>[];
+                          final coverItems = <(int, void Function(Canvas))>[];
+                          Map<int, List<Rect>> byLine(List<Rect> rects) {
+                            final out = <int, List<Rect>>{};
+                            for (final r in rects) {
+                              (out[layout._lineOf(r.center.dy)] ??= []).add(r);
                             }
-                            paintVerseBoxes(
-                              c,
-                              boxes,
-                              tokens.colors.highlight,
-                              stroke: 0.7,
-                              radius: 3,
-                            );
-                            if (x.touchColor != null) {
-                              paintVerseBoxes(
-                                c,
-                                touchedBoxes,
-                                x.touchColor!,
-                                stroke: 0.7,
-                                radius: 3,
+                            return out;
+                          }
+
+                          void also(
+                            List<(int, void Function(Canvas))> items,
+                            int line,
+                            void Function(Canvas) draw,
+                          ) => items.add((line, draw));
+
+                          // Under the ink: marker tints and the selection.
+                          for (final v in verses) {
+                            final m = v.marker;
+                            if (m == null) continue;
+                            final j = layout._lineOf(m.dy);
+                            if (look != null) {
+                              also(
+                                underItems,
+                                j,
+                                (c) => look!.paintUnder(c, m, markerR),
+                              );
+                              also(
+                                overItems,
+                                j,
+                                (c) => look!.paintOver(
+                                  c,
+                                  m,
+                                  markerR,
+                                  v.key.ayah,
+                                  marked: x.marks[v.key],
+                                ),
                               );
                             }
-                            if (wordBox != null) {
-                              paintVerseBoxes(
+                            final colour = x.marks[v.key];
+                            if (colour != null) {
+                              also(underItems, j, (c) {
+                                c.drawCircle(
+                                  m,
+                                  markerR,
+                                  Paint()
+                                    ..color = colour.withValues(alpha: 0.35),
+                                );
+                                c.drawCircle(
+                                  m,
+                                  markerR,
+                                  Paint()
+                                    ..style = PaintingStyle.stroke
+                                    ..strokeWidth = markerR * 0.22
+                                    ..color = colour,
+                                );
+                              });
+                            }
+                          }
+                          for (final e in byLine(boxes).entries) {
+                            also(
+                              underItems,
+                              e.key,
+                              (c) => paintVerseBoxes(
+                                c,
+                                e.value,
+                                tokens.colors.highlight,
+                                stroke: 0.7,
+                                radius: 3,
+                              ),
+                            );
+                          }
+                          if (x.touchColor != null) {
+                            for (final e in byLine(touchedBoxes).entries) {
+                              also(
+                                underItems,
+                                e.key,
+                                (c) => paintVerseBoxes(
+                                  c,
+                                  e.value,
+                                  x.touchColor!,
+                                  stroke: 0.7,
+                                  radius: 3,
+                                ),
+                              );
+                            }
+                          }
+                          if (wordBox != null) {
+                            also(
+                              underItems,
+                              layout._lineOf(wordBox.center.dy),
+                              (c) => paintVerseBoxes(
                                 c,
                                 [wordBox],
                                 tokens.colors.highlight.withValues(
@@ -579,166 +786,133 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 ),
                                 stroke: 0.9,
                                 radius: 3,
+                              ),
+                            );
+                          }
+
+                          // Recitation mode: the covered verses' lines,
+                          // band high, from one verse marker to the next, so
+                          // no mark of theirs is left.
+                          final hidden = x.hidden;
+                          if (hidden != null) {
+                            final cover = Paint()
+                              ..color = tokens.colors.paper;
+                            final markersOn = <int, List<double>>{};
+                            for (final v in verses) {
+                              final m = v.marker;
+                              if (m == null) continue;
+                              (markersOn[layout._lineOf(m.dy)] ??= []).add(
+                                m.dx,
                               );
                             }
                             for (final v in verses) {
-                              final colour = x.marks[v.key];
-                              if (v.marker == null || colour == null) continue;
-                              c.drawCircle(
-                                v.marker!,
-                                markerR,
-                                Paint()..color = colour.withValues(alpha: 0.35),
-                              );
-                              c.drawCircle(
-                                v.marker!,
-                                markerR,
-                                Paint()
-                                  ..style = PaintingStyle.stroke
-                                  ..strokeWidth = markerR * 0.22
-                                  ..color = colour,
-                              );
+                              if (!hidden.contains(v.key)) continue;
+                              final words = x.hiddenWords[v.key];
+                              if (words == null ||
+                                  words.isEmpty ||
+                                  widget.page <= 2) {
+                                also(
+                                  coverItems,
+                                  layout._lineOf(v.path.getBounds().center.dy),
+                                  (c) => c.drawPath(v.path, cover),
+                                );
+                                continue;
+                              }
+                              for (final b in lineBoxes(
+                                words,
+                                lineOf: (r) => layout._lineOf(r.center.dy),
+                                centre: layout._centre,
+                                halfHeight: _pitch * 0.5,
+                              )) {
+                                final j = layout._lineOf(b.center.dy);
+                                final xs = markersOn[j] ?? const <double>[];
+                                // The markers on either side of the words,
+                                // or the text's edge.
+                                final left = xs
+                                    .where((m) => m < b.left)
+                                    .fold(viewBox.left, math.max);
+                                final right = xs
+                                    .where((m) => m > b.right)
+                                    .fold(viewBox.right, math.min);
+                                final rect = Rect.fromLTRB(
+                                  left,
+                                  layout._bandTop(j),
+                                  right,
+                                  layout._bandBottom(j),
+                                );
+                                also(
+                                  coverItems,
+                                  j,
+                                  (c) => c.drawRect(rect, cover),
+                                );
+                              }
                             }
-                            // The page itself, recoloured outside light mode.
-                            if (ink != null) {
-                              c.saveLayer(
-                                null,
-                                Paint()
-                                  ..colorFilter = ColorFilter.mode(
-                                    ink,
-                                    BlendMode.srcIn,
-                                  ),
-                              );
-                            }
-                            // The picture starts at the viewBox corner, not at
-                            // the origin (pages 1 and 2 have a shifted one).
-                            void page() {
-                              c.save();
-                              c.translate(viewBox.left, viewBox.top);
-                              c.drawPicture(picture.picture);
-                              c.restore();
-                            }
+                          }
 
-                            if (bold) {
-                              // Faux bold: the same line drawn three times,
-                              // a hair apart.
-                              for (final dx in const [-0.32, 0.32]) {
-                                c.save();
-                                c.translate(dx, 0);
-                                page();
-                                c.restore();
-                              }
+                          void drawEach(
+                            List<(int, void Function(Canvas))> items,
+                          ) {
+                            for (final (line, draw) in items) {
+                              layout.atBand(
+                                canvas,
+                                line,
+                                x.emphasisLines.contains(line),
+                                draw,
+                              );
                             }
-                            page();
-                            if (ink != null) c.restore();
-                            // The divine names, recoloured in place. Only
-                            // this line's, or all of them when the page is
-                            // not split into bands.
-                            final divine = x.divineColor;
-                            if (divine != null) {
-                              final names = line < 0
-                                  ? x.divineNames
-                                  : divineByLine[line] ?? const <Rect>[];
-                              for (final r in names) {
-                                c.save();
-                                c.clipRect(r);
-                                c.saveLayer(
-                                  r,
-                                  Paint()
-                                    ..colorFilter = ColorFilter.mode(
-                                      divine,
-                                      BlendMode.srcIn,
-                                    ),
-                                );
-                                page();
-                                c.restore();
-                                c.restore();
-                              }
+                          }
+
+                          drawEach(underItems);
+                          if (art != null) {
+                            canvas.drawImageRect(
+                              art,
+                              _imageRect(art),
+                              Offset.zero & layout.size,
+                              Paint(),
+                            );
+                          } else {
+                            // Not baked yet: draw the picture itself, line
+                            // band by line band.
+                            layout.paintBands(
+                              canvas,
+                              emphasis: x.emphasisLines,
+                              (c, bold, line) => _paintInk(
+                                c,
+                                picture: picture.picture,
+                                viewBox: viewBox,
+                                ink: ink,
+                                bold: bold,
+                                line: line,
+                                divineColor: x.divineColor,
+                                divineNames: x.divineNames,
+                                divineByLine: divineByLine,
+                              ),
+                            );
+                          }
+                          drawEach(coverItems);
+                          if (hidden != null) {
+                            // The printed markers again, on top.
+                            if (markerArt != null) {
+                              canvas.drawImageRect(
+                                markerArt,
+                                _imageRect(markerArt),
+                                Offset.zero & layout.size,
+                                Paint(),
+                              );
+                            } else if (markerPicture != null) {
+                              layout.paintBands(
+                                canvas,
+                                emphasis: x.emphasisLines,
+                                (c, bold, line) => _paintMarkers(
+                                  c,
+                                  picture: markerPicture.picture,
+                                  viewBox: viewBox,
+                                  ink: ink,
+                                ),
+                              );
                             }
-                            // Recitation mode: the covered verses' lines,
-                            // band high, from one verse marker to the
-                            // next, so no mark of theirs is left; then the
-                            // markers are drawn again on top.
-                            final hidden = x.hidden;
-                            if (hidden != null) {
-                              final cover = Paint()
-                                ..color = tokens.colors.paper;
-                              final markersOn = <int, List<double>>{};
-                              for (final v in verses) {
-                                final m = v.marker;
-                                if (m == null) continue;
-                                (markersOn[layout._lineOf(m.dy)] ??= []).add(
-                                  m.dx,
-                                );
-                              }
-                              for (final v in verses) {
-                                if (!hidden.contains(v.key)) continue;
-                                final words = x.hiddenWords[v.key];
-                                if (words == null ||
-                                    words.isEmpty ||
-                                    widget.page <= 2) {
-                                  c.drawPath(v.path, cover);
-                                  continue;
-                                }
-                                for (final b in lineBoxes(
-                                  words,
-                                  lineOf: (r) => layout._lineOf(r.center.dy),
-                                  centre: layout._centre,
-                                  halfHeight: _pitch * 0.5,
-                                )) {
-                                  final j = layout._lineOf(b.center.dy);
-                                  final xs = markersOn[j] ?? const <double>[];
-                                  // The markers on either side of the words,
-                                  // or the text's edge.
-                                  final left = xs
-                                      .where((m) => m < b.left)
-                                      .fold(viewBox.left, math.max);
-                                  final right = xs
-                                      .where((m) => m > b.right)
-                                      .fold(viewBox.right, math.min);
-                                  c.drawRect(
-                                    Rect.fromLTRB(
-                                      left,
-                                      layout._bandTop(j),
-                                      right,
-                                      layout._bandBottom(j),
-                                    ),
-                                    cover,
-                                  );
-                                }
-                              }
-                              if (markerPicture != null) {
-                                if (ink != null) {
-                                  c.saveLayer(
-                                    null,
-                                    Paint()
-                                      ..colorFilter = ColorFilter.mode(
-                                        ink,
-                                        BlendMode.srcIn,
-                                      ),
-                                  );
-                                }
-                                c.save();
-                                c.translate(viewBox.left, viewBox.top);
-                                c.drawPicture(markerPicture.picture);
-                                c.restore();
-                                if (ink != null) c.restore();
-                              }
-                            }
-                            // Over the ink: the chosen rosettes.
-                            if (look != null) {
-                              for (final v in verses) {
-                                if (v.marker != null) {
-                                  look.paintOver(
-                                    c,
-                                    v.marker!,
-                                    markerR,
-                                    v.key.ayah,
-                                    marked: x.marks[v.key],
-                                  );
-                                }
-                              }
-                            }
-                          });
+                          }
+                          drawEach(overItems);
                         }),
                       ),
                     ),
@@ -887,6 +1061,89 @@ List<Rect> outlineRects(String d) {
         a.top != b.top ? a.top.compareTo(b.top) : b.right.compareTo(a.right),
   );
   return rects;
+}
+
+/// The image's full extent: the source rect of a whole-image blit.
+Rect _imageRect(ui.Image image) =>
+    Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
+
+/// The page's printed ink, coloured for the mode, drawn at one line band or
+/// over the whole page (when [line] is -1). The page renders this once into
+/// the image it blits; see [_MushafPageState._bakeArt].
+void _paintInk(
+  Canvas c, {
+  required ui.Picture picture,
+  required Rect viewBox,
+  required Color? ink,
+  required bool bold,
+  required int line,
+  required Color? divineColor,
+  required List<Rect> divineNames,
+  required Map<int, List<Rect>> divineByLine,
+}) {
+  // The page itself, recoloured outside light mode.
+  if (ink != null) {
+    c.saveLayer(
+      null,
+      Paint()..colorFilter = ColorFilter.mode(ink, BlendMode.srcIn),
+    );
+  }
+  // The picture starts at the viewBox corner, not at the origin (pages 1
+  // and 2 have a shifted one).
+  void page() {
+    c.save();
+    c.translate(viewBox.left, viewBox.top);
+    c.drawPicture(picture);
+    c.restore();
+  }
+
+  if (bold) {
+    // Faux bold: the same line drawn three times, a hair apart.
+    for (final dx in const [-0.32, 0.32]) {
+      c.save();
+      c.translate(dx, 0);
+      page();
+      c.restore();
+    }
+  }
+  page();
+  if (ink != null) c.restore();
+  // The divine names, recoloured in place. Only this line's, or all of them
+  // when the page is not split into bands.
+  if (divineColor != null) {
+    final names = line < 0 ? divineNames : divineByLine[line] ?? const <Rect>[];
+    for (final r in names) {
+      c.save();
+      c.clipRect(r);
+      c.saveLayer(
+        r,
+        Paint()..colorFilter = ColorFilter.mode(divineColor, BlendMode.srcIn),
+      );
+      page();
+      c.restore();
+      c.restore();
+    }
+  }
+}
+
+/// The printed verse markers alone, drawn again over the recitation covers.
+void _paintMarkers(
+  Canvas c, {
+  required ui.Picture picture,
+  required Rect viewBox,
+  required Color? ink,
+}) {
+  if (ink != null) {
+    c.saveLayer(
+      null,
+      Paint()..colorFilter = ColorFilter.mode(ink, BlendMode.srcIn),
+    );
+  }
+  c.save();
+  c.translate(viewBox.left, viewBox.top);
+  c.drawPicture(picture);
+  c.restore();
+  if (ink != null) c.restore();
 }
 
 class _CallbackPainter extends CustomPainter {
