@@ -9,6 +9,7 @@ import '../../../../core/db/content_database.dart';
 import '../../../../core/settings/app_settings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/compiled_svg.dart';
 import '../../mushaf_providers.dart';
 import 'page_interaction.dart';
 
@@ -286,14 +287,22 @@ class _MushafPageState extends ConsumerState<MushafPage> {
 
   Future<_PageData> _fetch() async {
     final svg = await ref.read(pageStoreProvider).svg(widget.page);
-    final info = await vg.loadPicture(
-      SvgStringLoader(_markersHidden ? withoutMarkers(svg) : svg),
-      null,
-    );
-    // The printed markers alone, drawn again over the recitation covers.
-    final markers = _markersHidden
-        ? null
-        : await vg.loadPicture(SvgStringLoader(markersOnly(svg)), null);
+    // Compiling these on the main isolate cost a few hundred milliseconds a
+    // page; see [compiledSvgPicture]. The page and its markers do not depend
+    // on each other, so both are asked for at once.
+    final (info, markers) = await (
+      compiledSvgPicture(
+        _markersHidden ? withoutMarkers(svg) : svg,
+        name: 'page ${widget.page}',
+      ),
+      // The printed markers alone, drawn again over the recitation covers.
+      _markersHidden
+          ? Future<PictureInfo?>.value(null)
+          : compiledSvgPicture(
+              markersOnly(svg),
+              name: 'page ${widget.page} markers',
+            ),
+    ).wait;
     // The old pictures are still on screen until the new ones are built:
     // they go after the next frame, not now.
     final old = [_picture, _markerPicture];

@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/settings/settings_controller.dart';
 import '../../../../core/theme/theme_tokens.dart';
+import '../../data/compiled_svg.dart';
 
 /// The heritage themes' art (frame, surah header, verse marker): SVG files
 /// from quran-assets in `assets/themes/`, drawn as they are, with each
@@ -111,14 +112,27 @@ Future<ArtPiece> _piece(
     RegExp(r'<metadata>.*?</metadata>', dotAll: true),
     '',
   );
-  final picture = await vg.loadPicture(
-    SvgStringLoader(recolourArt(drawing, colours)),
-    null,
+  final picture = await compiledSvgPicture(
+    recolourArt(drawing, colours),
+    name: file,
   );
   return ArtPiece(picture, svgSlot(svg));
 }
 
+/// A frame piece the theme may not have.
+Future<ArtPiece?> _maybe(
+  AssetBundle bundle,
+  String? file,
+  Map<String, Color> colours,
+) => file == null
+    ? Future<ArtPiece?>.value(null)
+    : _piece(bundle, file, colours);
+
 /// Loads and colours a theme's art for [mode].
+///
+/// The pieces do not depend on each other, so they are all asked for at once
+/// and compiled in parallel; one after another cost a theme 400-600 ms on a
+/// phone, which is most of what the theme picker spent on showing a theme.
 Future<ThemeArtPictures> loadThemeArt(
   ThemeArt art,
   ThemeModeId mode, {
@@ -127,14 +141,22 @@ Future<ThemeArtPictures> loadThemeArt(
   final b = bundle ?? rootBundle;
   final c = art.colours[mode]!;
   final f = art.frame;
+  final (header, marker, corner, edgeH, edgeV, whole) = await (
+    _piece(b, art.header, c.header),
+    _piece(b, art.marker, c.marker),
+    _maybe(b, f.corner, c.frame),
+    _maybe(b, f.edgeH, c.frame),
+    _maybe(b, f.edgeV, c.frame),
+    _maybe(b, f.whole, c.frame),
+  ).wait;
   return ThemeArtPictures(
     band: art.band,
-    header: await _piece(b, art.header, c.header),
-    marker: await _piece(b, art.marker, c.marker),
-    corner: f.corner == null ? null : await _piece(b, f.corner!, c.frame),
-    edgeH: f.edgeH == null ? null : await _piece(b, f.edgeH!, c.frame),
-    edgeV: f.edgeV == null ? null : await _piece(b, f.edgeV!, c.frame),
-    whole: f.whole == null ? null : await _piece(b, f.whole!, c.frame),
+    header: header,
+    marker: marker,
+    corner: corner,
+    edgeH: edgeH,
+    edgeV: edgeV,
+    whole: whole,
   );
 }
 
