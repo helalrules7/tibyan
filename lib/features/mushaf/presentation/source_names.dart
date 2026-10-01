@@ -102,6 +102,18 @@ const _ar = <String, SourceText>{
     license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
     credit: 'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
   ),
+  'quranicaudio': (
+    title: 'تلاوة ياسر الدوسري (مرتل)',
+    publisher: 'موقع quranicaudio.com (صوت Quran.com)',
+    license: 'إذن من الموقع بالبريد (2026-10-01)، بشرط ذكر اسم الموقع',
+    credit: 'تلاوة ياسر الدوسري: quranicaudio.com',
+  ),
+  'qdc-timing': (
+    title: 'توقيت آيات ياسر الدوسري وكلماته',
+    publisher: 'Quran.com (واجهة QDC)، ومقاطع الكلمات من مكتبة QUL',
+    license: 'الإذن قيد الطلب من Quran.com (رسالة 14)',
+    credit: 'توقيت الآيات والكلمات: Quran.com',
+  ),
   'quran-assets': (
     title: 'إطارات الثيمات وترويساتها وفواصلها (quran-assets)',
     publisher: 'مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
@@ -201,6 +213,19 @@ const _en = <String, SourceText>{
     publisher: 'Nuqayah (read.tafsir.one), by written permission',
     license: 'Written permission from Nuqayah: no ads and no profit',
     credit: 'Al-Muyassar fi Gharib al-Quran: from Nuqayah\'s read.tafsir.one, by permission',
+  ),
+  'quranicaudio': (
+    title: 'Yasser al-Dosari (murattal)',
+    publisher: 'quranicaudio.com (Quran.com audio)',
+    license:
+        'Permission granted by the site by email (2026-10-01), on condition that the site is named',
+    credit: 'Yasser al-Dosari: quranicaudio.com',
+  ),
+  'qdc-timing': (
+    title: 'Verse and word timings for Yasser al-Dosari',
+    publisher: 'Quran.com (QDC API); word segments from the QUL library',
+    license: 'Permission requested from Quran.com (letter 14)',
+    credit: 'Verse and word timings: Quran.com',
   ),
   'quran-assets': (
     title: 'Theme frames, surah headers and verse markers (quran-assets)',

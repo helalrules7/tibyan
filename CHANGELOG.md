@@ -40,7 +40,8 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ### Changed (recitations)
 - Only murattal recitations are offered: the two mujawwad ones (al-Banna and Mustafa Ismail) are removed.
-- New recitation: Yasser al-Dosari (murattal), from quranicaudio.com, with verse and word highlighting from quran.com's QDC timings (110 surahs, 95.7% of words). Two other imams of the Haram were fetched but are not offered: their published timings no longer match the audio files the host serves, so no verse of theirs could be placed.
+- New recitation: Yasser al-Dosari (murattal), from quranicaudio.com, with verse and word highlighting from quran.com's QDC timings (110 surahs, 95.7% of words).
+- Four more from mp3quran.net, each with every verse of all 114 surahs timed: Abdul-Rahman al-Sudais, Mishary al-Afasy, Saad al-Ghamdi and Muhammad al-Tablaway. Their verse is highlighted and the page turns with it; their words are not, mp3quran publishing no word timings. al-Sudais is here rather than on quranicaudio.com: quran.com's timings for him name files that are not the bytes his own URL serves.
 - Mustafa Ismail (murattal) now has verse timing for nearly all the Quran, derived from the recitation itself, so changing to him no longer restarts the surah.
 
 ### Fixed

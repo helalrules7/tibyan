@@ -23,9 +23,11 @@ void main() {
   });
   tearDownAll(() => db.close());
 
-  test('six recitations, murattal only, each with a folder of files', () async {
+  test('ten recitations, murattal only, each with a folder of files', () async {
     final reciters = await repo.reciters();
-    expect(reciters.map((r) => r.id).toList()..sort(), [1, 2, 3, 4, 5, 10]);
+    expect(reciters.map((r) => r.id).toList()..sort(), [
+      1, 2, 3, 4, 5, 10, 11, 12, 13, 14,
+    ]);
     // The mujawwad ones (ids 6 and 7) were removed, and their numbers are
     // never reused, so a reader who saved one cannot land on another.
     expect(reciters.every((r) => r.style == 'murattal'), isTrue);
@@ -56,7 +58,7 @@ void main() {
 
   test('timings cover every verse, in order, where they exist', () async {
     final surahs = await repo.surahs();
-    for (final reciter in [1, 2, 3, 4, 10]) {
+    for (final reciter in [1, 2, 3, 4, 10, 11, 12, 13, 14]) {
       for (final s in [1, 2, 9, 114]) {
         final t = await repo.timings(reciter, s);
         if (t.isEmpty) continue;
@@ -79,6 +81,17 @@ void main() {
       expect(await repo.timings(4, s), isNotEmpty, reason: 'surah $s');
     }
     expect(await repo.timings(4, 55), isEmpty);
+    // The four added from mp3quran: every verse of every surah is timed, so
+    // the verse is highlighted throughout and no surah is left out.
+    for (final reciter in [11, 12, 13, 14]) {
+      for (final s in [1, 2, 9, 55, 114]) {
+        expect(
+          await repo.timings(reciter, s),
+          isNotEmpty,
+          reason: 'reciter $reciter, surah $s',
+        );
+      }
+    }
     // al-Dosari: verse and word timing from quran.com, in every surah.
     for (final s in [1, 2, 9, 114]) {
       expect(await repo.timings(10, s), isNotEmpty, reason: 'surah $s');

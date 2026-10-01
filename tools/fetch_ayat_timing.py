@@ -17,13 +17,15 @@ ROOT = Path(__file__).resolve().parent
 OUT = ROOT / '.cache' / 'mp3quran_ayat_timing.json'
 API = 'https://www.mp3quran.net/api/v3/ayat_timing?surah={surah}&read={read}'
 
-# mp3quran "read" ids with timing: Minshawi, Husary, Abdul Basit (murattal),
-# and the imams of the two Harams whose word timings were checked (see
-# build_content_db.RECITERS). al-Banna's and Mustafa Ismail's murattal have
-# no published timing (tools/build_quranlab_timing.py derives it).
-# Candidates: Sudais 54, Shuraim 31, Yasser al-Dosari 92, Abdullah
-# al-Juhani 62, Ali al-Hudhaify 74, Salah al-Budair 43, Muhsin al-Qasim 67.
-READS = [112, 118, 53, 54, 31, 92, 62, 74, 43, 67]
+# mp3quran "read" ids with timing for the reciters Tibyan ships: al-Minshawi,
+# al-Husary, Abdul Basit, al-Sudais, al-Tablaway, al-Afasy and al-Ghamdi
+# (see build_content_db.RECITERS). al-Banna's and Mustafa Ismail's murattal
+# have no published timing (tools/build_quranlab_timing.py derives it), and
+# al-Dosari's comes from quran.com (tools/build_qdc_timing.py).
+# Each of these seven covers all 114 surahs with every verse timed, measured
+# 2026-10-01; reads 31 (al-Shuraim) and 74 (al-Hudhaify) were left out: a
+# duplicated verse and a gap in nearly every surah make them unusable.
+READS = [112, 118, 53, 54, 106, 123, 30]
 
 
 def fetch(url):

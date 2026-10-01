@@ -125,12 +125,23 @@ RECITERS = [
     (5, 'مصطفى إسماعيل', 'Mustafa Ismail', 'murattal',
      'https://server8.mp3quran.net/mustafa/', None),
     # An imam of the Haram, from quranicaudio.com (quran.com's audio), with
-    # quran.com's QDC timings for him (tools/build_qdc_timing.py). Sudais's
-    # and Shuraim's timings name files whose bytes are not what their own
-    # audio_url serves, so no verse of theirs could be placed and they are
-    # not offered. id 10 keeps its number: ids are never reused.
+    # quran.com's QDC timings for him (tools/build_qdc_timing.py), which give
+    # word timings too. id 10 keeps its number: ids are never reused.
     (10, 'ياسر الدوسري', 'Yasser al-Dosari', 'murattal',
      'https://download.quranicaudio.com/quran/yasser_ad-dussary/', None),
+    # Seven more from mp3quran, each with a published timing that covers
+    # every verse of all 114 surahs (measured 2026-10-01): verse timings
+    # only, so the verse is highlighted but not each word. al-Sudais is
+    # here rather than on quranicaudio: quran.com's timings for him name
+    # files that are not the bytes his audio_url serves.
+    (11, 'عبدالرحمن السديس', 'Abdul-Rahman al-Sudais', 'murattal',
+     'https://server11.mp3quran.net/sds/', 54),
+    (12, 'مشاري العفاسي', 'Mishary Rashid al-Afasy', 'murattal',
+     'https://server8.mp3quran.net/afs/', 123),
+    (13, 'سعد الغامدي', 'Saad al-Ghamdi', 'murattal',
+     'https://server7.mp3quran.net/s_gmd/', 30),
+    (14, 'محمد الطبلاوي', 'Muhammad al-Tablaway', 'murattal',
+     'https://server12.mp3quran.net/tblawi/', 106),
 ]
 
 
