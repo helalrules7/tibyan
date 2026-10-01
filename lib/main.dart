@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -22,6 +23,19 @@ import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Per-frame timings, for profiling a build run with
+  // `--dart-define=PROF=true`. Off, and free, in every other build.
+  if (const bool.fromEnvironment('PROF')) {
+    SchedulerBinding.instance.addTimingsCallback((timings) {
+      for (final t in timings) {
+        // ignore: avoid_print
+        print(
+          'PROF ui=${t.buildDuration.inMilliseconds} '
+          'raster=${t.rasterDuration.inMilliseconds}',
+        );
+      }
+    });
+  }
   // Recitation keeps playing with the screen off, with lock-screen controls.
   await JustAudioBackground.init(
     androidNotificationChannelId: 'app.tibyan.recitation',

@@ -712,12 +712,12 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                               also(
                                 underItems,
                                 j,
-                                (c) => look!.paintUnder(c, m, markerR),
+                                (c) => look.paintUnder(c, m, markerR),
                               );
                               also(
                                 overItems,
                                 j,
-                                (c) => look!.paintOver(
+                                (c) => look.paintOver(
                                   c,
                                   m,
                                   markerR,

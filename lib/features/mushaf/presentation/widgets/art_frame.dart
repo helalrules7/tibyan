@@ -10,6 +10,7 @@ import 'illuminated_frame.dart';
 import 'theme_art.dart';
 import 'opening_art.dart';
 
+import 'raster_frame.dart';
 /// The page in a heritage theme, laid out as approved: the juz ✦ hizb ✦
 /// surah cartouche above the frame, the theme's frame around the page,
 /// the page number in the theme's verse marker below it (with the quarter
@@ -74,7 +75,10 @@ class ArtPageFrame extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             Positioned.fill(
-              child: CustomPaint(
+              child: RasterFrame(
+                cache:
+                    'art|${t.paper.toARGB32()}|${identityHashCode(art)}'
+                    '|$gap',
                 painter: ArtFramePainter(art: art, paper: t.paper),
               ),
             ),

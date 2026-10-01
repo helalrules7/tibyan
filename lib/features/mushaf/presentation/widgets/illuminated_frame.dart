@@ -9,6 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import 'art_frame.dart';
 import 'catchword_view.dart';
 import 'opening_art.dart';
+import 'raster_frame.dart';
 
 /// Ornament images for the Zakhrafa frame (built by tools/build_ornaments.py).
 class FrameImages {
@@ -251,7 +252,10 @@ class IlluminatedFrame extends ConsumerWidget {
           child: Stack(
             children: [
               Positioned.fill(
-                child: CustomPaint(
+                child: RasterFrame(
+                  cache:
+                      'zakhrafa|${t.paper.toARGB32()}|${t.marker.toARGB32()}'
+                      '|${identityHashCode(images)}',
                   painter: _FramePainter(
                     images: images,
                     rule: t.marker,
@@ -629,9 +633,9 @@ class _FramePainter extends CustomPainter {
     // sixty milliseconds a frame on a phone. A rectangle clip is a
     // scissor, which is free.
     final topStrip = Rect.fromLTRB(0, 0, w, band);
-    final bottomStrip = Rect.fromLTRB(0, h - band, w, band);
-    final leftStrip = Rect.fromLTRB(0, band, band, h - 2 * band);
-    final rightStrip = Rect.fromLTRB(w - band, band, band, h - 2 * band);
+    final bottomStrip = Rect.fromLTRB(0, h - band, w, h);
+    final leftStrip = Rect.fromLTRB(0, band, band, h - band);
+    final rightStrip = Rect.fromLTRB(w - band, band, w, h - band);
     void inRect(Rect r, void Function() body) {
       if (r.height <= 0 || r.width <= 0) return;
       canvas.save();
