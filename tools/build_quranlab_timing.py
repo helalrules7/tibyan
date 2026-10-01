@@ -91,6 +91,18 @@ DB = ROOT.parent / 'assets' / 'db' / 'content.db'
 RECITERS = {
     4: ('quranlab_banna_timing.json', 'mahmoud_ali_al_banna_32kbps', True),
     5: ('quranlab_mustafa-ismail_timing.json', 'Mustafa_Ismail_48kbps', False),
+    11: (
+        'quranlab_abdul-rahman-al-sudais_timing.json',
+        'Abdurrahmaan_As-Sudais_192kbps',
+        True,
+    ),
+    12: ('quranlab_mishary-alafasy_timing.json', 'Alafasy_128kbps', True),
+    13: ('quranlab_saad-al-ghamdi_timing.json', 'Ghamadi_40kbps', True),
+    14: (
+        'quranlab_mohamed-al-tablawi_timing.json',
+        'Mohammad_al_Tablaway_128kbps',
+        True,
+    ),
 }
 AYAH_OUT = CACHE / 'quranlab_ayah_timing.json'
 WORD_OUT = CACHE / 'quranlab_word_timing.json'

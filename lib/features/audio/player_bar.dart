@@ -11,6 +11,7 @@ import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'recitation.dart';
+import 'reciter_avatar.dart';
 
 String reciterLabel(BuildContext context, ReciterRow r) {
   final l = AppLocalizations.of(context);
@@ -323,6 +324,11 @@ class PlayerOptions extends ConsumerWidget {
                   dense: true,
                   value: r.id,
                   title: Text(reciterLabel(context, r)),
+                  secondary: ReciterAvatar(
+                    id: r.id,
+                    name: reciterLabel(context, r),
+                    size: 36,
+                  ),
                 ),
             ],
           ),

@@ -41,6 +41,9 @@ CONFIGS = {
     'salah-al-budair': 'salah-al-budair',
     'muhsin-al-qasim': 'muhsin-al-qasim',
     'maher-al-muaiqly': 'maher-al-muaiqly',
+    'mishary-alafasy': 'mishary-alafasy',
+    'saad-al-ghamdi': 'saad-al-ghamdi',
+    'mohamed-al-tablawi': 'mohamed-al-tablawi',
 }
 API = ('https://datasets-server.huggingface.co/rows?dataset=quranlab/quran-audio'
        '&config={config}&split=train&offset={offset}&length=100')

@@ -10,6 +10,7 @@ import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'player_bar.dart';
 import 'recitation.dart';
+import 'reciter_avatar.dart';
 
 /// Download the chosen reciter's surahs for listening offline. Surahs
 /// saved while listening are listed here too, as downloaded.
@@ -89,6 +90,11 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
       body: Column(
         children: [
           ListTile(
+            leading: ReciterAvatar(
+              id: reciter.id,
+              name: reciterLabel(context, reciter),
+              size: 38,
+            ),
             title: Text(reciterLabel(context, reciter)),
             subtitle: Text(
               '${l.audioDownloaded}: ${digits(have.length)} / ${digits(114)}',
