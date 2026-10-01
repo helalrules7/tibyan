@@ -9,10 +9,12 @@ void main() {
       Size(352, 520), // small phone
       Size(812, 1050), // tablet, portrait
     ]) {
-      test('$room: full width, taller, the art undistorted', () {
+      test('$room: covers the width, taller, the art undistorted', () {
         final g = OpeningArtGeometry.fit(room);
-        // As wide as the room, and never taller than it.
-        expect(g.frame.width, closeTo(room.width, 0.01));
+        // The room's width is covered — what the drawing loses at its sides
+        // runs off both edges — and the frame is never taller than the room.
+        expect(g.frame.width, greaterThanOrEqualTo(room.width - 0.01));
+        expect(g.frame.left, lessThanOrEqualTo(0.01));
         expect(g.frame.height, lessThanOrEqualTo(room.height + 0.01));
         expect(g.frame.top, greaterThanOrEqualTo(-0.01));
         // The band copies are stretched by 8% at most.
@@ -43,10 +45,35 @@ void main() {
       const room = Size(382, 700);
       final plain = 1457 * room.width / 1200;
       final g = OpeningArtGeometry.fit(room);
-      expect(g.repeats, greaterThan(0));
       expect(g.frame.height, greaterThan(plain + 100));
       // What is left over is less than one band.
       expect(room.height - g.frame.height, lessThan(257 * g.scale));
+    });
+
+    test('the sides are cropped, and the page inside gets more of them', () {
+      const room = Size(360, 742); // a phone, near enough
+      final g = OpeningArtGeometry.fit(room);
+      // The drawing fills the width between its two cropped sides, and the
+      // rest of it runs off both edges.
+      expect(
+        room.width / g.scale,
+        closeTo(OpeningArtLayout.visibleWidth, 0.01),
+      );
+      expect(
+        -g.frame.left,
+        closeTo(OpeningArtLayout.sideCut * g.scale, 0.01),
+      );
+      // The page keeps the drawing's panel, and it is about half again as
+      // wide as fitting the whole drawing gave it.
+      final panel = g.place(OpeningArtLayout.panel);
+      final whole = OpeningArtLayout.panel.width * (room.width / 1200);
+      expect(panel.width, greaterThan(whole * 1.4));
+      // Both cartouches stay on the screen.
+      for (final r in [OpeningArtLayout.top, OpeningArtLayout.bottom]) {
+        final cartouche = g.place(r);
+        expect(cartouche.left, greaterThanOrEqualTo(-0.01));
+        expect(cartouche.right, lessThanOrEqualTo(room.width + 0.01));
+      }
     });
 
     test(
