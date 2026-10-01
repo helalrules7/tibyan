@@ -71,6 +71,43 @@ def call(method, url, tok, body=None, data=None, headers=None):
         sys.exit(f'{method} {url.split("?")[0]} -> {e.code}: {e.read().decode()[:2000]}')
 
 
+CHUNK = 8 * 1024 * 1024  # every chunk but the last must be a multiple of 256 KB
+
+
+def upload(session, tok, path, size):
+    """Sends the bundle over the resumable session, reporting how far it is.
+
+    The session takes a file in ranges and answers 308 with what it has after
+    each one, then the bundle itself on the last. Sending the whole 159 MB in
+    a single PUT (what this did first) gives the same bytes with nothing to
+    show and nothing to resume, and holds all of it in memory while urllib
+    waits.
+    """
+    sent = 0
+    with open(path, 'rb') as f:
+        while True:
+            chunk = f.read(min(CHUNK, size - sent))
+            last = sent + len(chunk) >= size
+            req = urllib.request.Request(session, data=chunk, method='PUT',
+                                         headers={
+                'Authorization': f'Bearer {tok}',
+                'Content-Type': 'application/octet-stream',
+                'Content-Range': f'bytes {sent}-{sent + len(chunk) - 1}/{size}',
+            })
+            try:
+                with urllib.request.urlopen(req, timeout=1800) as res:
+                    print(f'\r  {size / 1e6:.0f} MB sent, all of it.        ')
+                    return json.loads(res.read())
+            except urllib.error.HTTPError as e:
+                if e.code != 308:  # 308 means: nothing wrong, keep going
+                    sys.exit(f'PUT -> {e.code}: {e.read().decode()[:2000]}')
+                sent += len(chunk)
+                print(f'\r  {sent / size * 100:5.1f}%  '
+                      f'{sent / 1e6:.0f}/{size / 1e6:.0f} MB', end='', flush=True)
+            if last:
+                sys.exit('the session did not take the last chunk')
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('aab')
@@ -94,9 +131,7 @@ def main():
         })
     with urllib.request.urlopen(start) as res:
         session = res.headers['Location']
-    with open(a.aab, 'rb') as f:
-        bundle = call('PUT', session, tok, data=f.read(),
-                      headers={'Content-Type': 'application/octet-stream'})
+    bundle = upload(session, tok, a.aab, size)
     code = bundle['versionCode']
     print(f'uploaded versionCode {code} ({size / 1e6:.1f} MB)')
     release = {'name': a.name, 'versionCodes': [str(code)], 'status': a.status}
