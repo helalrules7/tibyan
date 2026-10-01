@@ -8,6 +8,7 @@ import 'package:vector_graphics/vector_graphics.dart';
 import '../../core/theme/theme_tokens.dart';
 import '../mushaf/data/compiled_svg.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
+import '../mushaf/presentation/widgets/raster_frame.dart';
 import '../mushaf/presentation/widgets/theme_art.dart';
 
 /// The artwork used for every preview: a real mushaf page (page 1, KFGQPC,
@@ -60,7 +61,15 @@ class RealPagePreview extends ConsumerWidget {
             child: page,
           );
     final Widget body;
-    if (style.art != null) {
+    if (style.frame.outerStyle == 'plain') {
+      // The plain theme has no frame: the page and nothing else.
+      body = FittedBox(
+        child: SizedBox.fromSize(
+          size: _artSize,
+          child: Padding(padding: const EdgeInsets.all(14), child: inked),
+        ),
+      );
+    } else if (style.art != null) {
       final art = ref
           .watch(themeArtProvider((style: style.id, mode: mode)))
           .value;
@@ -90,7 +99,15 @@ class RealPagePreview extends ConsumerWidget {
     return Semantics(
       label: semanticLabel,
       image: true,
-      child: SizedBox(width: width, height: width * 1.3, child: body),
+      child: SizedBox(
+        width: width,
+        height: width * 1.3,
+        // A card is a whole page in a frame: drawn once, then blitted.
+        child: FrozenBox(
+          cache: 'preview|${style.id}|${mode.name}|$width',
+          child: body,
+        ),
+      ),
     );
   }
 }

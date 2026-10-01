@@ -2,6 +2,7 @@
   "default": "zakhrafa",
   "styles": [
     "zakhrafa",
+    "simple",
     "seljuk",
     "umayyad",
     "timurid",

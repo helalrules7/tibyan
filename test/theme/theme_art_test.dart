@@ -35,9 +35,13 @@ void main() {
   setUpAll(() async => registry = await ThemeRegistry.load(rootBundle));
 
   group('theme files', () {
-    test('Zakhrafa first and default, then the eight heritage themes', () {
+    test('Zakhrafa first and default, then the plain and heritage themes', () {
       expect(registry.defaultStyleId, 'zakhrafa');
-      expect(registry.styles.map((s) => s.id), ['zakhrafa', ...heritage]);
+      expect(registry.styles.map((s) => s.id), [
+        'zakhrafa',
+        'simple',
+        ...heritage,
+      ]);
     });
 
     test('every style has four modes; only the heritage themes have art', () {
@@ -46,7 +50,8 @@ void main() {
         expect(style.name['ar'], isNotEmpty, reason: style.id);
         expect(style.name['en'], isNotEmpty, reason: style.id);
         expect(style.description['ar'], isNotEmpty, reason: style.id);
-        if (style.id == 'zakhrafa') {
+        if (style.frame.outerStyle != 'art') {
+          // Zakhrafa keeps its own illuminated frame, the plain theme none.
           expect(style.art, isNull);
           continue;
         }

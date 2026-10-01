@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 /// Draws a frame once into an image, then blits it.
 ///
@@ -98,4 +99,76 @@ class _Blit extends CustomPainter {
 
   @override
   bool shouldRepaint(_Blit old) => old.image != image;
+}
+
+/// Draws a widget once into an image, then blits it.
+///
+/// The theme picker shows a real page in every theme's frame — a vector
+/// page, an ornament and a colour filter, card after card — and redraws
+/// them whenever the list moves. Each card is drawn once here; after that
+/// the image is all that is painted.
+class FrozenBox extends StatefulWidget {
+  const FrozenBox({super.key, required this.cache, required this.child});
+
+  /// Everything the drawing depends on: a change draws it again.
+  final String cache;
+  final Widget child;
+
+  @override
+  State<FrozenBox> createState() => _FrozenBoxState();
+}
+
+class _FrozenBoxState extends State<FrozenBox> {
+  /// Cards of every theme in every mode, at a card's size: small.
+  static const _keep = 14;
+  static final _drawn = <String, ui.Image>{};
+  static final _order = <String>[];
+  static bool _busy = false;
+
+  final _boundary = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    final dpr = MediaQuery.devicePixelRatioOf(context);
+    final key = '${widget.cache}|$dpr';
+    final image = _drawn[key];
+    if (image != null) return RawImage(image: image, fit: BoxFit.fill);
+    final child = RepaintBoundary(key: _boundary, child: widget.child);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _capture(key, dpr));
+    return child;
+  }
+
+  Future<void> _capture(String key, double dpr) async {
+    // One card at a time: a screenful of pages is not drawn at once.
+    if (_busy || _drawn.containsKey(key)) return;
+    final object = _boundary.currentContext?.findRenderObject();
+    if (object is! RenderRepaintBoundary) return;
+    if (object.debugNeedsPaint || object.size.isEmpty) {
+      _retry();
+      return;
+    }
+    _busy = true;
+    ui.Image image;
+    try {
+      image = await object.toImage(pixelRatio: dpr);
+    } finally {
+      _busy = false;
+    }
+    if (!mounted) {
+      image.dispose();
+      return;
+    }
+    while (_order.length >= _keep) {
+      _drawn.remove(_order.removeAt(0))?.dispose();
+    }
+    _drawn[key] = image;
+    _order.add(key);
+    if (mounted) setState(() {});
+  }
+
+  void _retry() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() {});
+    });
+  }
 }

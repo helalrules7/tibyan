@@ -199,6 +199,20 @@ class IlluminatedFrame extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // A plain theme has no frame at all: a box above the page and a circle
+    // under it.
+    if (context.tokens.style.frame.outerStyle == 'plain') {
+      return PlainFrame(
+        info: info,
+        onJuzTap: onJuzTap,
+        onHizbTap: onHizbTap,
+        onSurahTap: onSurahTap,
+        onPageTap: onPageTap,
+        tools: tools,
+        showCatchword: showCatchword,
+        child: child,
+      );
+    }
     // A heritage theme draws its own frame from its art.
     if (context.tokens.style.art != null) {
       return ArtPageFrame(
@@ -1117,6 +1131,176 @@ class QuarterLabel extends StatelessWidget {
     return Text.rich(
       TextSpan(style: base, children: spans),
       semanticsLabel: text,
+    );
+  }
+}
+
+/// The plain theme's frame: nothing around the page. A box above it holds
+/// the surah, the juz and the hizb; a circle under it holds the page
+/// number, with the hizb on the right of that row and the next page's
+/// first word on its left, and the reading tools below it.
+class PlainFrame extends StatelessWidget {
+  const PlainFrame({
+    super.key,
+    required this.info,
+    required this.child,
+    this.onJuzTap,
+    this.onHizbTap,
+    this.onSurahTap,
+    this.onPageTap,
+    this.tools,
+    this.showCatchword = true,
+  });
+
+  final FrameInfo? info;
+  final Widget child;
+  final VoidCallback? onJuzTap;
+  final VoidCallback? onHizbTap;
+  final VoidCallback? onSurahTap;
+  final VoidCallback? onPageTap;
+
+  /// Small reading tools shown under the page number.
+  final Widget? tools;
+  final bool showCatchword;
+
+  /// Room the row of the page number takes.
+  static const row = 44.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens.colors;
+    final l = AppLocalizations.of(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final info = this.info;
+    final label = TextStyle(
+      fontFamily: 'UthmanTahaNaskh',
+      fontSize: 14,
+      color: t.ink,
+      height: 1.3,
+    );
+    return Column(
+      children: [
+        if (info != null)
+          Container(
+            margin: const EdgeInsets.fromLTRB(10, 2, 10, 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              border: Border.all(color: t.border),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: DefaultTextStyle.merge(
+              style: label,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FrameTap(
+                    label: info.surahName,
+                    bold: true,
+                    onTap: onSurahTap,
+                  ),
+                  FrameStar(color: t.marker),
+                  FrameTap(
+                    label: l.juzLabel(digits(info.juz)),
+                    onTap: onJuzTap,
+                  ),
+                  FrameStar(color: t.marker),
+                  FrameTap(
+                    label: l.hizbLabel(digits(info.hizb)),
+                    onTap: onHizbTap,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: child,
+          ),
+        ),
+        SizedBox(
+          height: row,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                if (info != null)
+                  DefaultTextStyle.merge(
+                    style: label.copyWith(color: t.muted),
+                    child: FrameTap(
+                      label: l.hizbLabel(digits(info.hizb)),
+                      onTap: onHizbTap,
+                    ),
+                  ),
+                const Spacer(),
+                if (info != null)
+                  _PageNumber(
+                    label: digits(info.page),
+                    semanticLabel: l.pageOf('${info.page}'),
+                    onTap: onPageTap,
+                  ),
+                const Spacer(),
+                if (showCatchword && (info?.hasCatchword ?? false))
+                  CatchwordView(
+                    page: info!.page,
+                    text: info.catchword,
+                    style: TextStyle(
+                      fontFamily: 'UthmanicHafs',
+                      fontSize: 15,
+                      height: 1.4,
+                      color: t.muted,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+        ?tools,
+      ],
+    );
+  }
+}
+
+/// The page number in a plain circle.
+class _PageNumber extends StatelessWidget {
+  const _PageNumber({
+    required this.label,
+    required this.semanticLabel,
+    this.onTap,
+  });
+
+  final String label;
+  final String semanticLabel;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens.colors;
+    return Semantics(
+      button: onTap != null,
+      label: semanticLabel,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 34,
+          height: 34,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: t.marker, width: 1.4),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'UthmanicHafs',
+              fontSize: 15,
+              height: 1,
+              color: t.ink,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
