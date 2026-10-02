@@ -4163,6 +4163,1183 @@ class OutboxCompanion extends UpdateCompanion<OutboxRow> {
   }
 }
 
+class $SrsItemsTable extends SrsItems
+    with TableInfo<$SrsItemsTable, SrsItemRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SrsItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+    clientDefault: newUuid,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: DateTime.now,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fromRefMeta = const VerificationMeta(
+    'fromRef',
+  );
+  @override
+  late final GeneratedColumn<String> fromRef = GeneratedColumn<String>(
+    'from_ref',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _toRefMeta = const VerificationMeta('toRef');
+  @override
+  late final GeneratedColumn<String> toRef = GeneratedColumn<String>(
+    'to_ref',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _stabilityMeta = const VerificationMeta(
+    'stability',
+  );
+  @override
+  late final GeneratedColumn<double> stability = GeneratedColumn<double>(
+    'stability',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _difficultyMeta = const VerificationMeta(
+    'difficulty',
+  );
+  @override
+  late final GeneratedColumn<double> difficulty = GeneratedColumn<double>(
+    'difficulty',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dueAtMeta = const VerificationMeta('dueAt');
+  @override
+  late final GeneratedColumn<DateTime> dueAt = GeneratedColumn<DateTime>(
+    'due_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _repsMeta = const VerificationMeta('reps');
+  @override
+  late final GeneratedColumn<int> reps = GeneratedColumn<int>(
+    'reps',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lapsesMeta = const VerificationMeta('lapses');
+  @override
+  late final GeneratedColumn<int> lapses = GeneratedColumn<int>(
+    'lapses',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lastReviewAtMeta = const VerificationMeta(
+    'lastReviewAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastReviewAt = GeneratedColumn<DateTime>(
+    'last_review_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    uuid,
+    updatedAt,
+    deletedAt,
+    id,
+    unit,
+    fromRef,
+    toRef,
+    stability,
+    difficulty,
+    dueAt,
+    reps,
+    lapses,
+    lastReviewAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'srs_item';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SrsItemRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('from_ref')) {
+      context.handle(
+        _fromRefMeta,
+        fromRef.isAcceptableOrUnknown(data['from_ref']!, _fromRefMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fromRefMeta);
+    }
+    if (data.containsKey('to_ref')) {
+      context.handle(
+        _toRefMeta,
+        toRef.isAcceptableOrUnknown(data['to_ref']!, _toRefMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_toRefMeta);
+    }
+    if (data.containsKey('stability')) {
+      context.handle(
+        _stabilityMeta,
+        stability.isAcceptableOrUnknown(data['stability']!, _stabilityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stabilityMeta);
+    }
+    if (data.containsKey('difficulty')) {
+      context.handle(
+        _difficultyMeta,
+        difficulty.isAcceptableOrUnknown(data['difficulty']!, _difficultyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_difficultyMeta);
+    }
+    if (data.containsKey('due_at')) {
+      context.handle(
+        _dueAtMeta,
+        dueAt.isAcceptableOrUnknown(data['due_at']!, _dueAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dueAtMeta);
+    }
+    if (data.containsKey('reps')) {
+      context.handle(
+        _repsMeta,
+        reps.isAcceptableOrUnknown(data['reps']!, _repsMeta),
+      );
+    }
+    if (data.containsKey('lapses')) {
+      context.handle(
+        _lapsesMeta,
+        lapses.isAcceptableOrUnknown(data['lapses']!, _lapsesMeta),
+      );
+    }
+    if (data.containsKey('last_review_at')) {
+      context.handle(
+        _lastReviewAtMeta,
+        lastReviewAt.isAcceptableOrUnknown(
+          data['last_review_at']!,
+          _lastReviewAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SrsItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SrsItemRow(
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      fromRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}from_ref'],
+      )!,
+      toRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}to_ref'],
+      )!,
+      stability: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}stability'],
+      )!,
+      difficulty: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}difficulty'],
+      )!,
+      dueAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}due_at'],
+      )!,
+      reps: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reps'],
+      )!,
+      lapses: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lapses'],
+      )!,
+      lastReviewAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_review_at'],
+      ),
+    );
+  }
+
+  @override
+  $SrsItemsTable createAlias(String alias) {
+    return $SrsItemsTable(attachedDatabase, alias);
+  }
+}
+
+class SrsItemRow extends DataClass implements Insertable<SrsItemRow> {
+  final String uuid;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final int id;
+
+  /// `page`, `quarter` or `surah`.
+  final String unit;
+
+  /// First and last verse, `surah:ayah`.
+  final String fromRef;
+  final String toRef;
+
+  /// FSRS memory state: days to 90% recall, and difficulty 1..10.
+  final double stability;
+  final double difficulty;
+  final DateTime dueAt;
+  final int reps;
+  final int lapses;
+  final DateTime? lastReviewAt;
+  const SrsItemRow({
+    required this.uuid,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.id,
+    required this.unit,
+    required this.fromRef,
+    required this.toRef,
+    required this.stability,
+    required this.difficulty,
+    required this.dueAt,
+    required this.reps,
+    required this.lapses,
+    this.lastReviewAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['uuid'] = Variable<String>(uuid);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['id'] = Variable<int>(id);
+    map['unit'] = Variable<String>(unit);
+    map['from_ref'] = Variable<String>(fromRef);
+    map['to_ref'] = Variable<String>(toRef);
+    map['stability'] = Variable<double>(stability);
+    map['difficulty'] = Variable<double>(difficulty);
+    map['due_at'] = Variable<DateTime>(dueAt);
+    map['reps'] = Variable<int>(reps);
+    map['lapses'] = Variable<int>(lapses);
+    if (!nullToAbsent || lastReviewAt != null) {
+      map['last_review_at'] = Variable<DateTime>(lastReviewAt);
+    }
+    return map;
+  }
+
+  SrsItemsCompanion toCompanion(bool nullToAbsent) {
+    return SrsItemsCompanion(
+      uuid: Value(uuid),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      id: Value(id),
+      unit: Value(unit),
+      fromRef: Value(fromRef),
+      toRef: Value(toRef),
+      stability: Value(stability),
+      difficulty: Value(difficulty),
+      dueAt: Value(dueAt),
+      reps: Value(reps),
+      lapses: Value(lapses),
+      lastReviewAt: lastReviewAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastReviewAt),
+    );
+  }
+
+  factory SrsItemRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SrsItemRow(
+      uuid: serializer.fromJson<String>(json['uuid']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      id: serializer.fromJson<int>(json['id']),
+      unit: serializer.fromJson<String>(json['unit']),
+      fromRef: serializer.fromJson<String>(json['fromRef']),
+      toRef: serializer.fromJson<String>(json['toRef']),
+      stability: serializer.fromJson<double>(json['stability']),
+      difficulty: serializer.fromJson<double>(json['difficulty']),
+      dueAt: serializer.fromJson<DateTime>(json['dueAt']),
+      reps: serializer.fromJson<int>(json['reps']),
+      lapses: serializer.fromJson<int>(json['lapses']),
+      lastReviewAt: serializer.fromJson<DateTime?>(json['lastReviewAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'uuid': serializer.toJson<String>(uuid),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'id': serializer.toJson<int>(id),
+      'unit': serializer.toJson<String>(unit),
+      'fromRef': serializer.toJson<String>(fromRef),
+      'toRef': serializer.toJson<String>(toRef),
+      'stability': serializer.toJson<double>(stability),
+      'difficulty': serializer.toJson<double>(difficulty),
+      'dueAt': serializer.toJson<DateTime>(dueAt),
+      'reps': serializer.toJson<int>(reps),
+      'lapses': serializer.toJson<int>(lapses),
+      'lastReviewAt': serializer.toJson<DateTime?>(lastReviewAt),
+    };
+  }
+
+  SrsItemRow copyWith({
+    String? uuid,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    int? id,
+    String? unit,
+    String? fromRef,
+    String? toRef,
+    double? stability,
+    double? difficulty,
+    DateTime? dueAt,
+    int? reps,
+    int? lapses,
+    Value<DateTime?> lastReviewAt = const Value.absent(),
+  }) => SrsItemRow(
+    uuid: uuid ?? this.uuid,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    id: id ?? this.id,
+    unit: unit ?? this.unit,
+    fromRef: fromRef ?? this.fromRef,
+    toRef: toRef ?? this.toRef,
+    stability: stability ?? this.stability,
+    difficulty: difficulty ?? this.difficulty,
+    dueAt: dueAt ?? this.dueAt,
+    reps: reps ?? this.reps,
+    lapses: lapses ?? this.lapses,
+    lastReviewAt: lastReviewAt.present ? lastReviewAt.value : this.lastReviewAt,
+  );
+  SrsItemRow copyWithCompanion(SrsItemsCompanion data) {
+    return SrsItemRow(
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      id: data.id.present ? data.id.value : this.id,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      fromRef: data.fromRef.present ? data.fromRef.value : this.fromRef,
+      toRef: data.toRef.present ? data.toRef.value : this.toRef,
+      stability: data.stability.present ? data.stability.value : this.stability,
+      difficulty: data.difficulty.present
+          ? data.difficulty.value
+          : this.difficulty,
+      dueAt: data.dueAt.present ? data.dueAt.value : this.dueAt,
+      reps: data.reps.present ? data.reps.value : this.reps,
+      lapses: data.lapses.present ? data.lapses.value : this.lapses,
+      lastReviewAt: data.lastReviewAt.present
+          ? data.lastReviewAt.value
+          : this.lastReviewAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SrsItemRow(')
+          ..write('uuid: $uuid, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('id: $id, ')
+          ..write('unit: $unit, ')
+          ..write('fromRef: $fromRef, ')
+          ..write('toRef: $toRef, ')
+          ..write('stability: $stability, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('reps: $reps, ')
+          ..write('lapses: $lapses, ')
+          ..write('lastReviewAt: $lastReviewAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    uuid,
+    updatedAt,
+    deletedAt,
+    id,
+    unit,
+    fromRef,
+    toRef,
+    stability,
+    difficulty,
+    dueAt,
+    reps,
+    lapses,
+    lastReviewAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SrsItemRow &&
+          other.uuid == this.uuid &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.id == this.id &&
+          other.unit == this.unit &&
+          other.fromRef == this.fromRef &&
+          other.toRef == this.toRef &&
+          other.stability == this.stability &&
+          other.difficulty == this.difficulty &&
+          other.dueAt == this.dueAt &&
+          other.reps == this.reps &&
+          other.lapses == this.lapses &&
+          other.lastReviewAt == this.lastReviewAt);
+}
+
+class SrsItemsCompanion extends UpdateCompanion<SrsItemRow> {
+  final Value<String> uuid;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> id;
+  final Value<String> unit;
+  final Value<String> fromRef;
+  final Value<String> toRef;
+  final Value<double> stability;
+  final Value<double> difficulty;
+  final Value<DateTime> dueAt;
+  final Value<int> reps;
+  final Value<int> lapses;
+  final Value<DateTime?> lastReviewAt;
+  const SrsItemsCompanion({
+    this.uuid = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.fromRef = const Value.absent(),
+    this.toRef = const Value.absent(),
+    this.stability = const Value.absent(),
+    this.difficulty = const Value.absent(),
+    this.dueAt = const Value.absent(),
+    this.reps = const Value.absent(),
+    this.lapses = const Value.absent(),
+    this.lastReviewAt = const Value.absent(),
+  });
+  SrsItemsCompanion.insert({
+    this.uuid = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required String unit,
+    required String fromRef,
+    required String toRef,
+    required double stability,
+    required double difficulty,
+    required DateTime dueAt,
+    this.reps = const Value.absent(),
+    this.lapses = const Value.absent(),
+    this.lastReviewAt = const Value.absent(),
+  }) : unit = Value(unit),
+       fromRef = Value(fromRef),
+       toRef = Value(toRef),
+       stability = Value(stability),
+       difficulty = Value(difficulty),
+       dueAt = Value(dueAt);
+  static Insertable<SrsItemRow> custom({
+    Expression<String>? uuid,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? id,
+    Expression<String>? unit,
+    Expression<String>? fromRef,
+    Expression<String>? toRef,
+    Expression<double>? stability,
+    Expression<double>? difficulty,
+    Expression<DateTime>? dueAt,
+    Expression<int>? reps,
+    Expression<int>? lapses,
+    Expression<DateTime>? lastReviewAt,
+  }) {
+    return RawValuesInsertable({
+      if (uuid != null) 'uuid': uuid,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (id != null) 'id': id,
+      if (unit != null) 'unit': unit,
+      if (fromRef != null) 'from_ref': fromRef,
+      if (toRef != null) 'to_ref': toRef,
+      if (stability != null) 'stability': stability,
+      if (difficulty != null) 'difficulty': difficulty,
+      if (dueAt != null) 'due_at': dueAt,
+      if (reps != null) 'reps': reps,
+      if (lapses != null) 'lapses': lapses,
+      if (lastReviewAt != null) 'last_review_at': lastReviewAt,
+    });
+  }
+
+  SrsItemsCompanion copyWith({
+    Value<String>? uuid,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? id,
+    Value<String>? unit,
+    Value<String>? fromRef,
+    Value<String>? toRef,
+    Value<double>? stability,
+    Value<double>? difficulty,
+    Value<DateTime>? dueAt,
+    Value<int>? reps,
+    Value<int>? lapses,
+    Value<DateTime?>? lastReviewAt,
+  }) {
+    return SrsItemsCompanion(
+      uuid: uuid ?? this.uuid,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      id: id ?? this.id,
+      unit: unit ?? this.unit,
+      fromRef: fromRef ?? this.fromRef,
+      toRef: toRef ?? this.toRef,
+      stability: stability ?? this.stability,
+      difficulty: difficulty ?? this.difficulty,
+      dueAt: dueAt ?? this.dueAt,
+      reps: reps ?? this.reps,
+      lapses: lapses ?? this.lapses,
+      lastReviewAt: lastReviewAt ?? this.lastReviewAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (fromRef.present) {
+      map['from_ref'] = Variable<String>(fromRef.value);
+    }
+    if (toRef.present) {
+      map['to_ref'] = Variable<String>(toRef.value);
+    }
+    if (stability.present) {
+      map['stability'] = Variable<double>(stability.value);
+    }
+    if (difficulty.present) {
+      map['difficulty'] = Variable<double>(difficulty.value);
+    }
+    if (dueAt.present) {
+      map['due_at'] = Variable<DateTime>(dueAt.value);
+    }
+    if (reps.present) {
+      map['reps'] = Variable<int>(reps.value);
+    }
+    if (lapses.present) {
+      map['lapses'] = Variable<int>(lapses.value);
+    }
+    if (lastReviewAt.present) {
+      map['last_review_at'] = Variable<DateTime>(lastReviewAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SrsItemsCompanion(')
+          ..write('uuid: $uuid, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('id: $id, ')
+          ..write('unit: $unit, ')
+          ..write('fromRef: $fromRef, ')
+          ..write('toRef: $toRef, ')
+          ..write('stability: $stability, ')
+          ..write('difficulty: $difficulty, ')
+          ..write('dueAt: $dueAt, ')
+          ..write('reps: $reps, ')
+          ..write('lapses: $lapses, ')
+          ..write('lastReviewAt: $lastReviewAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MemorizationsTable extends Memorizations
+    with TableInfo<$MemorizationsTable, MemorizationRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MemorizationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+    clientDefault: newUuid,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: DateTime.now,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _refMeta = const VerificationMeta('ref');
+  @override
+  late final GeneratedColumn<String> ref = GeneratedColumn<String>(
+    'ref',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _strengthMeta = const VerificationMeta(
+    'strength',
+  );
+  @override
+  late final GeneratedColumn<int> strength = GeneratedColumn<int>(
+    'strength',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    uuid,
+    updatedAt,
+    deletedAt,
+    id,
+    unit,
+    ref,
+    strength,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'memorization';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MemorizationRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitMeta);
+    }
+    if (data.containsKey('ref')) {
+      context.handle(
+        _refMeta,
+        ref.isAcceptableOrUnknown(data['ref']!, _refMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_refMeta);
+    }
+    if (data.containsKey('strength')) {
+      context.handle(
+        _strengthMeta,
+        strength.isAcceptableOrUnknown(data['strength']!, _strengthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_strengthMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MemorizationRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MemorizationRow(
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      )!,
+      ref: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ref'],
+      )!,
+      strength: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}strength'],
+      )!,
+    );
+  }
+
+  @override
+  $MemorizationsTable createAlias(String alias) {
+    return $MemorizationsTable(attachedDatabase, alias);
+  }
+}
+
+class MemorizationRow extends DataClass implements Insertable<MemorizationRow> {
+  final String uuid;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final int id;
+  final String unit;
+  final String ref;
+  final int strength;
+  const MemorizationRow({
+    required this.uuid,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.id,
+    required this.unit,
+    required this.ref,
+    required this.strength,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['uuid'] = Variable<String>(uuid);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['id'] = Variable<int>(id);
+    map['unit'] = Variable<String>(unit);
+    map['ref'] = Variable<String>(ref);
+    map['strength'] = Variable<int>(strength);
+    return map;
+  }
+
+  MemorizationsCompanion toCompanion(bool nullToAbsent) {
+    return MemorizationsCompanion(
+      uuid: Value(uuid),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      id: Value(id),
+      unit: Value(unit),
+      ref: Value(ref),
+      strength: Value(strength),
+    );
+  }
+
+  factory MemorizationRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MemorizationRow(
+      uuid: serializer.fromJson<String>(json['uuid']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      id: serializer.fromJson<int>(json['id']),
+      unit: serializer.fromJson<String>(json['unit']),
+      ref: serializer.fromJson<String>(json['ref']),
+      strength: serializer.fromJson<int>(json['strength']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'uuid': serializer.toJson<String>(uuid),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'id': serializer.toJson<int>(id),
+      'unit': serializer.toJson<String>(unit),
+      'ref': serializer.toJson<String>(ref),
+      'strength': serializer.toJson<int>(strength),
+    };
+  }
+
+  MemorizationRow copyWith({
+    String? uuid,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    int? id,
+    String? unit,
+    String? ref,
+    int? strength,
+  }) => MemorizationRow(
+    uuid: uuid ?? this.uuid,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    id: id ?? this.id,
+    unit: unit ?? this.unit,
+    ref: ref ?? this.ref,
+    strength: strength ?? this.strength,
+  );
+  MemorizationRow copyWithCompanion(MemorizationsCompanion data) {
+    return MemorizationRow(
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      id: data.id.present ? data.id.value : this.id,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      ref: data.ref.present ? data.ref.value : this.ref,
+      strength: data.strength.present ? data.strength.value : this.strength,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MemorizationRow(')
+          ..write('uuid: $uuid, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('id: $id, ')
+          ..write('unit: $unit, ')
+          ..write('ref: $ref, ')
+          ..write('strength: $strength')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(uuid, updatedAt, deletedAt, id, unit, ref, strength);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MemorizationRow &&
+          other.uuid == this.uuid &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.id == this.id &&
+          other.unit == this.unit &&
+          other.ref == this.ref &&
+          other.strength == this.strength);
+}
+
+class MemorizationsCompanion extends UpdateCompanion<MemorizationRow> {
+  final Value<String> uuid;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> id;
+  final Value<String> unit;
+  final Value<String> ref;
+  final Value<int> strength;
+  const MemorizationsCompanion({
+    this.uuid = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.ref = const Value.absent(),
+    this.strength = const Value.absent(),
+  });
+  MemorizationsCompanion.insert({
+    this.uuid = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.id = const Value.absent(),
+    required String unit,
+    required String ref,
+    required int strength,
+  }) : unit = Value(unit),
+       ref = Value(ref),
+       strength = Value(strength);
+  static Insertable<MemorizationRow> custom({
+    Expression<String>? uuid,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? id,
+    Expression<String>? unit,
+    Expression<String>? ref,
+    Expression<int>? strength,
+  }) {
+    return RawValuesInsertable({
+      if (uuid != null) 'uuid': uuid,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (id != null) 'id': id,
+      if (unit != null) 'unit': unit,
+      if (ref != null) 'ref': ref,
+      if (strength != null) 'strength': strength,
+    });
+  }
+
+  MemorizationsCompanion copyWith({
+    Value<String>? uuid,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? id,
+    Value<String>? unit,
+    Value<String>? ref,
+    Value<int>? strength,
+  }) {
+    return MemorizationsCompanion(
+      uuid: uuid ?? this.uuid,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      id: id ?? this.id,
+      unit: unit ?? this.unit,
+      ref: ref ?? this.ref,
+      strength: strength ?? this.strength,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (ref.present) {
+      map['ref'] = Variable<String>(ref.value);
+    }
+    if (strength.present) {
+      map['strength'] = Variable<int>(strength.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MemorizationsCompanion(')
+          ..write('uuid: $uuid, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('id: $id, ')
+          ..write('unit: $unit, ')
+          ..write('ref: $ref, ')
+          ..write('strength: $strength')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$UserDatabase extends GeneratedDatabase {
   _$UserDatabase(QueryExecutor e) : super(e);
   $UserDatabaseManager get managers => $UserDatabaseManager(this);
@@ -4179,6 +5356,8 @@ abstract class _$UserDatabase extends GeneratedDatabase {
       $ListeningSessionsTable(this);
   late final $ReflectionsTable reflections = $ReflectionsTable(this);
   late final $OutboxTable outbox = $OutboxTable(this);
+  late final $SrsItemsTable srsItems = $SrsItemsTable(this);
+  late final $MemorizationsTable memorizations = $MemorizationsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4192,6 +5371,8 @@ abstract class _$UserDatabase extends GeneratedDatabase {
     listeningSessions,
     reflections,
     outbox,
+    srsItems,
+    memorizations,
   ];
 }
 
@@ -6380,6 +7561,605 @@ typedef $$OutboxTableProcessedTableManager =
       OutboxRow,
       PrefetchHooks Function()
     >;
+typedef $$SrsItemsTableCreateCompanionBuilder = SrsItemsCompanion Function({
+  Value<String> uuid,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> deletedAt,
+  Value<int> id,
+  required String unit,
+  required String fromRef,
+  required String toRef,
+  required double stability,
+  required double difficulty,
+  required DateTime dueAt,
+  Value<int> reps,
+  Value<int> lapses,
+  Value<DateTime?> lastReviewAt,
+});
+typedef $$SrsItemsTableUpdateCompanionBuilder = SrsItemsCompanion Function({
+  Value<String> uuid,
+  Value<DateTime> updatedAt,
+  Value<DateTime?> deletedAt,
+  Value<int> id,
+  Value<String> unit,
+  Value<String> fromRef,
+  Value<String> toRef,
+  Value<double> stability,
+  Value<double> difficulty,
+  Value<DateTime> dueAt,
+  Value<int> reps,
+  Value<int> lapses,
+  Value<DateTime?> lastReviewAt,
+});
+
+class $$SrsItemsTableFilterComposer
+    extends Composer<_$UserDatabase, $SrsItemsTable> {
+  $$SrsItemsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fromRef => $composableBuilder(
+    column: $table.fromRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toRef => $composableBuilder(
+    column: $table.toRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get stability => $composableBuilder(
+    column: $table.stability,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dueAt => $composableBuilder(
+    column: $table.dueAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reps => $composableBuilder(
+    column: $table.reps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lapses => $composableBuilder(
+    column: $table.lapses,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastReviewAt => $composableBuilder(
+    column: $table.lastReviewAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SrsItemsTableOrderingComposer
+    extends Composer<_$UserDatabase, $SrsItemsTable> {
+  $$SrsItemsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fromRef => $composableBuilder(
+    column: $table.fromRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toRef => $composableBuilder(
+    column: $table.toRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get stability => $composableBuilder(
+    column: $table.stability,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dueAt => $composableBuilder(
+    column: $table.dueAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reps => $composableBuilder(
+    column: $table.reps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lapses => $composableBuilder(
+    column: $table.lapses,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastReviewAt => $composableBuilder(
+    column: $table.lastReviewAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SrsItemsTableAnnotationComposer
+    extends Composer<_$UserDatabase, $SrsItemsTable> {
+  $$SrsItemsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<String> get fromRef =>
+      $composableBuilder(column: $table.fromRef, builder: (column) => column);
+
+  GeneratedColumn<String> get toRef =>
+      $composableBuilder(column: $table.toRef, builder: (column) => column);
+
+  GeneratedColumn<double> get stability =>
+      $composableBuilder(column: $table.stability, builder: (column) => column);
+
+  GeneratedColumn<double> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get dueAt =>
+      $composableBuilder(column: $table.dueAt, builder: (column) => column);
+
+  GeneratedColumn<int> get reps =>
+      $composableBuilder(column: $table.reps, builder: (column) => column);
+
+  GeneratedColumn<int> get lapses =>
+      $composableBuilder(column: $table.lapses, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastReviewAt => $composableBuilder(
+    column: $table.lastReviewAt,
+    builder: (column) => column,
+  );
+}
+
+class $$SrsItemsTableTableManager
+    extends
+        RootTableManager<
+          _$UserDatabase,
+          $SrsItemsTable,
+          SrsItemRow,
+          $$SrsItemsTableFilterComposer,
+          $$SrsItemsTableOrderingComposer,
+          $$SrsItemsTableAnnotationComposer,
+          $$SrsItemsTableCreateCompanionBuilder,
+          $$SrsItemsTableUpdateCompanionBuilder,
+          (
+            SrsItemRow,
+            BaseReferences<_$UserDatabase, $SrsItemsTable, SrsItemRow>,
+          ),
+          SrsItemRow,
+          PrefetchHooks Function()
+        > {
+  $$SrsItemsTableTableManager(_$UserDatabase db, $SrsItemsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SrsItemsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SrsItemsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SrsItemsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> uuid = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<String> fromRef = const Value.absent(),
+                Value<String> toRef = const Value.absent(),
+                Value<double> stability = const Value.absent(),
+                Value<double> difficulty = const Value.absent(),
+                Value<DateTime> dueAt = const Value.absent(),
+                Value<int> reps = const Value.absent(),
+                Value<int> lapses = const Value.absent(),
+                Value<DateTime?> lastReviewAt = const Value.absent(),
+              }) => SrsItemsCompanion(
+                uuid: uuid,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                id: id,
+                unit: unit,
+                fromRef: fromRef,
+                toRef: toRef,
+                stability: stability,
+                difficulty: difficulty,
+                dueAt: dueAt,
+                reps: reps,
+                lapses: lapses,
+                lastReviewAt: lastReviewAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<String> uuid = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                required String unit,
+                required String fromRef,
+                required String toRef,
+                required double stability,
+                required double difficulty,
+                required DateTime dueAt,
+                Value<int> reps = const Value.absent(),
+                Value<int> lapses = const Value.absent(),
+                Value<DateTime?> lastReviewAt = const Value.absent(),
+              }) => SrsItemsCompanion.insert(
+                uuid: uuid,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                id: id,
+                unit: unit,
+                fromRef: fromRef,
+                toRef: toRef,
+                stability: stability,
+                difficulty: difficulty,
+                dueAt: dueAt,
+                reps: reps,
+                lapses: lapses,
+                lastReviewAt: lastReviewAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$SrsItemsTable, SrsItemRow>(table),
+                  BaseReferences<_$UserDatabase, $SrsItemsTable, SrsItemRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SrsItemsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserDatabase,
+      $SrsItemsTable,
+      SrsItemRow,
+      $$SrsItemsTableFilterComposer,
+      $$SrsItemsTableOrderingComposer,
+      $$SrsItemsTableAnnotationComposer,
+      $$SrsItemsTableCreateCompanionBuilder,
+      $$SrsItemsTableUpdateCompanionBuilder,
+      (SrsItemRow, BaseReferences<_$UserDatabase, $SrsItemsTable, SrsItemRow>),
+      SrsItemRow,
+      PrefetchHooks Function()
+    >;
+typedef $$MemorizationsTableCreateCompanionBuilder =
+    MemorizationsCompanion Function({
+      Value<String> uuid,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> id,
+      required String unit,
+      required String ref,
+      required int strength,
+    });
+typedef $$MemorizationsTableUpdateCompanionBuilder =
+    MemorizationsCompanion Function({
+      Value<String> uuid,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> id,
+      Value<String> unit,
+      Value<String> ref,
+      Value<int> strength,
+    });
+
+class $$MemorizationsTableFilterComposer
+    extends Composer<_$UserDatabase, $MemorizationsTable> {
+  $$MemorizationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ref => $composableBuilder(
+    column: $table.ref,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get strength => $composableBuilder(
+    column: $table.strength,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MemorizationsTableOrderingComposer
+    extends Composer<_$UserDatabase, $MemorizationsTable> {
+  $$MemorizationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ref => $composableBuilder(
+    column: $table.ref,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get strength => $composableBuilder(
+    column: $table.strength,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MemorizationsTableAnnotationComposer
+    extends Composer<_$UserDatabase, $MemorizationsTable> {
+  $$MemorizationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<String> get ref =>
+      $composableBuilder(column: $table.ref, builder: (column) => column);
+
+  GeneratedColumn<int> get strength =>
+      $composableBuilder(column: $table.strength, builder: (column) => column);
+}
+
+class $$MemorizationsTableTableManager
+    extends
+        RootTableManager<
+          _$UserDatabase,
+          $MemorizationsTable,
+          MemorizationRow,
+          $$MemorizationsTableFilterComposer,
+          $$MemorizationsTableOrderingComposer,
+          $$MemorizationsTableAnnotationComposer,
+          $$MemorizationsTableCreateCompanionBuilder,
+          $$MemorizationsTableUpdateCompanionBuilder,
+          (
+            MemorizationRow,
+            BaseReferences<
+              _$UserDatabase,
+              $MemorizationsTable,
+              MemorizationRow
+            >,
+          ),
+          MemorizationRow,
+          PrefetchHooks Function()
+        > {
+  $$MemorizationsTableTableManager(_$UserDatabase db, $MemorizationsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MemorizationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MemorizationsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MemorizationsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> uuid = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                Value<String> unit = const Value.absent(),
+                Value<String> ref = const Value.absent(),
+                Value<int> strength = const Value.absent(),
+              }) => MemorizationsCompanion(
+                uuid: uuid,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                id: id,
+                unit: unit,
+                ref: ref,
+                strength: strength,
+              ),
+          createCompanionCallback:
+              ({
+                Value<String> uuid = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> id = const Value.absent(),
+                required String unit,
+                required String ref,
+                required int strength,
+              }) => MemorizationsCompanion.insert(
+                uuid: uuid,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                id: id,
+                unit: unit,
+                ref: ref,
+                strength: strength,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MemorizationsTable, MemorizationRow>(table),
+                  BaseReferences<
+                    _$UserDatabase,
+                    $MemorizationsTable,
+                    MemorizationRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MemorizationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$UserDatabase,
+      $MemorizationsTable,
+      MemorizationRow,
+      $$MemorizationsTableFilterComposer,
+      $$MemorizationsTableOrderingComposer,
+      $$MemorizationsTableAnnotationComposer,
+      $$MemorizationsTableCreateCompanionBuilder,
+      $$MemorizationsTableUpdateCompanionBuilder,
+      (
+        MemorizationRow,
+        BaseReferences<_$UserDatabase, $MemorizationsTable, MemorizationRow>,
+      ),
+      MemorizationRow,
+      PrefetchHooks Function()
+    >;
 
 class $UserDatabaseManager {
   final _$UserDatabase _db;
@@ -6400,4 +8180,8 @@ class $UserDatabaseManager {
       $$ReflectionsTableTableManager(_db, _db.reflections);
   $$OutboxTableTableManager get outbox =>
       $$OutboxTableTableManager(_db, _db.outbox);
+  $$SrsItemsTableTableManager get srsItems =>
+      $$SrsItemsTableTableManager(_db, _db.srsItems);
+  $$MemorizationsTableTableManager get memorizations =>
+      $$MemorizationsTableTableManager(_db, _db.memorizations);
 }

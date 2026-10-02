@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/hifz/presentation/hifz_map_screen.dart';
+import '../../features/hifz/presentation/hifz_screen.dart';
 import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/search/search_screen.dart';
@@ -87,6 +89,16 @@ final appRouterProvider = Provider<GoRouter>(
         ],
       ),
       GoRoute(
+        path: '/hifz',
+        builder: (context, state) => const HifzScreen(),
+        routes: [
+          GoRoute(
+            path: 'map',
+            builder: (context, state) => const HifzMapScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
         path: '/khatma',
         builder: (context, state) => const KhatmaScreen(),
         routes: [
@@ -111,6 +123,9 @@ final appRouterProvider = Provider<GoRouter>(
           initialPage: _int(state, 'page'),
           selectSurah: _int(state, 's'),
           selectAyah: _int(state, 'a'),
+          hifzUnit: state.uri.queryParameters['hifz'],
+          hifzFrom: state.uri.queryParameters['from'],
+          hifzTo: state.uri.queryParameters['to'],
         ),
         routes: [
           GoRoute(

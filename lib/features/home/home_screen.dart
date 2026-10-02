@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../hifz/hifz_providers.dart';
 import '../khatma/khatma_providers.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
@@ -26,9 +27,10 @@ class HomeScreen extends ConsumerWidget {
     }
     final khatma = ref.watch(khatmaStatusProvider).value;
     final portion = khatma?.todayPortion;
-    final soon = <(IconData, String)>[
-      (Icons.task_alt_outlined, l.sectionHifz),
-    ];
+    final due = dueToday(
+      ref.watch(srsItemsProvider).value ?? const [],
+      DateTime.now(),
+    ).length;
 
     return Scaffold(
       body: SafeArea(
@@ -189,8 +191,14 @@ class HomeScreen extends ConsumerWidget {
                       : l.khatmaTileStart,
                   onTap: () => context.push('/khatma'),
                 ),
-                for (final (icon, label) in soon)
-                  _ComingSoonTile(icon: icon, label: label, note: l.comingSoon),
+                _SectionTile(
+                  icon: Icons.task_alt_outlined,
+                  label: l.sectionHifz,
+                  note: due > 0
+                      ? '${l.hifzToday} ${digits(due)}'
+                      : l.hifzTileNote,
+                  onTap: () => context.push('/hifz'),
+                ),
               ],
             ),
           ],
@@ -237,41 +245,6 @@ class _SectionTile extends StatelessWidget {
               Text(note, style: TextStyle(color: t.goldText, fontSize: 12)),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ComingSoonTile extends StatelessWidget {
-  const _ComingSoonTile({
-    required this.icon,
-    required this.label,
-    required this.note,
-  });
-
-  final IconData icon;
-  final String label;
-  final String note;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens.colors;
-    return Semantics(
-      label: '$label. $note',
-      excludeSemantics: true,
-      child: Card(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: t.goldText, size: 26),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(color: t.ink, fontWeight: FontWeight.w600),
-            ),
-            Text(note, style: TextStyle(color: t.muted, fontSize: 12)),
-          ],
         ),
       ),
     );

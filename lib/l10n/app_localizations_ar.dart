@@ -1138,128 +1138,166 @@ class AppLocalizationsAr extends AppLocalizations {
   String get journalEarlier => 'ملاحظاتك على هذه الآية';
 
   @override
-  String get elderlyMode => 'وضع كبار السن';
+  String get hifzTitle => 'الحفظ';
 
   @override
-  String get elderlyModeHint =>
-      'خط أكبر، وأزرار أكبر بأسمائها، وألوان أوضح، وصفحة رئيسية فيها المهم فقط، وصفحة المصحف بأكبر حجم، وانتقالات أهدأ';
+  String get hifzTileNote => 'المراجعة والتسميع';
 
   @override
-  String get searchModeWords => 'بالكلمات';
+  String get hifzToday => 'مراجعة اليوم';
 
   @override
-  String get searchModeMeaning => 'بالمعنى';
+  String get hifzNothingDue => 'لا مراجعة مستحقة اليوم.';
 
   @override
-  String get searchMeaningHint => 'اكتب فكرة أو سؤالا بكلماتك';
+  String get hifzNothingDueHint =>
+      'سمّع صفحة أو ربعا أو سورة ثم قيّم تسميعك، فتدخل المراجعة المتباعدة.';
 
   @override
-  String get searchMeaningIntro =>
-      'اكتب فكرة بكلماتك، بالعربية أو بالإنجليزية، مثل «الصبر على البلاء» أو «بر الوالدين»، فتظهر الآيات التي يتناولها معناها في التفسير الميسر والترجمتين. تظهر كل آية بنصها، ومعها النص الذي طابق كما هو من مصدره.';
+  String get hifzStartTest => 'ابدأ تسميعا';
 
   @override
-  String searchMatchedIn(String source) {
-    return 'طابق في: $source';
+  String get hifzMap => 'خريطة الحفظ';
+
+  @override
+  String get hifzMapHint =>
+      'كل صفحة ملوّنة بقوة حفظها، ومعها علامة تقرأ دون ألوان.';
+
+  @override
+  String get hifzAllUnits => 'كل وحدات المراجعة';
+
+  @override
+  String get hifzDueToday => 'مستحقة اليوم';
+
+  @override
+  String hifzDueOn(String date) {
+    return 'موعدها $date';
   }
 
   @override
-  String searchMeaningCount(String count) {
-    return '$count آية';
+  String hifzQuarter(String number) {
+    return 'الربع $number';
   }
 
   @override
-  String get semanticPackName => 'حزمة البحث بالمعنى';
+  String get hifzUnitPage => 'صفحة';
 
   @override
-  String semanticPackOffer(String size) {
-    return 'البحث الآن بالكلمات داخل نصوص المعاني. نزّل حزمة البحث بالمعنى (نحو $size ميجا) ليجد البحث الآيات بمعناها وإن اختلفت الكلمات، دون اتصال.';
+  String get hifzUnitQuarter => 'ربع';
+
+  @override
+  String get hifzUnitSurah => 'سورة';
+
+  @override
+  String get hifzChooseUnit => 'ماذا تسمّع؟';
+
+  @override
+  String hifzNumberRange(String max) {
+    return 'الرقم، من ١ إلى $max';
   }
 
   @override
-  String get semanticPackDownload => 'تنزيل الحزمة';
+  String get hifzBegin => 'ابدأ';
 
   @override
-  String semanticPackDownloading(String percent) {
-    return 'يُنزَّل: $percent٪';
+  String get hifzRemove => 'احذف من المراجعة';
+
+  @override
+  String get revealNextWord => 'الكلمة التالية';
+
+  @override
+  String get revealNextVerse => 'الآية التالية';
+
+  @override
+  String get revealAll => 'الكل';
+
+  @override
+  String get endRecite => 'إنهاء التسميع';
+
+  @override
+  String get verseRemembered => 'حفظت';
+
+  @override
+  String get verseMissed => 'أخطأت';
+
+  @override
+  String testCounts(String remembered, String missed) {
+    return 'حفظت $remembered · أخطأت $missed';
   }
 
   @override
-  String get semanticPackVerifying => 'يُتحقَّق من الحزمة ويُثبَّت…';
+  String get revealByLine =>
+      'لا مواضع لكلمات هذه الآية في هذه الطبعة، فتُكشف سطرا سطرا.';
 
   @override
-  String get semanticPackFailed => 'تعذّر التنزيل. حاول مرة أخرى.';
+  String get gradeUnit => 'قيّم';
 
   @override
-  String get semanticPackLoading => 'يُجهَّز البحث بالمعنى…';
+  String get gradeTitle => 'كيف كان تسميعك؟';
 
   @override
-  String get semanticPackError =>
-      'تعذّر فتح حزمة البحث بالمعنى، فالبحث الآن بالكلمات.';
+  String get gradeSuggested => 'الاختيار المقترح من نتائج الآيات';
 
   @override
-  String get semanticResultsNote =>
-      'نتائج تقريبية مرتبة بقرب المعنى. راجع الآية في موضعها وفي تفسيرها.';
+  String get gradeAgain => 'أعِدها';
 
   @override
-  String verseLabel(String surah, String ayah) {
-    return 'سورة $surah، الآية $ayah';
+  String get gradeHard => 'صعبة';
+
+  @override
+  String get gradeGood => 'جيدة';
+
+  @override
+  String get gradeEasy => 'سهلة';
+
+  @override
+  String gradeSaved(String date) {
+    return 'المراجعة القادمة: $date';
   }
 
   @override
-  String pageLabelFull(String page, String surah) {
-    return 'الصفحة $page، $surah';
+  String get similarVerses => 'المتشابهات';
+
+  @override
+  String similarCount(String count) {
+    return 'متشابهات ($count)';
   }
 
   @override
-  String get markThisVerse => 'ضع علامة القراءة عند هذه الآية أو أزلها';
+  String get similarThisVerse => 'الآية';
 
   @override
-  String loadingPage(String page) {
-    return 'تُحمَّل الصفحة $page';
-  }
+  String get similarFollowing => 'والآية بعدها';
 
   @override
-  String get clearSearch => 'مسح البحث';
+  String get strengthNone => 'لم يُحفظ';
 
   @override
-  String get previousPageNumber => 'الصفحة السابقة';
+  String get strengthWeak => 'ضعيف';
 
   @override
-  String get nextPageNumber => 'الصفحة التالية';
+  String get strengthFair => 'متوسط';
 
   @override
-  String get showMenus => 'إظهار القوائم';
+  String get strengthGood => 'جيد';
 
   @override
-  String get hideMenus => 'إخفاء القوائم';
+  String get strengthStrong => 'متقن';
 
   @override
-  String downloadSurah(String surah) {
-    return 'تنزيل سورة $surah';
-  }
+  String get mapPages => 'الصفحات';
 
   @override
-  String retryDownloadSurah(String surah) {
-    return 'أعد تنزيل سورة $surah';
-  }
+  String get mapSurahs => 'السور';
 
   @override
-  String deleteSurahDownload(String surah) {
-    return 'سورة $surah منزّلة. احذفها';
-  }
+  String get mapZoomIn => 'تكبير';
 
   @override
-  String downloadingSurah(String surah) {
-    return 'تُنزَّل سورة $surah';
-  }
+  String get mapZoomOut => 'تصغير';
 
   @override
-  String verseCounter(String current, String total) {
-    return 'الآية $current من $total';
-  }
-
-  @override
-  String downloadPercentSpoken(String percent) {
-    return 'اكتمل $percent٪ من التحميل';
+  String mapCell(String name, String strength) {
+    return '$name: $strength';
   }
 }

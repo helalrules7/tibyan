@@ -24,6 +24,7 @@ class PageInteraction {
     this.markerLook,
     this.hidden,
     this.hiddenWords = const {},
+    this.revealedWords = const {},
     this.onHiddenTap,
     this.ornateOpening = false,
     this.showHandles = false,
@@ -84,6 +85,12 @@ class PageInteraction {
   /// line by line, band high, from marker to marker, with every mark it
   /// has; only the verse-end markers and their numbers stay.
   final Map<VerseKey, List<Rect>> hiddenWords;
+
+  /// Recitation test (word by word): the words of a covered verse already
+  /// shown, in reading order (edition units). Then [hiddenWords] holds only
+  /// the words still covered: lines with none of them stay uncovered, and
+  /// on the line where the two meet the cover stops at the shown words.
+  final Map<VerseKey, List<Rect>> revealedWords;
 
   /// Recitation mode: a verse was tapped (to show or cover it).
   final ValueChanged<VerseKey>? onHiddenTap;

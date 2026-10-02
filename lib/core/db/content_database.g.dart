@@ -10896,6 +10896,447 @@ class GharibCompanion extends UpdateCompanion<GharibRow> {
   }
 }
 
+class $MutashabihTable extends Mutashabih
+    with TableInfo<$MutashabihTable, MutashabihRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MutashabihTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _srcFromMeta = const VerificationMeta(
+    'srcFrom',
+  );
+  @override
+  late final GeneratedColumn<int> srcFrom = GeneratedColumn<int>(
+    'src_from',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _srcToMeta = const VerificationMeta('srcTo');
+  @override
+  late final GeneratedColumn<int> srcTo = GeneratedColumn<int>(
+    'src_to',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mutFromMeta = const VerificationMeta(
+    'mutFrom',
+  );
+  @override
+  late final GeneratedColumn<int> mutFrom = GeneratedColumn<int>(
+    'mut_from',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mutToMeta = const VerificationMeta('mutTo');
+  @override
+  late final GeneratedColumn<int> mutTo = GeneratedColumn<int>(
+    'mut_to',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contextMeta = const VerificationMeta(
+    'context',
+  );
+  @override
+  late final GeneratedColumn<int> context = GeneratedColumn<int>(
+    'context',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<int> sourceId = GeneratedColumn<int>(
+    'source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    srcFrom,
+    srcTo,
+    mutFrom,
+    mutTo,
+    context,
+    sourceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mutashabih';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MutashabihRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('src_from')) {
+      context.handle(
+        _srcFromMeta,
+        srcFrom.isAcceptableOrUnknown(data['src_from']!, _srcFromMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_srcFromMeta);
+    }
+    if (data.containsKey('src_to')) {
+      context.handle(
+        _srcToMeta,
+        srcTo.isAcceptableOrUnknown(data['src_to']!, _srcToMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_srcToMeta);
+    }
+    if (data.containsKey('mut_from')) {
+      context.handle(
+        _mutFromMeta,
+        mutFrom.isAcceptableOrUnknown(data['mut_from']!, _mutFromMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mutFromMeta);
+    }
+    if (data.containsKey('mut_to')) {
+      context.handle(
+        _mutToMeta,
+        mutTo.isAcceptableOrUnknown(data['mut_to']!, _mutToMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mutToMeta);
+    }
+    if (data.containsKey('context')) {
+      context.handle(
+        _contextMeta,
+        this.context.isAcceptableOrUnknown(data['context']!, _contextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contextMeta);
+    }
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MutashabihRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MutashabihRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      srcFrom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}src_from'],
+      )!,
+      srcTo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}src_to'],
+      )!,
+      mutFrom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mut_from'],
+      )!,
+      mutTo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mut_to'],
+      )!,
+      context: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}context'],
+      )!,
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_id'],
+      )!,
+    );
+  }
+
+  @override
+  $MutashabihTable createAlias(String alias) {
+    return $MutashabihTable(attachedDatabase, alias);
+  }
+}
+
+class MutashabihRow extends DataClass implements Insertable<MutashabihRow> {
+  final int id;
+  final int srcFrom;
+  final int srcTo;
+  final int mutFrom;
+  final int mutTo;
+
+  /// 1 when the start of the following verse tells the passages apart.
+  final int context;
+  final int sourceId;
+  const MutashabihRow({
+    required this.id,
+    required this.srcFrom,
+    required this.srcTo,
+    required this.mutFrom,
+    required this.mutTo,
+    required this.context,
+    required this.sourceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['src_from'] = Variable<int>(srcFrom);
+    map['src_to'] = Variable<int>(srcTo);
+    map['mut_from'] = Variable<int>(mutFrom);
+    map['mut_to'] = Variable<int>(mutTo);
+    map['context'] = Variable<int>(context);
+    map['source_id'] = Variable<int>(sourceId);
+    return map;
+  }
+
+  MutashabihCompanion toCompanion(bool nullToAbsent) {
+    return MutashabihCompanion(
+      id: Value(id),
+      srcFrom: Value(srcFrom),
+      srcTo: Value(srcTo),
+      mutFrom: Value(mutFrom),
+      mutTo: Value(mutTo),
+      context: Value(context),
+      sourceId: Value(sourceId),
+    );
+  }
+
+  factory MutashabihRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MutashabihRow(
+      id: serializer.fromJson<int>(json['id']),
+      srcFrom: serializer.fromJson<int>(json['srcFrom']),
+      srcTo: serializer.fromJson<int>(json['srcTo']),
+      mutFrom: serializer.fromJson<int>(json['mutFrom']),
+      mutTo: serializer.fromJson<int>(json['mutTo']),
+      context: serializer.fromJson<int>(json['context']),
+      sourceId: serializer.fromJson<int>(json['sourceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'srcFrom': serializer.toJson<int>(srcFrom),
+      'srcTo': serializer.toJson<int>(srcTo),
+      'mutFrom': serializer.toJson<int>(mutFrom),
+      'mutTo': serializer.toJson<int>(mutTo),
+      'context': serializer.toJson<int>(context),
+      'sourceId': serializer.toJson<int>(sourceId),
+    };
+  }
+
+  MutashabihRow copyWith({
+    int? id,
+    int? srcFrom,
+    int? srcTo,
+    int? mutFrom,
+    int? mutTo,
+    int? context,
+    int? sourceId,
+  }) => MutashabihRow(
+    id: id ?? this.id,
+    srcFrom: srcFrom ?? this.srcFrom,
+    srcTo: srcTo ?? this.srcTo,
+    mutFrom: mutFrom ?? this.mutFrom,
+    mutTo: mutTo ?? this.mutTo,
+    context: context ?? this.context,
+    sourceId: sourceId ?? this.sourceId,
+  );
+  MutashabihRow copyWithCompanion(MutashabihCompanion data) {
+    return MutashabihRow(
+      id: data.id.present ? data.id.value : this.id,
+      srcFrom: data.srcFrom.present ? data.srcFrom.value : this.srcFrom,
+      srcTo: data.srcTo.present ? data.srcTo.value : this.srcTo,
+      mutFrom: data.mutFrom.present ? data.mutFrom.value : this.mutFrom,
+      mutTo: data.mutTo.present ? data.mutTo.value : this.mutTo,
+      context: data.context.present ? data.context.value : this.context,
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MutashabihRow(')
+          ..write('id: $id, ')
+          ..write('srcFrom: $srcFrom, ')
+          ..write('srcTo: $srcTo, ')
+          ..write('mutFrom: $mutFrom, ')
+          ..write('mutTo: $mutTo, ')
+          ..write('context: $context, ')
+          ..write('sourceId: $sourceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, srcFrom, srcTo, mutFrom, mutTo, context, sourceId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MutashabihRow &&
+          other.id == this.id &&
+          other.srcFrom == this.srcFrom &&
+          other.srcTo == this.srcTo &&
+          other.mutFrom == this.mutFrom &&
+          other.mutTo == this.mutTo &&
+          other.context == this.context &&
+          other.sourceId == this.sourceId);
+}
+
+class MutashabihCompanion extends UpdateCompanion<MutashabihRow> {
+  final Value<int> id;
+  final Value<int> srcFrom;
+  final Value<int> srcTo;
+  final Value<int> mutFrom;
+  final Value<int> mutTo;
+  final Value<int> context;
+  final Value<int> sourceId;
+  const MutashabihCompanion({
+    this.id = const Value.absent(),
+    this.srcFrom = const Value.absent(),
+    this.srcTo = const Value.absent(),
+    this.mutFrom = const Value.absent(),
+    this.mutTo = const Value.absent(),
+    this.context = const Value.absent(),
+    this.sourceId = const Value.absent(),
+  });
+  MutashabihCompanion.insert({
+    this.id = const Value.absent(),
+    required int srcFrom,
+    required int srcTo,
+    required int mutFrom,
+    required int mutTo,
+    required int context,
+    required int sourceId,
+  }) : srcFrom = Value(srcFrom),
+       srcTo = Value(srcTo),
+       mutFrom = Value(mutFrom),
+       mutTo = Value(mutTo),
+       context = Value(context),
+       sourceId = Value(sourceId);
+  static Insertable<MutashabihRow> custom({
+    Expression<int>? id,
+    Expression<int>? srcFrom,
+    Expression<int>? srcTo,
+    Expression<int>? mutFrom,
+    Expression<int>? mutTo,
+    Expression<int>? context,
+    Expression<int>? sourceId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (srcFrom != null) 'src_from': srcFrom,
+      if (srcTo != null) 'src_to': srcTo,
+      if (mutFrom != null) 'mut_from': mutFrom,
+      if (mutTo != null) 'mut_to': mutTo,
+      if (context != null) 'context': context,
+      if (sourceId != null) 'source_id': sourceId,
+    });
+  }
+
+  MutashabihCompanion copyWith({
+    Value<int>? id,
+    Value<int>? srcFrom,
+    Value<int>? srcTo,
+    Value<int>? mutFrom,
+    Value<int>? mutTo,
+    Value<int>? context,
+    Value<int>? sourceId,
+  }) {
+    return MutashabihCompanion(
+      id: id ?? this.id,
+      srcFrom: srcFrom ?? this.srcFrom,
+      srcTo: srcTo ?? this.srcTo,
+      mutFrom: mutFrom ?? this.mutFrom,
+      mutTo: mutTo ?? this.mutTo,
+      context: context ?? this.context,
+      sourceId: sourceId ?? this.sourceId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (srcFrom.present) {
+      map['src_from'] = Variable<int>(srcFrom.value);
+    }
+    if (srcTo.present) {
+      map['src_to'] = Variable<int>(srcTo.value);
+    }
+    if (mutFrom.present) {
+      map['mut_from'] = Variable<int>(mutFrom.value);
+    }
+    if (mutTo.present) {
+      map['mut_to'] = Variable<int>(mutTo.value);
+    }
+    if (context.present) {
+      map['context'] = Variable<int>(context.value);
+    }
+    if (sourceId.present) {
+      map['source_id'] = Variable<int>(sourceId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MutashabihCompanion(')
+          ..write('id: $id, ')
+          ..write('srcFrom: $srcFrom, ')
+          ..write('srcTo: $srcTo, ')
+          ..write('mutFrom: $mutFrom, ')
+          ..write('mutTo: $mutTo, ')
+          ..write('context: $context, ')
+          ..write('sourceId: $sourceId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -10932,6 +11373,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
       $ShamarlyCatchwordTable(this);
   late final $WordRootTable wordRoot = $WordRootTable(this);
   late final $GharibTable gharib = $GharibTable(this);
+  late final $MutashabihTable mutashabih = $MutashabihTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10961,6 +11403,7 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     shamarlyCatchword,
     wordRoot,
     gharib,
+    mutashabih,
   ];
 }
 
@@ -16992,6 +17435,245 @@ typedef $$GharibTableProcessedTableManager =
       GharibRow,
       PrefetchHooks Function()
     >;
+typedef $$MutashabihTableCreateCompanionBuilder = MutashabihCompanion Function({
+  Value<int> id,
+  required int srcFrom,
+  required int srcTo,
+  required int mutFrom,
+  required int mutTo,
+  required int context,
+  required int sourceId,
+});
+typedef $$MutashabihTableUpdateCompanionBuilder = MutashabihCompanion Function({
+  Value<int> id,
+  Value<int> srcFrom,
+  Value<int> srcTo,
+  Value<int> mutFrom,
+  Value<int> mutTo,
+  Value<int> context,
+  Value<int> sourceId,
+});
+
+class $$MutashabihTableFilterComposer
+    extends Composer<_$ContentDatabase, $MutashabihTable> {
+  $$MutashabihTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get srcFrom => $composableBuilder(
+    column: $table.srcFrom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get srcTo => $composableBuilder(
+    column: $table.srcTo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mutFrom => $composableBuilder(
+    column: $table.mutFrom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mutTo => $composableBuilder(
+    column: $table.mutTo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get context => $composableBuilder(
+    column: $table.context,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MutashabihTableOrderingComposer
+    extends Composer<_$ContentDatabase, $MutashabihTable> {
+  $$MutashabihTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get srcFrom => $composableBuilder(
+    column: $table.srcFrom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get srcTo => $composableBuilder(
+    column: $table.srcTo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mutFrom => $composableBuilder(
+    column: $table.mutFrom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mutTo => $composableBuilder(
+    column: $table.mutTo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get context => $composableBuilder(
+    column: $table.context,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MutashabihTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $MutashabihTable> {
+  $$MutashabihTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get srcFrom =>
+      $composableBuilder(column: $table.srcFrom, builder: (column) => column);
+
+  GeneratedColumn<int> get srcTo =>
+      $composableBuilder(column: $table.srcTo, builder: (column) => column);
+
+  GeneratedColumn<int> get mutFrom =>
+      $composableBuilder(column: $table.mutFrom, builder: (column) => column);
+
+  GeneratedColumn<int> get mutTo =>
+      $composableBuilder(column: $table.mutTo, builder: (column) => column);
+
+  GeneratedColumn<int> get context =>
+      $composableBuilder(column: $table.context, builder: (column) => column);
+
+  GeneratedColumn<int> get sourceId =>
+      $composableBuilder(column: $table.sourceId, builder: (column) => column);
+}
+
+class $$MutashabihTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $MutashabihTable,
+          MutashabihRow,
+          $$MutashabihTableFilterComposer,
+          $$MutashabihTableOrderingComposer,
+          $$MutashabihTableAnnotationComposer,
+          $$MutashabihTableCreateCompanionBuilder,
+          $$MutashabihTableUpdateCompanionBuilder,
+          (
+            MutashabihRow,
+            BaseReferences<_$ContentDatabase, $MutashabihTable, MutashabihRow>,
+          ),
+          MutashabihRow,
+          PrefetchHooks Function()
+        > {
+  $$MutashabihTableTableManager(_$ContentDatabase db, $MutashabihTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MutashabihTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MutashabihTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MutashabihTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> srcFrom = const Value.absent(),
+                Value<int> srcTo = const Value.absent(),
+                Value<int> mutFrom = const Value.absent(),
+                Value<int> mutTo = const Value.absent(),
+                Value<int> context = const Value.absent(),
+                Value<int> sourceId = const Value.absent(),
+              }) => MutashabihCompanion(
+                id: id,
+                srcFrom: srcFrom,
+                srcTo: srcTo,
+                mutFrom: mutFrom,
+                mutTo: mutTo,
+                context: context,
+                sourceId: sourceId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int srcFrom,
+                required int srcTo,
+                required int mutFrom,
+                required int mutTo,
+                required int context,
+                required int sourceId,
+              }) => MutashabihCompanion.insert(
+                id: id,
+                srcFrom: srcFrom,
+                srcTo: srcTo,
+                mutFrom: mutFrom,
+                mutTo: mutTo,
+                context: context,
+                sourceId: sourceId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MutashabihTable, MutashabihRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $MutashabihTable,
+                    MutashabihRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MutashabihTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $MutashabihTable,
+      MutashabihRow,
+      $$MutashabihTableFilterComposer,
+      $$MutashabihTableOrderingComposer,
+      $$MutashabihTableAnnotationComposer,
+      $$MutashabihTableCreateCompanionBuilder,
+      $$MutashabihTableUpdateCompanionBuilder,
+      (
+        MutashabihRow,
+        BaseReferences<_$ContentDatabase, $MutashabihTable, MutashabihRow>,
+      ),
+      MutashabihRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -17043,4 +17725,6 @@ class $ContentDatabaseManager {
       $$WordRootTableTableManager(_db, _db.wordRoot);
   $$GharibTableTableManager get gharib =>
       $$GharibTableTableManager(_db, _db.gharib);
+  $$MutashabihTableTableManager get mutashabih =>
+      $$MutashabihTableTableManager(_db, _db.mutashabih);
 }

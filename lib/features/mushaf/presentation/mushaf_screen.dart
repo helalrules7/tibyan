@@ -14,6 +14,12 @@ import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
+import '../../hifz/data/hifz_repository.dart';
+import '../../hifz/domain/recitation_test.dart';
+import '../../hifz/domain/strength.dart';
+import '../../hifz/hifz_providers.dart';
+import '../../hifz/presentation/hifz_sheets.dart';
+import '../../hifz/presentation/similar_sheet.dart';
 import '../../word_study/word_pick.dart';
 import '../../word_study/word_study_sheet.dart';
 import '../../khatma/domain/reading_tracker.dart';
@@ -44,11 +50,21 @@ class MushafScreen extends ConsumerStatefulWidget {
     this.initialPage,
     this.selectSurah,
     this.selectAyah,
+    this.hifzUnit,
+    this.hifzFrom,
+    this.hifzTo,
   });
 
   final int? initialPage;
   final int? selectSurah;
   final int? selectAyah;
+
+  /// A hifz test: the unit kind (`page`, `quarter`, `surah`) and its first
+  /// and last verse (`surah:ayah`). The page opens with its verses
+  /// covered, revealed word by word, and the unit is graded at the end.
+  final String? hifzUnit;
+  final String? hifzFrom;
+  final String? hifzTo;
 
   @override
   ConsumerState<MushafScreen> createState() => _MushafScreenState();
@@ -74,6 +90,14 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Recitation mode: verses stay covered until revealed.
   bool _recite = false;
   final Set<VerseKey> _revealed = {};
+
+  /// Hifz test (word by word): unlike recitation mode, it goes on across
+  /// pages (a unit may span several) until it is graded or closed.
+  late bool _testing = _hifzKind != null && widget.hifzFrom != null;
+  final RecitationTest _test = RecitationTest();
+
+  HifzUnitKind? get _hifzKind =>
+      HifzUnitKind.values.asNameMap()[widget.hifzUnit ?? ''];
 
   /// Word study: the next tap on the page picks a word to study.
   bool _pickWord = false;
@@ -186,6 +210,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       // Recitation mode is for one page: turning the page ends it.
       _recite = false;
       _revealed.clear();
+      _test.newPage();
     });
     _trackPage();
     if (_page < 1) return;
@@ -289,6 +314,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         MushafEdition.shamarly => pg == 2 || pg == 3 ? pg - 1 : null,
         _ => pg <= 2 ? pg : null,
       };
+      final testUnits = _testing && pg == _page
+          ? ref.watch(pageRevealUnitsProvider(pg)).value ??
+                const <VerseKey, RevealUnits>{}
+          : const <VerseKey, RevealUnits>{};
+      final testCovers = _testing && pg == _page
+          ? _test.covers(_pageKeys(pg), testUnits)
+          : null;
       final interaction = PageInteraction(
         // The reader's selection, or else the verse being recited.
         selection: pg == _page && _selA != null
@@ -322,11 +354,27 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         // Recitation mode covers the page being drawn, whatever the page
         // count says: after an edition change the two can differ for a
         // moment (turning the page ends the mode anyway).
-        hidden: _recite ? _hiddenOn(pg) : null,
-        hiddenWords: _recite ? _wordsOf(_hiddenOn(pg), pg) : const {},
-        // A tap shows a covered verse, or covers it again.
+        hidden: _testing
+            ? testCovers?.hidden
+            : _recite
+            ? _hiddenOn(pg)
+            : null,
+        hiddenWords: _testing
+            ? testCovers?.pieces ?? const {}
+            : _recite
+            ? _wordsOf(_hiddenOn(pg), pg)
+            : const {},
+        revealedWords: _testing
+            ? _test.shownPieces(_pageKeys(pg), testUnits)
+            : const {},
+        // A tap shows a covered verse, or covers it again; in a hifz test
+        // it shows the verse's next word.
         onHiddenTap: (v) => setState(
-          () => _revealed.contains(v) ? _revealed.remove(v) : _revealed.add(v),
+          () => _testing
+              ? _test.revealPiece(v, testUnits[v])
+              : _revealed.contains(v)
+              ? _revealed.remove(v)
+              : _revealed.add(v),
         ),
         ornateOpening: openingSurah != null,
         showHandles: _multi,
@@ -371,11 +419,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           ? null
           : _ReadingTools(
               touchReading: _touchReading,
-              recite: _recite,
               onTouchReading: _toggleTouchReading,
               listening: recitation.active,
               onListen: _listenFromPage,
-              onRecite: () => _recite
+              recite: _recite || _testing,
+              onRecite: () => _testing
+                  ? _closeTest()
+                  : _recite
                   ? setState(() {
                       _recite = false;
                       _revealed.clear();
@@ -413,7 +463,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             page: pg,
             surah: openingSurah,
             // Recitation mode: the next page's first word would give it away.
-            catchword: _recite ? null : info?.catchword,
+            catchword: _recite || _testing ? null : info?.catchword,
             onPageTap: _goToPage,
             onSurahTap: () => openIndex('surahs'),
             tools: tools,
@@ -431,7 +481,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onSurahTap: () => openIndex('surahs'),
           onPageTap: _goToPage,
           tools: tools,
-          showCatchword: !_recite,
+          showCatchword: !_recite && !_testing,
           linePadding: edition == MushafEdition.shamarly
               ? shamarlyLinePadding
               : null,
@@ -614,6 +664,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 ),
               ),
             ),
+          if (_testing && !_chrome)
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: SafeArea(top: false, child: _testBar(context, surahs)),
+            ),
           if (_pickWord)
             Positioned(
               top: 0,
@@ -672,6 +729,22 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   verses: [
                     for (final v in range) (surah: v.surah, ayah: v.ayah),
                   ],
+                ),
+                similarCount: range.length == 1
+                    ? ref
+                              .watch(
+                                similarCountProvider((
+                                  range.first.surah,
+                                  range.first.ayah,
+                                )),
+                              )
+                              .value ??
+                          0
+                    : 0,
+                onSimilar: () => showSimilarSheet(
+                  context,
+                  surah: range.first.surah,
+                  ayah: range.first.ayah,
                 ),
                 onReflect: () => showReflectionSheet(
                   context,
@@ -836,6 +909,146 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         );
     }
   }
+
+  /// Hifz test toolbar: reveal word by word or verse by verse, judge
+  /// each verse, see its similar verses, and grade the unit.
+  Widget _testBar(BuildContext context, List<SurahRow>? surahs) {
+    final l = AppLocalizations.of(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final units = ref.watch(pageRevealUnitsProvider(_page)).value ?? const {};
+    final current = _test.current;
+    final remembered = _test.results.values
+        .where((r) => r == VerseResult.remembered)
+        .length;
+    final missed = _test.results.length - remembered;
+    return _TestBar(
+      verse: current == null || surahs == null
+          ? null
+          : '${surahName(context, surahs[current.surah - 1])} ${digits(current.ayah)}',
+      result: current == null ? null : _test.results[current],
+      byLine: current != null && units[current]?.byWord == false,
+      counts: _test.results.isEmpty
+          ? null
+          : l.testCounts(digits(remembered), digits(missed)),
+      similar: current == null
+          ? 0
+          : ref
+                    .watch(similarCountProvider((current.surah, current.ayah)))
+                    .value ??
+                0,
+      onSimilar: current == null
+          ? null
+          : () => showSimilarSheet(
+              context,
+              surah: current.surah,
+              ayah: current.ayah,
+            ),
+      onNextWord: () =>
+          setState(() => _test.revealNext(_pageKeys(_page), _units)),
+      onNextVerse: () =>
+          setState(() => _test.revealNextVerse(_pageKeys(_page), _units)),
+      onAll: () => setState(() => _test.revealAll(_pageKeys(_page), _units)),
+      onRemembered: current == null
+          ? null
+          : () => _judge(current, VerseResult.remembered),
+      onMissed: current == null
+          ? null
+          : () => _judge(current, VerseResult.missed),
+      onGrade: _gradeUnit,
+      onClose: _closeTest,
+    );
+  }
+
+  /// The reader judged a verse: kept for the unit's grade, and saved to
+  /// the verse's strength on the hifz map.
+  Future<void> _judge(VerseKey v, VerseResult r) async {
+    HapticFeedback.selectionClick();
+    setState(() => _test.grade(v, r, _pageKeys(_page), _units));
+    await saveVerseResults(ref.read(userDatabaseProvider), {v: r});
+  }
+
+  /// Grades the unit under test (in a hifz test) or else the current page,
+  /// and schedules its next review.
+  Future<void> _gradeUnit() async {
+    final repo = ref.read(hifzRepositoryProvider);
+    final edition = ref.read(editionProvider);
+    final kind = _hifzKind;
+    final HifzUnit? unit;
+    if (kind != null && widget.hifzFrom != null && widget.hifzTo != null) {
+      final verses = await repo.versesOf(widget.hifzFrom!, widget.hifzTo!);
+      unit = verses.isEmpty ? null : HifzUnit(kind, verses.first, verses.last);
+    } else {
+      unit = await repo.unit(HifzUnitKind.page, _page, edition);
+    }
+    if (unit == null || !mounted) return;
+    final l = AppLocalizations.of(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final surahs = ref.read(surahsProvider).value;
+    final title = switch (unit.kind) {
+      HifzUnitKind.page => l.pageOf(digits(_page)),
+      HifzUnitKind.quarter => l.hifzQuarter(digits(unit.from.hizbQuarter)),
+      HifzUnitKind.surah => l.surahWord(
+        surahs == null ? '' : surahName(context, surahs[unit.from.surah - 1]),
+      ),
+    };
+    final inUnit = {
+      for (final e in _test.results.entries)
+        if (_inRange(e.key, unit)) e.key: e.value,
+    };
+    final remembered = inUnit.values
+        .where((r) => r == VerseResult.remembered)
+        .length;
+    final grade = await showGradeSheet(
+      context,
+      title: title,
+      suggested: suggestGrade(inUnit.values),
+      counts: inUnit.isEmpty
+          ? null
+          : l.testCounts(
+              digits(remembered),
+              digits(inUnit.length - remembered),
+            ),
+    );
+    if (grade == null || !mounted) return;
+    final review = await gradeUnit(
+      db: ref.read(userDatabaseProvider),
+      repo: repo,
+      kind: unit.kind,
+      fromRef: unit.fromRef,
+      toRef: unit.toRef,
+      grade: grade,
+      results: inUnit,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text(l.gradeSaved(reviewDate(context, review.due))),
+        ),
+      );
+    _closeTest();
+  }
+
+  static bool _inRange(VerseKey v, HifzUnit u) {
+    int order(int s, int a) => s * 1000 + a;
+    final x = order(v.surah, v.ayah);
+    return x >= order(u.from.surah, u.from.number) &&
+        x <= order(u.to.surah, u.to.number);
+  }
+
+  /// Ends the hifz test and returns to where it was opened from.
+  void _closeTest() {
+    setState(() {
+      _testing = false;
+      _test.newPage();
+    });
+    if (context.canPop()) context.pop();
+  }
+
+  Map<VerseKey, RevealUnits> get _units =>
+      ref.read(pageRevealUnitsProvider(_page)).value ?? const {};
 
   void _startRecite() {
     _setChrome(false);
@@ -1299,6 +1512,186 @@ class _WordPickBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Hifz test toolbar.
+class _TestBar extends StatelessWidget {
+  const _TestBar({
+    required this.verse,
+    required this.result,
+    required this.byLine,
+    required this.counts,
+    required this.similar,
+    required this.onSimilar,
+    required this.onNextWord,
+    required this.onNextVerse,
+    required this.onAll,
+    required this.onRemembered,
+    required this.onMissed,
+    required this.onGrade,
+    required this.onClose,
+  });
+
+  /// The verse being recited, named; null before the first reveal.
+  final String? verse;
+  final VerseResult? result;
+
+  /// The current verse is revealed line by line (no word boxes).
+  final bool byLine;
+  final String? counts;
+
+  /// Passages similar to the current verse.
+  final int similar;
+  final VoidCallback? onSimilar;
+  final VoidCallback onNextWord;
+  final VoidCallback onNextVerse;
+  final VoidCallback onAll;
+  final VoidCallback? onRemembered;
+  final VoidCallback? onMissed;
+  final VoidCallback onGrade;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    return Material(
+      color: t.paper,
+      elevation: 6,
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 8, 6, 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (verse != null) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            verse!,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          if (counts != null)
+                            Text(
+                              counts!,
+                              style: TextStyle(fontSize: 12, color: t.muted),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (similar > 0)
+                    TextButton.icon(
+                      onPressed: onSimilar,
+                      icon: const Icon(Icons.compare_arrows, size: 18),
+                      label: Text(l.similarCount(digits(similar))),
+                    ),
+                ],
+              ),
+              if (byLine)
+                Text(
+                  l.revealByLine,
+                  style: TextStyle(fontSize: 12, color: t.muted),
+                ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Expanded(
+                    child: _JudgeButton(
+                      label: l.verseRemembered,
+                      icon: Icons.check,
+                      chosen: result == VerseResult.remembered,
+                      onPressed: onRemembered,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: _JudgeButton(
+                      label: l.verseMissed,
+                      icon: Icons.close,
+                      chosen: result == VerseResult.missed,
+                      onPressed: onMissed,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+              ),
+              const SizedBox(height: 6),
+            ],
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    onPressed: onNextWord,
+                    child: Text(l.revealNextWord),
+                  ),
+                ),
+                IconButton(
+                  tooltip: l.revealNextVerse,
+                  onPressed: onNextVerse,
+                  icon: const Icon(Icons.keyboard_double_arrow_left),
+                ),
+                IconButton(
+                  tooltip: l.revealAll,
+                  onPressed: onAll,
+                  icon: const Icon(Icons.visibility_outlined),
+                ),
+                IconButton(
+                  tooltip: l.gradeUnit,
+                  onPressed: onGrade,
+                  icon: const Icon(Icons.grading),
+                ),
+                IconButton(
+                  tooltip: l.endRecite,
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// «حفظت» or «أخطأت» for the current verse; filled once chosen.
+class _JudgeButton extends StatelessWidget {
+  const _JudgeButton({
+    required this.label,
+    required this.icon,
+    required this.chosen,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool chosen;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    selected: chosen,
+    child: chosen
+        ? FilledButton.tonalIcon(
+            onPressed: onPressed,
+            icon: Icon(icon, size: 18),
+            label: Text(label),
+          )
+        : OutlinedButton.icon(
+            onPressed: onPressed,
+            icon: Icon(icon, size: 18),
+            label: Text(label),
+          ),
+  );
 }
 
 /// Auto-scroll toolbar.

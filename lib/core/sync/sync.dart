@@ -178,6 +178,18 @@ Future<bool> applyRemote(UserDatabase db, RemoteChange c) async {
       (j) => ReflectionRow.fromJson(noId(j)),
       (r) => r.toCompanion(true).copyWith(id: const Value.absent()),
     ),
+    'srs_item' => merge(
+      db.srsItems,
+      db.srsItems.uuid,
+      (j) => SrsItemRow.fromJson(noId(j)),
+      (r) => r.toCompanion(true).copyWith(id: const Value.absent()),
+    ),
+    'memorization' => merge(
+      db.memorizations,
+      db.memorizations.uuid,
+      (j) => MemorizationRow.fromJson(noId(j)),
+      (r) => r.toCompanion(true).copyWith(id: const Value.absent()),
+    ),
     _ => Future.value(false),
   };
 }

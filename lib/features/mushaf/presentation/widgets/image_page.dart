@@ -468,12 +468,23 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               ];
               // The verse's boxes, one per row of the page.
               final spans = <int, Rect>{};
-              for (final (j, (k, r)) in data.pieces.indexed) {
-                if (k != v || r == own) continue;
-                final i = known
-                    ? rows.indexOf(byLine[data.pieceLines[j]]!)
-                    : rowOf(r);
-                spans[i] = spans[i]?.expandToInclude(r) ?? r;
+              // A word-by-word test: only the rows of the words still
+              // covered, and on each the cover stops at the words shown.
+              final shown = x.revealedWords[v] ?? const <Rect>[];
+              final rest = x.hiddenWords[v];
+              if (shown.isNotEmpty && rest != null && rest.isNotEmpty) {
+                for (final r in rest) {
+                  final i = rowOf(r);
+                  spans[i] = spans[i]?.expandToInclude(r) ?? r;
+                }
+              } else {
+                for (final (j, (k, r)) in data.pieces.indexed) {
+                  if (k != v || r == own) continue;
+                  final i = known
+                      ? rows.indexOf(byLine[data.pieceLines[j]]!)
+                      : rowOf(r);
+                  spans[i] = spans[i]?.expandToInclude(r) ?? r;
+                }
               }
               return [
                 for (final MapEntry(key: i, value: span) in spans.entries)
@@ -497,9 +508,21 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                                 column.left,
                                 (a, m) => math.max(a, m.center.dx),
                               );
-                    final right = others
-                        .where((m) => inRow(m) && m.center.dx > span.right)
-                        .fold(column.right, (a, m) => math.min(a, m.center.dx));
+                    final right =
+                        [
+                          for (final r in shown)
+                            if (inRow(r)) r.left - 1,
+                        ].fold(
+                          others
+                              .where(
+                                (m) => inRow(m) && m.center.dx > span.right,
+                              )
+                              .fold(
+                                column.right,
+                                (a, m) => math.min(a, m.center.dx),
+                              ),
+                          math.min,
+                        );
                     final line = layout.lineOfImageY(rows[i].center.dy);
                     Rect screen(Rect r) => Rect.fromPoints(
                       layout.toScreen(r.topLeft, line: line),

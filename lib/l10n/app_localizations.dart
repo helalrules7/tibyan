@@ -2042,197 +2042,299 @@ abstract class AppLocalizations {
   /// **'ملاحظاتك على هذه الآية'**
   String get journalEarlier;
 
-  /// No description provided for @elderlyMode.
+  /// No description provided for @hifzTitle.
   ///
   /// In ar, this message translates to:
-  /// **'وضع كبار السن'**
-  String get elderlyMode;
+  /// **'الحفظ'**
+  String get hifzTitle;
 
-  /// No description provided for @elderlyModeHint.
+  /// No description provided for @hifzTileNote.
   ///
   /// In ar, this message translates to:
-  /// **'خط أكبر، وأزرار أكبر بأسمائها، وألوان أوضح، وصفحة رئيسية فيها المهم فقط، وصفحة المصحف بأكبر حجم، وانتقالات أهدأ'**
-  String get elderlyModeHint;
+  /// **'المراجعة والتسميع'**
+  String get hifzTileNote;
 
-  /// No description provided for @searchModeWords.
+  /// No description provided for @hifzToday.
   ///
   /// In ar, this message translates to:
-  /// **'بالكلمات'**
-  String get searchModeWords;
+  /// **'مراجعة اليوم'**
+  String get hifzToday;
 
-  /// No description provided for @searchModeMeaning.
+  /// No description provided for @hifzNothingDue.
   ///
   /// In ar, this message translates to:
-  /// **'بالمعنى'**
-  String get searchModeMeaning;
+  /// **'لا مراجعة مستحقة اليوم.'**
+  String get hifzNothingDue;
 
-  /// No description provided for @searchMeaningHint.
+  /// No description provided for @hifzNothingDueHint.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب فكرة أو سؤالا بكلماتك'**
-  String get searchMeaningHint;
+  /// **'سمّع صفحة أو ربعا أو سورة ثم قيّم تسميعك، فتدخل المراجعة المتباعدة.'**
+  String get hifzNothingDueHint;
 
-  /// No description provided for @searchMeaningIntro.
+  /// No description provided for @hifzStartTest.
   ///
   /// In ar, this message translates to:
-  /// **'اكتب فكرة بكلماتك، بالعربية أو بالإنجليزية، مثل «الصبر على البلاء» أو «بر الوالدين»، فتظهر الآيات التي يتناولها معناها في التفسير الميسر والترجمتين. تظهر كل آية بنصها، ومعها النص الذي طابق كما هو من مصدره.'**
-  String get searchMeaningIntro;
+  /// **'ابدأ تسميعا'**
+  String get hifzStartTest;
 
-  /// No description provided for @searchMatchedIn.
+  /// No description provided for @hifzMap.
   ///
   /// In ar, this message translates to:
-  /// **'طابق في: {source}'**
-  String searchMatchedIn(String source);
+  /// **'خريطة الحفظ'**
+  String get hifzMap;
 
-  /// No description provided for @searchMeaningCount.
+  /// No description provided for @hifzMapHint.
   ///
   /// In ar, this message translates to:
-  /// **'{count} آية'**
-  String searchMeaningCount(String count);
+  /// **'كل صفحة ملوّنة بقوة حفظها، ومعها علامة تقرأ دون ألوان.'**
+  String get hifzMapHint;
 
-  /// No description provided for @semanticPackName.
+  /// No description provided for @hifzAllUnits.
   ///
   /// In ar, this message translates to:
-  /// **'حزمة البحث بالمعنى'**
-  String get semanticPackName;
+  /// **'كل وحدات المراجعة'**
+  String get hifzAllUnits;
 
-  /// No description provided for @semanticPackOffer.
+  /// No description provided for @hifzDueToday.
   ///
   /// In ar, this message translates to:
-  /// **'البحث الآن بالكلمات داخل نصوص المعاني. نزّل حزمة البحث بالمعنى (نحو {size} ميجا) ليجد البحث الآيات بمعناها وإن اختلفت الكلمات، دون اتصال.'**
-  String semanticPackOffer(String size);
+  /// **'مستحقة اليوم'**
+  String get hifzDueToday;
 
-  /// No description provided for @semanticPackDownload.
+  /// No description provided for @hifzDueOn.
   ///
   /// In ar, this message translates to:
-  /// **'تنزيل الحزمة'**
-  String get semanticPackDownload;
+  /// **'موعدها {date}'**
+  String hifzDueOn(String date);
 
-  /// No description provided for @semanticPackDownloading.
+  /// No description provided for @hifzQuarter.
   ///
   /// In ar, this message translates to:
-  /// **'يُنزَّل: {percent}٪'**
-  String semanticPackDownloading(String percent);
+  /// **'الربع {number}'**
+  String hifzQuarter(String number);
 
-  /// No description provided for @semanticPackVerifying.
+  /// No description provided for @hifzUnitPage.
   ///
   /// In ar, this message translates to:
-  /// **'يُتحقَّق من الحزمة ويُثبَّت…'**
-  String get semanticPackVerifying;
+  /// **'صفحة'**
+  String get hifzUnitPage;
 
-  /// No description provided for @semanticPackFailed.
+  /// No description provided for @hifzUnitQuarter.
   ///
   /// In ar, this message translates to:
-  /// **'تعذّر التنزيل. حاول مرة أخرى.'**
-  String get semanticPackFailed;
+  /// **'ربع'**
+  String get hifzUnitQuarter;
 
-  /// No description provided for @semanticPackLoading.
+  /// No description provided for @hifzUnitSurah.
   ///
   /// In ar, this message translates to:
-  /// **'يُجهَّز البحث بالمعنى…'**
-  String get semanticPackLoading;
+  /// **'سورة'**
+  String get hifzUnitSurah;
 
-  /// No description provided for @semanticPackError.
+  /// No description provided for @hifzChooseUnit.
   ///
   /// In ar, this message translates to:
-  /// **'تعذّر فتح حزمة البحث بالمعنى، فالبحث الآن بالكلمات.'**
-  String get semanticPackError;
+  /// **'ماذا تسمّع؟'**
+  String get hifzChooseUnit;
 
-  /// No description provided for @semanticResultsNote.
+  /// No description provided for @hifzNumberRange.
   ///
   /// In ar, this message translates to:
-  /// **'نتائج تقريبية مرتبة بقرب المعنى. راجع الآية في موضعها وفي تفسيرها.'**
-  String get semanticResultsNote;
+  /// **'الرقم، من ١ إلى {max}'**
+  String hifzNumberRange(String max);
 
-  /// No description provided for @verseLabel.
+  /// No description provided for @hifzBegin.
   ///
   /// In ar, this message translates to:
-  /// **'سورة {surah}، الآية {ayah}'**
-  String verseLabel(String surah, String ayah);
+  /// **'ابدأ'**
+  String get hifzBegin;
 
-  /// No description provided for @pageLabelFull.
+  /// No description provided for @hifzRemove.
   ///
   /// In ar, this message translates to:
-  /// **'الصفحة {page}، {surah}'**
-  String pageLabelFull(String page, String surah);
+  /// **'احذف من المراجعة'**
+  String get hifzRemove;
 
-  /// No description provided for @markThisVerse.
+  /// No description provided for @revealNextWord.
   ///
   /// In ar, this message translates to:
-  /// **'ضع علامة القراءة عند هذه الآية أو أزلها'**
-  String get markThisVerse;
+  /// **'الكلمة التالية'**
+  String get revealNextWord;
 
-  /// No description provided for @loadingPage.
+  /// No description provided for @revealNextVerse.
   ///
   /// In ar, this message translates to:
-  /// **'تُحمَّل الصفحة {page}'**
-  String loadingPage(String page);
+  /// **'الآية التالية'**
+  String get revealNextVerse;
 
-  /// No description provided for @clearSearch.
+  /// No description provided for @revealAll.
   ///
   /// In ar, this message translates to:
-  /// **'مسح البحث'**
-  String get clearSearch;
+  /// **'الكل'**
+  String get revealAll;
 
-  /// No description provided for @previousPageNumber.
+  /// No description provided for @endRecite.
   ///
   /// In ar, this message translates to:
-  /// **'الصفحة السابقة'**
-  String get previousPageNumber;
+  /// **'إنهاء التسميع'**
+  String get endRecite;
 
-  /// No description provided for @nextPageNumber.
+  /// No description provided for @verseRemembered.
   ///
   /// In ar, this message translates to:
-  /// **'الصفحة التالية'**
-  String get nextPageNumber;
+  /// **'حفظت'**
+  String get verseRemembered;
 
-  /// No description provided for @showMenus.
+  /// No description provided for @verseMissed.
   ///
   /// In ar, this message translates to:
-  /// **'إظهار القوائم'**
-  String get showMenus;
+  /// **'أخطأت'**
+  String get verseMissed;
 
-  /// No description provided for @hideMenus.
+  /// No description provided for @testCounts.
   ///
   /// In ar, this message translates to:
-  /// **'إخفاء القوائم'**
-  String get hideMenus;
+  /// **'حفظت {remembered} · أخطأت {missed}'**
+  String testCounts(String remembered, String missed);
 
-  /// No description provided for @downloadSurah.
+  /// No description provided for @revealByLine.
   ///
   /// In ar, this message translates to:
-  /// **'تنزيل سورة {surah}'**
-  String downloadSurah(String surah);
+  /// **'لا مواضع لكلمات هذه الآية في هذه الطبعة، فتُكشف سطرا سطرا.'**
+  String get revealByLine;
 
-  /// No description provided for @retryDownloadSurah.
+  /// No description provided for @gradeUnit.
   ///
   /// In ar, this message translates to:
-  /// **'أعد تنزيل سورة {surah}'**
-  String retryDownloadSurah(String surah);
+  /// **'قيّم'**
+  String get gradeUnit;
 
-  /// No description provided for @deleteSurahDownload.
+  /// No description provided for @gradeTitle.
   ///
   /// In ar, this message translates to:
-  /// **'سورة {surah} منزّلة. احذفها'**
-  String deleteSurahDownload(String surah);
+  /// **'كيف كان تسميعك؟'**
+  String get gradeTitle;
 
-  /// No description provided for @downloadingSurah.
+  /// No description provided for @gradeSuggested.
   ///
   /// In ar, this message translates to:
-  /// **'تُنزَّل سورة {surah}'**
-  String downloadingSurah(String surah);
+  /// **'الاختيار المقترح من نتائج الآيات'**
+  String get gradeSuggested;
 
-  /// No description provided for @verseCounter.
+  /// No description provided for @gradeAgain.
   ///
   /// In ar, this message translates to:
-  /// **'الآية {current} من {total}'**
-  String verseCounter(String current, String total);
+  /// **'أعِدها'**
+  String get gradeAgain;
 
-  /// No description provided for @downloadPercentSpoken.
+  /// No description provided for @gradeHard.
   ///
   /// In ar, this message translates to:
-  /// **'اكتمل {percent}٪ من التحميل'**
-  String downloadPercentSpoken(String percent);
+  /// **'صعبة'**
+  String get gradeHard;
+
+  /// No description provided for @gradeGood.
+  ///
+  /// In ar, this message translates to:
+  /// **'جيدة'**
+  String get gradeGood;
+
+  /// No description provided for @gradeEasy.
+  ///
+  /// In ar, this message translates to:
+  /// **'سهلة'**
+  String get gradeEasy;
+
+  /// No description provided for @gradeSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'المراجعة القادمة: {date}'**
+  String gradeSaved(String date);
+
+  /// No description provided for @similarVerses.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتشابهات'**
+  String get similarVerses;
+
+  /// No description provided for @similarCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'متشابهات ({count})'**
+  String similarCount(String count);
+
+  /// No description provided for @similarThisVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية'**
+  String get similarThisVerse;
+
+  /// No description provided for @similarFollowing.
+  ///
+  /// In ar, this message translates to:
+  /// **'والآية بعدها'**
+  String get similarFollowing;
+
+  /// No description provided for @strengthNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يُحفظ'**
+  String get strengthNone;
+
+  /// No description provided for @strengthWeak.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضعيف'**
+  String get strengthWeak;
+
+  /// No description provided for @strengthFair.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسط'**
+  String get strengthFair;
+
+  /// No description provided for @strengthGood.
+  ///
+  /// In ar, this message translates to:
+  /// **'جيد'**
+  String get strengthGood;
+
+  /// No description provided for @strengthStrong.
+  ///
+  /// In ar, this message translates to:
+  /// **'متقن'**
+  String get strengthStrong;
+
+  /// No description provided for @mapPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحات'**
+  String get mapPages;
+
+  /// No description provided for @mapSurahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'السور'**
+  String get mapSurahs;
+
+  /// No description provided for @mapZoomIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكبير'**
+  String get mapZoomIn;
+
+  /// No description provided for @mapZoomOut.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصغير'**
+  String get mapZoomOut;
+
+  /// No description provided for @mapCell.
+  ///
+  /// In ar, this message translates to:
+  /// **'{name}: {strength}'**
+  String mapCell(String name, String strength);
 }
 
 class _AppLocalizationsDelegate

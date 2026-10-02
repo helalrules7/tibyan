@@ -6,6 +6,13 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (hifz)
+- A «الحفظ» screen from the home tile (it replaces «قريبا»): today's review, start a test, the hifz map, and every review unit with its next date.
+- Word-by-word recitation test: a unit (a page of the edition being read, a hizb quarter or a surah) opens with its verses covered; «الكلمة التالية» or a tap on a verse shows its next word, in all three editions and on the opening pages. Verses without word positions (219 in the old edition, the Shamarly verses whose split is not reviewed) are shown line by line, and the bar says so. «حفظت» / «أخطأت» judges each verse.
+- Spaced review: grading a test (Again, Hard, Good, Easy; the choice is suggested from the verse results) schedules the unit with our own implementation of FSRS 4.5 (default weights, 90% retention, whole days). Units and verse strengths are kept in user.db (`srs_item`, `memorization`, schema step 4) with uuid, updated_at and deleted_at, and queue in the sync outbox.
+- Mutashabihat: a «متشابهات (n)» button in the test bar and in the verse services opens the similar verses, each shown as its own text, with the source's credit and no commentary. Links from Waqar144/Quran_Mutashabihat_Data (no licence file yet, MISSING_DATA.md إ17), in content.db `mutashabih` (schema 14).
+- Hifz map: the pages of the edition being read, or the 114 surahs, coloured by the weakest memorized verse in four strengths that also step in lightness, each with one to four bars and a spoken label; pinch or the zoom buttons to scale the cells; tap a cell to test it.
+
 ### Added (data review; nothing changes in the app)
 - A review tool (Flutter web, `apps/review/`): each imported passage beside its verses in the mushaf text; editors link, reviewers approve or return with a note, never their own work; an append-only log of every action. Works on a review file now; a Supabase schema with row-level security is ready for later.
 - al-Wahidi's «أسباب نزول القرآن» (OpenITI) imported as 534 drafts with suggested verse links, waiting for review. `tools/export_pack.py` builds packs from reviewed entries only.

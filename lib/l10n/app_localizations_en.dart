@@ -1145,128 +1145,166 @@ class AppLocalizationsEn extends AppLocalizations {
   String get journalEarlier => 'Your notes on this verse';
 
   @override
-  String get elderlyMode => 'Elderly mode';
+  String get hifzTitle => 'Memorization';
 
   @override
-  String get elderlyModeHint =>
-      'Larger text, larger buttons with their names, clearer colours, a home with only the essentials, the mushaf page as large as possible, and calmer transitions';
+  String get hifzTileNote => 'Review and recite';
 
   @override
-  String get searchModeWords => 'By words';
+  String get hifzToday => 'Today\'s review';
 
   @override
-  String get searchModeMeaning => 'By meaning';
+  String get hifzNothingDue => 'Nothing is due today.';
 
   @override
-  String get searchMeaningHint => 'Describe an idea in your own words';
+  String get hifzNothingDueHint =>
+      'Recite a page, a quarter or a surah and grade it; it then joins spaced review.';
 
   @override
-  String get searchMeaningIntro =>
-      'Describe an idea in your own words, in Arabic or English, such as “patience in hardship” or “kindness to parents”, and the verses whose meaning in al-Tafsir al-Muyassar and the translations is closest appear. Each verse is shown with its text, and the text that matched exactly as its source has it.';
+  String get hifzStartTest => 'Start a test';
 
   @override
-  String searchMatchedIn(String source) {
-    return 'Matched in: $source';
+  String get hifzMap => 'Hifz map';
+
+  @override
+  String get hifzMapHint =>
+      'Each page is coloured by how firmly it is memorized, with a mark that reads without colour.';
+
+  @override
+  String get hifzAllUnits => 'All review units';
+
+  @override
+  String get hifzDueToday => 'Due today';
+
+  @override
+  String hifzDueOn(String date) {
+    return 'Due $date';
   }
 
   @override
-  String searchMeaningCount(String count) {
-    return '$count verses';
+  String hifzQuarter(String number) {
+    return 'Quarter $number';
   }
 
   @override
-  String get semanticPackName => 'Search-by-meaning pack';
+  String get hifzUnitPage => 'Page';
 
   @override
-  String semanticPackOffer(String size) {
-    return 'This searches the words of the meaning texts for now. Download the search-by-meaning pack (about $size MB) to find verses by their meaning even in other words, offline.';
+  String get hifzUnitQuarter => 'Quarter';
+
+  @override
+  String get hifzUnitSurah => 'Surah';
+
+  @override
+  String get hifzChooseUnit => 'What will you recite?';
+
+  @override
+  String hifzNumberRange(String max) {
+    return 'Number, 1 to $max';
   }
 
   @override
-  String get semanticPackDownload => 'Download the pack';
+  String get hifzBegin => 'Begin';
 
   @override
-  String semanticPackDownloading(String percent) {
-    return 'Downloading: $percent%';
+  String get hifzRemove => 'Remove from review';
+
+  @override
+  String get revealNextWord => 'Next word';
+
+  @override
+  String get revealNextVerse => 'Next verse';
+
+  @override
+  String get revealAll => 'All';
+
+  @override
+  String get endRecite => 'End the test';
+
+  @override
+  String get verseRemembered => 'Remembered';
+
+  @override
+  String get verseMissed => 'Missed';
+
+  @override
+  String testCounts(String remembered, String missed) {
+    return 'Remembered $remembered · Missed $missed';
   }
 
   @override
-  String get semanticPackVerifying => 'Checking and installing the pack…';
+  String get revealByLine =>
+      'This edition has no word positions for this verse, so it is revealed line by line.';
 
   @override
-  String get semanticPackFailed => 'The download failed. Please try again.';
+  String get gradeUnit => 'Grade';
 
   @override
-  String get semanticPackLoading => 'Preparing search by meaning…';
+  String get gradeTitle => 'How did it go?';
 
   @override
-  String get semanticPackError =>
-      'The search-by-meaning pack could not be opened; searching by words instead.';
+  String get gradeSuggested => 'Suggested from the verse results';
 
   @override
-  String get semanticResultsNote =>
-      'Approximate results, closest meaning first. Read each verse in its place and in its tafsir.';
+  String get gradeAgain => 'Again';
 
   @override
-  String verseLabel(String surah, String ayah) {
-    return 'Surah $surah, verse $ayah';
+  String get gradeHard => 'Hard';
+
+  @override
+  String get gradeGood => 'Good';
+
+  @override
+  String get gradeEasy => 'Easy';
+
+  @override
+  String gradeSaved(String date) {
+    return 'Next review: $date';
   }
 
   @override
-  String pageLabelFull(String page, String surah) {
-    return 'Page $page, $surah';
+  String get similarVerses => 'Similar verses';
+
+  @override
+  String similarCount(String count) {
+    return 'Similar ($count)';
   }
 
   @override
-  String get markThisVerse => 'Set or remove the reading mark at this verse';
+  String get similarThisVerse => 'This verse';
 
   @override
-  String loadingPage(String page) {
-    return 'Loading page $page';
-  }
+  String get similarFollowing => 'and the verse after it';
 
   @override
-  String get clearSearch => 'Clear the search';
+  String get strengthNone => 'Not memorized';
 
   @override
-  String get previousPageNumber => 'Previous page';
+  String get strengthWeak => 'Weak';
 
   @override
-  String get nextPageNumber => 'Next page';
+  String get strengthFair => 'Fair';
 
   @override
-  String get showMenus => 'Show the menus';
+  String get strengthGood => 'Good';
 
   @override
-  String get hideMenus => 'Hide the menus';
+  String get strengthStrong => 'Strong';
 
   @override
-  String downloadSurah(String surah) {
-    return 'Download surah $surah';
-  }
+  String get mapPages => 'Pages';
 
   @override
-  String retryDownloadSurah(String surah) {
-    return 'Retry downloading surah $surah';
-  }
+  String get mapSurahs => 'Surahs';
 
   @override
-  String deleteSurahDownload(String surah) {
-    return 'Surah $surah is downloaded. Delete it';
-  }
+  String get mapZoomIn => 'Zoom in';
 
   @override
-  String downloadingSurah(String surah) {
-    return 'Downloading surah $surah';
-  }
+  String get mapZoomOut => 'Zoom out';
 
   @override
-  String verseCounter(String current, String total) {
-    return 'Verse $current of $total';
-  }
-
-  @override
-  String downloadPercentSpoken(String percent) {
-    return '$percent% downloaded';
+  String mapCell(String name, String strength) {
+    return '$name: $strength';
   }
 }

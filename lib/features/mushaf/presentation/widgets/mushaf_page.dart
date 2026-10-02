@@ -808,6 +808,23 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                             for (final v in verses) {
                               if (!hidden.contains(v.key)) continue;
                               final words = x.hiddenWords[v.key];
+                              final shown =
+                                  x.revealedWords[v.key] ?? const <Rect>[];
+                              if (shown.isNotEmpty &&
+                                  words != null &&
+                                  words.isNotEmpty &&
+                                  widget.page <= 2) {
+                                // A test on an opening page (no line grid):
+                                // the words still covered, line by line.
+                                for (final r in openingCovers(v.rects, words)) {
+                                  also(
+                                    coverItems,
+                                    layout._lineOf(r.center.dy),
+                                    (c) => c.drawRect(r, cover),
+                                  );
+                                }
+                                continue;
+                              }
                               if (words == null ||
                                   words.isEmpty ||
                                   widget.page <= 2) {
@@ -831,9 +848,20 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 final left = xs
                                     .where((m) => m < b.left)
                                     .fold(viewBox.left, math.max);
-                                final right = xs
-                                    .where((m) => m > b.right)
-                                    .fold(viewBox.right, math.min);
+                                // In a word-by-word test, the words already
+                                // shown on this line stay: the cover stops
+                                // at them (right to left).
+                                final right =
+                                    [
+                                      for (final r in shown)
+                                        if (layout._lineOf(r.center.dy) == j)
+                                          r.left - 0.5,
+                                    ].fold(
+                                      xs
+                                          .where((m) => m > b.right)
+                                          .fold(viewBox.right, math.min),
+                                      math.min,
+                                    );
                                 final rect = Rect.fromLTRB(
                                   left,
                                   layout._bandTop(j),
@@ -1030,6 +1058,45 @@ Path parseOutline(String d) {
     }
   }
   return path;
+}
+
+/// Recitation covers on the opening pages (1 and 2), which have no line
+/// grid: [words] (page units) grouped into lines by their centres, each
+/// group covered across its span, as tall as the verse's own line box
+/// ([lineRects]) when one holds it, else as the words plus a margin.
+List<Rect> openingCovers(List<Rect> lineRects, List<Rect> words) {
+  if (words.isEmpty) return const [];
+  final sorted = [...words]..sort((a, b) => a.center.dy.compareTo(b.center.dy));
+  final heights = [for (final w in sorted) w.height]..sort();
+  final gap = heights[heights.length ~/ 2] * 0.5;
+  final groups = <Rect>[];
+  for (final w in sorted) {
+    if (groups.isNotEmpty &&
+        (w.center.dy - groups.last.center.dy).abs() < gap) {
+      groups.last = groups.last.expandToInclude(w);
+    } else {
+      groups.add(w);
+    }
+  }
+  return [
+    for (final g in groups)
+      () {
+        final line = lineRects
+            .where(
+              (r) =>
+                  r.top <= g.center.dy &&
+                  g.center.dy <= r.bottom &&
+                  r.height < g.height * 2.2,
+            )
+            .firstOrNull;
+        return Rect.fromLTRB(
+          g.left - 1.5,
+          line == null ? g.top - 2 : line.top - 1,
+          g.right + 1.5,
+          line == null ? g.bottom + 2 : line.bottom + 1,
+        );
+      }(),
+  ];
 }
 
 /// Bounds of each sub-path of a verse outline, in reading order.

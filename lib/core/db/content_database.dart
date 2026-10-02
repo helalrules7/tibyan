@@ -552,6 +552,28 @@ class Gharib extends Table {
   bool get withoutRowId => true;
 }
 
+/// Similar verses (mutashabihat): a passage and one passage that resembles
+/// it, as ranges of verse ids (`ayah.id`). Links only, from
+/// tools/build_mutashabih.py; the verses' text comes from [Ayah].
+@DataClassName('MutashabihRow')
+class Mutashabih extends Table {
+  @override
+  String get tableName => 'mutashabih';
+
+  IntColumn get id => integer()();
+  IntColumn get srcFrom => integer()();
+  IntColumn get srcTo => integer()();
+  IntColumn get mutFrom => integer()();
+  IntColumn get mutTo => integer()();
+
+  /// 1 when the start of the following verse tells the passages apart.
+  IntColumn get context => integer()();
+  IntColumn get sourceId => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     Surah,
@@ -578,6 +600,7 @@ class Gharib extends Table {
     ShamarlyCatchword,
     WordRoot,
     Gharib,
+    Mutashabih,
   ],
 )
 class ContentDatabase extends _$ContentDatabase {
@@ -585,7 +608,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override
