@@ -6,6 +6,10 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (data review; nothing changes in the app)
+- A review tool (Flutter web, `apps/review/`): each imported passage beside its verses in the mushaf text; editors link, reviewers approve or return with a note, never their own work; an append-only log of every action. Works on a review file now; a Supabase schema with row-level security is ready for later.
+- al-Wahidi's «أسباب نزول القرآن» (OpenITI) imported as 534 drafts with suggested verse links, waiting for review. `tools/export_pack.py` builds packs from reviewed entries only.
+
 ### Added (themes)
 - Eight heritage themes beside Zakhrafa (still the default): Seljuk, Umayyad, Timurid, Hijazi, Fatimid, Andalusi, Mamluk and Abbasid. Each draws its frame, surah header and verse marker from quran-assets as they are, recoloured per mode (light, bright white, night, black), in all three editions and on the opening pages. The juz, hizb and surah sit above the frame, the page number inside the theme's marker below it.
 - A theme picker in «شكل المصحف» and on the first-launch style screen, and a verse-marker shape «حسب الثيم» (the default in the new themes).
