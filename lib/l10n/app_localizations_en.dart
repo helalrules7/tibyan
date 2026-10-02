@@ -1145,6 +1145,132 @@ class AppLocalizationsEn extends AppLocalizations {
   String get journalEarlier => 'Your notes on this verse';
 
   @override
+  String get elderlyMode => 'Elderly mode';
+
+  @override
+  String get elderlyModeHint =>
+      'Larger text, larger buttons with their names, clearer colours, a home with only the essentials, the mushaf page as large as possible, and calmer transitions';
+
+  @override
+  String get searchModeWords => 'By words';
+
+  @override
+  String get searchModeMeaning => 'By meaning';
+
+  @override
+  String get searchMeaningHint => 'Describe an idea in your own words';
+
+  @override
+  String get searchMeaningIntro =>
+      'Describe an idea in your own words, in Arabic or English, such as “patience in hardship” or “kindness to parents”, and the verses whose meaning in al-Tafsir al-Muyassar and the translations is closest appear. Each verse is shown with its text, and the text that matched exactly as its source has it.';
+
+  @override
+  String searchMatchedIn(String source) {
+    return 'Matched in: $source';
+  }
+
+  @override
+  String searchMeaningCount(String count) {
+    return '$count verses';
+  }
+
+  @override
+  String get semanticPackName => 'Search-by-meaning pack';
+
+  @override
+  String semanticPackOffer(String size) {
+    return 'This searches the words of the meaning texts for now. Download the search-by-meaning pack (about $size MB) to find verses by their meaning even in other words, offline.';
+  }
+
+  @override
+  String get semanticPackDownload => 'Download the pack';
+
+  @override
+  String semanticPackDownloading(String percent) {
+    return 'Downloading: $percent%';
+  }
+
+  @override
+  String get semanticPackVerifying => 'Checking and installing the pack…';
+
+  @override
+  String get semanticPackFailed => 'The download failed. Please try again.';
+
+  @override
+  String get semanticPackLoading => 'Preparing search by meaning…';
+
+  @override
+  String get semanticPackError =>
+      'The search-by-meaning pack could not be opened; searching by words instead.';
+
+  @override
+  String get semanticResultsNote =>
+      'Approximate results, closest meaning first. Read each verse in its place and in its tafsir.';
+
+  @override
+  String verseLabel(String surah, String ayah) {
+    return 'Surah $surah, verse $ayah';
+  }
+
+  @override
+  String pageLabelFull(String page, String surah) {
+    return 'Page $page, $surah';
+  }
+
+  @override
+  String get markThisVerse => 'Set or remove the reading mark at this verse';
+
+  @override
+  String loadingPage(String page) {
+    return 'Loading page $page';
+  }
+
+  @override
+  String get clearSearch => 'Clear the search';
+
+  @override
+  String get previousPageNumber => 'Previous page';
+
+  @override
+  String get nextPageNumber => 'Next page';
+
+  @override
+  String get showMenus => 'Show the menus';
+
+  @override
+  String get hideMenus => 'Hide the menus';
+
+  @override
+  String downloadSurah(String surah) {
+    return 'Download surah $surah';
+  }
+
+  @override
+  String retryDownloadSurah(String surah) {
+    return 'Retry downloading surah $surah';
+  }
+
+  @override
+  String deleteSurahDownload(String surah) {
+    return 'Surah $surah is downloaded. Delete it';
+  }
+
+  @override
+  String downloadingSurah(String surah) {
+    return 'Downloading surah $surah';
+  }
+
+  @override
+  String verseCounter(String current, String total) {
+    return 'Verse $current of $total';
+  }
+
+  @override
+  String downloadPercentSpoken(String percent) {
+    return '$percent% downloaded';
+  }
+
+  @override
   String get hifzTitle => 'Memorization';
 
   @override

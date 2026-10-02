@@ -2042,6 +2042,198 @@ abstract class AppLocalizations {
   /// **'ملاحظاتك على هذه الآية'**
   String get journalEarlier;
 
+  /// No description provided for @elderlyMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع كبار السن'**
+  String get elderlyMode;
+
+  /// No description provided for @elderlyModeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'خط أكبر، وأزرار أكبر بأسمائها، وألوان أوضح، وصفحة رئيسية فيها المهم فقط، وصفحة المصحف بأكبر حجم، وانتقالات أهدأ'**
+  String get elderlyModeHint;
+
+  /// No description provided for @searchModeWords.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالكلمات'**
+  String get searchModeWords;
+
+  /// No description provided for @searchModeMeaning.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالمعنى'**
+  String get searchModeMeaning;
+
+  /// No description provided for @searchMeaningHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب فكرة أو سؤالا بكلماتك'**
+  String get searchMeaningHint;
+
+  /// No description provided for @searchMeaningIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب فكرة بكلماتك، بالعربية أو بالإنجليزية، مثل «الصبر على البلاء» أو «بر الوالدين»، فتظهر الآيات التي يتناولها معناها في التفسير الميسر والترجمتين. تظهر كل آية بنصها، ومعها النص الذي طابق كما هو من مصدره.'**
+  String get searchMeaningIntro;
+
+  /// No description provided for @searchMatchedIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'طابق في: {source}'**
+  String searchMatchedIn(String source);
+
+  /// No description provided for @searchMeaningCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} آية'**
+  String searchMeaningCount(String count);
+
+  /// No description provided for @semanticPackName.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزمة البحث بالمعنى'**
+  String get semanticPackName;
+
+  /// No description provided for @semanticPackOffer.
+  ///
+  /// In ar, this message translates to:
+  /// **'البحث الآن بالكلمات داخل نصوص المعاني. نزّل حزمة البحث بالمعنى (نحو {size} ميجا) ليجد البحث الآيات بمعناها وإن اختلفت الكلمات، دون اتصال.'**
+  String semanticPackOffer(String size);
+
+  /// No description provided for @semanticPackDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل الحزمة'**
+  String get semanticPackDownload;
+
+  /// No description provided for @semanticPackDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُنزَّل: {percent}٪'**
+  String semanticPackDownloading(String percent);
+
+  /// No description provided for @semanticPackVerifying.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُتحقَّق من الحزمة ويُثبَّت…'**
+  String get semanticPackVerifying;
+
+  /// No description provided for @semanticPackFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر التنزيل. حاول مرة أخرى.'**
+  String get semanticPackFailed;
+
+  /// No description provided for @semanticPackLoading.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُجهَّز البحث بالمعنى…'**
+  String get semanticPackLoading;
+
+  /// No description provided for @semanticPackError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر فتح حزمة البحث بالمعنى، فالبحث الآن بالكلمات.'**
+  String get semanticPackError;
+
+  /// No description provided for @semanticResultsNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'نتائج تقريبية مرتبة بقرب المعنى. راجع الآية في موضعها وفي تفسيرها.'**
+  String get semanticResultsNote;
+
+  /// No description provided for @verseLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {surah}، الآية {ayah}'**
+  String verseLabel(String surah, String ayah);
+
+  /// No description provided for @pageLabelFull.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة {page}، {surah}'**
+  String pageLabelFull(String page, String surah);
+
+  /// No description provided for @markThisVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضع علامة القراءة عند هذه الآية أو أزلها'**
+  String get markThisVerse;
+
+  /// No description provided for @loadingPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُحمَّل الصفحة {page}'**
+  String loadingPage(String page);
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح البحث'**
+  String get clearSearch;
+
+  /// No description provided for @previousPageNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة السابقة'**
+  String get previousPageNumber;
+
+  /// No description provided for @nextPageNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة التالية'**
+  String get nextPageNumber;
+
+  /// No description provided for @showMenus.
+  ///
+  /// In ar, this message translates to:
+  /// **'إظهار القوائم'**
+  String get showMenus;
+
+  /// No description provided for @hideMenus.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء القوائم'**
+  String get hideMenus;
+
+  /// No description provided for @downloadSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل سورة {surah}'**
+  String downloadSurah(String surah);
+
+  /// No description provided for @retryDownloadSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعد تنزيل سورة {surah}'**
+  String retryDownloadSurah(String surah);
+
+  /// No description provided for @deleteSurahDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {surah} منزّلة. احذفها'**
+  String deleteSurahDownload(String surah);
+
+  /// No description provided for @downloadingSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُنزَّل سورة {surah}'**
+  String downloadingSurah(String surah);
+
+  /// No description provided for @verseCounter.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {current} من {total}'**
+  String verseCounter(String current, String total);
+
+  /// No description provided for @downloadPercentSpoken.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمل {percent}٪ من التحميل'**
+  String downloadPercentSpoken(String percent);
+
   /// No description provided for @hifzTitle.
   ///
   /// In ar, this message translates to:
