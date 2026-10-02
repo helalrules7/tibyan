@@ -306,9 +306,12 @@ def align(segments, counts, expected=None):
     return groups
 
 
-def build(pages=range(1, 605)):
-    """Returns {(surah, ayah): (exact, [(word_no, page, x0, y0, x1, y1)])}.
-    Word numbers count words only (۞ is skipped), from 1."""
+def layouts(pages=range(1, 605)):
+    """Yields, per verse, how its contours split into its words:
+    (verse, tokens, segs, groups, exact, owner). segs are the verse's line
+    segments [(page, line, pieces, contours)]; groups[word index] is
+    (segment, first piece, last piece); owner maps id(bbox) of every
+    contour to its word index (tokens include ۞)."""
     text = load_text()
     font_widths = json.loads(FONT_WIDTHS.read_text(encoding='utf-8'))
     by_verse = {}
@@ -316,7 +319,6 @@ def build(pages=range(1, 605)):
         for page in pages:
             for verse, li, pieces, cs in page_segments(z.read(f'svg/{page:03d}.svg').decode()):
                 by_verse.setdefault(verse, []).append((page, li, pieces, cs))
-    result = {}
     for verse, segs in by_verse.items():
         segs.sort(key=lambda s: (s[0], s[1]))
         tokens = text[verse]
@@ -337,16 +339,28 @@ def build(pages=range(1, 605)):
                 for bbox in piece[2]:
                     owner[id(bbox)] = wi
                     by_page.setdefault(segs[si][0], []).append((bbox, wi))
+        for page, _, _, cs in segs:
+            for bbox, _ in cs:
+                if id(bbox) in owner:
+                    continue
+
+                def dist(pb):
+                    dx = max(pb[0] - bbox[2], bbox[0] - pb[2], 0)
+                    dy = max(pb[1] - bbox[3], bbox[1] - pb[3], 0)
+                    return (MARK_H_WEIGHT * dx) ** 2 + dy * dy
+                owner[id(bbox)] = min(by_page[page], key=lambda c: dist(c[0]))[1]
+        yield verse, tokens, segs, groups, exact, owner
+
+
+def build(pages=range(1, 605)):
+    """Returns {(surah, ayah): (exact, [(word_no, page, x0, y0, x1, y1)])}.
+    Word numbers count words only (۞ is skipped), from 1."""
+    result = {}
+    for verse, tokens, segs, _, exact, owner in layouts(pages):
         boxes = [None] * len(tokens)
         for page, _, _, cs in segs:
             for bbox, _ in cs:
-                wi = owner.get(id(bbox))
-                if wi is None:
-                    def dist(pb):
-                        dx = max(pb[0] - bbox[2], bbox[0] - pb[2], 0)
-                        dy = max(pb[1] - bbox[3], bbox[1] - pb[3], 0)
-                        return (MARK_H_WEIGHT * dx) ** 2 + dy * dy
-                    wi = min(by_page[page], key=lambda c: dist(c[0]))[1]
+                wi = owner[id(bbox)]
                 cur = boxes[wi]
                 boxes[wi] = (page, *bbox) if cur is None else (
                     page, min(cur[1], bbox[0]), min(cur[2], bbox[1]),

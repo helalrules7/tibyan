@@ -172,6 +172,33 @@
       "sha256": "20e8163fba25d2af8591974b8a8695e6d823af44da3acc11f82631183ce5d254",
       "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Edition: tahqiq Isam al-Humaydan, Dar al-Islah, 2nd ed. 1412/1992; the editor's rights are not covered. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/openiti-wahidi-asbab/",
       "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "cpfair-quran-tajweed-496f71c",
+      "file": "cpfair_tajweed.hafs.uthmani-pause-sajdah.json",
+      "url": "https://raw.githubusercontent.com/cpfair/quran-tajweed/496f71cd191da00fa2a37ded79dbbddb033bb0ad/output/tajweed.hafs.uthmani-pause-sajdah.json",
+      "method": "GET",
+      "sha256": "151d616ad37a4cc21a80f20d5e1104c5b408375107ddd4d71247dea4c05ebf67",
+      "license": "CC BY 4.0 (data file), Collin Fair. Machine-generated (decision trees), unmaintained since 2021; needs a qualified reviewer before it is presented as reviewed. Mirrored on Tibyan's server (mirror/sources/cpfair-quran-tajweed/)",
+      "evidence": "docs/licenses/2026-09-28_cpfair_quran-tajweed.pdf; README at the same commit (tools/.cache/cpfair_quran-tajweed_README.md)"
+    },
+    {
+      "id": "cpfair-quran-tajweed-readme-496f71c",
+      "file": "cpfair_quran-tajweed_README.md",
+      "url": "https://raw.githubusercontent.com/cpfair/quran-tajweed/496f71cd191da00fa2a37ded79dbbddb033bb0ad/README.md",
+      "method": "GET",
+      "sha256": "89373f92f0806541aca3c144f2c4469fcc304f904d0ff58271b4a318244e7e8e",
+      "license": "States the data license (CC BY 4.0) and the Tanzil text the offsets refer to",
+      "evidence": "docs/licenses/2026-09-28_cpfair_quran-tajweed.pdf"
+    },
+    {
+      "id": "tanzil-uthmani-2017-cpfair",
+      "file": "quran-uthmani-2017-cpfair.txt",
+      "url": "https://github.com/cpfair/quran-tajweed/files/7281388/quran-uthmani.txt",
+      "method": "GET",
+      "sha256": "abe6447a5d29bb126383ba9120628060cf96dc9ef5b402a506fc251f6ed0b9a2",
+      "license": "CC BY 3.0, verbatim copies only (Tanzil). The Tanzil Uthmani text of about April 2017 that the cpfair tajweed offsets count in; used only to place those offsets, never shown",
+      "evidence": "docs/licenses/2026-09-28_tanzil_text_license.pdf"
     }
   ]
 }
