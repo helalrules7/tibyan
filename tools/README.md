@@ -16,6 +16,11 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `verify_text/compare_tanzil_kfgqpc.py` | Lists verses whose base letters differ between Tanzil and the KFGQPC text. Every listed verse goes to a human reviewer |
 | `import_wahidi_asbab.py` | Splits al-Wahidi's «أسباب نزول القرآن» (OpenITI) by the book's own sections and passage headers into a review database of drafts, with suggested verse links and their confidence. Proves the split kept every word |
 | `review_db.py`, `review_schema.sql` | The review database: schema (append-only audit log, frozen text, reviewer ≠ editor) and the content hash shared with the review tool |
+| `riwayat.py` | Readers for the riwaya sources (quran-ws pages and outlines, KFGQPC riwaya texts and fonts, Quranpedia), and the riwaya → Hafs verse map worked out by aligning the base letters of the KFGQPC riwaya and Hafs texts (letters compared, never changed) |
+| `verify_riwayat.py` | Cross-checks the riwaya sources (verse counts per surah, start pages, the map's coverage and order, the map against Quranpedia's `number_in_hafs`); `--report` writes `docs/verification/` |
+| `build_riwaya_packs.py` | Builds the Warsh, Qalun, al-Duri and Shu'bah page packs: the quran-ws SVG pages unchanged (xz each), `riwaya.json.xz` (verses, map, outlines, line cuts, measured grid) and the riwaya's KFGQPC font, into `out/pages-<riwaya>-v1.zip` |
+| `fetch_riwaya_timing.py` | Downloads mp3quran's verse timings of the riwaya recitations into `.cache/mp3quran_riwaya_timing.json` |
+| `riwaya_reciters.py` | The riwaya recitations, their timings and sources in `content.db` (called by `build_content_db.py`; also adds them to a built file) |
 | `export_pack.py` | Builds a data pack from a review database with reviewed entries only, after re-checking each one's hash and approval; writes the pack's index |
 
 Tests: `python3 -m unittest discover -s tools/tests`. The review workflow is in `docs/review/README.md`.
