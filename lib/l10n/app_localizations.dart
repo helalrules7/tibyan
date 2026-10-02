@@ -1609,6 +1609,120 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.'**
   String get themeArtCredit;
+
+  /// No description provided for @elderlyMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع كبار السن'**
+  String get elderlyMode;
+
+  /// No description provided for @elderlyModeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'خط أكبر، وأزرار أكبر بأسمائها، وألوان أوضح، وصفحة رئيسية فيها المهم فقط، وصفحة المصحف بأكبر حجم، وانتقالات أهدأ'**
+  String get elderlyModeHint;
+
+  /// No description provided for @searchModeWords.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالكلمات'**
+  String get searchModeWords;
+
+  /// No description provided for @searchModeMeaning.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالمعنى'**
+  String get searchModeMeaning;
+
+  /// No description provided for @searchMeaningHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب فكرة أو سؤالا بكلماتك'**
+  String get searchMeaningHint;
+
+  /// No description provided for @searchMeaningIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب فكرة بكلماتك، بالعربية أو بالإنجليزية، مثل «الصبر على البلاء» أو «بر الوالدين»، فتظهر الآيات التي يتناولها معناها في التفسير الميسر والترجمتين. تظهر كل آية بنصها، ومعها النص الذي طابق كما هو من مصدره.'**
+  String get searchMeaningIntro;
+
+  /// No description provided for @searchMatchedIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'طابق في: {source}'**
+  String searchMatchedIn(String source);
+
+  /// No description provided for @searchMeaningCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} آية'**
+  String searchMeaningCount(String count);
+
+  /// No description provided for @semanticPackName.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزمة البحث بالمعنى'**
+  String get semanticPackName;
+
+  /// No description provided for @semanticPackOffer.
+  ///
+  /// In ar, this message translates to:
+  /// **'البحث الآن بالكلمات داخل نصوص المعاني. نزّل حزمة البحث بالمعنى (نحو {size} ميجا) ليجد البحث الآيات بمعناها وإن اختلفت الكلمات، دون اتصال.'**
+  String semanticPackOffer(String size);
+
+  /// No description provided for @semanticPackDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل الحزمة'**
+  String get semanticPackDownload;
+
+  /// No description provided for @semanticPackDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُنزَّل: {percent}٪'**
+  String semanticPackDownloading(String percent);
+
+  /// No description provided for @semanticPackVerifying.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُتحقَّق من الحزمة ويُثبَّت…'**
+  String get semanticPackVerifying;
+
+  /// No description provided for @semanticPackFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر التنزيل. حاول مرة أخرى.'**
+  String get semanticPackFailed;
+
+  /// No description provided for @semanticPackLoading.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُجهَّز البحث بالمعنى…'**
+  String get semanticPackLoading;
+
+  /// No description provided for @semanticPackError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر فتح حزمة البحث بالمعنى، فالبحث الآن بالكلمات.'**
+  String get semanticPackError;
+
+  /// No description provided for @semanticResultsNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'نتائج تقريبية مرتبة بقرب المعنى. راجع الآية في موضعها وفي تفسيرها.'**
+  String get semanticResultsNote;
+
+  /// No description provided for @verseLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {surah}، الآية {ayah}'**
+  String verseLabel(String surah, String ayah);
+
+  /// No description provided for @pageLabelFull.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة {page}، {surah}'**
+  String pageLabelFull(String page, String surah);
 }
 
 class _AppLocalizationsDelegate

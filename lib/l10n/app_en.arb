@@ -514,5 +514,24 @@
       "total": { "type": "String" }
     }
   },
-  "themeArtCredit": "Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers."
+  "themeArtCredit": "Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers.",
+  "elderlyMode": "Elderly mode",
+  "elderlyModeHint": "Larger text, larger buttons with their names, clearer colours, a home with only the essentials, the mushaf page as large as possible, and calmer transitions",
+  "searchModeWords": "By words",
+  "searchModeMeaning": "By meaning",
+  "searchMeaningHint": "Describe an idea in your own words",
+  "searchMeaningIntro": "Describe an idea in your own words, in Arabic or English, such as “patience in hardship” or “kindness to parents”, and the verses whose meaning in al-Tafsir al-Muyassar and the translations is closest appear. Each verse is shown with its text, and the text that matched exactly as its source has it.",
+  "searchMatchedIn": "Matched in: {source}",
+  "searchMeaningCount": "{count} verses",
+  "semanticPackName": "Search-by-meaning pack",
+  "semanticPackOffer": "This searches the words of the meaning texts for now. Download the search-by-meaning pack (about {size} MB) to find verses by their meaning even in other words, offline.",
+  "semanticPackDownload": "Download the pack",
+  "semanticPackDownloading": "Downloading: {percent}%",
+  "semanticPackVerifying": "Checking and installing the pack…",
+  "semanticPackFailed": "The download failed. Please try again.",
+  "semanticPackLoading": "Preparing search by meaning…",
+  "semanticPackError": "The search-by-meaning pack could not be opened; searching by words instead.",
+  "semanticResultsNote": "Approximate results, closest meaning first. Read each verse in its place and in its tafsir.",
+  "verseLabel": "Surah {surah}, verse {ayah}",
+  "pageLabelFull": "Page {page}, {surah}"
 }

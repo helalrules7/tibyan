@@ -200,8 +200,10 @@ class IlluminatedFrame extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // A plain theme has no frame at all: a box above the page and a circle
-    // under it.
-    if (context.tokens.style.frame.outerStyle == 'plain') {
+    // under it. Elderly mode uses it in every theme, so the page is as
+    // large as the screen allows.
+    if (context.tokens.style.frame.outerStyle == 'plain' ||
+        context.tokens.elderly) {
       return PlainFrame(
         info: info,
         onJuzTap: onJuzTap,

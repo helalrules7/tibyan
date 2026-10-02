@@ -40,6 +40,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kVersePause = 'settings.versePause';
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
+  static const _kElderly = 'settings.elderlyMode';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -89,6 +90,7 @@ class SettingsController extends Notifier<AppSettings> {
       versePause: _prefs.getInt(_kVersePause) ?? 500,
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
+      elderlyMode: _prefs.getBool(_kElderly) ?? false,
     );
   }
 
@@ -218,6 +220,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setRepeatSilence(int seconds) async {
     state = state.copyWith(repeatSilence: seconds);
     await _prefs.setInt(_kRepeatSilence, seconds);
+  }
+
+  Future<void> setElderlyMode(bool value) async {
+    state = state.copyWith(elderlyMode: value);
+    await _prefs.setBool(_kElderly, value);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

@@ -885,4 +885,77 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get themeArtCredit =>
       'الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.';
+
+  @override
+  String get elderlyMode => 'وضع كبار السن';
+
+  @override
+  String get elderlyModeHint =>
+      'خط أكبر، وأزرار أكبر بأسمائها، وألوان أوضح، وصفحة رئيسية فيها المهم فقط، وصفحة المصحف بأكبر حجم، وانتقالات أهدأ';
+
+  @override
+  String get searchModeWords => 'بالكلمات';
+
+  @override
+  String get searchModeMeaning => 'بالمعنى';
+
+  @override
+  String get searchMeaningHint => 'اكتب فكرة أو سؤالا بكلماتك';
+
+  @override
+  String get searchMeaningIntro =>
+      'اكتب فكرة بكلماتك، بالعربية أو بالإنجليزية، مثل «الصبر على البلاء» أو «بر الوالدين»، فتظهر الآيات التي يتناولها معناها في التفسير الميسر والترجمتين. تظهر كل آية بنصها، ومعها النص الذي طابق كما هو من مصدره.';
+
+  @override
+  String searchMatchedIn(String source) {
+    return 'طابق في: $source';
+  }
+
+  @override
+  String searchMeaningCount(String count) {
+    return '$count آية';
+  }
+
+  @override
+  String get semanticPackName => 'حزمة البحث بالمعنى';
+
+  @override
+  String semanticPackOffer(String size) {
+    return 'البحث الآن بالكلمات داخل نصوص المعاني. نزّل حزمة البحث بالمعنى (نحو $size ميجا) ليجد البحث الآيات بمعناها وإن اختلفت الكلمات، دون اتصال.';
+  }
+
+  @override
+  String get semanticPackDownload => 'تنزيل الحزمة';
+
+  @override
+  String semanticPackDownloading(String percent) {
+    return 'يُنزَّل: $percent٪';
+  }
+
+  @override
+  String get semanticPackVerifying => 'يُتحقَّق من الحزمة ويُثبَّت…';
+
+  @override
+  String get semanticPackFailed => 'تعذّر التنزيل. حاول مرة أخرى.';
+
+  @override
+  String get semanticPackLoading => 'يُجهَّز البحث بالمعنى…';
+
+  @override
+  String get semanticPackError =>
+      'تعذّر فتح حزمة البحث بالمعنى، فالبحث الآن بالكلمات.';
+
+  @override
+  String get semanticResultsNote =>
+      'نتائج تقريبية مرتبة بقرب المعنى. راجع الآية في موضعها وفي تفسيرها.';
+
+  @override
+  String verseLabel(String surah, String ayah) {
+    return 'سورة $surah، الآية $ayah';
+  }
+
+  @override
+  String pageLabelFull(String page, String surah) {
+    return 'الصفحة $page، $surah';
+  }
 }

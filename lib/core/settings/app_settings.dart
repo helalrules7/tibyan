@@ -61,6 +61,7 @@ class AppSettings {
     this.versePause = 500,
     this.repeat = 1,
     this.repeatSilence = 0,
+    this.elderlyMode = false,
   });
 
   final String styleId;
@@ -117,6 +118,11 @@ class AppSettings {
   /// Seconds of silence between repetitions, to repeat after the reciter.
   final int repeatSilence;
 
+  /// «وضع كبار السن»: larger text and touch targets, stronger contrast, a
+  /// home with only the main tasks, the page as large as it can be, and
+  /// slower transitions.
+  final bool elderlyMode;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -139,6 +145,7 @@ class AppSettings {
     int? versePause,
     int? repeat,
     int? repeatSilence,
+    bool? elderlyMode,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -161,6 +168,7 @@ class AppSettings {
     versePause: versePause ?? this.versePause,
     repeat: repeat ?? this.repeat,
     repeatSilence: repeatSilence ?? this.repeatSilence,
+    elderlyMode: elderlyMode ?? this.elderlyMode,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

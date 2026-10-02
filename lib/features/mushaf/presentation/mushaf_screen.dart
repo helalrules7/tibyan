@@ -318,19 +318,23 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             ? (point, verse) => _pickAt(pg, point, verse)
             : null,
       );
-      final tools = _ReadingTools(
-        touchReading: _touchReading,
-        recite: _recite,
-        onTouchReading: _toggleTouchReading,
-        listening: recitation.active,
-        onListen: _listenFromPage,
-        onRecite: () => _recite
-            ? setState(() {
-                _recite = false;
-                _revealed.clear();
-              })
-            : _startRecite(),
-      );
+      // Elderly mode: no small icon-only tools on the page; the same tools
+      // are labelled buttons in the bottom bar.
+      final tools = context.tokens.elderly
+          ? null
+          : _ReadingTools(
+              touchReading: _touchReading,
+              recite: _recite,
+              onTouchReading: _toggleTouchReading,
+              listening: recitation.active,
+              onListen: _listenFromPage,
+              onRecite: () => _recite
+                  ? setState(() {
+                      _recite = false;
+                      _revealed.clear();
+                    })
+                  : _startRecite(),
+            );
       final pageWidget = switch (edition) {
         MushafEdition.madina1441 => MushafPage(
           page: pg,
@@ -497,6 +501,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 onListen: _listenFromPage,
                 onGoTo: _goToPage,
                 onAutoScroll: _startAutoScroll,
+                touchReading: _touchReading,
+                onTouchReading: _toggleTouchReading,
               ),
             ),
           ],
@@ -692,7 +698,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (!mounted || page == _page) return;
     _controller?.animateToPage(
       page - _first,
-      duration: const Duration(milliseconds: 350),
+      // Elderly mode: a slower turn that is easy to follow.
+      duration: Duration(milliseconds: context.tokens.elderly ? 700 : 350),
       curve: Curves.easeInOut,
     );
   }
@@ -991,8 +998,12 @@ class _BottomControls extends StatelessWidget {
     required this.onListen,
     required this.onGoTo,
     required this.onAutoScroll,
+    required this.touchReading,
+    required this.onTouchReading,
   });
 
+  final bool touchReading;
+  final VoidCallback onTouchReading;
   final int page;
   final int pageCount;
   final String label;
@@ -1017,33 +1028,76 @@ class _BottomControls extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  IconButton.filledTonal(
-                    tooltip: l.reciteMode,
-                    onPressed: onRecite,
-                    icon: const Icon(Icons.visibility_outlined),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.filledTonal(
-                    tooltip: l.listen,
-                    onPressed: onListen,
-                    icon: const Icon(Icons.headphones_outlined),
-                  ),
-                  const Spacer(),
-                  FilledButton.tonalIcon(
-                    onPressed: onGoTo,
-                    icon: const Icon(Icons.menu_book_outlined, size: 18),
-                    label: Text(l.goToPage),
-                  ),
-                  const Spacer(),
-                  IconButton.filledTonal(
-                    tooltip: l.autoScroll,
-                    onPressed: onAutoScroll,
-                    icon: const Icon(Icons.keyboard_double_arrow_down),
-                  ),
-                ],
-              ),
+              if (context.tokens.elderly)
+                // Elderly mode: every tool with its name, large enough to
+                // press easily.
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    FilledButton.tonalIcon(
+                      onPressed: onListen,
+                      icon: const Icon(Icons.headphones_outlined),
+                      label: Text(l.listen),
+                    ),
+                    FilledButton.tonalIcon(
+                      onPressed: onGoTo,
+                      icon: const Icon(Icons.menu_book_outlined),
+                      label: Text(l.goToPage),
+                    ),
+                    FilledButton.tonalIcon(
+                      onPressed: onRecite,
+                      icon: const Icon(Icons.visibility_outlined),
+                      label: Text(l.reciteMode),
+                    ),
+                    Semantics(
+                      toggled: touchReading,
+                      child: FilledButton.tonalIcon(
+                        onPressed: onTouchReading,
+                        icon: Icon(
+                          touchReading
+                              ? Icons.touch_app
+                              : Icons.touch_app_outlined,
+                        ),
+                        label: Text(l.touchReading),
+                      ),
+                    ),
+                    FilledButton.tonalIcon(
+                      onPressed: onAutoScroll,
+                      icon: const Icon(Icons.keyboard_double_arrow_down),
+                      label: Text(l.autoScroll),
+                    ),
+                  ],
+                )
+              else
+                Row(
+                  children: [
+                    IconButton.filledTonal(
+                      tooltip: l.reciteMode,
+                      onPressed: onRecite,
+                      icon: const Icon(Icons.visibility_outlined),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton.filledTonal(
+                      tooltip: l.listen,
+                      onPressed: onListen,
+                      icon: const Icon(Icons.headphones_outlined),
+                    ),
+                    const Spacer(),
+                    FilledButton.tonalIcon(
+                      onPressed: onGoTo,
+                      icon: const Icon(Icons.menu_book_outlined, size: 18),
+                      label: Text(l.goToPage),
+                    ),
+                    const Spacer(),
+                    IconButton.filledTonal(
+                      tooltip: l.autoScroll,
+                      onPressed: onAutoScroll,
+                      icon: const Icon(Icons.keyboard_double_arrow_down),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 6),
               Container(
                 padding: const EdgeInsets.symmetric(
