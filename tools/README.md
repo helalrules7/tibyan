@@ -14,6 +14,11 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `build_word_study.py` | Roots and lemmas (Quranic Arabic Corpus 0.4) and the book's entries, mapped to our word numbers for `content.db` (`word_root`, `gharib`); prints the coverage |
 | `build_themes.py` | Copies the eight heritage themes' frame, header and marker SVGs unchanged from a quran-assets checkout into `assets/themes/`, and writes each theme's JSON (interface colours checked against the contrast rules, art class colours per mode) |
 | `verify_text/compare_tanzil_kfgqpc.py` | Lists verses whose base letters differ between Tanzil and the KFGQPC text. Every listed verse goes to a human reviewer |
+| `import_wahidi_asbab.py` | Splits al-Wahidi's «أسباب نزول القرآن» (OpenITI) by the book's own sections and passage headers into a review database of drafts, with suggested verse links and their confidence. Proves the split kept every word |
+| `review_db.py`, `review_schema.sql` | The review database: schema (append-only audit log, frozen text, reviewer ≠ editor) and the content hash shared with the review tool |
+| `export_pack.py` | Builds a data pack from a review database with reviewed entries only, after re-checking each one's hash and approval; writes the pack's index |
+
+Tests: `python3 -m unittest discover -s tools/tests`. The review workflow is in `docs/review/README.md`.
 
 Rules:
 - Raw files stay in `.cache/` (git-ignored) and are rebuilt from `sources.json`.
