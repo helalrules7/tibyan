@@ -26,6 +26,7 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
                                           build_word_study.py)
   tools/.cache/nuqayah_almuyassar_gharib.json  al-Muyassar fi Gharib al-Quran, Nuqayah
                                           (fetch_gharib.py, build_word_study.py)
+  tools/.cache/waqar144_mutashabiha_data.json  mutashabihat links (build_mutashabih.py)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -43,6 +44,7 @@ from datetime import date
 from pathlib import Path
 
 import build_line_cuts
+import build_mutashabih
 import build_word_boxes
 import build_word_study
 
@@ -50,7 +52,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 13
+SCHEMA_VERSION = 14
 SHAMARLY = CACHE / 'shamarly_geometry.db'
 SHAMARLY_CATCHWORD = CACHE / 'shamarly_catchword.json'
 
@@ -644,6 +646,7 @@ def main():
                            [('madina1405', page, j, y) for j, y in enumerate(cuts)])
             db.executemany('INSERT INTO line_overflow_1405 VALUES (?,?,?,?,?,?)',
                            [(page, k, *b) for k, b in overflow])
+    build_mutashabih.add(db)
     db.execute('CREATE INDEX line_overflow_page ON line_overflow(page)')
     db.execute('CREATE INDEX ayah_page ON ayah(page)')
     db.execute('CREATE INDEX word_box_page ON word_box(page)')
@@ -675,6 +678,7 @@ def main():
     ends = [r[0] for r in check.execute('SELECT page_shamarly_end FROM ayah ORDER BY id')]
     assert ends == sorted(ends)
     assert check.execute('SELECT COUNT(*) FROM shamarly_marker').fetchone()[0] == 6236
+    assert check.execute('SELECT COUNT(*) FROM mutashabih').fetchone()[0] > 0
     # Word study: the corpus maps every verse but 7; 20 more are only
     # disjoined letters (الٓمٓ...), which have no root or lemma. al-Rahman is ر ح م.
     assert len(skipped) == 7, skipped
