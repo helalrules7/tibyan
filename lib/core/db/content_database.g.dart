@@ -5126,6 +5126,16 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _riwayaMeta = const VerificationMeta('riwaya');
+  @override
+  late final GeneratedColumn<String> riwaya = GeneratedColumn<String>(
+    'riwaya',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('hafs'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5134,6 +5144,7 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
     style,
     folderUrl,
     sourceId,
+    riwaya,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5190,6 +5201,12 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
     } else if (isInserting) {
       context.missing(_sourceIdMeta);
     }
+    if (data.containsKey('riwaya')) {
+      context.handle(
+        _riwayaMeta,
+        riwaya.isAcceptableOrUnknown(data['riwaya']!, _riwayaMeta),
+      );
+    }
     return context;
   }
 
@@ -5223,6 +5240,10 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
         DriftSqlType.int,
         data['${effectivePrefix}source_id'],
       )!,
+      riwaya: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}riwaya'],
+      )!,
     );
   }
 
@@ -5243,6 +5264,10 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
   /// A surah's file is this URL followed by `NNN.mp3`.
   final String folderUrl;
   final int sourceId;
+
+  /// The riwaya recited (`Riwaya.name`: hafs, warsh, qalun, douri,
+  /// shubah). Its verse timings are numbered by that riwaya's own count.
+  final String riwaya;
   const ReciterRow({
     required this.id,
     required this.nameAr,
@@ -5250,6 +5275,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     required this.style,
     required this.folderUrl,
     required this.sourceId,
+    required this.riwaya,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5260,6 +5286,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     map['style'] = Variable<String>(style);
     map['folder_url'] = Variable<String>(folderUrl);
     map['source_id'] = Variable<int>(sourceId);
+    map['riwaya'] = Variable<String>(riwaya);
     return map;
   }
 
@@ -5271,6 +5298,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       style: Value(style),
       folderUrl: Value(folderUrl),
       sourceId: Value(sourceId),
+      riwaya: Value(riwaya),
     );
   }
 
@@ -5286,6 +5314,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       style: serializer.fromJson<String>(json['style']),
       folderUrl: serializer.fromJson<String>(json['folderUrl']),
       sourceId: serializer.fromJson<int>(json['sourceId']),
+      riwaya: serializer.fromJson<String>(json['riwaya']),
     );
   }
   @override
@@ -5298,6 +5327,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       'style': serializer.toJson<String>(style),
       'folderUrl': serializer.toJson<String>(folderUrl),
       'sourceId': serializer.toJson<int>(sourceId),
+      'riwaya': serializer.toJson<String>(riwaya),
     };
   }
 
@@ -5308,6 +5338,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     String? style,
     String? folderUrl,
     int? sourceId,
+    String? riwaya,
   }) => ReciterRow(
     id: id ?? this.id,
     nameAr: nameAr ?? this.nameAr,
@@ -5315,6 +5346,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     style: style ?? this.style,
     folderUrl: folderUrl ?? this.folderUrl,
     sourceId: sourceId ?? this.sourceId,
+    riwaya: riwaya ?? this.riwaya,
   );
   ReciterRow copyWithCompanion(ReciterCompanion data) {
     return ReciterRow(
@@ -5324,6 +5356,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       style: data.style.present ? data.style.value : this.style,
       folderUrl: data.folderUrl.present ? data.folderUrl.value : this.folderUrl,
       sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      riwaya: data.riwaya.present ? data.riwaya.value : this.riwaya,
     );
   }
 
@@ -5335,14 +5368,15 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
           ..write('nameEn: $nameEn, ')
           ..write('style: $style, ')
           ..write('folderUrl: $folderUrl, ')
-          ..write('sourceId: $sourceId')
+          ..write('sourceId: $sourceId, ')
+          ..write('riwaya: $riwaya')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, nameAr, nameEn, style, folderUrl, sourceId);
+      Object.hash(id, nameAr, nameEn, style, folderUrl, sourceId, riwaya);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5352,7 +5386,8 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
           other.nameEn == this.nameEn &&
           other.style == this.style &&
           other.folderUrl == this.folderUrl &&
-          other.sourceId == this.sourceId);
+          other.sourceId == this.sourceId &&
+          other.riwaya == this.riwaya);
 }
 
 class ReciterCompanion extends UpdateCompanion<ReciterRow> {
@@ -5362,6 +5397,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
   final Value<String> style;
   final Value<String> folderUrl;
   final Value<int> sourceId;
+  final Value<String> riwaya;
   const ReciterCompanion({
     this.id = const Value.absent(),
     this.nameAr = const Value.absent(),
@@ -5369,6 +5405,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     this.style = const Value.absent(),
     this.folderUrl = const Value.absent(),
     this.sourceId = const Value.absent(),
+    this.riwaya = const Value.absent(),
   });
   ReciterCompanion.insert({
     this.id = const Value.absent(),
@@ -5377,6 +5414,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     required String style,
     required String folderUrl,
     required int sourceId,
+    this.riwaya = const Value.absent(),
   }) : nameAr = Value(nameAr),
        nameEn = Value(nameEn),
        style = Value(style),
@@ -5389,6 +5427,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     Expression<String>? style,
     Expression<String>? folderUrl,
     Expression<int>? sourceId,
+    Expression<String>? riwaya,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5397,6 +5436,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
       if (style != null) 'style': style,
       if (folderUrl != null) 'folder_url': folderUrl,
       if (sourceId != null) 'source_id': sourceId,
+      if (riwaya != null) 'riwaya': riwaya,
     });
   }
 
@@ -5407,6 +5447,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     Value<String>? style,
     Value<String>? folderUrl,
     Value<int>? sourceId,
+    Value<String>? riwaya,
   }) {
     return ReciterCompanion(
       id: id ?? this.id,
@@ -5415,6 +5456,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
       style: style ?? this.style,
       folderUrl: folderUrl ?? this.folderUrl,
       sourceId: sourceId ?? this.sourceId,
+      riwaya: riwaya ?? this.riwaya,
     );
   }
 
@@ -5439,6 +5481,9 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     if (sourceId.present) {
       map['source_id'] = Variable<int>(sourceId.value);
     }
+    if (riwaya.present) {
+      map['riwaya'] = Variable<String>(riwaya.value);
+    }
     return map;
   }
 
@@ -5450,7 +5495,8 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
           ..write('nameEn: $nameEn, ')
           ..write('style: $style, ')
           ..write('folderUrl: $folderUrl, ')
-          ..write('sourceId: $sourceId')
+          ..write('sourceId: $sourceId, ')
+          ..write('riwaya: $riwaya')
           ..write(')'))
         .toString();
   }
@@ -13642,6 +13688,7 @@ typedef $$ReciterTableCreateCompanionBuilder = ReciterCompanion Function({
   required String style,
   required String folderUrl,
   required int sourceId,
+  Value<String> riwaya,
 });
 typedef $$ReciterTableUpdateCompanionBuilder = ReciterCompanion Function({
   Value<int> id,
@@ -13650,6 +13697,7 @@ typedef $$ReciterTableUpdateCompanionBuilder = ReciterCompanion Function({
   Value<String> style,
   Value<String> folderUrl,
   Value<int> sourceId,
+  Value<String> riwaya,
 });
 
 class $$ReciterTableFilterComposer
@@ -13688,6 +13736,11 @@ class $$ReciterTableFilterComposer
 
   ColumnFilters<int> get sourceId => $composableBuilder(
     column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get riwaya => $composableBuilder(
+    column: $table.riwaya,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -13730,6 +13783,11 @@ class $$ReciterTableOrderingComposer
     column: $table.sourceId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get riwaya => $composableBuilder(
+    column: $table.riwaya,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ReciterTableAnnotationComposer
@@ -13758,6 +13816,9 @@ class $$ReciterTableAnnotationComposer
 
   GeneratedColumn<int> get sourceId =>
       $composableBuilder(column: $table.sourceId, builder: (column) => column);
+
+  GeneratedColumn<String> get riwaya =>
+      $composableBuilder(column: $table.riwaya, builder: (column) => column);
 }
 
 class $$ReciterTableTableManager
@@ -13797,6 +13858,7 @@ class $$ReciterTableTableManager
                 Value<String> style = const Value.absent(),
                 Value<String> folderUrl = const Value.absent(),
                 Value<int> sourceId = const Value.absent(),
+                Value<String> riwaya = const Value.absent(),
               }) => ReciterCompanion(
                 id: id,
                 nameAr: nameAr,
@@ -13804,6 +13866,7 @@ class $$ReciterTableTableManager
                 style: style,
                 folderUrl: folderUrl,
                 sourceId: sourceId,
+                riwaya: riwaya,
               ),
           createCompanionCallback:
               ({
@@ -13813,6 +13876,7 @@ class $$ReciterTableTableManager
                 required String style,
                 required String folderUrl,
                 required int sourceId,
+                Value<String> riwaya = const Value.absent(),
               }) => ReciterCompanion.insert(
                 id: id,
                 nameAr: nameAr,
@@ -13820,6 +13884,7 @@ class $$ReciterTableTableManager
                 style: style,
                 folderUrl: folderUrl,
                 sourceId: sourceId,
+                riwaya: riwaya,
               ),
           withReferenceMapper: (p0) => p0
               .map(
