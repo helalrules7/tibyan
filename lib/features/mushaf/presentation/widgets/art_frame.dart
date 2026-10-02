@@ -11,6 +11,7 @@ import 'theme_art.dart';
 import 'opening_art.dart';
 
 import 'raster_frame.dart';
+
 /// The page in a heritage theme, laid out as approved: the juz ✦ hizb ✦
 /// surah cartouche above the frame, the theme's frame around the page,
 /// the page number in the theme's verse marker below it (with the quarter
@@ -239,6 +240,7 @@ class _SmallTap extends StatelessWidget {
     button: onTap != null,
     label: label,
     excludeSemantics: true,
+    onTap: onTap,
     child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -289,6 +291,7 @@ class ArtPageNumber extends StatelessWidget {
       button: onTap != null,
       label: l.pageOf('$page'),
       excludeSemantics: true,
+      onTap: onTap,
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

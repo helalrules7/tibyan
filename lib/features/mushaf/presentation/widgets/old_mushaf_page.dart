@@ -105,8 +105,10 @@ Future<ImagePageData> _loadOldPage(WidgetRef ref, int page) async {
     repo.lineCuts('madina1405', page),
     repo.oldLineOverflow(page),
   ).wait;
-  final (image, (glyphRows, cuts, overflowRows)) =
-      await (decode, geometry).wait;
+  final (image, (glyphRows, cuts, overflowRows)) = await (
+    decode,
+    geometry,
+  ).wait;
   final glyphs = [...glyphRows]..sort((a, b) => a.glyphId.compareTo(b.glyphId));
   final overflow = <int, List<Rect>>{};
   for (final o in overflowRows) {

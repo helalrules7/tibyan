@@ -28,6 +28,19 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           Card(
+            child: SwitchListTile(
+              secondary: const Icon(Icons.elderly),
+              title: Text(l.elderlyMode),
+              subtitle: Text(
+                l.elderlyModeHint,
+                style: TextStyle(color: t.muted),
+              ),
+              value: settings.elderlyMode,
+              onChanged: controller.setElderlyMode,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
             child: ListTile(
               leading: const Icon(Icons.palette_outlined),
               title: Text(l.appearanceTitle),

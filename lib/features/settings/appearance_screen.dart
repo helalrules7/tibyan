@@ -182,6 +182,7 @@ class _MarkerSettings extends ConsumerWidget {
         button: true,
         label: label,
         excludeSemantics: true,
+        onTap: onTap,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(14),
@@ -216,7 +217,10 @@ class _MarkerSettings extends ConsumerWidget {
                   label: switch (style) {
                     MarkerStyle.theme => l.markerTheme,
                     MarkerStyle.traditional => l.markerTraditional,
-                    _ => l.markerRosette,
+                    // Told apart by their points: 7, 9 or 16.
+                    MarkerStyle.rosette7 => '${l.markerRosette} ٧',
+                    MarkerStyle.rosette9 => '${l.markerRosette} ٩',
+                    MarkerStyle.rosette16 => '${l.markerRosette} ١٦',
                   },
                   onTap: () => controller.setMarkerStyle(style),
                   child: style == MarkerStyle.theme
@@ -265,10 +269,10 @@ class _MarkerSettings extends ConsumerWidget {
                 onTap: () => controller.setMarkerTint(null),
                 child: Icon(Icons.block, color: t.muted),
               ),
-              for (final c in markerTints)
+              for (final (i, c) in markerTints.indexed)
                 choice(
                   selected: settings.markerTint == c,
-                  label: l.markerTintLabel,
+                  label: '${l.markerTintLabel} ${i + 1}',
                   onTap: () => controller.setMarkerTint(c),
                   child: Container(
                     width: 30,

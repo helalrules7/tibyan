@@ -30,7 +30,28 @@ class TibyanApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: buildTheme(style: style, mode: mode, uiFont: settings.uiFont),
+      theme: buildTheme(
+        style: style,
+        mode: mode,
+        uiFont: settings.uiFont,
+        elderly: settings.elderlyMode,
+      ),
+      // Elderly mode: text at least a quarter larger, whatever the device
+      // asks for (a larger system size is kept).
+      builder: settings.elderlyMode
+          ? (context, child) {
+              final mq = MediaQuery.of(context);
+              final scale = mq.textScaler.scale(1);
+              return MediaQuery(
+                data: mq.copyWith(
+                  textScaler: TextScaler.linear(
+                    scale < elderlyTextScale ? elderlyTextScale : scale,
+                  ),
+                ),
+                child: child!,
+              );
+            }
+          : null,
     );
   }
 }

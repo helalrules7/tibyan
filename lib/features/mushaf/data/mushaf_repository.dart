@@ -220,6 +220,11 @@ class MushafRepository {
     return {for (final r in rows) r.sourceId: r};
   }
 
+  /// Every entry of the given texts, for searching by meaning.
+  Future<List<CommentaryRow>> commentaryOf(List<int> sourceIds) => (_db.select(
+    _db.commentary,
+  )..where((t) => t.sourceId.isIn(sourceIds))).get();
+
   Future<List<ReciterRow>> reciters() =>
       (_db.select(_db.reciter)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 

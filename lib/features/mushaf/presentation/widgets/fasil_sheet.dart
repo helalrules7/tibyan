@@ -43,12 +43,15 @@ Future<void> showSaveToFasil(
             shrinkWrap: true,
             padding: const EdgeInsets.only(bottom: 12),
             children: [
-              ListTile(
-                title: Text(
-                  l.fasilSaveHere,
-                  style: TextStyle(
-                    color: t.goldText,
-                    fontWeight: FontWeight.w600,
+              Semantics(
+                header: true,
+                child: ListTile(
+                  title: Text(
+                    l.fasilSaveHere,
+                    style: TextStyle(
+                      color: t.goldText,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

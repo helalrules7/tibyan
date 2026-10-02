@@ -120,6 +120,13 @@ const _ar = <String, SourceText>{
     license: 'المنقول من المصاحف: المشاع الإبداعي غير التجاري 4.0 (CC BY-NC-SA 4.0)، مبدئي ولم يُحصل على إذن الناشرين بعد؛ فواصل الخطوط: رخصة الخطوط المفتوحة (OFL 1.1)',
     credit: 'زخارف الثيمات: quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets)، عن مصاحف مجمع الملك فهد وغيره، وخطوط Noto وScheherazade New وKufam وMirza',
   ),
+  'multilingual-e5-small': (
+    title: 'نموذج البحث بالمعنى (multilingual-e5-small)',
+    publisher: 'intfloat (Liang Wang وآخرون)، على Hugging Face؛ أوزانه مكممة في تبيان، ومتجهات الآيات محسوبة من نصوص المعاني كما هي',
+    license: 'رخصة MIT كما في بطاقة النموذج: يُسمح بالاستعمال والنسخ والتعديل والتوزيع مع ذكر الرخصة',
+    credit:
+        'البحث بالمعنى: نموذج multilingual-e5-small (MIT)، في حزمة اختيارية',
+  ),
 };
 
 const _en = <String, SourceText>{
@@ -217,8 +224,7 @@ const _en = <String, SourceText>{
   'quranicaudio': (
     title: 'Yasser al-Dosari (murattal)',
     publisher: 'quranicaudio.com (Quran.com audio)',
-    license:
-        'Permission granted by the site by email (2026-10-01), on condition that the site is named',
+    license: 'Permission granted by the site by email (2026-10-01), on condition that the site is named',
     credit: 'Yasser al-Dosari: quranicaudio.com',
   ),
   'qdc-timing': (
@@ -233,6 +239,12 @@ const _en = <String, SourceText>{
     license: 'Traced from mushafs: CC BY-NC-SA 4.0, provisional, publishers\' permission not yet obtained; font markers: SIL Open Font License 1.1',
     credit: 'Theme ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets), from mushafs of the King Fahd Complex and others, and the Noto, Scheherazade New, Kufam and Mirza fonts',
   ),
+  'multilingual-e5-small': (
+    title: 'Search-by-meaning model (multilingual-e5-small)',
+    publisher: 'intfloat (Liang Wang et al.), on Hugging Face; weights quantised by Tibyan, verse vectors computed from the meaning texts as stored',
+    license: 'MIT License, as stated on the model card: use, copy, modify and distribute with the licence kept',
+    credit: 'Search by meaning: the multilingual-e5-small model (MIT), in an optional pack',
+  ),
 };
 
 /// Sources that are not in content.db (bundled with the app), listed after
@@ -242,6 +254,11 @@ const bundledSources = [
     key: 'quran-assets',
     url: 'https://github.com/quran-ws/quran-assets',
     version: 'd4cae845c9aae1fbe56ee69d04bc7d8964419373',
+  ),
+  (
+    key: 'multilingual-e5-small',
+    url: 'https://huggingface.co/intfloat/multilingual-e5-small',
+    version: '614241f622f53c4eeff9890bdc4f31cfecc418b3',
   ),
 ];
 

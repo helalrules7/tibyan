@@ -82,22 +82,26 @@ class PlayerBar extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      Text(
-                        s.error != null
-                            ? l.playerError
-                            : repeating
-                            ? l.repeatProgress(
-                                digits(s.repeatDone + 1),
-                                s.repeat == 0 ? '∞' : digits(s.repeat),
-                              )
-                            : reciter == null
-                            ? ''
-                            : reciterLabel(context, reciter),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: t.playerFg.withValues(alpha: 0.8),
-                          fontSize: 12,
+                      // Live: an error or the repeat count is announced.
+                      Semantics(
+                        liveRegion: true,
+                        child: Text(
+                          s.error != null
+                              ? l.playerError
+                              : repeating
+                              ? l.repeatProgress(
+                                  digits(s.repeatDone + 1),
+                                  s.repeat == 0 ? '∞' : digits(s.repeat),
+                                )
+                              : reciter == null
+                              ? ''
+                              : reciterLabel(context, reciter),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: t.playerFg.withValues(alpha: 0.8),
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ],
@@ -122,11 +126,13 @@ class PlayerBar extends ConsumerWidget {
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
                         color: t.playerFg,
+                        semanticsLabel: l.loadingLabel,
                       ),
                     ),
                   )
                 : IconButton.filled(
                     tooltip: s.playing ? l.pause : l.resume,
+                    isSelected: s.playing,
                     onPressed: c.toggle,
                     style: IconButton.styleFrom(
                       backgroundColor: t.playerFg,
@@ -312,7 +318,7 @@ class PlayerOptions extends ConsumerWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
-        Text(l.reciterLabel, style: title),
+        Semantics(header: true, child: Text(l.reciterLabel, style: title)),
         RadioGroup<int>(
           groupValue: settings.reciterId,
           onChanged: (id) => id == null ? null : c.changeReciter(id),
@@ -358,7 +364,7 @@ class PlayerOptions extends ConsumerWidget {
           const SizedBox(height: 12),
         ],
         if (!playing || s.timed) ...[
-          Text(l.repeatLabel, style: title),
+          Semantics(header: true, child: Text(l.repeatLabel, style: title)),
           Text(l.repeatHint, style: hint),
           const SizedBox(height: 6),
           chips<int>(
@@ -370,7 +376,7 @@ class PlayerOptions extends ConsumerWidget {
             c.setRepeat,
           ),
           const SizedBox(height: 12),
-          Text(l.silenceLabel, style: title),
+          Semantics(header: true, child: Text(l.silenceLabel, style: title)),
           const SizedBox(height: 6),
           chips<int>(
             [
@@ -384,7 +390,7 @@ class PlayerOptions extends ConsumerWidget {
         ],
         // A sleep timer belongs to one listening, so it is set only then.
         if (playing) ...[
-          Text(l.sleepLabel, style: title),
+          Semantics(header: true, child: Text(l.sleepLabel, style: title)),
           const SizedBox(height: 6),
           chips<int>(
             [
@@ -403,7 +409,7 @@ class PlayerOptions extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
         ],
-        Text(l.versePauseLabel, style: title),
+        Semantics(header: true, child: Text(l.versePauseLabel, style: title)),
         Text(l.versePauseHint, style: hint),
         const SizedBox(height: 6),
         chips<int>(

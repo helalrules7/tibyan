@@ -59,10 +59,7 @@ void main() {
         room.width / g.scale,
         closeTo(OpeningArtLayout.visibleWidth, 0.01),
       );
-      expect(
-        -g.frame.left,
-        closeTo(OpeningArtLayout.sideCut * g.scale, 0.01),
-      );
+      expect(-g.frame.left, closeTo(OpeningArtLayout.sideCut * g.scale, 0.01));
       // The page keeps the drawing's panel, and it is about half again as
       // wide as fitting the whole drawing gave it.
       final panel = g.place(OpeningArtLayout.panel);

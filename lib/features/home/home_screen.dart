@@ -21,6 +21,9 @@ class HomeScreen extends ConsumerWidget {
     final surahs = ref.watch(surahsProvider).value;
     final surah = position == null || surahs == null ? 1 : position.surah;
     final ayah = position?.ayah ?? 1;
+    if (context.tokens.elderly) {
+      return const _ElderlyHome();
+    }
     final khatma = ref.watch(khatmaStatusProvider).value;
     final portion = khatma?.todayPortion;
     final soon = <(IconData, String)>[
@@ -38,14 +41,17 @@ class HomeScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l.appTitle,
-                        style: TextStyle(
-                          fontFamily: 'ArefRuqaa',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 38,
-                          height: 1.2,
-                          color: t.headBg == t.paper ? t.headFg : t.ink,
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          l.appTitle,
+                          style: TextStyle(
+                            fontFamily: 'ArefRuqaa',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 38,
+                            height: 1.2,
+                            color: t.headBg == t.paper ? t.headFg : t.ink,
+                          ),
                         ),
                       ),
                       Text(
@@ -214,6 +220,7 @@ class _SectionTile extends StatelessWidget {
       button: true,
       label: '$label. $note',
       excludeSemantics: true,
+      onTap: onTap,
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -265,6 +272,153 @@ class _ComingSoonTile extends StatelessWidget {
             ),
             Text(note, style: TextStyle(color: t.muted, fontSize: 12)),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Elderly mode's home: only the three main tasks, as large labelled
+/// buttons, and settings (with its name) to leave the mode.
+class _ElderlyHome extends ConsumerWidget {
+  const _ElderlyHome();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final position = ref.watch(readingPositionProvider).value;
+    final surahs = ref.watch(surahsProvider).value;
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 32),
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Semantics(
+                    header: true,
+                    child: Text(
+                      l.appTitle,
+                      style: TextStyle(
+                        fontFamily: 'ArefRuqaa',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 40,
+                        height: 1.2,
+                        color: t.headBg == t.paper ? t.headFg : t.ink,
+                      ),
+                    ),
+                  ),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/settings'),
+                  icon: const Icon(Icons.settings_outlined),
+                  label: Text(l.settingsTitle),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            _BigAction(
+              icon: Icons.menu_book,
+              label: l.continueReading,
+              detail: position == null || surahs == null
+                  ? null
+                  : l.continueReadingAt(
+                      surahName(context, surahs[position.surah - 1]),
+                      digits(position.ayah),
+                      digits(position.page),
+                    ),
+              primary: true,
+              onTap: () => context.go('/mushaf'),
+            ),
+            const SizedBox(height: 16),
+            _BigAction(
+              icon: Icons.headphones_outlined,
+              label: l.sectionListen,
+              onTap: () => context.push('/mushaf/audio'),
+            ),
+            const SizedBox(height: 16),
+            _BigAction(
+              icon: Icons.search,
+              label: l.sectionSearch,
+              onTap: () => context.go('/search'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BigAction extends StatelessWidget {
+  const _BigAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.detail,
+    this.primary = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final String? detail;
+  final bool primary;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens.colors;
+    final fg = primary ? t.onControl : t.ink;
+    return Semantics(
+      button: true,
+      label: detail == null ? label : '$label. $detail',
+      excludeSemantics: true,
+      // The InkWell below is excluded with the rest: the action is here.
+      onTap: onTap,
+      child: Material(
+        color: primary ? t.control : t.paper,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: primary ? t.control : t.border, width: 2),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 96),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                children: [
+                  Icon(icon, size: 40, color: fg),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: fg,
+                          ),
+                        ),
+                        if (detail != null)
+                          Text(
+                            detail!,
+                            style: TextStyle(fontSize: 17, color: fg),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

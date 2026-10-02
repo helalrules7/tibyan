@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart' show listEquals, setEquals;
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -361,7 +362,12 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
       future: _load,
       builder: (context, snap) {
         if (!snap.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: AppLocalizations.of(context)
+                  .loadingPage('${widget.page}'),
+            ),
+          );
         }
         final data = snap.data!;
         final x = widget.interaction;
@@ -591,6 +597,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                     child: Semantics(
                       label: l.pageOf('${widget.page}'),
                       image: true,
+                      sortKey: const OrdinalSortKey(0),
                       child: CustomPaint(
                         size: box.biggest,
                         painter: _ImagePagePainter(
@@ -643,6 +650,14 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                       ),
                     ),
                   ),
+                ),
+                ...verseSemanticNodes(
+                  x,
+                  verseAreas([
+                    for (final (k, r) in data.pieces)
+                      (k, layout.toScreenRect(r)),
+                  ]),
+                  markAction: l.markThisVerse,
                 ),
                 ...handles,
               ],

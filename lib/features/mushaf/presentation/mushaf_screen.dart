@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -190,6 +191,14 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (_page < 1) return;
     final ayahs = await ref.read(pageAyahsProvider(_page).future);
     if (ayahs.isEmpty) return;
+    // Screen readers hear where the turn landed: the surah and the page.
+    if (mounted && MediaQuery.accessibleNavigationOf(context)) {
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        _scrubLabel(context, _page, ref.read(surahsProvider).value),
+        Directionality.of(context),
+      );
+    }
     await ref
         .read(userDatabaseProvider)
         .savePosition(
@@ -343,20 +352,36 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         onPick: _pickWord && pg == _page
             ? (point, verse) => _pickAt(pg, point, verse)
             : null,
+        // Screen readers: each verse by its surah and number, then its
+        // text as stored (Tanzil's plain text, which reads aloud well).
+        verseLabel: (v) => l.verseLabel(
+          surahs == null ? '' : surahName(context, surahs[v.surah - 1]),
+          NumberFormatter(Localizations.localeOf(context))(v.ayah),
+        ),
+        verseText: (v) => ref
+            .read(pageAyahsProvider(pg))
+            .value
+            ?.where((a) => a.surah == v.surah && a.number == v.ayah)
+            .firstOrNull
+            ?.textSearch,
       );
-      final tools = _ReadingTools(
-        touchReading: _touchReading,
-        recite: _recite,
-        onTouchReading: _toggleTouchReading,
-        listening: recitation.active,
-        onListen: _listenFromPage,
-        onRecite: () => _recite
-            ? setState(() {
-                _recite = false;
-                _revealed.clear();
-              })
-            : _startRecite(),
-      );
+      // Elderly mode: no small icon-only tools on the page; the same tools
+      // are labelled buttons in the bottom bar.
+      final tools = context.tokens.elderly
+          ? null
+          : _ReadingTools(
+              touchReading: _touchReading,
+              recite: _recite,
+              onTouchReading: _toggleTouchReading,
+              listening: recitation.active,
+              onListen: _listenFromPage,
+              onRecite: () => _recite
+                  ? setState(() {
+                      _recite = false;
+                      _revealed.clear();
+                    })
+                  : _startRecite(),
+            );
       final pageWidget = switch (edition) {
         MushafEdition.madina1441 => MushafPage(
           page: pg,
@@ -451,7 +476,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       },
                     )
                   : _controller == null
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        semanticsLabel: l.loadingLabel,
+                      ),
+                    )
                   // The mushaf opens from the right in every interface language.
                   : Directionality(
                       textDirection: TextDirection.rtl,
@@ -471,9 +500,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           if (_chrome) ...[
             // A light veil so the controls read as a layer over the page.
             Positioned.fill(
-              child: GestureDetector(
+              child: Semantics(
+                button: true,
+                label: l.hideMenus,
                 onTap: () => _setChrome(false),
-                child: ColoredBox(color: Colors.black.withValues(alpha: 0.28)),
+                excludeSemantics: true,
+                child: GestureDetector(
+                  onTap: () => _setChrome(false),
+                  child: ColoredBox(
+                    color: Colors.black.withValues(alpha: 0.28),
+                  ),
+                ),
               ),
             ),
             Positioned(
@@ -523,6 +560,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 onListen: _listenFromPage,
                 onGoTo: _goToPage,
                 onAutoScroll: _startAutoScroll,
+                touchReading: _touchReading,
+                onTouchReading: _toggleTouchReading,
+                recite: _recite,
+                listening: recitation.active,
               ),
             ),
           ],
@@ -723,7 +764,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (!mounted || page == _page) return;
     _controller?.animateToPage(
       page - _first,
-      duration: const Duration(milliseconds: 350),
+      // Elderly mode: a slower turn that is easy to follow.
+      duration: Duration(milliseconds: context.tokens.elderly ? 700 : 350),
       curve: Curves.easeInOut,
     );
   }
@@ -917,23 +959,32 @@ class _ReadingTools extends StatelessWidget {
           button: true,
           toggled: on,
           label: label,
+          excludeSemantics: true,
+          onTap: onTap,
           child: Tooltip(
             message: label,
+            excludeFromSemantics: true,
             child: InkResponse(
               onTap: onTap,
-              radius: 18,
+              radius: 24,
+              // A 48 px target around the small drawn button.
               child: Container(
-                width: 30,
-                height: 22,
-                decoration: BoxDecoration(
-                  color: on ? t.control.withValues(alpha: 0.15) : null,
-                  borderRadius: BorderRadius.circular(11),
-                  border: Border.all(
-                    color: on ? t.control : t.border,
-                    width: 0.8,
+                width: 48,
+                height: 48,
+                alignment: Alignment.center,
+                child: Container(
+                  width: 30,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: on ? t.control.withValues(alpha: 0.15) : null,
+                    borderRadius: BorderRadius.circular(11),
+                    border: Border.all(
+                      color: on ? t.control : t.border,
+                      width: 0.8,
+                    ),
                   ),
+                  child: Icon(icon, size: 15, color: on ? t.control : t.muted),
                 ),
-                child: Icon(icon, size: 15, color: on ? t.control : t.muted),
               ),
             ),
           ),
@@ -947,14 +998,12 @@ class _ReadingTools extends StatelessWidget {
           touchReading,
           onTouchReading,
         ),
-        const SizedBox(width: 10),
         button(
           Icons.headphones_outlined,
           l.listenFromPage,
           listening,
           onListen,
         ),
-        const SizedBox(width: 10),
         button(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
       ],
     );
@@ -995,7 +1044,7 @@ class _TopControls extends StatelessWidget {
                             label,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 11, color: t.muted),
+                            style: TextStyle(fontSize: 12, color: t.muted),
                           ),
                         ],
                       ),
@@ -1022,8 +1071,16 @@ class _BottomControls extends StatelessWidget {
     required this.onListen,
     required this.onGoTo,
     required this.onAutoScroll,
+    required this.touchReading,
+    required this.onTouchReading,
+    required this.recite,
+    required this.listening,
   });
 
+  final bool recite;
+  final bool listening;
+  final bool touchReading;
+  final VoidCallback onTouchReading;
   final int page;
   final int pageCount;
   final String label;
@@ -1048,33 +1105,81 @@ class _BottomControls extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  IconButton.filledTonal(
-                    tooltip: l.reciteMode,
-                    onPressed: onRecite,
-                    icon: const Icon(Icons.visibility_outlined),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton.filledTonal(
-                    tooltip: l.listen,
-                    onPressed: onListen,
-                    icon: const Icon(Icons.headphones_outlined),
-                  ),
-                  const Spacer(),
-                  FilledButton.tonalIcon(
-                    onPressed: onGoTo,
-                    icon: const Icon(Icons.menu_book_outlined, size: 18),
-                    label: Text(l.goToPage),
-                  ),
-                  const Spacer(),
-                  IconButton.filledTonal(
-                    tooltip: l.autoScroll,
-                    onPressed: onAutoScroll,
-                    icon: const Icon(Icons.keyboard_double_arrow_down),
-                  ),
-                ],
-              ),
+              if (context.tokens.elderly)
+                // Elderly mode: every tool with its name, large enough to
+                // press easily.
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    FilledButton.tonalIcon(
+                      onPressed: onListen,
+                      icon: const Icon(Icons.headphones_outlined),
+                      label: Text(l.listen),
+                    ),
+                    FilledButton.tonalIcon(
+                      onPressed: onGoTo,
+                      icon: const Icon(Icons.menu_book_outlined),
+                      label: Text(l.goToPage),
+                    ),
+                    Semantics(
+                      toggled: recite,
+                      child: FilledButton.tonalIcon(
+                        onPressed: onRecite,
+                        icon: const Icon(Icons.visibility_outlined),
+                        label: Text(l.reciteMode),
+                      ),
+                    ),
+                    Semantics(
+                      toggled: touchReading,
+                      child: FilledButton.tonalIcon(
+                        onPressed: onTouchReading,
+                        icon: Icon(
+                          touchReading
+                              ? Icons.touch_app
+                              : Icons.touch_app_outlined,
+                        ),
+                        label: Text(l.touchReading),
+                      ),
+                    ),
+                    FilledButton.tonalIcon(
+                      onPressed: onAutoScroll,
+                      icon: const Icon(Icons.keyboard_double_arrow_down),
+                      label: Text(l.autoScroll),
+                    ),
+                  ],
+                )
+              else
+                Row(
+                  children: [
+                    IconButton.filledTonal(
+                      tooltip: l.reciteMode,
+                      isSelected: recite,
+                      onPressed: onRecite,
+                      icon: const Icon(Icons.visibility_outlined),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton.filledTonal(
+                      tooltip: l.listen,
+                      isSelected: listening,
+                      onPressed: onListen,
+                      icon: const Icon(Icons.headphones_outlined),
+                    ),
+                    const Spacer(),
+                    FilledButton.tonalIcon(
+                      onPressed: onGoTo,
+                      icon: const Icon(Icons.menu_book_outlined, size: 18),
+                      label: Text(l.goToPage),
+                    ),
+                    const Spacer(),
+                    IconButton.filledTonal(
+                      tooltip: l.autoScroll,
+                      onPressed: onAutoScroll,
+                      icon: const Icon(Icons.keyboard_double_arrow_down),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 6),
               Container(
                 padding: const EdgeInsets.symmetric(

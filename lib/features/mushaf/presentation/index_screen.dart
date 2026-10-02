@@ -402,6 +402,7 @@ class _PagesTabState extends ConsumerState<_PagesTab> {
               selected: current,
               label: l.pageOf('${i + 1}'),
               excludeSemantics: true,
+              onTap: () => openPage(context, ref, i + 1),
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.zero,

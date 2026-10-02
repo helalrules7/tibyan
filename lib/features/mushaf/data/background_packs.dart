@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 
-import '../../../core/settings/app_settings.dart';
 import 'page_pack.dart';
 
 /// Page packs downloaded by the system (WorkManager / a user-initiated job
@@ -60,8 +59,7 @@ class BackgroundPacks {
   }
 
   PagePackSpec? _spec(String id) {
-    for (final e in MushafEdition.values) {
-      final s = PagePackSpec.of(e);
+    for (final s in PagePackSpec.all) {
       if (s.id == id) return s;
     }
     return null;

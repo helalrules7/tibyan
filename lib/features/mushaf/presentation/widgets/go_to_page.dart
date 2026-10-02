@@ -64,7 +64,7 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton.filledTonal(
-            tooltip: '−',
+            tooltip: l.previousPageNumber,
             onPressed: () => _step(-1),
             icon: const Icon(Icons.remove),
           ),
@@ -99,7 +99,7 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
           ),
           const SizedBox(width: 10),
           IconButton.filledTonal(
-            tooltip: '+',
+            tooltip: l.nextPageNumber,
             onPressed: () => _step(1),
             icon: const Icon(Icons.add),
           ),

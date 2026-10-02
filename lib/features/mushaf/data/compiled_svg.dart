@@ -102,11 +102,10 @@ class SvgCompiler {
     final replies = ReceivePort();
     final Isolate isolate;
     try {
-      isolate = await Isolate.spawn(
-        _work,
-        [hello.sendPort, replies.sendPort],
-        debugName: 'svg compiler $slot',
-      );
+      isolate = await Isolate.spawn(_work, [
+        hello.sendPort,
+        replies.sendPort,
+      ], debugName: 'svg compiler $slot');
     } on Object catch (e) {
       debugPrint('SvgCompiler: no worker ($e), compiling per page instead');
       hello.close();
