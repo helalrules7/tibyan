@@ -50,6 +50,7 @@ class DownloadAllScreen extends ConsumerWidget {
             LinearProgressIndicator(
               value: done / editions.length,
               minHeight: 6,
+              semanticsLabel: l.downloadAllTitle,
             ),
             const SizedBox(height: 16),
             for (final e in editions) ...[
@@ -105,8 +106,20 @@ class _EditionRow extends ConsumerWidget {
       PackPhase.installed => l.downloadDone,
       PackPhase.failed => l.downloadFailed(p.error ?? ''),
     };
+    // Read aloud in steps of ten percent, not on every piece received.
+    final spoken = p.phase == PackPhase.downloading
+        ? l.downloadPercentSpoken(
+            NumberFormatter(Localizations.localeOf(context))(
+              ((fraction ?? 0) * 10).floor() * 10,
+            ),
+          )
+        : status;
     final action = switch (p.phase) {
-      PackPhase.installed => Icon(Icons.check_circle, color: t.control),
+      PackPhase.installed => Icon(
+        Icons.check_circle,
+        color: t.control,
+        semanticLabel: l.downloadDone,
+      ),
       PackPhase.verifying || PackPhase.installing => null,
       PackPhase.downloading => IconButton(
         tooltip: l.downloadPause,
@@ -133,7 +146,7 @@ class _EditionRow extends ConsumerWidget {
             Expanded(
               child: Semantics(
                 liveRegion: true,
-                label: '${editionName(l, edition)}. $status',
+                label: '${editionName(l, edition)}. $spoken',
                 excludeSemantics: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

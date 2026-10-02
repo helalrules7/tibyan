@@ -60,6 +60,14 @@ class _DownloadScreenState extends ConsumerState<DownloadScreen> {
       PackPhase.installed => l.downloadDone,
       PackPhase.failed => l.downloadFailed(p.error ?? ''),
     };
+    // Read aloud in steps of ten percent, not on every piece received.
+    final spoken = p.phase == PackPhase.downloading
+        ? l.downloadPercentSpoken(
+            NumberFormatter(Localizations.localeOf(context))(
+              ((fraction ?? 0) * 10).floor() * 10,
+            ),
+          )
+        : status;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.downloadTitle)),
@@ -77,7 +85,8 @@ class _DownloadScreenState extends ConsumerState<DownloadScreen> {
             const SizedBox(height: 24),
             Semantics(
               liveRegion: true,
-              label: status,
+              label: spoken,
+              excludeSemantics: true,
               child: Column(
                 children: [
                   LinearProgressIndicator(value: fraction, minHeight: 8),
@@ -133,6 +142,8 @@ class _DownloadScreenState extends ConsumerState<DownloadScreen> {
                 PackFormat.svgXz => l.pagesCredit,
                 PackFormat.pngQuranCom => l.pagesCreditOld,
                 PackFormat.pngShamarly => l.pagesCreditShamarly,
+                // Not an edition: never shown here.
+                PackFormat.semantic => '',
               },
               textAlign: TextAlign.center,
               style: TextStyle(color: t.muted, fontSize: 12),
@@ -170,25 +181,31 @@ class DownloadingBanner extends ConsumerWidget {
       color: t.paper,
       elevation: 3,
       borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+      child: Semantics(
+        button: true,
+        label: l.downloadingBanner(editionName(l, chosen), digits(percent)),
+        excludeSemantics: true,
         onTap: () => context.push('/mushaf/download'),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l.downloadingBanner(editionName(l, chosen), digits(percent)),
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: t.ink),
-              ),
-              const SizedBox(height: 6),
-              LinearProgressIndicator(
-                value: p.phase == PackPhase.downloading ? p.fraction : null,
-                minHeight: 3,
-              ),
-            ],
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () => context.push('/mushaf/download'),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l.downloadingBanner(editionName(l, chosen), digits(percent)),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: t.ink),
+                ),
+                const SizedBox(height: 6),
+                LinearProgressIndicator(
+                  value: p.phase == PackPhase.downloading ? p.fraction : null,
+                  minHeight: 3,
+                ),
+              ],
+            ),
           ),
         ),
       ),

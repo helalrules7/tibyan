@@ -14,6 +14,7 @@ import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'search_engine.dart';
 import '../mushaf/presentation/navigation.dart';
+import 'semantic/meaning_results.dart';
 
 /// Every verse's searchable text, loaded once.
 final searchVersesProvider = FutureProvider<List<SearchVerse>>((ref) async {
@@ -36,6 +37,11 @@ final allAyahsProvider = FutureProvider<Map<(int, int), AyahRow>>((ref) async {
 
 const _historyKey = 'search.history';
 const _historyMax = 20;
+const _modeKey = 'search.mode';
+
+/// What the query is compared with: the Quran's words, or the meaning
+/// texts (tafsir and translations).
+enum SearchMode { words, meaning }
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -48,6 +54,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _field = TextEditingController();
   Timer? _debounce;
   String _query = '';
+  late SearchMode _mode =
+      ref.read(sharedPreferencesProvider).getString(_modeKey) ==
+          SearchMode.meaning.name
+      ? SearchMode.meaning
+      : SearchMode.words;
+
+  void _setMode(SearchMode mode) {
+    setState(() => _mode = mode);
+    ref.read(sharedPreferencesProvider).setString(_modeKey, mode.name);
+  }
 
   @override
   void dispose() {
@@ -92,8 +108,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final names = {
       for (final s in surahs ?? const <SurahRow>[]) s.id: [s.nameAr, s.nameEn],
     };
-    final ref0 = _query.isEmpty ? null : parseReference(_query, names);
-    final hits = verses == null || _query.isEmpty
+    final meaning = _mode == SearchMode.meaning;
+    final ref0 = _query.isEmpty || meaning
+        ? null
+        : parseReference(_query, names);
+    final hits = verses == null || _query.isEmpty || meaning
         ? const <SearchHit>[]
         : search(verses, _query);
     final total = hits.fold<int>(0, (n, h) => n + h.count);
@@ -105,7 +124,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           autofocus: true,
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
-            hintText: l.searchHint,
+            hintText: meaning ? l.searchMeaningHint : l.searchHint,
             border: InputBorder.none,
           ),
           onChanged: _changed,
@@ -117,7 +136,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         actions: [
           if (_field.text.isNotEmpty)
             IconButton(
-              tooltip: l.cancel,
+              tooltip: l.clearSearch,
               icon: const Icon(Icons.close),
               onPressed: () => setState(() {
                 _field.clear();
@@ -125,8 +144,36 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               }),
             ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(context.tokens.elderly ? 72 : 56),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<SearchMode>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(
+                    value: SearchMode.words,
+                    icon: const Icon(Icons.text_fields),
+                    label: Text(l.searchModeWords),
+                  ),
+                  ButtonSegment(
+                    value: SearchMode.meaning,
+                    icon: const Icon(Icons.lightbulb_outline),
+                    label: Text(l.searchModeMeaning),
+                  ),
+                ],
+                selected: {_mode},
+                onSelectionChanged: (s) => _setMode(s.single),
+              ),
+            ),
+          ),
+        ),
       ),
-      body: _query.isEmpty
+      body: meaning
+          ? MeaningResults(query: _query, onOpen: (s, a) => _open(s, a))
+          : _query.isEmpty
           ? _History(
               items: _history,
               onPick: (q) {
@@ -159,13 +206,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       },
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    hits.isEmpty
-                        ? (ref0 == null ? l.searchNothing : '')
-                        : l.searchCount(digits(total), digits(hits.length)),
-                    style: TextStyle(color: t.muted),
+                Semantics(
+                  liveRegion: true,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      hits.isEmpty
+                          ? (ref0 == null ? l.searchNothing : '')
+                          : l.searchCount(digits(total), digits(hits.length)),
+                      style: TextStyle(color: t.muted),
+                    ),
                   ),
                 ),
                 for (final h in hits.take(300))
@@ -226,6 +276,7 @@ class _Result extends ConsumerWidget {
             children: [
               Text(
                 '${l.surahWord(name)} · ${digits(hit.ayah)}',
+                semanticsLabel: l.verseLabel(name, digits(hit.ayah)),
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
