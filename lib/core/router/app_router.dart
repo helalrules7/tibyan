@@ -5,6 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/search/search_screen.dart';
+import '../../features/khatma/presentation/journal_screen.dart';
+import '../../features/khatma/presentation/khatma_screen.dart';
+import '../../features/khatma/presentation/new_khatma_screen.dart';
+import '../../features/khatma/presentation/reports_screen.dart';
 import '../../features/mushaf/presentation/about_mushaf_screen.dart';
 import '../../features/mushaf/presentation/download_all_screen.dart';
 import '../../features/mushaf/presentation/download_screen.dart';
@@ -79,6 +83,24 @@ final appRouterProvider = Provider<GoRouter>(
                 builder: (context, state) => const PlayerSettingsScreen(),
               ),
             ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/khatma',
+        builder: (context, state) => const KhatmaScreen(),
+        routes: [
+          GoRoute(
+            path: 'new',
+            builder: (context, state) => const NewKhatmaScreen(),
+          ),
+          GoRoute(
+            path: 'reports',
+            builder: (context, state) => const ReportsScreen(),
+          ),
+          GoRoute(
+            path: 'journal',
+            builder: (context, state) => const JournalScreen(),
           ),
         ],
       ),

@@ -13,9 +13,13 @@ import 'core/crash/crash_reporting.dart';
 import 'core/db/content_database.dart';
 import 'core/db/user_database.dart';
 import 'core/flags/feature_flags.dart';
+import 'core/router/app_router.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
 import 'features/audio/recitation.dart';
+import 'features/khatma/khatma_providers.dart';
+import 'features/khatma/services/home_widget_sync.dart';
+import 'features/khatma/services/reminder_scheduler.dart';
 import 'features/mushaf/data/background_packs.dart';
 import 'features/mushaf/data/bundled_pack.dart';
 import 'features/mushaf/mushaf_providers.dart';
@@ -57,6 +61,8 @@ Future<void> main() async {
       contentDatabaseProvider.overrideWithValue(content),
       userDatabaseProvider.overrideWithValue(UserDatabase.open()),
       packRootProvider.overrideWithValue(packRoot),
+      reminderSchedulerProvider.overrideWithValue(LocalReminderScheduler()),
+      homeWidgetSyncProvider.overrideWithValue(PluginHomeWidgetSync()),
     ],
   );
 
@@ -100,4 +106,36 @@ Future<void> main() async {
 
   // Which audio host is faster for this reader, measured in the background.
   unawaited(measureAudioHosts(container));
+  _startKhatma(container);
+}
+
+/// Keeps the khatma's reminders (rolling) and the home screen widget up to
+/// date, and opens the page a reminder or the widget points to.
+void _startKhatma(ProviderContainer container) {
+  final service = container.read(khatmaServiceProvider);
+  Future<void> refresh() => service.refresh().catchError((_) {});
+  unawaited(refresh());
+  AppLifecycleListener(onResume: refresh);
+
+  Future<void> open(Uri? uri, {bool launch = false}) async {
+    if (uri == null || uri.host != 'khatma') return;
+    final route = await service.routeFor(uri);
+    // Opened the app: after the splash screen has handed over to home.
+    if (launch) await Future<void>.delayed(const Duration(milliseconds: 2200));
+    container.read(appRouterProvider).go(route);
+  }
+
+  final reminders = container.read(reminderSchedulerProvider);
+  reminders.onTap = (payload) => open(Uri.tryParse(payload));
+  unawaited(
+    reminders
+        .launchPayload()
+        .then((p) => open(p == null ? null : Uri.tryParse(p), launch: true))
+        .catchError((_) {}),
+  );
+  final widget = container.read(homeWidgetSyncProvider);
+  unawaited(
+    widget.launchUri().then((u) => open(u, launch: true)).catchError((_) {}),
+  );
+  widget.taps.listen(open, onError: (_) {});
 }

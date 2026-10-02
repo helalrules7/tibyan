@@ -664,9 +664,205 @@
   "downloadAllCount": "اكتمل {done} من {total}",
   "@downloadAllCount": {
     "placeholders": {
-      "done": { "type": "String" },
-      "total": { "type": "String" }
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
-  "themeArtCredit": "الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين."
+  "themeArtCredit": "الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.",
+  "khatmaTitle": "الختمة",
+  "khatmaNew": "ختمة جديدة",
+  "khatmaEmptyTitle": "لا ختمة الآن",
+  "khatmaEmptyBody": "ضع خطة لختم المصحف: حدد موعد الختم أو مقدار الورد اليومي. والصفحات التي تقرؤها في المصحف تُحسب تلقائيا.",
+  "khatmaDefaultName": "ختمتي",
+  "khatmaNameLabel": "الاسم",
+  "khatmaByDate": "حسب موعد الختم",
+  "khatmaByAmount": "حسب الورد اليومي",
+  "khatmaEndDateLabel": "موعد الختم",
+  "khatmaAmountLabel": "المقدار في اليوم",
+  "khatmaUnitPage": "صفحة",
+  "khatmaUnitJuz": "جزء",
+  "khatmaUnitHizb": "حزب",
+  "khatmaAboutPerDay": "نحو {count} صفحة في اليوم",
+  "@khatmaAboutPerDay": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDuration": "المدة: {count} يوم، والختم يوم {date}",
+  "@khatmaDuration": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaEditionNote": "بصفحات {edition}",
+  "@khatmaEditionNote": {
+    "placeholders": {
+      "edition": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminder": "تذكير يومي",
+  "khatmaReminderOff": "بلا تذكير",
+  "khatmaStart": "ابدأ الختمة",
+  "khatmaReplaceTitle": "ختمة مفتوحة",
+  "khatmaReplaceBody": "تُحذف الختمة الحالية وسجلها عند بدء ختمة جديدة.",
+  "khatmaToday": "ورد اليوم",
+  "khatmaPagesRange": "من صفحة {from} إلى صفحة {to}",
+  "@khatmaPagesRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaPagesCount": "عدد الصفحات: {count}",
+  "@khatmaPagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReadNow": "اقرأ الآن",
+  "khatmaMarkRead": "قرأته في مصحف آخر",
+  "khatmaTodayDone": "ورد اليوم مقروء",
+  "khatmaContinue": "تابع القراءة",
+  "khatmaProgress": "{done} من {total} صفحة",
+  "@khatmaProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDaysLeft": "الأيام الباقية: {count}",
+  "@khatmaDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaEnds": "الختم يوم {date}",
+  "@khatmaEnds": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaBehindTitle": "صفحات من الأيام الماضية: {count}",
+  "@khatmaBehindTitle": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaBehindBody": "أُضيفت إلى ورد اليوم. يمكنك توزيعها على الأيام الباقية، أو تأخير موعد الختم.",
+  "khatmaSpread": "وزّعها على الأيام الباقية",
+  "khatmaExtend": "أخّر موعد الختم",
+  "khatmaComplete": "اكتملت الختمة",
+  "khatmaCompletedOn": "اكتملت يوم {date}",
+  "@khatmaCompletedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaPast": "ختمات سابقة",
+  "khatmaDelete": "حذف الختمة",
+  "khatmaDeleteBody": "يُحذف سجل هذه الختمة.",
+  "khatmaTileStart": "ابدأ",
+  "khatmaTilePages": "ورد اليوم: {count}",
+  "@khatmaTilePages": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTitle": "ورد الختمة",
+  "khatmaReminderBody": "ورد اليوم: من صفحة {from} إلى صفحة {to}",
+  "@khatmaReminderBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderChannel": "تذكير الختمة",
+  "homeTodayTitle": "اليوم",
+  "widgetNoKhatma": "ابدأ ختمة في تبيان",
+  "reportsTitle": "تقارير القراءة",
+  "reportsWeek": "آخر ٧ أيام",
+  "reportsMonth": "آخر ٣٠ يوما",
+  "reportsDays": "أيام القراءة",
+  "reportsPages": "الصفحات",
+  "reportsReadingMinutes": "دقائق القراءة",
+  "reportsListeningMinutes": "دقائق الاستماع",
+  "reportsEmpty": "تظهر هنا قراءتك واستماعك تلقائيا.",
+  "reportsDayRead": "يوم فيه قراءة أو استماع",
+  "streakReadToday": "قرأت اليوم. الأيام المتتالية: {count}",
+  "@streakReadToday": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "streakContinue": "الأيام المتتالية حتى أمس: {count}. صفحة اليوم تصلها.",
+  "@streakContinue": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "streakWelcome": "مرحبا بعودتك. تابع من حيث وقفت.",
+  "streakNotesToggle": "رسائل الاستمرار",
+  "streakNotesHint": "تعرض الأيام المتتالية فقط، ولا تعرض الأيام الفائتة.",
+  "journalTitle": "دفتر التدبر",
+  "journalSearch": "ابحث في ملاحظاتك",
+  "journalEmpty": "لا ملاحظات بعد. اضغط مطولا على آية في المصحف واختر «ملاحظة تدبر».",
+  "journalNoMatch": "لا ملاحظات فيها هذه الكلمات.",
+  "journalAdd": "ملاحظة تدبر",
+  "journalHint": "اكتب ملاحظتك على الآية",
+  "journalEdit": "تعديل",
+  "journalOpenVerse": "افتح الآية",
+  "journalVerseRef": "سورة {surah} · آية {ayah}",
+  "@journalVerseRef": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "journalSaved": "حُفظت الملاحظة",
+  "journalEarlier": "ملاحظاتك على هذه الآية"
 }

@@ -15,6 +15,9 @@ import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
 import '../../word_study/word_pick.dart';
 import '../../word_study/word_study_sheet.dart';
+import '../../khatma/domain/reading_tracker.dart';
+import '../../khatma/khatma_providers.dart';
+import '../../khatma/presentation/journal_screen.dart';
 import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
@@ -87,9 +90,20 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   Duration _lastTick = Duration.zero;
   double _pageExtent = 1;
 
+  /// Counts pages read (for the khatma) and the time spent reading (for
+  /// the reports).
+  late final ReadingTracker _tracker;
+  late final AppLifecycleListener _lifecycle;
+
   @override
   void initState() {
     super.initState();
+    final service = ref.read(khatmaServiceProvider);
+    _tracker = ReadingTracker(
+      onPageRead: service.pageRead,
+      onSessionEnd: service.sessionEnded,
+    );
+    _lifecycle = AppLifecycleListener(onHide: _tracker.end, onShow: _trackPage);
     if (widget.selectSurah != null && widget.selectAyah != null) {
       _selA = _selB = (surah: widget.selectSurah!, ayah: widget.selectAyah!);
     }
@@ -139,10 +153,21 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _page = start;
       _controller = PageController(initialPage: start - _first);
     });
+    _trackPage();
+  }
+
+  void _trackPage() {
+    if (_page >= 1) {
+      _tracker.show(_page, ref.read(editionProvider).name);
+    } else {
+      _tracker.leavePage();
+    }
   }
 
   @override
   void dispose() {
+    _lifecycle.dispose();
+    _tracker.end();
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _ticker?.dispose();
@@ -161,6 +186,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _recite = false;
       _revealed.clear();
     });
+    _trackPage();
     if (_page < 1) return;
     final ayahs = await ref.read(pageAyahsProvider(_page).future);
     if (ayahs.isEmpty) return;
@@ -605,6 +631,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   verses: [
                     for (final v in range) (surah: v.surah, ayah: v.ayah),
                   ],
+                ),
+                onReflect: () => showReflectionSheet(
+                  context,
+                  surah: range.first.surah,
+                  ayah: range.first.ayah,
                 ),
               ),
             ),

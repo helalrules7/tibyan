@@ -24,6 +24,7 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onListen,
     required this.onWordStudy,
     required this.onWordMeanings,
+    this.onReflect,
   });
 
   final List<VerseKey> verses;
@@ -40,6 +41,8 @@ class VerseServicesPanel extends StatelessWidget {
 
   /// The meanings of the selected verses' words («الميسر في غريب القرآن»).
   final VoidCallback onWordMeanings;
+  /// Writes a note on the first selected verse (tadabbur journal).
+  final VoidCallback? onReflect;
 
   @override
   Widget build(BuildContext context) {
@@ -191,13 +194,32 @@ class VerseServicesPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              OutlinedButton.icon(
-                onPressed: onMultiSelect,
-                icon: const Icon(Icons.format_line_spacing),
-                label: Text(l.multiSelect),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onMultiSelect,
+                      icon: const Icon(Icons.format_line_spacing),
+                      label: Text(l.multiSelect),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(44),
+                      ),
+                    ),
+                  ),
+                  if (onReflect != null) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: onReflect,
+                        icon: const Icon(Icons.edit_note_outlined),
+                        label: Text(l.journalAdd),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(44),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
               const SizedBox(height: 8),
               FilledButton.tonalIcon(

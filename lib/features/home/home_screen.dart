@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../khatma/khatma_providers.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
@@ -20,9 +21,10 @@ class HomeScreen extends ConsumerWidget {
     final surahs = ref.watch(surahsProvider).value;
     final surah = position == null || surahs == null ? 1 : position.surah;
     final ayah = position?.ayah ?? 1;
+    final khatma = ref.watch(khatmaStatusProvider).value;
+    final portion = khatma?.todayPortion;
     final soon = <(IconData, String)>[
       (Icons.task_alt_outlined, l.sectionHifz),
-      (Icons.groups_outlined, l.sectionKhatma),
     ];
 
     return Scaffold(
@@ -88,6 +90,56 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            if (khatma != null && portion != null) ...[
+              const SizedBox(height: 12),
+              // The «Today» card: the khatma's portion for today.
+              Card(
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () => context.push('/khatma'),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l.homeTodayTitle,
+                                style: TextStyle(
+                                  color: t.goldText,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${l.khatmaToday}: ${l.khatmaPagesRange(digits(portion.range.from), digits(portion.range.to))}',
+                              ),
+                            ],
+                          ),
+                        ),
+                        FilledButton(
+                          onPressed: () async => context.go(
+                            await ref
+                                .read(khatmaServiceProvider)
+                                .routeFor(
+                                  Uri(
+                                    queryParameters: {
+                                      'page': '${portion.range.from}',
+                                      'edition': khatma.row.edition,
+                                    },
+                                  ),
+                                ),
+                          ),
+                          child: Text(l.khatmaReadNow),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
             GridView.count(
               crossAxisCount: 3,
@@ -120,6 +172,16 @@ class HomeScreen extends ConsumerWidget {
                   label: l.sectionListen,
                   note: l.openLabel,
                   onTap: () => context.push('/mushaf/audio'),
+                ),
+                _SectionTile(
+                  icon: Icons.groups_outlined,
+                  label: l.sectionKhatma,
+                  note: portion != null
+                      ? l.khatmaTilePages(digits(portion.pages))
+                      : khatma != null
+                      ? l.khatmaTodayDone
+                      : l.khatmaTileStart,
+                  onTap: () => context.push('/khatma'),
                 ),
                 for (final (icon, label) in soon)
                   _ComingSoonTile(icon: icon, label: label, note: l.comingSoon),
@@ -165,7 +227,7 @@ class _SectionTile extends StatelessWidget {
                 label,
                 style: TextStyle(color: t.ink, fontWeight: FontWeight.w600),
               ),
-              Text(note, style: TextStyle(color: t.accent, fontSize: 12)),
+              Text(note, style: TextStyle(color: t.goldText, fontSize: 12)),
             ],
           ),
         ),

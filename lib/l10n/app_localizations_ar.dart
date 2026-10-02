@@ -885,4 +885,255 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get themeArtCredit =>
       'الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.';
+
+  @override
+  String get khatmaTitle => 'الختمة';
+
+  @override
+  String get khatmaNew => 'ختمة جديدة';
+
+  @override
+  String get khatmaEmptyTitle => 'لا ختمة الآن';
+
+  @override
+  String get khatmaEmptyBody =>
+      'ضع خطة لختم المصحف: حدد موعد الختم أو مقدار الورد اليومي. والصفحات التي تقرؤها في المصحف تُحسب تلقائيا.';
+
+  @override
+  String get khatmaDefaultName => 'ختمتي';
+
+  @override
+  String get khatmaNameLabel => 'الاسم';
+
+  @override
+  String get khatmaByDate => 'حسب موعد الختم';
+
+  @override
+  String get khatmaByAmount => 'حسب الورد اليومي';
+
+  @override
+  String get khatmaEndDateLabel => 'موعد الختم';
+
+  @override
+  String get khatmaAmountLabel => 'المقدار في اليوم';
+
+  @override
+  String get khatmaUnitPage => 'صفحة';
+
+  @override
+  String get khatmaUnitJuz => 'جزء';
+
+  @override
+  String get khatmaUnitHizb => 'حزب';
+
+  @override
+  String khatmaAboutPerDay(String count) {
+    return 'نحو $count صفحة في اليوم';
+  }
+
+  @override
+  String khatmaDuration(String count, String date) {
+    return 'المدة: $count يوم، والختم يوم $date';
+  }
+
+  @override
+  String khatmaEditionNote(String edition) {
+    return 'بصفحات $edition';
+  }
+
+  @override
+  String get khatmaReminder => 'تذكير يومي';
+
+  @override
+  String get khatmaReminderOff => 'بلا تذكير';
+
+  @override
+  String get khatmaStart => 'ابدأ الختمة';
+
+  @override
+  String get khatmaReplaceTitle => 'ختمة مفتوحة';
+
+  @override
+  String get khatmaReplaceBody =>
+      'تُحذف الختمة الحالية وسجلها عند بدء ختمة جديدة.';
+
+  @override
+  String get khatmaToday => 'ورد اليوم';
+
+  @override
+  String khatmaPagesRange(String from, String to) {
+    return 'من صفحة $from إلى صفحة $to';
+  }
+
+  @override
+  String khatmaPagesCount(String count) {
+    return 'عدد الصفحات: $count';
+  }
+
+  @override
+  String get khatmaReadNow => 'اقرأ الآن';
+
+  @override
+  String get khatmaMarkRead => 'قرأته في مصحف آخر';
+
+  @override
+  String get khatmaTodayDone => 'ورد اليوم مقروء';
+
+  @override
+  String get khatmaContinue => 'تابع القراءة';
+
+  @override
+  String khatmaProgress(String done, String total) {
+    return '$done من $total صفحة';
+  }
+
+  @override
+  String khatmaDaysLeft(String count) {
+    return 'الأيام الباقية: $count';
+  }
+
+  @override
+  String khatmaEnds(String date) {
+    return 'الختم يوم $date';
+  }
+
+  @override
+  String khatmaBehindTitle(String count) {
+    return 'صفحات من الأيام الماضية: $count';
+  }
+
+  @override
+  String get khatmaBehindBody =>
+      'أُضيفت إلى ورد اليوم. يمكنك توزيعها على الأيام الباقية، أو تأخير موعد الختم.';
+
+  @override
+  String get khatmaSpread => 'وزّعها على الأيام الباقية';
+
+  @override
+  String get khatmaExtend => 'أخّر موعد الختم';
+
+  @override
+  String get khatmaComplete => 'اكتملت الختمة';
+
+  @override
+  String khatmaCompletedOn(String date) {
+    return 'اكتملت يوم $date';
+  }
+
+  @override
+  String get khatmaPast => 'ختمات سابقة';
+
+  @override
+  String get khatmaDelete => 'حذف الختمة';
+
+  @override
+  String get khatmaDeleteBody => 'يُحذف سجل هذه الختمة.';
+
+  @override
+  String get khatmaTileStart => 'ابدأ';
+
+  @override
+  String khatmaTilePages(String count) {
+    return 'ورد اليوم: $count';
+  }
+
+  @override
+  String get khatmaReminderTitle => 'ورد الختمة';
+
+  @override
+  String khatmaReminderBody(String from, String to) {
+    return 'ورد اليوم: من صفحة $from إلى صفحة $to';
+  }
+
+  @override
+  String get khatmaReminderChannel => 'تذكير الختمة';
+
+  @override
+  String get homeTodayTitle => 'اليوم';
+
+  @override
+  String get widgetNoKhatma => 'ابدأ ختمة في تبيان';
+
+  @override
+  String get reportsTitle => 'تقارير القراءة';
+
+  @override
+  String get reportsWeek => 'آخر ٧ أيام';
+
+  @override
+  String get reportsMonth => 'آخر ٣٠ يوما';
+
+  @override
+  String get reportsDays => 'أيام القراءة';
+
+  @override
+  String get reportsPages => 'الصفحات';
+
+  @override
+  String get reportsReadingMinutes => 'دقائق القراءة';
+
+  @override
+  String get reportsListeningMinutes => 'دقائق الاستماع';
+
+  @override
+  String get reportsEmpty => 'تظهر هنا قراءتك واستماعك تلقائيا.';
+
+  @override
+  String get reportsDayRead => 'يوم فيه قراءة أو استماع';
+
+  @override
+  String streakReadToday(String count) {
+    return 'قرأت اليوم. الأيام المتتالية: $count';
+  }
+
+  @override
+  String streakContinue(String count) {
+    return 'الأيام المتتالية حتى أمس: $count. صفحة اليوم تصلها.';
+  }
+
+  @override
+  String get streakWelcome => 'مرحبا بعودتك. تابع من حيث وقفت.';
+
+  @override
+  String get streakNotesToggle => 'رسائل الاستمرار';
+
+  @override
+  String get streakNotesHint =>
+      'تعرض الأيام المتتالية فقط، ولا تعرض الأيام الفائتة.';
+
+  @override
+  String get journalTitle => 'دفتر التدبر';
+
+  @override
+  String get journalSearch => 'ابحث في ملاحظاتك';
+
+  @override
+  String get journalEmpty =>
+      'لا ملاحظات بعد. اضغط مطولا على آية في المصحف واختر «ملاحظة تدبر».';
+
+  @override
+  String get journalNoMatch => 'لا ملاحظات فيها هذه الكلمات.';
+
+  @override
+  String get journalAdd => 'ملاحظة تدبر';
+
+  @override
+  String get journalHint => 'اكتب ملاحظتك على الآية';
+
+  @override
+  String get journalEdit => 'تعديل';
+
+  @override
+  String get journalOpenVerse => 'افتح الآية';
+
+  @override
+  String journalVerseRef(String surah, String ayah) {
+    return 'سورة $surah · آية $ayah';
+  }
+
+  @override
+  String get journalSaved => 'حُفظت الملاحظة';
+
+  @override
+  String get journalEarlier => 'ملاحظاتك على هذه الآية';
 }

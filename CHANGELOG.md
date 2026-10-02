@@ -15,6 +15,18 @@ All notable changes to Tibyan are recorded here. The format follows
 - «دراسة الكلمة» (word study) in the verse services: tap it, then tap a word on the page, in all three editions. A sheet shows the word, its meaning quoted from «الميسر في غريب القرآن» (Nuqayah, by permission), its root and lemma from the Quranic Arabic Corpus 0.4, and every verse where the root occurs (count shown; a tap opens that verse's page with it selected). The verse's words are listed in the sheet, so any of them can be studied, including where the page has no word boxes.
 - «معاني الكلمات» (word meanings) in the verse services: every entry of the book for the selected verses.
 - A word the book does not explain shows no meaning; nothing is filled in. Roots cover 6,229 of 6,236 verses (the other 7 split words differently from the corpus); 11,233 of the book's 11,362 entries are tied to their words, the rest are shown with their verse.
+### Added (khatma, reports and journal)
+- Khatma planner: plan a full reading by an end date or by a daily amount of pages, juz or hizb, in the pages of the edition being read (all three editions). Today's portion, progress and days left; pages that stay on screen for 15 seconds in the mushaf count automatically (a page read in another edition counts through its verses), and a portion read in a printed mushaf can be marked by hand.
+- Catch-up when behind: earlier pages join today's portion, with a choice to spread them over the days left or move the end date. Wording is neutral; nothing is shown as a failure.
+- Daily reminder at a chosen time with the day's pages, scheduled 14 days ahead and rescheduled on every open (within iOS's limit of 64 pending notifications); tapping it opens the page.
+- Reading reports: reading and listening sessions are recorded automatically; days, pages, reading and listening minutes over 7 or 30 days, and a week strip where only days with reading are marked. Gentle streak notes that can be turned off, and a missed day is never shown.
+- Tadabbur journal: write a note on a verse from the verse services, then list, search, edit and delete notes, and open their verse.
+- Home screen widget on Android with today's portion and the verse it starts at; tapping opens the page. The iOS WidgetKit extension is written and waits for its Xcode target (docs/HOME_WIDGET.md).
+- The home screen's khatma tile opens the khatma, and a «Today» card shows today's portion.
+- Sync layer for accounts, behind the `accounts_sync` flag (off): every new table carries uuid, updated_at and deleted_at, changes queue in an outbox, and rows merge by last write wins. Nothing leaves the device until a Supabase project is set up (docs/SYNC.md, which also covers Google/Apple sign-in and group khatma).
+
+### Fixed
+- Notes under the home screen tiles were white on white in the Zakhrafa style.
 
 ### Added (reading and downloads)
 - The new Madina edition ships with the app and opens on first launch; while another chosen edition downloads, it is read meanwhile, with a progress banner.

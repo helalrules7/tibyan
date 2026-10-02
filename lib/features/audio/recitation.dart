@@ -10,6 +10,7 @@ import 'package:path/path.dart' as p;
 
 import '../../core/db/content_database.dart';
 import '../../core/settings/settings_controller.dart';
+import '../khatma/khatma_providers.dart' show listeningTrackerProvider;
 import '../mushaf/mushaf_providers.dart';
 
 final recitersProvider = FutureProvider<List<ReciterRow>>(
@@ -828,6 +829,8 @@ class RecitationController extends Notifier<RecitationState> {
     final playing = s.playing || _inSilence;
     if (state.playing != playing) {
       state = state.copyWith(playing: playing);
+      // Listening time for the reading reports.
+      ref.read(listeningTrackerProvider).playing(playing, _reciterId);
     }
     final before = _processing;
     _processing = s.processingState;

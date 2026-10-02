@@ -891,4 +891,256 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get themeArtCredit =>
       'Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers.';
+
+  @override
+  String get khatmaTitle => 'Khatma';
+
+  @override
+  String get khatmaNew => 'New khatma';
+
+  @override
+  String get khatmaEmptyTitle => 'No khatma yet';
+
+  @override
+  String get khatmaEmptyBody =>
+      'Plan a full reading of the mushaf: choose an end date or a daily amount. Pages you read in the mushaf are counted automatically.';
+
+  @override
+  String get khatmaDefaultName => 'My khatma';
+
+  @override
+  String get khatmaNameLabel => 'Name';
+
+  @override
+  String get khatmaByDate => 'By end date';
+
+  @override
+  String get khatmaByAmount => 'By daily amount';
+
+  @override
+  String get khatmaEndDateLabel => 'End date';
+
+  @override
+  String get khatmaAmountLabel => 'Amount a day';
+
+  @override
+  String get khatmaUnitPage => 'Pages';
+
+  @override
+  String get khatmaUnitJuz => 'Juz';
+
+  @override
+  String get khatmaUnitHizb => 'Hizb';
+
+  @override
+  String khatmaAboutPerDay(String count) {
+    return 'About $count pages a day';
+  }
+
+  @override
+  String khatmaDuration(String count, String date) {
+    return '$count days, finishing on $date';
+  }
+
+  @override
+  String khatmaEditionNote(String edition) {
+    return 'In the pages of $edition';
+  }
+
+  @override
+  String get khatmaReminder => 'Daily reminder';
+
+  @override
+  String get khatmaReminderOff => 'No reminder';
+
+  @override
+  String get khatmaStart => 'Start the khatma';
+
+  @override
+  String get khatmaReplaceTitle => 'A khatma is open';
+
+  @override
+  String get khatmaReplaceBody =>
+      'The current khatma and its log are removed when a new one starts.';
+
+  @override
+  String get khatmaToday => 'Today\'s portion';
+
+  @override
+  String khatmaPagesRange(String from, String to) {
+    return 'Pages $from to $to';
+  }
+
+  @override
+  String khatmaPagesCount(String count) {
+    return '$count pages';
+  }
+
+  @override
+  String get khatmaReadNow => 'Read now';
+
+  @override
+  String get khatmaMarkRead => 'I read it elsewhere';
+
+  @override
+  String get khatmaTodayDone => 'Today\'s portion is read';
+
+  @override
+  String get khatmaContinue => 'Keep reading';
+
+  @override
+  String khatmaProgress(String done, String total) {
+    return '$done of $total pages';
+  }
+
+  @override
+  String khatmaDaysLeft(String count) {
+    return 'Days left: $count';
+  }
+
+  @override
+  String khatmaEnds(String date) {
+    return 'Ends on $date';
+  }
+
+  @override
+  String khatmaBehindTitle(String count) {
+    return 'Pages from earlier days: $count';
+  }
+
+  @override
+  String get khatmaBehindBody =>
+      'They are added to today\'s portion. You can spread them over the days left, or move the end date.';
+
+  @override
+  String get khatmaSpread => 'Spread over the days left';
+
+  @override
+  String get khatmaExtend => 'Move the end date';
+
+  @override
+  String get khatmaComplete => 'Khatma complete';
+
+  @override
+  String khatmaCompletedOn(String date) {
+    return 'Completed on $date';
+  }
+
+  @override
+  String get khatmaPast => 'Past khatmas';
+
+  @override
+  String get khatmaDelete => 'Delete the khatma';
+
+  @override
+  String get khatmaDeleteBody => 'This khatma\'s log is removed.';
+
+  @override
+  String get khatmaTileStart => 'Start';
+
+  @override
+  String khatmaTilePages(String count) {
+    return 'Today: $count';
+  }
+
+  @override
+  String get khatmaReminderTitle => 'Khatma portion';
+
+  @override
+  String khatmaReminderBody(String from, String to) {
+    return 'Today: pages $from to $to';
+  }
+
+  @override
+  String get khatmaReminderChannel => 'Khatma reminders';
+
+  @override
+  String get homeTodayTitle => 'Today';
+
+  @override
+  String get widgetNoKhatma => 'Start a khatma in Tibyan';
+
+  @override
+  String get reportsTitle => 'Reading reports';
+
+  @override
+  String get reportsWeek => 'Last 7 days';
+
+  @override
+  String get reportsMonth => 'Last 30 days';
+
+  @override
+  String get reportsDays => 'Reading days';
+
+  @override
+  String get reportsPages => 'Pages';
+
+  @override
+  String get reportsReadingMinutes => 'Reading minutes';
+
+  @override
+  String get reportsListeningMinutes => 'Listening minutes';
+
+  @override
+  String get reportsEmpty =>
+      'Your reading and listening appear here automatically.';
+
+  @override
+  String get reportsDayRead => 'A day with reading or listening';
+
+  @override
+  String streakReadToday(String count) {
+    return 'You read today. Days in a row: $count';
+  }
+
+  @override
+  String streakContinue(String count) {
+    return 'Days in a row until yesterday: $count. A page today continues it.';
+  }
+
+  @override
+  String get streakWelcome => 'Welcome back. Pick up where you left off.';
+
+  @override
+  String get streakNotesToggle => 'Streak notes';
+
+  @override
+  String get streakNotesHint =>
+      'Shows days in a row only; missed days are never shown.';
+
+  @override
+  String get journalTitle => 'Tadabbur journal';
+
+  @override
+  String get journalSearch => 'Search your notes';
+
+  @override
+  String get journalEmpty =>
+      'No notes yet. Long-press a verse in the mushaf and choose “Reflection note”.';
+
+  @override
+  String get journalNoMatch => 'No notes contain these words.';
+
+  @override
+  String get journalAdd => 'Reflection note';
+
+  @override
+  String get journalHint => 'Write your note on the verse';
+
+  @override
+  String get journalEdit => 'Edit';
+
+  @override
+  String get journalOpenVerse => 'Open the verse';
+
+  @override
+  String journalVerseRef(String surah, String ayah) {
+    return '$surah · verse $ayah';
+  }
+
+  @override
+  String get journalSaved => 'Note saved';
+
+  @override
+  String get journalEarlier => 'Your notes on this verse';
 }
