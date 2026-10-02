@@ -38,6 +38,9 @@ class MushafRepository {
                 MushafEdition.shamarly =>
                   t.pageShamarly.isSmallerOrEqualValue(page) &
                       t.pageShamarlyEnd.isBiggerOrEqualValue(page),
+                // Riwaya pages and verses are in their pack (RiwayaData),
+                // numbered by the riwaya, never in this Hafs table.
+                _ => const Constant(false),
               },
             )
             ..orderBy([(t) => OrderingTerm.asc(t.id)]))
@@ -274,25 +277,28 @@ const shamarlyWordLevel = 2;
 /// is the page where the verse starts.
 extension EditionPages on AyahRow {
   int pageIn(MushafEdition edition) => switch (edition) {
-    MushafEdition.madina1441 => page,
     MushafEdition.madina1405 => page1405,
     MushafEdition.shamarly => pageShamarly,
+    // The riwaya editions' pages come from their packs
+    // (`versePageProvider`); this falls back to the new Madina edition's.
+    _ => page,
   };
 }
 
 extension EditionStartPages on SurahRow {
   int startPageIn(MushafEdition edition) => switch (edition) {
-    MushafEdition.madina1441 => startPage,
     MushafEdition.madina1405 => startPage1405,
     MushafEdition.shamarly => startPageShamarly,
+    // Riwaya editions: `surahStartPageProvider`.
+    _ => startPage,
   };
 }
 
 extension on MushafEdition {
   /// The `ayah` column holding the (start) page in this edition.
   String get pageColumn => switch (this) {
-    MushafEdition.madina1441 => 'page',
     MushafEdition.madina1405 => 'page_1405',
     MushafEdition.shamarly => 'page_shamarly',
+    _ => 'page',
   };
 }

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 
+/// The same reader's recitation in another riwaya uses that reader's photo:
+/// al-Husary (Warsh, Qalun, al-Duri) and Abdul Basit (Warsh).
+const _photoOf = {101: 2, 111: 2, 121: 2, 106: 3};
+
 /// A reciter's photo beside their name, or their initials while there is
 /// no photo for them.
 ///
@@ -40,7 +44,7 @@ class ReciterAvatar extends StatelessWidget {
       height: size,
       child: ClipOval(
         child: Image.asset(
-          'assets/reciters/$id.webp',
+          'assets/reciters/${_photoOf[id] ?? id}.webp',
           width: size,
           height: size,
           fit: BoxFit.cover,

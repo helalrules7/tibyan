@@ -84,6 +84,11 @@ class SettingsController extends Notifier<AppSettings> {
       },
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
       reciterId: _prefs.getInt(_kReciter) ?? 1,
+      riwayaReciters: {
+        for (final r in Riwaya.values)
+          if (r != Riwaya.hafs && _prefs.getInt('$_kReciter.${r.name}') != null)
+            r: _prefs.getInt('$_kReciter.${r.name}')!,
+      },
       followRecitation: _prefs.getBool(_kFollow) ?? true,
       touchReading: _prefs.getBool(_kTouchReading) ?? true,
       versePause: _prefs.getInt(_kVersePause) ?? 500,
@@ -190,9 +195,17 @@ class SettingsController extends Notifier<AppSettings> {
     await _prefs.setBool(_kKashida, value);
   }
 
-  Future<void> setReciter(int id) async {
-    state = state.copyWith(reciterId: id);
-    await _prefs.setInt(_kReciter, id);
+  /// Chooses the recitation for [riwaya] (Hafs unless given).
+  Future<void> setReciter(int id, {Riwaya riwaya = Riwaya.hafs}) async {
+    if (riwaya == Riwaya.hafs) {
+      state = state.copyWith(reciterId: id);
+      await _prefs.setInt(_kReciter, id);
+      return;
+    }
+    state = state.copyWith(
+      riwayaReciters: {...state.riwayaReciters, riwaya: id},
+    );
+    await _prefs.setInt('$_kReciter.${riwaya.name}', id);
   }
 
   Future<void> setFollowRecitation(bool value) async {

@@ -6,6 +6,12 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (riwayat)
+- Four more mushafs to choose from in settings: the King Fahd Complex's Madina mushaf in the riwayat of Warsh, Qalun, al-Duri and Shu'bah, each its own download from the Tibyan mirror (70 to 83 MB). The pages are the Complex's own artwork (quran-ws SVG), drawn like the new Madina edition with every theme, frame, recitation mode and touch reading.
+- Each riwaya keeps its own verse count and numbers. Bookmarks, the reading position, tafsir, translation, word meanings, reflections and search go through a verse map between the riwaya and Hafs, worked out from the Complex's texts of both and checked against Quranpedia's published map (they agree at every verse); the tafsir screen names the verse as read in the riwaya, shows its text in the riwaya's KFGQPC font, and says which Hafs verses it matches.
+- Riwaya recitations from mp3quran: Warsh (al-Husary, al-Qari Yasin, al-Oyoun al-Koushi, Omar al-Qazabri, Mohammad Sayed, Abdul Basit), Qalun (al-Husary, al-Hudhaifi, al-Dokali), al-Duri (al-Husary, Noreen Siddiq, al-Fatih al-Zubair) and Shu'bah (al-Hudhaifi, Ahmad Deban), offered only while that riwaya is read, with the verse highlighted and pages turned for the ten with published timings.
+- Not in the riwaya editions yet: word highlighting, word study and divine-name colouring (no word boxes), and hizb and quarter labels (not in the sources). al-Susi, al-Bazzi and Qunbul: no page artwork found (docs/MISSING_DATA.md ث5).
+
 ### Added (data review; nothing changes in the app)
 - A review tool (Flutter web, `apps/review/`): each imported passage beside its verses in the mushaf text; editors link, reviewers approve or return with a note, never their own work; an append-only log of every action. Works on a review file now; a Supabase schema with row-level security is ready for later.
 - al-Wahidi's «أسباب نزول القرآن» (OpenITI) imported as 534 drafts with suggested verse links, waiting for review. `tools/export_pack.py` builds packs from reviewed entries only.

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/db/content_database.dart';
+import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/theme_tokens.dart';
@@ -33,12 +34,7 @@ class PlayerBar extends ConsumerWidget {
     final s = ref.watch(recitationProvider);
     final c = ref.read(recitationProvider.notifier);
     final surahs = ref.watch(surahsProvider).value;
-    final reciterId = ref.watch(settingsProvider.select((x) => x.reciterId));
-    final reciter = ref
-        .watch(recitersProvider)
-        .value
-        ?.where((r) => r.id == reciterId)
-        .firstOrNull;
+    final reciter = ref.watch(currentReciterProvider).value;
     final surah = surahs == null ? '' : surahName(context, surahs[s.surah - 1]);
     final where = s.ayah == null
         ? l.surahWord(surah)
@@ -280,6 +276,8 @@ class PlayerOptions extends ConsumerWidget {
     final c = ref.read(recitationProvider.notifier);
     final settings = ref.watch(settingsProvider);
     final reciters = ref.watch(recitersProvider).value ?? const [];
+    final current = ref.watch(currentReciterProvider).value;
+    final riwaya = ref.watch(editionProvider.select((e) => e.riwaya));
     final title = Theme.of(context).textTheme.titleSmall;
     final hint = TextStyle(color: muted, fontSize: 12);
     final playing = inSheet && s.active;
@@ -312,9 +310,15 @@ class PlayerOptions extends ConsumerWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
-        Text(l.reciterLabel, style: title),
+        // A riwaya edition lists that riwaya's recitations only.
+        Text(
+          riwaya == Riwaya.hafs
+              ? l.reciterLabel
+              : l.riwayaRecitersNote(riwayaName(l, riwaya)),
+          style: title,
+        ),
         RadioGroup<int>(
-          groupValue: settings.reciterId,
+          groupValue: current?.id ?? settings.reciterId,
           onChanged: (id) => id == null ? null : c.changeReciter(id),
           child: Column(
             children: [

@@ -76,9 +76,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Future<void> _open(int surah, int ayah) async {
     await _remember(_field.text);
-    final row = await ref.read(mushafRepositoryProvider).ayah(surah, ayah);
+    // Search finds Hafs verses; a riwaya edition opens the page of the
+    // riwaya verse that holds the found one (and selects it there).
+    final page = await ref.read(versePageProvider((surah, ayah)).future);
     if (!mounted) return;
-    final page = row.pageIn(ref.read(editionProvider));
     context.go(mushafLocation(page, surah: surah, ayah: ayah));
   }
 

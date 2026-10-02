@@ -86,10 +86,49 @@ class PagePackSpec {
     fallbacks: [],
   );
 
+  /// The KFGQPC Madina mushaf of a riwaya other than Hafs: its 604 SVG
+  /// pages (quran-ws, the Complex's artwork unchanged), the riwaya's
+  /// verses, verse map and page geometry (`riwaya.json.xz`) and its KFGQPC
+  /// font. Built by tools/build_riwaya_packs.py; on Tibyan's mirror only
+  /// (no other host serves these bytes).
+  static PagePackSpec _riwaya(String riwaya, String sha256, int bytes) =>
+      PagePackSpec(
+        id: 'pages-$riwaya-v1',
+        url: 'https://tibyan.ahmedhelal.dev/mirror/packs/pages-$riwaya-v1.zip',
+        sha256: sha256,
+        bytes: bytes,
+        format: PackFormat.svgXz,
+      );
+
+  static final warsh = _riwaya(
+    'warsh',
+    '826e9be1da8a7b6dcd60f542d88fafcd030382576296b475fe1569c793409e51',
+    78608758,
+  );
+  static final qalun = _riwaya(
+    'qalun',
+    '611b716755f3b6150d99017bf9a46d8cad3012092acae4216d2b16435c16d852',
+    82756503,
+  );
+  static final douri = _riwaya(
+    'douri',
+    '3c3beaf4e0f69e5f4efd1a09af301997e529285f51194e2b7a25c5def381fe7a',
+    70224157,
+  );
+  static final shubah = _riwaya(
+    'shubah',
+    '9fe1042cb316df8a84d724facaada1ae916f02c3e9ab32eaeaa3890be091bcbd',
+    72332382,
+  );
+
   static PagePackSpec of(MushafEdition edition) => switch (edition) {
     MushafEdition.madina1441 => madina1441,
     MushafEdition.madina1405 => madina1405,
     MushafEdition.shamarly => shamarly,
+    MushafEdition.warsh => warsh,
+    MushafEdition.qalun => qalun,
+    MushafEdition.douri => douri,
+    MushafEdition.shubah => shubah,
   };
 }
 

@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 
 var _visit = 0;
@@ -23,9 +22,11 @@ Future<void> openVerse(
   required int surah,
   required int ayah,
 }) async {
-  final row = await ref.read(mushafRepositoryProvider).ayah(surah, ayah);
+  // [surah]:[ayah] is in Hafs numbers; a riwaya edition opens the page of
+  // the riwaya verse that holds it.
+  final page = await ref.read(versePageProvider((surah, ayah)).future);
   if (!context.mounted) return;
-  context.go(mushafLocation(row.pageIn(ref.read(editionProvider))));
+  context.go(mushafLocation(page));
 }
 
 /// Opens a page of the edition being read.

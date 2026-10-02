@@ -590,5 +590,22 @@
   "journalOpenVerse": "Open the verse",
   "journalVerseRef": "{surah} · verse {ayah}",
   "journalSaved": "Note saved",
-  "journalEarlier": "Your notes on this verse"
+  "journalEarlier": "Your notes on this verse",
+  "editionWarsh": "Madina Mushaf: Warsh from Nafi",
+  "editionQalun": "Madina Mushaf: Qalun from Nafi",
+  "editionDouri": "Madina Mushaf: al-Duri from Abu Amr",
+  "editionShubah": "Madina Mushaf: Shu'bah from Asim",
+  "riwayaWarsh": "Warsh from Nafi",
+  "riwayaQalun": "Qalun from Nafi",
+  "riwayaDouri": "al-Duri from Abu Amr",
+  "riwayaShubah": "Shu'bah from Asim",
+  "riwayatTitle": "Other riwayat",
+  "riwayaEditionDesc": "The King Fahd Complex's Madina mushaf in this riwaya, with its own verse count and numbers. Tafsir, translation and bookmarks link to the matching verses in Hafs's count.",
+  "riwayaGaps": "In the riwaya editions: no word highlighting while listening, no colouring of the divine names, and no hizb or quarter in the frame (the page carries its own printed signs).",
+  "riwayaTafsirNote": "Verse {ayah} of surah {surah} in {riwaya} matches, in the count of Hafs: {hafs}. The tafsir, translation and verse text below follow Hafs.",
+  "riwayaNoHafs": "no verse in the count of Hafs",
+  "hafsVerseOne": "verse {number}",
+  "hafsVerseRange": "verses {from} to {to}",
+  "riwayaVerseText": "The verse in {riwaya}",
+  "riwayaRecitersNote": "Recitations in {riwaya}"
 }

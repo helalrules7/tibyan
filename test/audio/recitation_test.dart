@@ -24,10 +24,24 @@ void main() {
   tearDownAll(() => db.close());
 
   test('ten recitations, murattal only, each with a folder of files', () async {
-    final reciters = await repo.reciters();
+    final all = await repo.reciters();
+    final reciters = [
+      for (final r in all)
+        if (r.riwaya == 'hafs') r,
+    ];
     expect(reciters.map((r) => r.id).toList()..sort(), [
       1, 2, 3, 4, 5, 10, 11, 12, 13, 14,
     ]);
+    // The riwaya recitations (Warsh, Qalun, al-Duri, Shu'bah): ids from
+    // 101, each tagged with its riwaya.
+    final others = all.where((r) => r.riwaya != 'hafs').toList();
+    expect(others.map((r) => r.riwaya).toSet(), {
+      'warsh',
+      'qalun',
+      'douri',
+      'shubah',
+    });
+    expect(others.every((r) => r.id > 100 && r.style == 'murattal'), isTrue);
     // The mujawwad ones (ids 6 and 7) were removed, and their numbers are
     // never reused, so a reader who saved one cannot land on another.
     expect(reciters.every((r) => r.style == 'murattal'), isTrue);
@@ -50,6 +64,7 @@ void main() {
       style: 'murattal',
       folderUrl: 'https://host/qdc/who/murattal/{surah}.mp3',
       sourceId: 16,
+      riwaya: 'hafs',
     );
     expect(surahUrl(r, 7), 'https://host/qdc/who/murattal/7.mp3');
     // Downloads are named the same whatever the host calls its files.

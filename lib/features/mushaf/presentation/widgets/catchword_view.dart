@@ -148,7 +148,15 @@ class CatchwordView extends ConsumerWidget {
       if (image.isLoading) return const SizedBox.shrink();
     }
     if (text == null) return const SizedBox.shrink();
-    return Text(text!, semanticsLabel: l.catchwordLabel(text!), style: style);
+    // A riwaya's catchword is its own KFGQPC text, in its own font.
+    final riwayaStyle = edition.isRiwaya && riwayaFontLoaded(edition.riwaya)
+        ? style.copyWith(fontFamily: riwayaFontFamily(edition.riwaya))
+        : style;
+    return Text(
+      text!,
+      semanticsLabel: l.catchwordLabel(text!),
+      style: riwayaStyle,
+    );
   }
 }
 

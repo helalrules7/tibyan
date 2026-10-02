@@ -116,6 +116,7 @@ class FakeRepo extends Fake implements MushafRepository {
         style: 'murattal',
         folderUrl: 'https://server$id.mp3quran.net/r$id/',
         sourceId: 10,
+        riwaya: 'hafs',
       ),
   ];
 

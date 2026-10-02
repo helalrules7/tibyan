@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/content_database.dart';
-import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/mushaf_providers.dart';
@@ -58,10 +57,8 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final reciterId = ref.watch(settingsProvider.select((s) => s.reciterId));
-    final reciters = ref.watch(recitersProvider).value;
     final surahs = ref.watch(surahsProvider).value;
-    final reciter = reciters?.where((r) => r.id == reciterId).firstOrNull;
+    final reciter = ref.watch(currentReciterProvider).value;
     if (reciter == null || surahs == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

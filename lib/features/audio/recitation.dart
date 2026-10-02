@@ -9,13 +9,37 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path/path.dart' as p;
 
 import '../../core/db/content_database.dart';
+import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../khatma/khatma_providers.dart' show listeningTrackerProvider;
 import '../mushaf/mushaf_providers.dart';
 
-final recitersProvider = FutureProvider<List<ReciterRow>>(
+/// Every recitation in the content database, of every riwaya.
+final allRecitersProvider = FutureProvider<List<ReciterRow>>(
   (ref) => ref.watch(mushafRepositoryProvider).reciters(),
 );
+
+/// The recitations of the riwaya being read: a riwaya edition offers its
+/// own riwaya's reciters, whose verses are numbered like its pages.
+final recitersProvider = FutureProvider<List<ReciterRow>>((ref) async {
+  final riwaya = ref.watch(editionProvider.select((e) => e.riwaya));
+  return [
+    for (final r in await ref.watch(allRecitersProvider.future))
+      if (r.riwaya == riwaya.name) r,
+  ];
+});
+
+/// The recitation that plays: the reader's choice for the riwaya being
+/// read, else that riwaya's first.
+final currentReciterProvider = FutureProvider<ReciterRow?>((ref) async {
+  final riwaya = ref.watch(editionProvider.select((e) => e.riwaya));
+  final chosen = ref.watch(
+    settingsProvider.select((s) => s.reciterFor(riwaya)),
+  );
+  final reciters = await ref.watch(recitersProvider.future);
+  return reciters.where((r) => r.id == chosen).firstOrNull ??
+      reciters.firstOrNull;
+});
 
 /// The verse playing at [ms], or null before the first timed verse.
 int? ayahAt(List<AyahTimingRow> timings, int ms) {
@@ -301,9 +325,7 @@ class AudioHosts extends Notifier<Map<String, AudioHost>> {
 /// On start: measure the hosts of the chosen recitation, in the background.
 Future<void> measureAudioHosts(ProviderContainer container) async {
   try {
-    final reciters = await container.read(recitersProvider.future);
-    final id = container.read(settingsProvider).reciterId;
-    final reciter = reciters.where((r) => r.id == id).firstOrNull;
+    final reciter = await container.read(currentReciterProvider.future);
     if (reciter != null) {
       await container.read(audioHostsProvider.notifier).measure(reciter);
     }
@@ -535,6 +557,11 @@ class RecitationController extends Notifier<RecitationState> {
       _sleepTimer?.cancel();
       _player?.dispose();
     });
+    // Verse numbers differ between riwayat: a recitation stops when the
+    // reader turns to an edition of another riwaya.
+    ref.listen(editionProvider.select((e) => e.riwaya), (before, now) {
+      if (before != now && state.active) unawaited(stop());
+    });
     return _idle();
   }
 
@@ -547,7 +574,10 @@ class RecitationController extends Notifier<RecitationState> {
     );
   }
 
-  int get _reciterId => ref.read(settingsProvider).reciterId;
+  /// The recitation playing (or last chosen) for the riwaya being read.
+  int get _reciterId =>
+      ref.read(currentReciterProvider).value?.id ??
+      ref.read(settingsProvider).reciterId;
 
   /// Starts reciting [surah] at [from] (the whole surah when null). With
   /// [to], only [rangeFrom] (by default [from])..[to] plays. [repeat]
@@ -567,11 +597,11 @@ class RecitationController extends Notifier<RecitationState> {
     _waits++;
     _inSilence = false;
     _restartAt = null;
-    final reciters = await ref.read(recitersProvider.future);
-    final reciter = reciters.firstWhere(
-      (r) => r.id == _reciterId,
-      orElse: () => reciters.first,
-    );
+    final reciter = await ref.read(currentReciterProvider.future);
+    if (reciter == null) {
+      _loading = false;
+      return;
+    }
     final hosts = ref.read(audioHostsProvider.notifier);
     unawaited(hosts.measure(reciter));
     final repo = ref.read(mushafRepositoryProvider);
@@ -663,7 +693,9 @@ class RecitationController extends Notifier<RecitationState> {
   /// the verse being recited when it has verse timings for this surah, and
   /// from the start of the surah when it has none.
   Future<void> changeReciter(int id) async {
-    await ref.read(settingsProvider.notifier).setReciter(id);
+    await ref
+        .read(settingsProvider.notifier)
+        .setReciter(id, riwaya: ref.read(editionProvider).riwaya);
     final s = state;
     if (!s.active) return;
     await play(

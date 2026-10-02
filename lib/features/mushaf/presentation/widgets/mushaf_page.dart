@@ -18,7 +18,7 @@ typedef _PageData = (
   PictureInfo,
   Rect,
   List<AyahPolygonRow>,
-  List<double>,
+  SvgPageGeometry,
   Map<int, List<Path>>,
   PictureInfo?,
   /// The clip region of each line, built once per page by [pageLineClips].
@@ -28,17 +28,10 @@ typedef _PageData = (
 /// Identifies a verse.
 typedef VerseKey = ({int surah, int ayah});
 
-/// Line grid of the new edition's pages (user units): 15 lines, first
-/// line centred at [_firstLine], [_pitch] apart. Measured on the pages.
+/// 15 lines on every page. The line grid (first line centre and pitch)
+/// and the opening pages' block are measured on each edition's pages; see
+/// [SvgPageGeometry].
 const _lineCount = 15;
-const _firstLine = 26.2;
-const _pitch = 35.75;
-
-/// Pages 1 and 2 draw a small centred block; this is its ink area.
-const _openingInk = Rect.fromLTRB(5, -68, 232, 236);
-
-/// The same block without its printed surah header.
-const _openingBody = Rect.fromLTRB(10, 15, 228, 217);
 
 /// The page-unit region that belongs to each line: its band, less the marks
 /// of neighbouring lines that reach into it, plus its own marks that reach
@@ -50,15 +43,17 @@ const _openingBody = Rect.fromLTRB(10, 15, 228, 217);
 List<Path> pageLineClips(
   Rect viewBox,
   List<double> cuts,
-  Map<int, List<Path>> overflow,
-) {
+  Map<int, List<Path>> overflow, {
+  double firstLine = 26.2,
+  double pitch = 35.75,
+}) {
   final hasCuts = cuts.length == _lineCount - 1;
-  double centre(int j) => _firstLine + j * _pitch;
+  double centre(int j) => firstLine + j * pitch;
   double bandTop(int j) =>
-      j == 0 ? viewBox.top : (hasCuts ? cuts[j - 1] : centre(j) - _pitch / 2);
+      j == 0 ? viewBox.top : (hasCuts ? cuts[j - 1] : centre(j) - pitch / 2);
   double bandBottom(int j) => j == _lineCount - 1
       ? viewBox.bottom
-      : (hasCuts ? cuts[j] : centre(j) + _pitch / 2);
+      : (hasCuts ? cuts[j] : centre(j) + pitch / 2);
   final marks = <(int, Path, Rect)>[
     for (final e in overflow.entries)
       for (final p in e.value) (e.key, p, p.getBounds()),
@@ -102,10 +97,14 @@ class _PageLayout {
     this.viewBox, {
     required bool opening,
     required this.clips,
+    required this.firstLine,
+    required this.pitch,
+    required Rect openingInk,
+    required Rect openingBody,
     this.cuts = const [],
     bool withoutHeader = false,
-  }) : clip = opening && withoutHeader ? _openingBody : null {
-    final area = clip ?? (opening ? _openingInk : viewBox);
+  }) : clip = opening && withoutHeader ? openingBody : null {
+    final area = clip ?? (opening ? openingInk : viewBox);
     final byWidth = size.width / area.width;
     final byHeight = size.height / area.height;
     scale = byWidth < byHeight ? byWidth : byHeight;
@@ -117,6 +116,10 @@ class _PageLayout {
   }
 
   final Size size;
+
+  /// The line grid: first line centre and pitch (page units).
+  final double firstLine;
+  final double pitch;
 
   /// Page-unit area to keep (pages 1 and 2 without their header).
   final Rect? clip;
@@ -153,19 +156,19 @@ class _PageLayout {
   }
 
   double get _slot => (size.height - _padTop - _padBottom) / _lineCount;
-  double _centre(int j) => _firstLine + j * _pitch;
+  double _centre(int j) => firstLine + j * pitch;
   bool get _hasCuts => cuts.length == _lineCount - 1;
   double _bandTop(int j) =>
-      j == 0 ? viewBox.top : (_hasCuts ? cuts[j - 1] : _centre(j) - _pitch / 2);
+      j == 0 ? viewBox.top : (_hasCuts ? cuts[j - 1] : _centre(j) - pitch / 2);
   double _bandBottom(int j) => j == _lineCount - 1
       ? viewBox.bottom
-      : (_hasCuts ? cuts[j] : _centre(j) + _pitch / 2);
+      : (_hasCuts ? cuts[j] : _centre(j) + pitch / 2);
 
   double _slotCentre(int j) => _padTop + (j + 0.5) * _slot;
 
   int _lineOf(double y) {
     if (!_hasCuts) {
-      return ((y - _firstLine + _pitch / 2) / _pitch).floor().clamp(
+      return ((y - firstLine + pitch / 2) / pitch).floor().clamp(
         0,
         _lineCount - 1,
       );
@@ -418,27 +421,30 @@ class _MushafPageState extends ConsumerState<MushafPage> {
         p?.picture.dispose();
       }
     });
-    final repo = ref.read(mushafRepositoryProvider);
-    // The three queries do not depend on each other, so they are asked for
-    // together: one wait instead of three.
-    final (polys, cuts, overflowRows) = await (
-      repo.polygons(widget.page),
-      repo.lineCuts('madina1441', widget.page),
-      repo.lineOverflow(widget.page),
-    ).wait;
+    // Outlines, line cuts and grid: the new edition's from content.db, a
+    // riwaya edition's from its pack.
+    final geometry = await ref.read(
+      svgPageGeometryProvider(widget.page).future,
+    );
     final overflow = <int, List<Path>>{};
-    for (final o in overflowRows) {
-      overflow.putIfAbsent(o.line, () => []).add(parseOutline(o.path));
+    for (final (line, path) in geometry.overflow) {
+      overflow.putIfAbsent(line, () => []).add(parseOutline(path));
     }
     final viewBox = _viewBox(svg);
     return (
       info,
       viewBox,
-      polys,
-      cuts,
+      geometry.polygons,
+      geometry,
       overflow,
       markers,
-      pageLineClips(viewBox, cuts, overflow),
+      pageLineClips(
+        viewBox,
+        geometry.cuts,
+        overflow,
+        firstLine: geometry.firstLine,
+        pitch: geometry.pitch,
+      ),
     );
   }
 
@@ -457,11 +463,12 @@ class _MushafPageState extends ConsumerState<MushafPage> {
           picture,
           viewBox,
           polys,
-          cuts,
+          geometry,
           overflow,
           markerPicture,
           clips,
         ) = snap.data!;
+        final cuts = geometry.cuts;
         final verses = [
           for (final p in polys)
             (
@@ -496,6 +503,10 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               opening: widget.page <= 2,
               cuts: cuts,
               clips: clips,
+              firstLine: geometry.firstLine,
+              pitch: geometry.pitch,
+              openingInk: geometry.openingInk,
+              openingBody: geometry.openingBody,
               withoutHeader: x.ornateOpening,
             );
             final selected = [
@@ -529,7 +540,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                     [for (final v in selected) ...v.rects],
                     lineOf: (r) => layout._lineOf(r.center.dy),
                     centre: layout._centre,
-                    halfHeight: _pitch * 0.42,
+                    halfHeight: layout.pitch * 0.42,
                     band: (j) => (layout._bandTop(j), layout._bandBottom(j)),
                   );
             final touchedBoxes = [
@@ -541,7 +552,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                           v.rects,
                           lineOf: (r) => layout._lineOf(r.center.dy),
                           centre: layout._centre,
-                          halfHeight: _pitch * 0.42,
+                          halfHeight: layout.pitch * 0.42,
                           band: (j) =>
                               (layout._bandTop(j), layout._bandBottom(j)),
                         ),
@@ -553,7 +564,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                     [active],
                     lineOf: (r) => layout._lineOf(r.center.dy),
                     centre: layout._centre,
-                    halfHeight: _pitch * 0.42,
+                    halfHeight: layout.pitch * 0.42,
                     band: (j) => (layout._bandTop(j), layout._bandBottom(j)),
                   ).first.widen(0.6);
             final handles = <Widget>[];
@@ -822,7 +833,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 words,
                                 lineOf: (r) => layout._lineOf(r.center.dy),
                                 centre: layout._centre,
-                                halfHeight: _pitch * 0.5,
+                                halfHeight: layout.pitch * 0.5,
                               )) {
                                 final j = layout._lineOf(b.center.dy);
                                 final xs = markersOn[j] ?? const <double>[];

@@ -864,5 +864,69 @@
     }
   },
   "journalSaved": "حُفظت الملاحظة",
-  "journalEarlier": "ملاحظاتك على هذه الآية"
+  "journalEarlier": "ملاحظاتك على هذه الآية",
+  "editionWarsh": "مصحف المدينة برواية ورش عن نافع",
+  "editionQalun": "مصحف المدينة برواية قالون عن نافع",
+  "editionDouri": "مصحف المدينة برواية الدوري عن أبي عمرو",
+  "editionShubah": "مصحف المدينة برواية شعبة عن عاصم",
+  "riwayaWarsh": "رواية ورش عن نافع",
+  "riwayaQalun": "رواية قالون عن نافع",
+  "riwayaDouri": "رواية الدوري عن أبي عمرو",
+  "riwayaShubah": "رواية شعبة عن عاصم",
+  "riwayatTitle": "مصاحف الروايات",
+  "riwayaEditionDesc": "صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها. التفسير والترجمة والفواصل تُربط بالآيات المقابلة في عدّ حفص.",
+  "riwayaGaps": "في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة ولا تلوين للفظ الجلالة، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).",
+  "riwayaTafsirNote": "الآية {ayah} من سورة {surah} في {riwaya} يقابلها في عدّ حفص: {hafs}. التفسير والترجمة ونص الآية أدناه بعدّ حفص وروايته.",
+  "@riwayaTafsirNote": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      },
+      "riwaya": {
+        "type": "String"
+      },
+      "hafs": {
+        "type": "String"
+      }
+    }
+  },
+  "riwayaNoHafs": "لا تقابلها آية في عدّ حفص",
+  "hafsVerseOne": "الآية {number}",
+  "@hafsVerseOne": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "hafsVerseRange": "الآيات {from} إلى {to}",
+  "@hafsVerseRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "riwayaVerseText": "نص الآية في {riwaya}",
+  "@riwayaVerseText": {
+    "placeholders": {
+      "riwaya": {
+        "type": "String"
+      }
+    }
+  },
+  "riwayaRecitersNote": "تلاوات {riwaya}",
+  "@riwayaRecitersNote": {
+    "placeholders": {
+      "riwaya": {
+        "type": "String"
+      }
+    }
+  }
 }

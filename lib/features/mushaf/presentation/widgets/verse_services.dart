@@ -37,7 +37,9 @@ class VerseServicesPanel extends StatelessWidget {
   final VoidCallback onListen;
 
   /// Word study: the next tap on the page picks the word.
-  final VoidCallback onWordStudy;
+  /// Null where the edition has no word data (the riwaya editions): the
+  /// button is shown disabled.
+  final VoidCallback? onWordStudy;
 
   /// The meanings of the selected verses' words («الميسر في غريب القرآن»).
   final VoidCallback onWordMeanings;

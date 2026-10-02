@@ -10,13 +10,42 @@ enum ModeSetting { system, light, white, night, black }
 enum LanguageSetting { system, ar, en }
 
 /// Mushaf edition shown in the page view: the two Madina prints and the
-/// Shamarly (Egyptian) print.
-enum MushafEdition { madina1441, madina1405, shamarly }
+/// Shamarly (Egyptian) print in the riwaya of Hafs, and the KFGQPC Madina
+/// mushafs of four other riwayat.
+enum MushafEdition {
+  madina1441,
+  madina1405,
+  shamarly,
+  warsh,
+  qalun,
+  douri,
+  shubah,
+}
+
+/// The riwaya an edition is printed in. Verse numbers follow the riwaya's
+/// own count; tafsir, translation and bookmarks use Hafs numbers, reached
+/// through each riwaya's verse map.
+enum Riwaya { hafs, warsh, qalun, douri, shubah }
 
 extension MushafEditionPages on MushafEdition {
   /// Pages of the printed mushaf, numbered from 1. Shamarly: page 1 is the
   /// cover and the text runs from page 2 to 522.
   int get pageCount => this == MushafEdition.shamarly ? 522 : 604;
+
+  Riwaya get riwaya => switch (this) {
+    MushafEdition.warsh => Riwaya.warsh,
+    MushafEdition.qalun => Riwaya.qalun,
+    MushafEdition.douri => Riwaya.douri,
+    MushafEdition.shubah => Riwaya.shubah,
+    _ => Riwaya.hafs,
+  };
+
+  /// A riwaya other than Hafs, numbered by its own count.
+  bool get isRiwaya => riwaya != Riwaya.hafs;
+
+  /// Drawn from KFGQPC's SVG page artwork (the new Madina edition and the
+  /// riwaya editions).
+  bool get isSvg => this == MushafEdition.madina1441 || isRiwaya;
 }
 
 /// Shape of the verse-end markers in the page view: the theme's own marker
@@ -56,6 +85,7 @@ class AppSettings {
     this.hiddenCommentaries = const {},
     this.tafsirKashida = false,
     this.reciterId = 1,
+    this.riwayaReciters = const {},
     this.followRecitation = true,
     this.touchReading = true,
     this.versePause = 500,
@@ -100,6 +130,14 @@ class AppSettings {
   /// Recitation chosen in the player (content.db `reciter.id`).
   final int reciterId;
 
+  /// Recitation chosen for each riwaya other than Hafs ([reciterId] is
+  /// Hafs's); a riwaya not listed plays its first recitation.
+  final Map<Riwaya, int> riwayaReciters;
+
+  /// The recitation chosen for [riwaya], or null for its first one.
+  int? reciterFor(Riwaya riwaya) =>
+      riwaya == Riwaya.hafs ? reciterId : riwayaReciters[riwaya];
+
   /// Turn pages to follow the verse being recited.
   final bool followRecitation;
 
@@ -134,6 +172,7 @@ class AppSettings {
     Set<int>? hiddenCommentaries,
     bool? tafsirKashida,
     int? reciterId,
+    Map<Riwaya, int>? riwayaReciters,
     bool? followRecitation,
     bool? touchReading,
     int? versePause,
@@ -156,6 +195,7 @@ class AppSettings {
     hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
     reciterId: reciterId ?? this.reciterId,
+    riwayaReciters: riwayaReciters ?? this.riwayaReciters,
     followRecitation: followRecitation ?? this.followRecitation,
     touchReading: touchReading ?? this.touchReading,
     versePause: versePause ?? this.versePause,
