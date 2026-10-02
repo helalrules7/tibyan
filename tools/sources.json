@@ -163,6 +163,15 @@
       "sha256": "a908a229a35c34399067ede4aedbfd2c3a87ba6700717ee0ede63117f44a8120",
       "license": "Written permission from Nuqayah (2026-09-28): yes, on condition of no ads and no profit. Covers al-Muyassar fi Gharib al-Quran only, not al-Siraj. No version is published; the SHA-256 and the retrieval date (2026-09-30) identify the copy",
       "evidence": "docs/licenses/2026-09-28_nuqayah_permission_email.pdf"
+    },
+    {
+      "id": "openiti-wahidi-asbab-shamela0011314",
+      "file": "0468IbnAhmadWahidiNaysaburi.AsbabNuzul.Shamela0011314-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/0475AH/cc9beb0d9645e8cdce892556423b9926a127054f/data/0468IbnAhmadWahidiNaysaburi/0468IbnAhmadWahidiNaysaburi.AsbabNuzul/0468IbnAhmadWahidiNaysaburi.AsbabNuzul.Shamela0011314-ara1",
+      "method": "GET",
+      "sha256": "20e8163fba25d2af8591974b8a8695e6d823af44da3acc11f82631183ce5d254",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Edition: tahqiq Isam al-Humaydan, Dar al-Islah, 2nd ed. 1412/1992; the editor's rights are not covered. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/openiti-wahidi-asbab/",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
     }
   ]
 }
