@@ -46,6 +46,7 @@ def main(wanted):
         if wanted and source['id'] not in wanted:
             continue
         target = CACHE / source['file']
+        target.parent.mkdir(parents=True, exist_ok=True)
         if not target.exists() or sha256(target) != source['sha256']:
             if source.get('method') == 'script':
                 subprocess.run([sys.executable, str(ROOT.parent / source['script'])], check=True)

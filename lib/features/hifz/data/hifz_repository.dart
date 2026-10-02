@@ -92,6 +92,9 @@ class HifzRepository {
             MushafEdition.shamarly =>
               t.pageShamarly.isSmallerOrEqualValue(number) &
                   t.pageShamarlyEnd.isBiggerOrEqualValue(number),
+            // A riwaya's pages are numbered in its own pack, not in
+            // content.db: its units are surahs and quarters only.
+            _ => const Constant(false),
           },
         },
       )

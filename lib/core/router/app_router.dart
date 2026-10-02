@@ -25,6 +25,7 @@ import '../../features/settings/player_settings_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
 
 int? _int(GoRouterState s, String key) =>
@@ -154,6 +155,8 @@ final appRouterProvider = Provider<GoRouter>(
             builder: (context, state) => TafsirScreen(
               surah: _int(state, 's') ?? 1,
               ayah: _int(state, 'a') ?? 1,
+              riwaya: Riwaya.values.asNameMap()[state.uri.queryParameters['r']],
+              riwayaAyah: _int(state, 'ra'),
             ),
           ),
           GoRoute(

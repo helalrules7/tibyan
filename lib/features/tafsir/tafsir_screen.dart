@@ -28,10 +28,22 @@ final verseCommentaryProvider =
 /// through the surah. Every text is shown exactly as its source has it,
 /// with the source's credit under it.
 class TafsirScreen extends ConsumerStatefulWidget {
-  const TafsirScreen({super.key, required this.surah, required this.ayah});
+  const TafsirScreen({
+    super.key,
+    required this.surah,
+    required this.ayah,
+    this.riwaya,
+    this.riwayaAyah,
+  });
 
+  /// The verse in Hafs numbers: tafsir and translations are keyed by them.
   final int surah;
   final int ayah;
+
+  /// Opened from a riwaya edition: the riwaya and the verse's number
+  /// there, named above the texts with the Hafs verses it matches.
+  final Riwaya? riwaya;
+  final int? riwayaAyah;
 
   @override
   ConsumerState<TafsirScreen> createState() => _TafsirScreenState();
@@ -90,11 +102,23 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
       ),
       body: ayahs == null
           ? const Center(child: CircularProgressIndicator())
-          : PageView.builder(
-              controller: _pages,
-              itemCount: ayahs.length,
-              onPageChanged: (i) => setState(() => _ayah = i + 1),
-              itemBuilder: (context, i) => _VersePage(ayah: ayahs[i]),
+          : Column(
+              children: [
+                if (widget.riwaya != null && widget.riwayaAyah != null)
+                  _RiwayaNote(
+                    riwaya: widget.riwaya!,
+                    surah: widget.surah,
+                    ayah: widget.riwayaAyah!,
+                  ),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pages,
+                    itemCount: ayahs.length,
+                    onPageChanged: (i) => setState(() => _ayah = i + 1),
+                    itemBuilder: (context, i) => _VersePage(ayah: ayahs[i]),
+                  ),
+                ),
+              ],
             ),
       bottomNavigationBar: SafeArea(
         child: Row(
@@ -122,6 +146,78 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Opened from a riwaya edition: the verse as read there (number and the
+/// riwaya's KFGQPC text) and the Hafs verses its tafsir is shown for.
+class _RiwayaNote extends ConsumerWidget {
+  const _RiwayaNote({
+    required this.riwaya,
+    required this.surah,
+    required this.ayah,
+  });
+
+  final Riwaya riwaya;
+  final int surah;
+  final int ayah;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final data = ref.watch(riwayaDataProvider).value;
+    final surahs = ref.watch(surahsProvider).value;
+    final verse = data?.id == riwaya.name ? data!.verse(surah, ayah) : null;
+    final hafs = verse?.hafs ?? const [];
+    final hafsText = hafs.isEmpty
+        ? l.riwayaNoHafs
+        : hafs.length == 1
+        ? l.hafsVerseOne(digits(hafs.first.ayah))
+        : l.hafsVerseRange(digits(hafs.first.ayah), digits(hafs.last.ayah));
+    final name = riwayaName(l, riwaya);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: t.bg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: t.marker.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (verse != null)
+            Semantics(
+              label: l.riwayaVerseText(name),
+              child: Text(
+                verse.text,
+                textDirection: TextDirection.rtl,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: riwayaFontFamily(riwaya),
+                  fontFamilyFallback: const ['UthmanicHafs'],
+                  fontSize: 22,
+                  height: 1.9,
+                  color: t.ink,
+                ),
+              ),
+            ),
+          const SizedBox(height: 6),
+          Text(
+            l.riwayaTafsirNote(
+              digits(ayah),
+              surahs == null ? '$surah' : surahs[surah - 1].nameAr,
+              name,
+              hafsText,
+            ),
+            style: TextStyle(fontSize: 13, height: 1.5, color: t.muted),
+          ),
+        ],
       ),
     );
   }

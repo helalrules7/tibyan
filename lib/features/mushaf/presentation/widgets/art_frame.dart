@@ -133,12 +133,14 @@ class ArtPageFrame extends StatelessWidget {
                               fontSize: 12.5,
                               onTap: onJuzTap,
                             ),
-                            FrameStar(color: t.marker),
-                            _SmallTap(
-                              label: l.hizbLabel(digits(info.hizb)),
-                              fontSize: 12.5,
-                              onTap: onHizbTap,
-                            ),
+                            if (info.hizb case final hizb?) ...[
+                              FrameStar(color: t.marker),
+                              _SmallTap(
+                                label: l.hizbLabel(digits(hizb)),
+                                fontSize: 12.5,
+                                onTap: onHizbTap,
+                              ),
+                            ],
                           ],
                         ),
                       ],

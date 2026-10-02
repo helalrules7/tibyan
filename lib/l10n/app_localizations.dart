@@ -2755,6 +2755,113 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'القلقلة'**
   String get tajweedQalqalah;
+
+  /// No description provided for @editionWarsh.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصحف المدينة برواية ورش عن نافع'**
+  String get editionWarsh;
+
+  /// No description provided for @editionQalun.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصحف المدينة برواية قالون عن نافع'**
+  String get editionQalun;
+
+  /// No description provided for @editionDouri.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصحف المدينة برواية الدوري عن أبي عمرو'**
+  String get editionDouri;
+
+  /// No description provided for @editionShubah.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصحف المدينة برواية شعبة عن عاصم'**
+  String get editionShubah;
+
+  /// No description provided for @riwayaWarsh.
+  ///
+  /// In ar, this message translates to:
+  /// **'رواية ورش عن نافع'**
+  String get riwayaWarsh;
+
+  /// No description provided for @riwayaQalun.
+  ///
+  /// In ar, this message translates to:
+  /// **'رواية قالون عن نافع'**
+  String get riwayaQalun;
+
+  /// No description provided for @riwayaDouri.
+  ///
+  /// In ar, this message translates to:
+  /// **'رواية الدوري عن أبي عمرو'**
+  String get riwayaDouri;
+
+  /// No description provided for @riwayaShubah.
+  ///
+  /// In ar, this message translates to:
+  /// **'رواية شعبة عن عاصم'**
+  String get riwayaShubah;
+
+  /// No description provided for @riwayatTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصاحف الروايات'**
+  String get riwayatTitle;
+
+  /// No description provided for @riwayaEditionDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها. التفسير والترجمة والفواصل تُربط بالآيات المقابلة في عدّ حفص.'**
+  String get riwayaEditionDesc;
+
+  /// No description provided for @riwayaGaps.
+  ///
+  /// In ar, this message translates to:
+  /// **'في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة ولا تلوين للفظ الجلالة، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).'**
+  String get riwayaGaps;
+
+  /// No description provided for @riwayaTafsirNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {ayah} من سورة {surah} في {riwaya} يقابلها في عدّ حفص: {hafs}. التفسير والترجمة ونص الآية أدناه بعدّ حفص وروايته.'**
+  String riwayaTafsirNote(
+    String ayah,
+    String surah,
+    String riwaya,
+    String hafs,
+  );
+
+  /// No description provided for @riwayaNoHafs.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تقابلها آية في عدّ حفص'**
+  String get riwayaNoHafs;
+
+  /// No description provided for @hafsVerseOne.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {number}'**
+  String hafsVerseOne(String number);
+
+  /// No description provided for @hafsVerseRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآيات {from} إلى {to}'**
+  String hafsVerseRange(String from, String to);
+
+  /// No description provided for @riwayaVerseText.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص الآية في {riwaya}'**
+  String riwayaVerseText(String riwaya);
+
+  /// No description provided for @riwayaRecitersNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلاوات {riwaya}'**
+  String riwayaRecitersNote(String riwaya);
 }
 
 class _AppLocalizationsDelegate

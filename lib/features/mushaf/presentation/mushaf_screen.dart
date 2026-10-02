@@ -27,6 +27,7 @@ import '../../khatma/khatma_providers.dart';
 import '../../khatma/presentation/journal_screen.dart';
 import '../data/mushaf_repository.dart';
 import '../data/tajweed.dart';
+import '../data/riwaya_data.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'widgets/art_frame.dart';
@@ -165,14 +166,21 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   Future<void> _open() async {
     final edition = ref.read(editionProvider);
     final saved = await ref.read(userDatabaseProvider).position();
+    // Positions and verses from elsewhere in the app are in Hafs numbers; a
+    // riwaya edition shows the riwaya verse that holds them.
+    final riwaya = await ref.read(riwayaDataProvider.future);
+    if (riwaya != null &&
+        widget.selectSurah != null &&
+        widget.selectAyah != null &&
+        mounted) {
+      final k = editionKeyOf(riwaya, widget.selectSurah!, widget.selectAyah!);
+      setState(() => _selA = _selB = k);
+    }
     var page = widget.initialPage;
     if (page == null && saved != null) {
       page = saved.edition == edition.name
           ? saved.page
-          : (await ref
-                    .read(mushafRepositoryProvider)
-                    .ayah(saved.surah, saved.ayah))
-                .pageIn(edition);
+          : await ref.read(versePageProvider((saved.surah, saved.ayah)).future);
     }
     final start = (page ?? 1).clamp(_first, edition.pageCount);
     if (!mounted) return;
@@ -218,6 +226,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (_page < 1) return;
     final ayahs = await ref.read(pageAyahsProvider(_page).future);
     if (ayahs.isEmpty) return;
+    // Kept in Hafs numbers, so any edition can reopen at the same verse.
+    final hafs = hafsKeyOf(await ref.read(riwayaDataProvider.future), (
+      surah: ayahs.first.surah,
+      ayah: ayahs.first.number,
+    ));
     // Screen readers hear where the turn landed: the surah and the page.
     if (mounted && MediaQuery.accessibleNavigationOf(context)) {
       SemanticsService.sendAnnouncement(
@@ -231,11 +244,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         .savePosition(
           edition: ref.read(editionProvider).name,
           view: 'page',
-          surah: ayahs.first.surah,
-          ayah: ayahs.first.number,
+          surah: hafs.surah,
+          ayah: hafs.ayah,
           page: _page,
         );
   }
+
+  /// The riwaya data of the edition being read, once loaded; null in the
+  /// Hafs editions.
+  RiwayaData? get _riwaya => ref.read(riwayaDataProvider).value;
 
   /// In the Zakhrafa style the mushaf opens with a cover as page 0.
   /// The Madina editions open with the app's cover as page 0. The
@@ -254,10 +271,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     // Page numbers differ between editions: reopen at the same verse.
     ref.listen(editionProvider, (_, _) => _open());
 
+    // Bookmarks are kept in Hafs numbers; a riwaya page shows each on the
+    // riwaya verse that holds it.
+    final riwaya = ref.watch(riwayaDataProvider).value;
     final marks = <VerseKey, Color>{
       for (final m
           in ref.watch(bookmarkSetsProvider).value ?? const <BookmarkSetRow>[])
-        (surah: m.surah, ayah: m.ayah): Color(m.color),
+        editionKeyOf(riwaya, m.surah, m.ayah): Color(m.color),
     };
 
     final settings = ref.watch(settingsProvider);
@@ -449,15 +469,18 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               onTajweedLegend: () => showTajweedLegend(context),
             );
       final pageWidget = switch (edition) {
-        MushafEdition.madina1441 => MushafPage(
-          page: pg,
-          interaction: interaction,
-        ),
         MushafEdition.madina1405 => OldMushafPage(
           page: pg,
           interaction: interaction,
         ),
         MushafEdition.shamarly => ShamarlyMushafPage(
+          page: pg,
+          interaction: interaction,
+        ),
+        // The new Madina edition and the riwaya editions: KFGQPC's SVG
+        // page artwork. Keyed by edition so a switch loads the other pages.
+        _ => MushafPage(
+          key: ValueKey('${edition.name}/$pg'),
           page: pg,
           interaction: interaction,
         ),
@@ -468,7 +491,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         context.push(
           '/mushaf/index?tab=$tab&p=$pg'
           '${a == null ? '' : '&s=${a.surah}'}'
-          '${info == null ? '' : '&j=${info.juz}&h=${info.hizb}'}',
+          '${info == null ? '' : '&j=${info.juz}'}'
+          '${info?.hizb == null ? '' : '&h=${info!.hizb}'}',
         );
       }
 
@@ -710,7 +734,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 onSaveToFasil: () => showSaveToFasil(
                   context,
                   ref,
-                  verse: range.first,
+                  verse: hafsKeyOf(_riwaya, range.first),
                   page: _page,
                 ),
                 onClose: () => setState(() => _selA = _selB = null),
@@ -730,43 +754,58 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                         to: one ? null : range.last.ayah,
                       );
                 },
-                onTafsir: () => context.push(
-                  '/mushaf/tafsir?s=${range.first.surah}&a=${range.first.ayah}',
-                ),
-                onWordStudy: () {
+                // Tafsir and translation are keyed by Hafs numbers; from a
+                // riwaya the screen also names the verse as read there.
+                onTafsir: () {
+                  final v = range.first;
+                  final h = hafsKeyOf(_riwaya, v);
+                  final r = ref.read(editionProvider).riwaya;
+                  context.push(
+                    '/mushaf/tafsir?s=${h.surah}&a=${h.ayah}'
+                    '${r == Riwaya.hafs ? '' : '&r=${r.name}&ra=${v.ayah}'}',
+                  );
+                },
+                // Word study reads the Hafs text's words: not offered on a
+                // riwaya's pages.
+                onWordStudy: edition.isRiwaya
+                    ? null
+                    : () {
                   _setChrome(false);
                   setState(() {
                     _selA = _selB = null;
                     _pickWord = true;
                   });
                 },
+                // Meanings and reflections are kept by Hafs verse: a riwaya
+                // verse opens those of the Hafs verses it covers.
                 onWordMeanings: () => showVerseMeanings(
                   context,
                   verses: [
-                    for (final v in range) (surah: v.surah, ayah: v.ayah),
+                    for (final v in range)
+                      ...?_riwaya?.toHafs(v.surah, v.ayah),
+                    if (_riwaya == null)
+                      for (final v in range) (surah: v.surah, ayah: v.ayah),
                   ],
                 ),
                 similarCount: range.length == 1
                     ? ref
                               .watch(
                                 similarCountProvider((
-                                  range.first.surah,
-                                  range.first.ayah,
+                                  hafsKeyOf(_riwaya, range.first).surah,
+                                  hafsKeyOf(_riwaya, range.first).ayah,
                                 )),
                               )
                               .value ??
                           0
                     : 0,
-                onSimilar: () => showSimilarSheet(
-                  context,
-                  surah: range.first.surah,
-                  ayah: range.first.ayah,
-                ),
-                onReflect: () => showReflectionSheet(
-                  context,
-                  surah: range.first.surah,
-                  ayah: range.first.ayah,
-                ),
+                onSimilar: () {
+                  final h = hafsKeyOf(_riwaya, range.first);
+                  showSimilarSheet(context, surah: h.surah, ayah: h.ayah);
+                },
+                onReflect: () {
+                  final h = hafsKeyOf(_riwaya, range.first);
+                  showReflectionSheet(context, surah: h.surah, ayah: h.ayah);
+                },
               ),
             ),
         ],
@@ -840,6 +879,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (_selA != null || _multi) return;
     final edition = ref.read(editionProvider);
     final repo = ref.read(mushafRepositoryProvider);
+    if (edition.isRiwaya) {
+      // A riwaya's recitations are numbered by the riwaya, like its pages.
+      final page = _riwaya?.pageOf(v.surah, v.ayah);
+      if (!mounted || page == null || page == _page) return;
+      _controller?.animateToPage(
+        page - _first,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
+      return;
+    }
     final row = await repo.ayah(v.surah, v.ayah);
     var page = row.pageIn(edition);
     if (edition == MushafEdition.shamarly && row.pageShamarlyEnd != page) {
@@ -873,9 +923,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       MarkKind.tadabbur => l.markTadabbur,
     };
     HapticFeedback.lightImpact();
+    // Marks are kept in Hafs numbers; the message names the verse as read.
+    final hafs = hafsKeyOf(_riwaya, v);
     await ref
         .read(userDatabaseProvider)
-        .setMark(kind, name: name, surah: v.surah, ayah: v.ayah, page: page);
+        .setMark(
+          kind,
+          name: name,
+          surah: hafs.surah,
+          ayah: hafs.ayah,
+          page: page,
+        );
     if (!mounted) return;
     final surahs = ref.read(surahsProvider).value;
     final sName = surahs == null ? '' : surahName(context, surahs[v.surah - 1]);
@@ -1120,10 +1178,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// marks already on that verse.
   Future<void> _toggleMark(VerseKey v, int page) async {
     final db = ref.read(userDatabaseProvider);
+    final riwaya = _riwaya;
     final here = [
       for (final m
           in ref.read(bookmarkSetsProvider).value ?? const <BookmarkSetRow>[])
-        if (m.surah == v.surah && m.ayah == v.ayah) m,
+        if (editionKeyOf(riwaya, m.surah, m.ayah) == v) m,
     ];
     if (here.isEmpty) return _setMark(MarkKind.reading, v, page, auto: true);
     HapticFeedback.lightImpact();

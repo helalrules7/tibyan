@@ -380,10 +380,15 @@ class _Occurrence extends ConsumerWidget {
       color: current ? t.highlight : null,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          final page = a.pageIn(ref.read(editionProvider));
+        onTap: () async {
+          // A Hafs verse: in a riwaya edition, the page of the riwaya verse
+          // that holds it.
           final router = GoRouter.of(context);
-          Navigator.of(context).pop();
+          final navigator = Navigator.of(context);
+          final page = await ref.read(
+            versePageProvider((a.surah, a.number)).future,
+          );
+          navigator.pop();
           router.go(mushafLocation(page, surah: a.surah, ayah: a.number));
         },
         child: Padding(

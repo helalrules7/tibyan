@@ -433,6 +433,10 @@ class Reciter extends Table {
   TextColumn get folderUrl => text()();
   IntColumn get sourceId => integer()();
 
+  /// The riwaya recited (`Riwaya.name`: hafs, warsh, qalun, douri,
+  /// shubah). Its verse timings are numbered by that riwaya's own count.
+  TextColumn get riwaya => text().withDefault(const Constant('hafs'))();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -608,7 +612,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

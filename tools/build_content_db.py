@@ -48,12 +48,13 @@ import build_mutashabih
 import build_tajweed
 import build_word_boxes
 import build_word_study
+import riwaya_reciters
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 15  # 14: mutashabih; 15: tajweed_page
+SCHEMA_VERSION = 16  # 14: mutashabih; 15: tajweed_page; 16: reciter.riwaya and the riwaya recitations
 SHAMARLY = CACHE / 'shamarly_geometry.db'
 SHAMARLY_CATCHWORD = CACHE / 'shamarly_catchword.json'
 
@@ -156,7 +157,7 @@ def check_reciters():
     reader. Both are checked here because the list above is the only place
     that decides.
     """
-    ids = [r[0] for r in RECITERS]
+    ids = [r[0] for r in RECITERS] + [r[0] for r in riwaya_reciters.RIWAYA_RECITERS]
     assert len(ids) == len(set(ids)), f'two reciters share an id: {ids}'
     styles = {r[3] for r in RECITERS}
     assert styles == {'murattal'}, f'only murattal is offered, found {styles}'
@@ -353,7 +354,8 @@ def main():
       id INTEGER PRIMARY KEY, name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
       style TEXT NOT NULL,                  -- murattal | mujawwad
       folder_url TEXT NOT NULL,             -- surah file = folder_url + NNN.mp3, or {surah} replaced by N
-      source_id INTEGER NOT NULL);
+      source_id INTEGER NOT NULL,
+      riwaya TEXT NOT NULL DEFAULT 'hafs'); -- hafs | warsh | qalun | douri | shubah; timings in its own count
     CREATE TABLE ayah_timing (              -- ms from the start of the surah file; ayah 0 = opening before verse 1
       reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
       start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
@@ -477,9 +479,12 @@ def main():
         'https://quranicaudio.com', 'تلاوات أئمة الحرمين: quranicaudio.com', None,
         # the timing file names every surah file and its size in bytes
         sha256(qdc_path), today))
-    db.executemany('INSERT INTO reciter VALUES (?,?,?,?,?,?)',
+    db.executemany('INSERT INTO reciter (id, name_ar, name_en, style, folder_url, source_id) '
+                   'VALUES (?,?,?,?,?,?)',
                    [(i, ar, en, style, url, 16 if 'quranicaudio.com' in url else 10)
                     for i, ar, en, style, url, _ in RECITERS])
+    # The riwaya recitations (Warsh, Qalun, al-Duri, Shu'bah) and their timings.
+    riwaya_reciters.apply(db, today)
     counts = {s['id']: s['ayas'] for s in surahs}
     timings, gaps = timing_rows(json.loads(timing_path.read_text(encoding='utf-8')), counts)
     db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)', timings)
@@ -673,7 +678,10 @@ def main():
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
     assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
     assert check.execute('SELECT COUNT(*) FROM commentary').fetchone()[0] == 3 * 6236
-    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing').fetchone()[0] == 6
+    # Verse timings: the ten Hafs recitations and ten of the riwaya ones
+    # (four riwaya recitations have none published).
+    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing WHERE reciter < 100').fetchone()[0] == 10
+    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing WHERE reciter > 100').fetchone()[0] == 10
     # Shamarly: every text page 2..522 carries verses; verses in order never go back a page.
     covered = {p for s, e in check.execute('SELECT page_shamarly, page_shamarly_end FROM ayah')
                for p in range(s, e + 1)}

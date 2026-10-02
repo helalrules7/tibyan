@@ -1552,4 +1552,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tajweedQalqalah => 'Qalqalah';
+
+  @override
+  String get editionWarsh => 'Madina Mushaf: Warsh from Nafi';
+
+  @override
+  String get editionQalun => 'Madina Mushaf: Qalun from Nafi';
+
+  @override
+  String get editionDouri => 'Madina Mushaf: al-Duri from Abu Amr';
+
+  @override
+  String get editionShubah => 'Madina Mushaf: Shu\'bah from Asim';
+
+  @override
+  String get riwayaWarsh => 'Warsh from Nafi';
+
+  @override
+  String get riwayaQalun => 'Qalun from Nafi';
+
+  @override
+  String get riwayaDouri => 'al-Duri from Abu Amr';
+
+  @override
+  String get riwayaShubah => 'Shu\'bah from Asim';
+
+  @override
+  String get riwayatTitle => 'Other riwayat';
+
+  @override
+  String get riwayaEditionDesc =>
+      'The King Fahd Complex\'s Madina mushaf in this riwaya, with its own verse count and numbers. Tafsir, translation and bookmarks link to the matching verses in Hafs\'s count.';
+
+  @override
+  String get riwayaGaps =>
+      'In the riwaya editions: no word highlighting while listening, no colouring of the divine names, and no hizb or quarter in the frame (the page carries its own printed signs).';
+
+  @override
+  String riwayaTafsirNote(
+    String ayah,
+    String surah,
+    String riwaya,
+    String hafs,
+  ) {
+    return 'Verse $ayah of surah $surah in $riwaya matches, in the count of Hafs: $hafs. The tafsir, translation and verse text below follow Hafs.';
+  }
+
+  @override
+  String get riwayaNoHafs => 'no verse in the count of Hafs';
+
+  @override
+  String hafsVerseOne(String number) {
+    return 'verse $number';
+  }
+
+  @override
+  String hafsVerseRange(String from, String to) {
+    return 'verses $from to $to';
+  }
+
+  @override
+  String riwayaVerseText(String riwaya) {
+    return 'The verse in $riwaya';
+  }
+
+  @override
+  String riwayaRecitersNote(String riwaya) {
+    return 'Recitations in $riwaya';
+  }
 }

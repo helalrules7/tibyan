@@ -51,29 +51,36 @@ def marker_items(svg):
     return out
 
 
+def svg_page_cuts(svg, first=FIRST, pitch=PITCH):
+    """(cuts[14], overflow[(line, path_d)]) of one SVG page whose 15 lines
+    are centred at first + j * pitch."""
+    items, _ = B.read_page(svg)
+    items = items + marker_items(svg)
+    cuts, overflow = [], []
+    for j in range(LINES - 1):
+        lo, hi = first + j * pitch + 6, first + (j + 1) * pitch - 6
+        best, y = None, lo
+        while y <= hi:
+            n = sum(1 for b, _ in items if b[1] < y < b[3])
+            if best is None or n < best[0]:
+                best = (n, y)
+            y += 0.25
+        cut = best[1]
+        cuts.append(cut)
+        for b, pts in items:
+            if b[1] < cut < b[3]:
+                cy = (b[1] + b[3]) / 2
+                line = min(range(LINES), key=lambda k: abs(first + k * pitch - cy))
+                overflow.append((line, _d(pts)))
+    return cuts, overflow
+
+
 def new_edition():
     """Yields (page, cuts[14], overflow[(line, path_d)])."""
     with zipfile.ZipFile(B.SVG_ZIP) as z:
         for page in range(3, 605):
             svg = z.read(f'svg/{page:03d}.svg').decode()
-            items, _ = B.read_page(svg)
-            items = items + marker_items(svg)
-            cuts, overflow = [], []
-            for j in range(LINES - 1):
-                lo, hi = FIRST + j * PITCH + 6, FIRST + (j + 1) * PITCH - 6
-                best, y = None, lo
-                while y <= hi:
-                    n = sum(1 for b, _ in items if b[1] < y < b[3])
-                    if best is None or n < best[0]:
-                        best = (n, y)
-                    y += 0.25
-                cut = best[1]
-                cuts.append(cut)
-                for b, pts in items:
-                    if b[1] < cut < b[3]:
-                        cy = (b[1] + b[3]) / 2
-                        line = min(range(LINES), key=lambda k: abs(FIRST + k * PITCH - cy))
-                        overflow.append((line, _d(pts)))
+            cuts, overflow = svg_page_cuts(svg)
             yield page, cuts, overflow
 
 

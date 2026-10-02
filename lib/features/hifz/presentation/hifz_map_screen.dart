@@ -51,25 +51,29 @@ class _HifzMapScreenState extends ConsumerState<HifzMapScreen> {
     final surahs = ref.watch(surahsProvider).value;
     final digits = NumberFormatter(Localizations.localeOf(context));
     final arabic = Localizations.localeOf(context).languageCode == 'ar';
+    // A riwaya's pages are numbered in its own pack: surahs only there.
+    final bySurah = _surahs || edition.isRiwaya;
 
     final byVerse = <String, List<int>>{};
     for (final (ref, surah, p1441, p1405, sh0, sh1)
         in cells ?? const <(String, int, int, int, int, int)>[]) {
-      byVerse[ref] = _surahs
+      byVerse[ref] = bySurah
           ? [surah]
           : switch (edition) {
               MushafEdition.madina1441 => [p1441],
               MushafEdition.madina1405 => [p1405],
               MushafEdition.shamarly => [for (var p = sh0; p <= sh1; p++) p],
+              // Not reached: a riwaya edition shows the surah map only.
+              _ => const <int>[],
             };
     }
     final levels = cellStrengths(strengths, (r) => byVerse[r] ?? const []);
-    final first = _surahs || edition != MushafEdition.shamarly ? 1 : 2;
-    final last = _surahs ? 114 : edition.pageCount;
-    final width = _surahs ? _cell * 2.2 : _cell;
+    final first = bySurah || edition != MushafEdition.shamarly ? 1 : 2;
+    final last = bySurah ? 114 : edition.pageCount;
+    final width = bySurah ? _cell * 2.2 : _cell;
 
     Future<void> open(int n) async {
-      final kind = _surahs ? HifzUnitKind.surah : HifzUnitKind.page;
+      final kind = bySurah ? HifzUnitKind.surah : HifzUnitKind.page;
       final unit = await ref
           .read(hifzRepositoryProvider)
           .unit(kind, n, edition);
@@ -101,17 +105,18 @@ class _HifzMapScreenState extends ConsumerState<HifzMapScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-            child: SegmentedButton<bool>(
-              segments: [
-                ButtonSegment(value: false, label: Text(l.mapPages)),
-                ButtonSegment(value: true, label: Text(l.mapSurahs)),
-              ],
-              selected: {_surahs},
-              onSelectionChanged: (s) => setState(() => _surahs = s.first),
+          if (!edition.isRiwaya)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+              child: SegmentedButton<bool>(
+                segments: [
+                  ButtonSegment(value: false, label: Text(l.mapPages)),
+                  ButtonSegment(value: true, label: Text(l.mapSurahs)),
+                ],
+                selected: {_surahs},
+                onSelectionChanged: (s) => setState(() => _surahs = s.first),
+              ),
             ),
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
@@ -165,19 +170,19 @@ class _HifzMapScreenState extends ConsumerState<HifzMapScreen> {
                 itemBuilder: (context, i) {
                   final n = first + i;
                   final s = levels[n] ?? Strength.none;
-                  final label = _surahs
+                  final label = bySurah
                       ? (surahs == null
                             ? digits(n)
                             : (arabic
                                   ? surahs[n - 1].nameAr
                                   : surahs[n - 1].nameEn))
                       : digits(n);
-                  final spoken = _surahs
+                  final spoken = bySurah
                       ? l.surahWord(label)
                       : l.pageOf(digits(n));
                   return _Cell(
                     label: label,
-                    number: _surahs ? digits(n) : null,
+                    number: bySurah ? digits(n) : null,
                     strength: s,
                     size: _cell,
                     semantics: l.mapCell(spoken, strengthLabel(l, s)),

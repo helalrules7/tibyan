@@ -49,7 +49,7 @@ class CoverPage extends ConsumerWidget {
             style: const TextStyle(fontFamily: 'UthmanicHafs', fontSize: 17),
           ),
           bottom: Text(
-            l.riwayaHafs,
+            riwayaName(l, edition.riwaya),
             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
           ),
           child: Semantics(
@@ -86,11 +86,7 @@ class CoverPage extends ConsumerWidget {
                         color: rule,
                       ),
                       Text(
-                        switch (edition) {
-                          MushafEdition.madina1441 => l.editionNew,
-                          MushafEdition.madina1405 => l.editionOld,
-                          MushafEdition.shamarly => l.editionShamarly,
-                        },
+                        editionName(l, edition),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 12, color: muted),
                       ),
@@ -245,7 +241,11 @@ class OpeningPage extends ConsumerWidget {
                   l.surahWord(s.nameAr),
                   l.openingInfo(
                     s.revelation == 'meccan' ? l.meccan : l.medinan,
-                    digits(s.ayahCount),
+                    // The edition's own count (a riwaya counts differently).
+                    digits(
+                      ref.watch(surahAyahCountProvider(surah)).value ??
+                          s.ayahCount,
+                    ),
                     digits(s.id),
                   ),
                 ),

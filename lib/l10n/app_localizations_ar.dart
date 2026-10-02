@@ -1545,4 +1545,72 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tajweedQalqalah => 'القلقلة';
+
+  @override
+  String get editionWarsh => 'مصحف المدينة برواية ورش عن نافع';
+
+  @override
+  String get editionQalun => 'مصحف المدينة برواية قالون عن نافع';
+
+  @override
+  String get editionDouri => 'مصحف المدينة برواية الدوري عن أبي عمرو';
+
+  @override
+  String get editionShubah => 'مصحف المدينة برواية شعبة عن عاصم';
+
+  @override
+  String get riwayaWarsh => 'رواية ورش عن نافع';
+
+  @override
+  String get riwayaQalun => 'رواية قالون عن نافع';
+
+  @override
+  String get riwayaDouri => 'رواية الدوري عن أبي عمرو';
+
+  @override
+  String get riwayaShubah => 'رواية شعبة عن عاصم';
+
+  @override
+  String get riwayatTitle => 'مصاحف الروايات';
+
+  @override
+  String get riwayaEditionDesc =>
+      'صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها. التفسير والترجمة والفواصل تُربط بالآيات المقابلة في عدّ حفص.';
+
+  @override
+  String get riwayaGaps =>
+      'في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة ولا تلوين للفظ الجلالة، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).';
+
+  @override
+  String riwayaTafsirNote(
+    String ayah,
+    String surah,
+    String riwaya,
+    String hafs,
+  ) {
+    return 'الآية $ayah من سورة $surah في $riwaya يقابلها في عدّ حفص: $hafs. التفسير والترجمة ونص الآية أدناه بعدّ حفص وروايته.';
+  }
+
+  @override
+  String get riwayaNoHafs => 'لا تقابلها آية في عدّ حفص';
+
+  @override
+  String hafsVerseOne(String number) {
+    return 'الآية $number';
+  }
+
+  @override
+  String hafsVerseRange(String from, String to) {
+    return 'الآيات $from إلى $to';
+  }
+
+  @override
+  String riwayaVerseText(String riwaya) {
+    return 'نص الآية في $riwaya';
+  }
+
+  @override
+  String riwayaRecitersNote(String riwaya) {
+    return 'تلاوات $riwaya';
+  }
 }

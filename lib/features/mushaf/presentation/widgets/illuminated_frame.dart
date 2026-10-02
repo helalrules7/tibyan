@@ -101,7 +101,10 @@ class FrameInfo {
 
   final int page;
   final int juz;
-  final int hizb;
+
+  /// Null where the edition's hizb divisions are not in its sources (the
+  /// riwaya editions); the frame then shows the juz alone.
+  final int? hizb;
   final String surahName;
 
   /// First word of the next page, shown under the frame.
@@ -311,11 +314,13 @@ class IlluminatedFrame extends ConsumerWidget {
                               onTap: onJuzTap,
                             ),
                             FrameStar(color: t.marker),
-                            FrameTap(
-                              label: l.hizbLabel(digits(info!.hizb)),
-                              onTap: onHizbTap,
-                            ),
-                            FrameStar(color: t.marker),
+                            if (info!.hizb case final hizb?) ...[
+                              FrameTap(
+                                label: l.hizbLabel(digits(hizb)),
+                                onTap: onHizbTap,
+                              ),
+                              FrameStar(color: t.marker),
+                            ],
                             FrameTap(
                               label: info!.surahName,
                               bold: true,
@@ -1206,11 +1211,13 @@ class PlainFrame extends StatelessWidget {
                     label: l.juzLabel(digits(info.juz)),
                     onTap: onJuzTap,
                   ),
-                  FrameStar(color: t.marker),
-                  FrameTap(
-                    label: l.hizbLabel(digits(info.hizb)),
-                    onTap: onHizbTap,
-                  ),
+                  if (info.hizb case final hizb?) ...[
+                    FrameStar(color: t.marker),
+                    FrameTap(
+                      label: l.hizbLabel(digits(hizb)),
+                      onTap: onHizbTap,
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1227,11 +1234,11 @@ class PlainFrame extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
-                if (info != null)
+                if (info?.hizb case final hizb?)
                   DefaultTextStyle.merge(
                     style: label.copyWith(color: t.muted),
                     child: FrameTap(
-                      label: l.hizbLabel(digits(info.hizb)),
+                      label: l.hizbLabel(digits(hizb)),
                       onTap: onHizbTap,
                     ),
                   ),

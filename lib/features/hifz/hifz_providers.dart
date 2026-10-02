@@ -126,6 +126,12 @@ Future<Map<VerseKey, List<Rect>>> _verseLines(
         final keys = e.value.keys.toList()..sort();
         out[e.key] = [for (final j in keys) e.value[j]!];
       }
+    // A riwaya page has no line boxes here: its verses are revealed whole.
+    case MushafEdition.warsh ||
+        MushafEdition.qalun ||
+        MushafEdition.douri ||
+        MushafEdition.shubah:
+      break;
     case MushafEdition.shamarly:
       for (final b in await repo.shamarlyVerseBoxes(page)) {
         (out[(surah: b.surah, ayah: b.ayah)] ??= []).add(

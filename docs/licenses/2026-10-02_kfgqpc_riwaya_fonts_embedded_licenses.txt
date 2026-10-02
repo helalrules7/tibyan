@@ -1,0 +1,86 @@
+KFGQPC riwaya fonts: licence and copyright embedded in each font file (name table),
+copied verbatim. Fonts from the KFGQPC quran-dev zips (MD5 as published by the Complex).
+
+== uthmanic_warsh_v21.ttf  sha256 b436fb89e1d26f827cd6a3c4d632fb68a49cc954c4ac90699a9502da25555230  (UthmanicWarsh_v2-1.zip)
+  [0] The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8010-07-5, Accession No. 1430/7270
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+  [1] kfgqpc_warsh_uthmanic_script
+  [5] Version 2.1
+  [8] King Fahd Glorious Quran Printing Complex
+  [9] King Fahd Glorious Quran Printing Complex
+  [11] http://fonts.qurancomplex.gov.sa/
+  [13] ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2008 by King Fahd Glorious Quran Printing Complex (KFGQPC), Al-?Madinah Munawarrah, Kingdom of Saudi Arabia. All Rights Reserved. The Font is ?owned by KFGQPC and its structure, organization and code are the valuable asset of ?KFGQPC. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font ?accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse ?Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the ?Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its ?use or performance, fitness for a particular purpose. KFGQPC does not and cannot ?warrant the performance or results you may obtain by using the Font. In no event shall ?KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, ?arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+== uthmanic_qaloun_v21.ttf  sha256 67b5c938383b6382f3cc10d01829db5a87aed05f56bd0216521b8654ab318f9a  (UthmanicQaloun_v2-1.zip)
+  [0] The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8010-06-8, Accession No. 1430/7269
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+  [1] kfgqpc_qaloun_uthmanic_script
+  [5] Version 2.1
+  [8] King Fahd Glorious Quran Printing Complex
+  [9] King Fahd Glorious Quran Printing Complex
+  [11] http://fonts.qurancomplex.gov.sa/
+  [13] ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2010 by King Fahd Glorious Quran Printing Complex (KFGQPC), Al-Madinah Munawarrah, Kingdom of Saudi Arabia. All Rights Reserved. The Font is owned by KFGQPC and its structure, organization and code are the valuable asset of KFGQPC. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font ?accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse ?Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the ?Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its ?use or performance, fitness for a particular purpose. KFGQPC does not and cannot ?warrant the performance or results you may obtain by using the Font. In no event shall ?KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, ?arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+== uthmanic_douri_v20.ttf  sha256 5ff180fbd908b93428b33f6a882c0f5a84f7c1a70f51dc35120aa5829d24ca19  (UthmanicDouri_v2-0.zip)
+  [0] The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8010-10-5, Accession No. 1430/7273
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+  [1] kfgqpc_douri_uthmanic_script
+  [5] Version 2.0
+  [8] King Fahd Glorious Quran Printing Complex
+  [9] King Fahd Glorious Quran Printing Complex
+  [11] http://fonts.qurancomplex.gov.sa/
+  [13] ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2010 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.
+
+== uthmanic_shuba_v20.ttf  sha256 d6c9029258dfd5a981f3d7bf64764f524508c1f6142448b82b6f5011088e05c4  (UthmanicShuba_v2-0.zip)
+  [0] The digitally signed machine readable Typeface(Font) licensed to you is copyrighted, (2010), King Fahd Glorious Quran Printing Complex.
+ISBN: 978-603-8010-14-3, Accession No. 1430/7277
+All rights reserved. This Font is the property of King Fahd Glorious Quran Printing Complex, and may not be reproduced, modified without the express written approval of King Fahd Glorious Quran Printing Complex.
+  [1] kfgqpc_shuba_uthmanic_script
+  [5] Version 2.0
+  [8] King Fahd Glorious Quran Printing Complex
+  [9] King Fahd Glorious Quran Printing Complex
+  [11] http://fonts.qurancomplex.gov.sa
+  [13] ELECTRONIC END-USER LICENSE AGREEMENT
+
+By installing this Font You accept all the terms and conditions of this Agreement.
+
+Copyright (c) 2010 by King Fahd Glorious Quran Printing Complex (KFGQPC), AlMadinah AlMunawarrah, Kingdom of Saudi Arabia. All Rights Reserved. KFGQPC retains full title and ownership of this Typeface both as artwork and font software. This Agreement does not grant you any intellectual property rights in the Font.
+
+Permission is hereby granted, Free of Cost, to any person obtaining a copy of this Font accompanying this license, the rights to Use, Copy, Distribute, subject to the following conditions:
+
+1.    The Font Software cannot be Sold, Modified, Altered, Translated, Reverse Engineered, Decompiled, Disassembled, Reproduced or Attempted to discover the Source Code of this Font in no means.
+
+2.    The Font Software is provided "AS IS", and KFGQPC makes no warranties as to its use or performance, fitness for a particular purpose. KFGQPC does not and cannot warrant the performance or results you may obtain by using the Font. In no event shall KFGQPC be liable for any Claims, Damages or other Liability, including any Damages, arising from, out of the use or inability to use the Font or from other dealings in the Font.

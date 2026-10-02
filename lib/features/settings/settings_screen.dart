@@ -63,13 +63,10 @@ class SettingsScreen extends ConsumerWidget {
               leading: const Icon(Icons.headphones_outlined),
               title: Text(l.playerSettings),
               subtitle: Text(
-                ref
-                        .watch(recitersProvider)
-                        .value
-                        ?.where((r) => r.id == settings.reciterId)
-                        .map((r) => reciterLabel(context, r))
-                        .firstOrNull ??
-                    '',
+                switch (ref.watch(currentReciterProvider).value) {
+                  final r? => reciterLabel(context, r),
+                  null => '',
+                },
                 style: TextStyle(color: t.muted),
               ),
               trailing: const Icon(Icons.chevron_right),
@@ -138,6 +135,21 @@ class SettingsScreen extends ConsumerWidget {
                           title: Text(name),
                           subtitle: EditionBadge(edition: e),
                         ),
+                      // The KFGQPC Madina mushafs of the other riwayat.
+                      ListTile(
+                        title: Text(
+                          l.riwayatTitle,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(l.riwayaEditionDesc),
+                      ),
+                      for (final e in MushafEdition.values)
+                        if (e.isRiwaya)
+                          RadioListTile(
+                            value: e,
+                            title: Text(editionName(l, e)),
+                            subtitle: EditionBadge(edition: e),
+                          ),
                     ],
                   ),
                 ),
