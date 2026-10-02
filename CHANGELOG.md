@@ -6,6 +6,12 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (phase 8: accessibility and search by meaning)
+- «وضع كبار السن» (elderly mode) in settings: text at least a quarter larger, buttons and rows at least 56 px, colours raised to 7:1 for text in every theme and mode, a home with only continue reading, listening and search (and a labelled settings button), the page in the plain frame so it is as large as the screen allows, the page's small tools as labelled buttons, and a slower cross-fade between screens and slower page turns.
+- Search by meaning («بالمعنى») beside search by words: describe an idea in Arabic or English and the verses whose meaning is closest in al-Tafsir al-Muyassar, Saheeh International or Pickthall are listed, each with its own text and the matched text exactly as stored, with its source. An optional 134 MB pack (multilingual-e5-small, MIT, int8, run in Dart; one vector per verse of each text) downloads in the background from the Tibyan mirror; until then the same mode searches the words of those texts.
+- Screen readers: every verse on the page is its own node («سورة البقرة، الآية ٥» then its text), selectable with a double tap, with an action to set or remove the reading mark, in all three editions; the surah and page are announced after a page turn; the menu veil, frame labels, theme and marker choices and page grid can be activated (they were announced without an action); sheet titles and sections are headings; the player's second line, search counts and download progress are live regions (download progress in steps of ten percent); spinners and progress bars are labelled; reading tools are 48 px targets; marker and tint choices have distinct names.
+
+
 ### Added (themes)
 - Eight heritage themes beside Zakhrafa (still the default): Seljuk, Umayyad, Timurid, Hijazi, Fatimid, Andalusi, Mamluk and Abbasid. Each draws its frame, surah header and verse marker from quran-assets as they are, recoloured per mode (light, bright white, night, black), in all three editions and on the opening pages. The juz, hizb and surah sit above the frame, the page number inside the theme's marker below it.
 - A theme picker in «شكل المصحف» and on the first-launch style screen, and a verse-marker shape «حسب الثيم» (the default in the new themes).

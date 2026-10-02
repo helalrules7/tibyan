@@ -964,4 +964,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String pageLabelFull(String page, String surah) {
     return 'Page $page, $surah';
   }
+
+  @override
+  String get markThisVerse => 'Set or remove the reading mark at this verse';
+
+  @override
+  String loadingPage(String page) {
+    return 'Loading page $page';
+  }
+
+  @override
+  String get clearSearch => 'Clear the search';
+
+  @override
+  String get previousPageNumber => 'Previous page';
+
+  @override
+  String get nextPageNumber => 'Next page';
+
+  @override
+  String get showMenus => 'Show the menus';
+
+  @override
+  String get hideMenus => 'Hide the menus';
+
+  @override
+  String downloadSurah(String surah) {
+    return 'Download surah $surah';
+  }
+
+  @override
+  String retryDownloadSurah(String surah) {
+    return 'Retry downloading surah $surah';
+  }
+
+  @override
+  String deleteSurahDownload(String surah) {
+    return 'Surah $surah is downloaded. Delete it';
+  }
+
+  @override
+  String downloadingSurah(String surah) {
+    return 'Downloading surah $surah';
+  }
+
+  @override
+  String verseCounter(String current, String total) {
+    return 'Verse $current of $total';
+  }
+
+  @override
+  String downloadPercentSpoken(String percent) {
+    return '$percent% downloaded';
+  }
 }

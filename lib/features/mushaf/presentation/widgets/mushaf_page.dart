@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -21,6 +22,7 @@ typedef _PageData = (
   List<double>,
   Map<int, List<Path>>,
   PictureInfo?,
+
   /// The clip region of each line, built once per page by [pageLineClips].
   List<Path>,
 );
@@ -451,17 +453,15 @@ class _MushafPageState extends ConsumerState<MushafPage> {
       future: _load,
       builder: (context, snap) {
         if (!snap.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: AppLocalizations.of(context)
+                  .loadingPage('${widget.page}'),
+            ),
+          );
         }
-        final (
-          picture,
-          viewBox,
-          polys,
-          cuts,
-          overflow,
-          markerPicture,
-          clips,
-        ) = snap.data!;
+        final (picture, viewBox, polys, cuts, overflow, markerPicture, clips) =
+            snap.data!;
         final verses = [
           for (final p in polys)
             (
@@ -675,6 +675,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                     child: Semantics(
                       label: l.pageOf('${widget.page}'),
                       image: true,
+                      sortKey: const OrdinalSortKey(0),
                       child: CustomPaint(
                         size: box.biggest,
                         painter: _CallbackPainter((canvas) {
@@ -795,8 +796,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                           // no mark of theirs is left.
                           final hidden = x.hidden;
                           if (hidden != null) {
-                            final cover = Paint()
-                              ..color = tokens.colors.paper;
+                            final cover = Paint()..color = tokens.colors.paper;
                             final markersOn = <int, List<double>>{};
                             for (final v in verses) {
                               final m = v.marker;
@@ -917,6 +917,27 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                       ),
                     ),
                   ),
+                ),
+                ...verseSemanticNodes(
+                  x,
+                  verseAreas([
+                    for (final v in verses)
+                      for (final r in v.rects)
+                        (
+                          v.key,
+                          Rect.fromPoints(
+                            layout.toScreen(
+                              r.topLeft,
+                              line: layout._lineOf(r.center.dy),
+                            ),
+                            layout.toScreen(
+                              r.bottomRight,
+                              line: layout._lineOf(r.center.dy),
+                            ),
+                          ),
+                        ),
+                  ]),
+                  markAction: l.markThisVerse,
                 ),
                 ...handles,
               ],

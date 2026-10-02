@@ -1723,6 +1723,84 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الصفحة {page}، {surah}'**
   String pageLabelFull(String page, String surah);
+
+  /// No description provided for @markThisVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضع علامة القراءة عند هذه الآية أو أزلها'**
+  String get markThisVerse;
+
+  /// No description provided for @loadingPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُحمَّل الصفحة {page}'**
+  String loadingPage(String page);
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح البحث'**
+  String get clearSearch;
+
+  /// No description provided for @previousPageNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة السابقة'**
+  String get previousPageNumber;
+
+  /// No description provided for @nextPageNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة التالية'**
+  String get nextPageNumber;
+
+  /// No description provided for @showMenus.
+  ///
+  /// In ar, this message translates to:
+  /// **'إظهار القوائم'**
+  String get showMenus;
+
+  /// No description provided for @hideMenus.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء القوائم'**
+  String get hideMenus;
+
+  /// No description provided for @downloadSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل سورة {surah}'**
+  String downloadSurah(String surah);
+
+  /// No description provided for @retryDownloadSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعد تنزيل سورة {surah}'**
+  String retryDownloadSurah(String surah);
+
+  /// No description provided for @deleteSurahDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {surah} منزّلة. احذفها'**
+  String deleteSurahDownload(String surah);
+
+  /// No description provided for @downloadingSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُنزَّل سورة {surah}'**
+  String downloadingSurah(String surah);
+
+  /// No description provided for @verseCounter.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {current} من {total}'**
+  String verseCounter(String current, String total);
+
+  /// No description provided for @downloadPercentSpoken.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمل {percent}٪ من التحميل'**
+  String downloadPercentSpoken(String percent);
 }
 
 class _AppLocalizationsDelegate

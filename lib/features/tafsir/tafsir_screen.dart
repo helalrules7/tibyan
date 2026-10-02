@@ -105,9 +105,14 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
               icon: const Icon(Icons.chevron_left),
             ),
             const Spacer(),
-            Text(
-              '${digits(_ayah)} / ${digits(count)}',
-              style: TextStyle(color: t.muted),
+            Semantics(
+              liveRegion: true,
+              label: l.verseCounter(digits(_ayah), digits(count)),
+              excludeSemantics: true,
+              child: Text(
+                '${digits(_ayah)} / ${digits(count)}',
+                style: TextStyle(color: t.muted),
+              ),
             ),
             const Spacer(),
             IconButton(
@@ -367,9 +372,12 @@ class _TafsirSettingsSheet extends ConsumerWidget {
         shrinkWrap: true,
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
-          Text(
-            l.tafsirFontLabel,
-            style: Theme.of(context).textTheme.titleSmall,
+          Semantics(
+            header: true,
+            child: Text(
+              l.tafsirFontLabel,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
           ),
           const SizedBox(height: 8),
           SegmentedButton<TafsirFont>(
@@ -387,9 +395,16 @@ class _TafsirSettingsSheet extends ConsumerWidget {
             onSelectionChanged: (v) => controller.setTafsirFont(v.first),
           ),
           const SizedBox(height: 16),
-          Text(l.tafsirTextSize, style: Theme.of(context).textTheme.titleSmall),
+          Semantics(
+            header: true,
+            child: Text(
+              l.tafsirTextSize,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+          ),
           Slider(
             value: settings.tafsirFontScale,
+            semanticFormatterCallback: (v) => '${(v * 100).round()}%',
             min: 0.8,
             max: 1.8,
             divisions: 10,

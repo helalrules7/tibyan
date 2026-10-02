@@ -533,5 +533,18 @@
   "semanticPackError": "The search-by-meaning pack could not be opened; searching by words instead.",
   "semanticResultsNote": "Approximate results, closest meaning first. Read each verse in its place and in its tafsir.",
   "verseLabel": "Surah {surah}, verse {ayah}",
-  "pageLabelFull": "Page {page}, {surah}"
+  "pageLabelFull": "Page {page}, {surah}",
+  "markThisVerse": "Set or remove the reading mark at this verse",
+  "loadingPage": "Loading page {page}",
+  "clearSearch": "Clear the search",
+  "previousPageNumber": "Previous page",
+  "nextPageNumber": "Next page",
+  "showMenus": "Show the menus",
+  "hideMenus": "Hide the menus",
+  "downloadSurah": "Download surah {surah}",
+  "retryDownloadSurah": "Retry downloading surah {surah}",
+  "deleteSurahDownload": "Surah {surah} is downloaded. Delete it",
+  "downloadingSurah": "Downloading surah {surah}",
+  "verseCounter": "Verse {current} of {total}",
+  "downloadPercentSpoken": "{percent}% downloaded"
 }

@@ -39,14 +39,17 @@ class HomeScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l.appTitle,
-                        style: TextStyle(
-                          fontFamily: 'ArefRuqaa',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 38,
-                          height: 1.2,
-                          color: t.headBg == t.paper ? t.headFg : t.ink,
+                      Semantics(
+                        header: true,
+                        child: Text(
+                          l.appTitle,
+                          style: TextStyle(
+                            fontFamily: 'ArefRuqaa',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 38,
+                            height: 1.2,
+                            color: t.headBg == t.paper ? t.headFg : t.ink,
+                          ),
                         ),
                       ),
                       Text(

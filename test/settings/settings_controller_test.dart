@@ -57,25 +57,31 @@ void main() {
     expect(s.locale, const Locale('en'));
   });
 
-  test('a new theme brings its own marker shape over an earlier choice', () async {
-    final c = await containerWith({});
-    final ctrl = c.read(settingsProvider.notifier);
-    await ctrl.setMarkerStyle(MarkerStyle.rosette7);
-    await ctrl.setStyle('mamluk');
-    expect(c.read(settingsProvider).markerStyle, MarkerStyle.theme);
-    // The reader can still choose another shape afterwards, and keeps it.
-    await ctrl.setMarkerStyle(MarkerStyle.traditional);
-    await ctrl.setStyle('mamluk');
-    expect(c.read(settingsProvider).markerStyle, MarkerStyle.traditional);
-    // Back to Zakhrafa: its rosette, also after a restart.
-    await ctrl.setStyle('zakhrafa');
-    expect(c.read(settingsProvider).markerStyle, MarkerStyle.rosette16);
-    final sp = await SharedPreferences.getInstance();
-    final restored = await containerWith({
-      for (final k in sp.getKeys()) k: sp.get(k)!,
-    });
-    expect(restored.read(settingsProvider).markerStyle, MarkerStyle.rosette16);
-  });
+  test(
+    'a new theme brings its own marker shape over an earlier choice',
+    () async {
+      final c = await containerWith({});
+      final ctrl = c.read(settingsProvider.notifier);
+      await ctrl.setMarkerStyle(MarkerStyle.rosette7);
+      await ctrl.setStyle('mamluk');
+      expect(c.read(settingsProvider).markerStyle, MarkerStyle.theme);
+      // The reader can still choose another shape afterwards, and keeps it.
+      await ctrl.setMarkerStyle(MarkerStyle.traditional);
+      await ctrl.setStyle('mamluk');
+      expect(c.read(settingsProvider).markerStyle, MarkerStyle.traditional);
+      // Back to Zakhrafa: its rosette, also after a restart.
+      await ctrl.setStyle('zakhrafa');
+      expect(c.read(settingsProvider).markerStyle, MarkerStyle.rosette16);
+      final sp = await SharedPreferences.getInstance();
+      final restored = await containerWith({
+        for (final k in sp.getKeys()) k: sp.get(k)!,
+      });
+      expect(
+        restored.read(settingsProvider).markerStyle,
+        MarkerStyle.rosette16,
+      );
+    },
+  );
 
   test('unknown stored style falls back to the default', () async {
     final c = await containerWith({'settings.style': 'removed-style'});

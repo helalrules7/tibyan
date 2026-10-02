@@ -35,6 +35,7 @@ class ThemePicker extends ConsumerWidget {
                 label: style.localizedName(lang),
                 hint: style.localizedDescription(lang),
                 excludeSemantics: true,
+                onTap: () => controller.setStyle(style.id),
                 child: InkWell(
                   onTap: () => controller.setStyle(style.id),
                   borderRadius: BorderRadius.circular(14),

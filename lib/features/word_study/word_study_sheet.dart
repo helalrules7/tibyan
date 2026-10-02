@@ -136,12 +136,15 @@ class _WordStudySheetState extends ConsumerState<WordStudySheet> {
 
     Widget section(String title) => Padding(
       padding: const EdgeInsets.only(top: 18, bottom: 6),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-          color: t.goldText,
+      child: Semantics(
+        header: true,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: t.goldText,
+          ),
         ),
       ),
     );
@@ -171,11 +174,14 @@ class _WordStudySheetState extends ConsumerState<WordStudySheet> {
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           sliver: SliverList.list(
             children: [
-              Text(
-                l.wordStudy,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+              Semantics(
+                header: true,
+                child: Text(
+                  l.wordStudy,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               Text(
@@ -455,9 +461,12 @@ class VerseMeaningsSheet extends ConsumerWidget {
       controller: scroll,
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       children: [
-        Text(
-          l.wordMeanings,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        Semantics(
+          header: true,
+          child: Text(
+            l.wordMeanings,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
         ),
         for (final v in verses) ...[
           Padding(

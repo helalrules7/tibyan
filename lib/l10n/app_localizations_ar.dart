@@ -958,4 +958,57 @@ class AppLocalizationsAr extends AppLocalizations {
   String pageLabelFull(String page, String surah) {
     return 'الصفحة $page، $surah';
   }
+
+  @override
+  String get markThisVerse => 'ضع علامة القراءة عند هذه الآية أو أزلها';
+
+  @override
+  String loadingPage(String page) {
+    return 'تُحمَّل الصفحة $page';
+  }
+
+  @override
+  String get clearSearch => 'مسح البحث';
+
+  @override
+  String get previousPageNumber => 'الصفحة السابقة';
+
+  @override
+  String get nextPageNumber => 'الصفحة التالية';
+
+  @override
+  String get showMenus => 'إظهار القوائم';
+
+  @override
+  String get hideMenus => 'إخفاء القوائم';
+
+  @override
+  String downloadSurah(String surah) {
+    return 'تنزيل سورة $surah';
+  }
+
+  @override
+  String retryDownloadSurah(String surah) {
+    return 'أعد تنزيل سورة $surah';
+  }
+
+  @override
+  String deleteSurahDownload(String surah) {
+    return 'سورة $surah منزّلة. احذفها';
+  }
+
+  @override
+  String downloadingSurah(String surah) {
+    return 'تُنزَّل سورة $surah';
+  }
+
+  @override
+  String verseCounter(String current, String total) {
+    return 'الآية $current من $total';
+  }
+
+  @override
+  String downloadPercentSpoken(String percent) {
+    return 'اكتمل $percent٪ من التحميل';
+  }
 }

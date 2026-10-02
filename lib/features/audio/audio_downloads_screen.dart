@@ -124,20 +124,30 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
                   title: Text(surahName(context, surahs[i])),
                   trailing:
                       _busy.contains(n) || files.downloading(reciter.id, n)
-                      ? const SizedBox.square(
+                      ? SizedBox.square(
                           dimension: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            semanticsLabel: l.downloadingSurah(
+                              surahName(context, surahs[i]),
+                            ),
+                          ),
                         )
                       : done
                       ? IconButton(
-                          tooltip: MaterialLocalizations.of(context)
-                              .deleteButtonTooltip,
+                          tooltip: l.deleteSurahDownload(
+                            surahName(context, surahs[i]),
+                          ),
                           icon: Icon(Icons.check_circle, color: t.control),
                           onPressed: () =>
                               setState(() => files.delete(reciter.id, n)),
                         )
                       : IconButton(
-                          tooltip: l.audioDownloads,
+                          tooltip: _failed.contains(n)
+                              ? l.retryDownloadSurah(
+                                  surahName(context, surahs[i]),
+                                )
+                              : l.downloadSurah(surahName(context, surahs[i])),
                           icon: Icon(
                             _failed.contains(n)
                                 ? Icons.error_outline

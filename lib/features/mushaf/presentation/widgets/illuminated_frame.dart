@@ -447,6 +447,7 @@ class FrameTap extends StatelessWidget {
       button: onTap != null,
       label: semanticLabel ?? label,
       excludeSemantics: true,
+      onTap: onTap,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -1282,6 +1283,7 @@ class _PageNumber extends StatelessWidget {
       button: onTap != null,
       label: semanticLabel,
       excludeSemantics: true,
+      onTap: onTap,
       child: GestureDetector(
         onTap: onTap,
         child: Container(

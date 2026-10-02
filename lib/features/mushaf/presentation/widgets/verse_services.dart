@@ -98,11 +98,14 @@ class VerseServicesPanel extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l.servicesTitle,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            l.servicesTitle,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                         Semantics(
@@ -116,7 +119,8 @@ class VerseServicesPanel extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    tooltip: l.cancel,
+                    tooltip: MaterialLocalizations.of(context)
+                        .closeButtonTooltip,
                     onPressed: onClose,
                     icon: const Icon(Icons.close),
                   ),
@@ -157,7 +161,7 @@ class VerseServicesPanel extends StatelessWidget {
                       icon: const Icon(Icons.touch_app_outlined),
                       label: Text(l.wordStudy),
                       style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(44),
+                        minimumSize: const Size.fromHeight(48),
                       ),
                     ),
                   ),
@@ -168,7 +172,7 @@ class VerseServicesPanel extends StatelessWidget {
                       icon: const Icon(Icons.notes),
                       label: Text(l.wordMeanings),
                       style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(44),
+                        minimumSize: const Size.fromHeight(48),
                       ),
                     ),
                   ),
@@ -196,7 +200,7 @@ class VerseServicesPanel extends StatelessWidget {
                 icon: const Icon(Icons.format_line_spacing),
                 label: Text(l.multiSelect),
                 style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44),
+                  minimumSize: const Size.fromHeight(48),
                 ),
               ),
               const SizedBox(height: 8),

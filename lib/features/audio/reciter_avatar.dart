@@ -48,16 +48,20 @@ class ReciterAvatar extends StatelessWidget {
           filterQuality: FilterQuality.medium,
           // No photo for this reciter (or it has not been added yet): the
           // name's initials, as every other place in the app shows them.
-          errorBuilder: (context, _, _) => ColoredBox(
-            color: t.accent,
-            child: Center(
-              child: Text(
-                _initials,
-                style: TextStyle(
-                  fontSize: size * 0.38,
-                  height: 1,
-                  fontWeight: FontWeight.w700,
-                  color: t.muted,
+          // Beside the reciter's name, so not read aloud again.
+          excludeFromSemantics: true,
+          errorBuilder: (context, _, _) => ExcludeSemantics(
+            child: ColoredBox(
+              color: t.accent,
+              child: Center(
+                child: Text(
+                  _initials,
+                  style: TextStyle(
+                    fontSize: size * 0.38,
+                    height: 1,
+                    fontWeight: FontWeight.w700,
+                    color: t.muted,
+                  ),
                 ),
               ),
             ),

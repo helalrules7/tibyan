@@ -619,9 +619,7 @@ class ContentDatabase extends _$ContentDatabase {
       data.offsetInBytes,
       data.lengthInBytes,
     );
-    final mark = build == null
-        ? 's${sha256.convert(bytes)}'
-        : 'b$build';
+    final mark = build == null ? 's${sha256.convert(bytes)}' : 'b$build';
     if (!installed || stamp.readAsStringSync() != mark) {
       await file.writeAsBytes(bytes, flush: true);
       await stamp.writeAsString(mark);
