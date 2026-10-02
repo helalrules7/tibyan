@@ -1,0 +1,33 @@
+name: tibyan_review
+description: "Tibyan review tool: shows each imported passage beside the mushaf text and records every review action."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  crypto: ^3.0.7
+  flutter:
+    sdk: flutter
+  sqlite3: ^3.7.0
+  typed_data: ^1.4.0
+  web: ^1.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Symlinks to the app's fonts (assets/fonts/kfgqpc/), shipped unmodified
+  # under their embedded KFGQPC licence.
+  fonts:
+    - family: KFGQPCHafs
+      fonts:
+        - asset: fonts/uthmanic_hafs_v20.ttf
+    - family: UthmanTaha
+      fonts:
+        - asset: fonts/UthmanTSVer1.ttf
