@@ -24,6 +24,7 @@ import 'package:tibyan/features/search/search_screen.dart';
 import 'package:tibyan/features/search/semantic/meaning_providers.dart';
 import 'package:tibyan/features/settings/settings_screen.dart';
 import 'package:tibyan/l10n/app_localizations.dart';
+import 'package:tibyan/features/khatma/khatma_providers.dart';
 
 /// TalkBack / VoiceOver: the main screens have every control labelled and
 /// large enough, with readable text, and the mushaf page names its verses.
@@ -103,15 +104,17 @@ void main() {
     tester,
   ) async {
     final handle = tester.ensureSemantics();
-    await pump(tester, const HomeScreen());
+    // No khatma: its status comes from a database stream that would
+    // leave a timer pending when the test ends.
+    await pump(
+      tester,
+      const HomeScreen(),
+      overrides: [khatmaStatusProvider.overrideWith((ref) async => null)],
+    );
     await guidelines(tester);
     expect(
       tester.getSemantics(find.bySemanticsLabel(RegExp('^البحث'))),
-      isSemantics(
-        label: 'البحث. افتح',
-        isButton: true,
-        hasTapAction: true,
-      ),
+      isSemantics(label: 'البحث. افتح', isButton: true, hasTapAction: true),
     );
     expect(
       tester.getSemantics(find.bySemanticsLabel(RegExp('^تبيان'))),
