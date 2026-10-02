@@ -25,6 +25,7 @@ import 'package:tibyan/features/search/semantic/meaning_providers.dart';
 import 'package:tibyan/features/settings/settings_screen.dart';
 import 'package:tibyan/l10n/app_localizations.dart';
 import 'package:tibyan/features/khatma/khatma_providers.dart';
+import 'package:tibyan/features/hifz/hifz_providers.dart';
 
 /// TalkBack / VoiceOver: the main screens have every control labelled and
 /// large enough, with readable text, and the mushaf page names its verses.
@@ -104,12 +105,15 @@ void main() {
     tester,
   ) async {
     final handle = tester.ensureSemantics();
-    // No khatma: its status comes from a database stream that would
-    // leave a timer pending when the test ends.
+    // No khatma and no reviews due: both come from database streams that
+    // would leave a timer pending when the test ends.
     await pump(
       tester,
       const HomeScreen(),
-      overrides: [khatmaStatusProvider.overrideWith((ref) async => null)],
+      overrides: [
+        khatmaStatusProvider.overrideWith((ref) async => null),
+        srsItemsProvider.overrideWith((ref) => Stream.value(const [])),
+      ],
     );
     await guidelines(tester);
     expect(
