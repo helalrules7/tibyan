@@ -1136,4 +1136,123 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get journalEarlier => 'ملاحظاتك على هذه الآية';
+
+  @override
+  String get tajweedColors => 'تلوين أحكام التجويد';
+
+  @override
+  String get tajweedColorsHint =>
+      'تلوين الحروف التي يقع عليها الحكم فقط، بالألوان التي تختارها';
+
+  @override
+  String get tajweedLegend => 'مفتاح ألوان التجويد';
+
+  @override
+  String get tajweedRuleColors => 'لون كل حكم';
+
+  @override
+  String get tajweedNoColor => 'بلا لون';
+
+  @override
+  String get tajweedReset => 'إعادة الألوان الافتراضية';
+
+  @override
+  String tajweedPickColor(String rule) {
+    return 'لون «$rule»';
+  }
+
+  @override
+  String get tajweedSourceNote =>
+      'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي تُلوَّن الكلمات المعروفة حدودها فقط.';
+
+  @override
+  String get tajweedLegendHint =>
+      'اضغط مطولا على زر التلوين في الصفحة لعرض هذا المفتاح.';
+
+  @override
+  String get tajweedHueCrimson => 'أحمر داكن';
+
+  @override
+  String get tajweedHueRed => 'أحمر';
+
+  @override
+  String get tajweedHueOrange => 'برتقالي';
+
+  @override
+  String get tajweedHueGold => 'ذهبي';
+
+  @override
+  String get tajweedHueGreen => 'أخضر';
+
+  @override
+  String get tajweedHueLightGreen => 'أخضر فاتح';
+
+  @override
+  String get tajweedHueTeal => 'فيروزي';
+
+  @override
+  String get tajweedHueBlue => 'أزرق';
+
+  @override
+  String get tajweedHuePurple => 'بنفسجي';
+
+  @override
+  String get tajweedHuePink => 'وردي';
+
+  @override
+  String get tajweedHueGrey => 'رمادي';
+
+  @override
+  String get tajweedHamzatWasl => 'همزة الوصل';
+
+  @override
+  String get tajweedLamShamsiyyah => 'اللام الشمسية';
+
+  @override
+  String get tajweedSilent => 'الحروف التي لا تُنطق';
+
+  @override
+  String get tajweedMadd2 => 'المد الطبيعي (حركتان)';
+
+  @override
+  String get tajweedMadd246 => 'المد العارض واللين (2 أو 4 أو 6 حركات)';
+
+  @override
+  String get tajweedMaddMuttasil => 'المد المتصل (4 أو 5 حركات)';
+
+  @override
+  String get tajweedMaddMunfasil => 'المد المنفصل (4 أو 5 حركات)';
+
+  @override
+  String get tajweedMadd6 => 'المد اللازم (6 حركات)';
+
+  @override
+  String get tajweedGhunnah => 'الغنة';
+
+  @override
+  String get tajweedIkhfa => 'الإخفاء';
+
+  @override
+  String get tajweedIkhfaShafawi => 'الإخفاء الشفوي';
+
+  @override
+  String get tajweedIqlab => 'الإقلاب';
+
+  @override
+  String get tajweedIdghaamGhunnah => 'الإدغام بغنة';
+
+  @override
+  String get tajweedIdghaamNoGhunnah => 'الإدغام بلا غنة';
+
+  @override
+  String get tajweedIdghaamShafawi => 'الإدغام الشفوي';
+
+  @override
+  String get tajweedIdghaamMutajanisayn => 'إدغام المتجانسين';
+
+  @override
+  String get tajweedIdghaamMutaqaribayn => 'إدغام المتقاربين';
+
+  @override
+  String get tajweedQalqalah => 'القلقلة';
 }

@@ -2041,6 +2041,234 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ملاحظاتك على هذه الآية'**
   String get journalEarlier;
+
+  /// No description provided for @tajweedColors.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلوين أحكام التجويد'**
+  String get tajweedColors;
+
+  /// No description provided for @tajweedColorsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلوين الحروف التي يقع عليها الحكم فقط، بالألوان التي تختارها'**
+  String get tajweedColorsHint;
+
+  /// No description provided for @tajweedLegend.
+  ///
+  /// In ar, this message translates to:
+  /// **'مفتاح ألوان التجويد'**
+  String get tajweedLegend;
+
+  /// No description provided for @tajweedRuleColors.
+  ///
+  /// In ar, this message translates to:
+  /// **'لون كل حكم'**
+  String get tajweedRuleColors;
+
+  /// No description provided for @tajweedNoColor.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا لون'**
+  String get tajweedNoColor;
+
+  /// No description provided for @tajweedReset.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة الألوان الافتراضية'**
+  String get tajweedReset;
+
+  /// No description provided for @tajweedPickColor.
+  ///
+  /// In ar, this message translates to:
+  /// **'لون «{rule}»'**
+  String tajweedPickColor(String rule);
+
+  /// No description provided for @tajweedSourceNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي تُلوَّن الكلمات المعروفة حدودها فقط.'**
+  String get tajweedSourceNote;
+
+  /// No description provided for @tajweedLegendHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط مطولا على زر التلوين في الصفحة لعرض هذا المفتاح.'**
+  String get tajweedLegendHint;
+
+  /// No description provided for @tajweedHueCrimson.
+  ///
+  /// In ar, this message translates to:
+  /// **'أحمر داكن'**
+  String get tajweedHueCrimson;
+
+  /// No description provided for @tajweedHueRed.
+  ///
+  /// In ar, this message translates to:
+  /// **'أحمر'**
+  String get tajweedHueRed;
+
+  /// No description provided for @tajweedHueOrange.
+  ///
+  /// In ar, this message translates to:
+  /// **'برتقالي'**
+  String get tajweedHueOrange;
+
+  /// No description provided for @tajweedHueGold.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذهبي'**
+  String get tajweedHueGold;
+
+  /// No description provided for @tajweedHueGreen.
+  ///
+  /// In ar, this message translates to:
+  /// **'أخضر'**
+  String get tajweedHueGreen;
+
+  /// No description provided for @tajweedHueLightGreen.
+  ///
+  /// In ar, this message translates to:
+  /// **'أخضر فاتح'**
+  String get tajweedHueLightGreen;
+
+  /// No description provided for @tajweedHueTeal.
+  ///
+  /// In ar, this message translates to:
+  /// **'فيروزي'**
+  String get tajweedHueTeal;
+
+  /// No description provided for @tajweedHueBlue.
+  ///
+  /// In ar, this message translates to:
+  /// **'أزرق'**
+  String get tajweedHueBlue;
+
+  /// No description provided for @tajweedHuePurple.
+  ///
+  /// In ar, this message translates to:
+  /// **'بنفسجي'**
+  String get tajweedHuePurple;
+
+  /// No description provided for @tajweedHuePink.
+  ///
+  /// In ar, this message translates to:
+  /// **'وردي'**
+  String get tajweedHuePink;
+
+  /// No description provided for @tajweedHueGrey.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمادي'**
+  String get tajweedHueGrey;
+
+  /// No description provided for @tajweedHamzatWasl.
+  ///
+  /// In ar, this message translates to:
+  /// **'همزة الوصل'**
+  String get tajweedHamzatWasl;
+
+  /// No description provided for @tajweedLamShamsiyyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللام الشمسية'**
+  String get tajweedLamShamsiyyah;
+
+  /// No description provided for @tajweedSilent.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحروف التي لا تُنطق'**
+  String get tajweedSilent;
+
+  /// No description provided for @tajweedMadd2.
+  ///
+  /// In ar, this message translates to:
+  /// **'المد الطبيعي (حركتان)'**
+  String get tajweedMadd2;
+
+  /// No description provided for @tajweedMadd246.
+  ///
+  /// In ar, this message translates to:
+  /// **'المد العارض واللين (2 أو 4 أو 6 حركات)'**
+  String get tajweedMadd246;
+
+  /// No description provided for @tajweedMaddMuttasil.
+  ///
+  /// In ar, this message translates to:
+  /// **'المد المتصل (4 أو 5 حركات)'**
+  String get tajweedMaddMuttasil;
+
+  /// No description provided for @tajweedMaddMunfasil.
+  ///
+  /// In ar, this message translates to:
+  /// **'المد المنفصل (4 أو 5 حركات)'**
+  String get tajweedMaddMunfasil;
+
+  /// No description provided for @tajweedMadd6.
+  ///
+  /// In ar, this message translates to:
+  /// **'المد اللازم (6 حركات)'**
+  String get tajweedMadd6;
+
+  /// No description provided for @tajweedGhunnah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الغنة'**
+  String get tajweedGhunnah;
+
+  /// No description provided for @tajweedIkhfa.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإخفاء'**
+  String get tajweedIkhfa;
+
+  /// No description provided for @tajweedIkhfaShafawi.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإخفاء الشفوي'**
+  String get tajweedIkhfaShafawi;
+
+  /// No description provided for @tajweedIqlab.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإقلاب'**
+  String get tajweedIqlab;
+
+  /// No description provided for @tajweedIdghaamGhunnah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإدغام بغنة'**
+  String get tajweedIdghaamGhunnah;
+
+  /// No description provided for @tajweedIdghaamNoGhunnah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإدغام بلا غنة'**
+  String get tajweedIdghaamNoGhunnah;
+
+  /// No description provided for @tajweedIdghaamShafawi.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإدغام الشفوي'**
+  String get tajweedIdghaamShafawi;
+
+  /// No description provided for @tajweedIdghaamMutajanisayn.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدغام المتجانسين'**
+  String get tajweedIdghaamMutajanisayn;
+
+  /// No description provided for @tajweedIdghaamMutaqaribayn.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدغام المتقاربين'**
+  String get tajweedIdghaamMutaqaribayn;
+
+  /// No description provided for @tajweedQalqalah.
+  ///
+  /// In ar, this message translates to:
+  /// **'القلقلة'**
+  String get tajweedQalqalah;
 }
 
 class _AppLocalizationsDelegate

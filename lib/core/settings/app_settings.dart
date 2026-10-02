@@ -61,6 +61,8 @@ class AppSettings {
     this.versePause = 500,
     this.repeat = 1,
     this.repeatSilence = 0,
+    this.tajweedColors = false,
+    this.tajweedHues = const {},
   });
 
   final String styleId;
@@ -117,6 +119,13 @@ class AppSettings {
   /// Seconds of silence between repetitions, to repeat after the reciter.
   final int repeatSilence;
 
+  /// Colour the letters that tajweed rules apply to (off by default).
+  final bool tajweedColors;
+
+  /// The reader's colour for a rule, by the rule's data key: a hue name
+  /// (TajweedHue), or '' for no colour. Rules not listed use their default.
+  final Map<String, String> tajweedHues;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -139,6 +148,8 @@ class AppSettings {
     int? versePause,
     int? repeat,
     int? repeatSilence,
+    bool? tajweedColors,
+    Map<String, String>? tajweedHues,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -161,6 +172,8 @@ class AppSettings {
     versePause: versePause ?? this.versePause,
     repeat: repeat ?? this.repeat,
     repeatSilence: repeatSilence ?? this.repeatSilence,
+    tajweedColors: tajweedColors ?? this.tajweedColors,
+    tajweedHues: tajweedHues ?? this.tajweedHues,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

@@ -6,6 +6,12 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (tajweed colours)
+- Tajweed colouring, off by default: only the letters and marks a rule applies to are coloured, on the pages of all three editions, including the opening pages. Turn it on in «شكل المصحف» or with the new button under the page number (a long press shows the colour key).
+- A colour for each of the 18 rules, chosen by the reader from 11 colours or none, with defaults after the usual printed tajweed mushafs; every colour has a shade for light and for dark paper, at least 3:1 against every theme's paper.
+- The colour key lists each rule with its colour, and says where the data comes from: cpfair/quran-tajweed (CC BY 4.0), machine-generated and not yet reviewed by a qualified reader.
+- Precision: new Madina edition, every letter placed (exact for a letter that stands alone, estimated inside joined letters); old Madina edition, 94% of the coloured letters; Shamarly, 44% (only words whose bounds are known).
+
 ### Added (data review; nothing changes in the app)
 - A review tool (Flutter web, `apps/review/`): each imported passage beside its verses in the mushaf text; editors link, reviewers approve or return with a note, never their own work; an append-only log of every action. Works on a review file now; a Supabase schema with row-level security is ready for later.
 - al-Wahidi's «أسباب نزول القرآن» (OpenITI) imported as 534 drafts with suggested verse links, waiting for review. `tools/export_pack.py` builds packs from reviewed entries only.

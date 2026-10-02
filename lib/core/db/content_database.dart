@@ -585,7 +585,7 @@ class ContentDatabase extends _$ContentDatabase {
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   /// The file is built ahead of time; never create or migrate it here.
   @override

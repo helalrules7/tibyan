@@ -1143,4 +1143,123 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get journalEarlier => 'Your notes on this verse';
+
+  @override
+  String get tajweedColors => 'Tajweed colours';
+
+  @override
+  String get tajweedColorsHint =>
+      'Colours only the letters a rule applies to, in the colours you choose';
+
+  @override
+  String get tajweedLegend => 'Tajweed colour key';
+
+  @override
+  String get tajweedRuleColors => 'Colour of each rule';
+
+  @override
+  String get tajweedNoColor => 'No colour';
+
+  @override
+  String get tajweedReset => 'Restore the default colours';
+
+  @override
+  String tajweedPickColor(String rule) {
+    return 'Colour of “$rule”';
+  }
+
+  @override
+  String get tajweedSourceNote =>
+      'Where each rule applies comes from the quran-tajweed data (Collin Fair, CC BY 4.0). It is machine-generated and not yet reviewed by a qualified reader. A letter’s place inside its word is estimated, and in the Shamarly edition only words whose bounds are known are coloured.';
+
+  @override
+  String get tajweedLegendHint =>
+      'Long-press the colouring button on the page to show this key.';
+
+  @override
+  String get tajweedHueCrimson => 'Dark red';
+
+  @override
+  String get tajweedHueRed => 'Red';
+
+  @override
+  String get tajweedHueOrange => 'Orange';
+
+  @override
+  String get tajweedHueGold => 'Gold';
+
+  @override
+  String get tajweedHueGreen => 'Green';
+
+  @override
+  String get tajweedHueLightGreen => 'Light green';
+
+  @override
+  String get tajweedHueTeal => 'Teal';
+
+  @override
+  String get tajweedHueBlue => 'Blue';
+
+  @override
+  String get tajweedHuePurple => 'Purple';
+
+  @override
+  String get tajweedHuePink => 'Pink';
+
+  @override
+  String get tajweedHueGrey => 'Grey';
+
+  @override
+  String get tajweedHamzatWasl => 'Hamzat al-Wasl';
+
+  @override
+  String get tajweedLamShamsiyyah => 'Lam al-Shamsiyyah';
+
+  @override
+  String get tajweedSilent => 'Silent';
+
+  @override
+  String get tajweedMadd2 => 'Madd, regular (2 harakat)';
+
+  @override
+  String get tajweedMadd246 => 'Madd al-Aarid / al-Leen (2, 4, 6 harakat)';
+
+  @override
+  String get tajweedMaddMuttasil => 'Madd al-Muttasil (4, 5 harakat)';
+
+  @override
+  String get tajweedMaddMunfasil => 'Madd al-Munfasil (4, 5 harakat)';
+
+  @override
+  String get tajweedMadd6 => 'Madd Laazim (6 harakat)';
+
+  @override
+  String get tajweedGhunnah => 'Ghunnah';
+
+  @override
+  String get tajweedIkhfa => 'Ikhfa';
+
+  @override
+  String get tajweedIkhfaShafawi => 'Ikhfa Shafawi';
+
+  @override
+  String get tajweedIqlab => 'Iqlab';
+
+  @override
+  String get tajweedIdghaamGhunnah => 'Idghaam with Ghunnah';
+
+  @override
+  String get tajweedIdghaamNoGhunnah => 'Idghaam without Ghunnah';
+
+  @override
+  String get tajweedIdghaamShafawi => 'Idghaam Shafawi';
+
+  @override
+  String get tajweedIdghaamMutajanisayn => 'Idghaam Mutajaanisain';
+
+  @override
+  String get tajweedIdghaamMutaqaribayn => 'Idghaam Mutaqaaribain';
+
+  @override
+  String get tajweedQalqalah => 'Qalqalah';
 }

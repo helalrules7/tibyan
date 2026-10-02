@@ -6,6 +6,7 @@ import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/presentation/widgets/art_frame.dart';
+import '../mushaf/presentation/widgets/tajweed_legend.dart';
 import '../mushaf/presentation/widgets/theme_art.dart';
 import 'theme_picker.dart';
 
@@ -94,6 +95,9 @@ class AppearanceScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          _Title(l.tajweedColors),
+          const TajweedSettings(),
           const SizedBox(height: 20),
           _Title(l.uiFontLabel),
           Card(

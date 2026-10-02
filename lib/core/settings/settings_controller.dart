@@ -40,6 +40,8 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kVersePause = 'settings.versePause';
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
+  static const _kTajweed = 'settings.tajweedColors';
+  static const _kTajweedHues = 'settings.tajweedHues';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -89,6 +91,12 @@ class SettingsController extends Notifier<AppSettings> {
       versePause: _prefs.getInt(_kVersePause) ?? 500,
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
+      tajweedColors: _prefs.getBool(_kTajweed) ?? false,
+      tajweedHues: {
+        for (final e in _prefs.getStringList(_kTajweedHues) ?? const <String>[])
+          if (e.indexOf('=') case final i when i > 0)
+            e.substring(0, i): e.substring(i + 1),
+      },
     );
   }
 
@@ -218,6 +226,29 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setRepeatSilence(int seconds) async {
     state = state.copyWith(repeatSilence: seconds);
     await _prefs.setInt(_kRepeatSilence, seconds);
+  }
+
+  Future<void> setTajweedColors(bool value) async {
+    state = state.copyWith(tajweedColors: value);
+    await _prefs.setBool(_kTajweed, value);
+  }
+
+  /// [hue] is a TajweedHue name, '' for no colour, or null to go back to
+  /// the rule's default.
+  Future<void> setTajweedHue(String ruleKey, String? hue) async {
+    final hues = {...state.tajweedHues};
+    hue == null ? hues.remove(ruleKey) : hues[ruleKey] = hue;
+    await _saveTajweedHues(hues);
+  }
+
+  /// Every rule back to its default colour.
+  Future<void> resetTajweedHues() => _saveTajweedHues(const {});
+
+  Future<void> _saveTajweedHues(Map<String, String> hues) async {
+    state = state.copyWith(tajweedHues: hues);
+    await _prefs.setStringList(_kTajweedHues, [
+      for (final e in hues.entries) '${e.key}=${e.value}',
+    ]);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {
