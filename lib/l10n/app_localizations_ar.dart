@@ -1136,4 +1136,168 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get journalEarlier => 'ملاحظاتك على هذه الآية';
+
+  @override
+  String get hifzTitle => 'الحفظ';
+
+  @override
+  String get hifzTileNote => 'المراجعة والتسميع';
+
+  @override
+  String get hifzToday => 'مراجعة اليوم';
+
+  @override
+  String get hifzNothingDue => 'لا مراجعة مستحقة اليوم.';
+
+  @override
+  String get hifzNothingDueHint =>
+      'سمّع صفحة أو ربعا أو سورة ثم قيّم تسميعك، فتدخل المراجعة المتباعدة.';
+
+  @override
+  String get hifzStartTest => 'ابدأ تسميعا';
+
+  @override
+  String get hifzMap => 'خريطة الحفظ';
+
+  @override
+  String get hifzMapHint =>
+      'كل صفحة ملوّنة بقوة حفظها، ومعها علامة تقرأ دون ألوان.';
+
+  @override
+  String get hifzAllUnits => 'كل وحدات المراجعة';
+
+  @override
+  String get hifzDueToday => 'مستحقة اليوم';
+
+  @override
+  String hifzDueOn(String date) {
+    return 'موعدها $date';
+  }
+
+  @override
+  String hifzQuarter(String number) {
+    return 'الربع $number';
+  }
+
+  @override
+  String get hifzUnitPage => 'صفحة';
+
+  @override
+  String get hifzUnitQuarter => 'ربع';
+
+  @override
+  String get hifzUnitSurah => 'سورة';
+
+  @override
+  String get hifzChooseUnit => 'ماذا تسمّع؟';
+
+  @override
+  String hifzNumberRange(String max) {
+    return 'الرقم، من ١ إلى $max';
+  }
+
+  @override
+  String get hifzBegin => 'ابدأ';
+
+  @override
+  String get hifzRemove => 'احذف من المراجعة';
+
+  @override
+  String get revealNextWord => 'الكلمة التالية';
+
+  @override
+  String get revealNextVerse => 'الآية التالية';
+
+  @override
+  String get revealAll => 'الكل';
+
+  @override
+  String get endRecite => 'إنهاء التسميع';
+
+  @override
+  String get verseRemembered => 'حفظت';
+
+  @override
+  String get verseMissed => 'أخطأت';
+
+  @override
+  String testCounts(String remembered, String missed) {
+    return 'حفظت $remembered · أخطأت $missed';
+  }
+
+  @override
+  String get revealByLine =>
+      'لا مواضع لكلمات هذه الآية في هذه الطبعة، فتُكشف سطرا سطرا.';
+
+  @override
+  String get gradeUnit => 'قيّم';
+
+  @override
+  String get gradeTitle => 'كيف كان تسميعك؟';
+
+  @override
+  String get gradeSuggested => 'الاختيار المقترح من نتائج الآيات';
+
+  @override
+  String get gradeAgain => 'أعِدها';
+
+  @override
+  String get gradeHard => 'صعبة';
+
+  @override
+  String get gradeGood => 'جيدة';
+
+  @override
+  String get gradeEasy => 'سهلة';
+
+  @override
+  String gradeSaved(String date) {
+    return 'المراجعة القادمة: $date';
+  }
+
+  @override
+  String get similarVerses => 'المتشابهات';
+
+  @override
+  String similarCount(String count) {
+    return 'متشابهات ($count)';
+  }
+
+  @override
+  String get similarThisVerse => 'الآية';
+
+  @override
+  String get similarFollowing => 'والآية بعدها';
+
+  @override
+  String get strengthNone => 'لم يُحفظ';
+
+  @override
+  String get strengthWeak => 'ضعيف';
+
+  @override
+  String get strengthFair => 'متوسط';
+
+  @override
+  String get strengthGood => 'جيد';
+
+  @override
+  String get strengthStrong => 'متقن';
+
+  @override
+  String get mapPages => 'الصفحات';
+
+  @override
+  String get mapSurahs => 'السور';
+
+  @override
+  String get mapZoomIn => 'تكبير';
+
+  @override
+  String get mapZoomOut => 'تصغير';
+
+  @override
+  String mapCell(String name, String strength) {
+    return '$name: $strength';
+  }
 }

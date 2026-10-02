@@ -11,6 +11,7 @@ import 'theme_art.dart';
 import 'opening_art.dart';
 
 import 'raster_frame.dart';
+
 /// The page in a heritage theme, laid out as approved: the juz ✦ hizb ✦
 /// surah cartouche above the frame, the theme's frame around the page,
 /// the page number in the theme's verse marker below it (with the quarter

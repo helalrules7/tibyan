@@ -864,5 +864,109 @@
     }
   },
   "journalSaved": "حُفظت الملاحظة",
-  "journalEarlier": "ملاحظاتك على هذه الآية"
+  "journalEarlier": "ملاحظاتك على هذه الآية",
+  "hifzTitle": "الحفظ",
+  "hifzTileNote": "المراجعة والتسميع",
+  "hifzToday": "مراجعة اليوم",
+  "hifzNothingDue": "لا مراجعة مستحقة اليوم.",
+  "hifzNothingDueHint": "سمّع صفحة أو ربعا أو سورة ثم قيّم تسميعك، فتدخل المراجعة المتباعدة.",
+  "hifzStartTest": "ابدأ تسميعا",
+  "hifzMap": "خريطة الحفظ",
+  "hifzMapHint": "كل صفحة ملوّنة بقوة حفظها، ومعها علامة تقرأ دون ألوان.",
+  "hifzAllUnits": "كل وحدات المراجعة",
+  "hifzDueToday": "مستحقة اليوم",
+  "hifzDueOn": "موعدها {date}",
+  "@hifzDueOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "hifzQuarter": "الربع {number}",
+  "@hifzQuarter": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "hifzUnitPage": "صفحة",
+  "hifzUnitQuarter": "ربع",
+  "hifzUnitSurah": "سورة",
+  "hifzChooseUnit": "ماذا تسمّع؟",
+  "hifzNumberRange": "الرقم، من ١ إلى {max}",
+  "@hifzNumberRange": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "hifzBegin": "ابدأ",
+  "hifzRemove": "احذف من المراجعة",
+  "revealNextWord": "الكلمة التالية",
+  "revealNextVerse": "الآية التالية",
+  "revealAll": "الكل",
+  "endRecite": "إنهاء التسميع",
+  "verseRemembered": "حفظت",
+  "verseMissed": "أخطأت",
+  "testCounts": "حفظت {remembered} · أخطأت {missed}",
+  "@testCounts": {
+    "placeholders": {
+      "remembered": {
+        "type": "String"
+      },
+      "missed": {
+        "type": "String"
+      }
+    }
+  },
+  "revealByLine": "لا مواضع لكلمات هذه الآية في هذه الطبعة، فتُكشف سطرا سطرا.",
+  "gradeUnit": "قيّم",
+  "gradeTitle": "كيف كان تسميعك؟",
+  "gradeSuggested": "الاختيار المقترح من نتائج الآيات",
+  "gradeAgain": "أعِدها",
+  "gradeHard": "صعبة",
+  "gradeGood": "جيدة",
+  "gradeEasy": "سهلة",
+  "gradeSaved": "المراجعة القادمة: {date}",
+  "@gradeSaved": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "similarVerses": "المتشابهات",
+  "similarCount": "متشابهات ({count})",
+  "@similarCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "similarThisVerse": "الآية",
+  "similarFollowing": "والآية بعدها",
+  "strengthNone": "لم يُحفظ",
+  "strengthWeak": "ضعيف",
+  "strengthFair": "متوسط",
+  "strengthGood": "جيد",
+  "strengthStrong": "متقن",
+  "mapPages": "الصفحات",
+  "mapSurahs": "السور",
+  "mapZoomIn": "تكبير",
+  "mapZoomOut": "تصغير",
+  "mapCell": "{name}: {strength}",
+  "@mapCell": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "strength": {
+        "type": "String"
+      }
+    }
+  }
 }

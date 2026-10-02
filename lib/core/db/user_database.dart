@@ -2,8 +2,10 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
 import 'habit_tables.dart';
+import 'hifz_tables.dart';
 
 export 'habit_tables.dart';
+export 'hifz_tables.dart';
 
 part 'user_database.g.dart';
 
@@ -65,6 +67,8 @@ class ReadingPositions extends Table {
     ListeningSessions,
     Reflections,
     Outbox,
+    SrsItems,
+    Memorizations,
   ],
 )
 class UserDatabase extends _$UserDatabase {
@@ -73,7 +77,7 @@ class UserDatabase extends _$UserDatabase {
   UserDatabase.open() : super(driftDatabase(name: 'user'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -86,6 +90,12 @@ class UserDatabase extends _$UserDatabase {
         // Tables are created only if missing, so this step is safe to run
         // after or before other branches' steps.
         await _createHabitTables(m);
+      }
+      if (from < 4) {
+        // Hifz: spaced review units and memorization strength. Also
+        // created only if missing.
+        await m.createTable(srsItems);
+        await m.createTable(memorizations);
       }
     },
   );

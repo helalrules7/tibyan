@@ -26,7 +26,16 @@ void main() {
   test('ten recitations, murattal only, each with a folder of files', () async {
     final reciters = await repo.reciters();
     expect(reciters.map((r) => r.id).toList()..sort(), [
-      1, 2, 3, 4, 5, 10, 11, 12, 13, 14,
+      1,
+      2,
+      3,
+      4,
+      5,
+      10,
+      11,
+      12,
+      13,
+      14,
     ]);
     // The mujawwad ones (ids 6 and 7) were removed, and their numbers are
     // never reused, so a reader who saved one cannot land on another.

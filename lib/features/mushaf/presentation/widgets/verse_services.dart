@@ -25,7 +25,14 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onWordStudy,
     required this.onWordMeanings,
     this.onReflect,
+    this.similarCount = 0,
+    this.onSimilar,
   });
+
+  /// Passages similar to the selected verse (mutashabihat); the button
+  /// shows only when there are some.
+  final int similarCount;
+  final VoidCallback? onSimilar;
 
   final List<VerseKey> verses;
   final List<SurahRow>? surahs;
@@ -41,6 +48,7 @@ class VerseServicesPanel extends StatelessWidget {
 
   /// The meanings of the selected verses' words («الميسر في غريب القرآن»).
   final VoidCallback onWordMeanings;
+
   /// Writes a note on the first selected verse (tadabbur journal).
   final VoidCallback? onReflect;
 
@@ -177,6 +185,17 @@ class VerseServicesPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (similarCount > 0 && onSimilar != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onSimilar,
+                  icon: const Icon(Icons.compare_arrows),
+                  label: Text(l.similarCount(digits(similarCount))),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               Row(
                 children: [

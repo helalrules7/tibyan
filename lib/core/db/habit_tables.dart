@@ -143,4 +143,6 @@ const syncedTables = [
   'reading_session',
   'listening_session',
   'reflection',
+  'srs_item',
+  'memorization',
 ];

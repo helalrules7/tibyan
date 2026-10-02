@@ -18,12 +18,13 @@ void main() {
     );
     addTearDown(db.close);
     Future<List<Rect>> rows(int ayah) async => wordRows([
-      for (final r in await db
-          .customSelect(
-            'SELECT x0, y0, x1, y1 FROM word_box '
-            'WHERE page = 1 AND surah = 1 AND ayah = $ayah',
-          )
-          .get())
+      for (final r
+          in await db
+              .customSelect(
+                'SELECT x0, y0, x1, y1 FROM word_box '
+                'WHERE page = 1 AND surah = 1 AND ayah = $ayah',
+              )
+              .get())
         Rect.fromLTRB(
           r.read<int>('x0') / 10,
           r.read<int>('y0') / 10,

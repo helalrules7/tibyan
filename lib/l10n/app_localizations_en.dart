@@ -1143,4 +1143,168 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get journalEarlier => 'Your notes on this verse';
+
+  @override
+  String get hifzTitle => 'Memorization';
+
+  @override
+  String get hifzTileNote => 'Review and recite';
+
+  @override
+  String get hifzToday => 'Today\'s review';
+
+  @override
+  String get hifzNothingDue => 'Nothing is due today.';
+
+  @override
+  String get hifzNothingDueHint =>
+      'Recite a page, a quarter or a surah and grade it; it then joins spaced review.';
+
+  @override
+  String get hifzStartTest => 'Start a test';
+
+  @override
+  String get hifzMap => 'Hifz map';
+
+  @override
+  String get hifzMapHint =>
+      'Each page is coloured by how firmly it is memorized, with a mark that reads without colour.';
+
+  @override
+  String get hifzAllUnits => 'All review units';
+
+  @override
+  String get hifzDueToday => 'Due today';
+
+  @override
+  String hifzDueOn(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String hifzQuarter(String number) {
+    return 'Quarter $number';
+  }
+
+  @override
+  String get hifzUnitPage => 'Page';
+
+  @override
+  String get hifzUnitQuarter => 'Quarter';
+
+  @override
+  String get hifzUnitSurah => 'Surah';
+
+  @override
+  String get hifzChooseUnit => 'What will you recite?';
+
+  @override
+  String hifzNumberRange(String max) {
+    return 'Number, 1 to $max';
+  }
+
+  @override
+  String get hifzBegin => 'Begin';
+
+  @override
+  String get hifzRemove => 'Remove from review';
+
+  @override
+  String get revealNextWord => 'Next word';
+
+  @override
+  String get revealNextVerse => 'Next verse';
+
+  @override
+  String get revealAll => 'All';
+
+  @override
+  String get endRecite => 'End the test';
+
+  @override
+  String get verseRemembered => 'Remembered';
+
+  @override
+  String get verseMissed => 'Missed';
+
+  @override
+  String testCounts(String remembered, String missed) {
+    return 'Remembered $remembered · Missed $missed';
+  }
+
+  @override
+  String get revealByLine =>
+      'This edition has no word positions for this verse, so it is revealed line by line.';
+
+  @override
+  String get gradeUnit => 'Grade';
+
+  @override
+  String get gradeTitle => 'How did it go?';
+
+  @override
+  String get gradeSuggested => 'Suggested from the verse results';
+
+  @override
+  String get gradeAgain => 'Again';
+
+  @override
+  String get gradeHard => 'Hard';
+
+  @override
+  String get gradeGood => 'Good';
+
+  @override
+  String get gradeEasy => 'Easy';
+
+  @override
+  String gradeSaved(String date) {
+    return 'Next review: $date';
+  }
+
+  @override
+  String get similarVerses => 'Similar verses';
+
+  @override
+  String similarCount(String count) {
+    return 'Similar ($count)';
+  }
+
+  @override
+  String get similarThisVerse => 'This verse';
+
+  @override
+  String get similarFollowing => 'and the verse after it';
+
+  @override
+  String get strengthNone => 'Not memorized';
+
+  @override
+  String get strengthWeak => 'Weak';
+
+  @override
+  String get strengthFair => 'Fair';
+
+  @override
+  String get strengthGood => 'Good';
+
+  @override
+  String get strengthStrong => 'Strong';
+
+  @override
+  String get mapPages => 'Pages';
+
+  @override
+  String get mapSurahs => 'Surahs';
+
+  @override
+  String get mapZoomIn => 'Zoom in';
+
+  @override
+  String get mapZoomOut => 'Zoom out';
+
+  @override
+  String mapCell(String name, String strength) {
+    return '$name: $strength';
+  }
 }

@@ -32,12 +32,8 @@ class CatchwordCut {
         ],
       );
 
-  static Rect _rect(List<int> v, double factor) => Rect.fromLTRB(
-    v[0] * factor,
-    v[1] * factor,
-    v[2] * factor,
-    v[3] * factor,
-  );
+  static Rect _rect(List<int> v, double factor) =>
+      Rect.fromLTRB(v[0] * factor, v[1] * factor, v[2] * factor, v[3] * factor);
 
   /// Image px of the next page.
   final Rect box;

@@ -217,8 +217,7 @@ const _en = <String, SourceText>{
   'quranicaudio': (
     title: 'Yasser al-Dosari (murattal)',
     publisher: 'quranicaudio.com (Quran.com audio)',
-    license:
-        'Permission granted by the site by email (2026-10-01), on condition that the site is named',
+    license: 'Permission granted by the site by email (2026-10-01), on condition that the site is named',
     credit: 'Yasser al-Dosari: quranicaudio.com',
   ),
   'qdc-timing': (
