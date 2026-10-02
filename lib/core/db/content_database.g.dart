@@ -5237,7 +5237,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
   final String nameAr;
   final String nameEn;
 
-  /// `murattal` or `mujawwad`.
+  /// `murattal`, and only that: the mujawwad readings are not offered.
   final String style;
 
   /// A surah's file is this URL followed by `NNN.mp3`.

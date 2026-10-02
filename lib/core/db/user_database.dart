@@ -1,6 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+import 'habit_tables.dart';
+
+export 'habit_tables.dart';
+
 part 'user_database.g.dart';
 
 /// Named bookmarks ("fawasil"). Each one moves to the last place read
@@ -51,14 +55,25 @@ class ReadingPositions extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [BookmarkSets, ReadingPositions])
+@DriftDatabase(
+  tables: [
+    BookmarkSets,
+    ReadingPositions,
+    Khatmas,
+    KhatmaLogs,
+    ReadingSessions,
+    ListeningSessions,
+    Reflections,
+    Outbox,
+  ],
+)
 class UserDatabase extends _$UserDatabase {
   UserDatabase(super.executor);
 
   UserDatabase.open() : super(driftDatabase(name: 'user'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -66,8 +81,23 @@ class UserDatabase extends _$UserDatabase {
       if (from < 2) {
         await m.addColumn(bookmarkSets, bookmarkSets.kind);
       }
+      if (from < 3) {
+        // Khatma, reading reports, tadabbur journal and the sync outbox.
+        // Tables are created only if missing, so this step is safe to run
+        // after or before other branches' steps.
+        await _createHabitTables(m);
+      }
     },
   );
+
+  Future<void> _createHabitTables(Migrator m) async {
+    await m.createTable(khatmas);
+    await m.createTable(khatmaLogs);
+    await m.createTable(readingSessions);
+    await m.createTable(listeningSessions);
+    await m.createTable(reflections);
+    await m.createTable(outbox);
+  }
 
   /// Moves a fixed mark to a verse, creating it the first time.
   Future<void> setMark(
