@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/app_settings.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../data/tajweed.dart';
 import 'mushaf_page.dart';
 import 'theme_art.dart';
 
@@ -38,6 +39,8 @@ class PageInteraction {
     this.onPick,
     this.verseLabel,
     this.verseText,
+    this.tajweedColor,
+    this.tajweed = '',
   });
 
   /// Screen readers: a verse's name («سورة البقرة، الآية ٥») and its text
@@ -45,6 +48,14 @@ class PageInteraction {
   /// verse nodes.
   final String Function(VerseKey verse)? verseLabel;
   final String? Function(VerseKey verse)? verseText;
+
+  /// Tajweed colouring: each rule's colour on this page's paper (null for
+  /// a rule left uncoloured); null when the colouring is off.
+  final Color? Function(TajweedRule rule)? tajweedColor;
+
+  /// This page's row of `tajweed_page` (tools/build_tajweed.py), in the
+  /// edition's format.
+  final String tajweed;
 
   /// Word picking («دراسة الكلمة»): while set, a tap goes here instead,
   /// with the point in edition units (page units in the new edition, image

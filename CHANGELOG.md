@@ -12,6 +12,11 @@ All notable changes to Tibyan are recorded here. The format follows
 - Spaced review: grading a test (Again, Hard, Good, Easy; the choice is suggested from the verse results) schedules the unit with our own implementation of FSRS 4.5 (default weights, 90% retention, whole days). Units and verse strengths are kept in user.db (`srs_item`, `memorization`, schema step 4) with uuid, updated_at and deleted_at, and queue in the sync outbox.
 - Mutashabihat: a «متشابهات (n)» button in the test bar and in the verse services opens the similar verses, each shown as its own text, with the source's credit and no commentary. Links from Waqar144/Quran_Mutashabihat_Data (no licence file yet, MISSING_DATA.md إ17), in content.db `mutashabih` (schema 14).
 - Hifz map: the pages of the edition being read, or the 114 surahs, coloured by the weakest memorized verse in four strengths that also step in lightness, each with one to four bars and a spoken label; pinch or the zoom buttons to scale the cells; tap a cell to test it.
+### Added (tajweed colours)
+- Tajweed colouring, off by default: only the letters and marks a rule applies to are coloured, on the pages of all three editions, including the opening pages. Turn it on in «شكل المصحف» or with the new button under the page number (a long press shows the colour key).
+- A colour for each of the 18 rules, chosen by the reader from 11 colours or none, with defaults after the usual printed tajweed mushafs; every colour has a shade for light and for dark paper, at least 3:1 against every theme's paper.
+- The colour key lists each rule with its colour, and says where the data comes from: cpfair/quran-tajweed (CC BY 4.0), machine-generated and not yet reviewed by a qualified reader.
+- Precision: new Madina edition, every letter placed (exact for a letter that stands alone, estimated inside joined letters); old Madina edition, 94% of the coloured letters; Shamarly, 44% (only words whose bounds are known).
 
 ### Added (data review; nothing changes in the app)
 - A review tool (Flutter web, `apps/review/`): each imported passage beside its verses in the mushaf text; editors link, reviewers approve or return with a note, never their own work; an append-only log of every action. Works on a review file now; a Supabase schema with row-level security is ready for later.

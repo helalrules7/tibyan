@@ -620,3 +620,11 @@ final divineNameBoxesProvider = FutureProvider.family<List<Rect>, int>((
         ...pieces,
   ];
 });
+
+/// The tajweed colouring of a page in the edition being read (a
+/// `tajweed_page` row, tools/build_tajweed.py); empty when there is none.
+final tajweedPageProvider = FutureProvider.family<String, int>(
+  (ref, page) => ref
+      .watch(mushafRepositoryProvider)
+      .tajweedPage(ref.watch(editionProvider), page),
+);

@@ -45,6 +45,7 @@ from pathlib import Path
 
 import build_line_cuts
 import build_mutashabih
+import build_tajweed
 import build_word_boxes
 import build_word_study
 
@@ -52,7 +53,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 14
+SCHEMA_VERSION = 15  # 14: mutashabih; 15: tajweed_page
 SHAMARLY = CACHE / 'shamarly_geometry.db'
 SHAMARLY_CATCHWORD = CACHE / 'shamarly_catchword.json'
 
@@ -636,6 +637,8 @@ def main():
         for (s, a), (exact, words) in word_boxes.items()
         for n, page, x0, y0, x1, y1 in words
     ])
+    # Tajweed colouring (cpfair/quran-tajweed, CC BY 4.0, machine-generated).
+    build_tajweed.write(db, today)
     for page, cuts, overflow in build_line_cuts.new_edition():
         db.executemany('INSERT INTO line_cut VALUES (?,?,?,?)',
                        [('madina1441', page, j, round(y, 2)) for j, y in enumerate(cuts)])
@@ -679,6 +682,7 @@ def main():
     assert ends == sorted(ends)
     assert check.execute('SELECT COUNT(*) FROM shamarly_marker').fetchone()[0] == 6236
     assert check.execute('SELECT COUNT(*) FROM mutashabih').fetchone()[0] > 0
+    assert check.execute("SELECT COUNT(*) FROM tajweed_page WHERE edition = 'madina1441'").fetchone()[0] == 604
     # Word study: the corpus maps every verse but 7; 20 more are only
     # disjoined letters (الٓمٓ...), which have no root or lemma. al-Rahman is ر ح م.
     assert len(skipped) == 7, skipped

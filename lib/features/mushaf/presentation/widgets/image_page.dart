@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/tajweed.dart';
 import 'mushaf_page.dart';
 import 'page_interaction.dart';
 
@@ -663,6 +664,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                           line: tokens.colors.border,
                           divineNames: x.divineNames,
                           divineColor: x.divineColor,
+                          tajweed: tajweedOf(x),
                           emphasis: x.emphasisLines,
                           rings: [
                             for (final e in markers.entries)
@@ -692,6 +694,17 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
   }
 }
 
+/// Tajweed colouring of an image page: each coloured box (image px) with
+/// its rule's colour; empty when the colouring is off.
+List<(Rect, Color)> tajweedOf(PageInteraction x) {
+  final colour = x.tajweedColor;
+  if (colour == null || x.tajweed.isEmpty) return const [];
+  return [
+    for (final (rule, r) in parseTajweedRects(x.tajweed))
+      if (colour(rule) case final c?) (r, c),
+  ];
+}
+
 class _ImagePagePainter extends CustomPainter {
   _ImagePagePainter({
     required this.image,
@@ -712,8 +725,12 @@ class _ImagePagePainter extends CustomPainter {
     required this.line,
     this.divineNames = const [],
     this.divineColor,
+    this.tajweed = const [],
     this.emphasis = const {},
   });
+
+  /// Tajweed: the ink inside each box (image px) drawn in its colour.
+  final List<(Rect, Color)> tajweed;
 
   /// Divine-name boxes (image px) and their colour.
   final List<Rect> divineNames;
@@ -799,6 +816,13 @@ class _ImagePagePainter extends CustomPainter {
         canvas.drawImageRect(image, r, layout.toScreenRect(r), tintPaint);
       }
     }
+    final tints = <Color, Paint>{};
+    for (final (r, colour) in tajweed) {
+      final tint = tints[colour] ??= Paint()
+        ..filterQuality = FilterQuality.medium
+        ..colorFilter = inkFilter(colour, alphaInk: alphaInk);
+      canvas.drawImageRect(image, r, layout.toScreenRect(r), tint);
+    }
     for (final (r, n, marked) in markers) {
       look?.paintOver(canvas, r.center, r.shortestSide / 2, n, marked: marked);
     }
@@ -853,6 +877,7 @@ class _ImagePagePainter extends CustomPainter {
       !listEquals(old.hidden, hidden) ||
       !listEquals(old.markers, markers) ||
       !listEquals(old.divineNames, divineNames) ||
+      !listEquals(old.tajweed, tajweed) ||
       !listEquals(old.markerPixels, markerPixels) ||
       !setEquals(old.emphasis, emphasis);
 }

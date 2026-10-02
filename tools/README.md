@@ -17,6 +17,9 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `verify_text/compare_tanzil_kfgqpc.py` | Lists verses whose base letters differ between Tanzil and the KFGQPC text. Every listed verse goes to a human reviewer |
 | `import_wahidi_asbab.py` | Splits al-Wahidi's «أسباب نزول القرآن» (OpenITI) by the book's own sections and passage headers into a review database of drafts, with suggested verse links and their confidence. Proves the split kept every word |
 | `review_db.py`, `review_schema.sql` | The review database: schema (append-only audit log, frozen text, reviewer ≠ editor) and the content hash shared with the review tool |
+| `build_tajweed.py` | Places the cpfair/quran-tajweed spans (CC BY 4.0) on the three editions' pages for `content.db` (`tajweed_page`): Tanzil 2017 offsets moved letter by letter onto the KFGQPC words, then onto the page contours (1441) or the ink inside the word boxes (1405, Shamarly). Never writes text; `--into DB` adds the table to a built database |
+| `measure_letter_widths.py` | Measures where each letter of each KFGQPC word ends in the KFGQPC font (headless Chrome, measuring only) into `word_letter_widths.json`, for `build_tajweed.py` |
+| `verify_tajweed.py` | Draws new-edition pages with their tajweed colouring (`tools/out/tajweed_NNN.png`) for a person to check |
 | `export_pack.py` | Builds a data pack from a review database with reviewed entries only, after re-checking each one's hash and approval; writes the pack's index |
 
 Tests: `python3 -m unittest discover -s tools/tests`. The review workflow is in `docs/review/README.md`.

@@ -62,6 +62,8 @@ class AppSettings {
     this.repeat = 1,
     this.repeatSilence = 0,
     this.elderlyMode = false,
+    this.tajweedColors = false,
+    this.tajweedHues = const {},
   });
 
   final String styleId;
@@ -122,6 +124,12 @@ class AppSettings {
   /// home with only the main tasks, the page as large as it can be, and
   /// slower transitions.
   final bool elderlyMode;
+  /// Colour the letters that tajweed rules apply to (off by default).
+  final bool tajweedColors;
+
+  /// The reader's colour for a rule, by the rule's data key: a hue name
+  /// (TajweedHue), or '' for no colour. Rules not listed use their default.
+  final Map<String, String> tajweedHues;
 
   AppSettings copyWith({
     String? styleId,
@@ -146,6 +154,8 @@ class AppSettings {
     int? repeat,
     int? repeatSilence,
     bool? elderlyMode,
+    bool? tajweedColors,
+    Map<String, String>? tajweedHues,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -169,6 +179,8 @@ class AppSettings {
     repeat: repeat ?? this.repeat,
     repeatSilence: repeatSilence ?? this.repeatSilence,
     elderlyMode: elderlyMode ?? this.elderlyMode,
+    tajweedColors: tajweedColors ?? this.tajweedColors,
+    tajweedHues: tajweedHues ?? this.tajweedHues,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

@@ -41,6 +41,8 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
   static const _kElderly = 'settings.elderlyMode';
+  static const _kTajweed = 'settings.tajweedColors';
+  static const _kTajweedHues = 'settings.tajweedHues';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -91,6 +93,12 @@ class SettingsController extends Notifier<AppSettings> {
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
       elderlyMode: _prefs.getBool(_kElderly) ?? false,
+      tajweedColors: _prefs.getBool(_kTajweed) ?? false,
+      tajweedHues: {
+        for (final e in _prefs.getStringList(_kTajweedHues) ?? const <String>[])
+          if (e.indexOf('=') case final i when i > 0)
+            e.substring(0, i): e.substring(i + 1),
+      },
     );
   }
 
@@ -225,6 +233,29 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setElderlyMode(bool value) async {
     state = state.copyWith(elderlyMode: value);
     await _prefs.setBool(_kElderly, value);
+  }
+
+  Future<void> setTajweedColors(bool value) async {
+    state = state.copyWith(tajweedColors: value);
+    await _prefs.setBool(_kTajweed, value);
+  }
+
+  /// [hue] is a TajweedHue name, '' for no colour, or null to go back to
+  /// the rule's default.
+  Future<void> setTajweedHue(String ruleKey, String? hue) async {
+    final hues = {...state.tajweedHues};
+    hue == null ? hues.remove(ruleKey) : hues[ruleKey] = hue;
+    await _saveTajweedHues(hues);
+  }
+
+  /// Every rule back to its default colour.
+  Future<void> resetTajweedHues() => _saveTajweedHues(const {});
+
+  Future<void> _saveTajweedHues(Map<String, String> hues) async {
+    state = state.copyWith(tajweedHues: hues);
+    await _prefs.setStringList(_kTajweedHues, [
+      for (final e in hues.entries) '${e.key}=${e.value}',
+    ]);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

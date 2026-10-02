@@ -26,6 +26,7 @@ import '../../khatma/domain/reading_tracker.dart';
 import '../../khatma/khatma_providers.dart';
 import '../../khatma/presentation/journal_screen.dart';
 import '../data/mushaf_repository.dart';
+import '../data/tajweed.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'widgets/art_frame.dart';
@@ -37,6 +38,7 @@ import 'widgets/ornate_pages.dart';
 import 'widgets/old_mushaf_page.dart';
 import 'widgets/page_interaction.dart';
 import 'widgets/shamarly_page.dart';
+import 'widgets/tajweed_legend.dart';
 import 'widgets/verse_services.dart';
 
 /// Name of a surah in the interface language (names from Tanzil metadata).
@@ -412,6 +414,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             ?.where((a) => a.surah == v.surah && a.number == v.ayah)
             .firstOrNull
             ?.textSearch,
+        tajweedColor: settings.tajweedColors
+            ? (rule) => tajweedHueOf(
+                rule,
+                settings.tajweedHues,
+              )?.on(darkPaper: !context.tokens.mode.isLight)
+            : null,
+        tajweed: settings.tajweedColors
+            ? ref.watch(tajweedPageProvider(pg)).value ?? ''
+            : '',
       );
       // Elderly mode: no small icon-only tools on the page; the same tools
       // are labelled buttons in the bottom bar.
@@ -431,6 +442,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       _revealed.clear();
                     })
                   : _startRecite(),
+              tajweed: settings.tajweedColors,
+              onTajweed: () => ref
+                  .read(settingsProvider.notifier)
+                  .setTajweedColors(!settings.tajweedColors),
+              onTajweedLegend: () => showTajweedLegend(context),
             );
       final pageWidget = switch (edition) {
         MushafEdition.madina1441 => MushafPage(
@@ -1154,7 +1170,16 @@ class _ReadingTools extends StatelessWidget {
     required this.onTouchReading,
     required this.onListen,
     required this.onRecite,
+    required this.tajweed,
+    required this.onTajweed,
+    required this.onTajweedLegend,
   });
+
+  /// Tajweed colouring: a tap turns it on or off; a long press shows the
+  /// colour key.
+  final bool tajweed;
+  final VoidCallback onTajweed;
+  final VoidCallback onTajweedLegend;
 
   final bool touchReading;
   final bool recite;
@@ -1167,8 +1192,13 @@ class _ReadingTools extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
-    Widget button(IconData icon, String label, bool on, VoidCallback onTap) =>
-        Semantics(
+    Widget button(
+      IconData icon,
+      String label,
+      bool on,
+      VoidCallback onTap, {
+      VoidCallback? onLongPress,
+    }) => Semantics(
           button: true,
           toggled: on,
           label: label,
@@ -1179,6 +1209,7 @@ class _ReadingTools extends StatelessWidget {
             excludeFromSemantics: true,
             child: InkResponse(
               onTap: onTap,
+              onLongPress: onLongPress,
               radius: 24,
               // A 48 px target around the small drawn button.
               child: Container(
@@ -1218,6 +1249,14 @@ class _ReadingTools extends StatelessWidget {
           onListen,
         ),
         button(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
+        const SizedBox(width: 10),
+        button(
+          Icons.format_color_text,
+          l.tajweedColors,
+          tajweed,
+          onTajweed,
+          onLongPress: onTajweedLegend,
+        ),
       ],
     );
   }

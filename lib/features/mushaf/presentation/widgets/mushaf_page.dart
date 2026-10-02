@@ -12,6 +12,7 @@ import '../../../../core/settings/app_settings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/compiled_svg.dart';
+import '../../data/tajweed.dart';
 import '../../mushaf_providers.dart';
 import 'page_interaction.dart';
 
@@ -365,6 +366,26 @@ class _MushafPageState extends ConsumerState<MushafPage> {
     _load = _fetch();
   }
 
+  /// Tajweed colouring: each coloured piece of the page (page units), for
+  /// [_tajweedKey] (page and data row).
+  List<(TajweedRule, Path)> _tajweed = const [];
+  (int, String)? _tajweedKey;
+
+  /// Reads the contours the page's tajweed row points at, once per page.
+  void _loadTajweed(String data) {
+    final key = (widget.page, data);
+    if (_tajweedKey == key) return;
+    _tajweedKey = key;
+    _tajweed = const [];
+    if (data.isEmpty) return;
+    final page = widget.page;
+    () async {
+      final svg = await ref.read(pageStoreProvider).svg(page);
+      final pieces = tajweedPieces(svg, parseTajweedContours(data));
+      if (mounted && _tajweedKey == key) setState(() => _tajweed = pieces);
+    }();
+  }
+
   /// A rosette replaces the printed marker, so the printed one is removed.
   bool get _hideMarkers {
     final style = widget.interaction.markerLook?.style;
@@ -616,12 +637,32 @@ class _MushafPageState extends ConsumerState<MushafPage> {
             // The ink is drawn once at the screen's pixel size; a frame
             // only blits it. Everything the drawing depends on is in the
             // key, so a change to any of it re-bakes.
+            // Tajweed: the coloured pieces as one clip path per line and
+            // colour, so a line band draws only its own.
+            final tajweedColor = x.tajweedColor;
+            if (tajweedColor != null) _loadTajweed(x.tajweed);
+            final tajweedByLine = <int, Map<Color, Path>>{};
+            if (tajweedColor != null) {
+              for (final (rule, path) in _tajweed) {
+                final colour = tajweedColor(rule);
+                if (colour == null) continue;
+                final j = layout._lineOf(path.getBounds().center.dy);
+                ((tajweedByLine[j] ??= {})[colour] ??= Path()).addPath(
+                  path,
+                  Offset.zero,
+                );
+              }
+            }
+            final tajweedSig = tajweedColor == null
+                ? ''
+                : '${_tajweed.length}:${[for (final r in TajweedRule.values) tajweedColor(r)?.toARGB32()].join(',')}';
             final dpr = MediaQuery.devicePixelRatioOf(context);
             final emphasisLines = x.emphasisLines.toList()..sort();
             _bakeArt(
               '${widget.page}|${box.biggest.width}x${box.biggest.height}'
               '|$dpr|$ink|${x.divineColor}|${x.divineNames.length}'
-              '|$_markersHidden|$_loadId|${emphasisLines.join(',')}',
+              '|$_markersHidden|$_loadId|${emphasisLines.join(',')}'
+              '|$tajweedSig',
               layout,
               dpr,
               emphasis: x.emphasisLines,
@@ -635,6 +676,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                 divineColor: x.divineColor,
                 divineNames: x.divineNames,
                 divineByLine: divineByLine,
+                tajweedByLine: tajweedByLine,
               ),
               markers: markerPicture == null
                   ? null
@@ -914,6 +956,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                                 divineColor: x.divineColor,
                                 divineNames: x.divineNames,
                                 divineByLine: divineByLine,
+                                tajweedByLine: tajweedByLine,
                               ),
                             );
                           }
@@ -1168,6 +1211,7 @@ void _paintInk(
   required Color? divineColor,
   required List<Rect> divineNames,
   required Map<int, List<Rect>> divineByLine,
+  Map<int, Map<Color, Path>> tajweedByLine = const {},
 }) {
   // The page itself, recoloured outside light mode.
   if (ink != null) {
@@ -1211,6 +1255,22 @@ void _paintInk(
       c.restore();
       c.restore();
     }
+  }
+  // Tajweed: only the letters (and marks) a rule applies to, recoloured in
+  // place. This line's, or every line's when the page is drawn whole.
+  final tajweed = line < 0
+      ? [for (final m in tajweedByLine.values) ...m.entries]
+      : (tajweedByLine[line] ?? const <Color, Path>{}).entries;
+  for (final MapEntry(key: colour, value: path) in tajweed) {
+    c.save();
+    c.clipPath(path);
+    c.saveLayer(
+      path.getBounds(),
+      Paint()..colorFilter = ColorFilter.mode(colour, BlendMode.srcIn),
+    );
+    page();
+    c.restore();
+    c.restore();
   }
 }
 
