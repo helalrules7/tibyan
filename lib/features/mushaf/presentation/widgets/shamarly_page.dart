@@ -156,6 +156,7 @@ Future<ImagePageData> _loadShamarlyPage(WidgetRef ref, int page) async {
         ((surah: b.surah, ayah: b.ayah), _rect(b.x0, b.y0, b.x1, b.y1)),
     ],
     pieceLines: [for (final b in boxes) b.line],
+    hitSlop: 6,
     markers: {
       for (final m in markerRows)
         (surah: m.surah, ayah: m.ayah): _rect(m.x0, m.y0, m.x1, m.y1),

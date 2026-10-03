@@ -14,6 +14,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../data/compiled_svg.dart';
 import '../../data/tajweed.dart';
 import '../../mushaf_providers.dart';
+import 'image_page.dart';
 import 'page_interaction.dart';
 
 typedef _PageData = (
@@ -89,6 +90,60 @@ List<Path> pageLineClips(
       }(),
   ];
 }
+
+/// The line grid of a page in the image editions' terms (page units), so a
+/// touch finds its verse the same way: by the line drawn nearest it first
+/// ([StripLayout.pieceAt]).
+PageGeometry svgLineGeometry(
+  Rect viewBox,
+  SvgPageGeometry geometry, {
+  required bool opening,
+}) {
+  final cuts = geometry.cuts, pitch = geometry.pitch;
+  final hasCuts = cuts.length == _lineCount - 1;
+  double centre(int j) => geometry.firstLine + j * pitch;
+  return PageGeometry(
+    ink: opening ? geometry.openingInk : viewBox,
+    inkWithoutHeader: opening ? geometry.openingBody : null,
+    whole: opening,
+    centres: [for (var j = 0; j < _lineCount; j++) centre(j)],
+    slots: [for (var j = 0; j < _lineCount; j++) j.toDouble()],
+    bandTops: [
+      for (var j = 0; j < _lineCount; j++)
+        j == 0 ? viewBox.top : (hasCuts ? cuts[j - 1] : centre(j) - pitch / 2),
+    ],
+    bandBottoms: [
+      for (var j = 0; j < _lineCount; j++)
+        j == _lineCount - 1
+            ? viewBox.bottom
+            : (hasCuts ? cuts[j] : centre(j) + pitch / 2),
+    ],
+    inkAbove: _PageLayout._inkAbove,
+    inkBelow: _PageLayout._inkBelow,
+    boxHalfHeight: pitch * 0.42,
+  );
+}
+
+/// A verse's outline rects (page units) cut at the lines: a rect can
+/// cover several whole lines, and each line is highlighted and touched on
+/// its own. A rect is on the lines whose centres it holds (its edges are a
+/// little off the cuts); one that holds none is kept whole.
+List<Rect> lineRects(List<Rect> rects, PageGeometry g) => [
+  for (final r in rects)
+    ...() {
+      final on = [
+        for (var j = 0; j < g.lines; j++)
+          if (r.top <= g.centres[j] && g.centres[j] <= r.bottom)
+            Rect.fromLTRB(
+              r.left,
+              math.max(r.top, g.bandTops[j]),
+              r.right,
+              math.min(r.bottom, g.bandBottoms[j]),
+            ),
+      ];
+      return on.isEmpty ? [r] : on;
+    }(),
+];
 
 /// Where the page is drawn on screen. Normal pages fill the width and their
 /// 15 lines are spread evenly over the full height, without stretching the
@@ -190,16 +245,6 @@ class _PageLayout {
     return Offset(
       p.dx * scale + offset.dx,
       _slotCentre(j) + (p.dy - _centre(j)) * scale,
-    );
-  }
-
-  /// Screen pixels to page units.
-  Offset toPage(Offset local) {
-    if (!strips) return (local - offset) / scale;
-    final j = ((local.dy - _padTop) / _slot).floor().clamp(0, _lineCount - 1);
-    return Offset(
-      (local.dx - offset.dx) / scale,
-      _centre(j) + (local.dy - _slotCentre(j)) / scale,
     );
   }
 
@@ -497,21 +542,30 @@ class _MushafPageState extends ConsumerState<MushafPage> {
           clips,
         ) = snap.data!;
         final cuts = geometry.cuts;
+        // Touches find their verse by the line first, as on the image
+        // editions ([StripLayout.pieceAt]).
+        final lineGeometry = svgLineGeometry(
+          viewBox,
+          geometry,
+          opening: widget.page <= 2,
+        );
         final verses = [
           for (final p in polys)
             (
               key: (surah: p.surah, ayah: p.number),
               path: parseOutline(p.path),
-              rects: outlineRects(p.path),
+              // Pages 1 and 2 have no line grid (see [openingRects]).
+              rects: widget.page <= 2
+                  ? outlineRects(p.path)
+                  : lineRects(outlineRects(p.path), lineGeometry),
               marker: p.markerX == null ? null : Offset(p.markerX!, p.markerY!),
             ),
         ];
-        VerseKey? verseAt(Offset point) {
-          for (final v in verses) {
-            if (v.path.contains(point)) return v.key;
-          }
-          return null;
-        }
+        final pieces = [
+          for (final v in verses)
+            for (final r in v.rects) (v.key, r),
+        ];
+        final pieceRects = [for (final (_, r) in pieces) r];
 
         VerseKey? markerAt(Offset point) {
           for (final v in verses) {
@@ -525,6 +579,30 @@ class _MushafPageState extends ConsumerState<MushafPage> {
 
         return LayoutBuilder(
           builder: (context, box) {
+            final touch = StripLayout(
+              box.biggest,
+              lineGeometry,
+              withoutHeader: x.ornateOpening,
+            );
+            VerseKey? verseAt(Offset local) {
+              // Pages 1 and 2 have no line grid; their outlines tile the
+              // text, and the page is scaled whole.
+              if (widget.page <= 2) {
+                final point = touch.toImage(local);
+                for (final v in verses) {
+                  if (v.path.contains(point)) return v.key;
+                }
+                return null;
+              }
+              final i = touch.pieceAt(
+                local,
+                pieceRects,
+                // The word picker's slop, in page units.
+                slop: 2,
+              );
+              return i == null ? null : pieces[i].$1;
+            }
+
             final layout = _PageLayout(
               box.biggest,
               viewBox,
@@ -612,7 +690,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               void drag(bool start, Offset global) {
                 final ro = context.findRenderObject();
                 if (ro is! RenderBox) return;
-                final v = verseAt(layout.toPage(ro.globalToLocal(global)));
+                final v = verseAt(ro.globalToLocal(global));
                 if (v != null) x.onHandleDrag(start, v);
               }
 
@@ -712,12 +790,13 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (d) {
-                      final point = layout.toPage(d.localPosition);
+                      final local = d.localPosition;
+                      final point = touch.toImage(local);
                       if (x.onPick != null) {
-                        return x.onPick!(point, verseAt(point));
+                        return x.onPick!(point, verseAt(local));
                       }
                       if (x.hidden != null) {
-                        final v = verseAt(point);
+                        final v = verseAt(local);
                         if (v != null) {
                           x.onHiddenTap?.call(v);
                           return;
@@ -725,11 +804,11 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                       }
                       final m = markerAt(point);
                       if (m != null) return x.onMarkerTap(m);
-                      final v = x.onVerseTap == null ? null : verseAt(point);
+                      final v = x.onVerseTap == null ? null : verseAt(local);
                       v != null ? x.onVerseTap!(v) : x.onTap();
                     },
                     onLongPressStart: (d) {
-                      final v = verseAt(layout.toPage(d.localPosition));
+                      final v = verseAt(d.localPosition);
                       if (v != null) x.onVerseLongPress(v);
                     },
                     child: Semantics(

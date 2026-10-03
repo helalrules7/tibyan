@@ -183,12 +183,129 @@ class StripLayout {
     );
   }
 
+  /// Where a touch passes from line j to line j + 1 on screen: halfway
+  /// across the gap between their bands as drawn. Slots can be fractional
+  /// (a surah header), so a slot's index is not its line's.
+  late final List<double> _screenCuts = [
+    for (var j = 0; j < _lines - 1; j++)
+      (toScreen(Offset(0, g.bandBottoms[j]), line: j).dy +
+              toScreen(Offset(0, g.bandTops[j + 1]), line: j + 1).dy) /
+          2,
+  ];
+
+  /// The line drawn nearest screen y [y].
+  int lineAt(double y) {
+    if (!strips) return lineOfImageY(toImage(Offset(0, y)).dy);
+    var j = 0;
+    while (j < _lines - 1 && y > _screenCuts[j]) {
+      j++;
+    }
+    return j;
+  }
+
+  /// In strips, a touch in the gap around a line is taken to the nearest
+  /// edge of that line's band: the screen there has no image of its own.
   Offset toImage(Offset p) {
     if (!strips) return (p - offset) / scale + ink.topLeft;
-    final j = ((p.dy - _padTop) / _slot).floor().clamp(0, _lines - 1);
+    final j = lineAt(p.dy);
     return Offset(
       p.dx / scale + ink.left,
-      g.centres[j] + (p.dy - _slotCentre(g.slots[j])) / scale,
+      (g.centres[j] + (p.dy - _slotCentre(g.slots[j])) / scale).clamp(
+        g.bandTops[j],
+        g.bandBottoms[j],
+      ),
+    );
+  }
+
+  /// The piece of [pieces] (image px) a touch at [p] (screen) selects, by
+  /// its index: on the line drawn nearest the touch, the piece under it,
+  /// or else the nearest across. Null off the text: on a line with no
+  /// pieces (a surah header, the basmala), past either end of a line's
+  /// text by more than [slop] (image px), or outside the drawn image.
+  ///
+  /// Pages scaled whole by their nature (the opening pages) find their
+  /// lines from the pieces' rows instead of the line grid, which they do
+  /// not all follow: by [lines], the printed line of each piece, or else
+  /// by [wordRows].
+  int? pieceAt(
+    Offset p,
+    List<Rect> pieces, {
+    List<int> lines = const [],
+    double slop = 0,
+  }) {
+    final screen = [for (final r in pieces) toScreenRect(r)];
+    final reach = slop * scale;
+    final List<int> lineOf;
+    final int line;
+    if (!g.whole) {
+      if (!strips) {
+        final y = toImage(p).dy;
+        if (y < ink.top || y > ink.bottom) return null;
+      }
+      lineOf = [for (final r in pieces) lineOfImageY(r.center.dy)];
+      line = lineAt(p.dy);
+    } else {
+      final List<int> keys;
+      if (lines.length == pieces.length) {
+        keys = lines;
+      } else {
+        final rows = wordRows(pieces);
+        int rowOf(Rect r) {
+          var best = 0;
+          for (var i = 1; i < rows.length; i++) {
+            if ((rows[i].center.dy - r.center.dy).abs() <
+                (rows[best].center.dy - r.center.dy).abs()) {
+              best = i;
+            }
+          }
+          return best;
+        }
+
+        keys = [for (final r in pieces) rowOf(r)];
+      }
+      // Each row's extent on screen, top to bottom; a touch belongs to
+      // the row it is on, or halfway across the gap to the next.
+      final extent = <int, Rect>{};
+      for (final (i, k) in keys.indexed) {
+        extent[k] = extent[k]?.expandToInclude(screen[i]) ?? screen[i];
+      }
+      final rows = extent.entries.toList()
+        ..sort((a, b) => a.value.center.dy.compareTo(b.value.center.dy));
+      if (rows.isEmpty ||
+          p.dy < rows.first.value.top - reach ||
+          p.dy > rows.last.value.bottom + reach) {
+        return null;
+      }
+      var i = 0;
+      while (i < rows.length - 1 &&
+          p.dy > (rows[i].value.bottom + rows[i + 1].value.top) / 2) {
+        i++;
+      }
+      lineOf = keys;
+      line = rows[i].key;
+    }
+    final on = [
+      for (var i = 0; i < pieces.length; i++)
+        if (lineOf[i] == line) i,
+    ];
+    if (on.isEmpty) return null;
+    final left = on.map((i) => screen[i].left).reduce(math.min);
+    final right = on.map((i) => screen[i].right).reduce(math.max);
+    if (p.dx < left - reach || p.dx > right + reach) return null;
+    double distance(int i) {
+      final r = screen[i];
+      return math.max(0, math.max(r.left - p.dx, p.dx - r.right));
+    }
+
+    // Glyphs can overlap across: of two under the touch, the one whose
+    // centre is nearer.
+    double off(int i) => (screen[i].center - p).distance;
+    return on.reduce(
+      (a, b) =>
+          distance(b) < distance(a) ||
+              (distance(b) == distance(a) && off(b) < off(a))
+          ? b
+          : a,
     );
   }
 
@@ -381,12 +498,17 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               data.geometry,
               withoutHeader: x.ornateOpening,
             );
+            // By the line first: the screen between two lines, and between
+            // two words, belongs to the nearest.
+            final rects = [for (final (_, r) in data.pieces) r];
             VerseKey? verseAt(Offset local) {
-              final point = layout.toImage(local);
-              for (final (k, r) in data.pieces) {
-                if (r.inflate(data.hitSlop).contains(point)) return k;
-              }
-              return null;
+              final i = layout.pieceAt(
+                local,
+                rects,
+                lines: data.pieceLines,
+                slop: data.hitSlop,
+              );
+              return i == null ? null : data.pieces[i].$1;
             }
 
             VerseKey? markerAt(Offset local) {
