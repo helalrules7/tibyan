@@ -121,6 +121,12 @@ const _ar = <String, SourceText>{
     credit:
         'توقيت الآيات والكلمات للمعيقلي: Quranic Universal Library (Tarteel)',
   ),
+  'forced-alignment-timing': (
+    title: 'توقيت آيات الدوسري والسديس والعفاسي والغامدي والطبلاوي وكلماتهم',
+    publisher: 'تبيان: مقيس على ملفات التلاوة نفسها بمحاذاة آلية، بنموذج wav2vec2 العربي (jonatasgrosman/wav2vec2-large-xlsr-53-arabic)',
+    license: 'التوقيت من عمل تبيان؛ والنموذج برخصة Apache 2.0',
+    credit: 'توقيت الآيات والكلمات: مقيس في تبيان على ملفات التلاوة',
+  ),
   'quran-assets': (
     title: 'إطارات الثيمات وترويساتها وفواصلها (quran-assets)',
     publisher: 'مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
@@ -245,6 +251,13 @@ const _en = <String, SourceText>{
     publisher: 'Quranic Universal Library (QUL, Tarteel)',
     license: 'No licence stated on the resource; permission not yet requested',
     credit: 'Verse and word timings for al-Muaiqly: Quranic Universal Library (Tarteel)',
+  ),
+  'forced-alignment-timing': (
+    title: 'Verse and word timings for al-Dosari, al-Sudais, al-Afasy, al-Ghamdi and al-Tablaway',
+    publisher: 'Tibyan: measured on the recitation files themselves by forced alignment, with the Arabic wav2vec2 model (jonatasgrosman/wav2vec2-large-xlsr-53-arabic)',
+    license: 'Timings by Tibyan; the model under the Apache License 2.0',
+    credit:
+        'Verse and word timings: measured by Tibyan on the recitation files',
   ),
   'quran-assets': (
     title: 'Theme frames, surah headers and verse markers (quran-assets)',

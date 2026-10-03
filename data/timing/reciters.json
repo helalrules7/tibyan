@@ -109,16 +109,16 @@
       "licence": "not-publishable",
       "publish": false,
       "verse_timing": {
-        "source": "Quran.com QDC audio API (segments from Quranic Universal Library)",
-        "licence": "none published; permission requested (docs/MISSING_DATA.md إ15)",
-        "attribution": "Quran.com"
+        "source": "Tibyan: measured by forced alignment on the quranicaudio surah files played (tools/build_aligned_timing.py, wav2vec2 Arabic model, Apache-2.0); each boundary at the quietest point of the pause between the verses",
+        "licence": "Tibyan",
+        "attribution": "Tibyan"
       },
       "word_timing": {
-        "source": "Quran.com QDC audio API (segments from Quranic Universal Library)",
-        "licence": "none published; permission requested (docs/MISSING_DATA.md إ15)",
-        "attribution": "Quran.com"
+        "source": "Tibyan: measured by forced alignment on the same files (tools/build_aligned_timing.py)",
+        "licence": "Tibyan",
+        "attribution": "Tibyan"
       },
-      "note": "Stays generated from the private cache until Quran.com grants permission (letter 14)."
+      "note": "Re-timed 2026-10-03 (Quran.com's QDC timings are no longer used). Not published here for now (decision of 2026-10-03); content.db gets its rows from tools/.cache/aligned_10.json (build_content_db.py)."
     },
     {
       "slug": "sudais",
@@ -130,16 +130,16 @@
       "licence": "publishable",
       "publish": true,
       "verse_timing": {
-        "source": "mp3quran.net ayat_timing (read 54)",
-        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
-        "attribution": "mp3quran.net"
+        "source": "Tibyan: measured by forced alignment on the mp3quran surah files played (tools/build_aligned_timing.py, wav2vec2 Arabic model, Apache-2.0); each boundary at the quietest point of the pause between the verses",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
       "word_timing": {
-        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
-        "licence": "CC BY 4.0",
-        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+        "source": "Tibyan: measured by forced alignment on the same files (tools/build_aligned_timing.py)",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
-      "note": "Being re-timed (verse boundaries); files are regenerated from content.db once that work is merged: python3 tools/timing_files.py export sudais."
+      "note": "Re-timed 2026-10-03: mp3quran's published verse timings and QuranLab's proportional words are replaced by timings measured on these files (docs/DATA_SOURCES.md). Verses whose words read badly keep verse timing only (docs/MISSING_DATA.md ث13)."
     },
     {
       "slug": "afasy",
@@ -149,18 +149,18 @@
       "riwaya": "hafs",
       "folder_url": "https://server8.mp3quran.net/afs/",
       "licence": "publishable",
-      "publish": false,
+      "publish": true,
       "verse_timing": {
-        "source": "mp3quran.net ayat_timing",
-        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
-        "attribution": "mp3quran.net"
+        "source": "Tibyan: measured by forced alignment on the mp3quran surah files played (tools/build_aligned_timing.py, wav2vec2 Arabic model, Apache-2.0); each boundary at the quietest point of the pause between the verses",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
       "word_timing": {
-        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
-        "licence": "CC BY 4.0",
-        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+        "source": "Tibyan: measured by forced alignment on the same files (tools/build_aligned_timing.py)",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
-      "note": "Phase 2b: exported once the verse-boundary re-timing is merged."
+      "note": "Re-timed 2026-10-03: mp3quran's published verse timings and QuranLab's proportional words are replaced by timings measured on these files (docs/DATA_SOURCES.md). Verses whose words read badly keep verse timing only (docs/MISSING_DATA.md ث13)."
     },
     {
       "slug": "ghamdi",
@@ -170,18 +170,18 @@
       "riwaya": "hafs",
       "folder_url": "https://server7.mp3quran.net/s_gmd/",
       "licence": "publishable",
-      "publish": false,
+      "publish": true,
       "verse_timing": {
-        "source": "mp3quran.net ayat_timing",
-        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
-        "attribution": "mp3quran.net"
+        "source": "Tibyan: measured by forced alignment on the mp3quran surah files played (tools/build_aligned_timing.py, wav2vec2 Arabic model, Apache-2.0); each boundary at the quietest point of the pause between the verses",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
       "word_timing": {
-        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
-        "licence": "CC BY 4.0",
-        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+        "source": "Tibyan: measured by forced alignment on the same files (tools/build_aligned_timing.py)",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
-      "note": "Phase 2b: exported once the verse-boundary re-timing is merged."
+      "note": "Re-timed 2026-10-03: mp3quran's published verse timings and QuranLab's proportional words are replaced by timings measured on these files (docs/DATA_SOURCES.md). Verses whose words read badly keep verse timing only (docs/MISSING_DATA.md ث13)."
     },
     {
       "slug": "tablawi",
@@ -191,18 +191,18 @@
       "riwaya": "hafs",
       "folder_url": "https://server12.mp3quran.net/tblawi/",
       "licence": "publishable",
-      "publish": false,
+      "publish": true,
       "verse_timing": {
-        "source": "mp3quran.net ayat_timing",
-        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
-        "attribution": "mp3quran.net"
+        "source": "Tibyan: measured by forced alignment on the mp3quran surah files played (tools/build_aligned_timing.py, wav2vec2 Arabic model, Apache-2.0); each boundary at the quietest point of the pause between the verses",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
       "word_timing": {
-        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
-        "licence": "CC BY 4.0",
-        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+        "source": "Tibyan: measured by forced alignment on the same files (tools/build_aligned_timing.py)",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
       },
-      "note": "Phase 2b: exported once the verse-boundary re-timing is merged."
+      "note": "Re-timed 2026-10-03: mp3quran's published verse timings and QuranLab's proportional words are replaced by timings measured on these files (docs/DATA_SOURCES.md). Verses whose words read badly keep verse timing only (docs/MISSING_DATA.md ث13)."
     },
     {
       "slug": "muaiqly",

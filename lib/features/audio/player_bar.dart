@@ -281,9 +281,17 @@ class PlayerOptions extends ConsumerWidget {
     final s = ref.watch(recitationProvider);
     final c = ref.read(recitationProvider.notifier);
     final settings = ref.watch(settingsProvider);
-    final reciters = ref.watch(recitersProvider).value ?? const [];
-    final current = ref.watch(currentReciterProvider).value;
     final riwaya = ref.watch(editionProvider.select((e) => e.riwaya));
+    final all = ref.watch(allRecitersProvider).value ?? const [];
+    final reciters = [
+      for (final r in all)
+        if (r.riwaya == riwaya.name) r,
+    ];
+    final others = [
+      for (final r in all)
+        if (r.riwaya != riwaya.name) r,
+    ];
+    final current = ref.watch(currentReciterProvider).value;
     final title = Theme.of(context).textTheme.titleSmall;
     final hint = TextStyle(color: muted, fontSize: 12);
     final playing = inSheet && s.active;
@@ -343,6 +351,40 @@ class PlayerOptions extends ConsumerWidget {
                     size: 36,
                   ),
                 ),
+              // Shown greyed out: their verses are numbered by another
+              // riwaya, so they play only from that riwaya's mushaf.
+              if (others.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(l.otherRiwayaReciters, style: title),
+                ),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(l.otherRiwayaHint, style: hint),
+                ),
+                for (final r in others)
+                  Opacity(
+                    opacity: 0.45,
+                    child: RadioListTile<int>(
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      enabled: false,
+                      value: r.id,
+                      title: Text(reciterLabel(context, r)),
+                      subtitle: Text(
+                        l.reciterOfRiwaya(
+                          riwayaName(l, Riwaya.values.byName(r.riwaya)),
+                        ),
+                      ),
+                      secondary: ReciterAvatar(
+                        id: r.id,
+                        name: reciterLabel(context, r),
+                        size: 36,
+                      ),
+                    ),
+                  ),
+              ],
             ],
           ),
         ),

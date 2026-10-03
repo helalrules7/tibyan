@@ -115,8 +115,9 @@ void main() {
       expect(await repo.timings(4, s), isNotEmpty, reason: 'surah $s');
       expect(await repo.wordTimings(4, s), isNotEmpty, reason: 'surah $s');
     }
-    // The four added from mp3quran: every verse of every surah is timed, so
-    // the verse is highlighted throughout and no surah is left out.
+    // The four played from mp3quran, timed by forced alignment on those
+    // files: every verse of every surah is timed, so the verse is
+    // highlighted throughout and no surah is left out.
     for (final reciter in [11, 12, 13, 14]) {
       for (final s in [1, 2, 9, 55, 114]) {
         expect(
@@ -189,6 +190,34 @@ void main() {
         expect(r.endMs, lessThanOrEqualTo(v.endMs + 500));
         if (i > 0) {
           expect(r.startMs, greaterThanOrEqualTo(muaiqly[i - 1].startMs));
+        }
+      }
+      // al-Dosari, al-Sudais, al-Afasy, al-Ghamdi and al-Tablaway: timed by
+      // forced alignment on the files played. Every word lies inside its
+      // verse, in order, and verses follow one another without overlap.
+      for (final reciter in [10, 11, 12, 13, 14]) {
+        final verses = await repo.timings(reciter, 2);
+        final words = await repo.wordTimings(reciter, 2);
+        expect(
+          words.map((r) => r.ayah).toSet().length,
+          greaterThan(280),
+          reason: 'reciter $reciter',
+        );
+        for (var i = 1; i < verses.length; i++) {
+          expect(
+            verses[i].startMs,
+            greaterThanOrEqualTo(verses[i - 1].endMs),
+            reason: 'reciter $reciter, verse ${verses[i].ayah}',
+          );
+        }
+        for (var i = 0; i < words.length; i++) {
+          final r = words[i];
+          final v = verses.firstWhere((t) => t.ayah == r.ayah);
+          expect(r.startMs, greaterThanOrEqualTo(v.startMs));
+          expect(r.endMs, lessThanOrEqualTo(v.endMs));
+          if (i > 0) {
+            expect(r.startMs, greaterThanOrEqualTo(words[i - 1].endMs));
+          }
         }
       }
       // No word timing where the recitation has none.
