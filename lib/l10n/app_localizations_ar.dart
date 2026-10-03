@@ -1623,4 +1623,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String riwayaRecitersNote(String riwaya) {
     return 'تلاوات $riwaya';
   }
+
+  @override
+  String get reciterPhotosTitle => 'صور القرّاء';
+
+  @override
+  String get reciterPhotosNote =>
+      'من ويكيميديا كومنز، مصغّرة ومقصوصة في تبيان.';
+
+  @override
+  String reciterPhotoCredit(String author, String license) {
+    return '$author، $license';
+  }
+
+  @override
+  String get unknownAuthor => 'مصوّر غير معروف';
 }

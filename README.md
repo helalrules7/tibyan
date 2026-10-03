@@ -24,6 +24,14 @@ A free, non-profit Quran app for Android and iOS: tafsir, recitation and memoriz
 
 ---
 
+## ساهم في تصحيح توقيت التلاوات · Help fix recitation timings
+
+إن رأيت التلوين يسبق صوت الكلمة أو يتأخر عنه، صححه بأذنك من المتصفح: [المحرر](https://helalrules7.github.io/tibyan/)، و[الدليل خطوة خطوة](docs/TIMING_GUIDE.md). لا تحتاج خبرة برمجية.
+
+If a word lights up early or late, fix it by ear in your browser: [the editor](https://helalrules7.github.io/tibyan/) and [the step-by-step guide](docs/TIMING_GUIDE.md). No programming needed.
+
+---
+
 ## Folder layout
 
 | Path | Contents |

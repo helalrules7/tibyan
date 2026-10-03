@@ -43,8 +43,15 @@ void main() {
   });
   tearDownAll(() => db.close());
 
-  Future<void> settle(WidgetTester tester, [int rounds = 8]) async {
+  /// Lets the database and isolates answer: [rounds] steps of 100 ms, or
+  /// fewer once [until] finds something.
+  Future<void> settle(
+    WidgetTester tester, [
+    int rounds = 8,
+    Finder? until,
+  ]) async {
     for (var i = 0; i < rounds; i++) {
+      if (until != null && until.evaluate().isNotEmpty) return;
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 100)),
       );
@@ -167,7 +174,8 @@ void main() {
     expect(find.text('تنزيل الحزمة'), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'patience prayer');
     await tester.pump(const Duration(milliseconds: 300));
-    await settle(tester, 30);
+    // Up to 15 s: slow when the machine is busy.
+    await settle(tester, 150, find.textContaining('طابق في'));
     // Every result names its verse, and the text that matched is shown
     // with its source.
     expect(find.textContaining('طابق في'), findsWidgets);

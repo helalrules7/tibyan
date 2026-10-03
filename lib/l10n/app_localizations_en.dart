@@ -1630,4 +1630,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String riwayaRecitersNote(String riwaya) {
     return 'Recitations in $riwaya';
   }
+
+  @override
+  String get reciterPhotosTitle => 'Reciter photos';
+
+  @override
+  String get reciterPhotosNote =>
+      'From Wikimedia Commons, resized and cropped by Tibyan.';
+
+  @override
+  String reciterPhotoCredit(String author, String license) {
+    return '$author, $license';
+  }
+
+  @override
+  String get unknownAuthor => 'Unknown author';
 }

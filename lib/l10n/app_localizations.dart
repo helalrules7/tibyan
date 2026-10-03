@@ -2880,6 +2880,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تلاوات {riwaya}'**
   String riwayaRecitersNote(String riwaya);
+
+  /// No description provided for @reciterPhotosTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'صور القرّاء'**
+  String get reciterPhotosTitle;
+
+  /// No description provided for @reciterPhotosNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'من ويكيميديا كومنز، مصغّرة ومقصوصة في تبيان.'**
+  String get reciterPhotosNote;
+
+  /// No description provided for @reciterPhotoCredit.
+  ///
+  /// In ar, this message translates to:
+  /// **'{author}، {license}'**
+  String reciterPhotoCredit(String author, String license);
+
+  /// No description provided for @unknownAuthor.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصوّر غير معروف'**
+  String get unknownAuthor;
 }
 
 class _AppLocalizationsDelegate

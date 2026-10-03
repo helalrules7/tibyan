@@ -114,6 +114,13 @@ const _ar = <String, SourceText>{
     license: 'الإذن قيد الطلب من Quran.com (رسالة 14)',
     credit: 'توقيت الآيات والكلمات: Quran.com',
   ),
+  'qul-timing': (
+    title: 'توقيت آيات ماهر المعيقلي وكلماته',
+    publisher: 'مكتبة القرآن الشاملة QUL (ترتيل)',
+    license: 'لا ترخيص منشور على المورد؛ الإذن لم يُطلب بعد',
+    credit:
+        'توقيت الآيات والكلمات للمعيقلي: Quranic Universal Library (Tarteel)',
+  ),
   'quran-assets': (
     title: 'إطارات الثيمات وترويساتها وفواصلها (quran-assets)',
     publisher: 'مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
@@ -233,6 +240,12 @@ const _en = <String, SourceText>{
     license: 'Permission requested from Quran.com (letter 14)',
     credit: 'Verse and word timings: Quran.com',
   ),
+  'qul-timing': (
+    title: 'Verse and word timings for Maher al-Muaiqly',
+    publisher: 'Quranic Universal Library (QUL, Tarteel)',
+    license: 'No licence stated on the resource; permission not yet requested',
+    credit: 'Verse and word timings for al-Muaiqly: Quranic Universal Library (Tarteel)',
+  ),
   'quran-assets': (
     title: 'Theme frames, surah headers and verse markers (quran-assets)',
     publisher: 'quran-assets by Quran.ws, developed by Abdullah Ibeid; frames and headers traced from printed mushafs, designs by the King Fahd Complex and other publishers; some markers from open fonts',
@@ -259,6 +272,67 @@ const bundledSources = [
     key: 'multilingual-e5-small',
     url: 'https://huggingface.co/intfloat/multilingual-e5-small',
     version: '614241f622f53c4eeff9890bdc4f31cfecc418b3',
+  ),
+];
+
+/// Who took each reciter photo in assets/reciters and under what licence,
+/// as Wikimedia Commons records it (assets/reciters/README.md). A null
+/// author is unknown. Photos whose licence does not let us ship them are
+/// not listed (docs/MISSING_DATA.md).
+const reciterPhotoCredits = [
+  (
+    reciter: 1,
+    author: null,
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Elminshwey.jpg',
+  ),
+  (
+    reciter: 2,
+    author: 'Zubairkhan1',
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Hussary.jpg',
+  ),
+  (
+    reciter: 3,
+    author: 'Prasar Bharati (India)',
+    license: 'GODL-India',
+    url: 'https://commons.wikimedia.org/wiki/File:Abdul_Basit_Abdul_Samad_at_Centenary_Celebration_Of_Darul_Uloom_Deoband_1980.jpg',
+  ),
+  (
+    reciter: 5,
+    author: null,
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Mustafa_Ismail_(1).jpg',
+  ),
+  (
+    reciter: 10,
+    author: 'MAL MALDIVE',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Yasser_Al-Dosari_(cropped).jpg',
+  ),
+  (
+    reciter: 11,
+    author: "Prime Minister's Office (India)",
+    license: 'GODL-India',
+    url: 'https://commons.wikimedia.org/wiki/File:Abdul-Rahman_Al-Sudais_(Cropped,_2011).jpg',
+  ),
+  (
+    reciter: 12,
+    author: 'quranic.ru',
+    license: 'Copyrighted free use',
+    url: 'https://commons.wikimedia.org/wiki/File:Мишари_Рашид.jpg',
+  ),
+  (
+    reciter: 13,
+    author: 'الشيخ هيثم الدخين',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Saad_al_Ghamdi.jpg',
+  ),
+  (
+    reciter: 15,
+    author: 'وليد أيوب',
+    license: 'CC BY-SA 3.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Maher_Al_Mueaqly.png',
   ),
 ];
 
