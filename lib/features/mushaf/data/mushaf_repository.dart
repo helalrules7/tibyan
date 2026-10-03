@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/content_database.dart';
 import '../../../core/settings/app_settings.dart';
+import '../../audio/timing_updates.dart';
 
 /// First verse of a juz, for the juz index.
 class JuzStart {
@@ -14,9 +15,13 @@ class JuzStart {
 /// Read-only access to Quran text and layout. All queries are small
 /// (one page or one surah) and run on the database's background isolate.
 class MushafRepository {
-  MushafRepository(this._db);
+  MushafRepository(this._db, [this._timing = const NoTimingOverrides()]);
 
   final ContentDatabase _db;
+
+  /// Corrected timings downloaded since this content.db was built; they
+  /// win over its rows for the reciters and surahs they hold.
+  final TimingOverrides _timing;
 
   Future<List<SurahRow>> surahs() =>
       (_db.select(_db.surah)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
@@ -248,11 +253,14 @@ class MushafRepository {
 
   /// Verse timings of one surah file, in order; empty when the source has
   /// none for this reciter or surah.
-  Future<List<AyahTimingRow>> timings(int reciter, int surah) =>
-      (_db.select(_db.ayahTiming)
-            ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
-            ..orderBy([(t) => OrderingTerm.asc(t.ayah)]))
-          .get();
+  Future<List<AyahTimingRow>> timings(int reciter, int surah) async {
+    final pack = await _timing.packFor(reciter, surah);
+    if (pack != null) return pack.ayahRows(surah);
+    return (_db.select(_db.ayahTiming)
+          ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
+          ..orderBy([(t) => OrderingTerm.asc(t.ayah)]))
+        .get();
+  }
 
   /// Speech spans of one surah file's verses, in order.
   Future<List<AyahSpeechRow>> speech(int reciter, int surah) =>
@@ -262,11 +270,30 @@ class MushafRepository {
           .get();
 
   /// Word timings of one surah file, in order of time.
-  Future<List<WordTimingRow>> wordTimings(int reciter, int surah) =>
-      (_db.select(_db.wordTiming)
-            ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
-            ..orderBy([(t) => OrderingTerm.asc(t.startMs)]))
-          .get();
+  Future<List<WordTimingRow>> wordTimings(int reciter, int surah) async {
+    final pack = await _timing.packFor(reciter, surah);
+    if (pack != null) return pack.wordRows(surah);
+    return (_db.select(_db.wordTiming)
+          ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
+          ..orderBy([(t) => OrderingTerm.asc(t.startMs)]))
+        .get();
+  }
+
+  /// The timing version content.db was built with for each reciter whose
+  /// timings come from `data/timing` (`meta` keys `timing_version:<slug>`).
+  /// Empty for a content.db built before those existed.
+  Future<Map<String, int>> timingVersions() async {
+    final rows = await _db
+        .customSelect(
+          "SELECT key, value FROM meta WHERE key LIKE 'timing_version:%'",
+        )
+        .get();
+    return {
+      for (final r in rows)
+        r.read<String>('key').substring('timing_version:'.length):
+            int.tryParse(r.read<String>('value')) ?? 0,
+    };
+  }
 
   /// Every verse in mushaf order, for search.
   Future<List<AyahRow>> searchRows() =>

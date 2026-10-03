@@ -12,6 +12,7 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/db/user_database.dart';
 import '../../l10n/app_localizations.dart';
+import '../audio/timing_updates.dart';
 import 'data/background_packs.dart';
 import 'data/divine_names.dart';
 import 'data/mushaf_repository.dart';
@@ -34,8 +35,16 @@ final packRootProvider = Provider<Directory>(
   (ref) => throw UnimplementedError('packRootProvider not overridden'),
 );
 
+/// Corrected timings downloaded from our server; overridden in `main()`.
+final timingOverridesProvider = Provider<TimingOverrides>(
+  (ref) => const NoTimingOverrides(),
+);
+
 final mushafRepositoryProvider = Provider<MushafRepository>(
-  (ref) => MushafRepository(ref.watch(contentDatabaseProvider)),
+  (ref) => MushafRepository(
+    ref.watch(contentDatabaseProvider),
+    ref.watch(timingOverridesProvider),
+  ),
 );
 
 final surahsProvider = FutureProvider<List<SurahRow>>(
