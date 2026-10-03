@@ -106,19 +106,19 @@
       "name_en": "Yasser al-Dosari",
       "riwaya": "hafs",
       "folder_url": "https://download.quranicaudio.com/quran/yasser_ad-dussary/",
-      "licence": "not-publishable",
-      "publish": false,
+      "licence": "publishable",
+      "publish": true,
       "verse_timing": {
         "source": "Tibyan: measured by forced alignment on the quranicaudio surah files played (tools/build_aligned_timing.py, wav2vec2 Arabic model, Apache-2.0); each boundary at the quietest point of the pause between the verses",
-        "licence": "Tibyan",
+        "licence": "Tibyan (published here under CC BY 4.0)",
         "attribution": "Tibyan"
       },
       "word_timing": {
         "source": "Tibyan: measured by forced alignment on the same files (tools/build_aligned_timing.py)",
-        "licence": "Tibyan",
+        "licence": "Tibyan (published here under CC BY 4.0)",
         "attribution": "Tibyan"
       },
-      "note": "Re-timed 2026-10-03 (Quran.com's QDC timings are no longer used). Not published here for now (decision of 2026-10-03); content.db gets its rows from tools/.cache/aligned_10.json (build_content_db.py)."
+      "note": "Re-timed 2026-10-03 (Quran.com's QDC timings are no longer used); published 2026-10-04 on the owner's decision. Verses whose words read badly keep verse timing only (docs/MISSING_DATA.md ث13)."
     },
     {
       "slug": "sudais",

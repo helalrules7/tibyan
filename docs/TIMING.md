@@ -38,7 +38,7 @@ data/timing/<reciter>/NNN.json ──(طلب دمج من المحرر)──▶ 
 | العفاسي (12)، الغامدي (13)، الطبلاوي (14) | **مقيس في تبيان** (مثل السديس) | مقيس معه | **يُنشر** | **منشور (المرحلة 2ب)**: 114 سورة لكل منهم |
 | تلاوات الروايات المؤقتة (101-105، 111-113، 121، 131) | mp3quran بعدّ الرواية | — | يُنشر | **منشور (المرحلة 2)**، آيات فقط. محمد سايد (105): 64 سورة (ث5-ج) |
 | 106، 122، 123، 132 | — | — | — | لا توقيت منشور لها في mp3quran |
-| الدوسري (10) | **مقيس في تبيان** (مثل السديس) على ملفات quranicaudio؛ كان Quran.com QDC | مقيس معه | **لا يُنشر** الآن (قرار المنسق)، مع أن التوقيت صار من عمل تبيان | يبقى في content.db من `tools/.cache/aligned_10.json` (`build_content_db.py`) |
+| الدوسري (10) | **مقيس في تبيان** (مثل السديس) على ملفات quranicaudio؛ كان Quran.com QDC | مقيس معه | **يُنشر** (قرار أحمد 2026-10-04) | **منشور**: 114 سورة، وملفات القمم على الخادم |
 | المعيقلي (15) | QUL (ترتيل) | QUL | **لا يُنشر الآن**: لا ترخيص على المورد، وطلب الإذن معلق (إ21) | `publish: false`؛ يبقى مولدا من الذاكرة المؤقتة الخاصة |
 
 **mp3quran:** نصها المحفوظ (`licenses/2026-09-28_mp3quran_privacy.pdf`): «All rights are available to everyone, and we allow any visitor or developer to copy any material or use any link». القرار: يجوز نشر توقيت آياتهم في المستودع وتصحيحه، مع ذكر mp3quran.net. لا يذكر النص التعديل صراحة ولا يمنعه؛ نصحح أخطاء قياس الحدود فقط، ونذكر في `reciters.json` أن الأصل منهم وأن التصحيحات من المساهمين.
@@ -95,7 +95,7 @@ python3 -m unittest tools/tests/test_timing_files.py       # الملفات = ص
 
 ```sh
 python tools/build_aligned_timing.py apply 10 11 12 13 14   # الصفوف في content.db
-python3 tools/timing_files.py export sudais afasy ghamdi tablawi && python3 tools/timing_files.py known-errors
+python3 tools/timing_files.py export dosari sudais afasy ghamdi tablawi && python3 tools/timing_files.py known-errors
 ```
 
-ملفات القمم و`audio.json` للعفاسي والغامدي والطبلاوي حُسبت على الخادم من المرآة (2026-10-03) ورُفعت إلى `timing/peaks/afasy|ghamdi|tablawi/`. **تنبيه للمحرر:** إعادة القياس تمحو أي تصحيح دُمج في ملفات هؤلاء بعدها؛ بعد أول تصحيح يُدمج، تصبح ملفات `data/timing` هي المصدر، ولا يُعاد التصدير إلا بعد مقارنة.
+ملفات القمم و`audio.json` للعفاسي والغامدي والطبلاوي حُسبت على الخادم من المرآة (2026-10-03)، وللدوسري (2026-10-04)، ورُفعت إلى `timing/peaks/afasy|ghamdi|tablawi|dosari/`. **تنبيه للمحرر:** إعادة القياس تمحو أي تصحيح دُمج في ملفات هؤلاء بعدها؛ بعد أول تصحيح يُدمج، تصبح ملفات `data/timing` هي المصدر، ولا يُعاد التصدير إلا بعد مقارنة.
