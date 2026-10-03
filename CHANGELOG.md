@@ -6,6 +6,9 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed (recitation timing)
+- al-Banna (murattal) is now highlighted verse by verse and word by word in all 114 surahs (6,236 verses, 77,430 words; before: 100 surahs, 5,117 verses with words). QuranLab's words are kept wherever his verses are found by their sound; a verse that is not found no longer costs its surah its timing, and is timed by forced alignment on the surah file (wav2vec2 Arabic, Apache-2.0), which agrees with QuranLab's word starts within 51 ms for 95% of words where both exist.
+
 ### Added (hifz)
 - A «الحفظ» screen from the home tile (it replaces «قريبا»): today's review, start a test, the hifz map, and every review unit with its next date.
 - Word-by-word recitation test: a unit (a page of the edition being read, a hizb quarter or a surah) opens with its verses covered; «الكلمة التالية» or a tap on a verse shows its next word, in all three editions and on the opening pages. Verses without word positions (219 in the old edition, the Shamarly verses whose split is not reviewed) are shown line by line, and the bar says so. «حفظت» / «أخطأت» judges each verse.

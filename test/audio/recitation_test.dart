@@ -108,12 +108,13 @@ void main() {
     // The two surahs with a verse missing in the source have no timing.
     expect(await repo.timings(1, 9), isEmpty);
     expect(await repo.timings(2, 1), isEmpty);
-    // al-Banna murattal: verse timings derived from QuranLab's word
-    // timings, except in the surahs that failed the checks.
-    for (final s in [1, 2, 9, 114]) {
+    // al-Banna murattal: timed verse by verse (QuranLab's words carried
+    // over, forced alignment where they cannot be), so every surah has
+    // verse and word timing, including those once left out (12, 18, 55, 70).
+    for (final s in [1, 2, 9, 12, 18, 55, 70, 114]) {
       expect(await repo.timings(4, s), isNotEmpty, reason: 'surah $s');
+      expect(await repo.wordTimings(4, s), isNotEmpty, reason: 'surah $s');
     }
-    expect(await repo.timings(4, 55), isEmpty);
     // The four added from mp3quran: every verse of every surah is timed, so
     // the verse is highlighted throughout and no surah is left out.
     for (final reciter in [11, 12, 13, 14]) {
@@ -170,6 +171,7 @@ void main() {
       // Every al-Banna word lies inside its verse.
       final verses = await repo.timings(4, 2);
       final banna = await repo.wordTimings(4, 2);
+      expect(banna.map((r) => r.ayah).toSet().length, 286);
       for (final r in banna) {
         final v = verses.firstWhere((t) => t.ayah == r.ayah);
         expect(r.startMs, greaterThanOrEqualTo(v.startMs));
