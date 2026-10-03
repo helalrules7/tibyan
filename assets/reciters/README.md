@@ -35,4 +35,7 @@
 
 1. صورة شخصية واضحة، الوجه في المنتصف (القصّ بياخد المربع الأوسط).
 2. مصدره Wikimedia Commons / صورة رسمية بإذن مكتوب.
-3. سطر attribution في الشاشة اللي بتعرض الصور (شرط CC BY/CC BY-SA).
+3. اسم المصوّر ورخصته في بطاقة «صور القرّاء» في شاشة المصادر
+   (`reciterPhotoCredits` في `lib/features/mushaf/presentation/source_names.dart`).
+   صور 3 و4 و14 ليست بترخيص حر (الاستخدام العادل أو مصدر غير معروف):
+   بند إ22 في `docs/MISSING_DATA.md`.

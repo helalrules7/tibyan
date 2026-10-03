@@ -729,5 +729,9 @@
   "hafsVerseOne": "verse {number}",
   "hafsVerseRange": "verses {from} to {to}",
   "riwayaVerseText": "The verse in {riwaya}",
-  "riwayaRecitersNote": "Recitations in {riwaya}"
+  "riwayaRecitersNote": "Recitations in {riwaya}",
+  "reciterPhotosTitle": "Reciter photos",
+  "reciterPhotosNote": "From Wikimedia Commons, resized and cropped by Tibyan.",
+  "reciterPhotoCredit": "{author}, {license}",
+  "unknownAuthor": "Unknown author"
 }
