@@ -62,13 +62,10 @@ class SettingsScreen extends ConsumerWidget {
             child: ListTile(
               leading: const Icon(Icons.headphones_outlined),
               title: Text(l.playerSettings),
-              subtitle: Text(
-                switch (ref.watch(currentReciterProvider).value) {
-                  final r? => reciterLabel(context, r),
-                  null => '',
-                },
-                style: TextStyle(color: t.muted),
-              ),
+              subtitle: Text(switch (ref.watch(currentReciterProvider).value) {
+                final r? => reciterLabel(context, r),
+                null => '',
+              }, style: TextStyle(color: t.muted)),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go('/settings/player'),
             ),

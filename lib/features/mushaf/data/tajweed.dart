@@ -117,7 +117,12 @@ TajweedHue? tajweedHueOf(TajweedRule rule, Map<String, String> choices) {
 /// One coloured piece of a new-edition page: a contour of the page text
 /// (its index in document order), clipped to [x0]..[x1] (page units) when
 /// only part of it is the letter.
-typedef TajweedContour = ({TajweedRule rule, int contour, double? x0, double? x1});
+typedef TajweedContour = ({
+  TajweedRule rule,
+  int contour,
+  double? x0,
+  double? x1,
+});
 
 /// Parses a `madina1441` row of `tajweed_page`: "rule,contour[,x0,x1];...".
 List<TajweedContour> parseTajweedContours(String data) => [
@@ -136,22 +141,22 @@ List<TajweedContour> parseTajweedContours(String data) => [
 List<(TajweedRule, Rect)> parseTajweedRects(String data) => [
   for (final e in data.split(';'))
     if (e.isNotEmpty)
-    if (e.split(',').map(int.parse).toList() case [
-      final r,
-      final x0,
-      final y0,
-      final x1,
-      final y1,
-    ])
-      (
-        TajweedRule.values[r],
-        Rect.fromLTRB(
-          x0.toDouble(),
-          y0.toDouble(),
-          x1.toDouble(),
-          y1.toDouble(),
+      if (e.split(',').map(int.parse).toList() case [
+        final r,
+        final x0,
+        final y0,
+        final x1,
+        final y1,
+      ])
+        (
+          TajweedRule.values[r],
+          Rect.fromLTRB(
+            x0.toDouble(),
+            y0.toDouble(),
+            x1.toDouble(),
+            y1.toDouble(),
+          ),
         ),
-      ),
 ];
 
 /// The coloured letters of a new-edition page as one clip path per rule

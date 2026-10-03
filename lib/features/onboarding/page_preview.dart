@@ -74,8 +74,8 @@ class RealPagePreview extends ConsumerWidget {
             filterQuality: FilterQuality.medium,
             gaplessPlayback: true,
             // Decoded at the size it is shown, not the file's.
-            cacheWidth:
-                (width * MediaQuery.devicePixelRatioOf(context)).round(),
+            cacheWidth: (width * MediaQuery.devicePixelRatioOf(context))
+                .round(),
             errorBuilder: (context, _, _) => RealPagePreview(
               style: style,
               mode: mode,

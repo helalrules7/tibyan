@@ -39,176 +39,187 @@ void main() {
       ? <int>[]
       : [2, 3, 5, 44, 90, 162, 260, 390, 504, 522, 32, 103];
 
-  testWidgets('render tajweed audit pages', (tester) async {
-    final db = ContentDatabase(
-      NativeDatabase(
-        File('assets/db/content.db'),
-        setup: (raw) => raw.execute('PRAGMA query_only = ON'),
-      ),
-    );
-    final repo = MushafRepository(db);
-    final registry = await tester.runAsync(
-      () => ThemeRegistry.load(rootBundle),
-    );
-    final style = registry!.byId(registry.defaultStyleId);
-    final out = Directory('build/tajweed_audit')..createSync(recursive: true);
-    final root = Directory.systemTemp.createTempSync('tajweed_audit');
-
-    // Pack folders as the app keeps them once installed.
-    final newDir = Directory(p.join(root.path, 'packs', 'pages-hafs-1441-v1'))
-      ..createSync(recursive: true);
-    final newZip = ZipDecoder().decodeBytes(
-      File('assets/packs/pages-hafs-1441-v1.zip').readAsBytesSync(),
-    );
-    for (final pg in madina) {
-      final e = newZip.findFile('${pg.toString().padLeft(3, '0')}.svg.xz')!;
-      File(p.join(newDir.path, e.name)).writeAsBytesSync(e.content);
-    }
-    File(p.join(newDir.path, '.installed')).writeAsStringSync('x');
-
-    final oldDir = Directory(
-      p.join(root.path, 'packs', 'pages-hafs-1405-qurancom-1024'),
-    )..createSync(recursive: true);
-    final oldZip = ZipDecoder().decodeStream(
-      InputFileStream('tools/.cache/images_1024.zip'),
-    );
-    for (final pg in madina) {
-      final e = oldZip.findFile(
-        'width_1024/page${pg.toString().padLeft(3, '0')}.png',
-      )!;
-      File(
-        p.join(oldDir.path, 'p${pg.toString().padLeft(3, '0')}.png'),
-      ).writeAsBytesSync(e.content);
-    }
-    File(p.join(oldDir.path, 'ayahinfo.db')).writeAsBytesSync(
-      oldZip.findFile('databases/ayahinfo_1024.db')!.content,
-    );
-    File(p.join(oldDir.path, '.installed')).writeAsStringSync('x');
-
-    final shDir = Directory(p.join(root.path, 'packs', 'pages-hafs-shamarly-v1'))
-      ..createSync(recursive: true);
-    final shZip = ZipDecoder().decodeStream(
-      InputFileStream('tools/.cache/shamarly/shamarly-pages-archive-org.zip'),
-    );
-    for (final pg in shamarly) {
-      final name = '${pg.toString().padLeft(3, '0')}.png';
-      File(p.join(shDir.path, name)).writeAsBytesSync(
-        shZip.findFile(name)!.content,
+  testWidgets(
+    'render tajweed audit pages',
+    (tester) async {
+      final db = ContentDatabase(
+        NativeDatabase(
+          File('assets/db/content.db'),
+          setup: (raw) => raw.execute('PRAGMA query_only = ON'),
+        ),
       );
-    }
-    File(p.join(shDir.path, '.installed')).writeAsStringSync('x');
-
-    // The defaults before 2026-10-03: grey for the letters not pronounced,
-    // no colour for the plain madd and idghaam without ghunnah.
-    const before = {
-      'hamzat_wasl': 'grey', 'lam_shamsiyyah': 'grey', 'silent': 'grey', //
-      'idghaam_mutajanisayn': 'grey', 'idghaam_mutaqaribayn': 'grey',
-      'madd_2': '', 'idghaam_no_ghunnah': '',
-    };
-    var mode = ThemeModeId.light;
-    var choices = const <String, String>{};
-    var tag = '';
-    Color? colour(TajweedRule r) =>
-        tajweedHueOf(r, choices)?.on(darkPaper: !mode.isLight);
-
-    Future<void> shoot(MushafEdition edition, int page, bool on) async {
-      final data = on
-          ? await tester.runAsync(() => repo.tajweedPage(edition, page))
-          : '';
-      final interaction = PageInteraction(
-        selection: const {},
-        marks: const {},
-        onTap: () {},
-        onVerseLongPress: (_) {},
-        onMarkerTap: (_) {},
-        onHandleDrag: (_, _) {},
-        tajweedColor: on ? colour : null,
-        tajweed: data ?? '',
+      final repo = MushafRepository(db);
+      final registry = await tester.runAsync(
+        () => ThemeRegistry.load(rootBundle),
       );
-      final boundary = GlobalKey();
-      await tester.pumpWidget(
-        ProviderScope(
-          key: UniqueKey(),
-          overrides: [
-            contentDatabaseProvider.overrideWithValue(db),
-            packRootProvider.overrideWithValue(root),
-            editionProvider.overrideWithValue(edition),
-          ],
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: buildTheme(
-              style: style,
-              mode: mode,
-              uiFont: UiFont.changa,
-            ),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('ar'),
-            home: RepaintBoundary(
-              key: boundary,
-              child: ColoredBox(
-                color: style.modes[mode]!.paper,
-                child: switch (edition) {
-                  MushafEdition.madina1405 => OldMushafPage(
-                    page: page,
-                    interaction: interaction,
-                  ),
-                  MushafEdition.shamarly => ShamarlyMushafPage(
-                    page: page,
-                    interaction: interaction,
-                  ),
-                  _ => MushafPage(page: page, interaction: interaction),
-                },
+      final style = registry!.byId(registry.defaultStyleId);
+      final out = Directory('build/tajweed_audit')..createSync(recursive: true);
+      final root = Directory.systemTemp.createTempSync('tajweed_audit');
+
+      // Pack folders as the app keeps them once installed.
+      final newDir = Directory(p.join(root.path, 'packs', 'pages-hafs-1441-v1'))
+        ..createSync(recursive: true);
+      final newZip = ZipDecoder().decodeBytes(
+        File('assets/packs/pages-hafs-1441-v1.zip').readAsBytesSync(),
+      );
+      for (final pg in madina) {
+        final e = newZip.findFile('${pg.toString().padLeft(3, '0')}.svg.xz')!;
+        File(p.join(newDir.path, e.name)).writeAsBytesSync(e.content);
+      }
+      File(p.join(newDir.path, '.installed')).writeAsStringSync('x');
+
+      final oldDir = Directory(
+        p.join(root.path, 'packs', 'pages-hafs-1405-qurancom-1024'),
+      )..createSync(recursive: true);
+      final oldZip = ZipDecoder().decodeStream(
+        InputFileStream('tools/.cache/images_1024.zip'),
+      );
+      for (final pg in madina) {
+        final e = oldZip.findFile(
+          'width_1024/page${pg.toString().padLeft(3, '0')}.png',
+        )!;
+        File(p.join(oldDir.path, 'p${pg.toString().padLeft(3, '0')}.png'))
+            .writeAsBytesSync(e.content);
+      }
+      File(p.join(oldDir.path, 'ayahinfo.db')).writeAsBytesSync(
+        oldZip.findFile('databases/ayahinfo_1024.db')!.content,
+      );
+      File(p.join(oldDir.path, '.installed')).writeAsStringSync('x');
+
+      final shDir = Directory(
+        p.join(root.path, 'packs', 'pages-hafs-shamarly-v1'),
+      )..createSync(recursive: true);
+      final shZip = ZipDecoder().decodeStream(
+        InputFileStream('tools/.cache/shamarly/shamarly-pages-archive-org.zip'),
+      );
+      for (final pg in shamarly) {
+        final name = '${pg.toString().padLeft(3, '0')}.png';
+        File(p.join(shDir.path, name))
+            .writeAsBytesSync(shZip.findFile(name)!.content);
+      }
+      File(p.join(shDir.path, '.installed')).writeAsStringSync('x');
+
+      // The defaults before 2026-10-03: grey for the letters not pronounced,
+      // no colour for the plain madd and idghaam without ghunnah.
+      const before = {
+        'hamzat_wasl': 'grey', 'lam_shamsiyyah': 'grey', 'silent': 'grey', //
+        'idghaam_mutajanisayn': 'grey', 'idghaam_mutaqaribayn': 'grey',
+        'madd_2': '', 'idghaam_no_ghunnah': '',
+      };
+      var mode = ThemeModeId.light;
+      var choices = const <String, String>{};
+      var tag = '';
+      Color? colour(TajweedRule r) =>
+          tajweedHueOf(r, choices)?.on(darkPaper: !mode.isLight);
+
+      Future<void> shoot(MushafEdition edition, int page, bool on) async {
+        final data = on
+            ? await tester.runAsync(() => repo.tajweedPage(edition, page))
+            : '';
+        final interaction = PageInteraction(
+          selection: const {},
+          marks: const {},
+          onTap: () {},
+          onVerseLongPress: (_) {},
+          onMarkerTap: (_) {},
+          onHandleDrag: (_, _) {},
+          tajweedColor: on ? colour : null,
+          tajweed: data ?? '',
+        );
+        final boundary = GlobalKey();
+        await tester.pumpWidget(
+          ProviderScope(
+            key: UniqueKey(),
+            overrides: [
+              contentDatabaseProvider.overrideWithValue(db),
+              packRootProvider.overrideWithValue(root),
+              editionProvider.overrideWithValue(edition),
+            ],
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: buildTheme(
+                style: style,
+                mode: mode,
+                uiFont: UiFont.changa,
+              ),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: const Locale('ar'),
+              home: RepaintBoundary(
+                key: boundary,
+                child: ColoredBox(
+                  color: style.modes[mode]!.paper,
+                  child: switch (edition) {
+                    MushafEdition.madina1405 => OldMushafPage(
+                      page: page,
+                      interaction: interaction,
+                    ),
+                    MushafEdition.shamarly => ShamarlyMushafPage(
+                      page: page,
+                      interaction: interaction,
+                    ),
+                    _ => MushafPage(page: page, interaction: interaction),
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      );
-      for (var i = 0; i < 40; i++) {
-        await tester.runAsync(
-          () => Future<void>.delayed(const Duration(milliseconds: 50)),
         );
-        await tester.pump();
+        for (var i = 0; i < 40; i++) {
+          await tester.runAsync(
+            () => Future<void>.delayed(const Duration(milliseconds: 50)),
+          );
+          await tester.pump();
+        }
+        final object =
+            boundary.currentContext!.findRenderObject()!
+                as RenderRepaintBoundary;
+        final bytes = await tester.runAsync(() async {
+          final image = await object.toImage(pixelRatio: 2);
+          final d = await image.toByteData(format: ui.ImageByteFormat.png);
+          image.dispose();
+          return d!.buffer.asUint8List();
+        });
+        final n = page.toString().padLeft(3, '0');
+        File(
+          '${out.path}/app_${edition.name}_p${n}_${on ? 'on' : 'off'}$tag.png',
+        ).writeAsBytesSync(bytes!);
       }
-      final object =
-          boundary.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-      final bytes = await tester.runAsync(() async {
-        final image = await object.toImage(pixelRatio: 2);
-        final d = await image.toByteData(format: ui.ImageByteFormat.png);
-        image.dispose();
-        return d!.buffer.asUint8List();
-      });
-      final n = page.toString().padLeft(3, '0');
-      File(
-        '${out.path}/app_${edition.name}_p${n}_${on ? 'on' : 'off'}$tag.png',
-      ).writeAsBytesSync(bytes!);
-    }
 
-    await tester.binding.setSurfaceSize(const Size(560, 860));
-    if (palette) {
-      for (final m in ThemeModeId.values) {
-        for (final (name, c) in [('before', before), ('after', <String, String>{})]) {
-          mode = m;
-          choices = c;
-          tag = '_${m.name}_$name';
-          for (final e in [MushafEdition.madina1441, MushafEdition.madina1405]) {
-            await shoot(e, 50, true);
+      await tester.binding.setSurfaceSize(const Size(560, 860));
+      if (palette) {
+        for (final m in ThemeModeId.values) {
+          for (final (name, c) in [
+            ('before', before),
+            ('after', <String, String>{}),
+          ]) {
+            mode = m;
+            choices = c;
+            tag = '_${m.name}_$name';
+            for (final e in [
+              MushafEdition.madina1441,
+              MushafEdition.madina1405,
+            ]) {
+              await shoot(e, 50, true);
+            }
           }
+        }
+        await tester.runAsync(() => db.close());
+        return;
+      }
+      for (final (edition, pages) in [
+        (MushafEdition.madina1441, madina),
+        (MushafEdition.madina1405, madina),
+        (MushafEdition.shamarly, shamarly),
+      ]) {
+        for (final pg in pages) {
+          await shoot(edition, pg, false);
+          await shoot(edition, pg, true);
         }
       }
       await tester.runAsync(() => db.close());
-      return;
-    }
-    for (final (edition, pages) in [
-      (MushafEdition.madina1441, madina),
-      (MushafEdition.madina1405, madina),
-      (MushafEdition.shamarly, shamarly),
-    ]) {
-      for (final pg in pages) {
-        await shoot(edition, pg, false);
-        await shoot(edition, pg, true);
-      }
-    }
-    await tester.runAsync(() => db.close());
-  }, skip: !run, timeout: const Timeout(Duration(minutes: 20)));
+    },
+    skip: !run,
+    timeout: const Timeout(Duration(minutes: 20)),
+  );
 }

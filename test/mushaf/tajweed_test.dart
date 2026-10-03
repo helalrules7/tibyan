@@ -32,29 +32,43 @@ void main() {
     test('rule numbers follow tools/build_tajweed.py RULES', () {
       // The order the build numbers the rules in; a change there must be
       // made here too.
-      expect([for (final r in TajweedRule.values) r.key], [
-        'hamzat_wasl', 'lam_shamsiyyah', 'silent', //
-        'madd_2', 'madd_246', 'madd_muttasil', 'madd_munfasil', 'madd_6',
-        'ghunnah', 'ikhfa', 'ikhfa_shafawi', 'iqlab',
-        'idghaam_ghunnah', 'idghaam_no_ghunnah', 'idghaam_shafawi',
-        'idghaam_mutajanisayn', 'idghaam_mutaqaribayn',
-        'qalqalah',
-      ]);
+      expect(
+        [for (final r in TajweedRule.values) r.key],
+        [
+          'hamzat_wasl', 'lam_shamsiyyah', 'silent', //
+          'madd_2', 'madd_246', 'madd_muttasil', 'madd_munfasil', 'madd_6',
+          'ghunnah', 'ikhfa', 'ikhfa_shafawi', 'iqlab',
+          'idghaam_ghunnah', 'idghaam_no_ghunnah', 'idghaam_shafawi',
+          'idghaam_mutajanisayn', 'idghaam_mutaqaribayn',
+          'qalqalah',
+        ],
+      );
       expect(TajweedRule.byKey('qalqalah'), TajweedRule.qalqalah);
     });
 
-    test('new-edition rows: whole contours and contours clipped to a letter', () {
-      final e = parseTajweedContours('8,120;5,121,10.5,14.25;');
-      expect(e, hasLength(2));
-      expect(e[0], (rule: TajweedRule.ghunnah, contour: 120, x0: null, x1: null));
-      expect(e[1].rule, TajweedRule.maddMuttasil);
-      expect((e[1].x0, e[1].x1), (10.5, 14.25));
-      expect(parseTajweedContours(''), isEmpty);
-    });
+    test(
+      'new-edition rows: whole contours and contours clipped to a letter',
+      () {
+        final e = parseTajweedContours('8,120;5,121,10.5,14.25;');
+        expect(e, hasLength(2));
+        expect(e[0], (
+          rule: TajweedRule.ghunnah,
+          contour: 120,
+          x0: null,
+          x1: null,
+        ));
+        expect(e[1].rule, TajweedRule.maddMuttasil);
+        expect((e[1].x0, e[1].x1), (10.5, 14.25));
+        expect(parseTajweedContours(''), isEmpty);
+      },
+    );
 
     test('page-image rows: rule and box in image pixels', () {
       final e = parseTajweedRects('17,1,2,30,40;0,5,6,7,8');
-      expect(e.first, (TajweedRule.qalqalah, const Rect.fromLTRB(1, 2, 30, 40)));
+      expect(e.first, (
+        TajweedRule.qalqalah,
+        const Rect.fromLTRB(1, 2, 30, 40),
+      ));
       expect(e.last.$1, TajweedRule.hamzatWasl);
       expect(parseTajweedRects(''), isEmpty);
     });
@@ -130,7 +144,8 @@ void main() {
             expect(
               contrastRatio(shades[i], shades[j]),
               greaterThanOrEqualTo(1.05),
-              reason: '${used.elementAt(i).name} / ${used.elementAt(j).name}'
+              reason:
+                  '${used.elementAt(i).name} / ${used.elementAt(j).name}'
                   ' (${dark ? 'dark' : 'light'})',
             );
           }
@@ -141,7 +156,9 @@ void main() {
 
   group('page contours', () {
     test('relative commands, implicit line segments and smooth curves', () {
-      final paths = subpaths('m10 10 5 0 0 5z m-5 0 l2 0 v2 h-2z M0 0 c1 1 2 2 3 3 s1 1 2 2');
+      final paths = subpaths(
+        'm10 10 5 0 0 5z m-5 0 l2 0 v2 h-2z M0 0 c1 1 2 2 3 3 s1 1 2 2',
+      );
       expect(paths, hasLength(3));
       expect(paths[0].$2.getBounds(), const Rect.fromLTRB(10, 10, 15, 15));
       // After z the pen is back at (10, 10): the second subpath starts at (5, 10).
@@ -205,7 +222,10 @@ void main() {
       final paths = tajweedPaths(svg, rows);
       expect(paths.keys, contains(TajweedRule.hamzatWasl));
 
-      for (final edition in [MushafEdition.madina1405, MushafEdition.shamarly]) {
+      for (final edition in [
+        MushafEdition.madina1405,
+        MushafEdition.shamarly,
+      ]) {
         final rects = parseTajweedRects(await repo.tajweedPage(edition, 5));
         expect(rects, isNotEmpty, reason: edition.name);
         for (final (_, r) in rects) {
