@@ -1453,7 +1453,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tajweedSourceNote =>
-      'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي تُلوَّن الكلمات المعروفة حدودها فقط.';
+      'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي حدود بعض الكلمات تقديرية أيضا.';
 
   @override
   String get tajweedLegendHint =>
@@ -1491,6 +1491,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tajweedHueGrey => 'رمادي';
+
+  @override
+  String get tajweedHueViolet => 'ليلكي';
+
+  @override
+  String get tajweedHueAmber => 'كهرماني';
+
+  @override
+  String get tajweedNoDataRiwaya =>
+      'لا تلوين للتجويد في مصاحف الروايات (ورش وقالون والدوري وشعبة): لا توجد بعد بيانات أحكام موثوقة لهذه الروايات، ولا نضع أحكاما بلا مصدر. التلوين يعمل في مصاحف حفص.';
 
   @override
   String get tajweedHamzatWasl => 'همزة الوصل';

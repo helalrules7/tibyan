@@ -127,7 +127,10 @@ class MushafRepository {
     final row = await _db
         .customSelect(
           'SELECT data FROM tajweed_page WHERE edition = ? AND page = ?',
-          variables: [Variable.withString(edition.name), Variable.withInt(page)],
+          variables: [
+            Variable.withString(edition.name),
+            Variable.withInt(page),
+          ],
         )
         .getSingleOrNull();
     return row?.read<String>('data') ?? '';

@@ -114,6 +114,13 @@ const _ar = <String, SourceText>{
     license: 'الإذن قيد الطلب من Quran.com (رسالة 14)',
     credit: 'توقيت الآيات والكلمات: Quran.com',
   ),
+  'qul-timing': (
+    title: 'توقيت آيات ماهر المعيقلي وكلماته',
+    publisher: 'مكتبة القرآن الشاملة QUL (ترتيل)',
+    license: 'لا ترخيص منشور على المورد؛ الإذن لم يُطلب بعد',
+    credit:
+        'توقيت الآيات والكلمات للمعيقلي: Quranic Universal Library (Tarteel)',
+  ),
   'quran-assets': (
     title: 'إطارات الثيمات وترويساتها وفواصلها (quran-assets)',
     publisher: 'مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
@@ -232,6 +239,12 @@ const _en = <String, SourceText>{
     publisher: 'Quran.com (QDC API); word segments from the QUL library',
     license: 'Permission requested from Quran.com (letter 14)',
     credit: 'Verse and word timings: Quran.com',
+  ),
+  'qul-timing': (
+    title: 'Verse and word timings for Maher al-Muaiqly',
+    publisher: 'Quranic Universal Library (QUL, Tarteel)',
+    license: 'No licence stated on the resource; permission not yet requested',
+    credit: 'Verse and word timings for al-Muaiqly: Quranic Universal Library (Tarteel)',
   ),
   'quran-assets': (
     title: 'Theme frames, surah headers and verse markers (quran-assets)',

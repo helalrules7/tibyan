@@ -162,6 +162,7 @@ class AppSettings {
   /// home with only the main tasks, the page as large as it can be, and
   /// slower transitions.
   final bool elderlyMode;
+
   /// Colour the letters that tajweed rules apply to (off by default).
   final bool tajweedColors;
 

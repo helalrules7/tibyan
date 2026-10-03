@@ -23,47 +23,56 @@ void main() {
   });
   tearDownAll(() => db.close());
 
-  test('ten recitations, murattal only, each with a folder of files', () async {
-    final all = await repo.reciters();
-    final reciters = [
-      for (final r in all)
-        if (r.riwaya == 'hafs') r,
-    ];
-    expect(reciters.map((r) => r.id).toList()..sort(), [
-      1,
-      2,
-      3,
-      4,
-      5,
-      10,
-      11,
-      12,
-      13,
-      14,
-    ]);
-    // The riwaya recitations (Warsh, Qalun, al-Duri, Shu'bah): ids from
-    // 101, each tagged with its riwaya.
-    final others = all.where((r) => r.riwaya != 'hafs').toList();
-    expect(others.map((r) => r.riwaya).toSet(), {
-      'warsh',
-      'qalun',
-      'douri',
-      'shubah',
-    });
-    expect(others.every((r) => r.id > 100 && r.style == 'murattal'), isTrue);
-    // The mujawwad ones (ids 6 and 7) were removed, and their numbers are
-    // never reused, so a reader who saved one cannot land on another.
-    expect(reciters.every((r) => r.style == 'murattal'), isTrue);
-    expect(reciters.every((r) => r.folderUrl.startsWith('https://')), isTrue);
-    expect(reciters.every((r) => r.folderUrl.endsWith('/')), isTrue);
-    expect(surahFile(2), '002.mp3');
-    // The mirror first, then the source, with the same path.
-    final dosari = reciters.firstWhere((r) => r.id == 10);
-    expect(surahUrls(dosari, 2).map((u) => u.toString()), [
-      'https://tibyan.ahmedhelal.dev/mirror/sources/recitations/quran/yasser_ad-dussary/002.mp3',
-      'https://download.quranicaudio.com/quran/yasser_ad-dussary/002.mp3',
-    ]);
-  });
+  test(
+    'eleven recitations, murattal only, each with a folder of files',
+    () async {
+      final all = await repo.reciters();
+      final reciters = [
+        for (final r in all)
+          if (r.riwaya == 'hafs') r,
+      ];
+      expect(reciters.map((r) => r.id).toList()..sort(), [
+        1,
+        2,
+        3,
+        4,
+        5,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+      ]);
+      // The riwaya recitations (Warsh, Qalun, al-Duri, Shu'bah): ids from
+      // 101, each tagged with its riwaya.
+      final others = all.where((r) => r.riwaya != 'hafs').toList();
+      expect(others.map((r) => r.riwaya).toSet(), {
+        'warsh',
+        'qalun',
+        'douri',
+        'shubah',
+      });
+      expect(others.every((r) => r.id > 100 && r.style == 'murattal'), isTrue);
+      // The mujawwad ones (ids 6 and 7) were removed, and their numbers are
+      // never reused, so a reader who saved one cannot land on another.
+      expect(reciters.every((r) => r.style == 'murattal'), isTrue);
+      expect(reciters.every((r) => r.folderUrl.startsWith('https://')), isTrue);
+      expect(reciters.every((r) => r.folderUrl.endsWith('/')), isTrue);
+      expect(surahFile(2), '002.mp3');
+      // The mirror first, then the source, with the same path.
+      final dosari = reciters.firstWhere((r) => r.id == 10);
+      expect(surahUrls(dosari, 2).map((u) => u.toString()), [
+        'https://tibyan.ahmedhelal.dev/mirror/sources/recitations/quran/yasser_ad-dussary/002.mp3',
+        'https://download.quranicaudio.com/quran/yasser_ad-dussary/002.mp3',
+      ]);
+      final muaiqly = reciters.firstWhere((r) => r.id == 15);
+      expect(surahUrls(muaiqly, 2).map((u) => u.toString()), [
+        'https://tibyan.ahmedhelal.dev/mirror/sources/recitations/quran/maher_almu3aiqly/year1440/002.mp3',
+        'https://download.quranicaudio.com/quran/maher_almu3aiqly/year1440/002.mp3',
+      ]);
+    },
+  );
 
   test('a folder may name the surah alone, as {surah}', () {
     const r = ReciterRow(
@@ -82,7 +91,7 @@ void main() {
 
   test('timings cover every verse, in order, where they exist', () async {
     final surahs = await repo.surahs();
-    for (final reciter in [1, 2, 3, 4, 10, 11, 12, 13, 14]) {
+    for (final reciter in [1, 2, 3, 4, 10, 11, 12, 13, 14, 15]) {
       for (final s in [1, 2, 9, 114]) {
         final t = await repo.timings(reciter, s);
         if (t.isEmpty) continue;
@@ -120,6 +129,12 @@ void main() {
     for (final s in [1, 2, 9, 114]) {
       expect(await repo.timings(10, s), isNotEmpty, reason: 'surah $s');
       expect(await repo.wordTimings(10, s), isNotEmpty, reason: 'surah $s');
+    }
+    // al-Muaiqly: verse and word timing from Quranic Universal Library,
+    // measured on the very files played, in every surah.
+    for (final s in [1, 2, 9, 55, 114]) {
+      expect(await repo.timings(15, s), isNotEmpty, reason: 'surah $s');
+      expect(await repo.wordTimings(15, s), isNotEmpty, reason: 'surah $s');
     }
     // Mustafa Ismail murattal: verse timing only where everyayah publishes
     // the per-verse files of his recording, which is not the whole Quran;
@@ -159,6 +174,20 @@ void main() {
         final v = verses.firstWhere((t) => t.ayah == r.ayah);
         expect(r.startMs, greaterThanOrEqualTo(v.startMs));
         expect(r.endMs, lessThanOrEqualTo(v.endMs));
+      }
+      // Every al-Muaiqly word lies inside its verse, in order; QUL times
+      // 6,225 of his 6,236 verses word by word (285 of al-Baqarah's 286).
+      final muaiqlyVerses = await repo.timings(15, 2);
+      final muaiqly = await repo.wordTimings(15, 2);
+      expect(muaiqly.map((r) => r.ayah).toSet().length, 285);
+      for (var i = 0; i < muaiqly.length; i++) {
+        final r = muaiqly[i];
+        final v = muaiqlyVerses.firstWhere((t) => t.ayah == r.ayah);
+        expect(r.startMs, greaterThanOrEqualTo(v.startMs - 500));
+        expect(r.endMs, lessThanOrEqualTo(v.endMs + 500));
+        if (i > 0) {
+          expect(r.startMs, greaterThanOrEqualTo(muaiqly[i - 1].startMs));
+        }
       }
       // No word timing where the recitation has none.
       expect(await repo.wordTimings(5, 2), isEmpty);

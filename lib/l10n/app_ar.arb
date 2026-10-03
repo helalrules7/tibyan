@@ -1115,7 +1115,7 @@
       }
     }
   },
-  "tajweedSourceNote": "مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي تُلوَّن الكلمات المعروفة حدودها فقط.",
+  "tajweedSourceNote": "مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي حدود بعض الكلمات تقديرية أيضا.",
   "tajweedLegendHint": "اضغط مطولا على زر التلوين في الصفحة لعرض هذا المفتاح.",
   "tajweedHueCrimson": "أحمر داكن",
   "tajweedHueRed": "أحمر",
@@ -1128,6 +1128,9 @@
   "tajweedHuePurple": "بنفسجي",
   "tajweedHuePink": "وردي",
   "tajweedHueGrey": "رمادي",
+  "tajweedHueViolet": "ليلكي",
+  "tajweedHueAmber": "كهرماني",
+  "tajweedNoDataRiwaya": "لا تلوين للتجويد في مصاحف الروايات (ورش وقالون والدوري وشعبة): لا توجد بعد بيانات أحكام موثوقة لهذه الروايات، ولا نضع أحكاما بلا مصدر. التلوين يعمل في مصاحف حفص.",
   "tajweedHamzatWasl": "همزة الوصل",
   "tajweedLamShamsiyyah": "اللام الشمسية",
   "tajweedSilent": "الحروف التي لا تُنطق",

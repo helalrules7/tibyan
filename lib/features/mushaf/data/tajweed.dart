@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import '../../../core/settings/app_settings.dart';
 import 'svg_contours.dart';
 
 /// The tajweed rules of the cpfair/quran-tajweed data (CC BY 4.0), in the
@@ -52,7 +53,9 @@ enum TajweedHue {
   blue(Color(0xFF1565C0), Color(0xFF7FB2FF)),
   purple(Color(0xFF7B1FA2), Color(0xFFD59BF0)),
   pink(Color(0xFFC2185B), Color(0xFFFF8AB8)),
-  grey(Color(0xFF7A7A7A), Color(0xFFD0D0D0));
+  grey(Color(0xFF7A7A7A), Color(0xFFD0D0D0)),
+  violet(Color(0xFF7E3FBF), Color(0xFFB98AE8)),
+  amber(Color(0xFFB07D00), Color(0xFFF0C75E));
 
   const TajweedHue(this.light, this.dark);
 
@@ -69,15 +72,19 @@ enum TajweedHue {
   }
 }
 
-/// The colours a rule starts with, after the usual colours of printed
-/// tajweed mushafs (docs/features/tajweed_colors.md). null: not coloured
-/// until the reader picks a colour (the plain 2-count madd and idghaam
-/// without ghunnah, as in those mushafs).
+/// The colours a rule starts with. The groups follow the colour key of
+/// alquran.cloud's tajweed guide (a copy on Tibyan's mirror,
+/// alquran-cloud-quran-tajweed/; docs/features/tajweed_colors.md): the letters that are not pronounced
+/// (hamzat al-wasl, the solar lam, silent letters, and the two idghaam of
+/// close letters) share one colour; every madd has a colour, the plain
+/// 2-count madd a lighter one; idghaam without ghunnah sits with the other
+/// idghaam. Where that key uses grey, a violet is used instead: grey on
+/// black ink (or on light ink at night) cannot be told from the ink.
 const defaultTajweedHues = <TajweedRule, TajweedHue?>{
-  TajweedRule.hamzatWasl: TajweedHue.grey,
-  TajweedRule.lamShamsiyyah: TajweedHue.grey,
-  TajweedRule.silent: TajweedHue.grey,
-  TajweedRule.madd2: null,
+  TajweedRule.hamzatWasl: TajweedHue.violet,
+  TajweedRule.lamShamsiyyah: TajweedHue.violet,
+  TajweedRule.silent: TajweedHue.violet,
+  TajweedRule.madd2: TajweedHue.amber,
   TajweedRule.madd246: TajweedHue.orange,
   TajweedRule.maddMuttasil: TajweedHue.red,
   TajweedRule.maddMunfasil: TajweedHue.red,
@@ -87,12 +94,17 @@ const defaultTajweedHues = <TajweedRule, TajweedHue?>{
   TajweedRule.ikhfaShafawi: TajweedHue.green,
   TajweedRule.iqlab: TajweedHue.green,
   TajweedRule.idghaamGhunnah: TajweedHue.green,
-  TajweedRule.idghaamNoGhunnah: null,
+  TajweedRule.idghaamNoGhunnah: TajweedHue.green,
   TajweedRule.idghaamShafawi: TajweedHue.green,
-  TajweedRule.idghaamMutajanisayn: TajweedHue.grey,
-  TajweedRule.idghaamMutaqaribayn: TajweedHue.grey,
+  TajweedRule.idghaamMutajanisayn: TajweedHue.violet,
+  TajweedRule.idghaamMutaqaribayn: TajweedHue.violet,
   TajweedRule.qalqalah: TajweedHue.blue,
 };
+
+/// Whether [edition] has tajweed data. The riwaya editions have none: no
+/// reviewed source annotates Warsh, Qalun, al-Duri or Shu'bah, and no rule
+/// is made up for a riwaya (docs/MISSING_DATA.md, gap 10).
+bool editionHasTajweed(MushafEdition edition) => !edition.isRiwaya;
 
 /// A rule's colour: the reader's choice when there is one ([choices] maps
 /// a rule's key to a hue name, or to '' for no colour), else the default.
@@ -105,7 +117,12 @@ TajweedHue? tajweedHueOf(TajweedRule rule, Map<String, String> choices) {
 /// One coloured piece of a new-edition page: a contour of the page text
 /// (its index in document order), clipped to [x0]..[x1] (page units) when
 /// only part of it is the letter.
-typedef TajweedContour = ({TajweedRule rule, int contour, double? x0, double? x1});
+typedef TajweedContour = ({
+  TajweedRule rule,
+  int contour,
+  double? x0,
+  double? x1,
+});
 
 /// Parses a `madina1441` row of `tajweed_page`: "rule,contour[,x0,x1];...".
 List<TajweedContour> parseTajweedContours(String data) => [
@@ -124,22 +141,22 @@ List<TajweedContour> parseTajweedContours(String data) => [
 List<(TajweedRule, Rect)> parseTajweedRects(String data) => [
   for (final e in data.split(';'))
     if (e.isNotEmpty)
-    if (e.split(',').map(int.parse).toList() case [
-      final r,
-      final x0,
-      final y0,
-      final x1,
-      final y1,
-    ])
-      (
-        TajweedRule.values[r],
-        Rect.fromLTRB(
-          x0.toDouble(),
-          y0.toDouble(),
-          x1.toDouble(),
-          y1.toDouble(),
+      if (e.split(',').map(int.parse).toList() case [
+        final r,
+        final x0,
+        final y0,
+        final x1,
+        final y1,
+      ])
+        (
+          TajweedRule.values[r],
+          Rect.fromLTRB(
+            x0.toDouble(),
+            y0.toDouble(),
+            x1.toDouble(),
+            y1.toDouble(),
+          ),
         ),
-      ),
 ];
 
 /// The coloured letters of a new-edition page as one clip path per rule

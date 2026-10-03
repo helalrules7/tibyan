@@ -186,15 +186,16 @@ def main():
     # 6. words
     ours_n = dict(((s, a), n) for s, a, n in content.execute('SELECT surah, ayah, COUNT(*) FROM word_box GROUP BY 1, 2'))
     level = dict(((s, a), m) for s, a, m in g.execute('SELECT surah, ayah, words_matched FROM ayah'))
-    matched = [v for v, m in level.items() if m >= 1]
     got_n = dict(((s, a), n) for s, a, n in g.execute('SELECT surah, ayah, COUNT(*) FROM word_box GROUP BY 1, 2'))
-    wrong = [v for v in matched if got_n.get(v) != ours_n[v]]
+    matched = [v for v, m in level.items() if m >= 1]
+    boxed = [v for v in level if v in got_n]       # level 0 too: best split, not confirmed
+    wrong = [v for v in boxed if got_n.get(v) != ours_n[v]]
     import re
     texts = {(s, a): [t for t in re.split('[  ]', d)[:-1] if t and t != '۞']
              for s, a, d in content.execute('SELECT surah, number, display_text FROM ayah')}
     fw = json.loads(FONT_WIDTHS.read_text(encoding='utf-8'))
     flagged = {}
-    for v in matched:
+    for v in boxed:
         ws = g.execute('SELECT word, x1 - x0 FROM word_box WHERE surah = ? AND ayah = ? ORDER BY word', v).fetchall()
         ratios = [w / fw[t] for (_, w), t in zip(ws, texts[v]) if fw.get(t)]
         if not ratios:
@@ -213,6 +214,11 @@ def main():
           f'{n_words} words; word count differs from ours: {len(wrong)}; '
           f'words far from their font width (for a look): {sum(len(x) for x in flagged.values())} in {len(flagged)} verses '
           f'({f2} of {w2} words at level 2)')
+    l0 = [v for v in boxed if level[v] == 0]
+    f0 = sum(len(flagged.get(v, [])) for v in l0)
+    w0 = sum(got_n[v] for v in l0)
+    print(f'      plus {len(l0)} verses with their best split, not confirmed (level 0): {w0} words, '
+          f'{f0} far from their font width; {len(verses) - len(boxed)} verses without word boxes')
     PREVIEW.mkdir(parents=True, exist_ok=True)
     with open(PREVIEW / 'flagged_words.txt', 'w') as f:
         for v, ws in sorted(flagged.items()):

@@ -32,29 +32,43 @@ void main() {
     test('rule numbers follow tools/build_tajweed.py RULES', () {
       // The order the build numbers the rules in; a change there must be
       // made here too.
-      expect([for (final r in TajweedRule.values) r.key], [
-        'hamzat_wasl', 'lam_shamsiyyah', 'silent', //
-        'madd_2', 'madd_246', 'madd_muttasil', 'madd_munfasil', 'madd_6',
-        'ghunnah', 'ikhfa', 'ikhfa_shafawi', 'iqlab',
-        'idghaam_ghunnah', 'idghaam_no_ghunnah', 'idghaam_shafawi',
-        'idghaam_mutajanisayn', 'idghaam_mutaqaribayn',
-        'qalqalah',
-      ]);
+      expect(
+        [for (final r in TajweedRule.values) r.key],
+        [
+          'hamzat_wasl', 'lam_shamsiyyah', 'silent', //
+          'madd_2', 'madd_246', 'madd_muttasil', 'madd_munfasil', 'madd_6',
+          'ghunnah', 'ikhfa', 'ikhfa_shafawi', 'iqlab',
+          'idghaam_ghunnah', 'idghaam_no_ghunnah', 'idghaam_shafawi',
+          'idghaam_mutajanisayn', 'idghaam_mutaqaribayn',
+          'qalqalah',
+        ],
+      );
       expect(TajweedRule.byKey('qalqalah'), TajweedRule.qalqalah);
     });
 
-    test('new-edition rows: whole contours and contours clipped to a letter', () {
-      final e = parseTajweedContours('8,120;5,121,10.5,14.25;');
-      expect(e, hasLength(2));
-      expect(e[0], (rule: TajweedRule.ghunnah, contour: 120, x0: null, x1: null));
-      expect(e[1].rule, TajweedRule.maddMuttasil);
-      expect((e[1].x0, e[1].x1), (10.5, 14.25));
-      expect(parseTajweedContours(''), isEmpty);
-    });
+    test(
+      'new-edition rows: whole contours and contours clipped to a letter',
+      () {
+        final e = parseTajweedContours('8,120;5,121,10.5,14.25;');
+        expect(e, hasLength(2));
+        expect(e[0], (
+          rule: TajweedRule.ghunnah,
+          contour: 120,
+          x0: null,
+          x1: null,
+        ));
+        expect(e[1].rule, TajweedRule.maddMuttasil);
+        expect((e[1].x0, e[1].x1), (10.5, 14.25));
+        expect(parseTajweedContours(''), isEmpty);
+      },
+    );
 
     test('page-image rows: rule and box in image pixels', () {
       final e = parseTajweedRects('17,1,2,30,40;0,5,6,7,8');
-      expect(e.first, (TajweedRule.qalqalah, const Rect.fromLTRB(1, 2, 30, 40)));
+      expect(e.first, (
+        TajweedRule.qalqalah,
+        const Rect.fromLTRB(1, 2, 30, 40),
+      ));
       expect(e.last.$1, TajweedRule.hamzatWasl);
       expect(parseTajweedRects(''), isEmpty);
     });
@@ -63,7 +77,14 @@ void main() {
   group('colours', () {
     test('defaults, a chosen colour, and a rule turned off', () {
       expect(tajweedHueOf(TajweedRule.qalqalah, const {}), TajweedHue.blue);
-      expect(tajweedHueOf(TajweedRule.madd2, const {}), isNull);
+      expect(tajweedHueOf(TajweedRule.madd2, const {}), TajweedHue.amber);
+      expect(tajweedHueOf(TajweedRule.silent, const {}), TajweedHue.violet);
+      // A reader's earlier choice stays, grey included.
+      expect(
+        tajweedHueOf(TajweedRule.silent, const {'silent': 'grey'}),
+        TajweedHue.grey,
+      );
+      expect(tajweedHueOf(TajweedRule.madd2, const {'madd_2': ''}), isNull);
       expect(
         tajweedHueOf(TajweedRule.qalqalah, const {'qalqalah': 'purple'}),
         TajweedHue.purple,
@@ -91,6 +112,29 @@ void main() {
       }
     });
 
+    test('every rule has a default colour, none of them grey', () {
+      // Grey cannot be told from the ink: black ink on light paper, light
+      // ink at night. Every default is a clear hue in both shades.
+      for (final rule in TajweedRule.values) {
+        final hue = defaultTajweedHues[rule];
+        expect(hue, isNotNull, reason: rule.key);
+        for (final dark in [false, true]) {
+          final c = hue!.on(darkPaper: dark);
+          final rgb = [c.r, c.g, c.b];
+          final chroma =
+              rgb.reduce((a, b) => a > b ? a : b) -
+              rgb.reduce((a, b) => a < b ? a : b);
+          expect(chroma, greaterThan(0.25), reason: '${rule.key} $dark');
+        }
+      }
+    });
+
+    test('the riwaya editions have no tajweed data', () {
+      for (final e in MushafEdition.values) {
+        expect(editionHasTajweed(e), !e.isRiwaya, reason: e.name);
+      }
+    });
+
     test('the default colours also differ in lightness', () {
       final used = {...defaultTajweedHues.values.whereType<TajweedHue>()};
       for (final dark in [false, true]) {
@@ -100,7 +144,8 @@ void main() {
             expect(
               contrastRatio(shades[i], shades[j]),
               greaterThanOrEqualTo(1.05),
-              reason: '${used.elementAt(i).name} / ${used.elementAt(j).name}'
+              reason:
+                  '${used.elementAt(i).name} / ${used.elementAt(j).name}'
                   ' (${dark ? 'dark' : 'light'})',
             );
           }
@@ -111,7 +156,9 @@ void main() {
 
   group('page contours', () {
     test('relative commands, implicit line segments and smooth curves', () {
-      final paths = subpaths('m10 10 5 0 0 5z m-5 0 l2 0 v2 h-2z M0 0 c1 1 2 2 3 3 s1 1 2 2');
+      final paths = subpaths(
+        'm10 10 5 0 0 5z m-5 0 l2 0 v2 h-2z M0 0 c1 1 2 2 3 3 s1 1 2 2',
+      );
       expect(paths, hasLength(3));
       expect(paths[0].$2.getBounds(), const Rect.fromLTRB(10, 10, 15, 15));
       // After z the pen is back at (10, 10): the second subpath starts at (5, 10).
@@ -175,12 +222,47 @@ void main() {
       final paths = tajweedPaths(svg, rows);
       expect(paths.keys, contains(TajweedRule.hamzatWasl));
 
-      for (final edition in [MushafEdition.madina1405, MushafEdition.shamarly]) {
+      for (final edition in [
+        MushafEdition.madina1405,
+        MushafEdition.shamarly,
+      ]) {
         final rects = parseTajweedRects(await repo.tajweedPage(edition, 5));
         expect(rects, isNotEmpty, reason: edition.name);
         for (final (_, r) in rects) {
           expect(r.width, greaterThan(0));
           expect(r.height, greaterThan(0));
+        }
+      }
+      // Every placed letter comes from the one letter table (Hafs only,
+      // source 18: cpfair), and the file is the schema drift expects.
+      final letters = await db
+          .customSelect(
+            'SELECT riwaya, source, COUNT(*) AS n FROM tajweed_letter '
+            'GROUP BY riwaya, source',
+          )
+          .get();
+      expect(letters, hasLength(1));
+      expect(letters.single.read<String>('riwaya'), 'hafs');
+      expect(letters.single.read<int>('source'), 18);
+      expect(letters.single.read<int>('n'), greaterThan(70000));
+      final version = await db.customSelect('PRAGMA user_version').getSingle();
+      expect(version.data.values.single, db.schemaVersion);
+      // Every Shamarly text page is coloured (pages 2-522), while touch and
+      // recitation still see only the surest word splits.
+      final shamarly = await db
+          .customSelect(
+            "SELECT COUNT(*) AS n FROM tajweed_page WHERE edition = 'shamarly'",
+          )
+          .getSingle();
+      expect(shamarly.read<int>('n'), 521);
+      for (final page in [32, 103, 205, 294]) {
+        expect(
+          await repo.tajweedPage(MushafEdition.shamarly, page),
+          isNotEmpty,
+          reason: 'Shamarly page $page',
+        );
+        for (final b in await repo.shamarlyWordBoxes(page)) {
+          expect(b.level, greaterThanOrEqualTo(shamarlyWordLevel));
         }
       }
       // Opening pages are coloured too.

@@ -69,7 +69,10 @@ void main() {
     test('Hud 82: a Warsh verse that covers the end of one Hafs verse and '
         'the next (KFGQPC texts and Quranpedia agree)', () {
       expect(data.toHafs(11, 81), [(surah: 11, ayah: 82)]);
-      expect(data.toHafs(11, 82), [(surah: 11, ayah: 82), (surah: 11, ayah: 83)]);
+      expect(data.toHafs(11, 82), [
+        (surah: 11, ayah: 82),
+        (surah: 11, ayah: 83),
+      ]);
       expect(data.fromHafs(11, 83), (surah: 11, ayah: 82));
       expect(data.fromHafs(11, 84), (surah: 11, ayah: 83));
     });
@@ -106,97 +109,99 @@ void main() {
       expect(MushafEdition.madina1405.isRiwaya, isFalse);
     });
 
-    test('switching to Warsh reads its pages, numbers and recitations', () async {
-      SharedPreferences.setMockInitialValues({
-        'settings.edition': 'madina1441',
-      });
-      final root = Directory.systemTemp.createTempSync('packs');
-      void install(PagePackSpec spec, [void Function(Directory)? fill]) {
-        final dir = Directory(p.join(root.path, 'packs', spec.id))
-          ..createSync(recursive: true);
-        fill?.call(dir);
-        File(p.join(dir.path, '.installed')).writeAsStringSync('x');
-      }
+    test(
+      'switching to Warsh reads its pages, numbers and recitations',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          'settings.edition': 'madina1441',
+        });
+        final root = Directory.systemTemp.createTempSync('packs');
+        void install(PagePackSpec spec, [void Function(Directory)? fill]) {
+          final dir = Directory(p.join(root.path, 'packs', spec.id))
+            ..createSync(recursive: true);
+          fill?.call(dir);
+          File(p.join(dir.path, '.installed')).writeAsStringSync('x');
+        }
 
-      install(PagePackSpec.madina1441);
-      final db = ContentDatabase(
-        NativeDatabase(
-          File('assets/db/content.db'),
-          setup: (raw) => raw.execute('PRAGMA query_only = ON'),
-        ),
-      );
-      addTearDown(db.close);
-      final container = ProviderContainer(
-        overrides: [
-          contentDatabaseProvider.overrideWithValue(db),
-          themeRegistryProvider.overrideWithValue(
-            await ThemeRegistry.load(rootBundle),
+        install(PagePackSpec.madina1441);
+        final db = ContentDatabase(
+          NativeDatabase(
+            File('assets/db/content.db'),
+            setup: (raw) => raw.execute('PRAGMA query_only = ON'),
           ),
-          sharedPreferencesProvider.overrideWithValue(
-            await SharedPreferences.getInstance(),
-          ),
-          packRootProvider.overrideWithValue(root),
-          allRecitersProvider.overrideWith(
-            (ref) async => [
-              _reciter(1, 'hafs'),
-              _reciter(2, 'hafs'),
-              _reciter(101, 'warsh'),
-              _reciter(102, 'warsh'),
-              _reciter(111, 'qalun'),
-            ],
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
+        );
+        addTearDown(db.close);
+        final container = ProviderContainer(
+          overrides: [
+            contentDatabaseProvider.overrideWithValue(db),
+            themeRegistryProvider.overrideWithValue(
+              await ThemeRegistry.load(rootBundle),
+            ),
+            sharedPreferencesProvider.overrideWithValue(
+              await SharedPreferences.getInstance(),
+            ),
+            packRootProvider.overrideWithValue(root),
+            allRecitersProvider.overrideWith(
+              (ref) async => [
+                _reciter(1, 'hafs'),
+                _reciter(2, 'hafs'),
+                _reciter(101, 'warsh'),
+                _reciter(102, 'warsh'),
+                _reciter(111, 'qalun'),
+              ],
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      expect(await container.read(riwayaDataProvider.future), isNull);
-      expect(
-        (await container.read(recitersProvider.future)).map((r) => r.id),
-        [1, 2],
-      );
+        expect(await container.read(riwayaDataProvider.future), isNull);
+        expect(
+          (await container.read(recitersProvider.future)).map((r) => r.id),
+          [1, 2],
+        );
 
-      await container
-          .read(settingsProvider.notifier)
-          .setEdition(MushafEdition.warsh);
-      // Not on the device yet: the new Madina edition is read meanwhile.
-      expect(container.read(editionProvider), MushafEdition.madina1441);
+        await container
+            .read(settingsProvider.notifier)
+            .setEdition(MushafEdition.warsh);
+        // Not on the device yet: the new Madina edition is read meanwhile.
+        expect(container.read(editionProvider), MushafEdition.madina1441);
 
-      install(PagePackSpec.warsh, (dir) {
-        final json = utf8.encode(_sample());
-        File(
-          p.join(dir.path, 'riwaya.json.xz'),
-        ).writeAsBytesSync(XZEncoder().encode(json));
-      });
-      container.read(packInstallsProvider.notifier).changed();
-      expect(container.read(editionProvider), MushafEdition.warsh);
+        install(PagePackSpec.warsh, (dir) {
+          final json = utf8.encode(_sample());
+          File(p.join(dir.path, 'riwaya.json.xz'))
+              .writeAsBytesSync(XZEncoder().encode(json));
+        });
+        container.read(packInstallsProvider.notifier).changed();
+        expect(container.read(editionProvider), MushafEdition.warsh);
 
-      final data = await container.read(riwayaDataProvider.future);
-      expect(data?.id, 'warsh');
-      final page1 = await container.read(pageAyahsProvider(1).future);
-      expect(page1.length, 7);
-      expect(page1.first.displayText, startsWith('اِ۬لْحَمْدُ'));
-      // A Hafs verse (bookmark, search result) opens the Warsh page.
-      expect(await container.read(versePageProvider((11, 83)).future), 231);
-      expect(editionKeyOf(data, 11, 83), (surah: 11, ayah: 82));
-      expect(hafsKeyOf(data, (surah: 2, ayah: 1)), (surah: 2, ayah: 1));
-      expect(await container.read(surahAyahCountProvider(2).future), 285);
+        final data = await container.read(riwayaDataProvider.future);
+        expect(data?.id, 'warsh');
+        final page1 = await container.read(pageAyahsProvider(1).future);
+        expect(page1.length, 7);
+        expect(page1.first.displayText, startsWith('اِ۬لْحَمْدُ'));
+        // A Hafs verse (bookmark, search result) opens the Warsh page.
+        expect(await container.read(versePageProvider((11, 83)).future), 231);
+        expect(editionKeyOf(data, 11, 83), (surah: 11, ayah: 82));
+        expect(hafsKeyOf(data, (surah: 2, ayah: 1)), (surah: 2, ayah: 1));
+        expect(await container.read(surahAyahCountProvider(2).future), 285);
 
-      // Only Warsh's recitations; the Hafs choice is kept apart.
-      expect(
-        (await container.read(recitersProvider.future)).map((r) => r.id),
-        [101, 102],
-      );
-      expect((await container.read(currentReciterProvider.future))?.id, 101);
-      await container
-          .read(settingsProvider.notifier)
-          .setReciter(102, riwaya: Riwaya.warsh);
-      expect((await container.read(currentReciterProvider.future))?.id, 102);
-      expect(container.read(settingsProvider).reciterId, 1);
+        // Only Warsh's recitations; the Hafs choice is kept apart.
+        expect(
+          (await container.read(recitersProvider.future)).map((r) => r.id),
+          [101, 102],
+        );
+        expect((await container.read(currentReciterProvider.future))?.id, 101);
+        await container
+            .read(settingsProvider.notifier)
+            .setReciter(102, riwaya: Riwaya.warsh);
+        expect((await container.read(currentReciterProvider.future))?.id, 102);
+        expect(container.read(settingsProvider).reciterId, 1);
 
-      // The frame shows the riwaya's juz and no hizb.
-      final frame = await container.read(frameInfoProvider(3).future);
-      expect(frame?.juz, 1);
-      expect(frame?.hizb, isNull);
-    });
+        // The frame shows the riwaya's juz and no hizb.
+        final frame = await container.read(frameInfoProvider(3).future);
+        expect(frame?.juz, 1);
+        expect(frame?.hizb, isNull);
+      },
+    );
   });
 }

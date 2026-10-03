@@ -62,9 +62,8 @@ void main() {
           image.dispose();
           return data!.buffer.asUint8List();
         });
-        File('${out.path}/${style.id}_${mode.name}.png').writeAsBytesSync(
-          bytes!,
-        );
+        File('${out.path}/${style.id}_${mode.name}.png')
+            .writeAsBytesSync(bytes!);
       }
     }
   }, skip: !run);

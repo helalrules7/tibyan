@@ -462,7 +462,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       _revealed.clear();
                     })
                   : _startRecite(),
-              tajweed: settings.tajweedColors,
+              tajweed: editionHasTajweed(edition)
+                  ? settings.tajweedColors
+                  : null,
               onTajweed: () => ref
                   .read(settingsProvider.notifier)
                   .setTajweedColors(!settings.tajweedColors),
@@ -1234,8 +1236,8 @@ class _ReadingTools extends StatelessWidget {
   });
 
   /// Tajweed colouring: a tap turns it on or off; a long press shows the
-  /// colour key.
-  final bool tajweed;
+  /// colour key. null: the edition has no tajweed data, so no button.
+  final bool? tajweed;
   final VoidCallback onTajweed;
   final VoidCallback onTajweedLegend;
 
@@ -1324,14 +1326,16 @@ class _ReadingTools extends StatelessWidget {
           onListen,
         ),
         button(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
-        const SizedBox(width: 10),
-        button(
-          'ج',
-          l.tajweedColors,
-          tajweed,
-          onTajweed,
-          onLongPress: onTajweedLegend,
-        ),
+        if (tajweed case final on?) ...[
+          const SizedBox(width: 10),
+          button(
+            'ج',
+            l.tajweedColors,
+            on,
+            onTajweed,
+            onLongPress: onTajweedLegend,
+          ),
+        ],
       ],
     );
   }

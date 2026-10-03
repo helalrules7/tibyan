@@ -342,7 +342,9 @@ class ShamarlyWordBox extends Table {
   IntColumn get x1 => integer()();
   IntColumn get y1 => integer()();
 
-  /// How sure the split into words is: 2 stable, 1 not yet reviewed.
+  /// How sure the split into words is: 2 stable, 1 not yet reviewed, 0
+  /// the best split, not confirmed (tajweed colouring only; see
+  /// [shamarlyWordLevel]).
   IntColumn get level => integer()();
 
   @override
@@ -611,10 +613,15 @@ class ContentDatabase extends _$ContentDatabase {
   ContentDatabase(super.executor);
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
+  /// 17: `tajweed_letter`, the letters each tajweed rule applies to, per
+  /// riwaya and source (read with custom queries, like `tajweed_page`).
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 17;
 
-  /// The file is built ahead of time; never create or migrate it here.
+  /// The file is built ahead of time; never create or migrate it here. An
+  /// app with a newer schema ships a newer file, and [openBundled] replaces
+  /// the old copy with it, so going from one version to the next (16 to
+  /// 17: a new table only) needs no step here.
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {},
