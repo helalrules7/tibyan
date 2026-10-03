@@ -19,9 +19,13 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quranlab_banna_timing.json QuranLab word timings, al-Banna (fetch_quranlab_timing.py)
   tools/.cache/quranlab_ayah_timing.json  al-Banna verse timings derived from it (build_quranlab_timing.py)
   tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
+  tools/.cache/banna_ayah_timing.json     al-Banna verse and word timings verse by verse, replacing
+  tools/.cache/banna_word_timing.json     the two above for him when present (build_banna_timing.py)
   tools/.cache/qul_timing.json            QUL verse and word timings, al-Muaiqly (fetch_qul_timing.py)
   tools/.cache/qul_ayah_timing.json       ... checked against the surah files (build_qdc_timing.py qul)
   tools/.cache/qul_word_timing.json
+  data/timing/<slug>/NNN.json            timings of the published reciters, which replace
+                                          the generated rows (timing_files.py, docs/TIMING.md)
   tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
                                           lines, verse, marker and word boxes; no text
   tools/.cache/shamarly_catchword.json    Shamarly catchword boxes (build_shamarly_catchword.py)
@@ -48,12 +52,14 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
+import build_banna_timing as banna_timing
 import build_line_cuts
 import build_mutashabih
 import build_tajweed
 import build_word_boxes
 import build_word_study
 import riwaya_reciters
+import timing_files
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
@@ -559,6 +565,13 @@ def main():
                    json.loads(quranlab_ayah_path.read_text(encoding='utf-8')))
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(quranlab_word_path.read_text(encoding='utf-8')))
+    # al-Banna verse by verse (build_banna_timing.py): QuranLab's words
+    # where his verses are found by sound, forced alignment elsewhere.
+    banna_ayah_path = CACHE / 'banna_ayah_timing.json'
+    if banna_ayah_path.exists():
+        banna_timing.replace(db, json.loads(banna_ayah_path.read_text(encoding='utf-8')),
+                             json.loads((CACHE / 'banna_word_timing.json').read_text(encoding='utf-8')))
+        db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', banna_timing.source_row(today))
     db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
         17, 'qdc-timing', 'Verse and word timings of the imams of the two Harams (quran.com)',
         'Quran.com (QDC audio API; segments from Quranic Universal Library)', None,
@@ -570,6 +583,10 @@ def main():
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(qdc_word_path.read_text(encoding='utf-8')))
     add_qul_timing(db, today)
+    # Timings kept as text in data/timing (the published reciters) replace
+    # the generated rows above: corrections merged there are the source.
+    for slug, (n_ayahs, n_words) in timing_files.apply(db).items():
+        print(f'timing from data/timing/{slug}: {n_ayahs} verses, {n_words} words')
     for reciter, surah in gaps:
         print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
     # Speech spans measured by tools/build_ayah_speech.py, which reads the

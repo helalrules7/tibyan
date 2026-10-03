@@ -1212,5 +1212,19 @@
         "type": "String"
       }
     }
-  }
+  },
+  "reciterPhotosTitle": "صور القرّاء",
+  "reciterPhotosNote": "من ويكيميديا كومنز، مصغّرة ومقصوصة في تبيان.",
+  "reciterPhotoCredit": "{author}، {license}",
+  "@reciterPhotoCredit": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownAuthor": "مصوّر غير معروف"
 }

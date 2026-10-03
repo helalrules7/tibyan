@@ -1,0 +1,116 @@
+name: Timing check
+
+# Checks a pull request that changes recitation timings (data/timing) and
+# comments with a summary and a link that opens the change in the editor.
+#
+# pull_request_target, so it can comment on pull requests from forks. It
+# runs the base branch's own code only: the proposed files are read as
+# data (git show of paths that match a strict pattern, parsed as JSON) and
+# nothing from the pull request is executed.
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'data/timing/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: timing-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Validate the timing files
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Bring in the proposed files, as data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ASSOCIATION: ${{ github.event.pull_request.author_association }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/base"
+          cp -r data "$RUNNER_TEMP/base/"
+          git fetch --no-tags --depth=1 "https://github.com/$REPO.git" "+refs/pull/$PR/head:refs/remotes/pr/head"
+          gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | [.status, .filename, (.previous_filename // "")] | @tsv' > "$RUNNER_TEMP/files.tsv"
+          case "$ASSOCIATION" in OWNER|MEMBER|COLLABORATOR) trusted=1 ;; *) trusted=0 ;; esac
+          published=$(python3 -c "import json; print(' '.join(r['slug'] for r in json.load(open('data/timing/reciters.json'))['reciters'] if r['publish']))")
+          : > "$RUNNER_TEMP/check.txt"
+          : > "$RUNNER_TEMP/policy.txt"
+          while IFS=$'\t' read -r status file _previous; do
+            ok=0
+            if [[ "$file" =~ ^data/timing/([a-z0-9-]+)/[0-9]{3}\.json$ ]]; then
+              slug="${BASH_REMATCH[1]}"
+              if [[ " $published " == *" $slug "* || $trusted == 1 ]]; then ok=1; fi
+            elif [[ $trusted == 1 && "$file" =~ ^data/timing/(reciters\.json|verse_words\.json|README\.md|[a-z0-9-]+/audio\.json)$ ]]; then
+              ok=2
+            fi
+            if [[ $ok == 0 || ( $trusted == 0 && ( "$status" == removed || "$status" == renamed ) ) ]]; then
+              echo "\`$file\` ($status)" >> "$RUNNER_TEMP/policy.txt"
+              continue
+            fi
+            if [[ "$status" == removed ]]; then
+              rm -f -- "$file"
+            else
+              mkdir -p "$(dirname -- "$file")"
+              git show "$HEAD_SHA:$file" > "$file"
+            fi
+            if [[ $ok == 1 ]]; then echo "$file" >> "$RUNNER_TEMP/check.txt"; fi
+            if [[ $ok == 2 ]]; then echo all > "$RUNNER_TEMP/all"; fi
+          done < "$RUNNER_TEMP/files.tsv"
+      - name: Check
+        id: check
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -uo pipefail
+          files=$(cat "$RUNNER_TEMP/check.txt")
+          if [[ -f "$RUNNER_TEMP/all" ]]; then files=""; fi  # reciters or counts changed: check every file
+          status=0
+          python3 tools/timing_files.py check --base "$RUNNER_TEMP/base" \
+            --json "$RUNNER_TEMP/result.json" --markdown "$RUNNER_TEMP/summary.md" \
+            --editor "https://helalrules7.github.io/tibyan/?pr=$PR" $files || status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+      - name: Comment
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          SUMMARY: ${{ runner.temp }}/summary.md
+          POLICY: ${{ runner.temp }}/policy.txt
+          STATUS: ${{ steps.check.outputs.status }}
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- tibyan-timing-check -->';
+            const summary = fs.existsSync(process.env.SUMMARY) ? fs.readFileSync(process.env.SUMMARY, 'utf8').trim() : '';
+            const policy = fs.readFileSync(process.env.POLICY, 'utf8').trim();
+            const failed = process.env.STATUS !== '0' || policy !== '';
+            let body = `${marker}\n### ${failed ? '❌' : '✅'} Timing check · فحص التوقيت\n\n`;
+            if (policy) {
+              body += '**Only `data/timing/<reciter>/NNN.json` files of published reciters may be changed here.** '
+                + 'These files are outside that (or removed/renamed):\n'
+                + 'يُقبل هنا تعديل ملفات التوقيت فقط، ولا تُحذف. هذه الملفات خارج ذلك:\n\n'
+                + policy.split('\n').map((l) => `- ${l}`).join('\n') + '\n\n';
+            }
+            body += summary ? `${summary}\n\n` : '';
+            body += 'Errors in verses this change did not touch are already on main and do not block it. '
+              + 'Reviewers: open the editor link, listen to each changed verse at 0.75×, then approve. '
+              + '· الأخطاء في آيات لم يغيرها الطلب موجودة من قبل ولا تمنعه. للمراجع: افتح رابط المحرر واستمع لكل آية معدلة.';
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const mine = comments.find((c) => c.user.type === 'Bot' && c.body.includes(marker));
+            if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+            else await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            if (failed) core.setFailed('The timing check found problems; see the comment on the pull request.');

@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,6 +19,7 @@ import 'core/router/app_router.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
 import 'features/audio/recitation.dart';
+import 'features/audio/timing_updates.dart';
 import 'features/khatma/khatma_providers.dart';
 import 'features/khatma/services/home_widget_sync.dart';
 import 'features/khatma/services/reminder_scheduler.dart';
@@ -52,6 +55,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final content = await ContentDatabase.openBundled(rootBundle);
   final packRoot = await getApplicationSupportDirectory();
+  final timing = TimingUpdates(Directory(p.join(packRoot.path, 'timing')));
 
   final container = ProviderContainer(
     overrides: [
@@ -61,6 +65,7 @@ Future<void> main() async {
       contentDatabaseProvider.overrideWithValue(content),
       userDatabaseProvider.overrideWithValue(UserDatabase.open()),
       packRootProvider.overrideWithValue(packRoot),
+      timingOverridesProvider.overrideWithValue(timing),
       reminderSchedulerProvider.overrideWithValue(LocalReminderScheduler()),
       homeWidgetSyncProvider.overrideWithValue(PluginHomeWidgetSync()),
     ],
@@ -106,7 +111,26 @@ Future<void> main() async {
 
   // Which audio host is faster for this reader, measured in the background.
   unawaited(measureAudioHosts(container));
+  unawaited(_refreshTimings(container, timing));
   _startKhatma(container);
+}
+
+/// Corrected recitation timings: what content.db was built with, then
+/// any newer pack on our server (checked at most twice a day). Offline or
+/// failing, content.db's timings stay.
+Future<void> _refreshTimings(
+  ProviderContainer container,
+  TimingUpdates timing,
+) async {
+  try {
+    final repo = container.read(mushafRepositoryProvider);
+    timing
+      ..folders = {for (final r in await repo.reciters()) r.id: r.folderUrl}
+      ..bundled = await repo.timingVersions();
+    await timing.refresh();
+  } catch (_) {
+    // Nothing to do: the bundled timings are used.
+  }
 }
 
 /// Keeps the khatma's reminders (rolling) and the home screen widget up to

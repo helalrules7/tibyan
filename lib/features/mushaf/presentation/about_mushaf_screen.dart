@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../audio/recitation.dart';
 import '../../../l10n/app_localizations.dart';
 import '../mushaf_providers.dart';
 import 'source_names.dart';
@@ -16,6 +17,12 @@ class AboutMushafScreen extends ConsumerWidget {
     final t = context.tokens.colors;
     final sources = ref.watch(sourcesProvider).value;
     final reviewCount = ref.watch(reviewNoteCountProvider).value;
+    final reciters = {
+      for (final r in ref.watch(recitersProvider).value ?? const [])
+        r.id: Localizations.localeOf(context).languageCode == 'ar'
+            ? r.nameAr
+            : r.nameEn,
+    };
 
     return Scaffold(
       appBar: AppBar(title: Text(l.aboutMushafTitle)),
@@ -106,6 +113,34 @@ class AboutMushafScreen extends ConsumerWidget {
                 },
               ),
             ),
+          Card(
+            child: ExpansionTile(
+              title: Text(l.reciterPhotosTitle),
+              subtitle: Text(
+                l.reciterPhotosNote,
+                style: TextStyle(color: t.muted),
+              ),
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              children: [
+                for (final c in reciterPhotoCredits) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    reciters[c.reciter] ?? '${c.reciter}',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    l.reciterPhotoCredit(
+                      c.author ?? l.unknownAuthor,
+                      c.license,
+                    ),
+                    style: TextStyle(color: t.muted),
+                  ),
+                  SelectableText(c.url, style: TextStyle(color: t.accent)),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );

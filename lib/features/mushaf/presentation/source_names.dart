@@ -275,6 +275,67 @@ const bundledSources = [
   ),
 ];
 
+/// Who took each reciter photo in assets/reciters and under what licence,
+/// as Wikimedia Commons records it (assets/reciters/README.md). A null
+/// author is unknown. Photos whose licence does not let us ship them are
+/// not listed (docs/MISSING_DATA.md).
+const reciterPhotoCredits = [
+  (
+    reciter: 1,
+    author: null,
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Elminshwey.jpg',
+  ),
+  (
+    reciter: 2,
+    author: 'Zubairkhan1',
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Hussary.jpg',
+  ),
+  (
+    reciter: 3,
+    author: 'Prasar Bharati (India)',
+    license: 'GODL-India',
+    url: 'https://commons.wikimedia.org/wiki/File:Abdul_Basit_Abdul_Samad_at_Centenary_Celebration_Of_Darul_Uloom_Deoband_1980.jpg',
+  ),
+  (
+    reciter: 5,
+    author: null,
+    license: 'Public domain',
+    url: 'https://commons.wikimedia.org/wiki/File:Mustafa_Ismail_(1).jpg',
+  ),
+  (
+    reciter: 10,
+    author: 'MAL MALDIVE',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Yasser_Al-Dosari_(cropped).jpg',
+  ),
+  (
+    reciter: 11,
+    author: "Prime Minister's Office (India)",
+    license: 'GODL-India',
+    url: 'https://commons.wikimedia.org/wiki/File:Abdul-Rahman_Al-Sudais_(Cropped,_2011).jpg',
+  ),
+  (
+    reciter: 12,
+    author: 'quranic.ru',
+    license: 'Copyrighted free use',
+    url: 'https://commons.wikimedia.org/wiki/File:Мишари_Рашид.jpg',
+  ),
+  (
+    reciter: 13,
+    author: 'الشيخ هيثم الدخين',
+    license: 'CC BY-SA 4.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Saad_al_Ghamdi.jpg',
+  ),
+  (
+    reciter: 15,
+    author: 'وليد أيوب',
+    license: 'CC BY-SA 3.0',
+    url: 'https://commons.wikimedia.org/wiki/File:Maher_Al_Mueaqly.png',
+  ),
+];
+
 /// The interface text of a source, or null for one not listed here (it is
 /// then shown as stored).
 SourceText? sourceText(String key, String languageCode) =>

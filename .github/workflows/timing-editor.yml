@@ -1,0 +1,79 @@
+name: Timing editor
+
+# Builds the timing editor (apps/timing-editor) with the Quran words and
+# the timing files, and publishes it on GitHub Pages from main. On a pull
+# request the built site is kept as an artefact to download and try.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/timing-editor/**'
+      - 'data/timing/**'
+      - 'tools/timing_files.py'
+      - 'docs/TIMING_GUIDE.md'
+      - 'tools/tests/test_timing_files.py'
+      - 'tools/tests/timing_cases.json'
+      - '.github/workflows/timing-editor.yml'
+  pull_request:
+    paths:
+      - 'apps/timing-editor/**'
+      - 'data/timing/**'
+      - 'tools/timing_files.py'
+      - 'docs/TIMING_GUIDE.md'
+      - 'tools/tests/test_timing_files.py'
+      - 'tools/tests/timing_cases.json'
+      - '.github/workflows/timing-editor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: timing-editor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test and build the editor
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true  # content.db: the words are exported from it
+          persist-credentials: false
+      - name: Model tests (the editor's checks agree with the Python ones)
+        run: node --test apps/timing-editor/test/model.test.mjs
+      - name: Format and checks tests
+        run: python3 -m unittest discover -s tools/tests -p 'test_timing_files.py' -v
+      - name: Build the site
+        run: python3 tools/timing_files.py site --out _site
+      - if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: timing-editor-preview
+          path: _site
+          retention-days: 14
+      - if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    name: Publish on GitHub Pages
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
