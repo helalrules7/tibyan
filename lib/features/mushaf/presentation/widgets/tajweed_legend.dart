@@ -5,6 +5,7 @@ import '../../../../core/settings/settings_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/tajweed.dart';
+import '../../mushaf_providers.dart';
 
 /// A rule's name: the data's rule, as the usual tajweed term.
 String tajweedRuleName(AppLocalizations l, TajweedRule r) => switch (r) {
@@ -40,6 +41,8 @@ String tajweedHueName(AppLocalizations l, TajweedHue h) => switch (h) {
   TajweedHue.purple => l.tajweedHuePurple,
   TajweedHue.pink => l.tajweedHuePink,
   TajweedHue.grey => l.tajweedHueGrey,
+  TajweedHue.violet => l.tajweedHueViolet,
+  TajweedHue.amber => l.tajweedHueAmber,
 };
 
 /// Rules in the order the key lists them: the madd rules, the nasal
@@ -160,10 +163,21 @@ class TajweedSettings extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
     final dark = !context.tokens.mode.isLight;
+    // The edition being read has no tajweed data: say why the page shows
+    // no colours and no button.
+    final noData = !editionHasTajweed(ref.watch(editionProvider));
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (noData)
+            ListTile(
+              leading: Icon(Icons.info_outline, color: t.muted),
+              title: Text(
+                l.tajweedNoDataRiwaya,
+                style: TextStyle(color: t.muted, fontSize: 13),
+              ),
+            ),
           SwitchListTile(
             title: Text(l.tajweedColors),
             subtitle: Text(

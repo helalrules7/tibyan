@@ -1493,6 +1493,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tajweedHueGrey => 'رمادي';
 
   @override
+  String get tajweedHueViolet => 'ليلكي';
+
+  @override
+  String get tajweedHueAmber => 'كهرماني';
+
+  @override
+  String get tajweedNoDataRiwaya =>
+      'لا تلوين للتجويد في مصاحف الروايات (ورش وقالون والدوري وشعبة): لا توجد بعد بيانات أحكام موثوقة لهذه الروايات، ولا نضع أحكاما بلا مصدر. التلوين يعمل في مصاحف حفص.';
+
+  @override
   String get tajweedHamzatWasl => 'همزة الوصل';
 
   @override

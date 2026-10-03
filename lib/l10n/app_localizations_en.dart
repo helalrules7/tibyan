@@ -1500,6 +1500,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tajweedHueGrey => 'Grey';
 
   @override
+  String get tajweedHueViolet => 'Violet';
+
+  @override
+  String get tajweedHueAmber => 'Amber';
+
+  @override
+  String get tajweedNoDataRiwaya =>
+      'No tajweed colouring in the riwaya mushafs (Warsh, Qalun, al-Duri, Shu‘bah): there is no reliable rule data for these riwayat yet, and we add no rule without a source. The colouring works in the Hafs mushafs.';
+
+  @override
   String get tajweedHamzatWasl => 'Hamzat al-Wasl';
 
   @override

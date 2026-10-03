@@ -63,7 +63,14 @@ void main() {
   group('colours', () {
     test('defaults, a chosen colour, and a rule turned off', () {
       expect(tajweedHueOf(TajweedRule.qalqalah, const {}), TajweedHue.blue);
-      expect(tajweedHueOf(TajweedRule.madd2, const {}), isNull);
+      expect(tajweedHueOf(TajweedRule.madd2, const {}), TajweedHue.amber);
+      expect(tajweedHueOf(TajweedRule.silent, const {}), TajweedHue.violet);
+      // A reader's earlier choice stays, grey included.
+      expect(
+        tajweedHueOf(TajweedRule.silent, const {'silent': 'grey'}),
+        TajweedHue.grey,
+      );
+      expect(tajweedHueOf(TajweedRule.madd2, const {'madd_2': ''}), isNull);
       expect(
         tajweedHueOf(TajweedRule.qalqalah, const {'qalqalah': 'purple'}),
         TajweedHue.purple,
@@ -88,6 +95,29 @@ void main() {
             );
           }
         }
+      }
+    });
+
+    test('every rule has a default colour, none of them grey', () {
+      // Grey cannot be told from the ink: black ink on light paper, light
+      // ink at night. Every default is a clear hue in both shades.
+      for (final rule in TajweedRule.values) {
+        final hue = defaultTajweedHues[rule];
+        expect(hue, isNotNull, reason: rule.key);
+        for (final dark in [false, true]) {
+          final c = hue!.on(darkPaper: dark);
+          final rgb = [c.r, c.g, c.b];
+          final chroma =
+              rgb.reduce((a, b) => a > b ? a : b) -
+              rgb.reduce((a, b) => a < b ? a : b);
+          expect(chroma, greaterThan(0.25), reason: '${rule.key} $dark');
+        }
+      }
+    });
+
+    test('the riwaya editions have no tajweed data', () {
+      for (final e in MushafEdition.values) {
+        expect(editionHasTajweed(e), !e.isRiwaya, reason: e.name);
       }
     });
 

@@ -31,8 +31,13 @@ import 'package:tibyan/l10n/app_localizations.dart';
 /// tools/.cache (images_1024.zip, shamarly/shamarly-pages-archive-org.zip).
 void main() {
   final run = Platform.environment['RENDER_TAJWEED_AUDIT'] == '1';
-  const madina = [2, 3, 50, 106, 187, 300, 450, 582, 604];
-  const shamarly = [2, 3, 5, 44, 90, 162, 260, 390, 504, 522, 32, 103];
+  // RENDER_TAJWEED_PALETTE=1: only Madina page 50 (both editions), in the
+  // four modes, with the colours before and after the 2026-10-03 change.
+  final palette = Platform.environment['RENDER_TAJWEED_PALETTE'] == '1';
+  final madina = palette ? [50] : [2, 3, 50, 106, 187, 300, 450, 582, 604];
+  final shamarly = palette
+      ? <int>[]
+      : [2, 3, 5, 44, 90, 162, 260, 390, 504, 522, 32, 103];
 
   testWidgets('render tajweed audit pages', (tester) async {
     final db = ContentDatabase(
@@ -93,8 +98,18 @@ void main() {
     }
     File(p.join(shDir.path, '.installed')).writeAsStringSync('x');
 
+    // The defaults before 2026-10-03: grey for the letters not pronounced,
+    // no colour for the plain madd and idghaam without ghunnah.
+    const before = {
+      'hamzat_wasl': 'grey', 'lam_shamsiyyah': 'grey', 'silent': 'grey', //
+      'idghaam_mutajanisayn': 'grey', 'idghaam_mutaqaribayn': 'grey',
+      'madd_2': '', 'idghaam_no_ghunnah': '',
+    };
+    var mode = ThemeModeId.light;
+    var choices = const <String, String>{};
+    var tag = '';
     Color? colour(TajweedRule r) =>
-        tajweedHueOf(r, const {})?.on(darkPaper: false);
+        tajweedHueOf(r, choices)?.on(darkPaper: !mode.isLight);
 
     Future<void> shoot(MushafEdition edition, int page, bool on) async {
       final data = on
@@ -123,7 +138,7 @@ void main() {
             debugShowCheckedModeBanner: false,
             theme: buildTheme(
               style: style,
-              mode: ThemeModeId.light,
+              mode: mode,
               uiFont: UiFont.changa,
             ),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -132,7 +147,7 @@ void main() {
             home: RepaintBoundary(
               key: boundary,
               child: ColoredBox(
-                color: Colors.white,
+                color: style.modes[mode]!.paper,
                 child: switch (edition) {
                   MushafEdition.madina1405 => OldMushafPage(
                     page: page,
@@ -165,11 +180,25 @@ void main() {
       });
       final n = page.toString().padLeft(3, '0');
       File(
-        '${out.path}/app_${edition.name}_p${n}_${on ? 'on' : 'off'}.png',
+        '${out.path}/app_${edition.name}_p${n}_${on ? 'on' : 'off'}$tag.png',
       ).writeAsBytesSync(bytes!);
     }
 
     await tester.binding.setSurfaceSize(const Size(560, 860));
+    if (palette) {
+      for (final m in ThemeModeId.values) {
+        for (final (name, c) in [('before', before), ('after', <String, String>{})]) {
+          mode = m;
+          choices = c;
+          tag = '_${m.name}_$name';
+          for (final e in [MushafEdition.madina1441, MushafEdition.madina1405]) {
+            await shoot(e, 50, true);
+          }
+        }
+      }
+      await tester.runAsync(() => db.close());
+      return;
+    }
     for (final (edition, pages) in [
       (MushafEdition.madina1441, madina),
       (MushafEdition.madina1405, madina),
