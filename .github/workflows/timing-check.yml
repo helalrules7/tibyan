@@ -103,7 +103,13 @@ jobs:
                 + 'يُقبل هنا تعديل ملفات التوقيت فقط، ولا تُحذف. هذه الملفات خارج ذلك:\n\n'
                 + policy.split('\n').map((l) => `- ${l}`).join('\n') + '\n\n';
             }
-            body += summary ? `${summary}\n\n` : '';
+            // GitHub refuses comments over 65,536 characters (a change
+            // touching hundreds of files): keep the head, point to the log.
+            const limit = 60000;
+            const short = summary && summary.length > limit
+              ? summary.slice(0, limit) + '\n\n… (cut here; the full report is in the job log)'
+              : summary;
+            body += short ? `${short}\n\n` : '';
             body += 'Errors in verses this change did not touch are already on main and do not block it. '
               + 'Reviewers: open the editor link, listen to each changed verse at 0.75×, then approve. '
               + '· الأخطاء في آيات لم يغيرها الطلب موجودة من قبل ولا تمنعه. للمراجع: افتح رابط المحرر واستمع لكل آية معدلة.';
