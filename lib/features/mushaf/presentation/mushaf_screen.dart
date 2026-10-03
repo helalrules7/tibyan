@@ -770,19 +770,18 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 onWordStudy: edition.isRiwaya
                     ? null
                     : () {
-                  _setChrome(false);
-                  setState(() {
-                    _selA = _selB = null;
-                    _pickWord = true;
-                  });
-                },
+                        _setChrome(false);
+                        setState(() {
+                          _selA = _selB = null;
+                          _pickWord = true;
+                        });
+                      },
                 // Meanings and reflections are kept by Hafs verse: a riwaya
                 // verse opens those of the Hafs verses it covers.
                 onWordMeanings: () => showVerseMeanings(
                   context,
                   verses: [
-                    for (final v in range)
-                      ...?_riwaya?.toHafs(v.surah, v.ayah),
+                    for (final v in range) ...?_riwaya?.toHafs(v.surah, v.ayah),
                     if (_riwaya == null)
                       for (final v in range) (surah: v.surah, ayah: v.ayah),
                   ],
@@ -1251,47 +1250,64 @@ class _ReadingTools extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
+    // [glyph] is an icon, or a letter drawn in its place.
     Widget button(
-      IconData icon,
+      Object glyph,
       String label,
       bool on,
       VoidCallback onTap, {
       VoidCallback? onLongPress,
     }) => Semantics(
-          button: true,
-          toggled: on,
-          label: label,
-          excludeSemantics: true,
+      button: true,
+      toggled: on,
+      label: label,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: Tooltip(
+        message: label,
+        excludeFromSemantics: true,
+        child: InkResponse(
           onTap: onTap,
-          child: Tooltip(
-            message: label,
-            excludeFromSemantics: true,
-            child: InkResponse(
-              onTap: onTap,
-              onLongPress: onLongPress,
-              radius: 24,
-              // A 48 px target around the small drawn button.
-              child: Container(
-                width: 48,
-                height: 48,
-                alignment: Alignment.center,
-                child: Container(
-                  width: 30,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    color: on ? t.control.withValues(alpha: 0.15) : null,
-                    borderRadius: BorderRadius.circular(11),
-                    border: Border.all(
-                      color: on ? t.control : t.border,
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Icon(icon, size: 15, color: on ? t.control : t.muted),
+          onLongPress: onLongPress,
+          radius: 24,
+          // A 48 px target around the small drawn button.
+          child: Container(
+            width: 48,
+            height: 48,
+            alignment: Alignment.center,
+            child: Container(
+              width: 30,
+              height: 22,
+              decoration: BoxDecoration(
+                color: on ? t.control.withValues(alpha: 0.15) : null,
+                borderRadius: BorderRadius.circular(11),
+                border: Border.all(
+                  color: on ? t.control : t.border,
+                  width: 0.8,
                 ),
               ),
+              alignment: Alignment.center,
+              child: switch (glyph) {
+                IconData icon => Icon(
+                  icon,
+                  size: 15,
+                  color: on ? t.control : t.muted,
+                ),
+                _ => Text(
+                  '$glyph',
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1,
+                    fontWeight: FontWeight.w700,
+                    color: on ? t.control : t.muted,
+                  ),
+                ),
+              },
             ),
           ),
-        );
+        ),
+      ),
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1310,7 +1326,7 @@ class _ReadingTools extends StatelessWidget {
         button(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
         const SizedBox(width: 10),
         button(
-          Icons.format_color_text,
+          'ج',
           l.tajweedColors,
           tajweed,
           onTajweed,
