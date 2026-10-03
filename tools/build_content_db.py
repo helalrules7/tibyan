@@ -59,7 +59,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 16  # 14: mutashabih; 15: tajweed_page; 16: reciter.riwaya and the riwaya recitations
+SCHEMA_VERSION = 17  # 14: mutashabih; 15: tajweed_page; 16: reciter.riwaya and the riwaya recitations; 17: tajweed_letter
 SHAMARLY = CACHE / 'shamarly_geometry.db'
 SHAMARLY_CATCHWORD = CACHE / 'shamarly_catchword.json'
 
@@ -445,7 +445,7 @@ def main():
       surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,
       page INTEGER NOT NULL, line INTEGER NOT NULL,
       x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
-      level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed
+      level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed, 0 best split, not confirmed
       PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
     CREATE TABLE shamarly_catchword (       -- next page's first word(s), cut from its image (px)
       page INTEGER PRIMARY KEY, x0 INTEGER NOT NULL, y0 INTEGER NOT NULL,
@@ -605,7 +605,7 @@ def main():
     db.executemany('INSERT INTO shamarly_word_box VALUES (?,?,?,?,?,?,?,?,?,?)', shamarly.execute(
         'SELECT w.surah, w.ayah, w.word, w.page, w.line, w.x0, w.y0, w.x1, w.y1, a.words_matched '
         'FROM word_box w JOIN ayah a ON a.surah = w.surah AND a.ayah = w.ayah '
-        'WHERE a.words_matched >= 1 ORDER BY w.surah, w.ayah, w.word'))
+        'ORDER BY w.surah, w.ayah, w.word'))
     shamarly.close()
     # built by build_shamarly_catchword.py from the page images
     db.executemany('INSERT INTO shamarly_catchword VALUES (?,?,?,?,?,?,?)',
@@ -743,6 +743,7 @@ def main():
     assert check.execute('SELECT COUNT(*) FROM shamarly_marker').fetchone()[0] == 6236
     assert check.execute('SELECT COUNT(*) FROM mutashabih').fetchone()[0] > 0
     assert check.execute("SELECT COUNT(*) FROM tajweed_page WHERE edition = 'madina1441'").fetchone()[0] == 604
+    assert check.execute("SELECT COUNT(*) FROM tajweed_letter WHERE riwaya = 'hafs'").fetchone()[0] > 70000
     # Word study: the corpus maps every verse but 7; 20 more are only
     # disjoined letters (الٓمٓ...), which have no root or lemma. al-Rahman is ر ح م.
     assert len(skipped) == 7, skipped

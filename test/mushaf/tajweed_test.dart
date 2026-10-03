@@ -63,7 +63,14 @@ void main() {
   group('colours', () {
     test('defaults, a chosen colour, and a rule turned off', () {
       expect(tajweedHueOf(TajweedRule.qalqalah, const {}), TajweedHue.blue);
-      expect(tajweedHueOf(TajweedRule.madd2, const {}), isNull);
+      expect(tajweedHueOf(TajweedRule.madd2, const {}), TajweedHue.amber);
+      expect(tajweedHueOf(TajweedRule.silent, const {}), TajweedHue.violet);
+      // A reader's earlier choice stays, grey included.
+      expect(
+        tajweedHueOf(TajweedRule.silent, const {'silent': 'grey'}),
+        TajweedHue.grey,
+      );
+      expect(tajweedHueOf(TajweedRule.madd2, const {'madd_2': ''}), isNull);
       expect(
         tajweedHueOf(TajweedRule.qalqalah, const {'qalqalah': 'purple'}),
         TajweedHue.purple,
@@ -88,6 +95,29 @@ void main() {
             );
           }
         }
+      }
+    });
+
+    test('every rule has a default colour, none of them grey', () {
+      // Grey cannot be told from the ink: black ink on light paper, light
+      // ink at night. Every default is a clear hue in both shades.
+      for (final rule in TajweedRule.values) {
+        final hue = defaultTajweedHues[rule];
+        expect(hue, isNotNull, reason: rule.key);
+        for (final dark in [false, true]) {
+          final c = hue!.on(darkPaper: dark);
+          final rgb = [c.r, c.g, c.b];
+          final chroma =
+              rgb.reduce((a, b) => a > b ? a : b) -
+              rgb.reduce((a, b) => a < b ? a : b);
+          expect(chroma, greaterThan(0.25), reason: '${rule.key} $dark');
+        }
+      }
+    });
+
+    test('the riwaya editions have no tajweed data', () {
+      for (final e in MushafEdition.values) {
+        expect(editionHasTajweed(e), !e.isRiwaya, reason: e.name);
       }
     });
 
@@ -181,6 +211,38 @@ void main() {
         for (final (_, r) in rects) {
           expect(r.width, greaterThan(0));
           expect(r.height, greaterThan(0));
+        }
+      }
+      // Every placed letter comes from the one letter table (Hafs only,
+      // source 18: cpfair), and the file is the schema drift expects.
+      final letters = await db
+          .customSelect(
+            'SELECT riwaya, source, COUNT(*) AS n FROM tajweed_letter '
+            'GROUP BY riwaya, source',
+          )
+          .get();
+      expect(letters, hasLength(1));
+      expect(letters.single.read<String>('riwaya'), 'hafs');
+      expect(letters.single.read<int>('source'), 18);
+      expect(letters.single.read<int>('n'), greaterThan(70000));
+      final version = await db.customSelect('PRAGMA user_version').getSingle();
+      expect(version.data.values.single, db.schemaVersion);
+      // Every Shamarly text page is coloured (pages 2-522), while touch and
+      // recitation still see only the surest word splits.
+      final shamarly = await db
+          .customSelect(
+            "SELECT COUNT(*) AS n FROM tajweed_page WHERE edition = 'shamarly'",
+          )
+          .getSingle();
+      expect(shamarly.read<int>('n'), 521);
+      for (final page in [32, 103, 205, 294]) {
+        expect(
+          await repo.tajweedPage(MushafEdition.shamarly, page),
+          isNotEmpty,
+          reason: 'Shamarly page $page',
+        );
+        for (final b in await repo.shamarlyWordBoxes(page)) {
+          expect(b.level, greaterThanOrEqualTo(shamarlyWordLevel));
         }
       }
       // Opening pages are coloured too.

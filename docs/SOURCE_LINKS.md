@@ -83,7 +83,7 @@
 | المصدر | الرابط | ما وجدناه | ملاحظاتك |
 |---|---|---|---|
 | موارد QUL | https://qul.tarteel.ai/resources | لا ترخيص على صفحات الموارد | |
-| QUL: المعيقلي سورة سورة، بالتوقيت | https://qul.tarteel.ai/resources/recitation/405 (الواجهة: https://qul.tarteel.ai/api/v1/audio/surah_segments/159?surah=1&per_page=300) | توقيت كل كلمة على ملفات quranicaudio 1440هـ. **مستعمل** للقارئ 15 (إ18). لا ترخيص على الصفحة | |
+| QUL: المعيقلي سورة سورة، بالتوقيت | https://qul.tarteel.ai/resources/recitation/405 (الواجهة: https://qul.tarteel.ai/api/v1/audio/surah_segments/159?surah=1&per_page=300) | توقيت كل كلمة على ملفات quranicaudio 1440هـ. **مستعمل** للقارئ 15 (إ21). لا ترخيص على الصفحة | |
 | QUL: المعيقلي (موارد أخرى) | https://qul.tarteel.ai/resources/recitation/562 (تسجيل 65، ملفات audio-cdn.tarteel.ai) و https://qul.tarteel.ai/resources/recitation/113 (آية آية، نفس ملفات everyayah) | 562: حدود الآيات لا تقع على سكوت (0 من 109 في الكهف) وتغطية الكلمات 6,118 آية. لم يُستعملا | |
 | الأسئلة الشائعة | https://qul.tarteel.ai/faq | «راجع شروط الترخيص لكل مورد» | |
 | نموذج الشراكة | https://t.zip/partnerships | يحوّل إلى نموذج Google بعنوان «Tarteel Ai — Business & Partnership Inquiries» | |

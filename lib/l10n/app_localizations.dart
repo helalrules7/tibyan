@@ -2573,7 +2573,7 @@ abstract class AppLocalizations {
   /// No description provided for @tajweedSourceNote.
   ///
   /// In ar, this message translates to:
-  /// **'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي تُلوَّن الكلمات المعروفة حدودها فقط.'**
+  /// **'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي حدود بعض الكلمات تقديرية أيضا.'**
   String get tajweedSourceNote;
 
   /// No description provided for @tajweedLegendHint.
@@ -2647,6 +2647,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'رمادي'**
   String get tajweedHueGrey;
+
+  /// No description provided for @tajweedHueViolet.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليلكي'**
+  String get tajweedHueViolet;
+
+  /// No description provided for @tajweedHueAmber.
+  ///
+  /// In ar, this message translates to:
+  /// **'كهرماني'**
+  String get tajweedHueAmber;
+
+  /// No description provided for @tajweedNoDataRiwaya.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تلوين للتجويد في مصاحف الروايات (ورش وقالون والدوري وشعبة): لا توجد بعد بيانات أحكام موثوقة لهذه الروايات، ولا نضع أحكاما بلا مصدر. التلوين يعمل في مصاحف حفص.'**
+  String get tajweedNoDataRiwaya;
 
   /// No description provided for @tajweedHamzatWasl.
   ///

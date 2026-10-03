@@ -140,14 +140,14 @@ CREATE TABLE ayah (                 -- 6,236 verses
   page INTEGER NOT NULL,            -- page where the verse starts (as content.db page_1405)
   end_page INTEGER NOT NULL,        -- page of its marker
   words INTEGER NOT NULL,           -- our word count (word_box numbering)
-  words_matched INTEGER NOT NULL,   -- 0: no word boxes; 1: boxes, but the split changes without the font widths; 2: boxes, stable
+  words_matched INTEGER NOT NULL,   -- how sure the word split is: 2 stable; 1 the split changes with a looser piece count; 0 not confirmed (boxes are the best split, or none)
   PRIMARY KEY (surah, ayah));
 CREATE TABLE verse_box (            -- one box per verse per line, reading order (part = 0..)
   surah INTEGER NOT NULL, ayah INTEGER NOT NULL, part INTEGER NOT NULL,
   page INTEGER NOT NULL, line INTEGER NOT NULL,
   x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
   PRIMARY KEY (surah, ayah, part));
-CREATE TABLE word_box (             -- verses with words_matched >= 1; word as in content.db word_box
+CREATE TABLE word_box (             -- every verse with a split (any words_matched); word as in content.db word_box
   surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,
   page INTEGER NOT NULL, line INTEGER NOT NULL,
   x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
@@ -822,6 +822,10 @@ def build(pages, jobs):
                     ok = level
                     if level == 1:
                         note('words', 'level 1: a looser piece count splits it otherwise', segs[0][0], v)
+                # Every verse with a split and ink for every word gets its
+                # boxes; ayah.words_matched (0, 1, 2) says how sure the split
+                # is, and readers of word_box choose the level they need.
+                if fw_ok and None not in boxes:
                     wn = 0
                     for t, b in zip(toks, boxes):
                         if t == B.HIZB:
