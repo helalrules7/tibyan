@@ -30,7 +30,7 @@ API = ('https://api.qurancdn.com/api/qdc/audio/reciters/{reciter}/audio_files'
        '?chapter={surah}&segments=true')
 
 # QDC reciter ids: Abdul-Rahman al-Sudais 3, Saud al-Shuraim 10,
-# Yasser al-Dosari 97 (see build_qdc_timing.RECITERS).
+# Yasser al-Dosari 97 (see build_qdc_timing.SETS).
 READS = [3, 10, 97]
 
 
