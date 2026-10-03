@@ -23,7 +23,7 @@ void main() {
   });
   tearDownAll(() => db.close());
 
-  test('ten recitations, murattal only, each with a folder of files', () async {
+  test('eleven recitations, murattal only, each with a folder of files', () async {
     final all = await repo.reciters();
     final reciters = [
       for (final r in all)
@@ -40,6 +40,7 @@ void main() {
       12,
       13,
       14,
+      15,
     ]);
     // The riwaya recitations (Warsh, Qalun, al-Duri, Shu'bah): ids from
     // 101, each tagged with its riwaya.
@@ -63,6 +64,11 @@ void main() {
       'https://tibyan.ahmedhelal.dev/mirror/sources/recitations/quran/yasser_ad-dussary/002.mp3',
       'https://download.quranicaudio.com/quran/yasser_ad-dussary/002.mp3',
     ]);
+    final muaiqly = reciters.firstWhere((r) => r.id == 15);
+    expect(surahUrls(muaiqly, 2).map((u) => u.toString()), [
+      'https://tibyan.ahmedhelal.dev/mirror/sources/recitations/quran/maher_almu3aiqly/year1440/002.mp3',
+      'https://download.quranicaudio.com/quran/maher_almu3aiqly/year1440/002.mp3',
+    ]);
   });
 
   test('a folder may name the surah alone, as {surah}', () {
@@ -82,7 +88,7 @@ void main() {
 
   test('timings cover every verse, in order, where they exist', () async {
     final surahs = await repo.surahs();
-    for (final reciter in [1, 2, 3, 4, 10, 11, 12, 13, 14]) {
+    for (final reciter in [1, 2, 3, 4, 10, 11, 12, 13, 14, 15]) {
       for (final s in [1, 2, 9, 114]) {
         final t = await repo.timings(reciter, s);
         if (t.isEmpty) continue;
@@ -120,6 +126,12 @@ void main() {
     for (final s in [1, 2, 9, 114]) {
       expect(await repo.timings(10, s), isNotEmpty, reason: 'surah $s');
       expect(await repo.wordTimings(10, s), isNotEmpty, reason: 'surah $s');
+    }
+    // al-Muaiqly: verse and word timing from Quranic Universal Library,
+    // measured on the very files played, in every surah.
+    for (final s in [1, 2, 9, 55, 114]) {
+      expect(await repo.timings(15, s), isNotEmpty, reason: 'surah $s');
+      expect(await repo.wordTimings(15, s), isNotEmpty, reason: 'surah $s');
     }
     // Mustafa Ismail murattal: verse timing only where everyayah publishes
     // the per-verse files of his recording, which is not the whole Quran;
@@ -159,6 +171,20 @@ void main() {
         final v = verses.firstWhere((t) => t.ayah == r.ayah);
         expect(r.startMs, greaterThanOrEqualTo(v.startMs));
         expect(r.endMs, lessThanOrEqualTo(v.endMs));
+      }
+      // Every al-Muaiqly word lies inside its verse, in order; QUL times
+      // 6,225 of his 6,236 verses word by word (285 of al-Baqarah's 286).
+      final muaiqlyVerses = await repo.timings(15, 2);
+      final muaiqly = await repo.wordTimings(15, 2);
+      expect(muaiqly.map((r) => r.ayah).toSet().length, 285);
+      for (var i = 0; i < muaiqly.length; i++) {
+        final r = muaiqly[i];
+        final v = muaiqlyVerses.firstWhere((t) => t.ayah == r.ayah);
+        expect(r.startMs, greaterThanOrEqualTo(v.startMs - 500));
+        expect(r.endMs, lessThanOrEqualTo(v.endMs + 500));
+        if (i > 0) {
+          expect(r.startMs, greaterThanOrEqualTo(muaiqly[i - 1].startMs));
+        }
       }
       // No word timing where the recitation has none.
       expect(await repo.wordTimings(5, 2), isEmpty);

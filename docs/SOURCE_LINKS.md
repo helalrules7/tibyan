@@ -36,7 +36,9 @@
 | mp3quran: توقيت وإحداثيات الآيات (مثال) | https://www.mp3quran.net/api/v3/ayat_timing?surah=1&read=112 | نفس الإذن | لكل آية: وقت البداية والنهاية، وpolygon على الصفحة، ورابط صفحة SVG | نفس الملف | |
 | mp3quran: صفحات SVG (مثال) | https://www.mp3quran.net/api/quran_pages_svg/001.svg | نفس الإذن | 604 صفحة | نفس الملف | |
 | batoulapps/quran-svg | https://github.com/batoulapps/quran-svg | https://github.com/batoulapps/quran-svg/blob/main/LICENSE | MIT، محولة من ملفات Illustrator للمجمع، وهي أصل صفحات mp3quran | `2026-09-28_batoulapps_quran-svg_MIT.pdf` | |
-| quranlab/quran-audio | https://huggingface.co/datasets/quranlab/quran-audio | https://huggingface.co/datasets/quranlab/quran-audio/blob/main/LICENSES.md | توقيت كلمات CC BY 4.0، والصوت غير مستضاف. البنا: 6,235 آية. مصطفى إسماعيل: 2,015 آية | `2026-09-28_quranlab_quran-audio_LICENSES.pdf` | |
+| quranlab/quran-audio | https://huggingface.co/datasets/quranlab/quran-audio | https://huggingface.co/datasets/quranlab/quran-audio/blob/main/LICENSES.md | توقيت كلمات CC BY 4.0، والصوت غير مستضاف. البنا: 6,235 آية. مصطفى إسماعيل: 2,015 آية. المعيقلي: 6,236 آية (على everyayah، تسجيل غير ملفات السور؛ غير مستعمل) | `2026-09-28_quranlab_quran-audio_LICENSES.pdf` | |
+| quranicaudio: المعيقلي 1440هـ | https://quranicaudio.com/quran/159 (الملفات: https://download.quranicaudio.com/quran/maher_almu3aiqly/year1440/001.mp3) | إذن quranicaudio بالبريد 2026-10-01 | 114 سورة، مرتل حفص؛ هي ملفات القارئ 15 | `2026-10-01_quranicaudio_permission.png` | |
+| mp3quran: المعيقلي مرتل | https://server12.mp3quran.net/maher/ | نفس إذن mp3quran | تسجيل آخر (64 kbps)، بلا توقيت منشور (توقيت mp3quran للمجوّد فقط، read 133). لم يُستعمل | — | |
 | cpfair/quran-align | https://github.com/cpfair/quran-align | ملف الترخيص في المستودع | CC BY 4.0 | `2026-09-28_cpfair_quran-align.pdf` | |
 | everyayah | https://everyayah.com/ | https://everyayah.com/data/timings_files/000_disclaimer.txt | **بلا ترخيص واضح:** صفحة الترخيص الكاملة 404، والمعلن فقط شرط وضع رابط لهم | `2026-09-28_everyayah_disclaimer_no-license.pdf` | |
 | quran_android (ayahinfo) | https://github.com/quran/quran_android | README المستودع | إحداثيات لكل كلمة، لكن ترخيص البيانات غير محدد، والصفحات ليست صفحات المجمع | — | |
@@ -81,6 +83,8 @@
 | المصدر | الرابط | ما وجدناه | ملاحظاتك |
 |---|---|---|---|
 | موارد QUL | https://qul.tarteel.ai/resources | لا ترخيص على صفحات الموارد | |
+| QUL: المعيقلي سورة سورة، بالتوقيت | https://qul.tarteel.ai/resources/recitation/405 (الواجهة: https://qul.tarteel.ai/api/v1/audio/surah_segments/159?surah=1&per_page=300) | توقيت كل كلمة على ملفات quranicaudio 1440هـ. **مستعمل** للقارئ 15 (إ18). لا ترخيص على الصفحة | |
+| QUL: المعيقلي (موارد أخرى) | https://qul.tarteel.ai/resources/recitation/562 (تسجيل 65، ملفات audio-cdn.tarteel.ai) و https://qul.tarteel.ai/resources/recitation/113 (آية آية، نفس ملفات everyayah) | 562: حدود الآيات لا تقع على سكوت (0 من 109 في الكهف) وتغطية الكلمات 6,118 آية. لم يُستعملا | |
 | الأسئلة الشائعة | https://qul.tarteel.ai/faq | «راجع شروط الترخيص لكل مورد» | |
 | نموذج الشراكة | https://t.zip/partnerships | يحوّل إلى نموذج Google بعنوان «Tarteel Ai — Business & Partnership Inquiries» | |
 | موارد المطورين | https://support.tarteel.ai/en/collections/15105284-developer-resources | تحيل إلى QUL وQuranEnc وalquran.cloud | |

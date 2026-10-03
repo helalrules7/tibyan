@@ -26,6 +26,7 @@
 
 | 5 | مصطفى إسماعيل | [Commons](https://commons.wikimedia.org/wiki/File:Mustafa_Ismail_(1).jpg) — صورة الوش |
 | 14 | محمد محمود الطبلاوي | [ar.wikipedia](https://ar.wikipedia.org/wiki/محمد_محمود_الطبلاوي) |
+| 15 | ماهر المعيقلي | [Commons](https://commons.wikimedia.org/wiki/File:Maher_Al_Mueaqly.png) — وليد أيوب، CC BY-SA 3.0 (`fetch_reciter_photos.py 15`) |
 
 **تبديل أو إضافة صورة:** حِطّ ملفك في `tools/photos/<رقم القارئ>.jpg`
 وشغّل `python3 tools/build_reciter_photos.py` — مفيش أي تعديل كود.
