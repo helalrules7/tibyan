@@ -11,6 +11,17 @@ ones (al-Banna and Mustafa Ismail) are checked the same way.
 
 Usage:
   python3 tools/verify_word_timing.py [reciter ...]   # default: every reciter with cached audio
+  python3 tools/verify_word_timing.py --db [reciter ...]
+      the rows content.db ships (ayah_timing, word_timing) instead of the
+      timing files in tools/.cache; a reciter's rows there are checked
+      whichever tool wrote them.
+  python3 tools/verify_word_timing.py [--db] --relative [reciter ...]
+      also a check that does not depend on how loud the pauses are: a
+      boundary is in a dip when, within 150 ms, the loudness (100 ms
+      smoothing) falls REL_DB under the speech around it (80th percentile
+      of the 3 s either side). Recordings made in the Haram keep their
+      reverberation in every pause, often above -35 dB, where
+      silencedetect hears nothing; this check hears those pauses too.
 """
 import bisect
 import json
@@ -26,6 +37,23 @@ CACHE = Path(__file__).resolve().parent / '.cache'
 WORD_FILES = ['word_timing.json', 'quranlab_word_timing.json', 'qdc_word_timing.json',
               'qul_word_timing.json']
 NEAR_MS = 150
+REL_DB = 12
+
+
+def dips(item):
+    """Boundaries of one surah in a dip REL_DB under the speech around them."""
+    import numpy as np
+    (reciter, surah), _, bounds = item
+    env = ql.envelope(CACHE / 'audio' / str(reciter) / f'{surah:03d}.mp3')
+    smooth = np.convolve(env, np.ones(10) / 10, mode='same')
+    hit = 0
+    for t in bounds:
+        c = t // 10
+        if c >= len(env):
+            continue
+        level = np.percentile(env[max(0, c - 300):c + 300], 80)
+        hit += level - smooth[max(0, c - NEAR_MS // 10):c + NEAR_MS // 10 + 1].min() >= REL_DB
+    return reciter, hit
 
 
 def inside(quiet, starts, t, margin):
@@ -78,16 +106,39 @@ def verse_bounds():
     return out
 
 
+def shipped():
+    """Word spans and verse boundaries as content.db holds them."""
+    import sqlite3
+    db = sqlite3.connect(c.OUT)
+    by, bounds = {}, {}
+    for reciter, surah, start, end in db.execute(
+            'SELECT reciter, surah, start_ms, end_ms FROM word_timing '
+            'ORDER BY reciter, surah, ayah, word'):
+        by.setdefault((reciter, surah), []).append((start, end))
+    for reciter, surah, start in db.execute(
+            'SELECT reciter, surah, start_ms FROM ayah_timing WHERE ayah > 1 '
+            'ORDER BY reciter, surah, ayah'):
+        bounds.setdefault((reciter, surah), []).append(start)
+    return by, bounds
+
+
 def main():
-    by = {}
-    for name in WORD_FILES:
-        path = CACHE / name
-        if not path.exists():
-            continue
-        for reciter, surah, _, _, start, end in json.loads(path.read_text(encoding='utf-8')):
-            by.setdefault((reciter, surah), []).append((start, end))
-    bounds = verse_bounds()
-    wanted = {int(a) for a in sys.argv[1:]} or {
+    args = sys.argv[1:]
+    relative = '--relative' in args
+    args = [a for a in args if a != '--relative']
+    if args[:1] == ['--db']:
+        args = args[1:]
+        by, bounds = shipped()
+    else:
+        by = {}
+        for name in WORD_FILES:
+            path = CACHE / name
+            if not path.exists():
+                continue
+            for reciter, surah, _, _, start, end in json.loads(path.read_text(encoding='utf-8')):
+                by.setdefault((reciter, surah), []).append((start, end))
+        bounds = verse_bounds()
+    wanted = {int(a) for a in args} or {
         r for r, *_ in c.RECITERS if (CACHE / 'audio' / str(r)).is_dir()}
     items = [(key, by.get(key, []), bounds.get(key, [])) for key in sorted(set(by) | set(bounds))
              if key[0] in wanted and (CACHE / 'audio' / str(key[0]) / f'{key[1]:03d}.mp3').exists()]
@@ -97,6 +148,11 @@ def main():
             t = totals.setdefault(reciter, [0, 0, 0, 0, 0])
             for k, v in enumerate((n, bad, nb, near, quiet)):
                 t[k] += v
+    in_dip = {}
+    if relative:
+        with ProcessPoolExecutor() as pool:
+            for reciter, hit in pool.map(dips, items):
+                in_dip[reciter] = in_dip.get(reciter, 0) + hit
     failed = False
     for reciter, (n, bad, nb, near, quiet) in sorted(totals.items()):
         if n:
@@ -107,6 +163,10 @@ def main():
             print(f'reciter {reciter}: {near} of {nb} verse boundaries lie in or next to '
                   f'a heard pause ({100 * near / nb:.1f}%); {quiet} ({100 * quiet / nb:.1f}%) '
                   f'within 100 ms of a quiet frame (under {ql.SPEECH_DB} dB)')
+        if nb and relative:
+            print(f'reciter {reciter}: {in_dip[reciter]} of {nb} verse boundaries '
+                  f'({100 * in_dip[reciter] / nb:.1f}%) in a dip {REL_DB} dB under the speech '
+                  f'around them')
     return 1 if failed else 0
 
 
