@@ -61,7 +61,7 @@ export class Timeline {
   /** Shows [start, end] with a margin. */
   show(start, end, margin = 0.15) {
     const len = Math.max(end - start, 400);
-    this.span = Math.min(Math.max(len * (1 + 2 * margin), 1500), Math.max(this.duration, 1500));
+    this.span = Math.min(Math.max(len * (1 + 2 * margin), 1500), this.duration > 0 ? Math.max(this.duration, 1500) : Infinity);
     this.t0 = start - (this.span - len) / 2;
     this._clamp();
   }

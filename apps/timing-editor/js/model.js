@@ -38,7 +38,8 @@ const issue = (level, code, verse = null, word = null, detail = '') => ({ level,
 
 /**
  * Every problem in one surah's file. [counts] is each verse's word count
- * (verse 1 first); [durationMs] the audio file's length, or null.
+ * (verse 1 first), null per verse for a riwaya recitation (timed by verse
+ * only); [durationMs] the audio file's length, or null.
  */
 export function validate(doc, slug, surah, counts, durationMs = null) {
   const out = [];
@@ -80,8 +81,8 @@ export function validate(doc, slug, surah, counts, durationMs = null) {
         `ends at ${end}, after the audio ends at ${durationMs}`));
     }
     prevVerseEnd = Math.max(end, prevVerseEnd ?? 0);
-    if (a === 0) {
-      if (words.length) out.push(issue('error', 'schema', 0, null, 'verse 0 (the opening) has no words'));
+    if (a === 0 || counts[a - 1] === null) {
+      if (words.length) out.push(issue('error', 'schema', a, null, 'this verse has no word numbering (the opening, or a riwaya recitation)'));
       continue;
     }
     if (!words.length) {

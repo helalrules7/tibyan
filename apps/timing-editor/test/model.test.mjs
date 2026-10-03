@@ -16,19 +16,23 @@ const key = (i) => `${i.level}:${i.code}:${i.verse ?? ''}:${i.word || ''}`;
 
 test('the shared cases give the same issues as the Python checks', () => {
   for (const c of cases.cases) {
-    const got = validate(c.doc, cases.slug, cases.surah, cases.counts, c.duration_ms).map(key).sort();
+    const got = validate(c.doc, cases.slug, cases.surah, c.counts ?? cases.counts, c.duration_ms).map(key).sort();
     assert.deepEqual(got, c.expect, c.name);
   }
 });
 
 test('dumps writes the files exactly as the repository holds them', () => {
-  const dir = join(repo, 'data/timing/sudais');
-  const files = readdirSync(dir).filter((f) => /^\d{3}\.json$/.test(f));
-  assert.equal(files.length, 114);
-  for (const f of files) {
-    const text = readFileSync(join(dir, f), 'utf8');
-    assert.equal(dumps(JSON.parse(text)), text, f);
+  const reciters = JSON.parse(readFileSync(join(repo, 'data/timing/reciters.json'), 'utf8')).reciters;
+  let n = 0;
+  for (const r of reciters.filter((x) => x.publish)) {
+    const dir = join(repo, 'data/timing', r.slug);
+    for (const f of readdirSync(dir).filter((x) => /^\d{3}\.json$/.test(x))) {
+      const text = readFileSync(join(dir, f), 'utf8');
+      assert.equal(dumps(JSON.parse(text)), text, `${r.slug}/${f}`);
+      n++;
+    }
   }
+  assert.ok(n >= 114);
 });
 
 const sample = () => ({

@@ -68,12 +68,16 @@ function hash(text) {
 // ------------------------------------------------------------------ load
 
 async function init() {
-  const [reciters, surahs, words] = await Promise.all([
+  const [reciters, surahs, words, known] = await Promise.all([
     getJSON('timing/reciters.json'), getJSON('quran/surahs.json'), getJSON('timing/verse_words.json'),
+    getJSON('timing/known_errors.json').catch(() => ({ errors: [] })),
   ]);
   S.reciters = reciters.reciters.filter((r) => r.publish);
   S.surahs = surahs;
   words.surahs.forEach((c, i) => { S.counts[i + 1] = c; });
+  S.riwayat = words.riwayat || {};
+  // Errors that came with the source data: shown, flagged, not blocking.
+  S.known = new Set(known.errors.map(([r, s, a, k, code]) => `${r}|${s}|${a}|${k ?? ''}|${code}`));
   const q = new URLSearchParams(location.search);
   let slug = q.get('reciter');
   let surah = Number(q.get('surah')) || 1;
@@ -116,8 +120,29 @@ async function prFile(n, slug, surah) {
   return { slug: m[1], surah: Number(m[2]), url: `https://raw.githubusercontent.com/${pr.head.repo.full_name}/${pr.head.sha}/${path}` };
 }
 
+const RIWAYA_AR = { hafs: 'حفص عن عاصم', warsh: 'ورش عن نافع', qalun: 'قالون عن نافع', douri: 'الدوري عن أبي عمرو', shubah: 'شعبة عن عاصم' };
+
+/** Each verse's word count, or null per verse for a riwaya recitation (timed by verse only). */
+function countsNow() {
+  const riwaya = S.reciter?.riwaya || 'hafs';
+  if (riwaya === 'hafs') return S.counts[S.surah];
+  return Array(S.riwayat[riwaya]?.[S.surah - 1] ?? 0).fill(null);
+}
+
+const isRiwaya = () => (S.reciter?.riwaya || 'hafs') !== 'hafs';
+
 function fillPickers(slug, surah) {
-  $('reciter').replaceChildren(...S.reciters.map((r) => new Option(r.name_ar, r.slug, false, r.slug === slug)));
+  const groups = [];
+  for (const r of S.reciters) {
+    let g = groups.find((x) => x.riwaya === r.riwaya);
+    if (!g) {
+      g = { riwaya: r.riwaya, el: document.createElement('optgroup') };
+      g.el.label = RIWAYA_AR[r.riwaya] || r.riwaya;
+      groups.push(g);
+    }
+    g.el.append(new Option(r.name_ar, r.slug, false, r.slug === slug));
+  }
+  $('reciter').replaceChildren(...groups.map((g) => g.el));
   $('surah').replaceChildren(...S.surahs.map((s) => new Option(`${s.n}. ${s.ar}`, s.n, false, s.n === surah)));
 }
 
@@ -125,11 +150,15 @@ async function loadSurah(slug, surah, { srcUrl = null, verse = null } = {}) {
   audio.pause();
   S.reciter = S.reciters.find((r) => r.slug === slug);
   S.surah = surah;
+  // A riwaya recitation has verses only: no words to tap or select.
+  if (isRiwaya() && S.tap) setTap(false);
+  $('tap').disabled = isRiwaya();
+  document.querySelector('input[name=target][value=word]').disabled = isRiwaya();
   $('reciter').value = slug;
   $('surah').value = String(surah);
   const path = `timing/${slug}/${pad3(surah)}.json`;
   const [quran, audioInfo, baseText] = await Promise.all([
-    getJSON(`quran/${pad3(surah)}.json`),
+    S.reciters.find((r) => r.slug === slug)?.riwaya === 'hafs' ? getJSON(`quran/${pad3(surah)}.json`) : null,
     getJSON(`timing/${slug}/audio.json`).catch(() => ({ files: {} })),
     fetch(path, { cache: 'no-cache' }).then((r) => (r.ok ? r.text() : null)),
   ]);
@@ -186,7 +215,8 @@ async function loadSurah(slug, surah, { srcUrl = null, verse = null } = {}) {
   })}`);
   loadAudio();
   const first = verse != null ? S.doc.verses.find((v) => v[0] === verse)
-    : S.review && S.changedVerses.length ? S.doc.verses.find((v) => v[0] === S.changedVerses[0]) : S.doc.verses[0];
+    : S.review && S.changedVerses.length ? S.doc.verses.find((v) => v[0] === S.changedVerses[0])
+      : S.doc.verses.find((v) => v[0] > 0) || S.doc.verses[0];
   const v = first || S.doc.verses[0];
   select(v[3].length ? { kind: 'word', verse: v[0], word: v[3][0][0] } : { kind: 'verse', verse: v[0] }, true);
 }
@@ -275,6 +305,26 @@ function wordText(a, k) {
 function renderWords() {
   const box = $('words');
   const frag = document.createDocumentFragment();
+  if (isRiwaya()) {
+    // A riwaya recitation is timed by verse, and numbered by its riwaya:
+    // its verses are shown by number only (the Hafs text would not match).
+    const note = document.createElement('p');
+    note.className = 'note';
+    note.textContent = `تلاوة برواية ${RIWAYA_AR[S.reciter.riwaya] || S.reciter.riwaya}: التوقيت للآيات فقط، والآيات مرقمة بعدّ الرواية.`;
+    frag.append(note);
+    for (const v of S.doc.verses) {
+      const mark = document.createElement('button');
+      mark.type = 'button';
+      mark.className = 'mark num';
+      mark.id = `m-${v[0]}`;
+      mark.dataset.v = v[0];
+      mark.tabIndex = -1;
+      mark.textContent = v[0] === 0 ? 'الافتتاح' : `﴿${v[0]}﴾`;
+      frag.append(mark, ' ');
+    }
+    box.replaceChildren(frag);
+    return;
+  }
   if (S.doc.verses.some((v) => v[0] === 0)) {
     const b = document.createElement('button');
     b.className = 'mark';
@@ -342,11 +392,17 @@ function recompute(light = false) {
   S.flat = flatWords(S.doc);
   timeline.invalidate();
   if (light) return;
-  S.issues = validate(S.doc, S.reciter.slug, S.surah, S.counts[S.surah], S.durations[pad3(S.surah)]?.duration_ms ?? null);
-  S.bad = new Set();
+  S.issues = validate(S.doc, S.reciter.slug, S.surah, countsNow(), S.durations[pad3(S.surah)]?.duration_ms ?? null);
   for (const i of S.issues) {
-    if (i.level !== 'error' || i.verse == null) continue;
-    S.bad.add(i.word ? `${i.verse}:${i.word}` : `${i.verse}`);
+    if (i.level === 'error' && S.known.has(`${S.reciter.slug}|${S.surah}|${i.verse}|${i.word ?? ''}|${i.code}`)) i.level = 'known';
+  }
+  S.bad = new Set();
+  S.knownBad = new Set();
+  for (const i of S.issues) {
+    if (i.level === 'warning' || i.verse == null) continue;
+    const key = i.word ? `${i.verse}:${i.word}` : `${i.verse}`;
+    S.bad.add(key);
+    if (i.level === 'known') S.knownBad.add(key);
   }
   const d = S.base ? diff(S.base, S.doc) : { verses: [], words: new Set() };
   S.changed = d.words;
@@ -355,7 +411,8 @@ function recompute(light = false) {
   for (const b of $('words').querySelectorAll('.w')) {
     const key = `${b.dataset.v}:${b.dataset.k}`;
     b.classList.toggle('untimed', !timed.has(key));
-    b.classList.toggle('bad', S.bad.has(key));
+    b.classList.toggle('bad', S.bad.has(key) && !S.knownBad.has(key));
+    b.classList.toggle('known', S.knownBad.has(key));
     b.classList.toggle('changed', S.changed.has(key));
   }
   for (const m of $('words').querySelectorAll('.mark')) m.classList.toggle('bad', S.bad.has(m.dataset.v));
@@ -369,15 +426,17 @@ function recompute(light = false) {
 function renderIssues() {
   const list = $('issues');
   const errors = S.issues.filter((i) => i.level === 'error').length;
-  const warnings = S.issues.length - errors;
-  $('check-count').textContent = errors || warnings ? `${errors} خطأ · ${warnings} تنبيه` : '';
+  const knownN = S.issues.filter((i) => i.level === 'known').length;
+  const warnings = S.issues.length - errors - knownN;
+  $('check-count').textContent = [errors && `${errors} خطأ`, knownN && `${knownN} قديم`, warnings && `${warnings} تنبيه`]
+    .filter(Boolean).join(' · ');
   const item = (i) => {
     const li = document.createElement('li');
     li.className = i.level;
     const b = document.createElement('button');
     b.type = 'button';
     const where = i.verse == null ? '' : i.word ? `${i.verse}:${i.word} ` : `آية ${i.verse} `;
-    b.textContent = `${i.level === 'error' ? '✕' : '!'} ${where}${ISSUE_AR[i.code] || i.code}`;
+    b.textContent = `${i.level === 'error' ? '✕' : i.level === 'known' ? '⚑' : '!'} ${where}${ISSUE_AR[i.code] || i.code}`;
     b.title = i.detail;
     b.addEventListener('click', () => {
       if (i.verse == null) return;
@@ -394,7 +453,23 @@ function renderIssues() {
     li.textContent = '✓ لا أخطاء';
     items.push(li);
   }
-  const warned = S.issues.filter((i) => i.level !== 'error');
+  const knownList = S.issues.filter((i) => i.level === 'known');
+  if (knownList.length) {
+    // Came with the source data; fixing them is welcome (docs/MISSING_DATA.md).
+    const li = document.createElement('li');
+    const det = document.createElement('details');
+    det.open = true;
+    const sum = document.createElement('summary');
+    sum.className = 'known';
+    sum.textContent = `أخطاء قديمة من المصدر، ساعد في تصحيحها (${knownList.length})`;
+    const ul = document.createElement('ul');
+    ul.className = 'issues';
+    ul.append(...knownList.slice(0, 200).map(item));
+    det.append(sum, ul);
+    li.append(det);
+    items.push(li);
+  }
+  const warned = S.issues.filter((i) => i.level === 'warning');
   if (warned.length) {
     // Warnings (small overlaps kept from the source) stay folded away.
     const li = document.createElement('li');
@@ -498,7 +573,8 @@ function reveal(el, center = false) {
 function renderInspector() {
   const sel = S.selected;
   const span = selectedSpan();
-  $('sel-word').textContent = !sel ? '—' : sel.kind === 'word' ? wordText(sel.verse, sel.word) : (S.quran.verses[sel.verse - 1]?.mark ?? 'الافتتاح');
+  $('sel-word').textContent = !sel ? '—' : sel.kind === 'word' ? wordText(sel.verse, sel.word)
+    : isRiwaya() ? (sel.verse ? `﴿${sel.verse}﴾` : 'الافتتاح') : (S.quran?.verses[sel.verse - 1]?.mark ?? 'الافتتاح');
   $('sel-ref').textContent = !sel ? '' : sel.kind === 'word' ? `الآية ${sel.verse} · الكلمة ${sel.word}` : `الآية ${sel.verse}`;
   $('sel-start').value = span ? span[0] : '';
   $('sel-end').value = span ? span[1] : '';
@@ -582,7 +658,7 @@ function setTap(on) {
   $('tap-button').hidden = !on;
   if (on) {
     const sel = S.selected;
-    S.tapNext = sel?.kind === 'word' ? { ...sel } : sel ? { verse: sel.verse, word: firstUntimed(sel.verse) > (S.counts[S.surah][sel.verse - 1] || 0) ? 1 : firstUntimed(sel.verse) } : null;
+    S.tapNext = sel?.kind === 'word' ? { ...sel } : sel ? { verse: sel.verse, word: firstUntimed(sel.verse) > (countsNow()[sel.verse - 1] || 0) ? 1 : firstUntimed(sel.verse) } : null;
     status('وضع النقر: اضغط مسافة عند بداية كل كلمة');
   }
 }
@@ -598,7 +674,7 @@ function tap() {
     return;
   }
   S.lastTapped = { ...next };
-  const count = S.counts[S.surah][next.verse - 1] || 0;
+  const count = countsNow()[next.verse - 1] || 0;
   S.tapNext = next.word < count ? { verse: next.verse, word: next.word + 1 } : { verse: next.verse + 1, word: 1 };
   recompute();
   const target = S.doc.verses[verseIndex(S.doc, S.tapNext.verse)]?.[3].some((w) => w[0] === S.tapNext.word)
@@ -805,6 +881,21 @@ $('copy').addEventListener('click', async () => {
 });
 $('copy-title').addEventListener('click', () => copyText($('pr-title').textContent));
 $('help-open').addEventListener('click', () => $('help-dialog').showModal());
+
+// First visit: three lines and a link to the guide, until dismissed.
+{
+  let seen = false;
+  try {
+    seen = localStorage.getItem('tibyan-timing:welcome') === '1';
+  } catch { /* storage blocked: show it */ }
+  if (!seen) $('welcome').hidden = false;
+  $('welcome-close').addEventListener('click', () => {
+    $('welcome').hidden = true;
+    try {
+      localStorage.setItem('tibyan-timing:welcome', '1');
+    } catch { /* fine */ }
+  });
+}
 
 const SPEEDS = ['0.5', '0.6', '0.75', '0.9', '1'];
 document.addEventListener('keydown', (e) => {

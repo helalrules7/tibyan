@@ -16,13 +16,28 @@
       <p class="sub">تبيان · صحح متى تبدأ كل آية وكل كلمة، ثم اقترح التعديل</p>
     </div>
     <nav class="links">
-      <button type="button" id="help-open" class="link">المساعدة والاختصارات</button>
+      <a class="button primary guide-link" href="guide.html">الدليل</a>
+      <button type="button" id="help-open" class="link">الاختصارات</button>
       <a class="link" href="https://github.com/helalrules7/tibyan/blob/main/apps/timing-editor/CONTRIBUTING.md" target="_blank" rel="noopener">كيف تساهم · Contributing</a>
     </nav>
   </header>
 
   <main>
+    <section id="welcome" class="welcome" aria-labelledby="welcome-title" hidden>
+      <h2 id="welcome-title">أول مرة هنا؟</h2>
+      <ol>
+        <li>اختر القارئ والسورة، ثم اضغط «تشغيل» واستمع بسماعة.</li>
+        <li>إن تلوّنت كلمة قبل صوتها أو بعده: انقرها، ثم حرّك بدايتها أو نهايتها.</li>
+        <li>تأكد بتكرار الكلمة، ثم اضغط «اقترح التعديل».</li>
+      </ol>
+      <div class="row">
+        <a class="button primary" href="guide.html">اقرأ الدليل خطوة خطوة</a>
+        <button type="button" id="welcome-close">فهمت، ابدأ</button>
+      </div>
+    </section>
+
     <section class="pickers" aria-label="اختيار التلاوة">
+      <p class="step"><b>١</b> اختر القارئ والسورة</p>
       <label>القارئ
         <select id="reciter"></select>
       </label>
@@ -36,6 +51,7 @@
     </section>
 
     <section class="player" aria-label="التشغيل">
+      <p class="step"><b>٢</b> شغّل واستمع بسماعة. الكلمة المسموعة تتلوّن في النص بالأسفل</p>
       <div class="transport">
         <button type="button" id="play" class="primary" aria-keyshortcuts="Space">تشغيل</button>
         <button type="button" id="back" title="رجوع ثانيتين" aria-label="رجوع ثانيتين">−٢ث</button>
@@ -68,6 +84,7 @@
     </section>
 
     <section class="timeline-wrap" aria-label="الموجة الصوتية والتوقيت">
+      <p class="step"><b>٣</b> كلمة خطأ؟ انقرها في النص، ثم اسحب حافتها هنا (اليمنى بدايتها، واليسرى نهايتها)، أو استعمل أزرار «المحدد»</p>
       <div class="timeline-tools">
         <button type="button" id="zoom-in" aria-label="تكبير">＋</button>
         <button type="button" id="zoom-out" aria-label="تصغير">－</button>
@@ -117,6 +134,7 @@
       </section>
 
       <section class="checks" aria-label="الفحص">
+        <p class="step"><b>٤</b> أصلح ما يظهر هنا بالأحمر، ثم اقترح التعديل</p>
         <h2>الفحص <span id="check-count" class="badge"></span></h2>
         <ul id="issues" class="issues"></ul>
         <div id="changes" class="changes"></div>
@@ -146,14 +164,14 @@
       <h2 id="submit-title">اقترح التعديل على GitHub</h2>
       <p id="submit-summary"></p>
       <ol class="steps">
-        <li><button type="button" id="copy" class="primary">١. انسخ الملف الجديد</button> <span id="copy-state" class="note"></span></li>
-        <li><a id="gh-edit" class="button" target="_blank" rel="noopener">٢. افتح الملف في محرر GitHub</a>
+        <li><button type="button" id="copy" class="primary">انسخ الملف الجديد</button> <span id="copy-state" class="note"></span></li>
+        <li><a id="gh-edit" class="button" target="_blank" rel="noopener">افتح الملف في محرر GitHub</a>
           <span class="note">سجّل الدخول إلى GitHub إن طُلب منك؛ سيعرض عليك إنشاء نسخة (fork) تلقائيا.</span></li>
         <li>في محرر GitHub: حدد كل النص (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>A</kbd>) والصق (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>V</kbd>).</li>
-        <li>اضغط <b>Commit changes…</b> ثم <b>Propose changes</b>، ثم <b>Create pull request</b>. اكتب في الوصف ما سمعته ولماذا عدّلت.
+        <li>اضغط الزر الأخضر <b>Commit changes…</b> ثم <b>Propose changes</b>. في الصفحة التالية اضغط <b>Create pull request</b>، واكتب ما سمعته ولماذا عدّلت، ثم <b>Create pull request</b> مرة أخرى.
           <div class="pr-title">عنوان مقترح: <code id="pr-title"></code> <button type="button" id="copy-title" class="small">انسخ</button></div></li>
       </ol>
-      <p class="note">سيفحص GitHub التعديل تلقائيا، ويراجعه أحد المشرفين بالاستماع قبل دمجه. بعد الدمج يصل التوقيت الجديد إلى التطبيق.</p>
+      <p class="note">سيفحص GitHub التعديل تلقائيا، ويراجعه أحد المشرفين بالاستماع قبل دمجه. بعد الدمج يصل التوقيت الجديد إلى التطبيق خلال ١٢ ساعة تقريبا. ليس لديك حساب GitHub؟ أنشئه مجانا من <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a>، أو نزّل الملف. التفاصيل في <a href="guide.html#step-12" target="_blank">الدليل</a>.</p>
       <details>
         <summary>English</summary>
         <ol>
