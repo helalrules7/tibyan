@@ -1226,5 +1226,15 @@
       }
     }
   },
-  "unknownAuthor": "مصوّر غير معروف"
+  "unknownAuthor": "مصوّر غير معروف",
+  "otherRiwayaReciters": "قرّاء الروايات الأخرى",
+  "otherRiwayaHint": "تُختار تلاواتهم من مصحف روايتهم، لأن ترقيم آياتها يختلف.",
+  "reciterOfRiwaya": "رواية {riwaya}",
+  "@reciterOfRiwaya": {
+    "placeholders": {
+      "riwaya": {
+        "type": "String"
+      }
+    }
+  }
 }

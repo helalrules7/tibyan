@@ -2904,6 +2904,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'مصوّر غير معروف'**
   String get unknownAuthor;
+
+  /// No description provided for @otherRiwayaReciters.
+  ///
+  /// In ar, this message translates to:
+  /// **'قرّاء الروايات الأخرى'**
+  String get otherRiwayaReciters;
+
+  /// No description provided for @otherRiwayaHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُختار تلاواتهم من مصحف روايتهم، لأن ترقيم آياتها يختلف.'**
+  String get otherRiwayaHint;
+
+  /// No description provided for @reciterOfRiwaya.
+  ///
+  /// In ar, this message translates to:
+  /// **'رواية {riwaya}'**
+  String reciterOfRiwaya(String riwaya);
 }
 
 class _AppLocalizationsDelegate
