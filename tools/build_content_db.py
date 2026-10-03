@@ -19,6 +19,8 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quranlab_banna_timing.json QuranLab word timings, al-Banna (fetch_quranlab_timing.py)
   tools/.cache/quranlab_ayah_timing.json  al-Banna verse timings derived from it (build_quranlab_timing.py)
   tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
+  tools/.cache/banna_ayah_timing.json     al-Banna verse and word timings verse by verse, replacing
+  tools/.cache/banna_word_timing.json     the two above for him when present (build_banna_timing.py)
   tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
                                           lines, verse, marker and word boxes; no text
   tools/.cache/shamarly_catchword.json    Shamarly catchword boxes (build_shamarly_catchword.py)
@@ -43,6 +45,7 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
+import build_banna_timing as banna_timing
 import build_line_cuts
 import build_mutashabih
 import build_tajweed
@@ -508,6 +511,13 @@ def main():
                    json.loads(quranlab_ayah_path.read_text(encoding='utf-8')))
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(quranlab_word_path.read_text(encoding='utf-8')))
+    # al-Banna verse by verse (build_banna_timing.py): QuranLab's words
+    # where his verses are found by sound, forced alignment elsewhere.
+    banna_ayah_path = CACHE / 'banna_ayah_timing.json'
+    if banna_ayah_path.exists():
+        banna_timing.replace(db, json.loads(banna_ayah_path.read_text(encoding='utf-8')),
+                             json.loads((CACHE / 'banna_word_timing.json').read_text(encoding='utf-8')))
+        db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', banna_timing.source_row(today))
     db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
         17, 'qdc-timing', 'Verse and word timings of the imams of the two Harams (quran.com)',
         'Quran.com (QDC audio API; segments from Quranic Universal Library)', None,
