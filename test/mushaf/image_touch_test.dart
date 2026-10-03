@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:archive/archive.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tibyan/core/db/ayahinfo_database.dart';
 import 'package:tibyan/core/db/content_database.dart';
 import 'package:tibyan/features/mushaf/data/mushaf_repository.dart';
+import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/image_page.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/mushaf_page.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/old_mushaf_page.dart';
@@ -256,6 +259,84 @@ void main() {
       expect(failures.take(20), isEmpty, reason: '${failures.length} failures');
     },
     skip: !glyphs.existsSync(),
+    timeout: const Timeout(Duration(minutes: 5)),
+  );
+
+  test(
+    'Madina 1441: every touch over a line of text selects its verse',
+    () async {
+      final pack = ZipDecoder().decodeBytes(
+        File('assets/packs/pages-hafs-1441-v1.zip').readAsBytesSync(),
+      );
+      var checked = 0;
+      final failures = <String>[];
+      for (var page = 1; page <= 604; page++) {
+        final svg = utf8.decode(
+          XZDecoder().decodeBytes(
+            pack.findFile('${page.toString().padLeft(3, '0')}.svg.xz')!.content,
+          ),
+        );
+        final v = [
+          for (final n in RegExp(
+            r'viewBox="([^"]+)"',
+          ).firstMatch(svg)!.group(1)!.trim().split(RegExp(r'[\s,]+')))
+            double.parse(n),
+        ];
+        final polys = await repo.polygons(page);
+        final g = svgLineGeometry(
+          Rect.fromLTWH(v[0], v[1], v[2], v[3]),
+          SvgPageGeometry(
+            polygons: polys,
+            cuts: await repo.lineCuts('madina1441', page),
+            overflow: const [],
+          ),
+          opening: page <= 2,
+        );
+        if (page <= 2) continue; // No line grid: hit by the outlines alone.
+        final pieces = [
+          for (final p in polys)
+            for (final r in lineRects(outlineRects(p.path), g))
+              ((surah: p.surah, ayah: p.number), r),
+        ];
+        // A verse has a piece on every line its outline crosses.
+        for (final p in polys) {
+          final outline = parseOutline(p.path);
+          final mine = {
+            for (final (k, r) in pieces)
+              if (k == (surah: p.surah, ayah: p.number))
+                StripLayout(_sizes.first, g).lineOfImageY(r.center.dy),
+          };
+          for (var j = 0; j < g.lines; j++) {
+            final crossed = [
+              for (var x = g.ink.left + 1; x < g.ink.right; x += 4)
+                Offset(x, g.centres[j]),
+            ].any(outline.contains);
+            if (crossed && !mine.contains(j)) {
+              failures.add('page $page: ${p.surah}:${p.number} not on line $j');
+            }
+          }
+        }
+        for (final size in _sizes) {
+          final layout = StripLayout(size, g);
+          final lines = [
+            for (final (_, r) in pieces) layout.lineOfImageY(r.center.dy),
+          ];
+          failures.addAll([
+            for (final f in _checkPage(
+              layout,
+              pieces,
+              lineOf: lines,
+              pieceLines: lines,
+              slop: 2,
+            ))
+              'page $page at $size: $f',
+          ]);
+          checked++;
+        }
+      }
+      expect(checked, 602 * _sizes.length);
+      expect(failures.take(20), isEmpty, reason: '${failures.length} failures');
+    },
     timeout: const Timeout(Duration(minutes: 5)),
   );
 }
