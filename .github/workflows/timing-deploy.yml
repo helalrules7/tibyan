@@ -73,7 +73,11 @@ jobs:
           built = json.load(open('out/manifest.json'))
           assert served == built, 'the server holds another manifest'
           for e in served['reciters']:
-              data = urllib.request.urlopen('https://tibyan.ahmedhelal.dev/timing/' + e['file']).read()
+              # Cloudflare refuses urllib's default user agent.
+              req = urllib.request.Request(
+                  'https://tibyan.ahmedhelal.dev/timing/' + e['file'],
+                  headers={'User-Agent': 'tibyan-timing-deploy'})
+              data = urllib.request.urlopen(req).read()
               assert hashlib.sha256(data).hexdigest() == e['sha256'], e['file']
               print('ok', e['file'])
           PY
