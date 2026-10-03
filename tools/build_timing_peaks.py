@@ -17,6 +17,8 @@ Needs ffmpeg. Runs on Python 3.8 (the server's).
 
 Usage:
   python3 tools/build_timing_peaks.py SLUG --out DIR [--audio-json PATH] [--surahs 1-114]
+      [--local-root DIR]   read mirrored files from this directory (the
+                           server's mirror/sources/recitations) instead of over HTTP
 """
 import argparse
 import hashlib
@@ -44,7 +46,11 @@ def surah_urls(folder_url, surah):
     return [MIRROR + path, source]
 
 
-def fetch(urls):
+def fetch(urls, local_root=None):
+    if local_root:
+        path = Path(local_root) / urls[0][len(MIRROR) + 1:]
+        if path.exists():
+            return urls[0], path.read_bytes()
     last = None
     for url in urls:
         try:
@@ -61,6 +67,15 @@ def peaks_of(mp3):
     p = subprocess.run(
         ['ffmpeg', '-v', 'error', '-i', 'pipe:0', '-ac', '1', '-ar', str(RATE), '-f', 's16le', 'pipe:1'],
         input=mp3, stdout=subprocess.PIPE, check=True)
+    try:
+        import numpy as np
+        pcm = np.frombuffer(p.stdout, dtype='<i2').astype(np.int32)
+        samples = len(pcm)
+        pad = (-samples) % HOP
+        blocks = np.abs(np.concatenate([pcm, np.zeros(pad, np.int32)])).reshape(-1, HOP).max(axis=1)
+        return bytes(np.minimum(255, blocks >> 7).astype(np.uint8)), samples * 1000 // RATE
+    except ImportError:
+        pass
     pcm = memoryview(p.stdout).cast('h')
     samples = len(pcm)
     out = bytearray()
@@ -78,6 +93,7 @@ def main():
     ap.add_argument('--audio-json')
     ap.add_argument('--reciters', default=str(DATA / 'reciters.json'))
     ap.add_argument('--surahs', default='1-114')
+    ap.add_argument('--local-root')
     args = ap.parse_args()
     reciter = next(r for r in json.loads(Path(args.reciters).read_text(encoding='utf-8'))['reciters']
                    if r['slug'] == args.slug)
@@ -89,7 +105,11 @@ def main():
     if audio_path.exists():
         files = json.loads(audio_path.read_text(encoding='utf-8'))['files']
     for surah in range(a, b + 1):
-        url, mp3 = fetch(surah_urls(reciter['folder_url'], surah))
+        try:
+            url, mp3 = fetch(surah_urls(reciter['folder_url'], surah), args.local_root)
+        except RuntimeError as e:
+            print('%s %03d: %s' % (args.slug, surah, e), flush=True)
+            continue
         peaks, duration = peaks_of(mp3)
         (out / ('%03d.bin' % surah)).write_bytes(peaks)
         files['%03d' % surah] = {'duration_ms': duration, 'bytes': len(mp3),

@@ -1,5 +1,5 @@
 {
- "about": "Cases the timing checks must agree on: tools/timing_files.py and apps/timing-editor/js/model.js. Each expect entry is level:code:verse:word, sorted.",
+ "about": "Cases the timing checks must agree on: tools/timing_files.py and apps/timing-editor/js/model.js. Each expect entry is level:code:verse:word, sorted. A case may carry its own counts (null: a riwaya verse, timed by verse only).",
  "counts": [
   2,
   3
@@ -1117,6 +1117,42 @@
    "duration_ms": null,
    "expect": [
     "error:verse_missing::"
+   ]
+  },
+  {
+   "name": "riwaya: verses only",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      []
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2000,
+        2500
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "counts": [
+    null,
+    null
+   ],
+   "expect": [
+    "error:schema:2:"
    ]
   }
  ]

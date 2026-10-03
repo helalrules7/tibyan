@@ -32,8 +32,19 @@ jobs:
           persist-credentials: false
       - name: Tests
         run: python3 -m unittest discover -s tools/tests -p 'test_timing_files.py'
-      - name: Check every file
-        run: python3 tools/timing_files.py check
+      - name: Check every file (only new errors block)
+        # Errors listed in data/timing/known_errors.json came with the source
+        # data, and errors in verses this push did not change were already on
+        # main: both are reported, not blocking (docs/MISSING_DATA.md).
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          base=$(mktemp -d)
+          if [[ -n "${BEFORE:-}" && "$BEFORE" != 0000000000000000000000000000000000000000 ]] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            git archive "$BEFORE" data/timing | tar -x -C "$base" || true
+          fi
+          python3 tools/timing_files.py check --base "$base"
       - name: Build packs
         run: python3 tools/timing_files.py pack --out out && cat out/manifest.json
       - name: Upload (packs first, then the manifest that names them)

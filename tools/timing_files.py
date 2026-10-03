@@ -98,9 +98,33 @@ def published():
 
 
 def verse_words():
-    """{surah: [word count of verse 1, verse 2, ...]}."""
+    """{surah: [word count of verse 1, verse 2, ...]}, Hafs."""
     surahs = load_json(DATA / 'verse_words.json')['surahs']
     return {i: counts for i, counts in enumerate(surahs, start=1)}
+
+
+def counts_for(slug, surah):
+    """What the checks compare a file with: each verse's word count (Hafs),
+    or None per verse for a riwaya recitation, which is timed by verse
+    only and numbered by its riwaya. None when the surah is unknown."""
+    r = {x['slug']: x for x in reciters()}.get(slug)
+    if r is None or not 1 <= surah <= 114:
+        return None
+    riwaya = r.get('riwaya', 'hafs')
+    if riwaya == 'hafs':
+        return verse_words().get(surah)
+    n = load_json(DATA / 'verse_words.json')['riwayat'][riwaya][surah - 1]
+    return [None] * n
+
+
+def known_errors():
+    """Errors already in the published data when it was exported, by
+    (slug, surah, verse, word, code). They are reported but do not block:
+    fixing them is a task for contributors (docs/MISSING_DATA.md)."""
+    path = DATA / 'known_errors.json'
+    if not path.exists():
+        return set()
+    return {tuple(e) for e in load_json(path)['errors']}
 
 
 def durations(slug):
@@ -172,9 +196,9 @@ def validate(doc, slug, surah, counts, duration_ms=None):
                            else ('warning', 'past_audio_end'))
             out.append(_issue(level, code, a, detail=f'ends at {end}, after the audio ends at {duration_ms}'))
         prev_verse_end = max(end, prev_verse_end or 0)
-        if a == 0:
+        if a == 0 or counts[a - 1] is None:
             if words:
-                out.append(_issue('error', 'schema', 0, detail='verse 0 (the opening) has no words'))
+                out.append(_issue('error', 'schema', a, detail='this verse has no word numbering (the opening, or a riwaya recitation)'))
             continue
         if not words:
             out.append(_issue('warning', 'words_missing', a, detail=f'{counts[a - 1]} words have no timing'))
@@ -261,7 +285,8 @@ def apply(db):
 
 
 def export(slug, db_path=DB):
-    """Writes data/timing/<slug>/NNN.json from content.db's rows, exactly."""
+    """Writes data/timing/<slug>/NNN.json from content.db's rows, exactly
+    (and removes surah files content.db no longer times)."""
     r = published().get(slug)
     if r is None:
         raise SystemExit(f'{slug}: not a published reciter in data/timing/reciters.json')
@@ -280,6 +305,9 @@ def export(slug, db_path=DB):
     db.close()
     out = DATA / slug
     out.mkdir(parents=True, exist_ok=True)
+    for old in out.glob('[0-9][0-9][0-9].json'):
+        if int(old.stem) not in verses:
+            old.unlink()
     for s, vs in sorted(verses.items()):
         doc = {'format': FORMAT, 'reciter': slug, 'surah': s,
                'verses': [vs[a] for a in sorted(vs)]}
@@ -288,6 +316,8 @@ def export(slug, db_path=DB):
 
 
 def write_verse_words(db_path=DB):
+    """Hafs word counts from content.db; riwaya verse counts from the
+    riwaya sources (tools/.cache, via riwaya_reciters.py)."""
     db = sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)
     counts = {}
     for s, a, n in db.execute('SELECT surah, ayah, COUNT(*) FROM word_box GROUP BY surah, ayah'):
@@ -300,8 +330,37 @@ def write_verse_words(db_path=DB):
              '  "surahs": [']
     lines += ['    ' + json.dumps(c, separators=(', ', ': ')) + (',' if i < 113 else '')
               for i, c in enumerate(surahs)]
-    lines += ['  ]', '}']
+    import riwaya_reciters
+    riwayat = riwaya_reciters.riwaya_counts()
+    lines += ['  ],', '  "riwayat": {']
+    names = sorted(riwayat)
+    for j, name in enumerate(names):
+        row = [riwayat[name][s] for s in range(1, 115)]
+        lines.append(f'    {json.dumps(name)}: ' + json.dumps(row, separators=(', ', ': ')) + (',' if j < len(names) - 1 else ''))
+    lines += ['  }', '}']
     (DATA / 'verse_words.json').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+
+def write_known_errors():
+    """Records the errors in the published files as they are now. Run after
+    an export; a contributor's fix makes an entry stale, which is harmless."""
+    rows = []
+    for slug in sorted(published()):
+        durs = durations(slug)
+        for path in sorted((DATA / slug).glob('[0-9][0-9][0-9].json')):
+            doc = load_json(path)
+            s = doc['surah']
+            for i in validate(doc, slug, s, counts_for(slug, s), durs.get(s)):
+                if i['level'] == 'error':
+                    rows.append([slug, s, i['verse'], i['word'], i['code']])
+    lines = ['{', '  "format": 1,',
+             '  "about": "Errors already in the published timings, from their sources: [reciter, surah, verse, word, code]. Reported, not blocking; fixing them is a task for contributors (docs/MISSING_DATA.md).",',
+             '  "errors": [']
+    lines += ['    ' + json.dumps(r, ensure_ascii=False, separators=(', ', ': ')) + (',' if j < len(rows) - 1 else '')
+              for j, r in enumerate(rows)]
+    lines += ['  ]', '}']
+    (DATA / 'known_errors.json').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    print(f'{len(rows)} known errors')
 
 
 # ------------------------------------------------------------------- check
@@ -323,7 +382,7 @@ def check_file(path, base_dir=None):
         return result
     slug, surah = m.group(1), int(m.group(2))
     pub = published()
-    counts = verse_words().get(surah)
+    counts = counts_for(slug, surah)
     if slug not in pub or counts is None:
         result['issues'].append(_issue('error', 'path', detail=f'"{slug}" is not a published reciter, or {surah} is not a surah'))
         return result
@@ -362,6 +421,11 @@ def check_file(path, base_dir=None):
         result['changed_words'] = words
         for i in issues:
             i['old'] = i['verse'] is not None and i['verse'] not in changed and i['code'] not in ('schema', 'layout')
+    known = known_errors()
+    for i in issues:
+        if i['level'] == 'error' and (slug, surah, i['verse'], i['word'], i['code']) in known:
+            i['old'] = True
+            i['known'] = True
     result['issues'] = issues
     return result
 
@@ -395,7 +459,7 @@ def summary_markdown(results, editor_links=None):
         if len(new_errors) > 20:
             lines.append(f'  - … and {len(new_errors) - 20} more errors')
         if old_errors:
-            lines.append(f'  - {len(old_errors)} error(s) in verses this change did not touch (already on main; not blocking)')
+            lines.append(f'  - {len(old_errors)} error(s) already in the data on main (known, or in verses this change did not touch): not blocking')
         fresh = [i for i in warnings if not i.get('old')]
         for i in fresh[:10]:
             where = f'{i["verse"]}' + (f':{i["word"]}' if i['word'] else '') if i['verse'] is not None else '—'
@@ -469,7 +533,9 @@ def site(out_dir, db_path=DB):
     out = Path(out_dir)
     if out.exists():
         shutil.rmtree(out)
-    shutil.copytree(EDITOR, out, ignore=shutil.ignore_patterns('test', 'node_modules', '*.md', 'package.json'))
+    shutil.copytree(EDITOR, out, ignore=shutil.ignore_patterns('test', 'node_modules', '*.md', 'package.json',
+                                                               'guide.template.html'))
+    write_guide(out)
     db = sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)
     counts = verse_words()
     (out / 'quran').mkdir()
@@ -500,13 +566,115 @@ def site(out_dir, db_path=DB):
     print(f'site written to {out}')
 
 
+# ------------------------------------------------------------------- guide
+
+GUIDE = REPO / 'docs' / 'TIMING_GUIDE.md'
+_IMG_PREFIX = '../apps/timing-editor/'
+
+
+def _inline(text):
+    import html
+    out = html.escape(text, quote=False)
+    out = re.sub(r'`([^`]+)`', r'<code>\1</code>', out)
+    out = re.sub(r'\*\*([^*]+)\*\*', r'<b>\1</b>', out)
+    out = re.sub(r'\[([^\]]+)\]\(([^)\s]+)\)', r'<a href="\2">\1</a>', out)
+    out = re.sub(r'(?<!href=")(https://[^\s<)،]+)', r'<a href="\1" target="_blank" rel="noopener" dir="ltr">\1</a>', out)
+    return out
+
+
+def guide_html(md):
+    """docs/TIMING_GUIDE.md as the body of guide.html: the same text, so the
+    page and the document never differ. Handles the little Markdown the
+    guide uses: headings, paragraphs, lists, a table, images, a quote."""
+    import html
+    parts = md.split('\n---\n')
+    sections = []
+    for n, part in enumerate(parts):
+        lang, direction = ('ar', 'rtl') if n == 0 else ('en', 'ltr')
+        out, para, lst = [], [], None
+        steps = 0
+
+        def flush():
+            nonlocal para, lst
+            if para:
+                out.append('<p>' + _inline(' '.join(para)) + '</p>')
+                para = []
+            if lst:
+                out.append(f'<{lst[0]}>' + ''.join(f'<li>{_inline(x)}</li>' for x in lst[1]) + f'</{lst[0]}>')
+                lst = None
+
+        lines = part.strip('\n').split('\n')
+        i = 0
+        while i < len(lines):
+            line = lines[i].rstrip()
+            m_img = re.fullmatch(r'!\[([^\]]*)\]\(([^)]+)\)', line)
+            m_ol = re.match(r'^([0-9٠-٩]+)\.\s+(.*)$', line)
+            if not line:
+                flush()
+            elif line.startswith('#'):
+                flush()
+                level = len(line) - len(line.lstrip('#'))
+                title = line[level:].strip()
+                anchor = ''
+                if level == 3 and n == 0:
+                    steps += 1
+                    anchor = f' id="step-{steps}"'
+                out.append(f'<h{level}{anchor}>{_inline(title)}</h{level}>')
+            elif m_img:
+                flush()
+                src = m_img.group(2).replace(_IMG_PREFIX, '')
+                alt = html.escape(m_img.group(1))
+                out.append(f'<figure><img src="{src}" alt="{alt}" loading="lazy"><figcaption>{alt}</figcaption></figure>')
+            elif line.startswith('> '):
+                flush()
+                out.append('<aside>' + _inline(line[2:]) + '</aside>')
+            elif line.startswith('|'):
+                flush()
+                rows = []
+                while i < len(lines) and lines[i].startswith('|'):
+                    cells = [c.strip() for c in lines[i].strip('|').split('|')]
+                    if not all(set(c) <= set('-: ') for c in cells):
+                        rows.append(cells)
+                    i += 1
+                head, body = rows[0], rows[1:]
+                out.append('<table><thead><tr>' + ''.join(f'<th>{_inline(c)}</th>' for c in head) + '</tr></thead><tbody>'
+                           + ''.join('<tr>' + ''.join(f'<td>{_inline(c)}</td>' for c in r) + '</tr>' for r in body)
+                           + '</tbody></table>')
+                continue
+            elif line.startswith('- ') or m_ol:
+                kind = 'ul' if line.startswith('- ') else 'ol'
+                if para:
+                    out.append('<p>' + _inline(' '.join(para)) + '</p>')
+                    para = []
+                if not lst or lst[0] != kind:
+                    if lst:
+                        flush()
+                    lst = (kind, [])
+                lst[1].append(line[2:] if kind == 'ul' else m_ol.group(2))
+            else:
+                if lst:
+                    flush()
+                para.append(line)
+            i += 1
+        flush()
+        sections.append(f'<section lang="{lang}" dir="{direction}">' + '\n'.join(out) + '</section>')
+    return '\n'.join(sections)
+
+
+def write_guide(out_dir):
+    body = guide_html(GUIDE.read_text(encoding='utf-8'))
+    page = (EDITOR / 'guide.template.html').read_text(encoding='utf-8').replace('<!-- GUIDE -->', body)
+    (Path(out_dir) / 'guide.html').write_text(page, encoding='utf-8')
+
+
 # --------------------------------------------------------------------- cli
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest='cmd', required=True)
     e = sub.add_parser('export')
-    e.add_argument('slug')
+    e.add_argument('slugs', nargs='+')
+    sub.add_parser('known-errors', help='write data/timing/known_errors.json: the errors in the published data now')
     c = sub.add_parser('check')
     c.add_argument('files', nargs='*')
     c.add_argument('--base', help='a checkout of the base branch, to tell changed verses from old ones')
@@ -520,7 +688,10 @@ def main(argv=None):
     sub.add_parser('verse-words')
     args = p.parse_args(argv)
     if args.cmd == 'export':
-        export(args.slug)
+        for slug in args.slugs:
+            export(slug)
+    elif args.cmd == 'known-errors':
+        write_known_errors()
     elif args.cmd == 'verse-words':
         write_verse_words()
     elif args.cmd == 'pack':

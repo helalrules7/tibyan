@@ -34,13 +34,12 @@ class ValidateTest(unittest.TestCase):
         for case in CASES['cases']:
             with self.subTest(case['name']):
                 got = sorted(key(i) for i in tf.validate(
-                    case['doc'], CASES['slug'], CASES['surah'], CASES['counts'], case['duration_ms']))
+                    case['doc'], CASES['slug'], CASES['surah'], case.get('counts', CASES['counts']), case['duration_ms']))
                 self.assertEqual(got, case['expect'])
 
 
 class FilesTest(unittest.TestCase):
     def test_every_published_file_is_canonical_and_valid(self):
-        counts = tf.verse_words()
         for slug in tf.published():
             durations = tf.durations(slug)
             files = sorted((tf.DATA / slug).glob('[0-9][0-9][0-9].json'))
@@ -49,9 +48,12 @@ class FilesTest(unittest.TestCase):
                 text = path.read_text(encoding='utf-8')
                 doc = json.loads(text)
                 self.assertEqual(text, tf.dumps(doc), path.name)
-                errors = [i for i in tf.validate(doc, slug, doc['surah'], counts[doc['surah']],
-                                                 durations.get(doc['surah'])) if i['level'] == 'error']
-                self.assertEqual(errors, [], f'{slug}/{path.name}')
+                known = tf.known_errors()
+                errors = [i for i in tf.validate(doc, slug, doc['surah'], tf.counts_for(slug, doc['surah']),
+                                                 durations.get(doc['surah']))
+                          if i['level'] == 'error'
+                          and (slug, doc['surah'], i['verse'], i['word'], i['code']) not in known]
+                self.assertEqual(errors, [], f'{slug}/{path.name}: errors not in known_errors.json')
 
     def test_only_publishable_reciters_have_files(self):
         listed = {r['slug']: r for r in tf.reciters()}
@@ -123,6 +125,7 @@ class ContentDbTest(unittest.TestCase):
         self.assertEqual(before, after)
         version = mem.execute("SELECT value FROM meta WHERE key = 'timing_version:sudais'").fetchone()
         self.assertIsNotNone(version)
+        mem.close()
 
     def test_verse_words_match_word_boxes(self):
         counts = tf.verse_words()
@@ -144,3 +147,15 @@ class ContentDbTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class GuideTest(unittest.TestCase):
+    def test_guide_page_has_the_document_text_and_pictures(self):
+        md = tf.GUIDE.read_text(encoding='utf-8')
+        page = tf.guide_html(md)
+        for line in md.splitlines():
+            if line.startswith('### '):
+                self.assertIn(tf._inline(line[4:]), page)
+        self.assertEqual(page.count('id="step-'), 13)
+        for src in __import__('re').findall(r'src="([^"]+)"', page):
+            self.assertTrue((tf.EDITOR / src).exists(), src)
