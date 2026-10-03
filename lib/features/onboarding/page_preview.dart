@@ -36,12 +36,24 @@ class RealPagePreview extends ConsumerWidget {
     required this.mode,
     required this.semanticLabel,
     this.width = 240,
+    this.prebuilt = true,
   });
+
+  /// The image of a preview made ahead of time by
+  /// tools/render_theme_previews.sh, one per style and mode.
+  static String assetFor(String styleId, ThemeModeId mode) =>
+      'assets/themes/preview_${styleId}_${mode.name}.webp';
 
   final TibyanStyle style;
   final ThemeModeId mode;
   final String semanticLabel;
   final double width;
+
+  /// Show the image made ahead of time (the default): the picker then
+  /// decodes ten small images instead of compiling ten themes' artwork and
+  /// a page. False draws it live, which is how those images are made, and
+  /// what is shown for a style that has no image yet.
+  final bool prebuilt;
 
   /// A theme's frame is drawn at this size and scaled down, so a small
   /// preview shows it as it looks around a page.
@@ -49,9 +61,39 @@ class RealPagePreview extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (prebuilt) {
+      return Semantics(
+        label: semanticLabel,
+        image: true,
+        child: SizedBox(
+          width: width,
+          height: width * 1.3,
+          child: Image.asset(
+            assetFor(style.id, mode),
+            fit: BoxFit.fill,
+            filterQuality: FilterQuality.medium,
+            gaplessPlayback: true,
+            // Decoded at the size it is shown, not the file's.
+            cacheWidth:
+                (width * MediaQuery.devicePixelRatioOf(context)).round(),
+            errorBuilder: (context, _, _) => RealPagePreview(
+              style: style,
+              mode: mode,
+              semanticLabel: semanticLabel,
+              width: width,
+              prebuilt: false,
+            ),
+          ),
+        ),
+      );
+    }
     final t = style.modes[mode]!;
+    final pageOne = ref.watch(_pageOneProvider).value;
+    // Frozen only once everything it shows has loaded; frozen earlier, the
+    // card would keep a page without its frame.
+    var ready = pageOne != null;
     final page = CustomPaint(
-      painter: PreviewPagePainter(ref.watch(_pageOneProvider).value),
+      painter: PreviewPagePainter(pageOne),
       child: const SizedBox.expand(),
     );
     final inked = mode.isLight
@@ -73,6 +115,7 @@ class RealPagePreview extends ConsumerWidget {
       final art = ref
           .watch(themeArtProvider((style: style.id, mode: mode)))
           .value;
+      ready = ready && art != null;
       final inset = art?.layout(_artSize).inset ?? style.art!.band;
       body = FittedBox(
         child: SizedBox.fromSize(
@@ -85,6 +128,7 @@ class RealPagePreview extends ConsumerWidget {
       );
     } else {
       // Zakhrafa: its own illuminated frame, drawn at the same size.
+      ready = ready && ref.watch(frameImagesProvider).value != null;
       body = FittedBox(
         child: SizedBox.fromSize(
           size: _artSize,
@@ -104,7 +148,7 @@ class RealPagePreview extends ConsumerWidget {
         height: width * 1.3,
         // A card is a whole page in a frame: drawn once, then blitted.
         child: FrozenBox(
-          cache: 'preview|${style.id}|${mode.name}|$width',
+          cache: 'preview|${style.id}|${mode.name}|$width|$ready',
           child: body,
         ),
       ),
