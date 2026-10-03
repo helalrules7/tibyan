@@ -54,7 +54,7 @@ ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 16  # 14: mutashabih; 15: tajweed_page; 16: reciter.riwaya and the riwaya recitations
+SCHEMA_VERSION = 17  # 14: mutashabih; 15: tajweed_page; 16: reciter.riwaya and the riwaya recitations; 17: tajweed_letter
 SHAMARLY = CACHE / 'shamarly_geometry.db'
 SHAMARLY_CATCHWORD = CACHE / 'shamarly_catchword.json'
 
@@ -691,6 +691,7 @@ def main():
     assert check.execute('SELECT COUNT(*) FROM shamarly_marker').fetchone()[0] == 6236
     assert check.execute('SELECT COUNT(*) FROM mutashabih').fetchone()[0] > 0
     assert check.execute("SELECT COUNT(*) FROM tajweed_page WHERE edition = 'madina1441'").fetchone()[0] == 604
+    assert check.execute("SELECT COUNT(*) FROM tajweed_letter WHERE riwaya = 'hafs'").fetchone()[0] > 70000
     # Word study: the corpus maps every verse but 7; 20 more are only
     # disjoined letters (الٓمٓ...), which have no root or lemma. al-Rahman is ر ح م.
     assert len(skipped) == 7, skipped

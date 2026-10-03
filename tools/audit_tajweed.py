@@ -43,7 +43,7 @@ OUT = ROOT.parent / 'build' / 'tajweed_audit'
 MADINA_PAGES = [2, 3, 50, 106, 187, 300, 450, 582, 604]
 # Shamarly: roughly the same places, plus pages that have no tajweed row.
 SHAMARLY_PAGES = [2, 3, 5, 44, 90, 162, 260, 390, 504, 522, 32, 103, 205, 294]
-NO_COLOUR = {'madd_2', 'idghaam_no_ghunnah'}   # lib/features/mushaf/data/tajweed.dart defaults
+NO_COLOUR = set()   # rules with no default colour (lib/features/mushaf/data/tajweed.dart): none since 2026-10-03
 
 
 def content():

@@ -107,5 +107,26 @@ class Placement(unittest.TestCase):
         self.assertLessEqual(ranges[1][1], ranges[0][0] + 1e-9)
 
 
+@unittest.skipUnless(HAVE_CACHE, 'needs tools/.cache')
+class LetterTable(unittest.TestCase):
+    def test_the_letter_table_gives_back_the_same_spans(self):
+        # Placement reads tajweed_letter; it must see exactly what the
+        # alignment produced, with word numbers as word_box counts them.
+        import sqlite3
+        kfgqpc = bw.load_text()
+        spans, _ = bt.all_spans(kfgqpc)
+        rows = bt.cpfair_letters(kfgqpc)
+        db = sqlite3.connect(':memory:')
+        db.executescript(bt.SCHEMA)
+        db.executemany('INSERT INTO tajweed_letter VALUES (?,?,?,?,?,?,?,?)', rows)
+        back = bt.spans_from_letters(bt.read_letters(db, 'hafs'), kfgqpc)
+        self.assertEqual({k: set(v) for k, v in spans.items() if v},
+                         {k: set(v) for k, v in back.items()})
+        self.assertEqual({r[0] for r in rows}, {'hafs'})
+        self.assertEqual({r[7] for r in rows}, {bt.SOURCE_ID})
+        self.assertTrue(all(r[3] >= 1 and r[4] >= 0 for r in rows))
+        self.assertEqual(bt.read_letters(db, 'warsh'), [])
+
+
 if __name__ == '__main__':
     unittest.main()

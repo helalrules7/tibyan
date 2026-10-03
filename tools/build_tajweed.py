@@ -31,7 +31,14 @@ places those spans on the printed pages. It never writes or changes text.
      shares are applied, and the result is stored as rectangles (image px)
      around the coloured ink.
 
-Output (content.db, table tajweed_page; one row per edition and page):
+Output (content.db):
+  tajweed_letter: every coloured letter on the KFGQPC text of a riwaya,
+              (riwaya, surah, ayah, word, letter, part, rule, source), source
+              being the row of the source table. One
+              table for every source: a new source (quran-ws, Quran.com,
+              the V4 fonts) adds rows with its own `source` and the same
+              placement below runs on them. Today: cpfair, Hafs.
+  tajweed_page (one row per edition and page), placed from tajweed_letter:
   madina1441: "rule,contour[,x0,x1];..."  contour = index of the contour in
               the page's text paths (document order, one per moveto); x0,x1
               (page units) clip it to a letter
@@ -197,6 +204,46 @@ def all_spans(kfgqpc):
         placed += len({(r, wi) for r, wi, _, _ in spans})
         out[key] = spans
     return out, total
+
+# ------------------------------------------------- the letter table
+
+
+
+
+def cpfair_letters(kfgqpc):
+    """Rows of tajweed_letter from cpfair (Hafs): (riwaya, surah, ayah,
+    word, letter, part, rule, source). word counts the words of the KFGQPC
+    verse from 1 (۞ not counted), as word_box does; letter counts the
+    word's letters from 0 (letters()); part is 'body' or 'marks'."""
+    spans, _ = all_spans(kfgqpc)
+    rows = set()
+    for (surah, ayah), sp in spans.items():
+        number = {t: n + 1 for n, t in enumerate(word_index(kfgqpc[(surah, ayah)]))}
+        for rule, wi, li, part in sp:
+            rows.add(('hafs', surah, ayah, number[wi], li, part, rule, SOURCE_ID))
+    return sorted(rows)
+
+
+def spans_from_letters(rows, kfgqpc):
+    """{(surah, ayah): [(rule, token index, letter, part)]}, the form the
+    placement below works on, from tajweed_letter rows of one riwaya (token
+    indices count ۞, as build_word_boxes does)."""
+    out = {}
+    for _, surah, ayah, word, letter, part, rule, _ in rows:
+        tokens = word_index(kfgqpc[(surah, ayah)])
+        out.setdefault((surah, ayah), []).append((rule, tokens[word - 1], letter, part))
+    return out
+
+
+def read_letters(db, riwaya='hafs', source=None):
+    """tajweed_letter rows of [riwaya] (and of one [source] when given)."""
+    q = ('SELECT riwaya, surah, ayah, word, letter, part, rule, source FROM tajweed_letter '
+         'WHERE riwaya = ?')
+    args = [riwaya]
+    if source:
+        q += ' AND source = ?'
+        args.append(source)
+    return db.execute(q + ' ORDER BY surah, ayah, word, letter', args).fetchall()
 
 # ------------------------------------------------------- letters in a word
 
@@ -554,6 +601,15 @@ def shamarly_edition(spans, kfgqpc, pages=None):
 
 SOURCE_ID = 18
 SCHEMA = '''
+CREATE TABLE tajweed_letter (           -- each letter a tajweed rule applies to (tools/build_tajweed.py)
+  riwaya TEXT NOT NULL,                 -- hafs (the only riwaya with data today)
+  surah INTEGER NOT NULL, ayah INTEGER NOT NULL,   -- the riwaya's own verse numbers
+  word INTEGER NOT NULL,                -- word of the KFGQPC text of the riwaya, from 1 (۞ not counted)
+  letter INTEGER NOT NULL,              -- letter of the word, from 0 (a base character and its marks)
+  part TEXT NOT NULL,                   -- body: the letter itself; marks: only its marks
+  rule TEXT NOT NULL,                   -- the source's rule key (build_tajweed.RULES)
+  source INTEGER NOT NULL,              -- where the rule comes from: source.id (18: cpfair/quran-tajweed 496f71c)
+  PRIMARY KEY (riwaya, surah, ayah, word, letter, part, rule, source)) WITHOUT ROWID;
 CREATE TABLE tajweed_page (             -- tajweed colouring per page (tools/build_tajweed.py)
   edition TEXT NOT NULL,                -- madina1441 | madina1405 | shamarly
   page INTEGER NOT NULL,
@@ -563,7 +619,8 @@ CREATE TABLE tajweed_page (             -- tajweed colouring per page (tools/bui
 
 
 def write(db, today):
-    """Adds the tajweed_page table and its source row to content.db."""
+    """Adds the tajweed_letter and tajweed_page tables and their source row
+    to content.db: the letters first, then each edition placed from them."""
     import hashlib
     import build_word_boxes
     db.executescript(SCHEMA)
@@ -575,8 +632,10 @@ def write(db, today):
         'أحكام التجويد: quran-tajweed © Collin Fair (CC BY 4.0)', None,
         hashlib.sha256(TAJWEED.read_bytes()).hexdigest(), today))
     kfgqpc = build_word_boxes.load_text()
-    spans, total = all_spans(kfgqpc)
-    print(f'tajweed: {total} annotations, {sum(len(v) for v in spans.values())} coloured letters')
+    db.executemany('INSERT INTO tajweed_letter VALUES (?,?,?,?,?,?,?,?)', cpfair_letters(kfgqpc))
+    # Every edition is placed from the letter table, whatever its source.
+    spans = spans_from_letters(read_letters(db, 'hafs'), kfgqpc)
+    print(f'tajweed: {sum(len(v) for v in spans.values())} coloured letters')
     new, stats = new_edition(spans)
     print(f'tajweed madina1441: {stats}')
     rows = [('madina1441', p, encode_new(v)) for p, v in sorted(new.items())]
@@ -597,6 +656,7 @@ def write_into(path, schema_version):
     from datetime import date
     db = sqlite3.connect(path)
     db.execute('DROP TABLE IF EXISTS tajweed_page')
+    db.execute('DROP TABLE IF EXISTS tajweed_letter')
     db.execute('DELETE FROM source WHERE id = ?', (SOURCE_ID,))
     write(db, date.today().isoformat())
     db.execute("UPDATE meta SET value = ? WHERE key = 'schema_version'", (str(schema_version),))

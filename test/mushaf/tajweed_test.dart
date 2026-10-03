@@ -213,6 +213,20 @@ void main() {
           expect(r.height, greaterThan(0));
         }
       }
+      // Every placed letter comes from the one letter table (Hafs only,
+      // source 18: cpfair), and the file is the schema drift expects.
+      final letters = await db
+          .customSelect(
+            'SELECT riwaya, source, COUNT(*) AS n FROM tajweed_letter '
+            'GROUP BY riwaya, source',
+          )
+          .get();
+      expect(letters, hasLength(1));
+      expect(letters.single.read<String>('riwaya'), 'hafs');
+      expect(letters.single.read<int>('source'), 18);
+      expect(letters.single.read<int>('n'), greaterThan(70000));
+      final version = await db.customSelect('PRAGMA user_version').getSingle();
+      expect(version.data.values.single, db.schemaVersion);
       // Opening pages are coloured too.
       expect(await repo.tajweedPage(MushafEdition.madina1441, 1), isNotEmpty);
       expect(await repo.tajweedPage(MushafEdition.madina1405, 1), isNotEmpty);
