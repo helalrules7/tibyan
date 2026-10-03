@@ -1460,7 +1460,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tajweedSourceNote =>
-      'Where each rule applies comes from the quran-tajweed data (Collin Fair, CC BY 4.0). It is machine-generated and not yet reviewed by a qualified reader. A letter’s place inside its word is estimated, and in the Shamarly edition only words whose bounds are known are coloured.';
+      'Where each rule applies comes from the quran-tajweed data (Collin Fair, CC BY 4.0). It is machine-generated and not yet reviewed by a qualified reader. A letter’s place inside its word is estimated, and in the Shamarly edition some word bounds are estimated too.';
 
   @override
   String get tajweedLegendHint =>

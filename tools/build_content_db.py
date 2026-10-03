@@ -394,7 +394,7 @@ def main():
       surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,
       page INTEGER NOT NULL, line INTEGER NOT NULL,
       x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
-      level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed
+      level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed, 0 best split, not confirmed
       PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
     CREATE TABLE shamarly_catchword (       -- next page's first word(s), cut from its image (px)
       page INTEGER PRIMARY KEY, x0 INTEGER NOT NULL, y0 INTEGER NOT NULL,
@@ -553,7 +553,7 @@ def main():
     db.executemany('INSERT INTO shamarly_word_box VALUES (?,?,?,?,?,?,?,?,?,?)', shamarly.execute(
         'SELECT w.surah, w.ayah, w.word, w.page, w.line, w.x0, w.y0, w.x1, w.y1, a.words_matched '
         'FROM word_box w JOIN ayah a ON a.surah = w.surah AND a.ayah = w.ayah '
-        'WHERE a.words_matched >= 1 ORDER BY w.surah, w.ayah, w.word'))
+        'ORDER BY w.surah, w.ayah, w.word'))
     shamarly.close()
     # built by build_shamarly_catchword.py from the page images
     db.executemany('INSERT INTO shamarly_catchword VALUES (?,?,?,?,?,?,?)',

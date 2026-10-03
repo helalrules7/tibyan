@@ -227,6 +227,24 @@ void main() {
       expect(letters.single.read<int>('n'), greaterThan(70000));
       final version = await db.customSelect('PRAGMA user_version').getSingle();
       expect(version.data.values.single, db.schemaVersion);
+      // Every Shamarly text page is coloured (pages 2-522), while touch and
+      // recitation still see only the surest word splits.
+      final shamarly = await db
+          .customSelect(
+            "SELECT COUNT(*) AS n FROM tajweed_page WHERE edition = 'shamarly'",
+          )
+          .getSingle();
+      expect(shamarly.read<int>('n'), 521);
+      for (final page in [32, 103, 205, 294]) {
+        expect(
+          await repo.tajweedPage(MushafEdition.shamarly, page),
+          isNotEmpty,
+          reason: 'Shamarly page $page',
+        );
+        for (final b in await repo.shamarlyWordBoxes(page)) {
+          expect(b.level, greaterThanOrEqualTo(shamarlyWordLevel));
+        }
+      }
       // Opening pages are coloured too.
       expect(await repo.tajweedPage(MushafEdition.madina1441, 1), isNotEmpty);
       expect(await repo.tajweedPage(MushafEdition.madina1405, 1), isNotEmpty);

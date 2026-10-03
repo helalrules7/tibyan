@@ -1453,7 +1453,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tajweedSourceNote =>
-      'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي تُلوَّن الكلمات المعروفة حدودها فقط.';
+      'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي حدود بعض الكلمات تقديرية أيضا.';
 
   @override
   String get tajweedLegendHint =>

@@ -342,7 +342,9 @@ class ShamarlyWordBox extends Table {
   IntColumn get x1 => integer()();
   IntColumn get y1 => integer()();
 
-  /// How sure the split into words is: 2 stable, 1 not yet reviewed.
+  /// How sure the split into words is: 2 stable, 1 not yet reviewed, 0
+  /// the best split, not confirmed (tajweed colouring only; see
+  /// [shamarlyWordLevel]).
   IntColumn get level => integer()();
 
   @override

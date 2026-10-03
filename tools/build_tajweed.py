@@ -42,7 +42,8 @@ Output (content.db):
   madina1441: "rule,contour[,x0,x1];..."  contour = index of the contour in
               the page's text paths (document order, one per moveto); x0,x1
               (page units) clip it to a letter
-  madina1405, shamarly: "rule,x0,y0,x1,y1;..." image px
+  madina1405, shamarly: "rule,x0,y0,x1,y1;..." image px (Shamarly: every
+              verse with a word split, confirmed or not)
 Rules are numbered as in RULES.
 
 Inputs: tools/.cache/cpfair_tajweed.hafs.uthmani-pause-sajdah.json,
@@ -560,9 +561,11 @@ def old_edition_words(kfgqpc, pages=range(1, 605)):
 def shamarly_words(kfgqpc):
     import sqlite3
     db = sqlite3.connect(f'file:{CACHE / "shamarly_geometry.db"}?mode=ro', uri=True)
+    # Every verse with a word split, the unconfirmed ones (words_matched 0)
+    # too: a letter coloured in its best-split word beats no colour at all
+    # (docs/features/tajweed_colors.md).
     rows = db.execute('SELECT w.page, w.surah, w.ayah, w.word, w.line, w.x0, w.y0, w.x1, w.y1 '
-                      'FROM word_box w JOIN ayah a ON a.surah = w.surah AND a.ayah = w.ayah '
-                      'WHERE a.words_matched >= 1 ORDER BY w.page').fetchall()
+                      'FROM word_box w ORDER BY w.page').fetchall()
     by_page = {}
     for page, s, a, n, line, x0, y0, x1, y1 in rows:
         index = word_index(kfgqpc[(s, a)])

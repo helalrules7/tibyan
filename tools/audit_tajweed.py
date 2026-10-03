@@ -58,11 +58,11 @@ def verses_on(edition, page):
 
 def shamarly_words(kfgqpc):
     """As build_tajweed.shamarly_words, from content.db's copy of the
-    Shamarly word boxes (the verses with words_matched >= 1)."""
+    Shamarly word boxes (every level)."""
     by_page = {}
     for page, s, a, n, line, x0, y0, x1, y1 in content().execute(
             'SELECT page, surah, ayah, word, line, x0, y0, x1, y1 FROM shamarly_word_box '
-            'WHERE level >= 1 ORDER BY page'):
+            'ORDER BY page'):
         index = bt.word_index(kfgqpc[(s, a)])
         if n <= len(index):
             by_page.setdefault(page, []).append(((s, a), index[n - 1], line, [(x0, y0, x1, y1)]))

@@ -2573,7 +2573,7 @@ abstract class AppLocalizations {
   /// No description provided for @tajweedSourceNote.
   ///
   /// In ar, this message translates to:
-  /// **'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي تُلوَّن الكلمات المعروفة حدودها فقط.'**
+  /// **'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي حدود بعض الكلمات تقديرية أيضا.'**
   String get tajweedSourceNote;
 
   /// No description provided for @tajweedLegendHint.
