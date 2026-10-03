@@ -75,7 +75,9 @@ class FilesTest(unittest.TestCase):
             (Path(base) / rel).parent.mkdir(parents=True)
             doc = tf.load_json(tf.REPO / rel)
             changed = json.loads(json.dumps(doc))
-            changed['verses'][1][3][0][2] += 10
+            # verse 2's first word (verse 0, the opening, may come first)
+            second = next(v for v in changed['verses'] if v[0] == 2)
+            second[3][0][2] += 10
             (Path(base) / rel).write_text(tf.dumps(changed), encoding='utf-8')
             r = tf.check_file(rel, base)
             self.assertEqual(r['changed_verses'], [2])

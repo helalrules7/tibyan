@@ -24,6 +24,8 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/qul_timing.json            QUL verse and word timings, al-Muaiqly (fetch_qul_timing.py)
   tools/.cache/qul_ayah_timing.json       ... checked against the surah files (build_qdc_timing.py qul)
   tools/.cache/qul_word_timing.json
+  tools/.cache/aligned_<id>.json          verse and word timings measured by forced alignment,
+                                          reciters 10 to 14 (build_aligned_timing.py)
   data/timing/<slug>/NNN.json            timings of the published reciters, which replace
                                           the generated rows (timing_files.py, docs/TIMING.md)
   tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
@@ -52,6 +54,7 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
+import build_aligned_timing as aligned_timing
 import build_banna_timing as banna_timing
 import build_line_cuts
 import build_mutashabih
@@ -583,6 +586,11 @@ def main():
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(qdc_word_path.read_text(encoding='utf-8')))
     add_qul_timing(db, today)
+    # al-Dosari, al-Sudais, al-Afasy, al-Ghamdi and al-Tablaway: timings
+    # measured by forced alignment on their files (build_aligned_timing.py),
+    # in place of the published ones above wherever they were aligned.
+    for reciter, (n_ayahs, n_words) in aligned_timing.add_all(db, today).items():
+        print(f'aligned timing, reciter {reciter}: {n_ayahs} verses, {n_words} words')
     # Timings kept as text in data/timing (the published reciters) replace
     # the generated rows above: corrections merged there are the source.
     for slug, (n_ayahs, n_words) in timing_files.apply(db).items():

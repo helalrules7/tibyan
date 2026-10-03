@@ -23,17 +23,21 @@ where the last kept verse ended.
 From the aligned words:
 - Verse boundary: the quietest point (100 ms smoothing) between the end
   of a verse's last word and the start of the next verse's first word
-  (REACH ms either side, inside those two words, when a pause DIP dB
-  deep is there; a reciter may join two verses without one).
+  (REACH ms either side, inside those two words, and no more than
+  LEAD_IN ms before the next verse's first letter). Where the reciter
+  joins two verses without a pause, it is the quietest point where they
+  meet.
   A verse's end is the next verse's start; the last verse ends where its
   sound fades (or at the end of the file). The opening before verse 1
   (isti'adha, basmala) is ayah 0.
 - Word: from its first letter to the next word's first letter; a word
   followed by a pause heard in the file (PAUSE ms or longer, quieter than
   the file's quiet level) ends where that pause starts.
-A verse whose words align badly (mean letter probability under MIN_SCORE,
-or a word squeezed into one frame) keeps its verse timing but no word
-timing; such verses are listed in the report.
+A verse whose words align badly (mean letter log-probability under
+MIN_SCORE) keeps its verse timing but no word timing; such verses are
+listed in the output ("flagged"). A verse of one word (opening letters
+said by name, حم or طسم, which the model hears poorly) is instead given
+its verse's sound, first to last loud frame.
 
 Python dependencies (not part of the app; any virtualenv):
   numpy, torch==2.5.1, torchaudio==2.5.1, transformers==4.46.3
@@ -80,15 +84,15 @@ BATCH = 240           # letters aligned per window
 # nearly free (the window runs on past the batch), its first one dearer,
 # so that a batch whose words come back later in the surah (a refrain)
 # takes their first reading.
-STAR_IN = 1.0
+STAR_IN = 0.3
 STAR_VERSE = 0.3
 STAR_LEAD = 0.3
 STAR_TAIL = 0.05
 RETRIES = 3           # wider windows tried for a batch whose kept verses read badly
 MIN_SCORE = -3.0      # mean letter log-probability under which a verse's words are dropped
 PAUSE = 300           # ms: shortest quiet stretch that ends a word early
+LEAD_IN = 1000        # ms before a verse's first letter searched for its pause
 REACH = 250           # ms either side of the aligned gap searched for the pause
-DIP = 12              # dB under the speech around it that makes a pause
 SMOOTH = 10           # 10 ms frames: smoothing of the loudness for the quietest point
 
 # Letters the model's vocabulary knows; ٱ (alif wasla) is read as ا.
@@ -120,10 +124,14 @@ def load_text(db):
 
 
 def audio(path):
-    raw = subprocess.run(
-        ['ffmpeg', '-v', 'error', '-i', str(path), '-map', '0:a:0', '-ac', '1',
-         '-ar', str(RATE), '-f', 'f32le', '-'], capture_output=True, check=True).stdout
-    return np.frombuffer(raw, dtype=np.float32)
+    for attempt in range(3):
+        # ffmpeg has been seen to die once on a file it then reads well
+        run = subprocess.run(
+            ['ffmpeg', '-v', 'error', '-i', str(path), '-map', '0:a:0', '-ac', '1',
+             '-ar', str(RATE), '-f', 'f32le', '-'], capture_output=True)
+        if run.returncode == 0:
+            return np.frombuffer(run.stdout, dtype=np.float32)
+    run.check_returncode()
 
 
 # ---------------------------------------------------------------- emit
@@ -349,21 +357,21 @@ def timings(path, units, placed, opening):
     bounds = []
     for k in range(len(verses)):
         if k == 0:
-            before = placed[0][-1][1] * f2ms if opening else max(0, starts[0] - 1500)
+            before = max(placed[0][-1][1] * f2ms if opening else 0, starts[0] - LEAD_IN)
             bounds.append(quietest(before, starts[0]) if starts[0] > before else starts[0])
         else:
             # CTC marks a letter by a short spike, which may come a little
             # before the sound ends or after it starts: the pause is looked
-            # for REACH ms either side of the gap, inside the two words.
-            # When the reciter joins the two verses (no pause DIP dB deep
-            # there), the boundary stays inside the aligned gap.
-            lo = max(ends[k - 1] - REACH, verses[k - 1][-1][0] * f2ms + f2ms)
+            # for REACH ms either side of the gap, inside the two words. The
+            # end of a verse is the less certain side (a held vowel, a madd
+            # or opening letters said by name, goes on after its spike and
+            # may dip inside), so the search starts no more than LEAD_IN ms
+            # before the next verse's first letter. When the reciter joins
+            # the two verses, this is the quietest point where they meet.
+            lo = max(ends[k - 1] - REACH, verses[k - 1][-1][0] * f2ms + f2ms,
+                     starts[k] - LEAD_IN)
             hi = min(starts[k] + REACH, verses[k][0][1] * f2ms)
             t = quietest(lo, hi) if hi > lo else starts[k]
-            c = t // 10
-            level = np.percentile(env[max(0, c - 300):c + 300], 80)
-            if level - sm[min(c, len(sm) - 1)] < DIP:
-                t = quietest(ends[k - 1], starts[k]) if starts[k] > ends[k - 1] else starts[k]
             bounds.append(t)
     # the last verse ends where its sound fades: the first heard pause after it
     tail = next((q[0] for q in heard if q[1] > ends[-1] + 10 and q[0] >= ends[-1] - 10),
@@ -378,6 +386,16 @@ def timings(path, units, placed, opening):
     import bisect
     for k, v in enumerate(verses):
         score = float(np.mean([w[2] for w in v]))
+        if score < MIN_SCORE and len(v) == 1:
+            # A verse of one word (mostly opening letters, حم, طسم, said by
+            # name, which the model hears poorly) is that word: from its
+            # first to its last loud frame inside the verse.
+            a, z = bounds[k] // 10, stops[k] // 10
+            seg = env[a:z]
+            loud = np.flatnonzero(seg > max(ql.SPEECH_DB, np.percentile(seg, 90) - 20)) if len(seg) else []
+            if len(loud):
+                words.append((k + 1, 1, (a + int(loud[0])) * 10, (a + int(loud[-1]) + 1) * 10))
+                continue
         if score < MIN_SCORE:
             flagged.append((k + 1, f'mean letter log-probability {score:.2f}'))
             continue
@@ -454,31 +472,63 @@ def source_row(today):
             MODEL_REVISION, today)
 
 
+RECITERS = [10, 11, 12, 13, 14]   # content.db ids timed here
+
+
+def write_rows(db, reciter, out):
+    """Replaces the reciter's verse and word rows with the aligned ones,
+    for the surahs in out (aligned_<reciter>.json); others keep theirs.
+    Returns (verses, words) written."""
+    verses = words = 0
+    for s, d in out.items():
+        surah = int(s)
+        db.execute('DELETE FROM ayah_timing WHERE reciter = ? AND surah = ?', (reciter, surah))
+        db.execute('DELETE FROM word_timing WHERE reciter = ? AND surah = ?', (reciter, surah))
+        db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)',
+                       [(reciter, surah, a, st, en) for a, st, en in d['verses']])
+        db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
+                       [(reciter, surah, a, w, st, en) for a, w, st, en in d['words']])
+        verses += sum(1 for v in d['verses'] if v[0] > 0)
+        words += len(d['words'])
+    return verses, words
+
+
+def add_all(db, today):
+    """For build_content_db.py: the rows of every reciter aligned here
+    (tools/.cache/aligned_<id>.json) and the source row. Published
+    reciters are then replaced by their data/timing files (the same rows,
+    plus any correction merged there)."""
+    done = {}
+    for reciter in RECITERS:
+        path = CACHE / f'aligned_{reciter}.json'
+        if path.exists():
+            done[reciter] = write_rows(db, reciter, json.loads(path.read_text(encoding='utf-8')))
+    if done:
+        set_sources(db, today)
+    return done
+
+
+def set_sources(db, today):
+    """Our source row; and Quran.com's timing row (QDC, source 17) goes
+    when no reciter is timed by it any more (al-Dosari was its only one)."""
+    import build_qdc_timing
+    db.execute('DELETE FROM source WHERE id = ?', (SOURCE_ID,))
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', source_row(today))
+    qdc = set(build_qdc_timing.SETS['qdc'])
+    if qdc <= {r for r in RECITERS if (CACHE / f'aligned_{r}.json').exists()}:
+        db.execute("DELETE FROM source WHERE key = 'qdc-timing'")
+
+
 def apply(reciters):
-    """Replace each reciter's verse and word rows with the aligned ones, for
-    the surahs aligned; other surahs keep their rows."""
+    """Writes the aligned rows of these reciters into content.db."""
     from datetime import date
     db = sqlite3.connect(DB)
     for reciter in reciters:
-        path = CACHE / f'aligned_{reciter}.json'
-        out = json.loads(path.read_text(encoding='utf-8'))
-        verses = words = 0
-        for s, d in out.items():
-            surah = int(s)
-            db.execute('DELETE FROM ayah_timing WHERE reciter = ? AND surah = ?', (reciter, surah))
-            db.execute('DELETE FROM word_timing WHERE reciter = ? AND surah = ?', (reciter, surah))
-            db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)',
-                           [(reciter, surah, a, st, en) for a, st, en in d['verses']])
-            db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
-                           [(reciter, surah, a, w, st, en) for a, w, st, en in d['words']])
-            verses += sum(1 for v in d['verses'] if v[0] > 0)
-            words += len(d['words'])
+        out = json.loads((CACHE / f'aligned_{reciter}.json').read_text(encoding='utf-8'))
+        verses, words = write_rows(db, reciter, out)
         print(f'reciter {reciter}: {len(out)} surahs, {verses} verses, {words} words written')
-    db.execute('DELETE FROM source WHERE id = ?', (SOURCE_ID,))
-    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-               source_row(date.today().isoformat()))
+    set_sources(db, date.today().isoformat())
     db.commit()
-
 
 def main():
     cmd, *args = sys.argv[1:]
