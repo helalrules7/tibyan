@@ -17,7 +17,7 @@
 |---|--------|----------------------|
 | 1 | محمد صديق المنشاوي | [ar](https://upload.wikimedia.org/wikipedia/commons/e/ee/Elminshwey.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
 | 2 | محمود خليل الحصري | [ar](https://upload.wikimedia.org/wikipedia/commons/7/70/Hussary.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
-| 3 | عبد الباسط عبد الصمد | [ar](https://upload.wikimedia.org/wikipedia/ar/7/73/%D8%B5%D9%88%D8%B1%D8%A9_%D8%B4%D8%AE%D8%B5%D9%8A%D8%A9_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%B5%D9%85%D8%AF.png?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
+| 3 | عبد الباسط عبد الصمد | [Commons](https://commons.wikimedia.org/wiki/File:Abdul_Basit_Abdul_Samad_at_Centenary_Celebration_Of_Darul_Uloom_Deoband_1980.jpg) — Prasar Bharati، GODL-India، لقطة من فيديو 1980 مقصوصة على الوجه |
 | 4 | محمود علي البنا | [ar](https://upload.wikimedia.org/wikipedia/ar/2/21/%D9%85%D8%AD%D9%85%D9%88%D8%AF_%D8%B9%D9%84%D9%8A_%D8%A7%D9%84%D8%A8%D9%86%D8%A7.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
 | 10 | ياسر الدوسري | [ar](https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Yasser_Al-Dosari_%28cropped%29.jpg/960px-Yasser_Al-Dosari_%28cropped%29.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail) |
 | 11 | عبد الرحمن السديس | [ar](https://upload.wikimedia.org/wikipedia/commons/1/18/Abdul-Rahman_Al-Sudais_%28Cropped%2C_2011%29.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
@@ -37,5 +37,5 @@
 2. مصدره Wikimedia Commons / صورة رسمية بإذن مكتوب.
 3. اسم المصوّر ورخصته في بطاقة «صور القرّاء» في شاشة المصادر
    (`reciterPhotoCredits` في `lib/features/mushaf/presentation/source_names.dart`).
-   صور 3 و4 و14 ليست بترخيص حر (الاستخدام العادل أو مصدر غير معروف):
+   صورتا 4 و14 ليستا بترخيص حر (الاستخدام العادل أو مصدر غير معروف):
    بند إ22 في `docs/MISSING_DATA.md`.

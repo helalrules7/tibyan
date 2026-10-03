@@ -293,6 +293,12 @@ const reciterPhotoCredits = [
     url: 'https://commons.wikimedia.org/wiki/File:Hussary.jpg',
   ),
   (
+    reciter: 3,
+    author: 'Prasar Bharati (India)',
+    license: 'GODL-India',
+    url: 'https://commons.wikimedia.org/wiki/File:Abdul_Basit_Abdul_Samad_at_Centenary_Celebration_Of_Darul_Uloom_Deoband_1980.jpg',
+  ),
+  (
     reciter: 5,
     author: null,
     license: 'Public domain',
