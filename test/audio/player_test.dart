@@ -118,6 +118,16 @@ class FakeRepo extends Fake implements MushafRepository {
         sourceId: 10,
         riwaya: 'hafs',
       ),
+    // Another riwaya's recitation: listed, but not offered with Hafs.
+    ReciterRow(
+      id: 101,
+      nameAr: 'قارئ ورش',
+      nameEn: 'Warsh reciter',
+      style: 'murattal',
+      folderUrl: 'https://server101.mp3quran.net/w/',
+      sourceId: 40,
+      riwaya: 'warsh',
+    ),
   ];
 
   @override
@@ -705,5 +715,42 @@ void main() {
     expect(find.text('كرر هذه الآية'), findsOneWidget);
     final sheet = tester.widget<BottomSheet>(find.byType(BottomSheet));
     expect(sheet.backgroundColor, style.modes[ThemeModeId.night]!.player);
+  });
+
+  testWidgets('another riwaya\'s reciters are shown greyed out', (
+    tester,
+  ) async {
+    final (c, _) = await recitation();
+    tester.view.physicalSize = const Size(1200, 4000);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: c,
+        child: MaterialApp(
+          locale: const Locale('ar'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildTheme(
+            style: registry.byId('mamluk'),
+            mode: ThemeModeId.light,
+            uiFont: UiFont.changa,
+          ),
+          home: const PlayerSettingsScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('قرّاء الروايات الأخرى'), findsOneWidget);
+    RadioListTile<int> tile(String name) => tester.widget(
+      find.ancestor(
+        of: find.textContaining(name),
+        matching: find.byType(RadioListTile<int>),
+      ),
+    );
+    expect(tile('قارئ 1').enabled, isNot(false));
+    expect(tile('قارئ ورش').enabled, isFalse);
+    await tester.tap(find.textContaining('قارئ ورش'), warnIfMissed: false);
+    await tester.pump();
+    expect(c.read(settingsProvider).reciterId, isNot(101));
   });
 }

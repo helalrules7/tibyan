@@ -733,5 +733,8 @@
   "reciterPhotosTitle": "Reciter photos",
   "reciterPhotosNote": "From Wikimedia Commons, resized and cropped by Tibyan.",
   "reciterPhotoCredit": "{author}, {license}",
-  "unknownAuthor": "Unknown author"
+  "unknownAuthor": "Unknown author",
+  "otherRiwayaReciters": "Reciters of other riwayat",
+  "otherRiwayaHint": "Chosen from the mushaf of their riwaya, whose verses are numbered differently.",
+  "reciterOfRiwaya": "Riwaya of {riwaya}"
 }

@@ -1645,4 +1645,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownAuthor => 'Unknown author';
+
+  @override
+  String get otherRiwayaReciters => 'Reciters of other riwayat';
+
+  @override
+  String get otherRiwayaHint =>
+      'Chosen from the mushaf of their riwaya, whose verses are numbered differently.';
+
+  @override
+  String reciterOfRiwaya(String riwaya) {
+    return 'Riwaya of $riwaya';
+  }
 }
