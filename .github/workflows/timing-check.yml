@@ -50,6 +50,9 @@ jobs:
           : > "$RUNNER_TEMP/check.txt"
           : > "$RUNNER_TEMP/policy.txt"
           while IFS=$'\t' read -r status file _previous; do
+            # The owner's and collaborators' changes to code and docs are
+            # theirs to make; only the timing data is checked here.
+            if [[ $trusted == 1 && "$file" != data/timing/* ]]; then continue; fi
             ok=0
             if [[ "$file" =~ ^data/timing/([a-z0-9-]+)/[0-9]{3}\.json$ ]]; then
               slug="${BASH_REMATCH[1]}"
