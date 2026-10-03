@@ -23,7 +23,8 @@ import build_quranlab_timing as ql
 import build_word_timing as b
 
 CACHE = Path(__file__).resolve().parent / '.cache'
-WORD_FILES = ['word_timing.json', 'quranlab_word_timing.json', 'qdc_word_timing.json']
+WORD_FILES = ['word_timing.json', 'quranlab_word_timing.json', 'qdc_word_timing.json',
+              'qul_word_timing.json']
 NEAR_MS = 150
 
 
@@ -60,13 +61,14 @@ def verse_bounds():
     """{(reciter, surah): [boundary ms]}: the start of every verse after
     the first, from mp3quran (reciters 1-3) and from our own derivation."""
     out = {}
-    timing = json.loads((CACHE / 'mp3quran_ayat_timing.json').read_text(encoding='utf-8'))
+    path = CACHE / 'mp3quran_ayat_timing.json'
+    timing = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     for reciter, *_, read in c.RECITERS:
-        if read is None:
+        if read is None or str(read) not in timing:
             continue
         for surah, rows in timing[str(read)].items():
             out[(reciter, int(surah))] = [s for a, s, _ in rows if a > 1]
-    for name in ('quranlab_ayah_timing.json', 'qdc_ayah_timing.json'):
+    for name in ('quranlab_ayah_timing.json', 'qdc_ayah_timing.json', 'qul_ayah_timing.json'):
         path = CACHE / name
         if not path.exists():
             continue
