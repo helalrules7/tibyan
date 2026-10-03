@@ -34,6 +34,9 @@ same kind of open tools QuranLab used:
    Tanzil splits three words that KFGQPC writes as one (15:7 لوما, 27:20
    and 36:22 مالي): their two parts' times are joined into the one word
    box.
+   A one-word verse timed this way (mostly opening letters such as حم,
+   said by name, which the aligner hears poorly) is given its verse's
+   sound, first to last loud frame (`span` in the report).
 3. Proportional placement is the last resort: QuranLab's word times
    scaled into the verse's measured window. It is flagged `approx` in
    the report and in docs/MISSING_DATA.md. A verse that cannot be
