@@ -1,0 +1,68 @@
+name: Timing deploy
+
+# After timing files are merged into main: checks them, builds one pack per
+# published reciter (timing-<slug>-v<n>.json.gz) and manifest.json, and
+# copies them to https://tibyan.ahmedhelal.dev/timing/, where the app looks
+# for updated timings. The key may only write into that directory.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/timing/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: timing-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build packs and upload
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0  # pack versions count the commits that touched each reciter
+          persist-credentials: false
+      - name: Tests
+        run: python3 -m unittest discover -s tools/tests -p 'test_timing_files.py'
+      - name: Check every file
+        run: python3 tools/timing_files.py check
+      - name: Build packs
+        run: python3 tools/timing_files.py pack --out out && cat out/manifest.json
+      - name: Upload (packs first, then the manifest that names them)
+        env:
+          KEY: ${{ secrets.TIMING_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.TIMING_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          dir=$(mktemp -d)
+          trap 'rm -rf "$dir"' EXIT
+          printf '%s\n' "$KEY" > "$dir/key"
+          printf '%s\n' "$KNOWN_HOSTS" > "$dir/known_hosts"
+          ssh="ssh -i $dir/key -o UserKnownHostsFile=$dir/known_hosts -o StrictHostKeyChecking=yes -o BatchMode=yes -o IdentitiesOnly=yes"
+          chmod 644 out/*
+          rsync -e "$ssh" out/timing-*.json.gz tibyan-ci@217.76.57.212:./
+          rsync -e "$ssh" out/manifest.json tibyan-ci@217.76.57.212:./
+      - name: Verify what the app will read
+        run: |
+          set -euo pipefail
+          sleep 5
+          curl -fsS "https://tibyan.ahmedhelal.dev/timing/manifest.json?t=$(date +%s)" -o served.json
+          python3 - <<'PY'
+          import hashlib, json, urllib.request
+          served = json.load(open('served.json'))
+          built = json.load(open('out/manifest.json'))
+          assert served == built, 'the server holds another manifest'
+          for e in served['reciters']:
+              data = urllib.request.urlopen('https://tibyan.ahmedhelal.dev/timing/' + e['file']).read()
+              assert hashlib.sha256(data).hexdigest() == e['sha256'], e['file']
+              print('ok', e['file'])
+          PY
