@@ -19,6 +19,11 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quranlab_banna_timing.json QuranLab word timings, al-Banna (fetch_quranlab_timing.py)
   tools/.cache/quranlab_ayah_timing.json  al-Banna verse timings derived from it (build_quranlab_timing.py)
   tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
+  tools/.cache/banna_ayah_timing.json     al-Banna verse and word timings verse by verse, replacing
+  tools/.cache/banna_word_timing.json     the two above for him when present (build_banna_timing.py)
+  tools/.cache/qul_timing.json            QUL verse and word timings, al-Muaiqly (fetch_qul_timing.py)
+  tools/.cache/qul_ayah_timing.json       ... checked against the surah files (build_qdc_timing.py qul)
+  tools/.cache/qul_word_timing.json
   data/timing/<slug>/NNN.json            timings of the published reciters, which replace
                                           the generated rows (timing_files.py, docs/TIMING.md)
   tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
@@ -33,6 +38,8 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
 Usage:
   python3 tools/fetch_sources.py
   python3 tools/build_content_db.py
+  python3 tools/build_content_db.py qul   # only the new reciters and the QUL timings,
+                                          # into the content.db already built
 """
 import hashlib
 import json
@@ -45,6 +52,7 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
+import build_banna_timing as banna_timing
 import build_line_cuts
 import build_mutashabih
 import build_tajweed
@@ -149,6 +157,13 @@ RECITERS = [
      'https://server7.mp3quran.net/s_gmd/', 30),
     (14, 'محمد الطبلاوي', 'Muhammad al-Tablaway', 'murattal',
      'https://server12.mp3quran.net/tblawi/', 106),
+    # An imam of the Haram, from quranicaudio.com (his 1440H recording).
+    # Quranic Universal Library times every word of it on these very files
+    # (tools/fetch_qul_timing.py, build_qdc_timing.py). mp3quran's murattal
+    # of his and everyayah's per-verse files (which QuranLab timed) are
+    # other takes: nothing from them could be placed on these files.
+    (15, 'ماهر المعيقلي', 'Maher al-Muaiqly', 'murattal',
+     'https://download.quranicaudio.com/quran/maher_almu3aiqly/year1440/', None),
 ]
 
 
@@ -190,6 +205,45 @@ def timing_rows(timing, counts):
                 continue
             rows += [(reciter, surah, a, start, end) for a, start, end in entries]
     return rows, gaps
+
+
+QUL_SOURCE_ID = 21
+
+
+def add_qul_timing(db, today):
+    """al-Muaiqly's verse and word timings from Quranic Universal Library
+    (tools/fetch_qul_timing.py, build_qdc_timing.py qul), and their
+    source row. Also run on its own (`build_content_db.py qul`) to put
+    them into an existing content.db, replacing the rows of the QUL
+    reciters only."""
+    timing_path = CACHE / 'qul_timing.json'
+    verses = json.loads((CACHE / 'qul_ayah_timing.json').read_text(encoding='utf-8'))
+    words = json.loads((CACHE / 'qul_word_timing.json').read_text(encoding='utf-8'))
+    reciters = sorted({r[0] for r in verses})
+    marks = ','.join('?' * len(reciters))
+    db.execute('DELETE FROM source WHERE id = ?', (QUL_SOURCE_ID,))
+    db.execute(f'DELETE FROM ayah_timing WHERE reciter IN ({marks})', reciters)
+    db.execute(f'DELETE FROM word_timing WHERE reciter IN ({marks})', reciters)
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
+        QUL_SOURCE_ID, 'qul-timing', 'Verse and word timings of Maher al-Muaiqly (Quranic Universal Library)',
+        'Quranic Universal Library (QUL, Tarteel), recitation segments', None,
+        'No licence stated on the resource; QUL FAQ: licences vary per resource. '
+        'Permission to be requested (see docs/MISSING_DATA.md)',
+        'https://qul.tarteel.ai/resources/recitation/405',
+        'توقيت الآيات والكلمات للمعيقلي: Quranic Universal Library (Tarteel)', None,
+        sha256(timing_path), today))
+    db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)', verses)
+    db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)', words)
+
+
+def add_reciters(db):
+    """Inserts the reciters of RECITERS missing from an existing
+    content.db (`build_content_db.py qul`); rows already there are kept."""
+    have = {r[0] for r in db.execute('SELECT id FROM reciter')}
+    db.executemany('INSERT INTO reciter (id, name_ar, name_en, style, folder_url, source_id) '
+                   'VALUES (?,?,?,?,?,?)',
+                   [(i, ar, en, style, url, 16 if 'quranicaudio.com' in url else 10)
+                    for i, ar, en, style, url, _ in RECITERS if i not in have])
 
 
 def basmala_prefix_length(verses, key):
@@ -511,6 +565,13 @@ def main():
                    json.loads(quranlab_ayah_path.read_text(encoding='utf-8')))
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(quranlab_word_path.read_text(encoding='utf-8')))
+    # al-Banna verse by verse (build_banna_timing.py): QuranLab's words
+    # where his verses are found by sound, forced alignment elsewhere.
+    banna_ayah_path = CACHE / 'banna_ayah_timing.json'
+    if banna_ayah_path.exists():
+        banna_timing.replace(db, json.loads(banna_ayah_path.read_text(encoding='utf-8')),
+                             json.loads((CACHE / 'banna_word_timing.json').read_text(encoding='utf-8')))
+        db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', banna_timing.source_row(today))
     db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
         17, 'qdc-timing', 'Verse and word timings of the imams of the two Harams (quran.com)',
         'Quran.com (QDC audio API; segments from Quranic Universal Library)', None,
@@ -521,6 +582,7 @@ def main():
                    json.loads(qdc_ayah_path.read_text(encoding='utf-8')))
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(qdc_word_path.read_text(encoding='utf-8')))
+    add_qul_timing(db, today)
     # Timings kept as text in data/timing (the published reciters) replace
     # the generated rows above: corrections merged there are the source.
     for slug, (n_ayahs, n_words) in timing_files.apply(db).items():
@@ -685,9 +747,9 @@ def main():
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
     assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
     assert check.execute('SELECT COUNT(*) FROM commentary').fetchone()[0] == 3 * 6236
-    # Verse timings: the ten Hafs recitations and ten of the riwaya ones
+    # Verse timings: the eleven Hafs recitations and ten of the riwaya ones
     # (four riwaya recitations have none published).
-    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing WHERE reciter < 100').fetchone()[0] == 10
+    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing WHERE reciter < 100').fetchone()[0] == 11
     assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing WHERE reciter > 100').fetchone()[0] == 10
     # Shamarly: every text page 2..522 carries verses; verses in order never go back a page.
     covered = {p for s, e in check.execute('SELECT page_shamarly, page_shamarly_end FROM ayah')
@@ -712,5 +774,27 @@ def main():
     return 0
 
 
+def update_qul():
+    """Puts the reciters added since and the QUL timings into the
+    content.db already built, without rebuilding the rest (whose inputs
+    are not all cached)."""
+    check_reciters()
+    db = sqlite3.connect(OUT)
+    add_reciters(db)
+    add_qul_timing(db, date.today().isoformat())
+    # Speech spans (tools/build_ayah_speech.py), when built since: the
+    # file holds the whole table.
+    speech_path = CACHE / 'ayah_speech.json'
+    if speech_path.exists():
+        db.execute('DELETE FROM ayah_speech')
+        db.executemany('INSERT INTO ayah_speech VALUES (?,?,?,?,?)',
+                       json.loads(speech_path.read_text(encoding='utf-8')))
+    db.commit()
+    db.execute('VACUUM')
+    db.close()
+    print(f'updated {OUT.relative_to(REPO)}: reciters and QUL timings')
+    return 0
+
+
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(update_qul() if sys.argv[1:] == ['qul'] else main())

@@ -10,7 +10,9 @@ For each reciter with verse timings in content.db:
 Nothing here touches the Quran text; it only measures the audio.
 
 Usage:
-  python3 tools/build_ayah_speech.py     # needs tools/.cache/audio/<reciter>/NNN.mp3
+  python3 tools/build_ayah_speech.py              # needs tools/.cache/audio/<reciter>/NNN.mp3
+  python3 tools/build_ayah_speech.py 15           # only these reciters; the others keep
+                                                  # the rows content.db already has
 A verse whose surah file is not cached keeps the row of the last build.
 Writes tools/.cache/ayah_speech.json: [[reciter, surah, ayah, start_ms, end_ms], ...]
 """
@@ -61,8 +63,12 @@ def main():
     for r, s, a, st, en in db.execute(
             'SELECT reciter, surah, ayah, MIN(start_ms), MAX(end_ms) FROM word_timing GROUP BY 1, 2, 3'):
         words.setdefault((r, s), {})[a] = (st, en)
-    jobs = [(r, s, w, words.get((r, s), {})) for (r, s), w in sorted(windows.items())]
+    only = {int(a) for a in sys.argv[1:]}
+    jobs = [(r, s, w, words.get((r, s), {})) for (r, s), w in sorted(windows.items())
+            if not only or r in only]
     rows = []
+    if only:
+        rows += [tuple(r) for r in db.execute('SELECT * FROM ayah_speech') if r[0] not in only]
     with ProcessPoolExecutor() as pool:
         for part in pool.map(surah_rows, jobs):
             rows += part
