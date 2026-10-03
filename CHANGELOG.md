@@ -6,6 +6,12 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (recitation timings anyone can correct)
+- The timings of al-Sudais (every verse and word of the 114 surahs) are now text files in `data/timing/`, published under CC BY 4.0 with their sources' credit; content.db is built from them, with the same rows as before. Which reciters' timings may be published, and why, is in docs/TIMING.md.
+- A timing editor on the web (https://helalrules7.github.io/tibyan/, Arabic, works on a phone): listen with the waveform, the word being recited highlighted in the mushaf text, drag a word's start or end, tap to mark words while listening, nudge by 10 or 50 ms, loop a word or verse, slow down to half speed, undo, and see problems as you go. «اقترح التعديل» opens GitHub's editor with the new file, so the correction arrives as a pull request.
+- Pull requests that change timings are checked automatically and get a comment with a link that opens the change in the editor for review; once merged, the timings are packed and published on our server.
+- The app picks up corrected timings from our server (at most twice a day), verifies them, and prefers them over the ones it shipped with; offline, nothing changes.
+
 ### Added (hifz)
 - A «الحفظ» screen from the home tile (it replaces «قريبا»): today's review, start a test, the hifz map, and every review unit with its next date.
 - Word-by-word recitation test: a unit (a page of the edition being read, a hizb quarter or a surah) opens with its verses covered; «الكلمة التالية» or a tap on a verse shows its next word, in all three editions and on the opening pages. Verses without word positions (219 in the old edition, the Shamarly verses whose split is not reviewed) are shown line by line, and the bar says so. «حفظت» / «أخطأت» judges each verse.
