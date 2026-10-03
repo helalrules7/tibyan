@@ -6,6 +6,11 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (recitation timings anyone can correct)
+- The timings of al-Sudais, al-Minshawi, al-Husary, Abdul Basit, al-Banna and Mustafa Ismail (verses and words), and of ten riwaya recitations (verses), are now text files in `data/timing/`, published under CC BY 4.0 with their sources' credit; content.db is built from them, with the same rows as before. Which reciters' timings may be published, and why, is in docs/TIMING.md.
+- A timing editor on the web (https://helalrules7.github.io/tibyan/, Arabic, works on a phone): listen with the waveform, the word being recited highlighted in the mushaf text, drag a word's start or end, tap to mark words while listening, nudge by 10 or 50 ms, loop a word or verse, slow down to half speed, undo, and see problems as you go. «اقترح التعديل» opens GitHub's editor with the new file, so the correction arrives as a pull request.
+- Pull requests that change timings are checked automatically and get a comment with a link that opens the change in the editor for review; once merged, the timings are packed and published on our server.
+- The app picks up corrected timings from our server (at most twice a day), verifies them, and prefers them over the ones it shipped with; offline, nothing changes.
 ### Changed (recitation timing)
 - al-Banna (murattal) is now highlighted verse by verse and word by word in all 114 surahs (6,236 verses, 77,430 words; before: 100 surahs, 5,117 verses with words). QuranLab's words are kept wherever his verses are found by their sound; a verse that is not found no longer costs its surah its timing, and is timed by forced alignment on the surah file (wav2vec2 Arabic, Apache-2.0), which agrees with QuranLab's word starts within 51 ms for 95% of words where both exist.
 

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>محرر توقيت التلاوات · تبيان</title>
+  <meta name="description" content="صحح توقيت الآيات والكلمات في تلاوات تطبيق تبيان، واقترح التعديل على GitHub.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23245c4f'/%3E%3Cpath d='M6 20h3v-6h2v10h2V9h2v13h2v-9h2v6h2v-3h3' stroke='%23f4efe3' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#words">انتقل إلى الكلمات</a>
+  <header class="top">
+    <div class="brand">
+      <h1>محرر توقيت التلاوات</h1>
+      <p class="sub">تبيان · صحح متى تبدأ كل آية وكل كلمة، ثم اقترح التعديل</p>
+    </div>
+    <nav class="links">
+      <a class="button primary guide-link" href="guide.html">الدليل</a>
+      <button type="button" id="help-open" class="link">الاختصارات</button>
+      <a class="link" href="https://github.com/helalrules7/tibyan/blob/main/apps/timing-editor/CONTRIBUTING.md" target="_blank" rel="noopener">كيف تساهم · Contributing</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="welcome" class="welcome" aria-labelledby="welcome-title" hidden>
+      <h2 id="welcome-title">أول مرة هنا؟</h2>
+      <ol>
+        <li>اختر القارئ والسورة، ثم اضغط «تشغيل» واستمع بسماعة.</li>
+        <li>إن تلوّنت كلمة قبل صوتها أو بعده: انقرها، ثم حرّك بدايتها أو نهايتها.</li>
+        <li>تأكد بتكرار الكلمة، ثم اضغط «اقترح التعديل».</li>
+      </ol>
+      <div class="row">
+        <a class="button primary" href="guide.html">اقرأ الدليل خطوة خطوة</a>
+        <button type="button" id="welcome-close">فهمت، ابدأ</button>
+      </div>
+    </section>
+
+    <section class="pickers" aria-label="اختيار التلاوة">
+      <p class="step"><b>١</b> اختر القارئ والسورة</p>
+      <label>القارئ
+        <select id="reciter"></select>
+      </label>
+      <label>السورة
+        <select id="surah"></select>
+      </label>
+      <label>الآية
+        <select id="verse"></select>
+      </label>
+      <p id="source-note" class="note" hidden></p>
+    </section>
+
+    <section class="player" aria-label="التشغيل">
+      <p class="step"><b>٢</b> شغّل واستمع بسماعة. الكلمة المسموعة تتلوّن في النص بالأسفل</p>
+      <div class="transport">
+        <button type="button" id="play" class="primary" aria-keyshortcuts="Space">تشغيل</button>
+        <button type="button" id="back" title="رجوع ثانيتين" aria-label="رجوع ثانيتين">−٢ث</button>
+        <button type="button" id="fwd" title="تقدم ثانيتين" aria-label="تقدم ثانيتين">+٢ث</button>
+        <span id="clock" class="clock" aria-live="off">0:00.000</span>
+      </div>
+      <div class="transport">
+        <label class="inline">السرعة
+          <select id="speed">
+            <option value="0.5">0.5×</option>
+            <option value="0.6">0.6×</option>
+            <option value="0.75">0.75×</option>
+            <option value="0.9">0.9×</option>
+            <option value="1" selected>1×</option>
+          </select>
+        </label>
+        <label class="inline">التكرار
+          <select id="loop">
+            <option value="">بلا تكرار</option>
+            <option value="word">الكلمة</option>
+            <option value="verse">الآية</option>
+          </select>
+        </label>
+        <label class="toggle"><input type="checkbox" id="tap"> وضع النقر</label>
+        <label class="toggle"><input type="checkbox" id="linked" checked> ربط الحدود</label>
+        <label class="toggle"><input type="checkbox" id="follow" checked> متابعة</label>
+      </div>
+      <p id="tap-hint" class="hint" hidden>وضع النقر: شغّل التلاوة واضغط <kbd>مسافة</kbd> (أو زر «علّم») عند بداية كل كلمة، و<kbd>Enter</kbd> عند نهاية كلمة يليها سكوت. <kbd>Esc</kbd> للخروج.</p>
+      <button type="button" id="tap-button" class="tap-button" hidden>علّم بداية الكلمة</button>
+    </section>
+
+    <section class="timeline-wrap" aria-label="الموجة الصوتية والتوقيت">
+      <p class="step"><b>٣</b> كلمة خطأ؟ انقرها في النص، ثم اسحب حافتها هنا (اليمنى بدايتها، واليسرى نهايتها)، أو استعمل أزرار «المحدد»</p>
+      <div class="timeline-tools">
+        <button type="button" id="zoom-in" aria-label="تكبير">＋</button>
+        <button type="button" id="zoom-out" aria-label="تصغير">－</button>
+        <span class="legend"><i class="sw verse"></i> آية <i class="sw word"></i> كلمة <i class="sw sel"></i> المحددة <i class="sw bad"></i> فيها خطأ</span>
+        <span id="wave-status" class="note"></span>
+      </div>
+      <canvas id="timeline" height="190" role="img" aria-label="الموجة الصوتية مع حدود الآيات والكلمات. اسحب حافة كلمة لتعديلها."></canvas>
+    </section>
+
+    <div class="cols">
+      <section class="inspector" aria-label="الكلمة المحددة" id="inspector">
+        <h2>المحدد</h2>
+        <div class="target">
+          <label class="inline"><input type="radio" name="target" value="word" checked> الكلمة</label>
+          <label class="inline"><input type="radio" name="target" value="verse"> الآية</label>
+        </div>
+        <p id="sel-word" class="sel-word quran" aria-live="polite">—</p>
+        <p id="sel-ref" class="note"></p>
+        <div class="edge">
+          <span class="edge-name">البداية</span>
+          <input type="number" id="sel-start" inputmode="numeric" step="10" aria-label="البداية بالمللي ثانية">
+          <div class="nudges" data-edge="start">
+            <button type="button" data-d="-50" aria-label="البداية −٥٠">−٥٠</button>
+            <button type="button" data-d="-10" aria-label="البداية −١٠">−١٠</button>
+            <button type="button" data-d="10" aria-label="البداية +١٠">+١٠</button>
+            <button type="button" data-d="50" aria-label="البداية +٥٠">+٥٠</button>
+            <button type="button" data-now aria-label="البداية = الآن">= الآن</button>
+          </div>
+        </div>
+        <div class="edge">
+          <span class="edge-name">النهاية</span>
+          <input type="number" id="sel-end" inputmode="numeric" step="10" aria-label="النهاية بالمللي ثانية">
+          <div class="nudges" data-edge="end">
+            <button type="button" data-d="-50" aria-label="النهاية −٥٠">−٥٠</button>
+            <button type="button" data-d="-10" aria-label="النهاية −١٠">−١٠</button>
+            <button type="button" data-d="10" aria-label="النهاية +١٠">+١٠</button>
+            <button type="button" data-d="50" aria-label="النهاية +٥٠">+٥٠</button>
+            <button type="button" data-now aria-label="النهاية = الآن">= الآن</button>
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" id="play-sel">▶ استمع للمحدد</button>
+          <button type="button" id="fit-verse" title="بداية الآية = بداية أول كلمة، ونهايتها = نهاية آخر كلمة">طابق الآية مع كلماتها</button>
+          <button type="button" id="undo" aria-keyshortcuts="Control+Z">تراجع</button>
+          <button type="button" id="redo" aria-keyshortcuts="Control+Shift+Z">إعادة</button>
+        </div>
+      </section>
+
+      <section class="checks" aria-label="الفحص">
+        <p class="step"><b>٤</b> أصلح ما يظهر هنا بالأحمر، ثم اقترح التعديل</p>
+        <h2>الفحص <span id="check-count" class="badge"></span></h2>
+        <ul id="issues" class="issues"></ul>
+        <div id="changes" class="changes"></div>
+        <div class="row">
+          <button type="button" id="submit" class="primary">اقترح التعديل</button>
+          <button type="button" id="download">تنزيل الملف</button>
+          <button type="button" id="reset">تجاهل تعديلاتي</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="text" aria-label="نص السورة">
+      <h2 id="surah-title">—</h2>
+      <div id="words" class="words quran" role="listbox" aria-label="كلمات السورة. الأسهم للتنقل، Enter للاستماع." tabindex="-1"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>نص القرآن من بيانات تطبيق تبيان كما هي (نص مجمع الملك فهد، الإصدار 2.0، بخط المجمع غير معدل). التوقيت منشور برخصة CC BY 4.0 مع نسبة مصادره المذكورة في <a href="https://github.com/helalrules7/tibyan/blob/main/docs/TIMING.md" target="_blank" rel="noopener">docs/TIMING.md</a>.</p>
+    <p id="attribution" class="note"></p>
+  </footer>
+
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+
+  <dialog id="submit-dialog" aria-labelledby="submit-title">
+    <form method="dialog" class="dialog">
+      <h2 id="submit-title">اقترح التعديل على GitHub</h2>
+      <p id="submit-summary"></p>
+      <ol class="steps">
+        <li><button type="button" id="copy" class="primary">انسخ الملف الجديد</button> <span id="copy-state" class="note"></span></li>
+        <li><a id="gh-edit" class="button" target="_blank" rel="noopener">افتح الملف في محرر GitHub</a>
+          <span class="note">سجّل الدخول إلى GitHub إن طُلب منك؛ سيعرض عليك إنشاء نسخة (fork) تلقائيا.</span></li>
+        <li>في محرر GitHub: حدد كل النص (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>A</kbd>) والصق (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>V</kbd>).</li>
+        <li>اضغط الزر الأخضر <b>Commit changes…</b> ثم <b>Propose changes</b>. في الصفحة التالية اضغط <b>Create pull request</b>، واكتب ما سمعته ولماذا عدّلت، ثم <b>Create pull request</b> مرة أخرى.
+          <div class="pr-title">عنوان مقترح: <code id="pr-title"></code> <button type="button" id="copy-title" class="small">انسخ</button></div></li>
+      </ol>
+      <p class="note">سيفحص GitHub التعديل تلقائيا، ويراجعه أحد المشرفين بالاستماع قبل دمجه. بعد الدمج يصل التوقيت الجديد إلى التطبيق خلال ١٢ ساعة تقريبا. ليس لديك حساب GitHub؟ أنشئه مجانا من <a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a>، أو نزّل الملف. التفاصيل في <a href="guide.html#step-12" target="_blank">الدليل</a>.</p>
+      <details>
+        <summary>English</summary>
+        <ol>
+          <li>Copy the new file.</li>
+          <li>Open it in GitHub's editor (sign in; GitHub offers to fork the repository).</li>
+          <li>Select all, paste, then <b>Commit changes…</b> → <b>Propose changes</b> → <b>Create pull request</b>. Say what you heard and why you changed it.</li>
+        </ol>
+      </details>
+      <div class="row">
+        <button type="button" id="download-2">تنزيل الملف بدلا من ذلك</button>
+        <button value="close">إغلاق</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <form method="dialog" class="dialog">
+      <h2 id="help-title">طريقة العمل</h2>
+      <ol>
+        <li>اختر القارئ والسورة، ثم شغّل التلاوة. الكلمة المسموعة تُظلَّل.</li>
+        <li>إن رأيت التظليل يسبق الصوت أو يتأخر عنه: اختر الكلمة (بالنقر عليها) وعدّل بدايتها أو نهايتها بالسحب على الموجة، أو بأزرار ±١٠ و±٥٠ مللي ثانية، أو «= الآن» أثناء التشغيل.</li>
+        <li>للكلمات الكثيرة: «وضع النقر» — اضغط مسافة عند بداية كل كلمة وأنت تسمع، وخفض السرعة إن احتجت.</li>
+        <li>كرر الكلمة أو الآية لتسمع الحد مرات. ثم «اقترح التعديل».</li>
+      </ol>
+      <h3>الاختصارات</h3>
+      <table class="keys">
+        <tr><td><kbd>مسافة</kbd></td><td>تشغيل وإيقاف (وفي وضع النقر: علّم بداية الكلمة التالية)</td></tr>
+        <tr><td><kbd>Enter</kbd></td><td>استمع للمحدد (وفي وضع النقر: نهاية الكلمة الحالية)</td></tr>
+        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>الكلمة التالية / السابقة</td></tr>
+        <tr><td><kbd>,</kbd> <kbd>.</kbd></td><td>البداية −١٠ / +١٠ مللي ثانية (مع <kbd>Shift</kbd>: ٥٠)</td></tr>
+        <tr><td><kbd>;</kbd> <kbd>'</kbd></td><td>النهاية −١٠ / +١٠ مللي ثانية (مع <kbd>Shift</kbd>: ٥٠)</td></tr>
+        <tr><td><kbd>S</kbd> <kbd>E</kbd></td><td>البداية / النهاية = لحظة التشغيل الآن</td></tr>
+        <tr><td><kbd>L</kbd></td><td>تكرار: بلا ← الكلمة ← الآية</td></tr>
+        <tr><td><kbd>[</kbd> <kbd>]</kbd></td><td>أبطأ / أسرع</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> ، <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td><td>تراجع / إعادة</td></tr>
+      </table>
+      <p class="note">الاختصارات تعمل بموضع المفتاح، فلا يهم إن كانت لوحة المفاتيح عربية.</p>
+      <div class="row"><button value="close" class="primary">حسنا</button></div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
