@@ -6,10 +6,11 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../audio/player_bar.dart';
+import '../audio/recitation.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
-import '../mushaf/presentation/widgets/illuminated_frame.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -27,6 +28,19 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           Card(
+            child: SwitchListTile(
+              secondary: const Icon(Icons.elderly),
+              title: Text(l.elderlyMode),
+              subtitle: Text(
+                l.elderlyModeHint,
+                style: TextStyle(color: t.muted),
+              ),
+              value: settings.elderlyMode,
+              onChanged: controller.setElderlyMode,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
             child: ListTile(
               leading: const Icon(Icons.palette_outlined),
               title: Text(l.appearanceTitle),
@@ -41,6 +55,19 @@ class SettingsScreen extends ConsumerWidget {
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go('/settings/appearance'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.headphones_outlined),
+              title: Text(l.playerSettings),
+              subtitle: Text(switch (ref.watch(currentReciterProvider).value) {
+                final r? => reciterLabel(context, r),
+                null => '',
+              }, style: TextStyle(color: t.muted)),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go('/settings/player'),
             ),
           ),
           const SizedBox(height: 8),
@@ -105,41 +132,25 @@ class SettingsScreen extends ConsumerWidget {
                           title: Text(name),
                           subtitle: EditionBadge(edition: e),
                         ),
+                      // The KFGQPC Madina mushafs of the other riwayat.
+                      ListTile(
+                        title: Text(
+                          l.riwayatTitle,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(l.riwayaEditionDesc),
+                      ),
+                      for (final e in MushafEdition.values)
+                        if (e.isRiwaya)
+                          RadioListTile(
+                            value: e,
+                            title: Text(editionName(l, e)),
+                            subtitle: EditionBadge(edition: e),
+                          ),
                     ],
                   ),
                 ),
                 const DownloadAllButton(),
-                const Divider(height: 1),
-                ListTile(
-                  title: Text(l.frameDesignLabel),
-                  trailing: const FramePreview(width: 56),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        for (final (design, name) in [
-                          (null, l.frameByStyle),
-                          (FrameDesign.zakhrafa, l.frameZakhrafa),
-                          (FrameDesign.plain, l.framePlain),
-                          (FrameDesign.abbasid, l.frameAbbasid),
-                          (FrameDesign.umayyad, l.frameUmayyad),
-                          (FrameDesign.andalusian, l.frameAndalusian),
-                          (FrameDesign.ottoman, l.frameOttoman),
-                          (FrameDesign.egyptian, l.frameEgyptian),
-                          (FrameDesign.modernIslamic, l.frameModernIslamic),
-                        ])
-                          ChoiceChip(
-                            label: Text(name),
-                            selected: settings.frameDesign == design,
-                            onSelected: (_) =>
-                                controller.setFrameDesign(design),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
                 const Divider(height: 1),
                 SwitchListTile(
                   title: Text(l.keepScreenOn),
@@ -155,8 +166,6 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.highlightDivineNames,
                   onChanged: controller.setHighlightDivineNames,
                 ),
-                const Divider(height: 1),
-                const _MarkerSettings(),
               ],
             ),
           ),
@@ -216,116 +225,4 @@ class _SectionTitle extends StatelessWidget {
       ),
     ),
   );
-}
-
-/// Verse-end marker shape and tint.
-class _MarkerSettings extends ConsumerWidget {
-  const _MarkerSettings();
-
-  static const _images = {
-    MarkerStyle.rosette7: 'assets/ornaments/marker_7.png',
-    MarkerStyle.rosette9: 'assets/ornaments/marker_9.png',
-    MarkerStyle.rosette16: 'assets/ornaments/marker_16.png',
-  };
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    final settings = ref.watch(settingsProvider);
-    final controller = ref.read(settingsProvider.notifier);
-    Widget choice({
-      required bool selected,
-      required String label,
-      required Widget child,
-      required VoidCallback onTap,
-    }) {
-      return Semantics(
-        selected: selected,
-        button: true,
-        label: label,
-        excludeSemantics: true,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: selected ? t.control : t.border,
-                width: selected ? 2.5 : 1,
-              ),
-            ),
-            child: Center(child: child),
-          ),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l.markerStyleLabel),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              for (final style in MarkerStyle.values)
-                choice(
-                  selected: settings.markerStyle == style,
-                  label: style == MarkerStyle.traditional
-                      ? l.markerTraditional
-                      : l.markerRosette,
-                  onTap: () => controller.setMarkerStyle(style),
-                  child: style == MarkerStyle.traditional
-                      ? Text(
-                          '\u06DD',
-                          style: TextStyle(
-                            fontFamily: 'UthmanicHafs',
-                            fontSize: 30,
-                            color: t.ink,
-                          ),
-                        )
-                      : Image.asset(_images[style]!, width: 40, height: 40),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(l.markerTintLabel),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              choice(
-                selected: settings.markerTint == null,
-                label: l.markerTintNone,
-                onTap: () => controller.setMarkerTint(null),
-                child: Icon(Icons.block, color: t.muted),
-              ),
-              for (final c in markerTints)
-                choice(
-                  selected: settings.markerTint == c,
-                  label: l.markerTintLabel,
-                  onTap: () => controller.setMarkerTint(c),
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Color(c),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }

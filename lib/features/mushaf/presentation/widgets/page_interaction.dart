@@ -2,13 +2,16 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/settings/app_settings.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../data/tajweed.dart';
 import 'mushaf_page.dart';
+import 'theme_art.dart';
 
 /// What the reader can do on a page; shared by both editions.
 class PageInteraction {
@@ -22,6 +25,7 @@ class PageInteraction {
     this.markerLook,
     this.hidden,
     this.hiddenWords = const {},
+    this.revealedWords = const {},
     this.onHiddenTap,
     this.ornateOpening = false,
     this.showHandles = false,
@@ -32,7 +36,31 @@ class PageInteraction {
     this.onVerseTap,
     this.touched,
     this.touchColor,
+    this.onPick,
+    this.verseLabel,
+    this.verseText,
+    this.tajweedColor,
+    this.tajweed = '',
   });
+
+  /// Screen readers: a verse's name («سورة البقرة، الآية ٥») and its text
+  /// as stored (read after the name). Without [verseLabel] the page has no
+  /// verse nodes.
+  final String Function(VerseKey verse)? verseLabel;
+  final String? Function(VerseKey verse)? verseText;
+
+  /// Tajweed colouring: each rule's colour on this page's paper (null for
+  /// a rule left uncoloured); null when the colouring is off.
+  final Color? Function(TajweedRule rule)? tajweedColor;
+
+  /// This page's row of `tajweed_page` (tools/build_tajweed.py), in the
+  /// edition's format.
+  final String tajweed;
+
+  /// Word picking («دراسة الكلمة»): while set, a tap goes here instead,
+  /// with the point in edition units (page units in the new edition, image
+  /// px in the others) and the verse under it, if any.
+  final void Function(Offset point, VerseKey? verse)? onPick;
 
   /// Touch reading: a tap on a verse shades it (replacing the last one).
   final ValueChanged<VerseKey>? onVerseTap;
@@ -64,12 +92,18 @@ class PageInteraction {
   final Set<VerseKey>? hidden;
 
   /// Recitation mode: the word boxes of each covered verse, where known
-  /// (edition units). Only the words are covered, so verse-end markers and
-  /// the hizb sign stay visible; verses without word boxes are covered
-  /// whole and their markers drawn again on top.
+  /// (edition units), which place its lines. A covered verse is hidden
+  /// line by line, band high, from marker to marker, with every mark it
+  /// has; only the verse-end markers and their numbers stay.
   final Map<VerseKey, List<Rect>> hiddenWords;
 
-  /// Recitation mode: a covered verse was tapped.
+  /// Recitation test (word by word): the words of a covered verse already
+  /// shown, in reading order (edition units). Then [hiddenWords] holds only
+  /// the words still covered: lines with none of them stay uncovered, and
+  /// on the line where the two meet the cover stops at the shown words.
+  final Map<VerseKey, List<Rect>> revealedWords;
+
+  /// Recitation mode: a verse was tapped (to show or cover it).
   final ValueChanged<VerseKey>? onHiddenTap;
 
   /// Verses highlighted on this page (the current selection).
@@ -86,6 +120,54 @@ class PageInteraction {
   /// A selection handle was dragged over [VerseKey]; `start` is true for
   /// the handle at the beginning of the selection.
   final void Function(bool start, VerseKey verse) onHandleDrag;
+}
+
+/// Screen-reader nodes for a page's verses, one per verse over the area
+/// it covers ([areas], screen coordinates, in reading order). A double tap
+/// selects the verse (or, in recitation mode, shows or covers it; while
+/// picking a word, studies the verse), a long press does what it does on
+/// the page, and a custom action sets or removes the reading mark. The
+/// nodes take no touches: the page under them still answers every gesture.
+List<Widget> verseSemanticNodes(
+  PageInteraction x,
+  List<(VerseKey, Rect)> areas, {
+  required String markAction,
+}) {
+  final label = x.verseLabel;
+  if (label == null) return const [];
+  return [
+    for (final (i, (v, rect)) in areas.indexed)
+      Positioned.fromRect(
+        rect: rect,
+        child: Semantics(
+          container: true,
+          sortKey: OrdinalSortKey(i + 1.0),
+          label: label(v),
+          value: x.verseText?.call(v),
+          selected: x.selection.contains(v),
+          onTap: () {
+            if (x.onPick != null) return x.onPick!(rect.center, v);
+            if (x.hidden != null) return x.onHiddenTap?.call(v);
+            x.onVerseLongPress(v);
+          },
+          onLongPress: () => x.onVerseLongPress(v),
+          customSemanticsActions: {
+            CustomSemanticsAction(label: markAction): () => x.onMarkerTap(v),
+          },
+          child: const SizedBox.expand(),
+        ),
+      ),
+  ];
+}
+
+/// The union of each verse's rectangles, in the order the verses first
+/// appear (reading order).
+List<(VerseKey, Rect)> verseAreas(Iterable<(VerseKey, Rect)> pieces) {
+  final out = <VerseKey, Rect>{};
+  for (final (v, r) in pieces) {
+    out[v] = out[v]?.expandToInclude(r) ?? r;
+  }
+  return [for (final e in out.entries) (e.key, e.value)];
 }
 
 /// One box per line of the highlighted verses: the width the verses take
@@ -260,19 +342,24 @@ class MarkerLook {
     required this.tint,
     required this.paper,
     required this.ink,
+    this.art,
   });
 
+  /// The shape drawn: [MarkerStyle.theme] only with [art].
   final MarkerStyle style;
 
   /// The rosette for [style]; null for the traditional marker.
   final ui.Image? image;
+
+  /// The theme's marker, coloured for the mode (style [MarkerStyle.theme]).
+  final ArtPiece? art;
   final Color? tint;
   final Color paper;
   final Color ink;
 
   /// Under the page ink: a tint that shows inside the printed marker.
   void paintUnder(Canvas canvas, Offset c, double r) {
-    if (tint == null || image != null) return;
+    if (tint == null || image != null || art != null) return;
     canvas.drawCircle(
       c,
       r * 0.95,
@@ -290,6 +377,22 @@ class MarkerLook {
     int number, {
     Color? marked,
   }) {
+    final art = this.art;
+    if (art != null) {
+      // The printed marker goes under the paper (the new edition leaves it
+      // out; the page images have it), then the theme's marker with the
+      // number in its number box.
+      canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
+      paintArtMarker(
+        canvas,
+        art,
+        markerBox(c, r, art.size),
+        number: number,
+        digits: ink,
+        fill: marked ?? tint,
+      );
+      return;
+    }
     final img = image;
     if (img == null) return;
     canvas.drawCircle(c, r * 1.12, Paint()..color = paper);

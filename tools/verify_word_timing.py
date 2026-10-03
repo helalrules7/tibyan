@@ -4,11 +4,13 @@ Words: a word whose middle falls inside a pause heard in the file (300 ms
 or longer) is misplaced. Verse boundaries: a boundary between two verses
 should lie in, or within 150 ms of, a pause heard in the file (200 ms or
 longer), and within 100 ms of a frame quieter than -40 dB (pauses too
-short for silencedetect). The published mp3quran boundaries of
-reciters 1 to 3 are checked the same way, for comparison.
+short for silencedetect). Both levels rise for a recording mastered
+loud (build_word_timing.quiet_db). The published mp3quran boundaries (reciters
+1 to 3), quran.com's (the imams, reciters 8 to 10) and the derived
+ones (al-Banna and Mustafa Ismail) are checked the same way.
 
 Usage:
-  python3 tools/verify_word_timing.py
+  python3 tools/verify_word_timing.py [reciter ...]   # default: every reciter with cached audio
 """
 import bisect
 import json
@@ -21,7 +23,7 @@ import build_quranlab_timing as ql
 import build_word_timing as b
 
 CACHE = Path(__file__).resolve().parent / '.cache'
-WORD_FILES = ['word_timing.json', 'quranlab_word_timing.json']
+WORD_FILES = ['word_timing.json', 'quranlab_word_timing.json', 'qdc_word_timing.json']
 NEAR_MS = 150
 
 
@@ -46,8 +48,10 @@ def check(item):
     # whose loudness drops below -40 dB within 100 ms as quiet too.
     quiet_near = 0
     if bounds:
-        env = ql.envelope(CACHE / 'audio' / str(reciter) / f'{surah:03d}.mp3')
-        quiet_near = sum(env[max(0, t // 10 - 10):t // 10 + 11].min() < ql.SPEECH_DB
+        path = CACHE / 'audio' / str(reciter) / f'{surah:03d}.mp3'
+        env = ql.envelope(path)
+        floor = b.quiet_db(path, ql.SPEECH_DB)
+        quiet_near = sum(env[max(0, t // 10 - 10):t // 10 + 11].min() < floor
                          for t in bounds if t // 10 - 10 < len(env))
     return reciter, len(words), bad, len(bounds), near, quiet_near
 
@@ -58,13 +62,15 @@ def verse_bounds():
     out = {}
     timing = json.loads((CACHE / 'mp3quran_ayat_timing.json').read_text(encoding='utf-8'))
     for reciter, *_, read in c.RECITERS:
-        if read is None or reciter > 3:
+        if read is None:
             continue
         for surah, rows in timing[str(read)].items():
             out[(reciter, int(surah))] = [s for a, s, _ in rows if a > 1]
-    derived = CACHE / 'quranlab_ayah_timing.json'
-    if derived.exists():
-        for reciter, surah, ayah, start, _ in json.loads(derived.read_text(encoding='utf-8')):
+    for name in ('quranlab_ayah_timing.json', 'qdc_ayah_timing.json'):
+        path = CACHE / name
+        if not path.exists():
+            continue
+        for reciter, surah, ayah, start, _ in json.loads(path.read_text(encoding='utf-8')):
             if ayah > 1:
                 out.setdefault((reciter, surah), []).append(start)
     return out
@@ -79,7 +85,10 @@ def main():
         for reciter, surah, _, _, start, end in json.loads(path.read_text(encoding='utf-8')):
             by.setdefault((reciter, surah), []).append((start, end))
     bounds = verse_bounds()
-    items = [(key, by.get(key, []), bounds.get(key, [])) for key in sorted(set(by) | set(bounds))]
+    wanted = {int(a) for a in sys.argv[1:]} or {
+        r for r, *_ in c.RECITERS if (CACHE / 'audio' / str(r)).is_dir()}
+    items = [(key, by.get(key, []), bounds.get(key, [])) for key in sorted(set(by) | set(bounds))
+             if key[0] in wanted and (CACHE / 'audio' / str(key[0]) / f'{key[1]:03d}.mp3').exists()]
     totals = {}
     with ProcessPoolExecutor() as pool:
         for reciter, n, bad, nb, near, quiet in pool.map(check, items):

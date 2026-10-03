@@ -50,10 +50,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openSettings => 'Open settings';
 
   @override
-  String get appearanceTitle => 'Appearance';
-
-  @override
-  String get styleLabel => 'Style';
+  String get appearanceTitle => 'Mushaf look';
 
   @override
   String get modeLabel => 'Mode';
@@ -66,6 +63,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get modeLight => 'Light';
+
+  @override
+  String get modeWhite => 'Bright white';
 
   @override
   String get modeNight => 'Night';
@@ -118,9 +118,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String versionLabel(String version) {
     return 'Version $version';
   }
-
-  @override
-  String get previewLabel => 'Preview';
 
   @override
   String get selected => 'Selected';
@@ -385,6 +382,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get catchwordImageLabel => 'The first word of the next page';
+
+  @override
   String get tabHizb => 'Hizbs';
 
   @override
@@ -457,6 +457,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markerRosette => 'Rosette';
 
   @override
+  String get markerTheme => 'Follows the theme';
+
+  @override
+  String get markerThemeHint =>
+      '“Follows the theme” draws the theme\'s own marker; in Tibyan, its rosette.';
+
+  @override
+  String get themeLabel => 'Theme';
+
+  @override
   String get markerTintLabel => 'Marker colour';
 
   @override
@@ -464,15 +474,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reciteMode => 'Recitation mode';
-
-  @override
-  String get revealNextVerse => 'Next verse';
-
-  @override
-  String get revealAll => 'All';
-
-  @override
-  String get endRecite => 'End recitation';
 
   @override
   String get autoScroll => 'Auto-scroll';
@@ -643,9 +644,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get murattal => 'Murattal';
 
   @override
-  String get mujawwad => 'Mujawwad';
-
-  @override
   String get repeatLabel => 'Times to repeat';
 
   @override
@@ -742,10 +740,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get allEditionsQueued =>
-      'All editions are downloading. You can keep reading or leave the app.';
-
-  @override
   String get downloadInBackgroundNote =>
       'You can leave the app: the download goes on in the background, and a notification tells you when it is done.';
 
@@ -787,38 +781,853 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shortens the long silences between verses without touching the recitation itself';
 
   @override
+  String get listenFromPage => 'Listen from the top of the page';
+
+  @override
+  String get repeatHint =>
+      'With no stretch chosen, each verse repeats this many times before the next';
+
+  @override
   String get homeTitle => 'Home';
 
   @override
-  String get frameDesignLabel => 'Page frame';
+  String get searchHint => 'Search the Quran, or type “2:255”';
 
   @override
-  String get frameByStyle => 'Style\'s own';
+  String get searchIntro =>
+      'Type one or more words of the Quran, with or without diacritics, or a place such as “2:255” or “al-Baqara 255”.';
 
   @override
-  String get frameZakhrafa => 'Zakhrafa';
+  String get searchGoTo => 'Go to this place';
 
   @override
-  String get framePlain => 'Plain';
+  String get searchNothing => 'No results';
 
   @override
-  String get frameAbbasid => 'Abbasid';
+  String searchCount(String count, String verses) {
+    return '$count matches in $verses verses';
+  }
 
   @override
-  String get frameUmayyad => 'Umayyad';
+  String searchMore(String count) {
+    return 'and $count more verses; narrow the search to see them';
+  }
 
   @override
-  String get frameAndalusian => 'Andalusian';
+  String get searchHistory => 'Recent searches';
 
   @override
-  String get frameOttoman => 'Ottoman';
+  String get searchClearHistory => 'Clear';
 
   @override
-  String get frameEgyptian => 'Egyptian';
+  String get continueReading => 'Continue reading';
 
   @override
-  String get frameModernIslamic => 'Modern Islamic';
+  String continueReadingAt(String surah, String ayah, String page) {
+    return '$surah · verse $ayah · page $page';
+  }
 
   @override
-  String get framePreviewLabel => 'Frame preview';
+  String get openLabel => 'Open';
+
+  @override
+  String get wordStudy => 'Word study';
+
+  @override
+  String get wordMeanings => 'Word meanings';
+
+  @override
+  String get wordPickHint => 'Tap the word you want to study';
+
+  @override
+  String get wordStudyChoose => 'Choose one of the verse\'s words';
+
+  @override
+  String get wordMeaningTitle => 'Meaning';
+
+  @override
+  String get wordNoMeaning =>
+      'Al-Muyassar fi Gharib al-Quran has no entry for this word.';
+
+  @override
+  String get wordRootTitle => 'Root';
+
+  @override
+  String get wordLemma => 'Lemma';
+
+  @override
+  String get wordNoRoot =>
+      'The Quranic Arabic Corpus gives no root for this word.';
+
+  @override
+  String get wordNoCorpusData =>
+      'The Quranic Arabic Corpus has no data for this word.';
+
+  @override
+  String get rootOccurrencesTitle => 'Where the root occurs';
+
+  @override
+  String rootOccurrencesCount(String words, String verses) {
+    return 'Words: $words, verses: $verses';
+  }
+
+  @override
+  String get verseNoMeanings =>
+      'Al-Muyassar fi Gharib al-Quran has no entries for this verse.';
+
+  @override
+  String wordStudyVerse(String surah, String ayah) {
+    return '$surah, verse $ayah';
+  }
+
+  @override
+  String get downloadAllTitle => 'Download all editions';
+
+  @override
+  String downloadAllCount(String done, String total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String get themeArtCredit =>
+      'Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers.';
+
+  @override
+  String get khatmaTitle => 'Khatma';
+
+  @override
+  String get khatmaNew => 'New khatma';
+
+  @override
+  String get khatmaEmptyTitle => 'No khatma yet';
+
+  @override
+  String get khatmaEmptyBody =>
+      'Plan a full reading of the mushaf: choose an end date or a daily amount. Pages you read in the mushaf are counted automatically.';
+
+  @override
+  String get khatmaDefaultName => 'My khatma';
+
+  @override
+  String get khatmaNameLabel => 'Name';
+
+  @override
+  String get khatmaByDate => 'By end date';
+
+  @override
+  String get khatmaByAmount => 'By daily amount';
+
+  @override
+  String get khatmaEndDateLabel => 'End date';
+
+  @override
+  String get khatmaAmountLabel => 'Amount a day';
+
+  @override
+  String get khatmaUnitPage => 'Pages';
+
+  @override
+  String get khatmaUnitJuz => 'Juz';
+
+  @override
+  String get khatmaUnitHizb => 'Hizb';
+
+  @override
+  String khatmaAboutPerDay(String count) {
+    return 'About $count pages a day';
+  }
+
+  @override
+  String khatmaDuration(String count, String date) {
+    return '$count days, finishing on $date';
+  }
+
+  @override
+  String khatmaEditionNote(String edition) {
+    return 'In the pages of $edition';
+  }
+
+  @override
+  String get khatmaReminder => 'Daily reminder';
+
+  @override
+  String get khatmaReminderOff => 'No reminder';
+
+  @override
+  String get khatmaStart => 'Start the khatma';
+
+  @override
+  String get khatmaReplaceTitle => 'A khatma is open';
+
+  @override
+  String get khatmaReplaceBody =>
+      'The current khatma and its log are removed when a new one starts.';
+
+  @override
+  String get khatmaToday => 'Today\'s portion';
+
+  @override
+  String khatmaPagesRange(String from, String to) {
+    return 'Pages $from to $to';
+  }
+
+  @override
+  String khatmaPagesCount(String count) {
+    return '$count pages';
+  }
+
+  @override
+  String get khatmaReadNow => 'Read now';
+
+  @override
+  String get khatmaMarkRead => 'I read it elsewhere';
+
+  @override
+  String get khatmaTodayDone => 'Today\'s portion is read';
+
+  @override
+  String get khatmaContinue => 'Keep reading';
+
+  @override
+  String khatmaProgress(String done, String total) {
+    return '$done of $total pages';
+  }
+
+  @override
+  String khatmaDaysLeft(String count) {
+    return 'Days left: $count';
+  }
+
+  @override
+  String khatmaEnds(String date) {
+    return 'Ends on $date';
+  }
+
+  @override
+  String khatmaBehindTitle(String count) {
+    return 'Pages from earlier days: $count';
+  }
+
+  @override
+  String get khatmaBehindBody =>
+      'They are added to today\'s portion. You can spread them over the days left, or move the end date.';
+
+  @override
+  String get khatmaSpread => 'Spread over the days left';
+
+  @override
+  String get khatmaExtend => 'Move the end date';
+
+  @override
+  String get khatmaComplete => 'Khatma complete';
+
+  @override
+  String khatmaCompletedOn(String date) {
+    return 'Completed on $date';
+  }
+
+  @override
+  String get khatmaPast => 'Past khatmas';
+
+  @override
+  String get khatmaDelete => 'Delete the khatma';
+
+  @override
+  String get khatmaDeleteBody => 'This khatma\'s log is removed.';
+
+  @override
+  String get khatmaTileStart => 'Start';
+
+  @override
+  String khatmaTilePages(String count) {
+    return 'Today: $count';
+  }
+
+  @override
+  String get khatmaReminderTitle => 'Khatma portion';
+
+  @override
+  String khatmaReminderBody(String from, String to) {
+    return 'Today: pages $from to $to';
+  }
+
+  @override
+  String get khatmaReminderChannel => 'Khatma reminders';
+
+  @override
+  String get homeTodayTitle => 'Today';
+
+  @override
+  String get widgetNoKhatma => 'Start a khatma in Tibyan';
+
+  @override
+  String get reportsTitle => 'Reading reports';
+
+  @override
+  String get reportsWeek => 'Last 7 days';
+
+  @override
+  String get reportsMonth => 'Last 30 days';
+
+  @override
+  String get reportsDays => 'Reading days';
+
+  @override
+  String get reportsPages => 'Pages';
+
+  @override
+  String get reportsReadingMinutes => 'Reading minutes';
+
+  @override
+  String get reportsListeningMinutes => 'Listening minutes';
+
+  @override
+  String get reportsEmpty =>
+      'Your reading and listening appear here automatically.';
+
+  @override
+  String get reportsDayRead => 'A day with reading or listening';
+
+  @override
+  String streakReadToday(String count) {
+    return 'You read today. Days in a row: $count';
+  }
+
+  @override
+  String streakContinue(String count) {
+    return 'Days in a row until yesterday: $count. A page today continues it.';
+  }
+
+  @override
+  String get streakWelcome => 'Welcome back. Pick up where you left off.';
+
+  @override
+  String get streakNotesToggle => 'Streak notes';
+
+  @override
+  String get streakNotesHint =>
+      'Shows days in a row only; missed days are never shown.';
+
+  @override
+  String get journalTitle => 'Tadabbur journal';
+
+  @override
+  String get journalSearch => 'Search your notes';
+
+  @override
+  String get journalEmpty =>
+      'No notes yet. Long-press a verse in the mushaf and choose “Reflection note”.';
+
+  @override
+  String get journalNoMatch => 'No notes contain these words.';
+
+  @override
+  String get journalAdd => 'Reflection note';
+
+  @override
+  String get journalHint => 'Write your note on the verse';
+
+  @override
+  String get journalEdit => 'Edit';
+
+  @override
+  String get journalOpenVerse => 'Open the verse';
+
+  @override
+  String journalVerseRef(String surah, String ayah) {
+    return '$surah · verse $ayah';
+  }
+
+  @override
+  String get journalSaved => 'Note saved';
+
+  @override
+  String get journalEarlier => 'Your notes on this verse';
+
+  @override
+  String get elderlyMode => 'Elderly mode';
+
+  @override
+  String get elderlyModeHint =>
+      'Larger text, larger buttons with their names, clearer colours, a home with only the essentials, the mushaf page as large as possible, and calmer transitions';
+
+  @override
+  String get searchModeWords => 'By words';
+
+  @override
+  String get searchModeMeaning => 'By meaning';
+
+  @override
+  String get searchMeaningHint => 'Describe an idea in your own words';
+
+  @override
+  String get searchMeaningIntro =>
+      'Describe an idea in your own words, in Arabic or English, such as “patience in hardship” or “kindness to parents”, and the verses whose meaning in al-Tafsir al-Muyassar and the translations is closest appear. Each verse is shown with its text, and the text that matched exactly as its source has it.';
+
+  @override
+  String searchMatchedIn(String source) {
+    return 'Matched in: $source';
+  }
+
+  @override
+  String searchMeaningCount(String count) {
+    return '$count verses';
+  }
+
+  @override
+  String get semanticPackName => 'Search-by-meaning pack';
+
+  @override
+  String semanticPackOffer(String size) {
+    return 'This searches the words of the meaning texts for now. Download the search-by-meaning pack (about $size MB) to find verses by their meaning even in other words, offline.';
+  }
+
+  @override
+  String get semanticPackDownload => 'Download the pack';
+
+  @override
+  String semanticPackDownloading(String percent) {
+    return 'Downloading: $percent%';
+  }
+
+  @override
+  String get semanticPackVerifying => 'Checking and installing the pack…';
+
+  @override
+  String get semanticPackFailed => 'The download failed. Please try again.';
+
+  @override
+  String get semanticPackLoading => 'Preparing search by meaning…';
+
+  @override
+  String get semanticPackError =>
+      'The search-by-meaning pack could not be opened; searching by words instead.';
+
+  @override
+  String get semanticResultsNote =>
+      'Approximate results, closest meaning first. Read each verse in its place and in its tafsir.';
+
+  @override
+  String verseLabel(String surah, String ayah) {
+    return 'Surah $surah, verse $ayah';
+  }
+
+  @override
+  String pageLabelFull(String page, String surah) {
+    return 'Page $page, $surah';
+  }
+
+  @override
+  String get markThisVerse => 'Set or remove the reading mark at this verse';
+
+  @override
+  String loadingPage(String page) {
+    return 'Loading page $page';
+  }
+
+  @override
+  String get clearSearch => 'Clear the search';
+
+  @override
+  String get previousPageNumber => 'Previous page';
+
+  @override
+  String get nextPageNumber => 'Next page';
+
+  @override
+  String get showMenus => 'Show the menus';
+
+  @override
+  String get hideMenus => 'Hide the menus';
+
+  @override
+  String downloadSurah(String surah) {
+    return 'Download surah $surah';
+  }
+
+  @override
+  String retryDownloadSurah(String surah) {
+    return 'Retry downloading surah $surah';
+  }
+
+  @override
+  String deleteSurahDownload(String surah) {
+    return 'Surah $surah is downloaded. Delete it';
+  }
+
+  @override
+  String downloadingSurah(String surah) {
+    return 'Downloading surah $surah';
+  }
+
+  @override
+  String verseCounter(String current, String total) {
+    return 'Verse $current of $total';
+  }
+
+  @override
+  String downloadPercentSpoken(String percent) {
+    return '$percent% downloaded';
+  }
+
+  @override
+  String get hifzTitle => 'Memorization';
+
+  @override
+  String get hifzTileNote => 'Review and recite';
+
+  @override
+  String get hifzToday => 'Today\'s review';
+
+  @override
+  String get hifzNothingDue => 'Nothing is due today.';
+
+  @override
+  String get hifzNothingDueHint =>
+      'Recite a page, a quarter or a surah and grade it; it then joins spaced review.';
+
+  @override
+  String get hifzStartTest => 'Start a test';
+
+  @override
+  String get hifzMap => 'Hifz map';
+
+  @override
+  String get hifzMapHint =>
+      'Each page is coloured by how firmly it is memorized, with a mark that reads without colour.';
+
+  @override
+  String get hifzAllUnits => 'All review units';
+
+  @override
+  String get hifzDueToday => 'Due today';
+
+  @override
+  String hifzDueOn(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String hifzQuarter(String number) {
+    return 'Quarter $number';
+  }
+
+  @override
+  String get hifzUnitPage => 'Page';
+
+  @override
+  String get hifzUnitQuarter => 'Quarter';
+
+  @override
+  String get hifzUnitSurah => 'Surah';
+
+  @override
+  String get hifzChooseUnit => 'What will you recite?';
+
+  @override
+  String hifzNumberRange(String max) {
+    return 'Number, 1 to $max';
+  }
+
+  @override
+  String get hifzBegin => 'Begin';
+
+  @override
+  String get hifzRemove => 'Remove from review';
+
+  @override
+  String get revealNextWord => 'Next word';
+
+  @override
+  String get revealNextVerse => 'Next verse';
+
+  @override
+  String get revealAll => 'All';
+
+  @override
+  String get endRecite => 'End the test';
+
+  @override
+  String get verseRemembered => 'Remembered';
+
+  @override
+  String get verseMissed => 'Missed';
+
+  @override
+  String testCounts(String remembered, String missed) {
+    return 'Remembered $remembered · Missed $missed';
+  }
+
+  @override
+  String get revealByLine =>
+      'This edition has no word positions for this verse, so it is revealed line by line.';
+
+  @override
+  String get gradeUnit => 'Grade';
+
+  @override
+  String get gradeTitle => 'How did it go?';
+
+  @override
+  String get gradeSuggested => 'Suggested from the verse results';
+
+  @override
+  String get gradeAgain => 'Again';
+
+  @override
+  String get gradeHard => 'Hard';
+
+  @override
+  String get gradeGood => 'Good';
+
+  @override
+  String get gradeEasy => 'Easy';
+
+  @override
+  String gradeSaved(String date) {
+    return 'Next review: $date';
+  }
+
+  @override
+  String get similarVerses => 'Similar verses';
+
+  @override
+  String similarCount(String count) {
+    return 'Similar ($count)';
+  }
+
+  @override
+  String get similarThisVerse => 'This verse';
+
+  @override
+  String get similarFollowing => 'and the verse after it';
+
+  @override
+  String get strengthNone => 'Not memorized';
+
+  @override
+  String get strengthWeak => 'Weak';
+
+  @override
+  String get strengthFair => 'Fair';
+
+  @override
+  String get strengthGood => 'Good';
+
+  @override
+  String get strengthStrong => 'Strong';
+
+  @override
+  String get mapPages => 'Pages';
+
+  @override
+  String get mapSurahs => 'Surahs';
+
+  @override
+  String get mapZoomIn => 'Zoom in';
+
+  @override
+  String get mapZoomOut => 'Zoom out';
+
+  @override
+  String mapCell(String name, String strength) {
+    return '$name: $strength';
+  }
+
+  @override
+  String get tajweedColors => 'Tajweed colours';
+
+  @override
+  String get tajweedColorsHint =>
+      'Colours only the letters a rule applies to, in the colours you choose';
+
+  @override
+  String get tajweedLegend => 'Tajweed colour key';
+
+  @override
+  String get tajweedRuleColors => 'Colour of each rule';
+
+  @override
+  String get tajweedNoColor => 'No colour';
+
+  @override
+  String get tajweedReset => 'Restore the default colours';
+
+  @override
+  String tajweedPickColor(String rule) {
+    return 'Colour of “$rule”';
+  }
+
+  @override
+  String get tajweedSourceNote =>
+      'Where each rule applies comes from the quran-tajweed data (Collin Fair, CC BY 4.0). It is machine-generated and not yet reviewed by a qualified reader. A letter’s place inside its word is estimated, and in the Shamarly edition some word bounds are estimated too.';
+
+  @override
+  String get tajweedLegendHint =>
+      'Long-press the colouring button on the page to show this key.';
+
+  @override
+  String get tajweedHueCrimson => 'Dark red';
+
+  @override
+  String get tajweedHueRed => 'Red';
+
+  @override
+  String get tajweedHueOrange => 'Orange';
+
+  @override
+  String get tajweedHueGold => 'Gold';
+
+  @override
+  String get tajweedHueGreen => 'Green';
+
+  @override
+  String get tajweedHueLightGreen => 'Light green';
+
+  @override
+  String get tajweedHueTeal => 'Teal';
+
+  @override
+  String get tajweedHueBlue => 'Blue';
+
+  @override
+  String get tajweedHuePurple => 'Purple';
+
+  @override
+  String get tajweedHuePink => 'Pink';
+
+  @override
+  String get tajweedHueGrey => 'Grey';
+
+  @override
+  String get tajweedHueViolet => 'Violet';
+
+  @override
+  String get tajweedHueAmber => 'Amber';
+
+  @override
+  String get tajweedNoDataRiwaya =>
+      'No tajweed colouring in the riwaya mushafs (Warsh, Qalun, al-Duri, Shu‘bah): there is no reliable rule data for these riwayat yet, and we add no rule without a source. The colouring works in the Hafs mushafs.';
+
+  @override
+  String get tajweedHamzatWasl => 'Hamzat al-Wasl';
+
+  @override
+  String get tajweedLamShamsiyyah => 'Lam al-Shamsiyyah';
+
+  @override
+  String get tajweedSilent => 'Silent';
+
+  @override
+  String get tajweedMadd2 => 'Madd, regular (2 harakat)';
+
+  @override
+  String get tajweedMadd246 => 'Madd al-Aarid / al-Leen (2, 4, 6 harakat)';
+
+  @override
+  String get tajweedMaddMuttasil => 'Madd al-Muttasil (4, 5 harakat)';
+
+  @override
+  String get tajweedMaddMunfasil => 'Madd al-Munfasil (4, 5 harakat)';
+
+  @override
+  String get tajweedMadd6 => 'Madd Laazim (6 harakat)';
+
+  @override
+  String get tajweedGhunnah => 'Ghunnah';
+
+  @override
+  String get tajweedIkhfa => 'Ikhfa';
+
+  @override
+  String get tajweedIkhfaShafawi => 'Ikhfa Shafawi';
+
+  @override
+  String get tajweedIqlab => 'Iqlab';
+
+  @override
+  String get tajweedIdghaamGhunnah => 'Idghaam with Ghunnah';
+
+  @override
+  String get tajweedIdghaamNoGhunnah => 'Idghaam without Ghunnah';
+
+  @override
+  String get tajweedIdghaamShafawi => 'Idghaam Shafawi';
+
+  @override
+  String get tajweedIdghaamMutajanisayn => 'Idghaam Mutajaanisain';
+
+  @override
+  String get tajweedIdghaamMutaqaribayn => 'Idghaam Mutaqaaribain';
+
+  @override
+  String get tajweedQalqalah => 'Qalqalah';
+
+  @override
+  String get editionWarsh => 'Madina Mushaf: Warsh from Nafi';
+
+  @override
+  String get editionQalun => 'Madina Mushaf: Qalun from Nafi';
+
+  @override
+  String get editionDouri => 'Madina Mushaf: al-Duri from Abu Amr';
+
+  @override
+  String get editionShubah => 'Madina Mushaf: Shu\'bah from Asim';
+
+  @override
+  String get riwayaWarsh => 'Warsh from Nafi';
+
+  @override
+  String get riwayaQalun => 'Qalun from Nafi';
+
+  @override
+  String get riwayaDouri => 'al-Duri from Abu Amr';
+
+  @override
+  String get riwayaShubah => 'Shu\'bah from Asim';
+
+  @override
+  String get riwayatTitle => 'Other riwayat';
+
+  @override
+  String get riwayaEditionDesc =>
+      'The King Fahd Complex\'s Madina mushaf in this riwaya, with its own verse count and numbers. Tafsir, translation and bookmarks link to the matching verses in Hafs\'s count.';
+
+  @override
+  String get riwayaGaps =>
+      'In the riwaya editions: no word highlighting while listening, no colouring of the divine names, and no hizb or quarter in the frame (the page carries its own printed signs).';
+
+  @override
+  String riwayaTafsirNote(
+    String ayah,
+    String surah,
+    String riwaya,
+    String hafs,
+  ) {
+    return 'Verse $ayah of surah $surah in $riwaya matches, in the count of Hafs: $hafs. The tafsir, translation and verse text below follow Hafs.';
+  }
+
+  @override
+  String get riwayaNoHafs => 'no verse in the count of Hafs';
+
+  @override
+  String hafsVerseOne(String number) {
+    return 'verse $number';
+  }
+
+  @override
+  String hafsVerseRange(String from, String to) {
+    return 'verses $from to $to';
+  }
+
+  @override
+  String riwayaVerseText(String riwaya) {
+    return 'The verse in $riwaya';
+  }
+
+  @override
+  String riwayaRecitersNote(String riwaya) {
+    return 'Recitations in $riwaya';
+  }
 }

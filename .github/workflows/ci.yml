@@ -30,5 +30,11 @@ jobs:
         run: flutter analyze
       - name: Tests (includes the theme contrast check)
         run: flutter test
+      - name: Review app
+        working-directory: apps/review
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test
       - name: Text verification tool compiles
         run: python3 -m py_compile tools/verify_text/compare_tanzil_kfgqpc.py

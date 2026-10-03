@@ -6,6 +6,54 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (hifz)
+- A «الحفظ» screen from the home tile (it replaces «قريبا»): today's review, start a test, the hifz map, and every review unit with its next date.
+- Word-by-word recitation test: a unit (a page of the edition being read, a hizb quarter or a surah) opens with its verses covered; «الكلمة التالية» or a tap on a verse shows its next word, in all three editions and on the opening pages. Verses without word positions (219 in the old edition, the Shamarly verses whose split is not reviewed) are shown line by line, and the bar says so. «حفظت» / «أخطأت» judges each verse.
+- Spaced review: grading a test (Again, Hard, Good, Easy; the choice is suggested from the verse results) schedules the unit with our own implementation of FSRS 4.5 (default weights, 90% retention, whole days). Units and verse strengths are kept in user.db (`srs_item`, `memorization`, schema step 4) with uuid, updated_at and deleted_at, and queue in the sync outbox.
+- Mutashabihat: a «متشابهات (n)» button in the test bar and in the verse services opens the similar verses, each shown as its own text, with the source's credit and no commentary. Links from Waqar144/Quran_Mutashabihat_Data (no licence file yet, MISSING_DATA.md إ17), in content.db `mutashabih` (schema 14).
+- Hifz map: the pages of the edition being read, or the 114 surahs, coloured by the weakest memorized verse in four strengths that also step in lightness, each with one to four bars and a spoken label; pinch or the zoom buttons to scale the cells; tap a cell to test it.
+### Added (tajweed colours)
+- Tajweed colouring, off by default: only the letters and marks a rule applies to are coloured, on the pages of all three editions, including the opening pages. Turn it on in «شكل المصحف» or with the new button under the page number (a long press shows the colour key).
+- A colour for each of the 18 rules, chosen by the reader from 11 colours or none, with defaults after the usual printed tajweed mushafs; every colour has a shade for light and for dark paper, at least 3:1 against every theme's paper.
+- The colour key lists each rule with its colour, and says where the data comes from: cpfair/quran-tajweed (CC BY 4.0), machine-generated and not yet reviewed by a qualified reader.
+- Precision: new Madina edition, every letter placed (exact for a letter that stands alone, estimated inside joined letters); old Madina edition, 94% of the coloured letters; Shamarly, 44% (only words whose bounds are known).
+### Added (riwayat)
+- Four more mushafs to choose from in settings: the King Fahd Complex's Madina mushaf in the riwayat of Warsh, Qalun, al-Duri and Shu'bah, each its own download from the Tibyan mirror (70 to 83 MB). The pages are the Complex's own artwork (quran-ws SVG), drawn like the new Madina edition with every theme, frame, recitation mode and touch reading.
+- Each riwaya keeps its own verse count and numbers. Bookmarks, the reading position, tafsir, translation, word meanings, reflections and search go through a verse map between the riwaya and Hafs, worked out from the Complex's texts of both and checked against Quranpedia's published map (they agree at every verse); the tafsir screen names the verse as read in the riwaya, shows its text in the riwaya's KFGQPC font, and says which Hafs verses it matches.
+- Riwaya recitations from mp3quran: Warsh (al-Husary, al-Qari Yasin, al-Oyoun al-Koushi, Omar al-Qazabri, Mohammad Sayed, Abdul Basit), Qalun (al-Husary, al-Hudhaifi, al-Dokali), al-Duri (al-Husary, Noreen Siddiq, al-Fatih al-Zubair) and Shu'bah (al-Hudhaifi, Ahmad Deban), offered only while that riwaya is read, with the verse highlighted and pages turned for the ten with published timings.
+- Not in the riwaya editions yet: word highlighting, word study and divine-name colouring (no word boxes), and hizb and quarter labels (not in the sources). al-Susi, al-Bazzi and Qunbul: no page artwork found (docs/MISSING_DATA.md ث5).
+
+### Added (data review; nothing changes in the app)
+- A review tool (Flutter web, `apps/review/`): each imported passage beside its verses in the mushaf text; editors link, reviewers approve or return with a note, never their own work; an append-only log of every action. Works on a review file now; a Supabase schema with row-level security is ready for later.
+- al-Wahidi's «أسباب نزول القرآن» (OpenITI) imported as 534 drafts with suggested verse links, waiting for review. `tools/export_pack.py` builds packs from reviewed entries only.
+### Added (phase 8: accessibility and search by meaning)
+- «وضع كبار السن» (elderly mode) in settings: text at least a quarter larger, buttons and rows at least 56 px, colours raised to 7:1 for text in every theme and mode, a home with only continue reading, listening and search (and a labelled settings button), the page in the plain frame so it is as large as the screen allows, the page's small tools as labelled buttons, and a slower cross-fade between screens and slower page turns.
+- Search by meaning («بالمعنى») beside search by words: describe an idea in Arabic or English and the verses whose meaning is closest in al-Tafsir al-Muyassar, Saheeh International or Pickthall are listed, each with its own text and the matched text exactly as stored, with its source. An optional 134 MB pack (multilingual-e5-small, MIT, int8, run in Dart; one vector per verse of each text) downloads in the background from the Tibyan mirror; until then the same mode searches the words of those texts.
+- Screen readers: every verse on the page is its own node («سورة البقرة، الآية ٥» then its text), selectable with a double tap, with an action to set or remove the reading mark, in all three editions; the surah and page are announced after a page turn; the menu veil, frame labels, theme and marker choices and page grid can be activated (they were announced without an action); sheet titles and sections are headings; the player's second line, search counts and download progress are live regions (download progress in steps of ten percent); spinners and progress bars are labelled; reading tools are 48 px targets; marker and tint choices have distinct names.
+
+
+### Added (themes)
+- Eight heritage themes beside Zakhrafa (still the default): Seljuk, Umayyad, Timurid, Hijazi, Fatimid, Andalusi, Mamluk and Abbasid. Each draws its frame, surah header and verse marker from quran-assets as they are, recoloured per mode (light, bright white, night, black), in all three editions and on the opening pages. The juz, hizb and surah sit above the frame, the page number inside the theme's marker below it.
+- A theme picker in «شكل المصحف» and on the first-launch style screen, and a verse-marker shape «حسب الثيم» (the default in the new themes).
+- Sources and licences of the theme art in DATA_SOURCES.md and the «عن المصحف» screen; the traced mushaf ornaments are provisional (CC BY-NC-SA 4.0, permission not yet obtained, MISSING_DATA.md إ14).
+
+### Added (word study)
+- «دراسة الكلمة» (word study) in the verse services: tap it, then tap a word on the page, in all three editions. A sheet shows the word, its meaning quoted from «الميسر في غريب القرآن» (Nuqayah, by permission), its root and lemma from the Quranic Arabic Corpus 0.4, and every verse where the root occurs (count shown; a tap opens that verse's page with it selected). The verse's words are listed in the sheet, so any of them can be studied, including where the page has no word boxes.
+- «معاني الكلمات» (word meanings) in the verse services: every entry of the book for the selected verses.
+- A word the book does not explain shows no meaning; nothing is filled in. Roots cover 6,229 of 6,236 verses (the other 7 split words differently from the corpus); 11,233 of the book's 11,362 entries are tied to their words, the rest are shown with their verse.
+### Added (khatma, reports and journal)
+- Khatma planner: plan a full reading by an end date or by a daily amount of pages, juz or hizb, in the pages of the edition being read (all three editions). Today's portion, progress and days left; pages that stay on screen for 15 seconds in the mushaf count automatically (a page read in another edition counts through its verses), and a portion read in a printed mushaf can be marked by hand.
+- Catch-up when behind: earlier pages join today's portion, with a choice to spread them over the days left or move the end date. Wording is neutral; nothing is shown as a failure.
+- Daily reminder at a chosen time with the day's pages, scheduled 14 days ahead and rescheduled on every open (within iOS's limit of 64 pending notifications); tapping it opens the page.
+- Reading reports: reading and listening sessions are recorded automatically; days, pages, reading and listening minutes over 7 or 30 days, and a week strip where only days with reading are marked. Gentle streak notes that can be turned off, and a missed day is never shown.
+- Tadabbur journal: write a note on a verse from the verse services, then list, search, edit and delete notes, and open their verse.
+- Home screen widget on Android with today's portion and the verse it starts at; tapping opens the page. The iOS WidgetKit extension is written and waits for its Xcode target (docs/HOME_WIDGET.md).
+- The home screen's khatma tile opens the khatma, and a «Today» card shows today's portion.
+- Sync layer for accounts, behind the `accounts_sync` flag (off): every new table carries uuid, updated_at and deleted_at, changes queue in an outbox, and rows merge by last write wins. Nothing leaves the device until a Supabase project is set up (docs/SYNC.md, which also covers Google/Apple sign-in and group khatma).
+
+### Fixed
+- Notes under the home screen tiles were white on white in the Zakhrafa style.
+
 ### Added (reading and downloads)
 - The new Madina edition ships with the app and opens on first launch; while another chosen edition downloads, it is read meanwhile, with a progress banner.
 - Editions download in the background (the system's downloader), with progress and completion notifications, and a "download all editions" button in settings and on the edition screen.
@@ -28,8 +76,16 @@ All notable changes to Tibyan are recorded here. The format follows
 - The verse highlight is a framed box per line instead of following every letter.
 - Page packs and recitations are fetched from the Tibyan mirror first, with the original source as the fallback (the mirror was only a fallback before, and the sources were slow).
 
+### Changed (recitations)
+- Only murattal recitations are offered: the two mujawwad ones (al-Banna and Mustafa Ismail) are removed.
+- New recitation: Yasser al-Dosari (murattal), from quranicaudio.com, with verse and word highlighting from quran.com's QDC timings (110 surahs, 95.7% of words).
+- Four more from mp3quran.net, each with every verse of all 114 surahs timed: Abdul-Rahman al-Sudais, Mishary al-Afasy, Saad al-Ghamdi and Muhammad al-Tablaway. Their verse is highlighted and the page turns with it; their words are not, mp3quran publishing no word timings. al-Sudais is here rather than on quranicaudio.com: quran.com's timings for him name files that are not the bytes his own URL serves.
+- Mustafa Ismail (murattal) now has verse timing for nearly all the Quran, derived from the recitation itself, so changing to him no longer restarts the surah.
+
 ### Fixed
 - Android release builds now declare the INTERNET permission needed to download pages and recitations.
+- Changing the reciter while listening no longer turns the page to the first page of the surah: the page no longer follows the verse reported while the new file is still loading.
+- The page clips of the new Madina edition are built once per page instead of on every rebuild, and the divine names are drawn once per line instead of redrawing the whole page for every one of them; the Shamarly catchword is cut from a page decoded at the size it is drawn; the bundled database is no longer read and hashed on every launch. Pages either side of the one being read are now built ahead, so turning a page does not wait.
 
 ## [0.4.0] - 2026-09-29
 

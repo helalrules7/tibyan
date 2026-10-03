@@ -18,3 +18,37 @@ double contrastRatio(Color a, Color b) {
   final lo = math.min(la, lb);
   return (hi + 0.05) / (lo + 0.05);
 }
+
+/// [color] moved toward [target], in steps of 5%, until it reaches [ratio]
+/// against every colour in [against]; [target] itself when no step does.
+Color towardContrast(
+  Color color,
+  Color target,
+  List<Color> against,
+  double ratio,
+) {
+  for (var i = 0; i <= 20; i++) {
+    final c = Color.lerp(color, target, i / 20)!;
+    if (against.every((b) => contrastRatio(c, b) >= ratio)) return c;
+  }
+  return target;
+}
+
+/// Black or white, whichever stands out more against [background].
+Color extremeAgainst(Color background) =>
+    contrastRatio(const Color(0xFF000000), background) >=
+        contrastRatio(const Color(0xFFFFFFFF), background)
+    ? const Color(0xFF000000)
+    : const Color(0xFFFFFFFF);
+
+/// A surface and what is drawn on it, reaching [ratio]: the foreground
+/// moves toward black or white first, then, when that is not enough (a
+/// mid-tone surface), the surface darkens or lightens away from it.
+(Color, Color) strongPair(Color surface, Color foreground, double ratio) {
+  final fg = towardContrast(foreground, extremeAgainst(surface), [
+    surface,
+  ], ratio);
+  if (contrastRatio(fg, surface) >= ratio) return (surface, fg);
+  final bg = towardContrast(surface, extremeAgainst(fg), [fg], ratio);
+  return (bg, fg);
+}

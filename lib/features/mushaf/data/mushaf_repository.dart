@@ -38,6 +38,9 @@ class MushafRepository {
                 MushafEdition.shamarly =>
                   t.pageShamarly.isSmallerOrEqualValue(page) &
                       t.pageShamarlyEnd.isBiggerOrEqualValue(page),
+                // Riwaya pages and verses are in their pack (RiwayaData),
+                // numbered by the riwaya, never in this Hafs table.
+                _ => const Constant(false),
               },
             )
             ..orderBy([(t) => OrderingTerm.asc(t.id)]))
@@ -118,6 +121,21 @@ class MushafRepository {
     return [for (final r in rows) r.y];
   }
 
+  /// Tajweed colouring of a page (tools/build_tajweed.py), in the format of
+  /// [edition]'s `tajweed_page` rows; empty when the page has none.
+  Future<String> tajweedPage(MushafEdition edition, int page) async {
+    final row = await _db
+        .customSelect(
+          'SELECT data FROM tajweed_page WHERE edition = ? AND page = ?',
+          variables: [
+            Variable.withString(edition.name),
+            Variable.withInt(page),
+          ],
+        )
+        .getSingleOrNull();
+    return row?.read<String>('data') ?? '';
+  }
+
   Future<List<LineOverflowRow>> lineOverflow(int page) =>
       (_db.select(_db.lineOverflow)..where((t) => t.page.equals(page))).get();
 
@@ -161,6 +179,11 @@ class MushafRepository {
 
   Future<List<ShamarlyMarkerRow>> shamarlyMarkers(int page) =>
       (_db.select(_db.shamarlyMarker)..where((t) => t.page.equals(page))).get();
+
+  /// The Shamarly catchword of [page]: its box on the next page's image.
+  Future<ShamarlyCatchwordRow?> shamarlyCatchword(int page) => (_db.select(
+    _db.shamarlyCatchword,
+  )..where((t) => t.page.equals(page))).getSingleOrNull();
 
   /// One box per verse per line on a Shamarly page, in reading order.
   Future<List<ShamarlyVerseBoxRow>> shamarlyVerseBoxes(int page) =>
@@ -215,6 +238,11 @@ class MushafRepository {
     return {for (final r in rows) r.sourceId: r};
   }
 
+  /// Every entry of the given texts, for searching by meaning.
+  Future<List<CommentaryRow>> commentaryOf(List<int> sourceIds) => (_db.select(
+    _db.commentary,
+  )..where((t) => t.sourceId.isIn(sourceIds))).get();
+
   Future<List<ReciterRow>> reciters() =>
       (_db.select(_db.reciter)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 
@@ -239,6 +267,10 @@ class MushafRepository {
             ..where((t) => t.reciter.equals(reciter) & t.surah.equals(surah))
             ..orderBy([(t) => OrderingTerm.asc(t.startMs)]))
           .get();
+
+  /// Every verse in mushaf order, for search.
+  Future<List<AyahRow>> searchRows() =>
+      (_db.select(_db.ayah)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 
   Future<List<SourceRow>> sources() =>
       (_db.select(_db.source)..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
@@ -265,25 +297,28 @@ const shamarlyWordLevel = 2;
 /// is the page where the verse starts.
 extension EditionPages on AyahRow {
   int pageIn(MushafEdition edition) => switch (edition) {
-    MushafEdition.madina1441 => page,
     MushafEdition.madina1405 => page1405,
     MushafEdition.shamarly => pageShamarly,
+    // The riwaya editions' pages come from their packs
+    // (`versePageProvider`); this falls back to the new Madina edition's.
+    _ => page,
   };
 }
 
 extension EditionStartPages on SurahRow {
   int startPageIn(MushafEdition edition) => switch (edition) {
-    MushafEdition.madina1441 => startPage,
     MushafEdition.madina1405 => startPage1405,
     MushafEdition.shamarly => startPageShamarly,
+    // Riwaya editions: `surahStartPageProvider`.
+    _ => startPage,
   };
 }
 
 extension on MushafEdition {
   /// The `ayah` column holding the (start) page in this edition.
   String get pageColumn => switch (this) {
-    MushafEdition.madina1441 => 'page',
     MushafEdition.madina1405 => 'page_1405',
     MushafEdition.shamarly => 'page_shamarly',
+    _ => 'page',
   };
 }

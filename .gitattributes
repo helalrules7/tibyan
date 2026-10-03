@@ -15,3 +15,12 @@ tools/ornaments/src/** filter=lfs diff=lfs merge=lfs -text
 
 # The new Madina edition's pages ship with the app.
 assets/packs/*.zip filter=lfs diff=lfs merge=lfs -text
+
+# Opening-page frames: the owner's source images and the copies the app ships.
+docs/design/fateha-themes/*.png filter=lfs diff=lfs merge=lfs -text
+docs/design/fateha-themes/*.webp filter=lfs diff=lfs merge=lfs -text
+assets/themes/*.webp filter=lfs diff=lfs merge=lfs -text
+
+# Review databases (drafts and review work) and exported data packs.
+data/review/*.db filter=lfs diff=lfs merge=lfs -text
+data/packs/*.db filter=lfs diff=lfs merge=lfs -text

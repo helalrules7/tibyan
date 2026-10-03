@@ -2,9 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/hifz/presentation/hifz_map_screen.dart';
+import '../../features/hifz/presentation/hifz_screen.dart';
 import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/search/search_screen.dart';
+import '../../features/khatma/presentation/journal_screen.dart';
+import '../../features/khatma/presentation/khatma_screen.dart';
+import '../../features/khatma/presentation/new_khatma_screen.dart';
+import '../../features/khatma/presentation/reports_screen.dart';
 import '../../features/mushaf/presentation/about_mushaf_screen.dart';
+import '../../features/mushaf/presentation/download_all_screen.dart';
 import '../../features/mushaf/presentation/download_screen.dart';
 import '../../features/mushaf/presentation/fawasil_screen.dart';
 import '../../features/mushaf/presentation/index_screen.dart';
@@ -13,9 +21,11 @@ import '../../features/onboarding/onboarding_edition_screen.dart';
 import '../../features/onboarding/onboarding_language_screen.dart';
 import '../../features/onboarding/onboarding_style_screen.dart';
 import '../../features/settings/appearance_screen.dart';
+import '../../features/settings/player_settings_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
 
 int? _int(GoRouterState s, String key) =>
@@ -29,10 +39,16 @@ final appRouterProvider = Provider<GoRouter>(
       final done = ref.read(settingsProvider).onboardingDone;
       if (state.matchedLocation == '/splash') return null;
       final inOnboarding = state.matchedLocation.startsWith('/onboarding');
-      if (!done && !inOnboarding) return '/onboarding/language';
+      // «Download all» is offered on the edition step too.
+      final downloads = state.matchedLocation == '/downloads';
+      if (!done && !inOnboarding && !downloads) return '/onboarding/language';
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/downloads',
+        builder: (context, state) => const DownloadAllScreen(),
+      ),
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
@@ -54,6 +70,10 @@ final appRouterProvider = Provider<GoRouter>(
         builder: (context, state) => const HomeScreen(),
         routes: [
           GoRoute(
+            path: 'search',
+            builder: (context, state) => const SearchScreen(),
+          ),
+          GoRoute(
             path: 'settings',
             builder: (context, state) => const SettingsScreen(),
             routes: [
@@ -61,7 +81,39 @@ final appRouterProvider = Provider<GoRouter>(
                 path: 'appearance',
                 builder: (context, state) => const AppearanceScreen(),
               ),
+              GoRoute(
+                path: 'player',
+                builder: (context, state) => const PlayerSettingsScreen(),
+              ),
             ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/hifz',
+        builder: (context, state) => const HifzScreen(),
+        routes: [
+          GoRoute(
+            path: 'map',
+            builder: (context, state) => const HifzMapScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/khatma',
+        builder: (context, state) => const KhatmaScreen(),
+        routes: [
+          GoRoute(
+            path: 'new',
+            builder: (context, state) => const NewKhatmaScreen(),
+          ),
+          GoRoute(
+            path: 'reports',
+            builder: (context, state) => const ReportsScreen(),
+          ),
+          GoRoute(
+            path: 'journal',
+            builder: (context, state) => const JournalScreen(),
           ),
         ],
       ),
@@ -72,6 +124,9 @@ final appRouterProvider = Provider<GoRouter>(
           initialPage: _int(state, 'page'),
           selectSurah: _int(state, 's'),
           selectAyah: _int(state, 'a'),
+          hifzUnit: state.uri.queryParameters['hifz'],
+          hifzFrom: state.uri.queryParameters['from'],
+          hifzTo: state.uri.queryParameters['to'],
         ),
         routes: [
           GoRoute(
@@ -100,6 +155,8 @@ final appRouterProvider = Provider<GoRouter>(
             builder: (context, state) => TafsirScreen(
               surah: _int(state, 's') ?? 1,
               ayah: _int(state, 'a') ?? 1,
+              riwaya: Riwaya.values.asNameMap()[state.uri.queryParameters['r']],
+              riwayaAyah: _int(state, 'ra'),
             ),
           ),
           GoRoute(

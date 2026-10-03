@@ -1,0 +1,37 @@
+# صور القُرّاء
+
+الصور اللي بتظهر جنب اسم القارئ في قايمة القُرّاء وشاشة التحميلات.
+مصغّرة ١٢٨×١٢٨ WebP (≈٦ كيلو للصورة) بـ
+`python3 tools/build_reciter_photos.py` من ملفات في `tools/photos/`.
+
+الصورة اسمها = رقم القارئ في `content.db` (مثلاً `11.webp` للسديس).
+اللي مفيش له صورة بيظهر بالحروف الأولى في دايرة ✓ (مش شرط تكتمل).
+
+## المصدر
+
+الصور هي صور مقالات القُرّاء على ويكيبيديا العربية (صور تاريخية
+لأعلام متوفين، بقرار مالك المشروع). تُجلب بـ
+`python3 tools/fetch_reciter_photos.py`:
+
+| # | القارئ | المصدر (صورة المقال) |
+|---|--------|----------------------|
+| 1 | محمد صديق المنشاوي | [ar](https://upload.wikimedia.org/wikipedia/commons/e/ee/Elminshwey.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
+| 2 | محمود خليل الحصري | [ar](https://upload.wikimedia.org/wikipedia/commons/7/70/Hussary.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
+| 3 | عبد الباسط عبد الصمد | [ar](https://upload.wikimedia.org/wikipedia/ar/7/73/%D8%B5%D9%88%D8%B1%D8%A9_%D8%B4%D8%AE%D8%B5%D9%8A%D8%A9_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%B5%D9%85%D8%AF.png?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
+| 4 | محمود علي البنا | [ar](https://upload.wikimedia.org/wikipedia/ar/2/21/%D9%85%D8%AD%D9%85%D9%88%D8%AF_%D8%B9%D9%84%D9%8A_%D8%A7%D9%84%D8%A8%D9%86%D8%A7.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
+| 10 | ياسر الدوسري | [ar](https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Yasser_Al-Dosari_%28cropped%29.jpg/960px-Yasser_Al-Dosari_%28cropped%29.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail) |
+| 11 | عبد الرحمن السديس | [ar](https://upload.wikimedia.org/wikipedia/commons/1/18/Abdul-Rahman_Al-Sudais_%28Cropped%2C_2011%29.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
+| 12 | مشاري العفاسي | [ar](https://upload.wikimedia.org/wikipedia/commons/2/24/%D0%9C%D0%B8%D1%88%D0%B0%D1%80%D0%B8_%D0%A0%D0%B0%D1%88%D0%B8%D0%B4.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled) |
+| 13 | سعد الغامدي | [ar](https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Saad_al_Ghamdi.jpg/960px-Saad_al_Ghamdi.jpg?utm_source=ar.wikipedia.org&utm_campaign=api&utm_content=thumbnail) |
+
+| 5 | مصطفى إسماعيل | [Commons](https://commons.wikimedia.org/wiki/File:Mustafa_Ismail_(1).jpg) — صورة الوش |
+| 14 | محمد محمود الطبلاوي | [ar.wikipedia](https://ar.wikipedia.org/wiki/محمد_محمود_الطبلاوي) |
+
+**تبديل أو إضافة صورة:** حِطّ ملفك في `tools/photos/<رقم القارئ>.jpg`
+وشغّل `python3 tools/build_reciter_photos.py` — مفيش أي تعديل كود.
+
+## قواعد اختيار الصورة
+
+1. صورة شخصية واضحة، الوجه في المنتصف (القصّ بياخد المربع الأوسط).
+2. مصدره Wikimedia Commons / صورة رسمية بإذن مكتوب.
+3. سطر attribution في الشاشة اللي بتعرض الصور (شرط CC BY/CC BY-SA).

@@ -1,8 +1,9 @@
 import 'dart:ui';
 
-/// A visual style (Classic, Manuscript, Royal, Calm) loaded from
-/// `assets/themes/<id>.json`. Adding a style means adding a JSON file,
-/// not code.
+/// A visual style loaded from `assets/themes/<id>.json`: Zakhrafa, drawn
+/// by the app, and the heritage themes, whose frame, surah header and
+/// verse marker are SVG art ([art]). Adding a style means adding a JSON
+/// file (and its art), not code.
 class TibyanStyle {
   const TibyanStyle({
     required this.id,
@@ -14,6 +15,8 @@ class TibyanStyle {
     required this.ornaments,
     required this.radii,
     required this.modes,
+    this.art,
+    this.opening,
   });
 
   final String id;
@@ -25,6 +28,15 @@ class TibyanStyle {
   final OrnamentSpec ornaments;
   final RadiiSpec radii;
   final Map<ThemeModeId, ModeTokens> modes;
+
+  /// The theme's frame, surah header and verse marker; null for Zakhrafa,
+  /// which keeps its own illuminated frame.
+  final ThemeArt? art;
+
+  /// Asset of the frame drawn around the opening pages (al-Fatiha, the
+  /// start of al-Baqarah) and the cover: a picture with a transparent
+  /// panel for the page and two cartouches; see [OpeningArtLayout].
+  final String? opening;
 
   String localizedName(String languageCode) =>
       name[languageCode] ?? name['ar'] ?? id;
@@ -51,12 +63,124 @@ class TibyanStyle {
             modesJson[mode.name] as Map<String, dynamic>,
           ),
       },
+      art: json['art'] == null
+          ? null
+          : ThemeArt.fromJson(json['art'] as Map<String, dynamic>),
+      opening: json['opening'] as String?,
     );
   }
 }
 
-/// The three colour modes every style must define.
-enum ThemeModeId { light, night, black }
+/// A theme's art: SVG files in `assets/themes/` (from quran-assets, drawn
+/// as they are) and, per mode, the colour of each class of the art. Only
+/// the fill of a `class="cN"` group and the stroke of the `class="line"`
+/// group change; classes not listed keep their drawn colour.
+class ThemeArt {
+  const ThemeArt({
+    required this.frame,
+    required this.header,
+    required this.marker,
+    required this.band,
+    required this.colours,
+  });
+
+  final ArtFrameFiles frame;
+
+  /// Surah header; its name box is the SVG's `data-slot`.
+  final String header;
+
+  /// Verse-end marker; its number box is the SVG's `data-slot`.
+  final String marker;
+
+  /// Depth of the frame's edge on screen (px).
+  final double band;
+
+  final Map<ThemeModeId, ArtColours> colours;
+
+  factory ThemeArt.fromJson(Map<String, dynamic> json) {
+    final frame = json['frame'] as Map<String, dynamic>;
+    final modes = json['modes'] as Map<String, dynamic>;
+    return ThemeArt(
+      frame: ArtFrameFiles.fromJson(frame),
+      header: json['header'] as String,
+      marker: json['marker'] as String,
+      band: (frame['band'] as num).toDouble(),
+      colours: {
+        for (final mode in ThemeModeId.values)
+          mode: ArtColours.fromJson(modes[mode.name] as Map<String, dynamic>),
+      },
+    );
+  }
+}
+
+/// A frame cut into slices (the top-left corner, one repeat of the top
+/// edge and one of the left edge), or drawn whole when it has none.
+class ArtFrameFiles {
+  const ArtFrameFiles.slices({
+    required String this.corner,
+    required String this.edgeH,
+    required String this.edgeV,
+  }) : whole = null;
+
+  const ArtFrameFiles.whole(String this.whole)
+    : corner = null,
+      edgeH = null,
+      edgeV = null;
+
+  final String? corner;
+  final String? edgeH;
+  final String? edgeV;
+  final String? whole;
+
+  List<String> get files =>
+      whole != null ? [whole!] : [corner!, edgeH!, edgeV!];
+
+  factory ArtFrameFiles.fromJson(Map<String, dynamic> json) =>
+      json['whole'] != null
+      ? ArtFrameFiles.whole(json['whole'] as String)
+      : ArtFrameFiles.slices(
+          corner: json['corner'] as String,
+          edgeH: json['edgeH'] as String,
+          edgeV: json['edgeV'] as String,
+        );
+}
+
+/// Class colours of the frame, header and marker in one mode.
+class ArtColours {
+  const ArtColours({
+    required this.frame,
+    required this.header,
+    required this.marker,
+  });
+
+  final Map<String, Color> frame;
+  final Map<String, Color> header;
+  final Map<String, Color> marker;
+
+  factory ArtColours.fromJson(Map<String, dynamic> json) {
+    Map<String, Color> map(String key) => {
+      for (final e in (json[key] as Map<String, dynamic>? ?? const {}).entries)
+        e.key: parseHexColor(e.value as String),
+    };
+    return ArtColours(
+      frame: map('frame'),
+      header: map('header'),
+      marker: map('marker'),
+    );
+  }
+}
+
+/// The colour modes every style must define. Bright white is a light mode
+/// whose screen and paper are pure white.
+enum ThemeModeId {
+  light,
+  white,
+  night,
+  black;
+
+  /// Dark ink on a light paper (light and bright white).
+  bool get isLight => this == light || this == white;
+}
 
 class ModeTokens {
   const ModeTokens({

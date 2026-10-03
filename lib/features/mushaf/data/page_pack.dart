@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
@@ -22,6 +23,11 @@ enum PackFormat {
   /// The Shamarly page images as archived: `001.png` … `522.png` at the
   /// zip root. Their geometry is in content.db.
   pngShamarly,
+
+  /// The search-by-meaning pack (tools/build_semantic_pack.py): the text
+  /// encoder, its vocabulary and the verse vectors, with a manifest
+  /// listing each file's SHA-256.
+  semantic,
 }
 
 /// A downloadable set of mushaf pages.
@@ -86,10 +92,63 @@ class PagePackSpec {
     fallbacks: [],
   );
 
+  /// The KFGQPC Madina mushaf of a riwaya other than Hafs: its 604 SVG
+  /// pages (quran-ws, the Complex's artwork unchanged), the riwaya's
+  /// verses, verse map and page geometry (`riwaya.json.xz`) and its KFGQPC
+  /// font. Built by tools/build_riwaya_packs.py; on Tibyan's mirror only
+  /// (no other host serves these bytes).
+  static PagePackSpec _riwaya(String riwaya, String sha256, int bytes) =>
+      PagePackSpec(
+        id: 'pages-$riwaya-v1',
+        url: 'https://tibyan.ahmedhelal.dev/mirror/packs/pages-$riwaya-v1.zip',
+        sha256: sha256,
+        bytes: bytes,
+        format: PackFormat.svgXz,
+      );
+
+  static final warsh = _riwaya(
+    'warsh',
+    '826e9be1da8a7b6dcd60f542d88fafcd030382576296b475fe1569c793409e51',
+    78608758,
+  );
+  static final qalun = _riwaya(
+    'qalun',
+    '611b716755f3b6150d99017bf9a46d8cad3012092acae4216d2b16435c16d852',
+    82756503,
+  );
+  static final douri = _riwaya(
+    'douri',
+    '3c3beaf4e0f69e5f4efd1a09af301997e529285f51194e2b7a25c5def381fe7a',
+    70224157,
+  );
+  static final shubah = _riwaya(
+    'shubah',
+    '9fe1042cb316df8a84d724facaada1ae916f02c3e9ab32eaeaa3890be091bcbd',
+    72332382,
+  );
+
+  /// Search by meaning (optional): multilingual-e5-small (MIT) as int8
+  /// weights run in Dart, and one vector per verse of each meaning text in
+  /// content.db. Built by tools/build_semantic_pack.py; on Tibyan's mirror.
+  static const semantic = PagePackSpec(
+    id: 'semantic-e5-small-v1',
+    url: 'https://tibyan.ahmedhelal.dev/mirror/packs/semantic-e5-small-v1.zip',
+    sha256: '841c6f5accea68d111513da400fb83138be06b41275abebe8d4c29baabc19f34',
+    bytes: 134489900,
+    format: PackFormat.semantic,
+  );
+
+  /// Every pack the app can download.
+  static const all = [madina1441, madina1405, shamarly, semantic];
+
   static PagePackSpec of(MushafEdition edition) => switch (edition) {
     MushafEdition.madina1441 => madina1441,
     MushafEdition.madina1405 => madina1405,
     MushafEdition.shamarly => shamarly,
+    MushafEdition.warsh => warsh,
+    MushafEdition.qalun => qalun,
+    MushafEdition.douri => douri,
+    MushafEdition.shubah => shubah,
   };
 }
 
@@ -230,6 +289,7 @@ class PagePackInstaller {
         PackFormat.svgXz => _extractAndVerify(path, target),
         PackFormat.pngQuranCom => _extractQuranCom(path, target),
         PackFormat.pngShamarly => _extractShamarly(path, target),
+        PackFormat.semantic => _extractSemantic(path, target),
       },
     );
     _done.writeAsStringSync(DateTime.now().toIso8601String());
@@ -312,6 +372,63 @@ void _extractShamarly(String zipPath, String targetDir) {
   }
 }
 
+/// Writes the search-by-meaning files one at a time, straight to disk, and
+/// checks each against the manifest's SHA-256.
+void _extractSemantic(String zipPath, String targetDir) {
+  final input = InputFileStream(zipPath);
+  final archive = ZipDecoder().decodeStream(input);
+  final manifestFile = archive.findFile('manifest.json');
+  if (manifestFile == null) throw const FormatException('Missing manifest');
+  final manifest =
+      jsonDecode(utf8.decode(manifestFile.content)) as Map<String, dynamic>;
+  Directory(targetDir).createSync(recursive: true);
+  for (final f in manifest['files'] as List) {
+    final name = (f as Map)['file'] as String;
+    final entry = archive.findFile(name);
+    if (entry == null || name.contains('/') || name.contains('..')) {
+      throw FormatException('Missing file: $name');
+    }
+    final out = p.join(targetDir, name);
+    final sink = OutputFileStream(out);
+    entry.writeContent(sink);
+    sink.closeSync();
+    if (_sha256File(out) != f['sha256']) {
+      throw FormatException('File damaged: $name');
+    }
+  }
+  File(p.join(targetDir, 'manifest.json'))
+      .writeAsBytesSync(manifestFile.content, flush: true);
+  input.closeSync();
+}
+
+/// SHA-256 of a file, read in 1 MB pieces.
+String _sha256File(String path) {
+  final out = _DigestSink();
+  final input = sha256.startChunkedConversion(out);
+  final file = File(path).openSync();
+  final buffer = Uint8List(1 << 20);
+  for (
+    var n = file.readIntoSync(buffer);
+    n > 0;
+    n = file.readIntoSync(buffer)
+  ) {
+    input.add(Uint8List.sublistView(buffer, 0, n));
+  }
+  file.closeSync();
+  input.close();
+  return out.digest.toString();
+}
+
+class _DigestSink implements Sink<Digest> {
+  late Digest digest;
+
+  @override
+  void add(Digest data) => digest = data;
+
+  @override
+  void close() {}
+}
+
 /// Pages in the Shamarly pack (page 1 is the cover).
 const shamarlyPageCount = 522;
 
@@ -323,7 +440,13 @@ class PageStore {
   final Directory dir;
   final _cache = <int, String>{};
   final _order = <int>[];
-  static const _capacity = 6;
+
+  /// Twelve pages: about 8 MB of text, and enough that turning back through
+  /// a surah does not decompress again. The page's *picture* is not kept —
+  /// that is the GPU's, and a caller disposes it — so a revisited page still
+  /// compiles once more, which on a warm worker is 26 ms for 12 ms of it on
+  /// the UI isolate.
+  static const _capacity = 12;
 
   Future<String> svg(int page) async {
     final hit = _cache[page];

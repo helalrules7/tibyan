@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -119,29 +120,45 @@ Rect _rect(int x0, int y0, int x1, int y1) =>
 Future<ImagePageData> _loadShamarlyPage(WidgetRef ref, int page) async {
   final dir = ref.read(pageInstallerProvider).dir;
   final file = File(p.join(dir.path, '${page.toString().padLeft(3, '0')}.png'));
-  final codec = await ui.instantiateImageCodec(await file.readAsBytes());
-  final image = (await codec.getNextFrame()).image;
   final repo = ref.read(mushafRepositoryProvider);
-  final row = await repo.shamarlyPage(page);
+  // The page's image, its lines and its boxes come from different places
+  // and none of them depends on another: asking for all of them together
+  // leaves one wait instead of six, on every page opened.
+  final decode = () async {
+    final codec = await ui.instantiateImageCodec(await file.readAsBytes());
+    return (await codec.getNextFrame()).image;
+  }();
+  final geometry = (
+    repo.shamarlyPage(page),
+    repo.shamarlyOverflow(page),
+    repo.shamarlyVerseBoxes(page),
+    repo.shamarlyLines(page),
+    repo.shamarlyHeaders(page),
+    repo.shamarlyMarkers(page),
+  ).wait;
+  final (image, (row, overflowRows, boxes, lines, headers, markerRows)) =
+      await (decode, geometry).wait;
   if (row == null) throw StateError('No Shamarly page $page');
   final overflow = <int, List<Rect>>{};
-  for (final o in await repo.shamarlyOverflow(page)) {
+  for (final o in overflowRows) {
     overflow.putIfAbsent(o.line, () => []).add(_rect(o.x0, o.y0, o.x1, o.y1));
   }
   return ImagePageData(
     image: image,
     geometry: shamarlyGeometry(
       row,
-      await repo.shamarlyLines(page),
-      headers: await repo.shamarlyHeaders(page),
+      lines,
+      headers: headers,
       overflow: overflow,
     ),
     pieces: [
-      for (final b in await repo.shamarlyVerseBoxes(page))
+      for (final b in boxes)
         ((surah: b.surah, ayah: b.ayah), _rect(b.x0, b.y0, b.x1, b.y1)),
     ],
+    pieceLines: [for (final b in boxes) b.line],
+    hitSlop: 6,
     markers: {
-      for (final m in await repo.shamarlyMarkers(page))
+      for (final m in markerRows)
         (surah: m.surah, ayah: m.ayah): _rect(m.x0, m.y0, m.x1, m.y1),
     },
     alphaInk: row.kind == 'text',

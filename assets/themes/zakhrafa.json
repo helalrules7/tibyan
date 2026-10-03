@@ -2,8 +2,8 @@
   "id": "zakhrafa",
   "version": 1,
   "name": {
-    "ar": "زخرفة",
-    "en": "Zakhrafa"
+    "ar": "تبيان",
+    "en": "Tibyan"
   },
   "description": {
     "ar": "إطار مزخرف بالتركواز والبرتقالي كالمصاحف المطبوعة",
@@ -32,6 +32,7 @@
     "chip": 18,
     "surahHeader": 0
   },
+  "opening": "assets/themes/opening_tibyan.webp",
   "modes": {
     "light": {
       "bg": "#FFFDF8",
@@ -40,6 +41,25 @@
       "frame": "#1C2F45",
       "goldText": "#0D5F59",
       "border": "#D9CBB8",
+      "headBg": "#1C2F45",
+      "headFg": "#FFFFFF",
+      "marker": "#1A9589",
+      "player": "#1C2F45",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#0D5F59",
+      "muted": "#6B6158",
+      "highlight": "#1FA79B33",
+      "control": "#0D5F59",
+      "onControl": "#FFFFFF"
+    },
+    "white": {
+      "bg": "#FFFFFF",
+      "paper": "#FFFFFF",
+      "ink": "#231F20",
+      "frame": "#1C2F45",
+      "goldText": "#0D5F59",
+      "border": "#E3E0DA",
       "headBg": "#1C2F45",
       "headFg": "#FFFFFF",
       "marker": "#1A9589",

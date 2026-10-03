@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -91,16 +92,26 @@ Future<ImagePageData> _loadOldPage(WidgetRef ref, int page) async {
   final file = File(
     p.join(dir.path, 'p${page.toString().padLeft(3, '0')}.png'),
   );
-  final codec = await ui.instantiateImageCodec(await file.readAsBytes());
-  final image = (await codec.getNextFrame()).image;
-  final glyphs = [
-    ...await ref.read(ayahInfoDatabaseProvider)?.page(page) ??
-        const <GlyphRow>[],
-  ]..sort((a, b) => a.glyphId.compareTo(b.glyphId));
   final repo = ref.read(mushafRepositoryProvider);
-  final cuts = await repo.lineCuts('madina1405', page);
+  // The image, the glyph boxes and the cuts come from different places and
+  // none depends on another: together, they cost one wait instead of four.
+  final decode = () async {
+    final codec = await ui.instantiateImageCodec(await file.readAsBytes());
+    return (await codec.getNextFrame()).image;
+  }();
+  final geometry = (
+    ref.read(ayahInfoDatabaseProvider)?.page(page) ??
+        Future.value(const <GlyphRow>[]),
+    repo.lineCuts('madina1405', page),
+    repo.oldLineOverflow(page),
+  ).wait;
+  final (image, (glyphRows, cuts, overflowRows)) = await (
+    decode,
+    geometry,
+  ).wait;
+  final glyphs = [...glyphRows]..sort((a, b) => a.glyphId.compareTo(b.glyphId));
   final overflow = <int, List<Rect>>{};
-  for (final o in await repo.oldLineOverflow(page)) {
+  for (final o in overflowRows) {
     overflow
         .putIfAbsent(o.line, () => [])
         .add(
@@ -138,5 +149,7 @@ Future<ImagePageData> _loadOldPage(WidgetRef ref, int page) async {
     ],
     markers: {for (final e in markers.entries) e.key: rect(e.value)},
     hitSlop: 6,
+    pieceLines: [for (final g in glyphs) g.lineNumber],
+    rowReach: 0,
   );
 }

@@ -32,11 +32,9 @@ class CoverPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
-    // Over a drawn design's splash: the art's own ink and gold.
-    final look = FrameLook.of(context, ref);
-    final ink = look?.ink ?? t.ink;
-    final muted = look?.ink.withValues(alpha: 0.8) ?? t.muted;
-    final rule = look?.gold ?? t.marker;
+    final ink = t.ink;
+    final muted = t.muted;
+    final rule = t.marker;
     final basmala = ref.watch(basmalaProvider).value ?? '';
     final edition = ref.watch(editionProvider);
     return GestureDetector(
@@ -51,7 +49,7 @@ class CoverPage extends ConsumerWidget {
             style: const TextStyle(fontFamily: 'UthmanicHafs', fontSize: 17),
           ),
           bottom: Text(
-            l.riwayaHafs,
+            riwayaName(l, edition.riwaya),
             style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
           ),
           child: Semantics(
@@ -88,11 +86,7 @@ class CoverPage extends ConsumerWidget {
                         color: rule,
                       ),
                       Text(
-                        switch (edition) {
-                          MushafEdition.madina1441 => l.editionNew,
-                          MushafEdition.madina1405 => l.editionOld,
-                          MushafEdition.shamarly => l.editionShamarly,
-                        },
+                        editionName(l, edition),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 12, color: muted),
                       ),
@@ -185,6 +179,7 @@ class OpeningPage extends ConsumerWidget {
     required this.child,
     this.catchword,
     this.onPageTap,
+    this.onSurahTap,
     this.tools,
   });
 
@@ -195,6 +190,9 @@ class OpeningPage extends ConsumerWidget {
   final Widget child;
   final String? catchword;
   final VoidCallback? onPageTap;
+
+  /// The surah's name was tapped (opens the index, as on other pages).
+  final VoidCallback? onSurahTap;
   final Widget? tools;
 
   @override
@@ -228,19 +226,29 @@ class OpeningPage extends ConsumerWidget {
       ],
     );
     return OrnateFrame(
-      openingSurah: surah,
       page: page,
       onPageTap: onPageTap,
       catchword: catchword,
       tools: tools,
       top: s == null
           ? const SizedBox.shrink()
-          : two(
-              l.surahWord(s.nameAr),
-              l.openingInfo(
-                s.revelation == 'meccan' ? l.meccan : l.medinan,
-                digits(s.ayahCount),
-                digits(s.id),
+          : Semantics(
+              button: onSurahTap != null,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onSurahTap,
+                child: two(
+                  l.surahWord(s.nameAr),
+                  l.openingInfo(
+                    s.revelation == 'meccan' ? l.meccan : l.medinan,
+                    // The edition's own count (a riwaya counts differently).
+                    digits(
+                      ref.watch(surahAyahCountProvider(surah)).value ??
+                          s.ayahCount,
+                    ),
+                    digits(s.id),
+                  ),
+                ),
               ),
             ),
       bottom: s == null

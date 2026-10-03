@@ -5,7 +5,10 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
-import 'widgets/style_preview.dart';
+import '../mushaf/presentation/widgets/art_frame.dart';
+import '../mushaf/presentation/widgets/tajweed_legend.dart';
+import '../mushaf/presentation/widgets/theme_art.dart';
+import 'theme_picker.dart';
 
 class AppearanceScreen extends ConsumerWidget {
   const AppearanceScreen({super.key});
@@ -15,71 +18,47 @@ class AppearanceScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
-    final registry = ref.watch(themeRegistryProvider);
-    final lang = Localizations.localeOf(context).languageCode;
-    final mode = settings.resolveMode(MediaQuery.platformBrightnessOf(context));
     final t = context.tokens.colors;
+    final lang = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.appearanceTitle)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          _Title(l.styleLabel),
-          SizedBox(
-            height: 290,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: registry.styles.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (context, i) {
-                final style = registry.styles[i];
-                final selected = style.id == settings.styleId;
-                final name = style.localizedName(lang);
-                return Semantics(
-                  selected: selected,
-                  button: true,
-                  label: '$name. ${style.localizedDescription(lang)}',
-                  excludeSemantics: true,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => controller.setStyle(style.id),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: selected ? t.goldText : t.border,
-                          width: selected ? 2 : 1,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          StylePreview(
-                            style: style,
-                            mode: mode,
-                            headerLabel: l.previewLabel,
-                            semanticLabel: name,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            name,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            selected
-                                ? l.selected
-                                : style.localizedDescription(lang),
-                            style: TextStyle(color: t.muted, fontSize: 12),
-                          ),
-                        ],
+          _Title(l.themeLabel),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const ThemePicker(),
+                  const SizedBox(height: 10),
+                  Text(
+                    context.tokens.style.localizedDescription(lang),
+                    style: TextStyle(color: t.muted, height: 1.5),
+                  ),
+                  // Whose ornaments these are, for the themes drawn from
+                  // quran-assets.
+                  if (context.tokens.style.art != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l.themeArtCredit,
+                      style: TextStyle(
+                        color: t.muted,
+                        fontSize: 12,
+                        height: 1.5,
                       ),
                     ),
-                  ),
-                );
-              },
+                  ],
+                ],
+              ),
             ),
           ),
+          const SizedBox(height: 20),
+          _Title(l.markerStyleLabel),
+          const Card(child: _MarkerSettings()),
           const SizedBox(height: 20),
           _Title(l.modeLabel),
           Card(
@@ -101,6 +80,10 @@ class AppearanceScreen extends ConsumerWidget {
                     title: Text(l.modeLight),
                   ),
                   RadioListTile(
+                    value: ModeSetting.white,
+                    title: Text(l.modeWhite),
+                  ),
+                  RadioListTile(
                     value: ModeSetting.night,
                     title: Text(l.modeNight),
                   ),
@@ -112,6 +95,9 @@ class AppearanceScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          _Title(l.tajweedColors),
+          const TajweedSettings(),
           const SizedBox(height: 20),
           _Title(l.uiFontLabel),
           Card(
@@ -170,4 +156,141 @@ class _Title extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Verse-end marker shape and tint.
+class _MarkerSettings extends ConsumerWidget {
+  const _MarkerSettings();
+
+  static const _images = {
+    MarkerStyle.rosette7: 'assets/ornaments/marker_7.png',
+    MarkerStyle.rosette9: 'assets/ornaments/marker_9.png',
+    MarkerStyle.rosette16: 'assets/ornaments/marker_16.png',
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
+    final art = watchThemeArt(context, ref);
+    Widget choice({
+      required bool selected,
+      required String label,
+      required Widget child,
+      required VoidCallback onTap,
+    }) {
+      return Semantics(
+        selected: selected,
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        onTap: onTap,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: selected ? t.control : t.border,
+                width: selected ? 2.5 : 1,
+              ),
+            ),
+            child: Center(child: child),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final style in MarkerStyle.values)
+                choice(
+                  selected: settings.markerStyle == style,
+                  label: switch (style) {
+                    MarkerStyle.theme => l.markerTheme,
+                    MarkerStyle.traditional => l.markerTraditional,
+                    // Told apart by their points: 7, 9 or 16.
+                    MarkerStyle.rosette7 => '${l.markerRosette} ٧',
+                    MarkerStyle.rosette9 => '${l.markerRosette} ٩',
+                    MarkerStyle.rosette16 => '${l.markerRosette} ١٦',
+                  },
+                  onTap: () => controller.setMarkerStyle(style),
+                  child: style == MarkerStyle.theme
+                      // The theme's own marker; Zakhrafa's is its rosette.
+                      ? art == null
+                            ? Image.asset(
+                                _images[MarkerStyle.rosette16]!,
+                                width: 40,
+                                height: 40,
+                              )
+                            : SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: CustomPaint(
+                                  painter: ArtPicturePainter(art.marker),
+                                ),
+                              )
+                      : style == MarkerStyle.traditional
+                      ? Text(
+                          '\u06DD',
+                          style: TextStyle(
+                            fontFamily: 'UthmanicHafs',
+                            fontSize: 30,
+                            color: t.ink,
+                          ),
+                        )
+                      : Image.asset(_images[style]!, width: 40, height: 40),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l.markerThemeHint,
+            style: TextStyle(color: t.muted, fontSize: 12.5),
+          ),
+          const SizedBox(height: 16),
+          Text(l.markerTintLabel),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              choice(
+                selected: settings.markerTint == null,
+                label: l.markerTintNone,
+                onTap: () => controller.setMarkerTint(null),
+                child: Icon(Icons.block, color: t.muted),
+              ),
+              for (final (i, c) in markerTints.indexed)
+                choice(
+                  selected: settings.markerTint == c,
+                  label: '${l.markerTintLabel} ${i + 1}',
+                  onTap: () => controller.setMarkerTint(c),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: Color(c),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

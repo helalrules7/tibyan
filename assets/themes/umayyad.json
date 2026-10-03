@@ -1,0 +1,252 @@
+{
+  "id": "umayyad",
+  "version": 1,
+  "name": {
+    "ar": "أموي",
+    "en": "Umayyad"
+  },
+  "description": {
+    "ar": "زيتوني ورملي هادئ كفسيفساء الأمويين",
+    "en": "Calm olive and sand, like Umayyad mosaics"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCAN"
+  },
+  "frame": {
+    "outerWidth": 20,
+    "outerStyle": "art",
+    "innerWidth": 0,
+    "gap": 0,
+    "radius": 0,
+    "innerRadius": 0,
+    "corner": "art"
+  },
+  "ornaments": {
+    "surahHeader": "art",
+    "ayahMarker": "theme",
+    "density": "rich"
+  },
+  "radii": {
+    "card": 14,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 0
+  },
+  "opening": "assets/themes/opening_umayyad.webp",
+  "art": {
+    "source": {
+      "repo": "https://github.com/quran-ws/quran-assets",
+      "commit": "d4cae845c9aae1fbe56ee69d04bc7d8964419373",
+      "frame": {
+        "id": "page-frames/mushaf-hafs-adi",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "header": {
+        "id": "surah-headers/mushaf-hafs-adi",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "marker": {
+        "id": "ayah-markers/font-013-regular",
+        "license": "OFL-1.1"
+      }
+    },
+    "frame": {
+      "corner": "umayyad_frame_corner.svg",
+      "edgeH": "umayyad_frame_edge_h.svg",
+      "edgeV": "umayyad_frame_edge_v.svg",
+      "band": 20
+    },
+    "header": "umayyad_header.svg",
+    "marker": "umayyad_marker.svg",
+    "modes": {
+      "light": {
+        "frame": {
+          "c2": "#DCE3C6",
+          "c3": "#EADBB8",
+          "c4": "#C9A76A",
+          "c5": "#7C8B4A",
+          "c6": "#A8844A",
+          "c7": "#4F5E2C",
+          "line": "#3A3A2C"
+        },
+        "header": {
+          "c2": "#DCE3C6",
+          "c3": "#EADBB8",
+          "c4": "#C9A76A",
+          "c5": "#7C8B4A",
+          "c6": "#4F5E2C",
+          "line": "#3A3A2C"
+        },
+        "marker": {
+          "c1": "#FDFBF3",
+          "c2": "#EADBB8",
+          "c3": "#4F5E2C",
+          "c4": "#7C8B4A",
+          "c5": "#C9A76A"
+        }
+      },
+      "white": {
+        "frame": {
+          "c1": "#FFFFFF",
+          "c2": "#DCE3C6",
+          "c3": "#EADBB8",
+          "c4": "#C9A76A",
+          "c5": "#7C8B4A",
+          "c6": "#A8844A",
+          "c7": "#4F5E2C",
+          "line": "#3A3A2C"
+        },
+        "header": {
+          "c1": "#FFFFFF",
+          "c2": "#DCE3C6",
+          "c3": "#EADBB8",
+          "c4": "#C9A76A",
+          "c5": "#7C8B4A",
+          "c6": "#4F5E2C",
+          "line": "#3A3A2C"
+        },
+        "marker": {
+          "c1": "#FFFFFF",
+          "c2": "#EADBB8",
+          "c3": "#4F5E2C",
+          "c4": "#7C8B4A",
+          "c5": "#C9A76A"
+        }
+      },
+      "night": {
+        "frame": {
+          "c1": "#282D1C",
+          "c2": "#41482B",
+          "c3": "#534524",
+          "c4": "#7E673F",
+          "c5": "#8D9A63",
+          "c6": "#957C54",
+          "c7": "#A4B47E",
+          "line": "#D0D0C8"
+        },
+        "header": {
+          "c1": "#282D1C",
+          "c2": "#41482B",
+          "c3": "#534524",
+          "c4": "#7E673F",
+          "c5": "#8D9A63",
+          "c6": "#A4B47E",
+          "line": "#D0D0C8"
+        },
+        "marker": {
+          "c1": "#1A1D12",
+          "c2": "#534524",
+          "c3": "#A4B47E",
+          "c4": "#8D9A63",
+          "c5": "#7E673F"
+        }
+      },
+      "black": {
+        "frame": {
+          "c1": "#181B11",
+          "c2": "#303520",
+          "c3": "#3E331B",
+          "c4": "#685534",
+          "c5": "#7A8555",
+          "c6": "#7F6947",
+          "c7": "#93A667",
+          "line": "#BDBDB2"
+        },
+        "header": {
+          "c1": "#181B11",
+          "c2": "#303520",
+          "c3": "#3E331B",
+          "c4": "#685534",
+          "c5": "#7A8555",
+          "c6": "#93A667",
+          "line": "#BDBDB2"
+        },
+        "marker": {
+          "c1": "#0A0B07",
+          "c2": "#3E331B",
+          "c3": "#93A667",
+          "c4": "#7A8555",
+          "c5": "#685534"
+        }
+      }
+    }
+  },
+  "modes": {
+    "light": {
+      "bg": "#F2F1E6",
+      "paper": "#FDFBF3",
+      "ink": "#26291C",
+      "frame": "#4F5E2C",
+      "goldText": "#4F5E2C",
+      "border": "#DAD9CE",
+      "headBg": "#4F5E2C",
+      "headFg": "#FFFFFF",
+      "marker": "#6E7C3F",
+      "player": "#4F5E2C",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#4F5E2C",
+      "muted": "#68695E",
+      "highlight": "#6E7C3F33",
+      "control": "#4F5E2C",
+      "onControl": "#FFFFFF"
+    },
+    "white": {
+      "bg": "#FFFFFF",
+      "paper": "#FFFFFF",
+      "ink": "#26291C",
+      "frame": "#4F5E2C",
+      "goldText": "#4F5E2C",
+      "border": "#D8D6D1",
+      "headBg": "#4F5E2C",
+      "headFg": "#FFFFFF",
+      "marker": "#6E7C3F",
+      "player": "#4F5E2C",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#4F5E2C",
+      "muted": "#71736A",
+      "highlight": "#6E7C3F33",
+      "control": "#4F5E2C",
+      "onControl": "#FFFFFF"
+    },
+    "night": {
+      "bg": "#12140C",
+      "paper": "#1A1D12",
+      "ink": "#E8E6D6",
+      "frame": "#2F3820",
+      "goldText": "#B5C58A",
+      "border": "#37392D",
+      "headBg": "#2F3820",
+      "headFg": "#E8E6D6",
+      "marker": "#8E9E5A",
+      "player": "#2F3820",
+      "playerFg": "#E8E6D6",
+      "accent": "#E8E6D6",
+      "accentFg": "#1A1D12",
+      "muted": "#9E9E8F",
+      "highlight": "#8E9E5A40",
+      "control": "#B5C58A",
+      "onControl": "#12140C"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#0A0B07",
+      "ink": "#E2E0D0",
+      "frame": "#232A17",
+      "goldText": "#A9B97F",
+      "border": "#282923",
+      "headBg": "#232A17",
+      "headFg": "#E2E0D0",
+      "marker": "#7F8F4E",
+      "player": "#232A17",
+      "playerFg": "#E2E0D0",
+      "accent": "#E2E0D0",
+      "accentFg": "#0A0B07",
+      "muted": "#949388",
+      "highlight": "#7F8F4E40",
+      "control": "#A9B97F",
+      "onControl": "#000000"
+    }
+  }
+}

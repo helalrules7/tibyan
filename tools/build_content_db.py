@@ -21,6 +21,12 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
   tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
                                           lines, verse, marker and word boxes; no text
+  tools/.cache/shamarly_catchword.json    Shamarly catchword boxes (build_shamarly_catchword.py)
+  tools/.cache/quranic-corpus-morphology-0.4.txt  Quranic Arabic Corpus 0.4 (roots, lemmas;
+                                          build_word_study.py)
+  tools/.cache/nuqayah_almuyassar_gharib.json  al-Muyassar fi Gharib al-Quran, Nuqayah
+                                          (fetch_gharib.py, build_word_study.py)
+  tools/.cache/waqar144_mutashabiha_data.json  mutashabihat links (build_mutashabih.py)
 
 Usage:
   python3 tools/fetch_sources.py
@@ -38,14 +44,19 @@ from datetime import date
 from pathlib import Path
 
 import build_line_cuts
+import build_mutashabih
+import build_tajweed
 import build_word_boxes
+import build_word_study
+import riwaya_reciters
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 CACHE = ROOT / '.cache'
 OUT = REPO / 'assets' / 'db' / 'content.db'
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 17  # 14: mutashabih; 15: tajweed_page; 16: reciter.riwaya and the riwaya recitations; 17: tajweed_letter
 SHAMARLY = CACHE / 'shamarly_geometry.db'
+SHAMARLY_CATCHWORD = CACHE / 'shamarly_catchword.json'
 
 TANZIL_NOTICE_MARK = '# PLEASE DO NOT REMOVE OR CHANGE THIS COPYRIGHT BLOCK'
 
@@ -101,10 +112,11 @@ def read_tanzil_translation(path):
 
 
 # Recitations streamed from mp3quran.net: (id, name_ar, name_en, style,
-# folder URL, mp3quran timing read id or None). al-Banna and Mustafa Ismail
-# have no published timing for their murattal, so their mujawwad is added.
-# al-Banna's murattal (4) gets verse timings derived by
-# build_quranlab_timing.py instead.
+# folder URL, mp3quran timing read id or None). Only murattal recitations
+# are offered (the mujawwad ones, ids 6 and 7, were removed 2026-09-30;
+# ids are never reused, so a saved choice cannot point at another reader).
+# al-Banna's (4) and Mustafa Ismail's (5) murattal have no published
+# timing: build_quranlab_timing.py derives their verse timings.
 RECITERS = [
     (1, 'محمد صديق المنشاوي', 'Mohamed Siddiq al-Minshawi', 'murattal',
      'https://server10.mp3quran.net/minsh/', 112),
@@ -116,11 +128,47 @@ RECITERS = [
      'https://server8.mp3quran.net/bna/', None),
     (5, 'مصطفى إسماعيل', 'Mustafa Ismail', 'murattal',
      'https://server8.mp3quran.net/mustafa/', None),
-    (6, 'محمود علي البنا', 'Mahmoud Ali al-Banna', 'mujawwad',
-     'https://server8.mp3quran.net/bna/Almusshaf-Al-Mojawwad/', 122),
-    (7, 'مصطفى إسماعيل', 'Mustafa Ismail', 'mujawwad',
-     'https://server8.mp3quran.net/mustafa/Almusshaf-Al-Mojawwad/', 288),
+    # An imam of the Haram, from quranicaudio.com (quran.com's audio), with
+    # quran.com's QDC timings for him (tools/build_qdc_timing.py), which give
+    # word timings too. id 10 keeps its number: ids are never reused.
+    (10, 'ياسر الدوسري', 'Yasser al-Dosari', 'murattal',
+     'https://download.quranicaudio.com/quran/yasser_ad-dussary/', None),
+    # Seven more from mp3quran, each with a published timing that covers
+    # every verse of all 114 surahs (measured 2026-10-01): verse timings
+    # only, so the verse is highlighted but not each word. al-Sudais is
+    # here rather than on quranicaudio: quran.com's timings for him name
+    # files that are not the bytes his audio_url serves.
+    (11, 'عبدالرحمن السديس', 'Abdul-Rahman al-Sudais', 'murattal',
+     'https://server11.mp3quran.net/sds/', 54),
+    (12, 'مشاري العفاسي', 'Mishary Rashid al-Afasy', 'murattal',
+     'https://server8.mp3quran.net/afs/', 123),
+    (13, 'سعد الغامدي', 'Saad al-Ghamdi', 'murattal',
+     'https://server7.mp3quran.net/s_gmd/', 30),
+    (14, 'محمد الطبلاوي', 'Muhammad al-Tablaway', 'murattal',
+     'https://server12.mp3quran.net/tblawi/', 106),
 ]
+
+
+def check_reciters():
+    """Every reading offered is murattal, and no id is reused.
+
+    The mujawwad readings are not offered at all, and ids are never
+    reassigned: a choice saved on a device must never turn into another
+    reader. Both are checked here because the list above is the only place
+    that decides.
+    """
+    ids = [r[0] for r in RECITERS] + [r[0] for r in riwaya_reciters.RIWAYA_RECITERS]
+    assert len(ids) == len(set(ids)), f'two reciters share an id: {ids}'
+    styles = {r[3] for r in RECITERS}
+    assert styles == {'murattal'}, f'only murattal is offered, found {styles}'
+
+
+def surah_url(folder_url, surah):
+    """A surah file's URL: folder_url + NNN.mp3, or, when folder_url holds
+    {surah}, folder_url with the surah number (not zero-padded) in its place."""
+    if '{surah}' in folder_url:
+        return folder_url.replace('{surah}', str(surah))
+    return f'{folder_url}{surah:03d}.mp3'
 
 
 def timing_rows(timing, counts):
@@ -160,6 +208,7 @@ def basmala_prefix_length(verses, key):
 
 
 def main():
+    check_reciters()
     uthmani_path = CACHE / 'quran-uthmani.txt'
     clean_path = CACHE / 'quran-simple-clean.txt'
     meta_path = CACHE / 'quran-data.xml'
@@ -173,6 +222,9 @@ def main():
     quranlab_path = CACHE / 'quranlab_banna_timing.json'
     quranlab_ayah_path = CACHE / 'quranlab_ayah_timing.json'
     quranlab_word_path = CACHE / 'quranlab_word_timing.json'
+    qdc_path = CACHE / 'qdc_timing.json'
+    qdc_ayah_path = CACHE / 'qdc_ayah_timing.json'
+    qdc_word_path = CACHE / 'qdc_word_timing.json'
 
     uthmani, notice = read_tanzil(uthmani_path)
     clean, clean_notice = read_tanzil(clean_path)
@@ -301,8 +353,9 @@ def main():
     CREATE TABLE reciter (                  -- recitations streamed or downloaded per surah
       id INTEGER PRIMARY KEY, name_ar TEXT NOT NULL, name_en TEXT NOT NULL,
       style TEXT NOT NULL,                  -- murattal | mujawwad
-      folder_url TEXT NOT NULL,             -- surah file = folder_url + NNN.mp3
-      source_id INTEGER NOT NULL);
+      folder_url TEXT NOT NULL,             -- surah file = folder_url + NNN.mp3, or {surah} replaced by N
+      source_id INTEGER NOT NULL,
+      riwaya TEXT NOT NULL DEFAULT 'hafs'); -- hafs | warsh | qalun | douri | shubah; timings in its own count
     CREATE TABLE ayah_timing (              -- ms from the start of the surah file; ayah 0 = opening before verse 1
       reciter INTEGER NOT NULL, surah INTEGER NOT NULL, ayah INTEGER NOT NULL,
       start_ms INTEGER NOT NULL, end_ms INTEGER NOT NULL,
@@ -341,8 +394,25 @@ def main():
       surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,
       page INTEGER NOT NULL, line INTEGER NOT NULL,
       x0 INTEGER NOT NULL, y0 INTEGER NOT NULL, x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
-      level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed
+      level INTEGER NOT NULL,               -- words_matched of the verse: 2 stable split, 1 unreviewed, 0 best split, not confirmed
       PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
+    CREATE TABLE shamarly_catchword (       -- next page's first word(s), cut from its image (px)
+      page INTEGER PRIMARY KEY, x0 INTEGER NOT NULL, y0 INTEGER NOT NULL,
+      x1 INTEGER NOT NULL, y1 INTEGER NOT NULL,
+      words INTEGER NOT NULL,               -- whole words in the box: 1 or 2
+      erase TEXT NOT NULL);                 -- other ink inside the box, not drawn: "x0,y0,x1,y1 ..."
+    CREATE TABLE word_root (                -- Quranic Arabic Corpus 0.4; word as in word_box
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL, word INTEGER NOT NULL,
+      root TEXT,                            -- Arabic letters with spaces («ر ح م»); NULL if none
+      lemma TEXT,                           -- Arabic, from the corpus transliteration
+      pos TEXT NOT NULL,                    -- corpus part-of-speech tag (N, V, PN, ADJ...)
+      PRIMARY KEY (surah, ayah, word)) WITHOUT ROWID;
+    CREATE TABLE gharib (                   -- «الميسر في غريب القرآن», verbatim, in the book's order
+      surah INTEGER NOT NULL, ayah INTEGER NOT NULL, ord INTEGER NOT NULL,
+      word_from INTEGER, word_to INTEGER,   -- words explained (as in word_box); NULL: the verse only
+      phrase TEXT NOT NULL,                 -- the words as the book quotes them between ﴿ ﴾
+      text TEXT NOT NULL,                   -- the book's explanation
+      PRIMARY KEY (surah, ayah, ord)) WITHOUT ROWID;
     CREATE TABLE review_note (              -- open questions for a qualified reviewer
       id INTEGER PRIMARY KEY, topic TEXT NOT NULL, surah INTEGER, number INTEGER,
       note TEXT NOT NULL,
@@ -402,8 +472,19 @@ def main():
         'mp3quran.net general permission to copy any material or use any link',
         'https://mp3quran.net', 'التلاوات وتوقيت الآيات: mp3quran.net', None,
         sha256(timing_path), today))
-    db.executemany('INSERT INTO reciter VALUES (?,?,?,?,?,?)',
-                   [(i, ar, en, style, url, 10) for i, ar, en, style, url, _ in RECITERS])
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
+        16, 'quranicaudio', 'Recitations of the imams of the two Harams',
+        'quranicaudio.com (Quran.com audio)', None,
+        'Permission granted by email, 2026-10-01: the recitations may be used on condition that the site is named as the source. The site names the recitation in the app and on the source page',
+        'https://quranicaudio.com', 'تلاوات أئمة الحرمين: quranicaudio.com', None,
+        # the timing file names every surah file and its size in bytes
+        sha256(qdc_path), today))
+    db.executemany('INSERT INTO reciter (id, name_ar, name_en, style, folder_url, source_id) '
+                   'VALUES (?,?,?,?,?,?)',
+                   [(i, ar, en, style, url, 16 if 'quranicaudio.com' in url else 10)
+                    for i, ar, en, style, url, _ in RECITERS])
+    # The riwaya recitations (Warsh, Qalun, al-Duri, Shu'bah) and their timings.
+    riwaya_reciters.apply(db, today)
     counts = {s['id']: s['ayas'] for s in surahs}
     timings, gaps = timing_rows(json.loads(timing_path.read_text(encoding='utf-8')), counts)
     db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)', timings)
@@ -417,7 +498,8 @@ def main():
                    json.loads(word_timing_path.read_text(encoding='utf-8')))
     db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
         12, 'quranlab-word-timing',
-        'Word timings for al-Banna (murattal), QuranLab; verse boundaries derived by Tibyan',
+        'Word timings for al-Banna (murattal), QuranLab; verse boundaries of al-Banna and '
+        'Mustafa Ismail (murattal) derived by Tibyan',
         'QuranLab (quranlab/quran-audio); placement and verse boundaries by Tibyan', None,
         'CC BY 4.0', 'https://huggingface.co/datasets/quranlab/quran-audio',
         'توقيت الكلمات للبنا: QuranLab (CC BY 4.0)، وحدود الآيات مستخرجة في تبيان', None,
@@ -426,6 +508,16 @@ def main():
                    json.loads(quranlab_ayah_path.read_text(encoding='utf-8')))
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(quranlab_word_path.read_text(encoding='utf-8')))
+    db.execute('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', (
+        17, 'qdc-timing', 'Verse and word timings of the imams of the two Harams (quran.com)',
+        'Quran.com (QDC audio API; segments from Quranic Universal Library)', None,
+        'No licence stated; permission requested (see docs/MISSING_DATA.md إ15)',
+        'https://api.qurancdn.com/api/qdc/audio/reciters',
+        'توقيت الآيات والكلمات لأئمة الحرمين: Quran.com', None, sha256(qdc_path), today))
+    db.executemany('INSERT INTO ayah_timing VALUES (?,?,?,?,?)',
+                   json.loads(qdc_ayah_path.read_text(encoding='utf-8')))
+    db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
+                   json.loads(qdc_word_path.read_text(encoding='utf-8')))
     for reciter, surah in gaps:
         print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
     # Speech spans measured by tools/build_ayah_speech.py, which reads the
@@ -461,8 +553,35 @@ def main():
     db.executemany('INSERT INTO shamarly_word_box VALUES (?,?,?,?,?,?,?,?,?,?)', shamarly.execute(
         'SELECT w.surah, w.ayah, w.word, w.page, w.line, w.x0, w.y0, w.x1, w.y1, a.words_matched '
         'FROM word_box w JOIN ayah a ON a.surah = w.surah AND a.ayah = w.ayah '
-        'WHERE a.words_matched >= 1 ORDER BY w.surah, w.ayah, w.word'))
+        'ORDER BY w.surah, w.ayah, w.word'))
     shamarly.close()
+    # built by build_shamarly_catchword.py from the page images
+    db.executemany('INSERT INTO shamarly_catchword VALUES (?,?,?,?,?,?,?)',
+                   json.loads(SHAMARLY_CATCHWORD.read_text(encoding='utf-8')))
+    corpus_path = build_word_study.CORPUS
+    gharib_path = build_word_study.GHARIB
+    corpus_lines = corpus_path.read_text(encoding='utf-8').splitlines()
+    corpus_notice = '\n'.join(corpus_lines[:corpus_lines.index('')]).strip()
+    assert 'Quranic Arabic Corpus (morphology, version 0.4)' in corpus_notice
+    db.executemany('INSERT INTO source VALUES (?,?,?,?,?,?,?,?,?,?,?)', [
+        (14, 'quranic-corpus', 'Quranic Arabic Corpus: morphology (roots and lemmas)',
+         'Kais Dukes (Quranic Arabic Corpus, University of Leeds)', '0.4',
+         'GNU GPL; verbatim copies only; credit the corpus and link to corpus.quran.com',
+         'https://corpus.quran.com',
+         'الجذور والصرف: المدونة القرآنية Quranic Arabic Corpus (corpus.quran.com)',
+         corpus_notice, sha256(corpus_path), today),
+        (15, 'nuqayah-almuyassar-gharib', 'الميسر في غريب القرآن',
+         'Nuqayah (read.tafsir.one), by written permission', None,
+         'Written permission from Nuqayah: no ads and no profit',
+         'https://read.tafsir.one/almuyassar-g',
+         'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
+         None, sha256(gharib_path), today),
+    ])
+    word_roots, skipped, gharib, odd = build_word_study.build()
+    build_word_study.report(word_roots, skipped, gharib, odd)
+    assert not odd, odd
+    db.executemany('INSERT INTO word_root VALUES (?,?,?,?,?,?)', word_roots)
+    db.executemany('INSERT INTO gharib VALUES (?,?,?,?,?,?,?)', gharib)
     db.executemany('INSERT INTO commentary_edition VALUES (?,?,?,?,?,?,?)', [
         (7, 'tafsir', 'ar', 'rtl', 'التفسير الميسر', 'Al-Tafsir al-Muyassar', 1),
         (8, 'translation', 'en', 'ltr', 'الترجمة الإنجليزية: صحيح إنترناشونال', 'Saheeh International', 2),
@@ -523,6 +642,8 @@ def main():
         for (s, a), (exact, words) in word_boxes.items()
         for n, page, x0, y0, x1, y1 in words
     ])
+    # Tajweed colouring (cpfair/quran-tajweed, CC BY 4.0, machine-generated).
+    build_tajweed.write(db, today)
     for page, cuts, overflow in build_line_cuts.new_edition():
         db.executemany('INSERT INTO line_cut VALUES (?,?,?,?)',
                        [('madina1441', page, j, round(y, 2)) for j, y in enumerate(cuts)])
@@ -533,6 +654,7 @@ def main():
                            [('madina1405', page, j, y) for j, y in enumerate(cuts)])
             db.executemany('INSERT INTO line_overflow_1405 VALUES (?,?,?,?,?,?)',
                            [(page, k, *b) for k, b in overflow])
+    build_mutashabih.add(db)
     db.execute('CREATE INDEX line_overflow_page ON line_overflow(page)')
     db.execute('CREATE INDEX ayah_page ON ayah(page)')
     db.execute('CREATE INDEX word_box_page ON word_box(page)')
@@ -542,6 +664,7 @@ def main():
     db.execute('CREATE INDEX shamarly_verse_box_page ON shamarly_verse_box(page)')
     db.execute('CREATE INDEX shamarly_word_box_page ON shamarly_word_box(page)')
     db.execute('CREATE INDEX shamarly_marker_page ON shamarly_marker(page)')
+    db.execute('CREATE INDEX word_root_root ON word_root(root)')
     db.commit()
     db.execute('VACUUM')
     db.close()
@@ -555,7 +678,10 @@ def main():
     assert check.execute('PRAGMA user_version').fetchone()[0] == SCHEMA_VERSION
     assert check.execute('SELECT COUNT(*) FROM word_box').fetchone()[0] == 77430
     assert check.execute('SELECT COUNT(*) FROM commentary').fetchone()[0] == 3 * 6236
-    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing').fetchone()[0] == 6
+    # Verse timings: the ten Hafs recitations and ten of the riwaya ones
+    # (four riwaya recitations have none published).
+    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing WHERE reciter < 100').fetchone()[0] == 10
+    assert check.execute('SELECT COUNT(DISTINCT reciter) FROM ayah_timing WHERE reciter > 100').fetchone()[0] == 10
     # Shamarly: every text page 2..522 carries verses; verses in order never go back a page.
     covered = {p for s, e in check.execute('SELECT page_shamarly, page_shamarly_end FROM ayah')
                for p in range(s, e + 1)}
@@ -563,6 +689,17 @@ def main():
     ends = [r[0] for r in check.execute('SELECT page_shamarly_end FROM ayah ORDER BY id')]
     assert ends == sorted(ends)
     assert check.execute('SELECT COUNT(*) FROM shamarly_marker').fetchone()[0] == 6236
+    assert check.execute('SELECT COUNT(*) FROM mutashabih').fetchone()[0] > 0
+    assert check.execute("SELECT COUNT(*) FROM tajweed_page WHERE edition = 'madina1441'").fetchone()[0] == 604
+    assert check.execute("SELECT COUNT(*) FROM tajweed_letter WHERE riwaya = 'hafs'").fetchone()[0] > 70000
+    # Word study: the corpus maps every verse but 7; 20 more are only
+    # disjoined letters (الٓمٓ...), which have no root or lemma. al-Rahman is ر ح م.
+    assert len(skipped) == 7, skipped
+    assert check.execute('SELECT COUNT(DISTINCT surah * 1000 + ayah) FROM word_root').fetchone()[0] == 6209
+    assert check.execute('SELECT root FROM word_root WHERE surah = 1 AND ayah = 1 AND word = 3'
+                         ).fetchone()[0] == 'ر ح م'
+    assert check.execute('SELECT COUNT(*) FROM word_root w LEFT JOIN word_box b USING (surah, ayah, word) '
+                         'WHERE b.page IS NULL').fetchone()[0] == 0
     print(f'built {OUT.relative_to(REPO)}: 6236 verses, 604 pages, '
           f'{len(polygons)} polygons, {OUT.stat().st_size // 1024} KB')
     return 0

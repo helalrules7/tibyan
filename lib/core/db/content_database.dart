@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -340,7 +342,9 @@ class ShamarlyWordBox extends Table {
   IntColumn get x1 => integer()();
   IntColumn get y1 => integer()();
 
-  /// How sure the split into words is: 2 stable, 1 not yet reviewed.
+  /// How sure the split into words is: 2 stable, 1 not yet reviewed, 0
+  /// the best split, not confirmed (tajweed colouring only; see
+  /// [shamarlyWordLevel]).
   IntColumn get level => integer()();
 
   @override
@@ -348,6 +352,29 @@ class ShamarlyWordBox extends Table {
 
   @override
   bool get withoutRowId => true;
+}
+
+/// The catchword of a Shamarly page, cut from the next page's image
+/// (tools/build_shamarly_catchword.py): the box of the next page's first
+/// word(s) in image px, and [erase], the rectangles of other ink inside
+/// it ("x0,y0,x1,y1" separated by spaces), which are not drawn.
+@DataClassName('ShamarlyCatchwordRow')
+class ShamarlyCatchword extends Table {
+  @override
+  String get tableName => 'shamarly_catchword';
+
+  IntColumn get page => integer()();
+  IntColumn get x0 => integer()();
+  IntColumn get y0 => integer()();
+  IntColumn get x1 => integer()();
+  IntColumn get y1 => integer()();
+
+  /// Whole words in the box: 1 or 2.
+  IntColumn get words => integer()();
+  TextColumn get erase => text()();
+
+  @override
+  Set<Column> get primaryKey => {page};
 }
 
 /// A tafsir or translation shipped in the content database.
@@ -401,12 +428,16 @@ class Reciter extends Table {
   TextColumn get nameAr => text()();
   TextColumn get nameEn => text()();
 
-  /// `murattal` or `mujawwad`.
+  /// `murattal`, and only that: the mujawwad readings are not offered.
   TextColumn get style => text()();
 
   /// A surah's file is this URL followed by `NNN.mp3`.
   TextColumn get folderUrl => text()();
   IntColumn get sourceId => integer()();
+
+  /// The riwaya recited (`Riwaya.name`: hafs, warsh, qalun, douri,
+  /// shubah). Its verse timings are numbered by that riwaya's own count.
+  TextColumn get riwaya => text().withDefault(const Constant('hafs'))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -474,6 +505,81 @@ class AyahSpeech extends Table {
   bool get withoutRowId => true;
 }
 
+/// A word's root, lemma and part of speech from the Quranic Arabic Corpus
+/// 0.4 (tools/build_word_study.py). Words are numbered as in [WordBox];
+/// verses whose word count differs from the corpus have no rows.
+@DataClassName('WordRootRow')
+class WordRoot extends Table {
+  @override
+  String get tableName => 'word_root';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+  IntColumn get word => integer()();
+
+  /// Arabic letters separated by spaces, as the corpus shows them
+  /// («ر ح م»); null for words without a root.
+  TextColumn get root => text().nullable()();
+  TextColumn get lemma => text().nullable()();
+
+  /// The corpus's part-of-speech tag (N, V, PN, ADJ, ...).
+  TextColumn get pos => text()();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah, word};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+/// An entry of «الميسر في غريب القرآن», verbatim: the words the book
+/// quotes and its explanation. [wordFrom]..[wordTo] are the words it
+/// explains when that is certain; null when the entry belongs to the verse
+/// only (its words occur more than once, or were not found).
+@DataClassName('GharibRow')
+class Gharib extends Table {
+  @override
+  String get tableName => 'gharib';
+
+  IntColumn get surah => integer()();
+  IntColumn get ayah => integer()();
+
+  /// Order of the entry within its verse, as in the book.
+  IntColumn get ord => integer()();
+  IntColumn get wordFrom => integer().nullable()();
+  IntColumn get wordTo => integer().nullable()();
+  TextColumn get phrase => text()();
+  TextColumn get body => text().named('text')();
+
+  @override
+  Set<Column> get primaryKey => {surah, ayah, ord};
+
+  @override
+  bool get withoutRowId => true;
+}
+
+/// Similar verses (mutashabihat): a passage and one passage that resembles
+/// it, as ranges of verse ids (`ayah.id`). Links only, from
+/// tools/build_mutashabih.py; the verses' text comes from [Ayah].
+@DataClassName('MutashabihRow')
+class Mutashabih extends Table {
+  @override
+  String get tableName => 'mutashabih';
+
+  IntColumn get id => integer()();
+  IntColumn get srcFrom => integer()();
+  IntColumn get srcTo => integer()();
+  IntColumn get mutFrom => integer()();
+  IntColumn get mutTo => integer()();
+
+  /// 1 when the start of the following verse tells the passages apart.
+  IntColumn get context => integer()();
+  IntColumn get sourceId => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     Surah,
@@ -497,16 +603,25 @@ class AyahSpeech extends Table {
     ShamarlyMarker,
     ShamarlyVerseBox,
     ShamarlyWordBox,
+    ShamarlyCatchword,
+    WordRoot,
+    Gharib,
+    Mutashabih,
   ],
 )
 class ContentDatabase extends _$ContentDatabase {
   ContentDatabase(super.executor);
 
   /// Must match `SCHEMA_VERSION` in tools/build_content_db.py.
+  /// 17: `tajweed_letter`, the letters each tajweed rule applies to, per
+  /// riwaya and source (read with custom queries, like `tajweed_page`).
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 17;
 
-  /// The file is built ahead of time; never create or migrate it here.
+  /// The file is built ahead of time; never create or migrate it here. An
+  /// app with a newer schema ships a newer file, and [openBundled] replaces
+  /// the old copy with it, so going from one version to the next (16 to
+  /// 17: a new table only) needs no step here.
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {},
@@ -514,28 +629,43 @@ class ContentDatabase extends _$ContentDatabase {
   );
 
   /// Copies the bundled database to app storage when missing or when the
-  /// bundled copy changed, then opens it read-only in a background isolate.
+  /// app changed, then opens it read-only in a background isolate.
+  ///
+  /// The copy is stamped with the app's build number, so a launch that
+  /// already holds this build's copy neither reads nor hashes the 31 MB
+  /// asset again: doing that on every launch cost the app a few hundred
+  /// milliseconds before the first frame, on a phone.
   static Future<ContentDatabase> openBundled(AssetBundle bundle) async {
     final dir = await getApplicationSupportDirectory();
     final file = File(p.join(dir.path, 'content.db'));
     final stamp = File(p.join(dir.path, 'content.db.stamp'));
+    // Under a debug build the asset can change without the build number
+    // changing, so there the copy is checked by its checksum as before.
+    final build = kDebugMode
+        ? null
+        : (await PackageInfo.fromPlatform()).buildNumber;
+    final installed = file.existsSync() && stamp.existsSync();
+    if (installed && build != null && stamp.readAsStringSync() == 'b$build') {
+      return _open(file);
+    }
     final data = await bundle.load('assets/db/content.db');
     final bytes = data.buffer.asUint8List(
       data.offsetInBytes,
       data.lengthInBytes,
     );
-    final fingerprint = sha256.convert(bytes).toString();
-    if (!file.existsSync() ||
-        !stamp.existsSync() ||
-        stamp.readAsStringSync() != fingerprint) {
+    final mark = build == null ? 's${sha256.convert(bytes)}' : 'b$build';
+    if (!installed || stamp.readAsStringSync() != mark) {
       await file.writeAsBytes(bytes, flush: true);
-      await stamp.writeAsString(fingerprint);
+      await stamp.writeAsString(mark);
     }
-    return ContentDatabase(
-      NativeDatabase.createInBackground(
-        file,
-        setup: (db) => db.execute('PRAGMA query_only = ON'),
-      ),
-    );
+    return _open(file);
   }
+
+  /// Opens [file] read-only, off the main isolate.
+  static ContentDatabase _open(File file) => ContentDatabase(
+    NativeDatabase.createInBackground(
+      file,
+      setup: (db) => db.execute('PRAGMA query_only = ON'),
+    ),
+  );
 }

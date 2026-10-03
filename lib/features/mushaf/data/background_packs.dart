@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 
-import '../../../core/settings/app_settings.dart';
 import 'page_pack.dart';
 
 /// Page packs downloaded by the system (WorkManager / a user-initiated job
@@ -60,8 +59,7 @@ class BackgroundPacks {
   }
 
   PagePackSpec? _spec(String id) {
-    for (final e in MushafEdition.values) {
-      final s = PagePackSpec.of(e);
+    for (final s in PagePackSpec.all) {
       if (s.id == id) return s;
     }
     return null;
@@ -71,14 +69,18 @@ class BackgroundPacks {
       PagePackInstaller(root: root, spec: spec);
 
   /// Queues a pack (the mirror first, then its fallbacks on failure).
-  /// Nothing happens when it is installed or already queued.
+  /// Nothing happens when it is installed or already running; a paused
+  /// one resumes.
   Future<void> enqueue(PagePackSpec spec, String displayName) async {
     if (_installer(spec).isInstalled) {
       _progress.add((spec.id, const PackProgress(PackPhase.installed)));
       return;
     }
     final existing = await _dl.taskForId(spec.id);
-    if (existing != null) return;
+    if (existing != null) {
+      if (existing is DownloadTask) await _dl.resume(existing);
+      return;
+    }
     await _dl.enqueue(_task(spec, displayName, 0));
     // Ask for notifications without holding the download on the answer.
     unawaited(

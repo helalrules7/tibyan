@@ -22,7 +22,17 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onMultiSelect,
     required this.onTafsir,
     required this.onListen,
+    required this.onWordStudy,
+    required this.onWordMeanings,
+    this.onReflect,
+    this.similarCount = 0,
+    this.onSimilar,
   });
+
+  /// Passages similar to the selected verse (mutashabihat); the button
+  /// shows only when there are some.
+  final int similarCount;
+  final VoidCallback? onSimilar;
 
   final List<VerseKey> verses;
   final List<SurahRow>? surahs;
@@ -32,6 +42,17 @@ class VerseServicesPanel extends StatelessWidget {
   final VoidCallback onMultiSelect;
   final VoidCallback onTafsir;
   final VoidCallback onListen;
+
+  /// Word study: the next tap on the page picks the word.
+  /// Null where the edition has no word data (the riwaya editions): the
+  /// button is shown disabled.
+  final VoidCallback? onWordStudy;
+
+  /// The meanings of the selected verses' words («الميسر في غريب القرآن»).
+  final VoidCallback onWordMeanings;
+
+  /// Writes a note on the first selected verse (tadabbur journal).
+  final VoidCallback? onReflect;
 
   @override
   Widget build(BuildContext context) {
@@ -90,11 +111,14 @@ class VerseServicesPanel extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l.servicesTitle,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            l.servicesTitle,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                         Semantics(
@@ -108,7 +132,8 @@ class VerseServicesPanel extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    tooltip: l.cancel,
+                    tooltip: MaterialLocalizations.of(context)
+                        .closeButtonTooltip,
                     onPressed: onClose,
                     icon: const Icon(Icons.close),
                   ),
@@ -140,6 +165,43 @@ class VerseServicesPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onWordStudy,
+                      icon: const Icon(Icons.touch_app_outlined),
+                      label: Text(l.wordStudy),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onWordMeanings,
+                      icon: const Icon(Icons.notes),
+                      label: Text(l.wordMeanings),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (similarCount > 0 && onSimilar != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onSimilar,
+                  icon: const Icon(Icons.compare_arrows),
+                  label: Text(l.similarCount(digits(similarCount))),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               Row(
                 children: [
@@ -157,13 +219,32 @@ class VerseServicesPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              OutlinedButton.icon(
-                onPressed: onMultiSelect,
-                icon: const Icon(Icons.format_line_spacing),
-                label: Text(l.multiSelect),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onMultiSelect,
+                      icon: const Icon(Icons.format_line_spacing),
+                      label: Text(l.multiSelect),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                      ),
+                    ),
+                  ),
+                  if (onReflect != null) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: onReflect,
+                        icon: const Icon(Icons.edit_note_outlined),
+                        label: Text(l.journalAdd),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
               const SizedBox(height: 8),
               FilledButton.tonalIcon(

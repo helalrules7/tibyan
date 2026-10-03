@@ -128,3 +128,10 @@
 | تطبيق الشمرلي للأندرويد | https://github.com/Mr-DDDAlKilanny/Shamarly | لا ترخيص للتطبيق | `shamerly.db`: صفحة كل آية وموضع علامة نهايتها | — | |
 | اكتشاف علامات الآيات | https://github.com/quran/ayah-detection | لا ترخيص | سكربتات Python جُربت على الشمرلي | — | |
 | فهرس أول كلمة لكل صفحة | https://github.com/quran/quran_android/issues/1180 | — | ملف `shemerly_page_first_word_index.txt` | — | |
+
+## زخارف الثيمات (quran-assets)
+
+| المصدر | الرابط | صفحة الترخيص | ما وجدناه | النسخة المحفوظة | ملاحظاتك |
+|---|---|---|---|---|---|
+| quran-assets (Quran.ws) | https://github.com/quran-ws/quran-assets (الإصدار `d4cae845c9aae1fbe56ee69d04bc7d8964419373`) | https://github.com/quran-ws/quran-assets/blob/main/LICENSE.md | إطارات وترويسات وفواصل متجهة، ترخيص لكل قطعة في `catalog.json`: المنقول من المصاحف CC BY-NC-SA 4.0 **مبدئي، غير مُجاز بعد**؛ فواصل الخطوط OFL 1.1 مؤكَّدة | `2026-09-30_quran-ws_quran-assets_LICENSE.md` و`.txt`، و`2026-09-30_quran-assets_ofl_*.txt` | |
+| مصاحف المصدر | الدوري والسوسي وورش: https://qurancomplex.gov.sa/wp-content/uploads/isdarat/qiraat/ ؛ حفص «العادي»: https://archive.org/details/quran-pdf-download-hafs ؛ المدينة الكبير: https://archive.org/details/20240716_20240716_0926 ؛ شعبة: https://archive.org/details/20240908_20240908_1247 ؛ قالون: https://archive.org/details/quran-qalon | — | الصفحات المأخوذ منها في `DATA_SOURCES.md` | — | |

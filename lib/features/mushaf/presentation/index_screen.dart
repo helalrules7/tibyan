@@ -66,6 +66,14 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
     List<SurahRow> surahs,
   ) async {
     if (r.surah < 1 || r.surah > 114) return;
+    // In a riwaya edition, a typed reference is in the riwaya's own count.
+    final riwaya = await ref.read(riwayaDataProvider.future);
+    if (!mounted) return;
+    if (riwaya != null) {
+      final ayah = r.ayah.clamp(1, riwaya.surahCounts[r.surah - 1]);
+      await openPage(context, ref, riwaya.pageOf(r.surah, ayah));
+      return;
+    }
     final ayah = r.ayah.clamp(1, surahs[r.surah - 1].ayahCount);
     await openVerse(context, ref, surah: r.surah, ayah: ayah);
   }
@@ -74,6 +82,7 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final surahs = ref.watch(surahsProvider).value;
+    final riwaya = ref.watch(riwayaDataProvider).value;
 
     return DefaultTabController(
       length: IndexTab.values.length,
@@ -100,20 +109,32 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
                   _surahTab(context, surahs),
                   _StartsTab(
                     surahs: surahs,
-                    starts: ref
-                        .watch(juzStartsProvider)
-                        .value
-                        ?.map((j) => j.ayah)
-                        .toList(),
+                    // A riwaya edition: its own juz starts (KFGQPC).
+                    starts: riwaya != null
+                        ? [for (final v in riwaya.juzStarts()) riwaya.row(v)]
+                        : ref
+                              .watch(juzStartsProvider)
+                              .value
+                              ?.map((j) => j.ayah)
+                              .toList(),
                     current: widget.juz,
                     title: (n) => l.juzLabel('$n'),
                   ),
-                  _StartsTab(
-                    surahs: surahs,
-                    starts: ref.watch(hizbStartsProvider).value,
-                    current: widget.hizb,
-                    title: (n) => l.hizbLabel('$n'),
-                  ),
+                  // The riwayat's hizb divisions are not in their sources.
+                  if (riwaya != null)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Text(l.riwayaGaps, textAlign: TextAlign.center),
+                      ),
+                    )
+                  else
+                    _StartsTab(
+                      surahs: surahs,
+                      starts: ref.watch(hizbStartsProvider).value,
+                      current: widget.hizb,
+                      title: (n) => l.hizbLabel('$n'),
+                    ),
                   _PagesTab(current: widget.page),
                   _MarksTab(surahs: surahs),
                 ],
@@ -189,10 +210,11 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
                 current: isCurrent,
                 badge: '${s.id}',
                 title: surahName(context, s),
+                // The edition's own count and page (a riwaya differs).
                 subtitle:
-                    '${s.revelation == 'meccan' ? l.meccan : l.medinan} · ${l.ayahCount('${s.ayahCount}')}',
+                    '${s.revelation == 'meccan' ? l.meccan : l.medinan} · ${l.ayahCount('${ref.watch(surahAyahCountProvider(s.id)).value ?? s.ayahCount}')}',
                 trailing: l.pageShort(
-                  '${s.startPageIn(ref.watch(editionProvider))}',
+                  '${ref.watch(surahStartPageProvider(s.id)).value ?? s.startPageIn(ref.watch(editionProvider))}',
                 ),
                 onTap: () => openVerse(context, ref, surah: s.id, ayah: 1),
               );
@@ -335,6 +357,8 @@ class _StartsTab extends ConsumerWidget {
       currentIndex: current == null ? null : current! - 1,
       itemBuilder: (context, i, isCurrent) {
         final a = list[i];
+        // Rows of a riwaya edition carry its own numbers and page.
+        final page = a.pageIn(ref.watch(editionProvider));
         return _Row(
           current: isCurrent,
           badge: '${i + 1}',
@@ -343,8 +367,8 @@ class _StartsTab extends ConsumerWidget {
             surahName(context, surahs[a.surah - 1]),
             '${a.number}',
           ),
-          trailing: l.pageShort('${a.pageIn(ref.watch(editionProvider))}'),
-          onTap: () => openVerse(context, ref, surah: a.surah, ayah: a.number),
+          trailing: l.pageShort('$page'),
+          onTap: () => openPage(context, ref, page),
         );
       },
     );
@@ -402,6 +426,7 @@ class _PagesTabState extends ConsumerState<_PagesTab> {
               selected: current,
               label: l.pageOf('${i + 1}'),
               excludeSemantics: true,
+              onTap: () => openPage(context, ref, i + 1),
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.zero,

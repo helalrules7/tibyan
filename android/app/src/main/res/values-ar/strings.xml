@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="khatma_widget_label">الختمة</string>
+    <string name="khatma_widget_description">ورد اليوم من الختمة</string>
+    <string name="khatma_widget_open">افتح تبيان</string>
+</resources>

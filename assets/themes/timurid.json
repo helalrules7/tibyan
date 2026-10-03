@@ -1,0 +1,238 @@
+{
+  "id": "timurid",
+  "version": 1,
+  "name": {
+    "ar": "تيموري",
+    "en": "Timurid"
+  },
+  "description": {
+    "ar": "فيروزي ورملي كقباب سمرقند، من مصحف المدينة الكبير",
+    "en": "Turquoise and sand like the domes of Samarkand, from the large Madina mushaf"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCAN"
+  },
+  "frame": {
+    "outerWidth": 24,
+    "outerStyle": "art",
+    "innerWidth": 0,
+    "gap": 0,
+    "radius": 0,
+    "innerRadius": 0,
+    "corner": "art"
+  },
+  "ornaments": {
+    "surahHeader": "art",
+    "ayahMarker": "theme",
+    "density": "rich"
+  },
+  "radii": {
+    "card": 14,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 0
+  },
+  "opening": "assets/themes/opening_timurid.webp",
+  "art": {
+    "source": {
+      "repo": "https://github.com/quran-ws/quran-assets",
+      "commit": "d4cae845c9aae1fbe56ee69d04bc7d8964419373",
+      "frame": {
+        "id": "page-frames/mushaf-hafs-madinah-kabir",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "header": {
+        "id": "surah-headers/mushaf-hafs-madinah-kabir",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "marker": {
+        "id": "ayah-markers/mushaf-hafs-madinah-kabir",
+        "license": "CC-BY-NC-SA-4.0"
+      }
+    },
+    "frame": {
+      "whole": "timurid_frame.svg",
+      "band": 24
+    },
+    "header": "timurid_header.svg",
+    "marker": "timurid_marker.svg",
+    "modes": {
+      "light": {
+        "frame": {
+          "c2": "#C9B79C",
+          "c3": "#2E8A95",
+          "c4": "#2E8A95",
+          "line": "#1F4E5A"
+        },
+        "header": {
+          "c2": "#C9B79C",
+          "c3": "#2E8A95",
+          "c4": "#2E8A95",
+          "c5": "#2E8A95",
+          "line": "#1F4E5A"
+        },
+        "marker": {
+          "c1": "#FCFBF7",
+          "c2": "#C9B79C",
+          "c3": "#2E8A95",
+          "c4": "#A08868",
+          "c5": "#6B5640",
+          "line": "#1F4E5A"
+        }
+      },
+      "white": {
+        "frame": {
+          "c1": "#FFFFFF",
+          "c2": "#C9B79C",
+          "c3": "#2E8A95",
+          "c4": "#2E8A95",
+          "line": "#1F4E5A"
+        },
+        "header": {
+          "c1": "#FFFFFF",
+          "c2": "#C9B79C",
+          "c3": "#2E8A95",
+          "c4": "#2E8A95",
+          "c5": "#2E8A95",
+          "line": "#1F4E5A"
+        },
+        "marker": {
+          "c1": "#FFFFFF",
+          "c2": "#C9B79C",
+          "c3": "#2E8A95",
+          "c4": "#A08868",
+          "c5": "#6B5640",
+          "line": "#1F4E5A"
+        }
+      },
+      "night": {
+        "frame": {
+          "c1": "#183033",
+          "c2": "#60533F",
+          "c3": "#57AAB4",
+          "c4": "#57AAB4",
+          "line": "#C1D2D7"
+        },
+        "header": {
+          "c1": "#183033",
+          "c2": "#60533F",
+          "c3": "#57AAB4",
+          "c4": "#57AAB4",
+          "c5": "#57AAB4",
+          "line": "#C1D2D7"
+        },
+        "marker": {
+          "c1": "#102022",
+          "c2": "#60533F",
+          "c3": "#57AAB4",
+          "c4": "#80705C",
+          "c5": "#A28E79",
+          "line": "#C1D2D7"
+        }
+      },
+      "black": {
+        "frame": {
+          "c1": "#0C1D1F",
+          "c2": "#4B4131",
+          "c3": "#47959E",
+          "c4": "#47959E",
+          "line": "#A9C0C7"
+        },
+        "header": {
+          "c1": "#0C1D1F",
+          "c2": "#4B4131",
+          "c3": "#47959E",
+          "c4": "#47959E",
+          "c5": "#47959E",
+          "line": "#A9C0C7"
+        },
+        "marker": {
+          "c1": "#050C0D",
+          "c2": "#4B4131",
+          "c3": "#47959E",
+          "c4": "#6B5E4D",
+          "c5": "#917B65",
+          "line": "#A9C0C7"
+        }
+      }
+    }
+  },
+  "modes": {
+    "light": {
+      "bg": "#EEF3F2",
+      "paper": "#FCFBF7",
+      "ink": "#16303A",
+      "frame": "#1F6E78",
+      "goldText": "#1F5E67",
+      "border": "#D4DCDC",
+      "headBg": "#1F6E78",
+      "headFg": "#FFFFFF",
+      "marker": "#2E8A95",
+      "player": "#1F6E78",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#1F6E78",
+      "muted": "#5C6D73",
+      "highlight": "#2E8A9533",
+      "control": "#1F6E78",
+      "onControl": "#FFFFFF"
+    },
+    "white": {
+      "bg": "#FFFFFF",
+      "paper": "#FFFFFF",
+      "ink": "#16303A",
+      "frame": "#1F6E78",
+      "goldText": "#1F5E67",
+      "border": "#D6D7D5",
+      "headBg": "#1F6E78",
+      "headFg": "#FFFFFF",
+      "marker": "#2E8A95",
+      "player": "#1F6E78",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#1F6E78",
+      "muted": "#62747B",
+      "highlight": "#2E8A9533",
+      "control": "#1F6E78",
+      "onControl": "#FFFFFF"
+    },
+    "night": {
+      "bg": "#0B1618",
+      "paper": "#102022",
+      "ink": "#E3ECEA",
+      "frame": "#173A40",
+      "goldText": "#7FCFD6",
+      "border": "#2E3D3E",
+      "headBg": "#173A40",
+      "headFg": "#E3ECEA",
+      "marker": "#3FA3AD",
+      "player": "#173A40",
+      "playerFg": "#E3ECEA",
+      "accent": "#E3ECEA",
+      "accentFg": "#102022",
+      "muted": "#97A3A2",
+      "highlight": "#3FA3AD40",
+      "control": "#7FCFD6",
+      "onControl": "#0B1618"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#050C0D",
+      "ink": "#DDE7E5",
+      "frame": "#10292D",
+      "goldText": "#72C2C9",
+      "border": "#232B2B",
+      "headBg": "#10292D",
+      "headFg": "#DDE7E5",
+      "marker": "#2F8F98",
+      "player": "#10292D",
+      "playerFg": "#DDE7E5",
+      "accent": "#DDE7E5",
+      "accentFg": "#050C0D",
+      "muted": "#8F9897",
+      "highlight": "#2F8F9840",
+      "control": "#72C2C9",
+      "onControl": "#000000"
+    }
+  }
+}

@@ -1,11 +1,14 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show listEquals, setEquals;
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/theme/theme_tokens.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/tajweed.dart';
 import 'mushaf_page.dart';
 import 'page_interaction.dart';
 
@@ -108,15 +111,29 @@ class StripLayout {
 
   /// Image region drawn by line [j]: its band, less neighbours' ink that
   /// reaches in, plus its own ink that reaches out.
+  ///
+  /// A neighbour's box that cannot reach this line's area cannot change
+  /// it, so it is skipped: on the Shamarly pages that is most of the
+  /// boxes, and [Path.combine] is costly.
   Path _region(int j) {
-    var p = Path()
-      ..addRect(
-        Rect.fromLTRB(ink.left, g.bandTops[j], ink.right, g.bandBottoms[j]),
-      );
+    final band = Rect.fromLTRB(
+      ink.left,
+      g.bandTops[j],
+      ink.right,
+      g.bandBottoms[j],
+    );
+    var area = band;
+    for (final r in g.overflow[j] ?? const <Rect>[]) {
+      area = area.expandToInclude(r);
+    }
+    if (!area.isFinite) area = band;
+    var p = Path()..addRect(band);
     for (final e in g.overflow.entries) {
+      final own = e.key == j;
       for (final r in e.value) {
+        if (!own && !r.overlaps(area)) continue;
         p = Path.combine(
-          e.key == j ? PathOperation.union : PathOperation.difference,
+          own ? PathOperation.union : PathOperation.difference,
           p,
           Path()..addRect(r),
         );
@@ -124,6 +141,10 @@ class StripLayout {
     }
     return p;
   }
+
+  /// The clip path of each line, built once. Building them inside
+  /// [paint] cost milliseconds on every repaint.
+  late final List<Path> _regions = List.generate(_lines, _region);
 
   /// Room kept above the first line and below the last, so no line is cut.
   late final EdgeInsets _pads = stripPadding(
@@ -162,12 +183,129 @@ class StripLayout {
     );
   }
 
+  /// Where a touch passes from line j to line j + 1 on screen: halfway
+  /// across the gap between their bands as drawn. Slots can be fractional
+  /// (a surah header), so a slot's index is not its line's.
+  late final List<double> _screenCuts = [
+    for (var j = 0; j < _lines - 1; j++)
+      (toScreen(Offset(0, g.bandBottoms[j]), line: j).dy +
+              toScreen(Offset(0, g.bandTops[j + 1]), line: j + 1).dy) /
+          2,
+  ];
+
+  /// The line drawn nearest screen y [y].
+  int lineAt(double y) {
+    if (!strips) return lineOfImageY(toImage(Offset(0, y)).dy);
+    var j = 0;
+    while (j < _lines - 1 && y > _screenCuts[j]) {
+      j++;
+    }
+    return j;
+  }
+
+  /// In strips, a touch in the gap around a line is taken to the nearest
+  /// edge of that line's band: the screen there has no image of its own.
   Offset toImage(Offset p) {
     if (!strips) return (p - offset) / scale + ink.topLeft;
-    final j = ((p.dy - _padTop) / _slot).floor().clamp(0, _lines - 1);
+    final j = lineAt(p.dy);
     return Offset(
       p.dx / scale + ink.left,
-      g.centres[j] + (p.dy - _slotCentre(g.slots[j])) / scale,
+      (g.centres[j] + (p.dy - _slotCentre(g.slots[j])) / scale).clamp(
+        g.bandTops[j],
+        g.bandBottoms[j],
+      ),
+    );
+  }
+
+  /// The piece of [pieces] (image px) a touch at [p] (screen) selects, by
+  /// its index: on the line drawn nearest the touch, the piece under it,
+  /// or else the nearest across. Null off the text: on a line with no
+  /// pieces (a surah header, the basmala), past either end of a line's
+  /// text by more than [slop] (image px), or outside the drawn image.
+  ///
+  /// Pages scaled whole by their nature (the opening pages) find their
+  /// lines from the pieces' rows instead of the line grid, which they do
+  /// not all follow: by [lines], the printed line of each piece, or else
+  /// by [wordRows].
+  int? pieceAt(
+    Offset p,
+    List<Rect> pieces, {
+    List<int> lines = const [],
+    double slop = 0,
+  }) {
+    final screen = [for (final r in pieces) toScreenRect(r)];
+    final reach = slop * scale;
+    final List<int> lineOf;
+    final int line;
+    if (!g.whole) {
+      if (!strips) {
+        final y = toImage(p).dy;
+        if (y < ink.top || y > ink.bottom) return null;
+      }
+      lineOf = [for (final r in pieces) lineOfImageY(r.center.dy)];
+      line = lineAt(p.dy);
+    } else {
+      final List<int> keys;
+      if (lines.length == pieces.length) {
+        keys = lines;
+      } else {
+        final rows = wordRows(pieces);
+        int rowOf(Rect r) {
+          var best = 0;
+          for (var i = 1; i < rows.length; i++) {
+            if ((rows[i].center.dy - r.center.dy).abs() <
+                (rows[best].center.dy - r.center.dy).abs()) {
+              best = i;
+            }
+          }
+          return best;
+        }
+
+        keys = [for (final r in pieces) rowOf(r)];
+      }
+      // Each row's extent on screen, top to bottom; a touch belongs to
+      // the row it is on, or halfway across the gap to the next.
+      final extent = <int, Rect>{};
+      for (final (i, k) in keys.indexed) {
+        extent[k] = extent[k]?.expandToInclude(screen[i]) ?? screen[i];
+      }
+      final rows = extent.entries.toList()
+        ..sort((a, b) => a.value.center.dy.compareTo(b.value.center.dy));
+      if (rows.isEmpty ||
+          p.dy < rows.first.value.top - reach ||
+          p.dy > rows.last.value.bottom + reach) {
+        return null;
+      }
+      var i = 0;
+      while (i < rows.length - 1 &&
+          p.dy > (rows[i].value.bottom + rows[i + 1].value.top) / 2) {
+        i++;
+      }
+      lineOf = keys;
+      line = rows[i].key;
+    }
+    final on = [
+      for (var i = 0; i < pieces.length; i++)
+        if (lineOf[i] == line) i,
+    ];
+    if (on.isEmpty) return null;
+    final left = on.map((i) => screen[i].left).reduce(math.min);
+    final right = on.map((i) => screen[i].right).reduce(math.max);
+    if (p.dx < left - reach || p.dx > right + reach) return null;
+    double distance(int i) {
+      final r = screen[i];
+      return math.max(0, math.max(r.left - p.dx, p.dx - r.right));
+    }
+
+    // Glyphs can overlap across: of two under the touch, the one whose
+    // centre is nearer.
+    double off(int i) => (screen[i].center - p).distance;
+    return on.reduce(
+      (a, b) =>
+          distance(b) < distance(a) ||
+              (distance(b) == distance(a) && off(b) < off(a))
+          ? b
+          : a,
     );
   }
 
@@ -224,7 +362,7 @@ class StripLayout {
       // Image pixels to screen, for this line.
       canvas.translate(-ink.left * scale, at - g.centres[j] * scale);
       canvas.scale(scale);
-      canvas.clipPath(_region(j));
+      canvas.clipPath(_regions[j]);
       if (emphasis.contains(j)) {
         for (final dx in const [-1.8, 1.8]) {
           canvas.drawImage(image, Offset(dx, 0), paint);
@@ -244,6 +382,8 @@ class ImagePageData {
     required this.pieces,
     required this.markers,
     this.hitSlop = 0,
+    this.rowReach = 0,
+    this.pieceLines = const [],
     this.alphaInk = true,
   });
 
@@ -258,6 +398,16 @@ class ImagePageData {
 
   /// How far around a piece a touch still selects its verse.
   final double hitSlop;
+
+  /// The printed line of each piece, in the order of [pieces]; empty
+  /// when unknown (lines are then found from the boxes' positions).
+  final List<int> pieceLines;
+
+  /// Recitation mode: how far a cover reaches above the first row of text
+  /// and below the last, as a share of the row's height. Boxes that are
+  /// single glyphs need it for the marks around them; boxes as tall as
+  /// the line do not (and reaching up would cover the basmala).
+  final double rowReach;
 
   /// The ink is the image's alpha (transparent paper). False for opaque
   /// scans, whose ink is taken from their darkness instead.
@@ -330,7 +480,12 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
       future: _load,
       builder: (context, snap) {
         if (!snap.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: AppLocalizations.of(context)
+                  .loadingPage('${widget.page}'),
+            ),
+          );
         }
         final data = snap.data!;
         final x = widget.interaction;
@@ -343,12 +498,17 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               data.geometry,
               withoutHeader: x.ornateOpening,
             );
+            // By the line first: the screen between two lines, and between
+            // two words, belongs to the nearest.
+            final rects = [for (final (_, r) in data.pieces) r];
             VerseKey? verseAt(Offset local) {
-              final point = layout.toImage(local);
-              for (final (k, r) in data.pieces) {
-                if (r.inflate(data.hitSlop).contains(point)) return k;
-              }
-              return null;
+              final i = layout.pieceAt(
+                local,
+                rects,
+                lines: data.pieceLines,
+                slop: data.hitSlop,
+              );
+              return i == null ? null : data.pieces[i].$1;
             }
 
             VerseKey? markerAt(Offset local) {
@@ -359,19 +519,158 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               return null;
             }
 
+            // Recitation mode: the page's rows of text, and its column.
+            // By the printed line where it is known: small glyphs (a dot, a
+            // sign) would otherwise make rows of their own.
+            final known = data.pieceLines.length == data.pieces.length;
+            final byLine = <int, Rect>{};
+            if (known) {
+              for (final (i, (_, r)) in data.pieces.indexed) {
+                final l = data.pieceLines[i];
+                byLine[l] = byLine[l]?.expandToInclude(r) ?? r;
+              }
+            }
+            final rows =
+                (known
+                      ? byLine.values.toList()
+                      : wordRows([for (final (_, r) in data.pieces) r]))
+                  ..sort((a, b) => a.top.compareTo(b.top));
+            // Across the whole drawn image: marks can reach past the boxes.
+            final column = layout.ink;
+            int rowOf(Rect r) {
+              var best = 0;
+              for (var i = 1; i < rows.length; i++) {
+                if ((rows[i].center.dy - r.center.dy).abs() <
+                    (rows[best].center.dy - r.center.dy).abs()) {
+                  best = i;
+                }
+              }
+              return best;
+            }
+
+            (double, double) rowSpan(int i) {
+              final r = rows[i];
+              final pad = r.height * data.rowReach;
+              var top = i == 0 ? r.top - pad : (rows[i - 1].bottom + r.top) / 2;
+              var bottom = i == rows.length - 1
+                  ? r.bottom + pad
+                  : (r.bottom + rows[i + 1].top) / 2;
+              if (!data.geometry.whole) {
+                // Lines drawn one by one, each spread to its own slot: the
+                // line's band is exactly what it draws (its overflow is
+                // covered on its own), and the neighbours are elsewhere.
+                return layout.band(layout.lineOfImageY(r.center.dy));
+              }
+              return (top, bottom);
+            }
+
             Iterable<Rect> piecesOf(bool Function(VerseKey) test) => [
               for (final (k, r) in data.pieces)
                 if (test(k)) r,
             ];
 
-            /// Recitation mode: a verse's words when known (so its marker
-            /// and the hizb sign stay), else the whole verse.
+            /// Recitation mode: each row of the verse, across from the
+            /// verse marker on one side to the next on the other (or the
+            /// text's edge), and from halfway to the row above to halfway
+            /// to the row below, so no mark of it is left. The markers are
+            /// drawn again on top. Rows come from the boxes themselves, not
+            /// the line grid, which the opening pages do not follow.
             Iterable<Rect> coverOf(VerseKey v) {
-              final words = x.hiddenWords[v];
-              if (words != null && words.isNotEmpty) {
-                return layout.frames(words).map((r) => r.widen(6));
+              final own = markers[v];
+              final mine = [
+                for (final (k, r) in data.pieces)
+                  if (k == v && r != own) r,
+              ];
+              if (mine.isEmpty) {
+                final words = x.hiddenWords[v];
+                return words == null ? const [] : layout.frames(words);
               }
-              return piecesOf((k) => k == v).map(layout.toScreenRect);
+              final others = [
+                for (final e in markers.entries)
+                  if (e.key != v) e.value,
+              ];
+              // The verse's boxes, one per row of the page.
+              final spans = <int, Rect>{};
+              // A word-by-word test: only the rows of the words still
+              // covered, and on each the cover stops at the words shown.
+              final shown = x.revealedWords[v] ?? const <Rect>[];
+              final rest = x.hiddenWords[v];
+              if (shown.isNotEmpty && rest != null && rest.isNotEmpty) {
+                for (final r in rest) {
+                  final i = rowOf(r);
+                  spans[i] = spans[i]?.expandToInclude(r) ?? r;
+                }
+              } else {
+                for (final (j, (k, r)) in data.pieces.indexed) {
+                  if (k != v || r == own) continue;
+                  final i = known
+                      ? rows.indexOf(byLine[data.pieceLines[j]]!)
+                      : rowOf(r);
+                  spans[i] = spans[i]?.expandToInclude(r) ?? r;
+                }
+              }
+              return [
+                for (final MapEntry(key: i, value: span) in spans.entries)
+                  () {
+                    final (top, bottom) = rowSpan(i);
+                    bool inRow(Rect m) => rowOf(m) == i;
+                    // Past the verse's own marker only when another verse
+                    // follows it on the row; else on to the text's edge,
+                    // where the ink of the rows around may hang.
+                    bool followed(Rect m) => data.pieces.any(
+                      (p) =>
+                          p.$1 != v &&
+                          inRow(p.$2) &&
+                          p.$2.center.dx < m.center.dx,
+                    );
+                    final left = own != null && inRow(own)
+                        ? (followed(own) ? own.center.dx : column.left)
+                        : others
+                              .where((m) => inRow(m) && m.center.dx < span.left)
+                              .fold(
+                                column.left,
+                                (a, m) => math.max(a, m.center.dx),
+                              );
+                    final right =
+                        [
+                          for (final r in shown)
+                            if (inRow(r)) r.left - 1,
+                        ].fold(
+                          others
+                              .where(
+                                (m) => inRow(m) && m.center.dx > span.right,
+                              )
+                              .fold(
+                                column.right,
+                                (a, m) => math.min(a, m.center.dx),
+                              ),
+                          math.min,
+                        );
+                    final line = layout.lineOfImageY(rows[i].center.dy);
+                    Rect screen(Rect r) => Rect.fromPoints(
+                      layout.toScreen(r.topLeft, line: line),
+                      layout.toScreen(r.bottomRight, line: line),
+                    );
+                    final box = Rect.fromLTRB(left, top, right, bottom);
+                    return [
+                      screen(box),
+                      // Ink of this line that crosses into a neighbour's
+                      // band is drawn with this line: cover it the same way.
+                      if (!data.geometry.whole)
+                        for (final o
+                            in data.geometry.overflow[line] ?? const <Rect>[])
+                          if (o.right > left && o.left < right)
+                            screen(
+                              Rect.fromLTRB(
+                                math.max(o.left, left),
+                                o.top,
+                                math.min(o.right, right),
+                                o.bottom,
+                              ),
+                            ),
+                    ];
+                  }(),
+              ].expand((e) => e);
             }
 
             final selected = piecesOf(x.selection.contains).toList();
@@ -417,9 +716,15 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (d) {
+                      if (x.onPick != null) {
+                        return x.onPick!(
+                          layout.toImage(d.localPosition),
+                          verseAt(d.localPosition),
+                        );
+                      }
                       if (x.hidden != null) {
                         final v = verseAt(d.localPosition);
-                        if (v != null && x.hidden!.contains(v)) {
+                        if (v != null) {
                           x.onHiddenTap?.call(v);
                           return;
                         }
@@ -438,6 +743,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                     child: Semantics(
                       label: l.pageOf('${widget.page}'),
                       image: true,
+                      sortKey: const OrdinalSortKey(0),
                       child: CustomPaint(
                         size: box.biggest,
                         painter: _ImagePagePainter(
@@ -446,7 +752,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                           layout: layout,
                           // Opaque scans are always recoloured, so their
                           // tinted paper never shows on ours.
-                          ink: tokens.mode == ThemeModeId.light && data.alphaInk
+                          ink: tokens.mode.isLight && data.alphaInk
                               ? null
                               : tokens.colors.ink,
                           highlight: tokens.colors.highlight,
@@ -480,6 +786,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                           line: tokens.colors.border,
                           divineNames: x.divineNames,
                           divineColor: x.divineColor,
+                          tajweed: tajweedOf(x),
                           emphasis: x.emphasisLines,
                           rings: [
                             for (final e in markers.entries)
@@ -491,6 +798,14 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                     ),
                   ),
                 ),
+                ...verseSemanticNodes(
+                  x,
+                  verseAreas([
+                    for (final (k, r) in data.pieces)
+                      (k, layout.toScreenRect(r)),
+                  ]),
+                  markAction: l.markThisVerse,
+                ),
                 ...handles,
               ],
             );
@@ -499,6 +814,17 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
       },
     );
   }
+}
+
+/// Tajweed colouring of an image page: each coloured box (image px) with
+/// its rule's colour; empty when the colouring is off.
+List<(Rect, Color)> tajweedOf(PageInteraction x) {
+  final colour = x.tajweedColor;
+  if (colour == null || x.tajweed.isEmpty) return const [];
+  return [
+    for (final (rule, r) in parseTajweedRects(x.tajweed))
+      if (colour(rule) case final c?) (r, c),
+  ];
 }
 
 class _ImagePagePainter extends CustomPainter {
@@ -521,8 +847,12 @@ class _ImagePagePainter extends CustomPainter {
     required this.line,
     this.divineNames = const [],
     this.divineColor,
+    this.tajweed = const [],
     this.emphasis = const {},
   });
+
+  /// Tajweed: the ink inside each box (image px) drawn in its colour.
+  final List<(Rect, Color)> tajweed;
 
   /// Divine-name boxes (image px) and their colour.
   final List<Rect> divineNames;
@@ -608,31 +938,34 @@ class _ImagePagePainter extends CustomPainter {
         canvas.drawImageRect(image, r, layout.toScreenRect(r), tintPaint);
       }
     }
+    final tints = <Color, Paint>{};
+    for (final (r, colour) in tajweed) {
+      final tint = tints[colour] ??= Paint()
+        ..filterQuality = FilterQuality.medium
+        ..colorFilter = inkFilter(colour, alphaInk: alphaInk);
+      canvas.drawImageRect(image, r, layout.toScreenRect(r), tint);
+    }
     for (final (r, n, marked) in markers) {
       look?.paintOver(canvas, r.center, r.shortestSide / 2, n, marked: marked);
     }
     if (hidden.isNotEmpty) {
       final cover = Paint()..color = paper;
-      final stroke = Paint()
-        ..color = line
-        ..strokeWidth = 1.2;
       for (final r in hidden) {
         canvas.drawRect(r.inflate(2), cover);
       }
-      for (final r in hidden) {
-        canvas.drawLine(
-          Offset(r.left, r.center.dy),
-          Offset(r.right, r.center.dy),
-          stroke,
-        );
-      }
       for (final (src, dst) in markerPixels) {
-        canvas.drawImageRect(
-          image,
-          src.inflate(3),
-          dst.inflate(3 * layout.scale),
-          paint,
-        );
+        // Just the round marker: its square box would bring back the
+        // neighbours' ink in its corners.
+        canvas
+          ..save()
+          ..clipPath(Path()..addOval(dst.inflate(layout.scale)))
+          ..drawImageRect(
+            image,
+            src.inflate(1),
+            dst.inflate(layout.scale),
+            paint,
+          )
+          ..restore();
       }
       for (final (r, n, marked) in markers) {
         look?.paintOver(
@@ -649,14 +982,24 @@ class _ImagePagePainter extends CustomPainter {
   @override
   bool shouldRepaint(_ImagePagePainter old) =>
       old.image != image ||
+      old.alphaInk != alphaInk ||
       old.layout.size != layout.size ||
+      old.layout.ink != layout.ink ||
       old.ink != ink ||
       old.highlight != highlight ||
       old.word != word ||
-      old.touched != touched ||
-      old.selected.length != selected.length ||
-      old.rings.length != rings.length ||
-      old.hidden.length != hidden.length ||
+      old.paper != paper ||
+      old.line != line ||
+      old.touchColor != touchColor ||
+      old.divineColor != divineColor ||
       old.look != look ||
-      (selected.isNotEmpty && old.selected.first != selected.first);
+      !listEquals(old.touched, touched) ||
+      !listEquals(old.selected, selected) ||
+      !listEquals(old.rings, rings) ||
+      !listEquals(old.hidden, hidden) ||
+      !listEquals(old.markers, markers) ||
+      !listEquals(old.divineNames, divineNames) ||
+      !listEquals(old.tajweed, tajweed) ||
+      !listEquals(old.markerPixels, markerPixels) ||
+      !setEquals(old.emphasis, emphasis);
 }

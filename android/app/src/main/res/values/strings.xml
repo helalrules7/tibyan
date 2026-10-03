@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="khatma_widget_label">Khatma</string>
+    <string name="khatma_widget_description">Today\'s khatma portion</string>
+    <string name="khatma_widget_open">Open Tibyan</string>
+</resources>

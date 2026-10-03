@@ -90,6 +90,43 @@ const _ar = <String, SourceText>{
     license: 'مجاني، يجوز نسخه وتداوله على أن يعامل بكل احترام، ولا يجوز استخدامه في الأغراض التجارية (نص الغلاف)',
     credit: 'صفحات مصحف الشمرلي: أرشيف الإنترنت (archive.org)',
   ),
+  'quranic-corpus': (
+    title: 'المدونة القرآنية: الجذور والصرف',
+    publisher: 'كايس دوكس (المدونة القرآنية Quranic Arabic Corpus، جامعة ليدز)',
+    license: 'رخصة جنو العمومية (GPL)، بشرط نقل الملف حرفيا دون تعديل',
+    credit: 'الجذور والصرف: المدونة القرآنية Quranic Arabic Corpus (corpus.quran.com)',
+  ),
+  'nuqayah-almuyassar-gharib': (
+    title: 'الميسر في غريب القرآن',
+    publisher: 'نقاية (التفسير التفاعلي read.tafsir.one)، بإذن مكتوب',
+    license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
+    credit: 'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
+  ),
+  'quranicaudio': (
+    title: 'تلاوة ياسر الدوسري (مرتل)',
+    publisher: 'موقع quranicaudio.com (صوت Quran.com)',
+    license: 'إذن من الموقع بالبريد (2026-10-01)، بشرط ذكر اسم الموقع',
+    credit: 'تلاوة ياسر الدوسري: quranicaudio.com',
+  ),
+  'qdc-timing': (
+    title: 'توقيت آيات ياسر الدوسري وكلماته',
+    publisher: 'Quran.com (واجهة QDC)، ومقاطع الكلمات من مكتبة QUL',
+    license: 'الإذن قيد الطلب من Quran.com (رسالة 14)',
+    credit: 'توقيت الآيات والكلمات: Quran.com',
+  ),
+  'quran-assets': (
+    title: 'إطارات الثيمات وترويساتها وفواصلها (quran-assets)',
+    publisher: 'مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid؛ الإطارات والترويسات منقولة من مصاحف مطبوعة، وتصميمها لمجمع الملك فهد وناشرين آخرين، وبعض الفواصل من خطوط مفتوحة',
+    license: 'المنقول من المصاحف: المشاع الإبداعي غير التجاري 4.0 (CC BY-NC-SA 4.0)، مبدئي ولم يُحصل على إذن الناشرين بعد؛ فواصل الخطوط: رخصة الخطوط المفتوحة (OFL 1.1)',
+    credit: 'زخارف الثيمات: quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets)، عن مصاحف مجمع الملك فهد وغيره، وخطوط Noto وScheherazade New وKufam وMirza',
+  ),
+  'multilingual-e5-small': (
+    title: 'نموذج البحث بالمعنى (multilingual-e5-small)',
+    publisher: 'intfloat (Liang Wang وآخرون)، على Hugging Face؛ أوزانه مكممة في تبيان، ومتجهات الآيات محسوبة من نصوص المعاني كما هي',
+    license: 'رخصة MIT كما في بطاقة النموذج: يُسمح بالاستعمال والنسخ والتعديل والتوزيع مع ذكر الرخصة',
+    credit:
+        'البحث بالمعنى: نموذج multilingual-e5-small (MIT)، في حزمة اختيارية',
+  ),
 };
 
 const _en = <String, SourceText>{
@@ -172,7 +209,58 @@ const _en = <String, SourceText>{
     license: 'Free; may be copied and circulated if treated with respect, not for commercial use (cover text)',
     credit: 'Shamarly mushaf pages: Internet Archive (archive.org)',
   ),
+  'quranic-corpus': (
+    title: 'Quranic Arabic Corpus: roots and morphology',
+    publisher: 'Kais Dukes (Quranic Arabic Corpus, University of Leeds)',
+    license: 'GNU GPL; verbatim copies only',
+    credit: 'Roots and morphology: Quranic Arabic Corpus (corpus.quran.com)',
+  ),
+  'nuqayah-almuyassar-gharib': (
+    title: 'Al-Muyassar fi Gharib al-Quran',
+    publisher: 'Nuqayah (read.tafsir.one), by written permission',
+    license: 'Written permission from Nuqayah: no ads and no profit',
+    credit: 'Al-Muyassar fi Gharib al-Quran: from Nuqayah\'s read.tafsir.one, by permission',
+  ),
+  'quranicaudio': (
+    title: 'Yasser al-Dosari (murattal)',
+    publisher: 'quranicaudio.com (Quran.com audio)',
+    license: 'Permission granted by the site by email (2026-10-01), on condition that the site is named',
+    credit: 'Yasser al-Dosari: quranicaudio.com',
+  ),
+  'qdc-timing': (
+    title: 'Verse and word timings for Yasser al-Dosari',
+    publisher: 'Quran.com (QDC API); word segments from the QUL library',
+    license: 'Permission requested from Quran.com (letter 14)',
+    credit: 'Verse and word timings: Quran.com',
+  ),
+  'quran-assets': (
+    title: 'Theme frames, surah headers and verse markers (quran-assets)',
+    publisher: 'quran-assets by Quran.ws, developed by Abdullah Ibeid; frames and headers traced from printed mushafs, designs by the King Fahd Complex and other publishers; some markers from open fonts',
+    license: 'Traced from mushafs: CC BY-NC-SA 4.0, provisional, publishers\' permission not yet obtained; font markers: SIL Open Font License 1.1',
+    credit: 'Theme ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets), from mushafs of the King Fahd Complex and others, and the Noto, Scheherazade New, Kufam and Mirza fonts',
+  ),
+  'multilingual-e5-small': (
+    title: 'Search-by-meaning model (multilingual-e5-small)',
+    publisher: 'intfloat (Liang Wang et al.), on Hugging Face; weights quantised by Tibyan, verse vectors computed from the meaning texts as stored',
+    license: 'MIT License, as stated on the model card: use, copy, modify and distribute with the licence kept',
+    credit: 'Search by meaning: the multilingual-e5-small model (MIT), in an optional pack',
+  ),
 };
+
+/// Sources that are not in content.db (bundled with the app), listed after
+/// the database's own: key, link and version.
+const bundledSources = [
+  (
+    key: 'quran-assets',
+    url: 'https://github.com/quran-ws/quran-assets',
+    version: 'd4cae845c9aae1fbe56ee69d04bc7d8964419373',
+  ),
+  (
+    key: 'multilingual-e5-small',
+    url: 'https://huggingface.co/intfloat/multilingual-e5-small',
+    version: '614241f622f53c4eeff9890bdc4f31cfecc418b3',
+  ),
+];
 
 /// The interface text of a source, or null for one not listed here (it is
 /// then shown as stored).

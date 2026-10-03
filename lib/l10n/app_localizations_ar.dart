@@ -50,10 +50,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get openSettings => 'فتح الإعدادات';
 
   @override
-  String get appearanceTitle => 'الشكل';
-
-  @override
-  String get styleLabel => 'الشكل';
+  String get appearanceTitle => 'شكل المصحف';
 
   @override
   String get modeLabel => 'وضع الإضاءة';
@@ -66,6 +63,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get modeLight => 'فاتح';
+
+  @override
+  String get modeWhite => 'أبيض زاهي';
 
   @override
   String get modeNight => 'ليلي';
@@ -118,9 +118,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String versionLabel(String version) {
     return 'الإصدار $version';
   }
-
-  @override
-  String get previewLabel => 'معاينة';
 
   @override
   String get selected => 'محدد';
@@ -384,6 +381,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get catchwordImageLabel => 'الكلمة الأولى في الصفحة التالية';
+
+  @override
   String get tabHizb => 'الأحزاب';
 
   @override
@@ -456,6 +456,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get markerRosette => 'وردة';
 
   @override
+  String get markerTheme => 'حسب الثيم';
+
+  @override
+  String get markerThemeHint =>
+      '«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «تبيان» وردتها.';
+
+  @override
+  String get themeLabel => 'الثيم';
+
+  @override
   String get markerTintLabel => 'لون الفواصل';
 
   @override
@@ -463,15 +473,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reciteMode => 'وضع التسميع';
-
-  @override
-  String get revealNextVerse => 'الآية التالية';
-
-  @override
-  String get revealAll => 'الكل';
-
-  @override
-  String get endRecite => 'إنهاء التسميع';
 
   @override
   String get autoScroll => 'التمرير التلقائي';
@@ -641,9 +642,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get murattal => 'مرتل';
 
   @override
-  String get mujawwad => 'مجود';
-
-  @override
   String get repeatLabel => 'عدد مرات التكرار';
 
   @override
@@ -739,10 +737,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get allEditionsQueued =>
-      'بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.';
-
-  @override
   String get downloadInBackgroundNote =>
       'يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.';
 
@@ -784,38 +778,849 @@ class AppLocalizationsAr extends AppLocalizations {
       'يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها';
 
   @override
+  String get listenFromPage => 'استمع من أول الصفحة';
+
+  @override
+  String get repeatHint =>
+      'إن لم تحدد مقطعًا تتكرر كل آية بهذا العدد ثم تليها التالية';
+
+  @override
   String get homeTitle => 'الرئيسية';
 
   @override
-  String get frameDesignLabel => 'إطار الصفحة';
+  String get searchHint => 'ابحث في القرآن، أو اكتب «البقرة ٢٥٥»';
 
   @override
-  String get frameByStyle => 'حسب الشكل';
+  String get searchIntro =>
+      'اكتب كلمة أو أكثر من القرآن، بتشكيل أو دونه، أو اكتب موضعا مثل «٢:٢٥٥» أو «البقرة ٢٥٥».';
 
   @override
-  String get frameZakhrafa => 'زخرفة';
+  String get searchGoTo => 'اذهب إلى الموضع';
 
   @override
-  String get framePlain => 'بسيط';
+  String get searchNothing => 'لا نتائج';
 
   @override
-  String get frameAbbasid => 'عباسي';
+  String searchCount(String count, String verses) {
+    return '$count موضعا في $verses آية';
+  }
 
   @override
-  String get frameUmayyad => 'أموي';
+  String searchMore(String count) {
+    return 'و$count آية أخرى، ضيّق البحث لرؤيتها';
+  }
 
   @override
-  String get frameAndalusian => 'أندلسي';
+  String get searchHistory => 'عمليات البحث السابقة';
 
   @override
-  String get frameOttoman => 'عثماني';
+  String get searchClearHistory => 'مسح';
 
   @override
-  String get frameEgyptian => 'مصري';
+  String get continueReading => 'متابعة القراءة';
 
   @override
-  String get frameModernIslamic => 'إسلامي حديث';
+  String continueReadingAt(String surah, String ayah, String page) {
+    return '$surah · الآية $ayah · صفحة $page';
+  }
 
   @override
-  String get framePreviewLabel => 'معاينة الإطار';
+  String get openLabel => 'افتح';
+
+  @override
+  String get wordStudy => 'دراسة الكلمة';
+
+  @override
+  String get wordMeanings => 'معاني الكلمات';
+
+  @override
+  String get wordPickHint => 'اضغط على الكلمة التي تريد دراستها';
+
+  @override
+  String get wordStudyChoose => 'اختر كلمة من كلمات الآية';
+
+  @override
+  String get wordMeaningTitle => 'المعنى';
+
+  @override
+  String get wordNoMeaning => 'لا شرح لهذه الكلمة في «الميسر في غريب القرآن».';
+
+  @override
+  String get wordRootTitle => 'الجذر';
+
+  @override
+  String get wordLemma => 'المدخل المعجمي';
+
+  @override
+  String get wordNoRoot => 'لا جذر لهذه الكلمة في المدونة القرآنية.';
+
+  @override
+  String get wordNoCorpusData => 'لا بيانات لهذه الكلمة في المدونة القرآنية.';
+
+  @override
+  String get rootOccurrencesTitle => 'مواضع الجذر';
+
+  @override
+  String rootOccurrencesCount(String words, String verses) {
+    return 'الكلمات: $words، الآيات: $verses';
+  }
+
+  @override
+  String get verseNoMeanings =>
+      'لا شرح لكلمات هذه الآية في «الميسر في غريب القرآن».';
+
+  @override
+  String wordStudyVerse(String surah, String ayah) {
+    return '$surah، الآية $ayah';
+  }
+
+  @override
+  String get downloadAllTitle => 'تحميل كل المصاحف';
+
+  @override
+  String downloadAllCount(String done, String total) {
+    return 'اكتمل $done من $total';
+  }
+
+  @override
+  String get themeArtCredit =>
+      'الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.';
+
+  @override
+  String get khatmaTitle => 'الختمة';
+
+  @override
+  String get khatmaNew => 'ختمة جديدة';
+
+  @override
+  String get khatmaEmptyTitle => 'لا ختمة الآن';
+
+  @override
+  String get khatmaEmptyBody =>
+      'ضع خطة لختم المصحف: حدد موعد الختم أو مقدار الورد اليومي. والصفحات التي تقرؤها في المصحف تُحسب تلقائيا.';
+
+  @override
+  String get khatmaDefaultName => 'ختمتي';
+
+  @override
+  String get khatmaNameLabel => 'الاسم';
+
+  @override
+  String get khatmaByDate => 'حسب موعد الختم';
+
+  @override
+  String get khatmaByAmount => 'حسب الورد اليومي';
+
+  @override
+  String get khatmaEndDateLabel => 'موعد الختم';
+
+  @override
+  String get khatmaAmountLabel => 'المقدار في اليوم';
+
+  @override
+  String get khatmaUnitPage => 'صفحة';
+
+  @override
+  String get khatmaUnitJuz => 'جزء';
+
+  @override
+  String get khatmaUnitHizb => 'حزب';
+
+  @override
+  String khatmaAboutPerDay(String count) {
+    return 'نحو $count صفحة في اليوم';
+  }
+
+  @override
+  String khatmaDuration(String count, String date) {
+    return 'المدة: $count يوم، والختم يوم $date';
+  }
+
+  @override
+  String khatmaEditionNote(String edition) {
+    return 'بصفحات $edition';
+  }
+
+  @override
+  String get khatmaReminder => 'تذكير يومي';
+
+  @override
+  String get khatmaReminderOff => 'بلا تذكير';
+
+  @override
+  String get khatmaStart => 'ابدأ الختمة';
+
+  @override
+  String get khatmaReplaceTitle => 'ختمة مفتوحة';
+
+  @override
+  String get khatmaReplaceBody =>
+      'تُحذف الختمة الحالية وسجلها عند بدء ختمة جديدة.';
+
+  @override
+  String get khatmaToday => 'ورد اليوم';
+
+  @override
+  String khatmaPagesRange(String from, String to) {
+    return 'من صفحة $from إلى صفحة $to';
+  }
+
+  @override
+  String khatmaPagesCount(String count) {
+    return 'عدد الصفحات: $count';
+  }
+
+  @override
+  String get khatmaReadNow => 'اقرأ الآن';
+
+  @override
+  String get khatmaMarkRead => 'قرأته في مصحف آخر';
+
+  @override
+  String get khatmaTodayDone => 'ورد اليوم مقروء';
+
+  @override
+  String get khatmaContinue => 'تابع القراءة';
+
+  @override
+  String khatmaProgress(String done, String total) {
+    return '$done من $total صفحة';
+  }
+
+  @override
+  String khatmaDaysLeft(String count) {
+    return 'الأيام الباقية: $count';
+  }
+
+  @override
+  String khatmaEnds(String date) {
+    return 'الختم يوم $date';
+  }
+
+  @override
+  String khatmaBehindTitle(String count) {
+    return 'صفحات من الأيام الماضية: $count';
+  }
+
+  @override
+  String get khatmaBehindBody =>
+      'أُضيفت إلى ورد اليوم. يمكنك توزيعها على الأيام الباقية، أو تأخير موعد الختم.';
+
+  @override
+  String get khatmaSpread => 'وزّعها على الأيام الباقية';
+
+  @override
+  String get khatmaExtend => 'أخّر موعد الختم';
+
+  @override
+  String get khatmaComplete => 'اكتملت الختمة';
+
+  @override
+  String khatmaCompletedOn(String date) {
+    return 'اكتملت يوم $date';
+  }
+
+  @override
+  String get khatmaPast => 'ختمات سابقة';
+
+  @override
+  String get khatmaDelete => 'حذف الختمة';
+
+  @override
+  String get khatmaDeleteBody => 'يُحذف سجل هذه الختمة.';
+
+  @override
+  String get khatmaTileStart => 'ابدأ';
+
+  @override
+  String khatmaTilePages(String count) {
+    return 'ورد اليوم: $count';
+  }
+
+  @override
+  String get khatmaReminderTitle => 'ورد الختمة';
+
+  @override
+  String khatmaReminderBody(String from, String to) {
+    return 'ورد اليوم: من صفحة $from إلى صفحة $to';
+  }
+
+  @override
+  String get khatmaReminderChannel => 'تذكير الختمة';
+
+  @override
+  String get homeTodayTitle => 'اليوم';
+
+  @override
+  String get widgetNoKhatma => 'ابدأ ختمة في تبيان';
+
+  @override
+  String get reportsTitle => 'تقارير القراءة';
+
+  @override
+  String get reportsWeek => 'آخر ٧ أيام';
+
+  @override
+  String get reportsMonth => 'آخر ٣٠ يوما';
+
+  @override
+  String get reportsDays => 'أيام القراءة';
+
+  @override
+  String get reportsPages => 'الصفحات';
+
+  @override
+  String get reportsReadingMinutes => 'دقائق القراءة';
+
+  @override
+  String get reportsListeningMinutes => 'دقائق الاستماع';
+
+  @override
+  String get reportsEmpty => 'تظهر هنا قراءتك واستماعك تلقائيا.';
+
+  @override
+  String get reportsDayRead => 'يوم فيه قراءة أو استماع';
+
+  @override
+  String streakReadToday(String count) {
+    return 'قرأت اليوم. الأيام المتتالية: $count';
+  }
+
+  @override
+  String streakContinue(String count) {
+    return 'الأيام المتتالية حتى أمس: $count. صفحة اليوم تصلها.';
+  }
+
+  @override
+  String get streakWelcome => 'مرحبا بعودتك. تابع من حيث وقفت.';
+
+  @override
+  String get streakNotesToggle => 'رسائل الاستمرار';
+
+  @override
+  String get streakNotesHint =>
+      'تعرض الأيام المتتالية فقط، ولا تعرض الأيام الفائتة.';
+
+  @override
+  String get journalTitle => 'دفتر التدبر';
+
+  @override
+  String get journalSearch => 'ابحث في ملاحظاتك';
+
+  @override
+  String get journalEmpty =>
+      'لا ملاحظات بعد. اضغط مطولا على آية في المصحف واختر «ملاحظة تدبر».';
+
+  @override
+  String get journalNoMatch => 'لا ملاحظات فيها هذه الكلمات.';
+
+  @override
+  String get journalAdd => 'ملاحظة تدبر';
+
+  @override
+  String get journalHint => 'اكتب ملاحظتك على الآية';
+
+  @override
+  String get journalEdit => 'تعديل';
+
+  @override
+  String get journalOpenVerse => 'افتح الآية';
+
+  @override
+  String journalVerseRef(String surah, String ayah) {
+    return 'سورة $surah · آية $ayah';
+  }
+
+  @override
+  String get journalSaved => 'حُفظت الملاحظة';
+
+  @override
+  String get journalEarlier => 'ملاحظاتك على هذه الآية';
+
+  @override
+  String get elderlyMode => 'وضع كبار السن';
+
+  @override
+  String get elderlyModeHint =>
+      'خط أكبر، وأزرار أكبر بأسمائها، وألوان أوضح، وصفحة رئيسية فيها المهم فقط، وصفحة المصحف بأكبر حجم، وانتقالات أهدأ';
+
+  @override
+  String get searchModeWords => 'بالكلمات';
+
+  @override
+  String get searchModeMeaning => 'بالمعنى';
+
+  @override
+  String get searchMeaningHint => 'اكتب فكرة أو سؤالا بكلماتك';
+
+  @override
+  String get searchMeaningIntro =>
+      'اكتب فكرة بكلماتك، بالعربية أو بالإنجليزية، مثل «الصبر على البلاء» أو «بر الوالدين»، فتظهر الآيات التي يتناولها معناها في التفسير الميسر والترجمتين. تظهر كل آية بنصها، ومعها النص الذي طابق كما هو من مصدره.';
+
+  @override
+  String searchMatchedIn(String source) {
+    return 'طابق في: $source';
+  }
+
+  @override
+  String searchMeaningCount(String count) {
+    return '$count آية';
+  }
+
+  @override
+  String get semanticPackName => 'حزمة البحث بالمعنى';
+
+  @override
+  String semanticPackOffer(String size) {
+    return 'البحث الآن بالكلمات داخل نصوص المعاني. نزّل حزمة البحث بالمعنى (نحو $size ميجا) ليجد البحث الآيات بمعناها وإن اختلفت الكلمات، دون اتصال.';
+  }
+
+  @override
+  String get semanticPackDownload => 'تنزيل الحزمة';
+
+  @override
+  String semanticPackDownloading(String percent) {
+    return 'يُنزَّل: $percent٪';
+  }
+
+  @override
+  String get semanticPackVerifying => 'يُتحقَّق من الحزمة ويُثبَّت…';
+
+  @override
+  String get semanticPackFailed => 'تعذّر التنزيل. حاول مرة أخرى.';
+
+  @override
+  String get semanticPackLoading => 'يُجهَّز البحث بالمعنى…';
+
+  @override
+  String get semanticPackError =>
+      'تعذّر فتح حزمة البحث بالمعنى، فالبحث الآن بالكلمات.';
+
+  @override
+  String get semanticResultsNote =>
+      'نتائج تقريبية مرتبة بقرب المعنى. راجع الآية في موضعها وفي تفسيرها.';
+
+  @override
+  String verseLabel(String surah, String ayah) {
+    return 'سورة $surah، الآية $ayah';
+  }
+
+  @override
+  String pageLabelFull(String page, String surah) {
+    return 'الصفحة $page، $surah';
+  }
+
+  @override
+  String get markThisVerse => 'ضع علامة القراءة عند هذه الآية أو أزلها';
+
+  @override
+  String loadingPage(String page) {
+    return 'تُحمَّل الصفحة $page';
+  }
+
+  @override
+  String get clearSearch => 'مسح البحث';
+
+  @override
+  String get previousPageNumber => 'الصفحة السابقة';
+
+  @override
+  String get nextPageNumber => 'الصفحة التالية';
+
+  @override
+  String get showMenus => 'إظهار القوائم';
+
+  @override
+  String get hideMenus => 'إخفاء القوائم';
+
+  @override
+  String downloadSurah(String surah) {
+    return 'تنزيل سورة $surah';
+  }
+
+  @override
+  String retryDownloadSurah(String surah) {
+    return 'أعد تنزيل سورة $surah';
+  }
+
+  @override
+  String deleteSurahDownload(String surah) {
+    return 'سورة $surah منزّلة. احذفها';
+  }
+
+  @override
+  String downloadingSurah(String surah) {
+    return 'تُنزَّل سورة $surah';
+  }
+
+  @override
+  String verseCounter(String current, String total) {
+    return 'الآية $current من $total';
+  }
+
+  @override
+  String downloadPercentSpoken(String percent) {
+    return 'اكتمل $percent٪ من التحميل';
+  }
+
+  @override
+  String get hifzTitle => 'الحفظ';
+
+  @override
+  String get hifzTileNote => 'المراجعة والتسميع';
+
+  @override
+  String get hifzToday => 'مراجعة اليوم';
+
+  @override
+  String get hifzNothingDue => 'لا مراجعة مستحقة اليوم.';
+
+  @override
+  String get hifzNothingDueHint =>
+      'سمّع صفحة أو ربعا أو سورة ثم قيّم تسميعك، فتدخل المراجعة المتباعدة.';
+
+  @override
+  String get hifzStartTest => 'ابدأ تسميعا';
+
+  @override
+  String get hifzMap => 'خريطة الحفظ';
+
+  @override
+  String get hifzMapHint =>
+      'كل صفحة ملوّنة بقوة حفظها، ومعها علامة تقرأ دون ألوان.';
+
+  @override
+  String get hifzAllUnits => 'كل وحدات المراجعة';
+
+  @override
+  String get hifzDueToday => 'مستحقة اليوم';
+
+  @override
+  String hifzDueOn(String date) {
+    return 'موعدها $date';
+  }
+
+  @override
+  String hifzQuarter(String number) {
+    return 'الربع $number';
+  }
+
+  @override
+  String get hifzUnitPage => 'صفحة';
+
+  @override
+  String get hifzUnitQuarter => 'ربع';
+
+  @override
+  String get hifzUnitSurah => 'سورة';
+
+  @override
+  String get hifzChooseUnit => 'ماذا تسمّع؟';
+
+  @override
+  String hifzNumberRange(String max) {
+    return 'الرقم، من ١ إلى $max';
+  }
+
+  @override
+  String get hifzBegin => 'ابدأ';
+
+  @override
+  String get hifzRemove => 'احذف من المراجعة';
+
+  @override
+  String get revealNextWord => 'الكلمة التالية';
+
+  @override
+  String get revealNextVerse => 'الآية التالية';
+
+  @override
+  String get revealAll => 'الكل';
+
+  @override
+  String get endRecite => 'إنهاء التسميع';
+
+  @override
+  String get verseRemembered => 'حفظت';
+
+  @override
+  String get verseMissed => 'أخطأت';
+
+  @override
+  String testCounts(String remembered, String missed) {
+    return 'حفظت $remembered · أخطأت $missed';
+  }
+
+  @override
+  String get revealByLine =>
+      'لا مواضع لكلمات هذه الآية في هذه الطبعة، فتُكشف سطرا سطرا.';
+
+  @override
+  String get gradeUnit => 'قيّم';
+
+  @override
+  String get gradeTitle => 'كيف كان تسميعك؟';
+
+  @override
+  String get gradeSuggested => 'الاختيار المقترح من نتائج الآيات';
+
+  @override
+  String get gradeAgain => 'أعِدها';
+
+  @override
+  String get gradeHard => 'صعبة';
+
+  @override
+  String get gradeGood => 'جيدة';
+
+  @override
+  String get gradeEasy => 'سهلة';
+
+  @override
+  String gradeSaved(String date) {
+    return 'المراجعة القادمة: $date';
+  }
+
+  @override
+  String get similarVerses => 'المتشابهات';
+
+  @override
+  String similarCount(String count) {
+    return 'متشابهات ($count)';
+  }
+
+  @override
+  String get similarThisVerse => 'الآية';
+
+  @override
+  String get similarFollowing => 'والآية بعدها';
+
+  @override
+  String get strengthNone => 'لم يُحفظ';
+
+  @override
+  String get strengthWeak => 'ضعيف';
+
+  @override
+  String get strengthFair => 'متوسط';
+
+  @override
+  String get strengthGood => 'جيد';
+
+  @override
+  String get strengthStrong => 'متقن';
+
+  @override
+  String get mapPages => 'الصفحات';
+
+  @override
+  String get mapSurahs => 'السور';
+
+  @override
+  String get mapZoomIn => 'تكبير';
+
+  @override
+  String get mapZoomOut => 'تصغير';
+
+  @override
+  String mapCell(String name, String strength) {
+    return '$name: $strength';
+  }
+
+  @override
+  String get tajweedColors => 'تلوين أحكام التجويد';
+
+  @override
+  String get tajweedColorsHint =>
+      'تلوين الحروف التي يقع عليها الحكم فقط، بالألوان التي تختارها';
+
+  @override
+  String get tajweedLegend => 'مفتاح ألوان التجويد';
+
+  @override
+  String get tajweedRuleColors => 'لون كل حكم';
+
+  @override
+  String get tajweedNoColor => 'بلا لون';
+
+  @override
+  String get tajweedReset => 'إعادة الألوان الافتراضية';
+
+  @override
+  String tajweedPickColor(String rule) {
+    return 'لون «$rule»';
+  }
+
+  @override
+  String get tajweedSourceNote =>
+      'مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي حدود بعض الكلمات تقديرية أيضا.';
+
+  @override
+  String get tajweedLegendHint =>
+      'اضغط مطولا على زر التلوين في الصفحة لعرض هذا المفتاح.';
+
+  @override
+  String get tajweedHueCrimson => 'أحمر داكن';
+
+  @override
+  String get tajweedHueRed => 'أحمر';
+
+  @override
+  String get tajweedHueOrange => 'برتقالي';
+
+  @override
+  String get tajweedHueGold => 'ذهبي';
+
+  @override
+  String get tajweedHueGreen => 'أخضر';
+
+  @override
+  String get tajweedHueLightGreen => 'أخضر فاتح';
+
+  @override
+  String get tajweedHueTeal => 'فيروزي';
+
+  @override
+  String get tajweedHueBlue => 'أزرق';
+
+  @override
+  String get tajweedHuePurple => 'بنفسجي';
+
+  @override
+  String get tajweedHuePink => 'وردي';
+
+  @override
+  String get tajweedHueGrey => 'رمادي';
+
+  @override
+  String get tajweedHueViolet => 'ليلكي';
+
+  @override
+  String get tajweedHueAmber => 'كهرماني';
+
+  @override
+  String get tajweedNoDataRiwaya =>
+      'لا تلوين للتجويد في مصاحف الروايات (ورش وقالون والدوري وشعبة): لا توجد بعد بيانات أحكام موثوقة لهذه الروايات، ولا نضع أحكاما بلا مصدر. التلوين يعمل في مصاحف حفص.';
+
+  @override
+  String get tajweedHamzatWasl => 'همزة الوصل';
+
+  @override
+  String get tajweedLamShamsiyyah => 'اللام الشمسية';
+
+  @override
+  String get tajweedSilent => 'الحروف التي لا تُنطق';
+
+  @override
+  String get tajweedMadd2 => 'المد الطبيعي (حركتان)';
+
+  @override
+  String get tajweedMadd246 => 'المد العارض واللين (2 أو 4 أو 6 حركات)';
+
+  @override
+  String get tajweedMaddMuttasil => 'المد المتصل (4 أو 5 حركات)';
+
+  @override
+  String get tajweedMaddMunfasil => 'المد المنفصل (4 أو 5 حركات)';
+
+  @override
+  String get tajweedMadd6 => 'المد اللازم (6 حركات)';
+
+  @override
+  String get tajweedGhunnah => 'الغنة';
+
+  @override
+  String get tajweedIkhfa => 'الإخفاء';
+
+  @override
+  String get tajweedIkhfaShafawi => 'الإخفاء الشفوي';
+
+  @override
+  String get tajweedIqlab => 'الإقلاب';
+
+  @override
+  String get tajweedIdghaamGhunnah => 'الإدغام بغنة';
+
+  @override
+  String get tajweedIdghaamNoGhunnah => 'الإدغام بلا غنة';
+
+  @override
+  String get tajweedIdghaamShafawi => 'الإدغام الشفوي';
+
+  @override
+  String get tajweedIdghaamMutajanisayn => 'إدغام المتجانسين';
+
+  @override
+  String get tajweedIdghaamMutaqaribayn => 'إدغام المتقاربين';
+
+  @override
+  String get tajweedQalqalah => 'القلقلة';
+
+  @override
+  String get editionWarsh => 'مصحف المدينة برواية ورش عن نافع';
+
+  @override
+  String get editionQalun => 'مصحف المدينة برواية قالون عن نافع';
+
+  @override
+  String get editionDouri => 'مصحف المدينة برواية الدوري عن أبي عمرو';
+
+  @override
+  String get editionShubah => 'مصحف المدينة برواية شعبة عن عاصم';
+
+  @override
+  String get riwayaWarsh => 'رواية ورش عن نافع';
+
+  @override
+  String get riwayaQalun => 'رواية قالون عن نافع';
+
+  @override
+  String get riwayaDouri => 'رواية الدوري عن أبي عمرو';
+
+  @override
+  String get riwayaShubah => 'رواية شعبة عن عاصم';
+
+  @override
+  String get riwayatTitle => 'مصاحف الروايات';
+
+  @override
+  String get riwayaEditionDesc =>
+      'صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها. التفسير والترجمة والفواصل تُربط بالآيات المقابلة في عدّ حفص.';
+
+  @override
+  String get riwayaGaps =>
+      'في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة ولا تلوين للفظ الجلالة، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).';
+
+  @override
+  String riwayaTafsirNote(
+    String ayah,
+    String surah,
+    String riwaya,
+    String hafs,
+  ) {
+    return 'الآية $ayah من سورة $surah في $riwaya يقابلها في عدّ حفص: $hafs. التفسير والترجمة ونص الآية أدناه بعدّ حفص وروايته.';
+  }
+
+  @override
+  String get riwayaNoHafs => 'لا تقابلها آية في عدّ حفص';
+
+  @override
+  String hafsVerseOne(String number) {
+    return 'الآية $number';
+  }
+
+  @override
+  String hafsVerseRange(String from, String to) {
+    return 'الآيات $from إلى $to';
+  }
+
+  @override
+  String riwayaVerseText(String riwaya) {
+    return 'نص الآية في $riwaya';
+  }
+
+  @override
+  String riwayaRecitersNote(String riwaya) {
+    return 'تلاوات $riwaya';
+  }
 }

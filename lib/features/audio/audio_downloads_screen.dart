@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/content_database.dart';
-import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/mushaf_providers.dart';
@@ -10,8 +9,10 @@ import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'player_bar.dart';
 import 'recitation.dart';
+import 'reciter_avatar.dart';
 
-/// Download the chosen reciter's surahs for listening offline.
+/// Download the chosen reciter's surahs for listening offline. Surahs
+/// saved while listening are listed here too, as downloaded.
 class AudioDownloadsScreen extends ConsumerStatefulWidget {
   const AudioDownloadsScreen({super.key});
 
@@ -31,7 +32,14 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
       _failed.remove(surah);
     });
     try {
-      await ref.read(audioFilesProvider).download(r, surah);
+      await ref
+          .read(audioFilesProvider)
+          .download(
+            r,
+            surah,
+            client: ref.read(audioHttpClientProvider),
+            urls: ref.read(audioHostsProvider.notifier).urls(r, surah),
+          );
     } catch (_) {
       _failed.add(surah);
     }
@@ -49,24 +57,41 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    final digits = NumberFormatter(Localizations.localeOf(context));
-    final reciterId = ref.watch(settingsProvider.select((s) => s.reciterId));
-    final reciters = ref.watch(recitersProvider).value;
     final surahs = ref.watch(surahsProvider).value;
-    final reciter = reciters?.where((r) => r.id == reciterId).firstOrNull;
+    final reciter = ref.watch(currentReciterProvider).value;
     if (reciter == null || surahs == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final files = ref.watch(audioFilesProvider);
-    final have = files.downloaded(reciter.id);
 
+    // Saving while listening also ends here: follow it.
+    return ValueListenableBuilder<int>(
+      valueListenable: files.changes,
+      builder: (context, _, _) =>
+          _build(context, reciter, surahs, files.downloaded(reciter.id)),
+    );
+  }
+
+  Widget _build(
+    BuildContext context,
+    ReciterRow reciter,
+    List<SurahRow> surahs,
+    Set<int> have,
+  ) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final files = ref.read(audioFilesProvider);
     return Scaffold(
       appBar: AppBar(title: Text(l.audioDownloads)),
       body: Column(
         children: [
           ListTile(
+            leading: ReciterAvatar(
+              id: reciter.id,
+              name: reciterLabel(context, reciter),
+              size: 38,
+            ),
             title: Text(reciterLabel(context, reciter)),
             subtitle: Text(
               '${l.audioDownloaded}: ${digits(have.length)} / ${digits(114)}',
@@ -94,21 +119,32 @@ class _AudioDownloadsScreenState extends ConsumerState<AudioDownloadsScreen> {
                   dense: true,
                   leading: Text(digits(n), style: TextStyle(color: t.muted)),
                   title: Text(surahName(context, surahs[i])),
-                  trailing: _busy.contains(n)
-                      ? const SizedBox.square(
+                  trailing:
+                      _busy.contains(n) || files.downloading(reciter.id, n)
+                      ? SizedBox.square(
                           dimension: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            semanticsLabel: l.downloadingSurah(
+                              surahName(context, surahs[i]),
+                            ),
+                          ),
                         )
                       : done
                       ? IconButton(
-                          tooltip: MaterialLocalizations.of(context)
-                              .deleteButtonTooltip,
+                          tooltip: l.deleteSurahDownload(
+                            surahName(context, surahs[i]),
+                          ),
                           icon: Icon(Icons.check_circle, color: t.control),
                           onPressed: () =>
                               setState(() => files.delete(reciter.id, n)),
                         )
                       : IconButton(
-                          tooltip: l.audioDownloads,
+                          tooltip: _failed.contains(n)
+                              ? l.retryDownloadSurah(
+                                  surahName(context, surahs[i]),
+                                )
+                              : l.downloadSurah(surahName(context, surahs[i])),
                           icon: Icon(
                             _failed.contains(n)
                                 ? Icons.error_outline

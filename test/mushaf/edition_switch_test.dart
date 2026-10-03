@@ -60,4 +60,40 @@ void main() {
     container.read(packInstallsProvider.notifier).changed();
     expect(container.read(editionProvider), MushafEdition.shamarly);
   });
+
+  test('each edition\'s download is followed on its own', () async {
+    SharedPreferences.setMockInitialValues({'settings.edition': 'shamarly'});
+    final root = Directory.systemTemp.createTempSync('packs');
+    final dir = Directory(
+      p.join(root.path, 'packs', PagePackSpec.madina1441.id),
+    )..createSync(recursive: true);
+    File(p.join(dir.path, '.installed')).writeAsStringSync('x');
+    final container = ProviderContainer(
+      overrides: [
+        themeRegistryProvider.overrideWithValue(
+          await ThemeRegistry.load(rootBundle),
+        ),
+        sharedPreferencesProvider.overrideWithValue(
+          await SharedPreferences.getInstance(),
+        ),
+        packRootProvider.overrideWithValue(root),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    PackPhase phase(MushafEdition e) =>
+        container.read(editionDownloadProvider(e)).phase;
+    // Not only the chosen edition: every one has its own state.
+    expect(phase(MushafEdition.madina1441), PackPhase.installed);
+    expect(phase(MushafEdition.madina1405), PackPhase.idle);
+    expect(phase(MushafEdition.shamarly), PackPhase.idle);
+
+    final old = Directory(
+      p.join(root.path, 'packs', PagePackSpec.madina1405.id),
+    )..createSync(recursive: true);
+    File(p.join(old.path, '.installed')).writeAsStringSync('x');
+    container.read(packInstallsProvider.notifier).changed();
+    expect(phase(MushafEdition.madina1405), PackPhase.installed);
+    expect(phase(MushafEdition.shamarly), PackPhase.idle);
+  });
 }

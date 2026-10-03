@@ -1,0 +1,240 @@
+{
+  "id": "hijazi",
+  "version": 1,
+  "name": {
+    "ar": "حجازي",
+    "en": "Hijazi"
+  },
+  "description": {
+    "ar": "أخف الزخارف: إطار رفيع بلون الحجر على أبيض صافٍ",
+    "en": "The lightest ornament: a thin stone-coloured frame on pure white"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCAN"
+  },
+  "frame": {
+    "outerWidth": 16,
+    "outerStyle": "art",
+    "innerWidth": 0,
+    "gap": 0,
+    "radius": 0,
+    "innerRadius": 0,
+    "corner": "art"
+  },
+  "ornaments": {
+    "surahHeader": "art",
+    "ayahMarker": "theme",
+    "density": "rich"
+  },
+  "radii": {
+    "card": 14,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 0
+  },
+  "opening": "assets/themes/opening_hijazi.webp",
+  "art": {
+    "source": {
+      "repo": "https://github.com/quran-ws/quran-assets",
+      "commit": "d4cae845c9aae1fbe56ee69d04bc7d8964419373",
+      "frame": {
+        "id": "page-frames/mushaf-warsh",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "header": {
+        "id": "surah-headers/mushaf-warsh",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "marker": {
+        "id": "ayah-markers/font-012-light",
+        "license": "OFL-1.1"
+      }
+    },
+    "frame": {
+      "corner": "hijazi_frame_corner.svg",
+      "edgeH": "hijazi_frame_edge_h.svg",
+      "edgeV": "hijazi_frame_edge_v.svg",
+      "band": 16
+    },
+    "header": "hijazi_header.svg",
+    "marker": "hijazi_marker.svg",
+    "modes": {
+      "light": {
+        "frame": {
+          "c2": "#E4E1DB",
+          "c3": "#D8C8B4",
+          "c4": "#B9C4C0",
+          "line": "#8C847C"
+        },
+        "header": {
+          "c2": "#EEEAE3",
+          "c3": "#D8C8B4",
+          "c4": "#D8C8B4",
+          "c5": "#C9C9C6",
+          "c6": "#9FB0AC",
+          "line": "#8C847C"
+        },
+        "marker": {
+          "c1": "#FFFFFF",
+          "c2": "#F1ECE3",
+          "c3": "#6F6A64",
+          "c4": "#8C847C",
+          "c5": "#D8C8B4"
+        }
+      },
+      "white": {
+        "frame": {
+          "c1": "#FFFFFF",
+          "c2": "#E4E1DB",
+          "c3": "#D8C8B4",
+          "c4": "#B9C4C0",
+          "line": "#8C847C"
+        },
+        "header": {
+          "c1": "#FFFFFF",
+          "c2": "#EEEAE3",
+          "c3": "#D8C8B4",
+          "c4": "#D8C8B4",
+          "c5": "#C9C9C6",
+          "c6": "#9FB0AC",
+          "line": "#8C847C"
+        },
+        "marker": {
+          "c1": "#FFFFFF",
+          "c2": "#F1ECE3",
+          "c3": "#6F6A64",
+          "c4": "#8C847C",
+          "c5": "#D8C8B4"
+        }
+      },
+      "night": {
+        "frame": {
+          "c1": "#26282A",
+          "c2": "#3D3931",
+          "c3": "#554736",
+          "c4": "#46494E",
+          "line": "#C3C9D5"
+        },
+        "header": {
+          "c1": "#26282A",
+          "c2": "#3B3529",
+          "c3": "#554736",
+          "c4": "#554736",
+          "c5": "#414348",
+          "c6": "#53575D",
+          "line": "#C3C9D5"
+        },
+        "marker": {
+          "c1": "#1A1B1D",
+          "c2": "#3D3526",
+          "c3": "#7A7F88",
+          "c4": "#696D75",
+          "c5": "#554736"
+        }
+      },
+      "black": {
+        "frame": {
+          "c1": "#161618",
+          "c2": "#2A2722",
+          "c3": "#403528",
+          "c4": "#36363B",
+          "line": "#ABABC4"
+        },
+        "header": {
+          "c1": "#161618",
+          "c2": "#27231B",
+          "c3": "#403528",
+          "c4": "#403528",
+          "c5": "#313135",
+          "c6": "#43434A",
+          "line": "#ABABC4"
+        },
+        "marker": {
+          "c1": "#0A0A0B",
+          "c2": "#282319",
+          "c3": "#696973",
+          "c4": "#585861",
+          "c5": "#403528"
+        }
+      }
+    }
+  },
+  "modes": {
+    "light": {
+      "bg": "#F6F5F2",
+      "paper": "#FFFFFF",
+      "ink": "#26292C",
+      "frame": "#5E5A55",
+      "goldText": "#5E5A55",
+      "border": "#DDDDDA",
+      "headBg": "#5E5A55",
+      "headFg": "#FFFFFF",
+      "marker": "#8C847C",
+      "player": "#5E5A55",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#5E5A55",
+      "muted": "#696B6D",
+      "highlight": "#8C847C33",
+      "control": "#5E5A55",
+      "onControl": "#FFFFFF"
+    },
+    "white": {
+      "bg": "#FFFFFF",
+      "paper": "#FFFFFF",
+      "ink": "#26292C",
+      "frame": "#5E5A55",
+      "goldText": "#5E5A55",
+      "border": "#D8D6D3",
+      "headBg": "#5E5A55",
+      "headFg": "#FFFFFF",
+      "marker": "#8C847C",
+      "player": "#5E5A55",
+      "playerFg": "#FFFFFF",
+      "accent": "#FFFFFF",
+      "accentFg": "#5E5A55",
+      "muted": "#6F7173",
+      "highlight": "#8C847C33",
+      "control": "#5E5A55",
+      "onControl": "#FFFFFF"
+    },
+    "night": {
+      "bg": "#121314",
+      "paper": "#1A1B1D",
+      "ink": "#E6E4E0",
+      "frame": "#34322F",
+      "goldText": "#C9C2B8",
+      "border": "#373738",
+      "headBg": "#34322F",
+      "headFg": "#E6E4E0",
+      "marker": "#9C948B",
+      "player": "#34322F",
+      "playerFg": "#E6E4E0",
+      "accent": "#E6E4E0",
+      "accentFg": "#1A1B1D",
+      "muted": "#9D9C9A",
+      "highlight": "#9C948B40",
+      "control": "#C9C2B8",
+      "onControl": "#121314"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#0A0A0B",
+      "ink": "#E0DED9",
+      "frame": "#262523",
+      "goldText": "#BEB7AD",
+      "border": "#282828",
+      "headBg": "#262523",
+      "headFg": "#E0DED9",
+      "marker": "#8A837B",
+      "player": "#262523",
+      "playerFg": "#E0DED9",
+      "accent": "#E0DED9",
+      "accentFg": "#0A0A0B",
+      "muted": "#93928F",
+      "highlight": "#8A837B40",
+      "control": "#BEB7AD",
+      "onControl": "#000000"
+    }
+  }
+}

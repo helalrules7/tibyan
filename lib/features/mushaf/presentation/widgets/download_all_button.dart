@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/settings/app_settings.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -7,8 +8,8 @@ import '../../data/page_pack.dart';
 import '../../mushaf_providers.dart';
 import 'illuminated_frame.dart';
 
-/// Queues every edition that is not on the device yet, in one tap. Hidden
-/// when all of them are there.
+/// Queues every edition that is not on the device yet, in one tap, and
+/// opens the screen that follows them. Hidden when all of them are there.
 class DownloadAllButton extends ConsumerWidget {
   const DownloadAllButton({super.key});
 
@@ -30,10 +31,7 @@ class DownloadAllButton extends ConsumerWidget {
         label: Text(l.downloadAllEditions(digits((mb / 1e6).round()))),
         onPressed: () async {
           await ref.read(pageDownloadProvider.notifier).startAll();
-          if (!context.mounted) return;
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(l.allEditionsQueued)));
+          if (context.mounted) context.push('/downloads');
         },
       ),
     );

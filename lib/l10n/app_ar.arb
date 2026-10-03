@@ -13,12 +13,12 @@
   "comingSoon": "قريبا",
   "settingsTitle": "الإعدادات",
   "openSettings": "فتح الإعدادات",
-  "appearanceTitle": "الشكل",
-  "styleLabel": "الشكل",
+  "appearanceTitle": "شكل المصحف",
   "modeLabel": "وضع الإضاءة",
   "modeSystem": "تلقائي",
   "modeSystemHint": "يتبع إعداد الجهاز",
   "modeLight": "فاتح",
+  "modeWhite": "أبيض زاهي",
   "modeNight": "ليلي",
   "modeBlack": "أسود",
   "uiFontLabel": "خط الواجهة",
@@ -42,7 +42,6 @@
       }
     }
   },
-  "previewLabel": "معاينة",
   "selected": "محدد",
   "onbLanguageTitle": "اختر اللغة\nChoose your language",
   "onbStyleTitle": "اختر الشكل الذي يريح عينك",
@@ -250,6 +249,7 @@
       }
     }
   },
+  "catchwordImageLabel": "الكلمة الأولى في الصفحة التالية",
   "tabHizb": "الأحزاب",
   "goToPage": "انتقال إلى صفحة",
   "goToPageHint": "رقم الصفحة من ١ إلى {max}",
@@ -330,12 +330,12 @@
   "markerStyleLabel": "شكل فواصل الآيات",
   "markerTraditional": "الفاصل التقليدي",
   "markerRosette": "وردة",
+  "markerTheme": "حسب الثيم",
+  "markerThemeHint": "«حسب الثيم» يرسم فاصل الثيم نفسه، وفي «تبيان» وردتها.",
+  "themeLabel": "الثيم",
   "markerTintLabel": "لون الفواصل",
   "markerTintNone": "بلا لون",
   "reciteMode": "وضع التسميع",
-  "revealNextVerse": "الآية التالية",
-  "revealAll": "الكل",
-  "endRecite": "إنهاء التسميع",
   "autoScroll": "التمرير التلقائي",
   "resume": "متابعة",
   "pause": "إيقاف مؤقت",
@@ -488,7 +488,6 @@
   "listen": "استماع",
   "reciterLabel": "القارئ",
   "murattal": "مرتل",
-  "mujawwad": "مجود",
   "repeatLabel": "عدد مرات التكرار",
   "repeatForever": "بلا توقف",
   "repeatTimes": "×{n}",
@@ -561,7 +560,6 @@
       }
     }
   },
-  "allEditionsQueued": "بدأ تحميل كل المصاحف. يمكنك متابعة القراءة أو الخروج من التطبيق.",
   "downloadInBackgroundNote": "يمكنك الخروج من التطبيق: التحميل يكمل في الخلفية، ويصلك إشعار عند انتهائه.",
   "notifDownloading": "تحميل صفحات المصحف",
   "notifComplete": "اكتمل تحميل المصحف",
@@ -584,16 +582,635 @@
   "versePauseSecond": "ثانية",
   "versePauseHalf": "نصف ثانية",
   "versePauseHint": "يقصّر السكتات الطويلة بين الآيات دون المساس بالتلاوة نفسها",
+  "listenFromPage": "استمع من أول الصفحة",
+  "repeatHint": "إن لم تحدد مقطعًا تتكرر كل آية بهذا العدد ثم تليها التالية",
   "homeTitle": "الرئيسية",
-  "frameDesignLabel": "إطار الصفحة",
-  "frameByStyle": "حسب الشكل",
-  "frameZakhrafa": "زخرفة",
-  "framePlain": "بسيط",
-  "frameAbbasid": "عباسي",
-  "frameUmayyad": "أموي",
-  "frameAndalusian": "أندلسي",
-  "frameOttoman": "عثماني",
-  "frameEgyptian": "مصري",
-  "frameModernIslamic": "إسلامي حديث",
-  "framePreviewLabel": "معاينة الإطار"
+  "searchHint": "ابحث في القرآن، أو اكتب «البقرة ٢٥٥»",
+  "searchIntro": "اكتب كلمة أو أكثر من القرآن، بتشكيل أو دونه، أو اكتب موضعا مثل «٢:٢٥٥» أو «البقرة ٢٥٥».",
+  "searchGoTo": "اذهب إلى الموضع",
+  "searchNothing": "لا نتائج",
+  "searchCount": "{count} موضعا في {verses} آية",
+  "@searchCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "verses": {
+        "type": "String"
+      }
+    }
+  },
+  "searchMore": "و{count} آية أخرى، ضيّق البحث لرؤيتها",
+  "@searchMore": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "searchHistory": "عمليات البحث السابقة",
+  "searchClearHistory": "مسح",
+  "continueReading": "متابعة القراءة",
+  "continueReadingAt": "{surah} · الآية {ayah} · صفحة {page}",
+  "@continueReadingAt": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "openLabel": "افتح",
+  "wordStudy": "دراسة الكلمة",
+  "wordMeanings": "معاني الكلمات",
+  "wordPickHint": "اضغط على الكلمة التي تريد دراستها",
+  "wordStudyChoose": "اختر كلمة من كلمات الآية",
+  "wordMeaningTitle": "المعنى",
+  "wordNoMeaning": "لا شرح لهذه الكلمة في «الميسر في غريب القرآن».",
+  "wordRootTitle": "الجذر",
+  "wordLemma": "المدخل المعجمي",
+  "wordNoRoot": "لا جذر لهذه الكلمة في المدونة القرآنية.",
+  "wordNoCorpusData": "لا بيانات لهذه الكلمة في المدونة القرآنية.",
+  "rootOccurrencesTitle": "مواضع الجذر",
+  "rootOccurrencesCount": "الكلمات: {words}، الآيات: {verses}",
+  "@rootOccurrencesCount": {
+    "placeholders": {
+      "words": {
+        "type": "String"
+      },
+      "verses": {
+        "type": "String"
+      }
+    }
+  },
+  "verseNoMeanings": "لا شرح لكلمات هذه الآية في «الميسر في غريب القرآن».",
+  "wordStudyVerse": "{surah}، الآية {ayah}",
+  "@wordStudyVerse": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadAllTitle": "تحميل كل المصاحف",
+  "downloadAllCount": "اكتمل {done} من {total}",
+  "@downloadAllCount": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "themeArtCredit": "الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.",
+  "khatmaTitle": "الختمة",
+  "khatmaNew": "ختمة جديدة",
+  "khatmaEmptyTitle": "لا ختمة الآن",
+  "khatmaEmptyBody": "ضع خطة لختم المصحف: حدد موعد الختم أو مقدار الورد اليومي. والصفحات التي تقرؤها في المصحف تُحسب تلقائيا.",
+  "khatmaDefaultName": "ختمتي",
+  "khatmaNameLabel": "الاسم",
+  "khatmaByDate": "حسب موعد الختم",
+  "khatmaByAmount": "حسب الورد اليومي",
+  "khatmaEndDateLabel": "موعد الختم",
+  "khatmaAmountLabel": "المقدار في اليوم",
+  "khatmaUnitPage": "صفحة",
+  "khatmaUnitJuz": "جزء",
+  "khatmaUnitHizb": "حزب",
+  "khatmaAboutPerDay": "نحو {count} صفحة في اليوم",
+  "@khatmaAboutPerDay": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDuration": "المدة: {count} يوم، والختم يوم {date}",
+  "@khatmaDuration": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaEditionNote": "بصفحات {edition}",
+  "@khatmaEditionNote": {
+    "placeholders": {
+      "edition": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminder": "تذكير يومي",
+  "khatmaReminderOff": "بلا تذكير",
+  "khatmaStart": "ابدأ الختمة",
+  "khatmaReplaceTitle": "ختمة مفتوحة",
+  "khatmaReplaceBody": "تُحذف الختمة الحالية وسجلها عند بدء ختمة جديدة.",
+  "khatmaToday": "ورد اليوم",
+  "khatmaPagesRange": "من صفحة {from} إلى صفحة {to}",
+  "@khatmaPagesRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaPagesCount": "عدد الصفحات: {count}",
+  "@khatmaPagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReadNow": "اقرأ الآن",
+  "khatmaMarkRead": "قرأته في مصحف آخر",
+  "khatmaTodayDone": "ورد اليوم مقروء",
+  "khatmaContinue": "تابع القراءة",
+  "khatmaProgress": "{done} من {total} صفحة",
+  "@khatmaProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDaysLeft": "الأيام الباقية: {count}",
+  "@khatmaDaysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaEnds": "الختم يوم {date}",
+  "@khatmaEnds": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaBehindTitle": "صفحات من الأيام الماضية: {count}",
+  "@khatmaBehindTitle": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaBehindBody": "أُضيفت إلى ورد اليوم. يمكنك توزيعها على الأيام الباقية، أو تأخير موعد الختم.",
+  "khatmaSpread": "وزّعها على الأيام الباقية",
+  "khatmaExtend": "أخّر موعد الختم",
+  "khatmaComplete": "اكتملت الختمة",
+  "khatmaCompletedOn": "اكتملت يوم {date}",
+  "@khatmaCompletedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaPast": "ختمات سابقة",
+  "khatmaDelete": "حذف الختمة",
+  "khatmaDeleteBody": "يُحذف سجل هذه الختمة.",
+  "khatmaTileStart": "ابدأ",
+  "khatmaTilePages": "ورد اليوم: {count}",
+  "@khatmaTilePages": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTitle": "ورد الختمة",
+  "khatmaReminderBody": "ورد اليوم: من صفحة {from} إلى صفحة {to}",
+  "@khatmaReminderBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderChannel": "تذكير الختمة",
+  "homeTodayTitle": "اليوم",
+  "widgetNoKhatma": "ابدأ ختمة في تبيان",
+  "reportsTitle": "تقارير القراءة",
+  "reportsWeek": "آخر ٧ أيام",
+  "reportsMonth": "آخر ٣٠ يوما",
+  "reportsDays": "أيام القراءة",
+  "reportsPages": "الصفحات",
+  "reportsReadingMinutes": "دقائق القراءة",
+  "reportsListeningMinutes": "دقائق الاستماع",
+  "reportsEmpty": "تظهر هنا قراءتك واستماعك تلقائيا.",
+  "reportsDayRead": "يوم فيه قراءة أو استماع",
+  "streakReadToday": "قرأت اليوم. الأيام المتتالية: {count}",
+  "@streakReadToday": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "streakContinue": "الأيام المتتالية حتى أمس: {count}. صفحة اليوم تصلها.",
+  "@streakContinue": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "streakWelcome": "مرحبا بعودتك. تابع من حيث وقفت.",
+  "streakNotesToggle": "رسائل الاستمرار",
+  "streakNotesHint": "تعرض الأيام المتتالية فقط، ولا تعرض الأيام الفائتة.",
+  "journalTitle": "دفتر التدبر",
+  "journalSearch": "ابحث في ملاحظاتك",
+  "journalEmpty": "لا ملاحظات بعد. اضغط مطولا على آية في المصحف واختر «ملاحظة تدبر».",
+  "journalNoMatch": "لا ملاحظات فيها هذه الكلمات.",
+  "journalAdd": "ملاحظة تدبر",
+  "journalHint": "اكتب ملاحظتك على الآية",
+  "journalEdit": "تعديل",
+  "journalOpenVerse": "افتح الآية",
+  "journalVerseRef": "سورة {surah} · آية {ayah}",
+  "@journalVerseRef": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "journalSaved": "حُفظت الملاحظة",
+  "journalEarlier": "ملاحظاتك على هذه الآية",
+  "elderlyMode": "وضع كبار السن",
+  "elderlyModeHint": "خط أكبر، وأزرار أكبر بأسمائها، وألوان أوضح، وصفحة رئيسية فيها المهم فقط، وصفحة المصحف بأكبر حجم، وانتقالات أهدأ",
+  "searchModeWords": "بالكلمات",
+  "searchModeMeaning": "بالمعنى",
+  "searchMeaningHint": "اكتب فكرة أو سؤالا بكلماتك",
+  "searchMeaningIntro": "اكتب فكرة بكلماتك، بالعربية أو بالإنجليزية، مثل «الصبر على البلاء» أو «بر الوالدين»، فتظهر الآيات التي يتناولها معناها في التفسير الميسر والترجمتين. تظهر كل آية بنصها، ومعها النص الذي طابق كما هو من مصدره.",
+  "searchMatchedIn": "طابق في: {source}",
+  "@searchMatchedIn": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "searchMeaningCount": "{count} آية",
+  "@searchMeaningCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "semanticPackName": "حزمة البحث بالمعنى",
+  "semanticPackOffer": "البحث الآن بالكلمات داخل نصوص المعاني. نزّل حزمة البحث بالمعنى (نحو {size} ميجا) ليجد البحث الآيات بمعناها وإن اختلفت الكلمات، دون اتصال.",
+  "@semanticPackOffer": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "semanticPackDownload": "تنزيل الحزمة",
+  "semanticPackDownloading": "يُنزَّل: {percent}٪",
+  "@semanticPackDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "semanticPackVerifying": "يُتحقَّق من الحزمة ويُثبَّت…",
+  "semanticPackFailed": "تعذّر التنزيل. حاول مرة أخرى.",
+  "semanticPackLoading": "يُجهَّز البحث بالمعنى…",
+  "semanticPackError": "تعذّر فتح حزمة البحث بالمعنى، فالبحث الآن بالكلمات.",
+  "semanticResultsNote": "نتائج تقريبية مرتبة بقرب المعنى. راجع الآية في موضعها وفي تفسيرها.",
+  "verseLabel": "سورة {surah}، الآية {ayah}",
+  "@verseLabel": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "pageLabelFull": "الصفحة {page}، {surah}",
+  "@pageLabelFull": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "markThisVerse": "ضع علامة القراءة عند هذه الآية أو أزلها",
+  "loadingPage": "تُحمَّل الصفحة {page}",
+  "@loadingPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "clearSearch": "مسح البحث",
+  "previousPageNumber": "الصفحة السابقة",
+  "nextPageNumber": "الصفحة التالية",
+  "showMenus": "إظهار القوائم",
+  "hideMenus": "إخفاء القوائم",
+  "downloadSurah": "تنزيل سورة {surah}",
+  "@downloadSurah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "retryDownloadSurah": "أعد تنزيل سورة {surah}",
+  "@retryDownloadSurah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteSurahDownload": "سورة {surah} منزّلة. احذفها",
+  "@deleteSurahDownload": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadingSurah": "تُنزَّل سورة {surah}",
+  "@downloadingSurah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "verseCounter": "الآية {current} من {total}",
+  "@verseCounter": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadPercentSpoken": "اكتمل {percent}٪ من التحميل",
+  "@downloadPercentSpoken": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "hifzTitle": "الحفظ",
+  "hifzTileNote": "المراجعة والتسميع",
+  "hifzToday": "مراجعة اليوم",
+  "hifzNothingDue": "لا مراجعة مستحقة اليوم.",
+  "hifzNothingDueHint": "سمّع صفحة أو ربعا أو سورة ثم قيّم تسميعك، فتدخل المراجعة المتباعدة.",
+  "hifzStartTest": "ابدأ تسميعا",
+  "hifzMap": "خريطة الحفظ",
+  "hifzMapHint": "كل صفحة ملوّنة بقوة حفظها، ومعها علامة تقرأ دون ألوان.",
+  "hifzAllUnits": "كل وحدات المراجعة",
+  "hifzDueToday": "مستحقة اليوم",
+  "hifzDueOn": "موعدها {date}",
+  "@hifzDueOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "hifzQuarter": "الربع {number}",
+  "@hifzQuarter": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "hifzUnitPage": "صفحة",
+  "hifzUnitQuarter": "ربع",
+  "hifzUnitSurah": "سورة",
+  "hifzChooseUnit": "ماذا تسمّع؟",
+  "hifzNumberRange": "الرقم، من ١ إلى {max}",
+  "@hifzNumberRange": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "hifzBegin": "ابدأ",
+  "hifzRemove": "احذف من المراجعة",
+  "revealNextWord": "الكلمة التالية",
+  "revealNextVerse": "الآية التالية",
+  "revealAll": "الكل",
+  "endRecite": "إنهاء التسميع",
+  "verseRemembered": "حفظت",
+  "verseMissed": "أخطأت",
+  "testCounts": "حفظت {remembered} · أخطأت {missed}",
+  "@testCounts": {
+    "placeholders": {
+      "remembered": {
+        "type": "String"
+      },
+      "missed": {
+        "type": "String"
+      }
+    }
+  },
+  "revealByLine": "لا مواضع لكلمات هذه الآية في هذه الطبعة، فتُكشف سطرا سطرا.",
+  "gradeUnit": "قيّم",
+  "gradeTitle": "كيف كان تسميعك؟",
+  "gradeSuggested": "الاختيار المقترح من نتائج الآيات",
+  "gradeAgain": "أعِدها",
+  "gradeHard": "صعبة",
+  "gradeGood": "جيدة",
+  "gradeEasy": "سهلة",
+  "gradeSaved": "المراجعة القادمة: {date}",
+  "@gradeSaved": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "similarVerses": "المتشابهات",
+  "similarCount": "متشابهات ({count})",
+  "@similarCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "similarThisVerse": "الآية",
+  "similarFollowing": "والآية بعدها",
+  "strengthNone": "لم يُحفظ",
+  "strengthWeak": "ضعيف",
+  "strengthFair": "متوسط",
+  "strengthGood": "جيد",
+  "strengthStrong": "متقن",
+  "mapPages": "الصفحات",
+  "mapSurahs": "السور",
+  "mapZoomIn": "تكبير",
+  "mapZoomOut": "تصغير",
+  "mapCell": "{name}: {strength}",
+  "@mapCell": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "strength": {
+        "type": "String"
+      }
+    }
+  },
+  "tajweedColors": "تلوين أحكام التجويد",
+  "tajweedColorsHint": "تلوين الحروف التي يقع عليها الحكم فقط، بالألوان التي تختارها",
+  "tajweedLegend": "مفتاح ألوان التجويد",
+  "tajweedRuleColors": "لون كل حكم",
+  "tajweedNoColor": "بلا لون",
+  "tajweedReset": "إعادة الألوان الافتراضية",
+  "tajweedPickColor": "لون «{rule}»",
+  "@tajweedPickColor": {
+    "placeholders": {
+      "rule": {
+        "type": "String"
+      }
+    }
+  },
+  "tajweedSourceNote": "مواضع الأحكام من بيانات quran-tajweed (Collin Fair، رخصة CC BY 4.0)، وهي مولّدة آليا ولم يراجعها متخصص بعد. وموضع الحرف داخل الكلمة تقديري، وفي الشمرلي حدود بعض الكلمات تقديرية أيضا.",
+  "tajweedLegendHint": "اضغط مطولا على زر التلوين في الصفحة لعرض هذا المفتاح.",
+  "tajweedHueCrimson": "أحمر داكن",
+  "tajweedHueRed": "أحمر",
+  "tajweedHueOrange": "برتقالي",
+  "tajweedHueGold": "ذهبي",
+  "tajweedHueGreen": "أخضر",
+  "tajweedHueLightGreen": "أخضر فاتح",
+  "tajweedHueTeal": "فيروزي",
+  "tajweedHueBlue": "أزرق",
+  "tajweedHuePurple": "بنفسجي",
+  "tajweedHuePink": "وردي",
+  "tajweedHueGrey": "رمادي",
+  "tajweedHueViolet": "ليلكي",
+  "tajweedHueAmber": "كهرماني",
+  "tajweedNoDataRiwaya": "لا تلوين للتجويد في مصاحف الروايات (ورش وقالون والدوري وشعبة): لا توجد بعد بيانات أحكام موثوقة لهذه الروايات، ولا نضع أحكاما بلا مصدر. التلوين يعمل في مصاحف حفص.",
+  "tajweedHamzatWasl": "همزة الوصل",
+  "tajweedLamShamsiyyah": "اللام الشمسية",
+  "tajweedSilent": "الحروف التي لا تُنطق",
+  "tajweedMadd2": "المد الطبيعي (حركتان)",
+  "tajweedMadd246": "المد العارض واللين (2 أو 4 أو 6 حركات)",
+  "tajweedMaddMuttasil": "المد المتصل (4 أو 5 حركات)",
+  "tajweedMaddMunfasil": "المد المنفصل (4 أو 5 حركات)",
+  "tajweedMadd6": "المد اللازم (6 حركات)",
+  "tajweedGhunnah": "الغنة",
+  "tajweedIkhfa": "الإخفاء",
+  "tajweedIkhfaShafawi": "الإخفاء الشفوي",
+  "tajweedIqlab": "الإقلاب",
+  "tajweedIdghaamGhunnah": "الإدغام بغنة",
+  "tajweedIdghaamNoGhunnah": "الإدغام بلا غنة",
+  "tajweedIdghaamShafawi": "الإدغام الشفوي",
+  "tajweedIdghaamMutajanisayn": "إدغام المتجانسين",
+  "tajweedIdghaamMutaqaribayn": "إدغام المتقاربين",
+  "tajweedQalqalah": "القلقلة",
+  "editionWarsh": "مصحف المدينة برواية ورش عن نافع",
+  "editionQalun": "مصحف المدينة برواية قالون عن نافع",
+  "editionDouri": "مصحف المدينة برواية الدوري عن أبي عمرو",
+  "editionShubah": "مصحف المدينة برواية شعبة عن عاصم",
+  "riwayaWarsh": "رواية ورش عن نافع",
+  "riwayaQalun": "رواية قالون عن نافع",
+  "riwayaDouri": "رواية الدوري عن أبي عمرو",
+  "riwayaShubah": "رواية شعبة عن عاصم",
+  "riwayatTitle": "مصاحف الروايات",
+  "riwayaEditionDesc": "صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها. التفسير والترجمة والفواصل تُربط بالآيات المقابلة في عدّ حفص.",
+  "riwayaGaps": "في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة ولا تلوين للفظ الجلالة، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).",
+  "riwayaTafsirNote": "الآية {ayah} من سورة {surah} في {riwaya} يقابلها في عدّ حفص: {hafs}. التفسير والترجمة ونص الآية أدناه بعدّ حفص وروايته.",
+  "@riwayaTafsirNote": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "surah": {
+        "type": "String"
+      },
+      "riwaya": {
+        "type": "String"
+      },
+      "hafs": {
+        "type": "String"
+      }
+    }
+  },
+  "riwayaNoHafs": "لا تقابلها آية في عدّ حفص",
+  "hafsVerseOne": "الآية {number}",
+  "@hafsVerseOne": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "hafsVerseRange": "الآيات {from} إلى {to}",
+  "@hafsVerseRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "riwayaVerseText": "نص الآية في {riwaya}",
+  "@riwayaVerseText": {
+    "placeholders": {
+      "riwaya": {
+        "type": "String"
+      }
+    }
+  },
+  "riwayaRecitersNote": "تلاوات {riwaya}",
+  "@riwayaRecitersNote": {
+    "placeholders": {
+      "riwaya": {
+        "type": "String"
+      }
+    }
+  }
 }

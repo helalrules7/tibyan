@@ -1,7 +1,17 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// The upload key for Google Play, kept outside the repository
+// (android/key.properties, ignored by git). Without it, release builds
+// fall back to the debug key so `flutter run --release` still works.
+val keyProperties = Properties().apply {
+    val file = rootProject.file("key.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
 android {
@@ -12,6 +22,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications schedules with java.time on older
+        // Android versions.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -29,11 +42,21 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (keyProperties.containsKey("storeFile")) {
+            create("upload") {
+                storeFile = file(keyProperties["storeFile"] as String)
+                storePassword = keyProperties["storePassword"] as String
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("upload")
+                ?: signingConfigs.getByName("debug")
         }
     }
 }
@@ -46,4 +69,8 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

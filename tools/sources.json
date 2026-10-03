@@ -144,6 +144,43 @@
       "sha256": "a636c2976548d527f2ba4d76687ea8006a8126725f40dd2074fca1bb744c7b35",
       "license": "Word timings CC BY 4.0 (QuranLab); the dataset hosts no audio. Upstream Parquet: mahmoud-ali-al-banna/train-00000-of-00001.parquet, SHA-256 f91ea421924b8b6c90e26c51ca79f04a90ffb3641df1805fd35341853375e1d2 (2026-09-29). Measured on everyayah's per-verse files (no license; used by the owner's decision for building and checking only, not shipped)",
       "evidence": "docs/licenses/2026-09-28_quranlab_quran-audio_LICENSES.pdf; docs/licenses/2026-09-28_everyayah_disclaimer_no-license.pdf"
+    },
+    {
+      "id": "quranic-corpus-morphology-0.4",
+      "file": "quranic-corpus-morphology-0.4.txt",
+      "url": "https://raw.githubusercontent.com/cltk/arabic_morphology_quranic-corpus/b5abd4d8fadd775f3329f34cbe10531fac71e391/quranic-corpus-morphology-0.4.txt",
+      "method": "GET",
+      "sha256": "a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46",
+      "license": "GNU GPL; verbatim copies only; credit the Quranic Arabic Corpus and link to corpus.quran.com (file header). corpus.quran.com/download/ asks for an e-mail address before the download, so a verbatim GitHub copy is used: byte-identical in three independent repositories (cltk/arabic_morphology_quranic-corpus, bnjasim/quranic-corpus, taziksh/quran-frequencies; git blob b91cec6e95d5e0306550b4aedacc7380dc71152a), header 'Quranic Arabic Corpus (morphology, version 0.4)'",
+      "evidence": "docs/licenses/2026-09-28_quranic-corpus_license.pdf"
+    },
+    {
+      "id": "nuqayah-almuyassar-gharib",
+      "file": "nuqayah_almuyassar_gharib.json",
+      "url": "https://read.tafsir.one/get.php?uth&src=almuyassar-g&s={surah}&a={ayah} (one request per mushaf page)",
+      "method": "script",
+      "script": "tools/fetch_gharib.py",
+      "sha256": "a908a229a35c34399067ede4aedbfd2c3a87ba6700717ee0ede63117f44a8120",
+      "license": "Written permission from Nuqayah (2026-09-28): yes, on condition of no ads and no profit. Covers al-Muyassar fi Gharib al-Quran only, not al-Siraj. No version is published; the SHA-256 and the retrieval date (2026-09-30) identify the copy",
+      "evidence": "docs/licenses/2026-09-28_nuqayah_permission_email.pdf"
+    },
+    {
+      "id": "openiti-wahidi-asbab-shamela0011314",
+      "file": "0468IbnAhmadWahidiNaysaburi.AsbabNuzul.Shamela0011314-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/0475AH/cc9beb0d9645e8cdce892556423b9926a127054f/data/0468IbnAhmadWahidiNaysaburi/0468IbnAhmadWahidiNaysaburi.AsbabNuzul/0468IbnAhmadWahidiNaysaburi.AsbabNuzul.Shamela0011314-ara1",
+      "method": "GET",
+      "sha256": "20e8163fba25d2af8591974b8a8695e6d823af44da3acc11f82631183ce5d254",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Edition: tahqiq Isam al-Humaydan, Dar al-Islah, 2nd ed. 1412/1992; the editor's rights are not covered. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/openiti-wahidi-asbab/",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "waqar144-mutashabihat",
+      "file": "waqar144_mutashabiha_data.json",
+      "url": "https://raw.githubusercontent.com/Waqar144/Quran_Mutashabihat_Data/f35f6d5d6e7d07f44e6a652d868b298fcd12e318/mutashabiha_data.json",
+      "method": "GET",
+      "sha256": "785d5efa266a19c405a449b0a01ebf34fe7dc09836d5b6ef301eae874db780f0",
+      "license": "No licence file. README: 'The data in this project is free to use as you see fit', a mention appreciated. Links between verses only (no text). Used under the 2026-09-29 rule while the status is confirmed; mirrored at tibyan.ahmedhelal.dev/mirror/sources/waqar144-mutashabihat/",
+      "evidence": "docs/licenses/2026-10-02_waqar144_mutashabihat_README.md"
     }
   ]
 }

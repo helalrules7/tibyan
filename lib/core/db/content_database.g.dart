@@ -5126,6 +5126,16 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _riwayaMeta = const VerificationMeta('riwaya');
+  @override
+  late final GeneratedColumn<String> riwaya = GeneratedColumn<String>(
+    'riwaya',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('hafs'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5134,6 +5144,7 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
     style,
     folderUrl,
     sourceId,
+    riwaya,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5190,6 +5201,12 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
     } else if (isInserting) {
       context.missing(_sourceIdMeta);
     }
+    if (data.containsKey('riwaya')) {
+      context.handle(
+        _riwayaMeta,
+        riwaya.isAcceptableOrUnknown(data['riwaya']!, _riwayaMeta),
+      );
+    }
     return context;
   }
 
@@ -5223,6 +5240,10 @@ class $ReciterTable extends Reciter with TableInfo<$ReciterTable, ReciterRow> {
         DriftSqlType.int,
         data['${effectivePrefix}source_id'],
       )!,
+      riwaya: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}riwaya'],
+      )!,
     );
   }
 
@@ -5237,12 +5258,16 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
   final String nameAr;
   final String nameEn;
 
-  /// `murattal` or `mujawwad`.
+  /// `murattal`, and only that: the mujawwad readings are not offered.
   final String style;
 
   /// A surah's file is this URL followed by `NNN.mp3`.
   final String folderUrl;
   final int sourceId;
+
+  /// The riwaya recited (`Riwaya.name`: hafs, warsh, qalun, douri,
+  /// shubah). Its verse timings are numbered by that riwaya's own count.
+  final String riwaya;
   const ReciterRow({
     required this.id,
     required this.nameAr,
@@ -5250,6 +5275,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     required this.style,
     required this.folderUrl,
     required this.sourceId,
+    required this.riwaya,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5260,6 +5286,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     map['style'] = Variable<String>(style);
     map['folder_url'] = Variable<String>(folderUrl);
     map['source_id'] = Variable<int>(sourceId);
+    map['riwaya'] = Variable<String>(riwaya);
     return map;
   }
 
@@ -5271,6 +5298,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       style: Value(style),
       folderUrl: Value(folderUrl),
       sourceId: Value(sourceId),
+      riwaya: Value(riwaya),
     );
   }
 
@@ -5286,6 +5314,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       style: serializer.fromJson<String>(json['style']),
       folderUrl: serializer.fromJson<String>(json['folderUrl']),
       sourceId: serializer.fromJson<int>(json['sourceId']),
+      riwaya: serializer.fromJson<String>(json['riwaya']),
     );
   }
   @override
@@ -5298,6 +5327,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       'style': serializer.toJson<String>(style),
       'folderUrl': serializer.toJson<String>(folderUrl),
       'sourceId': serializer.toJson<int>(sourceId),
+      'riwaya': serializer.toJson<String>(riwaya),
     };
   }
 
@@ -5308,6 +5338,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     String? style,
     String? folderUrl,
     int? sourceId,
+    String? riwaya,
   }) => ReciterRow(
     id: id ?? this.id,
     nameAr: nameAr ?? this.nameAr,
@@ -5315,6 +5346,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     style: style ?? this.style,
     folderUrl: folderUrl ?? this.folderUrl,
     sourceId: sourceId ?? this.sourceId,
+    riwaya: riwaya ?? this.riwaya,
   );
   ReciterRow copyWithCompanion(ReciterCompanion data) {
     return ReciterRow(
@@ -5324,6 +5356,7 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
       style: data.style.present ? data.style.value : this.style,
       folderUrl: data.folderUrl.present ? data.folderUrl.value : this.folderUrl,
       sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+      riwaya: data.riwaya.present ? data.riwaya.value : this.riwaya,
     );
   }
 
@@ -5335,14 +5368,15 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
           ..write('nameEn: $nameEn, ')
           ..write('style: $style, ')
           ..write('folderUrl: $folderUrl, ')
-          ..write('sourceId: $sourceId')
+          ..write('sourceId: $sourceId, ')
+          ..write('riwaya: $riwaya')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, nameAr, nameEn, style, folderUrl, sourceId);
+      Object.hash(id, nameAr, nameEn, style, folderUrl, sourceId, riwaya);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5352,7 +5386,8 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
           other.nameEn == this.nameEn &&
           other.style == this.style &&
           other.folderUrl == this.folderUrl &&
-          other.sourceId == this.sourceId);
+          other.sourceId == this.sourceId &&
+          other.riwaya == this.riwaya);
 }
 
 class ReciterCompanion extends UpdateCompanion<ReciterRow> {
@@ -5362,6 +5397,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
   final Value<String> style;
   final Value<String> folderUrl;
   final Value<int> sourceId;
+  final Value<String> riwaya;
   const ReciterCompanion({
     this.id = const Value.absent(),
     this.nameAr = const Value.absent(),
@@ -5369,6 +5405,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     this.style = const Value.absent(),
     this.folderUrl = const Value.absent(),
     this.sourceId = const Value.absent(),
+    this.riwaya = const Value.absent(),
   });
   ReciterCompanion.insert({
     this.id = const Value.absent(),
@@ -5377,6 +5414,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     required String style,
     required String folderUrl,
     required int sourceId,
+    this.riwaya = const Value.absent(),
   }) : nameAr = Value(nameAr),
        nameEn = Value(nameEn),
        style = Value(style),
@@ -5389,6 +5427,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     Expression<String>? style,
     Expression<String>? folderUrl,
     Expression<int>? sourceId,
+    Expression<String>? riwaya,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5397,6 +5436,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
       if (style != null) 'style': style,
       if (folderUrl != null) 'folder_url': folderUrl,
       if (sourceId != null) 'source_id': sourceId,
+      if (riwaya != null) 'riwaya': riwaya,
     });
   }
 
@@ -5407,6 +5447,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     Value<String>? style,
     Value<String>? folderUrl,
     Value<int>? sourceId,
+    Value<String>? riwaya,
   }) {
     return ReciterCompanion(
       id: id ?? this.id,
@@ -5415,6 +5456,7 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
       style: style ?? this.style,
       folderUrl: folderUrl ?? this.folderUrl,
       sourceId: sourceId ?? this.sourceId,
+      riwaya: riwaya ?? this.riwaya,
     );
   }
 
@@ -5439,6 +5481,9 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
     if (sourceId.present) {
       map['source_id'] = Variable<int>(sourceId.value);
     }
+    if (riwaya.present) {
+      map['riwaya'] = Variable<String>(riwaya.value);
+    }
     return map;
   }
 
@@ -5450,7 +5495,8 @@ class ReciterCompanion extends UpdateCompanion<ReciterRow> {
           ..write('nameEn: $nameEn, ')
           ..write('style: $style, ')
           ..write('folderUrl: $folderUrl, ')
-          ..write('sourceId: $sourceId')
+          ..write('sourceId: $sourceId, ')
+          ..write('riwaya: $riwaya')
           ..write(')'))
         .toString();
   }
@@ -9643,6 +9689,1700 @@ class ShamarlyWordBoxCompanion extends UpdateCompanion<ShamarlyWordBoxRow> {
   }
 }
 
+class $ShamarlyCatchwordTable extends ShamarlyCatchword
+    with TableInfo<$ShamarlyCatchwordTable, ShamarlyCatchwordRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShamarlyCatchwordTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _x0Meta = const VerificationMeta('x0');
+  @override
+  late final GeneratedColumn<int> x0 = GeneratedColumn<int>(
+    'x0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y0Meta = const VerificationMeta('y0');
+  @override
+  late final GeneratedColumn<int> y0 = GeneratedColumn<int>(
+    'y0',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _x1Meta = const VerificationMeta('x1');
+  @override
+  late final GeneratedColumn<int> x1 = GeneratedColumn<int>(
+    'x1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _y1Meta = const VerificationMeta('y1');
+  @override
+  late final GeneratedColumn<int> y1 = GeneratedColumn<int>(
+    'y1',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordsMeta = const VerificationMeta('words');
+  @override
+  late final GeneratedColumn<int> words = GeneratedColumn<int>(
+    'words',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eraseMeta = const VerificationMeta('erase');
+  @override
+  late final GeneratedColumn<String> erase = GeneratedColumn<String>(
+    'erase',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [page, x0, y0, x1, y1, words, erase];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'shamarly_catchword';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShamarlyCatchwordRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    }
+    if (data.containsKey('x0')) {
+      context.handle(_x0Meta, x0.isAcceptableOrUnknown(data['x0']!, _x0Meta));
+    } else if (isInserting) {
+      context.missing(_x0Meta);
+    }
+    if (data.containsKey('y0')) {
+      context.handle(_y0Meta, y0.isAcceptableOrUnknown(data['y0']!, _y0Meta));
+    } else if (isInserting) {
+      context.missing(_y0Meta);
+    }
+    if (data.containsKey('x1')) {
+      context.handle(_x1Meta, x1.isAcceptableOrUnknown(data['x1']!, _x1Meta));
+    } else if (isInserting) {
+      context.missing(_x1Meta);
+    }
+    if (data.containsKey('y1')) {
+      context.handle(_y1Meta, y1.isAcceptableOrUnknown(data['y1']!, _y1Meta));
+    } else if (isInserting) {
+      context.missing(_y1Meta);
+    }
+    if (data.containsKey('words')) {
+      context.handle(
+        _wordsMeta,
+        words.isAcceptableOrUnknown(data['words']!, _wordsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordsMeta);
+    }
+    if (data.containsKey('erase')) {
+      context.handle(
+        _eraseMeta,
+        erase.isAcceptableOrUnknown(data['erase']!, _eraseMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eraseMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {page};
+  @override
+  ShamarlyCatchwordRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShamarlyCatchwordRow(
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      x0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x0'],
+      )!,
+      y0: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y0'],
+      )!,
+      x1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}x1'],
+      )!,
+      y1: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}y1'],
+      )!,
+      words: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}words'],
+      )!,
+      erase: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}erase'],
+      )!,
+    );
+  }
+
+  @override
+  $ShamarlyCatchwordTable createAlias(String alias) {
+    return $ShamarlyCatchwordTable(attachedDatabase, alias);
+  }
+}
+
+class ShamarlyCatchwordRow extends DataClass
+    implements Insertable<ShamarlyCatchwordRow> {
+  final int page;
+  final int x0;
+  final int y0;
+  final int x1;
+  final int y1;
+
+  /// Whole words in the box: 1 or 2.
+  final int words;
+  final String erase;
+  const ShamarlyCatchwordRow({
+    required this.page,
+    required this.x0,
+    required this.y0,
+    required this.x1,
+    required this.y1,
+    required this.words,
+    required this.erase,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['page'] = Variable<int>(page);
+    map['x0'] = Variable<int>(x0);
+    map['y0'] = Variable<int>(y0);
+    map['x1'] = Variable<int>(x1);
+    map['y1'] = Variable<int>(y1);
+    map['words'] = Variable<int>(words);
+    map['erase'] = Variable<String>(erase);
+    return map;
+  }
+
+  ShamarlyCatchwordCompanion toCompanion(bool nullToAbsent) {
+    return ShamarlyCatchwordCompanion(
+      page: Value(page),
+      x0: Value(x0),
+      y0: Value(y0),
+      x1: Value(x1),
+      y1: Value(y1),
+      words: Value(words),
+      erase: Value(erase),
+    );
+  }
+
+  factory ShamarlyCatchwordRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShamarlyCatchwordRow(
+      page: serializer.fromJson<int>(json['page']),
+      x0: serializer.fromJson<int>(json['x0']),
+      y0: serializer.fromJson<int>(json['y0']),
+      x1: serializer.fromJson<int>(json['x1']),
+      y1: serializer.fromJson<int>(json['y1']),
+      words: serializer.fromJson<int>(json['words']),
+      erase: serializer.fromJson<String>(json['erase']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'page': serializer.toJson<int>(page),
+      'x0': serializer.toJson<int>(x0),
+      'y0': serializer.toJson<int>(y0),
+      'x1': serializer.toJson<int>(x1),
+      'y1': serializer.toJson<int>(y1),
+      'words': serializer.toJson<int>(words),
+      'erase': serializer.toJson<String>(erase),
+    };
+  }
+
+  ShamarlyCatchwordRow copyWith({
+    int? page,
+    int? x0,
+    int? y0,
+    int? x1,
+    int? y1,
+    int? words,
+    String? erase,
+  }) => ShamarlyCatchwordRow(
+    page: page ?? this.page,
+    x0: x0 ?? this.x0,
+    y0: y0 ?? this.y0,
+    x1: x1 ?? this.x1,
+    y1: y1 ?? this.y1,
+    words: words ?? this.words,
+    erase: erase ?? this.erase,
+  );
+  ShamarlyCatchwordRow copyWithCompanion(ShamarlyCatchwordCompanion data) {
+    return ShamarlyCatchwordRow(
+      page: data.page.present ? data.page.value : this.page,
+      x0: data.x0.present ? data.x0.value : this.x0,
+      y0: data.y0.present ? data.y0.value : this.y0,
+      x1: data.x1.present ? data.x1.value : this.x1,
+      y1: data.y1.present ? data.y1.value : this.y1,
+      words: data.words.present ? data.words.value : this.words,
+      erase: data.erase.present ? data.erase.value : this.erase,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyCatchwordRow(')
+          ..write('page: $page, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('words: $words, ')
+          ..write('erase: $erase')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(page, x0, y0, x1, y1, words, erase);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShamarlyCatchwordRow &&
+          other.page == this.page &&
+          other.x0 == this.x0 &&
+          other.y0 == this.y0 &&
+          other.x1 == this.x1 &&
+          other.y1 == this.y1 &&
+          other.words == this.words &&
+          other.erase == this.erase);
+}
+
+class ShamarlyCatchwordCompanion extends UpdateCompanion<ShamarlyCatchwordRow> {
+  final Value<int> page;
+  final Value<int> x0;
+  final Value<int> y0;
+  final Value<int> x1;
+  final Value<int> y1;
+  final Value<int> words;
+  final Value<String> erase;
+  const ShamarlyCatchwordCompanion({
+    this.page = const Value.absent(),
+    this.x0 = const Value.absent(),
+    this.y0 = const Value.absent(),
+    this.x1 = const Value.absent(),
+    this.y1 = const Value.absent(),
+    this.words = const Value.absent(),
+    this.erase = const Value.absent(),
+  });
+  ShamarlyCatchwordCompanion.insert({
+    this.page = const Value.absent(),
+    required int x0,
+    required int y0,
+    required int x1,
+    required int y1,
+    required int words,
+    required String erase,
+  }) : x0 = Value(x0),
+       y0 = Value(y0),
+       x1 = Value(x1),
+       y1 = Value(y1),
+       words = Value(words),
+       erase = Value(erase);
+  static Insertable<ShamarlyCatchwordRow> custom({
+    Expression<int>? page,
+    Expression<int>? x0,
+    Expression<int>? y0,
+    Expression<int>? x1,
+    Expression<int>? y1,
+    Expression<int>? words,
+    Expression<String>? erase,
+  }) {
+    return RawValuesInsertable({
+      if (page != null) 'page': page,
+      if (x0 != null) 'x0': x0,
+      if (y0 != null) 'y0': y0,
+      if (x1 != null) 'x1': x1,
+      if (y1 != null) 'y1': y1,
+      if (words != null) 'words': words,
+      if (erase != null) 'erase': erase,
+    });
+  }
+
+  ShamarlyCatchwordCompanion copyWith({
+    Value<int>? page,
+    Value<int>? x0,
+    Value<int>? y0,
+    Value<int>? x1,
+    Value<int>? y1,
+    Value<int>? words,
+    Value<String>? erase,
+  }) {
+    return ShamarlyCatchwordCompanion(
+      page: page ?? this.page,
+      x0: x0 ?? this.x0,
+      y0: y0 ?? this.y0,
+      x1: x1 ?? this.x1,
+      y1: y1 ?? this.y1,
+      words: words ?? this.words,
+      erase: erase ?? this.erase,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    if (x0.present) {
+      map['x0'] = Variable<int>(x0.value);
+    }
+    if (y0.present) {
+      map['y0'] = Variable<int>(y0.value);
+    }
+    if (x1.present) {
+      map['x1'] = Variable<int>(x1.value);
+    }
+    if (y1.present) {
+      map['y1'] = Variable<int>(y1.value);
+    }
+    if (words.present) {
+      map['words'] = Variable<int>(words.value);
+    }
+    if (erase.present) {
+      map['erase'] = Variable<String>(erase.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShamarlyCatchwordCompanion(')
+          ..write('page: $page, ')
+          ..write('x0: $x0, ')
+          ..write('y0: $y0, ')
+          ..write('x1: $x1, ')
+          ..write('y1: $y1, ')
+          ..write('words: $words, ')
+          ..write('erase: $erase')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WordRootTable extends WordRoot
+    with TableInfo<$WordRootTable, WordRootRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WordRootTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordMeta = const VerificationMeta('word');
+  @override
+  late final GeneratedColumn<int> word = GeneratedColumn<int>(
+    'word',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rootMeta = const VerificationMeta('root');
+  @override
+  late final GeneratedColumn<String> root = GeneratedColumn<String>(
+    'root',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lemmaMeta = const VerificationMeta('lemma');
+  @override
+  late final GeneratedColumn<String> lemma = GeneratedColumn<String>(
+    'lemma',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _posMeta = const VerificationMeta('pos');
+  @override
+  late final GeneratedColumn<String> pos = GeneratedColumn<String>(
+    'pos',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [surah, ayah, word, root, lemma, pos];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'word_root';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WordRootRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('word')) {
+      context.handle(
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordMeta);
+    }
+    if (data.containsKey('root')) {
+      context.handle(
+        _rootMeta,
+        root.isAcceptableOrUnknown(data['root']!, _rootMeta),
+      );
+    }
+    if (data.containsKey('lemma')) {
+      context.handle(
+        _lemmaMeta,
+        lemma.isAcceptableOrUnknown(data['lemma']!, _lemmaMeta),
+      );
+    }
+    if (data.containsKey('pos')) {
+      context.handle(
+        _posMeta,
+        pos.isAcceptableOrUnknown(data['pos']!, _posMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_posMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {surah, ayah, word};
+  @override
+  WordRootRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WordRootRow(
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}word'],
+      )!,
+      root: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}root'],
+      ),
+      lemma: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lemma'],
+      ),
+      pos: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pos'],
+      )!,
+    );
+  }
+
+  @override
+  $WordRootTable createAlias(String alias) {
+    return $WordRootTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class WordRootRow extends DataClass implements Insertable<WordRootRow> {
+  final int surah;
+  final int ayah;
+  final int word;
+
+  /// Arabic letters separated by spaces, as the corpus shows them
+  /// («ر ح م»); null for words without a root.
+  final String? root;
+  final String? lemma;
+
+  /// The corpus's part-of-speech tag (N, V, PN, ADJ, ...).
+  final String pos;
+  const WordRootRow({
+    required this.surah,
+    required this.ayah,
+    required this.word,
+    this.root,
+    this.lemma,
+    required this.pos,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['word'] = Variable<int>(word);
+    if (!nullToAbsent || root != null) {
+      map['root'] = Variable<String>(root);
+    }
+    if (!nullToAbsent || lemma != null) {
+      map['lemma'] = Variable<String>(lemma);
+    }
+    map['pos'] = Variable<String>(pos);
+    return map;
+  }
+
+  WordRootCompanion toCompanion(bool nullToAbsent) {
+    return WordRootCompanion(
+      surah: Value(surah),
+      ayah: Value(ayah),
+      word: Value(word),
+      root: root == null && nullToAbsent ? const Value.absent() : Value(root),
+      lemma: lemma == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lemma),
+      pos: Value(pos),
+    );
+  }
+
+  factory WordRootRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WordRootRow(
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      word: serializer.fromJson<int>(json['word']),
+      root: serializer.fromJson<String?>(json['root']),
+      lemma: serializer.fromJson<String?>(json['lemma']),
+      pos: serializer.fromJson<String>(json['pos']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'word': serializer.toJson<int>(word),
+      'root': serializer.toJson<String?>(root),
+      'lemma': serializer.toJson<String?>(lemma),
+      'pos': serializer.toJson<String>(pos),
+    };
+  }
+
+  WordRootRow copyWith({
+    int? surah,
+    int? ayah,
+    int? word,
+    Value<String?> root = const Value.absent(),
+    Value<String?> lemma = const Value.absent(),
+    String? pos,
+  }) => WordRootRow(
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    word: word ?? this.word,
+    root: root.present ? root.value : this.root,
+    lemma: lemma.present ? lemma.value : this.lemma,
+    pos: pos ?? this.pos,
+  );
+  WordRootRow copyWithCompanion(WordRootCompanion data) {
+    return WordRootRow(
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      word: data.word.present ? data.word.value : this.word,
+      root: data.root.present ? data.root.value : this.root,
+      lemma: data.lemma.present ? data.lemma.value : this.lemma,
+      pos: data.pos.present ? data.pos.value : this.pos,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WordRootRow(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('root: $root, ')
+          ..write('lemma: $lemma, ')
+          ..write('pos: $pos')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(surah, ayah, word, root, lemma, pos);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WordRootRow &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.word == this.word &&
+          other.root == this.root &&
+          other.lemma == this.lemma &&
+          other.pos == this.pos);
+}
+
+class WordRootCompanion extends UpdateCompanion<WordRootRow> {
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> word;
+  final Value<String?> root;
+  final Value<String?> lemma;
+  final Value<String> pos;
+  const WordRootCompanion({
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.word = const Value.absent(),
+    this.root = const Value.absent(),
+    this.lemma = const Value.absent(),
+    this.pos = const Value.absent(),
+  });
+  WordRootCompanion.insert({
+    required int surah,
+    required int ayah,
+    required int word,
+    this.root = const Value.absent(),
+    this.lemma = const Value.absent(),
+    required String pos,
+  }) : surah = Value(surah),
+       ayah = Value(ayah),
+       word = Value(word),
+       pos = Value(pos);
+  static Insertable<WordRootRow> custom({
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? word,
+    Expression<String>? root,
+    Expression<String>? lemma,
+    Expression<String>? pos,
+  }) {
+    return RawValuesInsertable({
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (word != null) 'word': word,
+      if (root != null) 'root': root,
+      if (lemma != null) 'lemma': lemma,
+      if (pos != null) 'pos': pos,
+    });
+  }
+
+  WordRootCompanion copyWith({
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? word,
+    Value<String?>? root,
+    Value<String?>? lemma,
+    Value<String>? pos,
+  }) {
+    return WordRootCompanion(
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      word: word ?? this.word,
+      root: root ?? this.root,
+      lemma: lemma ?? this.lemma,
+      pos: pos ?? this.pos,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (word.present) {
+      map['word'] = Variable<int>(word.value);
+    }
+    if (root.present) {
+      map['root'] = Variable<String>(root.value);
+    }
+    if (lemma.present) {
+      map['lemma'] = Variable<String>(lemma.value);
+    }
+    if (pos.present) {
+      map['pos'] = Variable<String>(pos.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WordRootCompanion(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('word: $word, ')
+          ..write('root: $root, ')
+          ..write('lemma: $lemma, ')
+          ..write('pos: $pos')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $GharibTable extends Gharib with TableInfo<$GharibTable, GharibRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GharibTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _surahMeta = const VerificationMeta('surah');
+  @override
+  late final GeneratedColumn<int> surah = GeneratedColumn<int>(
+    'surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahMeta = const VerificationMeta('ayah');
+  @override
+  late final GeneratedColumn<int> ayah = GeneratedColumn<int>(
+    'ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ordMeta = const VerificationMeta('ord');
+  @override
+  late final GeneratedColumn<int> ord = GeneratedColumn<int>(
+    'ord',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordFromMeta = const VerificationMeta(
+    'wordFrom',
+  );
+  @override
+  late final GeneratedColumn<int> wordFrom = GeneratedColumn<int>(
+    'word_from',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _wordToMeta = const VerificationMeta('wordTo');
+  @override
+  late final GeneratedColumn<int> wordTo = GeneratedColumn<int>(
+    'word_to',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _phraseMeta = const VerificationMeta('phrase');
+  @override
+  late final GeneratedColumn<String> phrase = GeneratedColumn<String>(
+    'phrase',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    surah,
+    ayah,
+    ord,
+    wordFrom,
+    wordTo,
+    phrase,
+    body,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'gharib';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GharibRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('surah')) {
+      context.handle(
+        _surahMeta,
+        surah.isAcceptableOrUnknown(data['surah']!, _surahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_surahMeta);
+    }
+    if (data.containsKey('ayah')) {
+      context.handle(
+        _ayahMeta,
+        ayah.isAcceptableOrUnknown(data['ayah']!, _ayahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahMeta);
+    }
+    if (data.containsKey('ord')) {
+      context.handle(
+        _ordMeta,
+        ord.isAcceptableOrUnknown(data['ord']!, _ordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ordMeta);
+    }
+    if (data.containsKey('word_from')) {
+      context.handle(
+        _wordFromMeta,
+        wordFrom.isAcceptableOrUnknown(data['word_from']!, _wordFromMeta),
+      );
+    }
+    if (data.containsKey('word_to')) {
+      context.handle(
+        _wordToMeta,
+        wordTo.isAcceptableOrUnknown(data['word_to']!, _wordToMeta),
+      );
+    }
+    if (data.containsKey('phrase')) {
+      context.handle(
+        _phraseMeta,
+        phrase.isAcceptableOrUnknown(data['phrase']!, _phraseMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_phraseMeta);
+    }
+    if (data.containsKey('text')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['text']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {surah, ayah, ord};
+  @override
+  GharibRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GharibRow(
+      surah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah'],
+      )!,
+      ayah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah'],
+      )!,
+      ord: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ord'],
+      )!,
+      wordFrom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}word_from'],
+      ),
+      wordTo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}word_to'],
+      ),
+      phrase: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phrase'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text'],
+      )!,
+    );
+  }
+
+  @override
+  $GharibTable createAlias(String alias) {
+    return $GharibTable(attachedDatabase, alias);
+  }
+
+  @override
+  bool get withoutRowId => true;
+}
+
+class GharibRow extends DataClass implements Insertable<GharibRow> {
+  final int surah;
+  final int ayah;
+
+  /// Order of the entry within its verse, as in the book.
+  final int ord;
+  final int? wordFrom;
+  final int? wordTo;
+  final String phrase;
+  final String body;
+  const GharibRow({
+    required this.surah,
+    required this.ayah,
+    required this.ord,
+    this.wordFrom,
+    this.wordTo,
+    required this.phrase,
+    required this.body,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['surah'] = Variable<int>(surah);
+    map['ayah'] = Variable<int>(ayah);
+    map['ord'] = Variable<int>(ord);
+    if (!nullToAbsent || wordFrom != null) {
+      map['word_from'] = Variable<int>(wordFrom);
+    }
+    if (!nullToAbsent || wordTo != null) {
+      map['word_to'] = Variable<int>(wordTo);
+    }
+    map['phrase'] = Variable<String>(phrase);
+    map['text'] = Variable<String>(body);
+    return map;
+  }
+
+  GharibCompanion toCompanion(bool nullToAbsent) {
+    return GharibCompanion(
+      surah: Value(surah),
+      ayah: Value(ayah),
+      ord: Value(ord),
+      wordFrom: wordFrom == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wordFrom),
+      wordTo: wordTo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(wordTo),
+      phrase: Value(phrase),
+      body: Value(body),
+    );
+  }
+
+  factory GharibRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GharibRow(
+      surah: serializer.fromJson<int>(json['surah']),
+      ayah: serializer.fromJson<int>(json['ayah']),
+      ord: serializer.fromJson<int>(json['ord']),
+      wordFrom: serializer.fromJson<int?>(json['wordFrom']),
+      wordTo: serializer.fromJson<int?>(json['wordTo']),
+      phrase: serializer.fromJson<String>(json['phrase']),
+      body: serializer.fromJson<String>(json['body']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'surah': serializer.toJson<int>(surah),
+      'ayah': serializer.toJson<int>(ayah),
+      'ord': serializer.toJson<int>(ord),
+      'wordFrom': serializer.toJson<int?>(wordFrom),
+      'wordTo': serializer.toJson<int?>(wordTo),
+      'phrase': serializer.toJson<String>(phrase),
+      'body': serializer.toJson<String>(body),
+    };
+  }
+
+  GharibRow copyWith({
+    int? surah,
+    int? ayah,
+    int? ord,
+    Value<int?> wordFrom = const Value.absent(),
+    Value<int?> wordTo = const Value.absent(),
+    String? phrase,
+    String? body,
+  }) => GharibRow(
+    surah: surah ?? this.surah,
+    ayah: ayah ?? this.ayah,
+    ord: ord ?? this.ord,
+    wordFrom: wordFrom.present ? wordFrom.value : this.wordFrom,
+    wordTo: wordTo.present ? wordTo.value : this.wordTo,
+    phrase: phrase ?? this.phrase,
+    body: body ?? this.body,
+  );
+  GharibRow copyWithCompanion(GharibCompanion data) {
+    return GharibRow(
+      surah: data.surah.present ? data.surah.value : this.surah,
+      ayah: data.ayah.present ? data.ayah.value : this.ayah,
+      ord: data.ord.present ? data.ord.value : this.ord,
+      wordFrom: data.wordFrom.present ? data.wordFrom.value : this.wordFrom,
+      wordTo: data.wordTo.present ? data.wordTo.value : this.wordTo,
+      phrase: data.phrase.present ? data.phrase.value : this.phrase,
+      body: data.body.present ? data.body.value : this.body,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GharibRow(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('ord: $ord, ')
+          ..write('wordFrom: $wordFrom, ')
+          ..write('wordTo: $wordTo, ')
+          ..write('phrase: $phrase, ')
+          ..write('body: $body')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(surah, ayah, ord, wordFrom, wordTo, phrase, body);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GharibRow &&
+          other.surah == this.surah &&
+          other.ayah == this.ayah &&
+          other.ord == this.ord &&
+          other.wordFrom == this.wordFrom &&
+          other.wordTo == this.wordTo &&
+          other.phrase == this.phrase &&
+          other.body == this.body);
+}
+
+class GharibCompanion extends UpdateCompanion<GharibRow> {
+  final Value<int> surah;
+  final Value<int> ayah;
+  final Value<int> ord;
+  final Value<int?> wordFrom;
+  final Value<int?> wordTo;
+  final Value<String> phrase;
+  final Value<String> body;
+  const GharibCompanion({
+    this.surah = const Value.absent(),
+    this.ayah = const Value.absent(),
+    this.ord = const Value.absent(),
+    this.wordFrom = const Value.absent(),
+    this.wordTo = const Value.absent(),
+    this.phrase = const Value.absent(),
+    this.body = const Value.absent(),
+  });
+  GharibCompanion.insert({
+    required int surah,
+    required int ayah,
+    required int ord,
+    this.wordFrom = const Value.absent(),
+    this.wordTo = const Value.absent(),
+    required String phrase,
+    required String body,
+  }) : surah = Value(surah),
+       ayah = Value(ayah),
+       ord = Value(ord),
+       phrase = Value(phrase),
+       body = Value(body);
+  static Insertable<GharibRow> custom({
+    Expression<int>? surah,
+    Expression<int>? ayah,
+    Expression<int>? ord,
+    Expression<int>? wordFrom,
+    Expression<int>? wordTo,
+    Expression<String>? phrase,
+    Expression<String>? body,
+  }) {
+    return RawValuesInsertable({
+      if (surah != null) 'surah': surah,
+      if (ayah != null) 'ayah': ayah,
+      if (ord != null) 'ord': ord,
+      if (wordFrom != null) 'word_from': wordFrom,
+      if (wordTo != null) 'word_to': wordTo,
+      if (phrase != null) 'phrase': phrase,
+      if (body != null) 'text': body,
+    });
+  }
+
+  GharibCompanion copyWith({
+    Value<int>? surah,
+    Value<int>? ayah,
+    Value<int>? ord,
+    Value<int?>? wordFrom,
+    Value<int?>? wordTo,
+    Value<String>? phrase,
+    Value<String>? body,
+  }) {
+    return GharibCompanion(
+      surah: surah ?? this.surah,
+      ayah: ayah ?? this.ayah,
+      ord: ord ?? this.ord,
+      wordFrom: wordFrom ?? this.wordFrom,
+      wordTo: wordTo ?? this.wordTo,
+      phrase: phrase ?? this.phrase,
+      body: body ?? this.body,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (surah.present) {
+      map['surah'] = Variable<int>(surah.value);
+    }
+    if (ayah.present) {
+      map['ayah'] = Variable<int>(ayah.value);
+    }
+    if (ord.present) {
+      map['ord'] = Variable<int>(ord.value);
+    }
+    if (wordFrom.present) {
+      map['word_from'] = Variable<int>(wordFrom.value);
+    }
+    if (wordTo.present) {
+      map['word_to'] = Variable<int>(wordTo.value);
+    }
+    if (phrase.present) {
+      map['phrase'] = Variable<String>(phrase.value);
+    }
+    if (body.present) {
+      map['text'] = Variable<String>(body.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GharibCompanion(')
+          ..write('surah: $surah, ')
+          ..write('ayah: $ayah, ')
+          ..write('ord: $ord, ')
+          ..write('wordFrom: $wordFrom, ')
+          ..write('wordTo: $wordTo, ')
+          ..write('phrase: $phrase, ')
+          ..write('body: $body')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MutashabihTable extends Mutashabih
+    with TableInfo<$MutashabihTable, MutashabihRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MutashabihTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _srcFromMeta = const VerificationMeta(
+    'srcFrom',
+  );
+  @override
+  late final GeneratedColumn<int> srcFrom = GeneratedColumn<int>(
+    'src_from',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _srcToMeta = const VerificationMeta('srcTo');
+  @override
+  late final GeneratedColumn<int> srcTo = GeneratedColumn<int>(
+    'src_to',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mutFromMeta = const VerificationMeta(
+    'mutFrom',
+  );
+  @override
+  late final GeneratedColumn<int> mutFrom = GeneratedColumn<int>(
+    'mut_from',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mutToMeta = const VerificationMeta('mutTo');
+  @override
+  late final GeneratedColumn<int> mutTo = GeneratedColumn<int>(
+    'mut_to',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contextMeta = const VerificationMeta(
+    'context',
+  );
+  @override
+  late final GeneratedColumn<int> context = GeneratedColumn<int>(
+    'context',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceIdMeta = const VerificationMeta(
+    'sourceId',
+  );
+  @override
+  late final GeneratedColumn<int> sourceId = GeneratedColumn<int>(
+    'source_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    srcFrom,
+    srcTo,
+    mutFrom,
+    mutTo,
+    context,
+    sourceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mutashabih';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MutashabihRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('src_from')) {
+      context.handle(
+        _srcFromMeta,
+        srcFrom.isAcceptableOrUnknown(data['src_from']!, _srcFromMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_srcFromMeta);
+    }
+    if (data.containsKey('src_to')) {
+      context.handle(
+        _srcToMeta,
+        srcTo.isAcceptableOrUnknown(data['src_to']!, _srcToMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_srcToMeta);
+    }
+    if (data.containsKey('mut_from')) {
+      context.handle(
+        _mutFromMeta,
+        mutFrom.isAcceptableOrUnknown(data['mut_from']!, _mutFromMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mutFromMeta);
+    }
+    if (data.containsKey('mut_to')) {
+      context.handle(
+        _mutToMeta,
+        mutTo.isAcceptableOrUnknown(data['mut_to']!, _mutToMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mutToMeta);
+    }
+    if (data.containsKey('context')) {
+      context.handle(
+        _contextMeta,
+        this.context.isAcceptableOrUnknown(data['context']!, _contextMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_contextMeta);
+    }
+    if (data.containsKey('source_id')) {
+      context.handle(
+        _sourceIdMeta,
+        sourceId.isAcceptableOrUnknown(data['source_id']!, _sourceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MutashabihRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MutashabihRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      srcFrom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}src_from'],
+      )!,
+      srcTo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}src_to'],
+      )!,
+      mutFrom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mut_from'],
+      )!,
+      mutTo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}mut_to'],
+      )!,
+      context: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}context'],
+      )!,
+      sourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_id'],
+      )!,
+    );
+  }
+
+  @override
+  $MutashabihTable createAlias(String alias) {
+    return $MutashabihTable(attachedDatabase, alias);
+  }
+}
+
+class MutashabihRow extends DataClass implements Insertable<MutashabihRow> {
+  final int id;
+  final int srcFrom;
+  final int srcTo;
+  final int mutFrom;
+  final int mutTo;
+
+  /// 1 when the start of the following verse tells the passages apart.
+  final int context;
+  final int sourceId;
+  const MutashabihRow({
+    required this.id,
+    required this.srcFrom,
+    required this.srcTo,
+    required this.mutFrom,
+    required this.mutTo,
+    required this.context,
+    required this.sourceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['src_from'] = Variable<int>(srcFrom);
+    map['src_to'] = Variable<int>(srcTo);
+    map['mut_from'] = Variable<int>(mutFrom);
+    map['mut_to'] = Variable<int>(mutTo);
+    map['context'] = Variable<int>(context);
+    map['source_id'] = Variable<int>(sourceId);
+    return map;
+  }
+
+  MutashabihCompanion toCompanion(bool nullToAbsent) {
+    return MutashabihCompanion(
+      id: Value(id),
+      srcFrom: Value(srcFrom),
+      srcTo: Value(srcTo),
+      mutFrom: Value(mutFrom),
+      mutTo: Value(mutTo),
+      context: Value(context),
+      sourceId: Value(sourceId),
+    );
+  }
+
+  factory MutashabihRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MutashabihRow(
+      id: serializer.fromJson<int>(json['id']),
+      srcFrom: serializer.fromJson<int>(json['srcFrom']),
+      srcTo: serializer.fromJson<int>(json['srcTo']),
+      mutFrom: serializer.fromJson<int>(json['mutFrom']),
+      mutTo: serializer.fromJson<int>(json['mutTo']),
+      context: serializer.fromJson<int>(json['context']),
+      sourceId: serializer.fromJson<int>(json['sourceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'srcFrom': serializer.toJson<int>(srcFrom),
+      'srcTo': serializer.toJson<int>(srcTo),
+      'mutFrom': serializer.toJson<int>(mutFrom),
+      'mutTo': serializer.toJson<int>(mutTo),
+      'context': serializer.toJson<int>(context),
+      'sourceId': serializer.toJson<int>(sourceId),
+    };
+  }
+
+  MutashabihRow copyWith({
+    int? id,
+    int? srcFrom,
+    int? srcTo,
+    int? mutFrom,
+    int? mutTo,
+    int? context,
+    int? sourceId,
+  }) => MutashabihRow(
+    id: id ?? this.id,
+    srcFrom: srcFrom ?? this.srcFrom,
+    srcTo: srcTo ?? this.srcTo,
+    mutFrom: mutFrom ?? this.mutFrom,
+    mutTo: mutTo ?? this.mutTo,
+    context: context ?? this.context,
+    sourceId: sourceId ?? this.sourceId,
+  );
+  MutashabihRow copyWithCompanion(MutashabihCompanion data) {
+    return MutashabihRow(
+      id: data.id.present ? data.id.value : this.id,
+      srcFrom: data.srcFrom.present ? data.srcFrom.value : this.srcFrom,
+      srcTo: data.srcTo.present ? data.srcTo.value : this.srcTo,
+      mutFrom: data.mutFrom.present ? data.mutFrom.value : this.mutFrom,
+      mutTo: data.mutTo.present ? data.mutTo.value : this.mutTo,
+      context: data.context.present ? data.context.value : this.context,
+      sourceId: data.sourceId.present ? data.sourceId.value : this.sourceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MutashabihRow(')
+          ..write('id: $id, ')
+          ..write('srcFrom: $srcFrom, ')
+          ..write('srcTo: $srcTo, ')
+          ..write('mutFrom: $mutFrom, ')
+          ..write('mutTo: $mutTo, ')
+          ..write('context: $context, ')
+          ..write('sourceId: $sourceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, srcFrom, srcTo, mutFrom, mutTo, context, sourceId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MutashabihRow &&
+          other.id == this.id &&
+          other.srcFrom == this.srcFrom &&
+          other.srcTo == this.srcTo &&
+          other.mutFrom == this.mutFrom &&
+          other.mutTo == this.mutTo &&
+          other.context == this.context &&
+          other.sourceId == this.sourceId);
+}
+
+class MutashabihCompanion extends UpdateCompanion<MutashabihRow> {
+  final Value<int> id;
+  final Value<int> srcFrom;
+  final Value<int> srcTo;
+  final Value<int> mutFrom;
+  final Value<int> mutTo;
+  final Value<int> context;
+  final Value<int> sourceId;
+  const MutashabihCompanion({
+    this.id = const Value.absent(),
+    this.srcFrom = const Value.absent(),
+    this.srcTo = const Value.absent(),
+    this.mutFrom = const Value.absent(),
+    this.mutTo = const Value.absent(),
+    this.context = const Value.absent(),
+    this.sourceId = const Value.absent(),
+  });
+  MutashabihCompanion.insert({
+    this.id = const Value.absent(),
+    required int srcFrom,
+    required int srcTo,
+    required int mutFrom,
+    required int mutTo,
+    required int context,
+    required int sourceId,
+  }) : srcFrom = Value(srcFrom),
+       srcTo = Value(srcTo),
+       mutFrom = Value(mutFrom),
+       mutTo = Value(mutTo),
+       context = Value(context),
+       sourceId = Value(sourceId);
+  static Insertable<MutashabihRow> custom({
+    Expression<int>? id,
+    Expression<int>? srcFrom,
+    Expression<int>? srcTo,
+    Expression<int>? mutFrom,
+    Expression<int>? mutTo,
+    Expression<int>? context,
+    Expression<int>? sourceId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (srcFrom != null) 'src_from': srcFrom,
+      if (srcTo != null) 'src_to': srcTo,
+      if (mutFrom != null) 'mut_from': mutFrom,
+      if (mutTo != null) 'mut_to': mutTo,
+      if (context != null) 'context': context,
+      if (sourceId != null) 'source_id': sourceId,
+    });
+  }
+
+  MutashabihCompanion copyWith({
+    Value<int>? id,
+    Value<int>? srcFrom,
+    Value<int>? srcTo,
+    Value<int>? mutFrom,
+    Value<int>? mutTo,
+    Value<int>? context,
+    Value<int>? sourceId,
+  }) {
+    return MutashabihCompanion(
+      id: id ?? this.id,
+      srcFrom: srcFrom ?? this.srcFrom,
+      srcTo: srcTo ?? this.srcTo,
+      mutFrom: mutFrom ?? this.mutFrom,
+      mutTo: mutTo ?? this.mutTo,
+      context: context ?? this.context,
+      sourceId: sourceId ?? this.sourceId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (srcFrom.present) {
+      map['src_from'] = Variable<int>(srcFrom.value);
+    }
+    if (srcTo.present) {
+      map['src_to'] = Variable<int>(srcTo.value);
+    }
+    if (mutFrom.present) {
+      map['mut_from'] = Variable<int>(mutFrom.value);
+    }
+    if (mutTo.present) {
+      map['mut_to'] = Variable<int>(mutTo.value);
+    }
+    if (context.present) {
+      map['context'] = Variable<int>(context.value);
+    }
+    if (sourceId.present) {
+      map['source_id'] = Variable<int>(sourceId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MutashabihCompanion(')
+          ..write('id: $id, ')
+          ..write('srcFrom: $srcFrom, ')
+          ..write('srcTo: $srcTo, ')
+          ..write('mutFrom: $mutFrom, ')
+          ..write('mutTo: $mutTo, ')
+          ..write('context: $context, ')
+          ..write('sourceId: $sourceId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ContentDatabase extends GeneratedDatabase {
   _$ContentDatabase(QueryExecutor e) : super(e);
   $ContentDatabaseManager get managers => $ContentDatabaseManager(this);
@@ -9675,6 +11415,11 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
   late final $ShamarlyWordBoxTable shamarlyWordBox = $ShamarlyWordBoxTable(
     this,
   );
+  late final $ShamarlyCatchwordTable shamarlyCatchword =
+      $ShamarlyCatchwordTable(this);
+  late final $WordRootTable wordRoot = $WordRootTable(this);
+  late final $GharibTable gharib = $GharibTable(this);
+  late final $MutashabihTable mutashabih = $MutashabihTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9701,6 +11446,10 @@ abstract class _$ContentDatabase extends GeneratedDatabase {
     shamarlyMarker,
     shamarlyVerseBox,
     shamarlyWordBox,
+    shamarlyCatchword,
+    wordRoot,
+    gharib,
+    mutashabih,
   ];
 }
 
@@ -12382,6 +14131,7 @@ typedef $$ReciterTableCreateCompanionBuilder = ReciterCompanion Function({
   required String style,
   required String folderUrl,
   required int sourceId,
+  Value<String> riwaya,
 });
 typedef $$ReciterTableUpdateCompanionBuilder = ReciterCompanion Function({
   Value<int> id,
@@ -12390,6 +14140,7 @@ typedef $$ReciterTableUpdateCompanionBuilder = ReciterCompanion Function({
   Value<String> style,
   Value<String> folderUrl,
   Value<int> sourceId,
+  Value<String> riwaya,
 });
 
 class $$ReciterTableFilterComposer
@@ -12428,6 +14179,11 @@ class $$ReciterTableFilterComposer
 
   ColumnFilters<int> get sourceId => $composableBuilder(
     column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get riwaya => $composableBuilder(
+    column: $table.riwaya,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -12470,6 +14226,11 @@ class $$ReciterTableOrderingComposer
     column: $table.sourceId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get riwaya => $composableBuilder(
+    column: $table.riwaya,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ReciterTableAnnotationComposer
@@ -12498,6 +14259,9 @@ class $$ReciterTableAnnotationComposer
 
   GeneratedColumn<int> get sourceId =>
       $composableBuilder(column: $table.sourceId, builder: (column) => column);
+
+  GeneratedColumn<String> get riwaya =>
+      $composableBuilder(column: $table.riwaya, builder: (column) => column);
 }
 
 class $$ReciterTableTableManager
@@ -12537,6 +14301,7 @@ class $$ReciterTableTableManager
                 Value<String> style = const Value.absent(),
                 Value<String> folderUrl = const Value.absent(),
                 Value<int> sourceId = const Value.absent(),
+                Value<String> riwaya = const Value.absent(),
               }) => ReciterCompanion(
                 id: id,
                 nameAr: nameAr,
@@ -12544,6 +14309,7 @@ class $$ReciterTableTableManager
                 style: style,
                 folderUrl: folderUrl,
                 sourceId: sourceId,
+                riwaya: riwaya,
               ),
           createCompanionCallback:
               ({
@@ -12553,6 +14319,7 @@ class $$ReciterTableTableManager
                 required String style,
                 required String folderUrl,
                 required int sourceId,
+                Value<String> riwaya = const Value.absent(),
               }) => ReciterCompanion.insert(
                 id: id,
                 nameAr: nameAr,
@@ -12560,6 +14327,7 @@ class $$ReciterTableTableManager
                 style: style,
                 folderUrl: folderUrl,
                 sourceId: sourceId,
+                riwaya: riwaya,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -15020,6 +16788,957 @@ typedef $$ShamarlyWordBoxTableProcessedTableManager =
       ShamarlyWordBoxRow,
       PrefetchHooks Function()
     >;
+typedef $$ShamarlyCatchwordTableCreateCompanionBuilder =
+    ShamarlyCatchwordCompanion Function({
+      Value<int> page,
+      required int x0,
+      required int y0,
+      required int x1,
+      required int y1,
+      required int words,
+      required String erase,
+    });
+typedef $$ShamarlyCatchwordTableUpdateCompanionBuilder =
+    ShamarlyCatchwordCompanion Function({
+      Value<int> page,
+      Value<int> x0,
+      Value<int> y0,
+      Value<int> x1,
+      Value<int> y1,
+      Value<int> words,
+      Value<String> erase,
+    });
+
+class $$ShamarlyCatchwordTableFilterComposer
+    extends Composer<_$ContentDatabase, $ShamarlyCatchwordTable> {
+  $$ShamarlyCatchwordTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get words => $composableBuilder(
+    column: $table.words,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get erase => $composableBuilder(
+    column: $table.erase,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ShamarlyCatchwordTableOrderingComposer
+    extends Composer<_$ContentDatabase, $ShamarlyCatchwordTable> {
+  $$ShamarlyCatchwordTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x0 => $composableBuilder(
+    column: $table.x0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y0 => $composableBuilder(
+    column: $table.y0,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get x1 => $composableBuilder(
+    column: $table.x1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get y1 => $composableBuilder(
+    column: $table.y1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get words => $composableBuilder(
+    column: $table.words,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get erase => $composableBuilder(
+    column: $table.erase,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ShamarlyCatchwordTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $ShamarlyCatchwordTable> {
+  $$ShamarlyCatchwordTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+
+  GeneratedColumn<int> get x0 =>
+      $composableBuilder(column: $table.x0, builder: (column) => column);
+
+  GeneratedColumn<int> get y0 =>
+      $composableBuilder(column: $table.y0, builder: (column) => column);
+
+  GeneratedColumn<int> get x1 =>
+      $composableBuilder(column: $table.x1, builder: (column) => column);
+
+  GeneratedColumn<int> get y1 =>
+      $composableBuilder(column: $table.y1, builder: (column) => column);
+
+  GeneratedColumn<int> get words =>
+      $composableBuilder(column: $table.words, builder: (column) => column);
+
+  GeneratedColumn<String> get erase =>
+      $composableBuilder(column: $table.erase, builder: (column) => column);
+}
+
+class $$ShamarlyCatchwordTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $ShamarlyCatchwordTable,
+          ShamarlyCatchwordRow,
+          $$ShamarlyCatchwordTableFilterComposer,
+          $$ShamarlyCatchwordTableOrderingComposer,
+          $$ShamarlyCatchwordTableAnnotationComposer,
+          $$ShamarlyCatchwordTableCreateCompanionBuilder,
+          $$ShamarlyCatchwordTableUpdateCompanionBuilder,
+          (
+            ShamarlyCatchwordRow,
+            BaseReferences<
+              _$ContentDatabase,
+              $ShamarlyCatchwordTable,
+              ShamarlyCatchwordRow
+            >,
+          ),
+          ShamarlyCatchwordRow,
+          PrefetchHooks Function()
+        > {
+  $$ShamarlyCatchwordTableTableManager(
+    _$ContentDatabase db,
+    $ShamarlyCatchwordTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShamarlyCatchwordTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShamarlyCatchwordTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShamarlyCatchwordTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                Value<int> x0 = const Value.absent(),
+                Value<int> y0 = const Value.absent(),
+                Value<int> x1 = const Value.absent(),
+                Value<int> y1 = const Value.absent(),
+                Value<int> words = const Value.absent(),
+                Value<String> erase = const Value.absent(),
+              }) => ShamarlyCatchwordCompanion(
+                page: page,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                words: words,
+                erase: erase,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> page = const Value.absent(),
+                required int x0,
+                required int y0,
+                required int x1,
+                required int y1,
+                required int words,
+                required String erase,
+              }) => ShamarlyCatchwordCompanion.insert(
+                page: page,
+                x0: x0,
+                y0: y0,
+                x1: x1,
+                y1: y1,
+                words: words,
+                erase: erase,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ShamarlyCatchwordTable, ShamarlyCatchwordRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $ShamarlyCatchwordTable,
+                    ShamarlyCatchwordRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ShamarlyCatchwordTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $ShamarlyCatchwordTable,
+      ShamarlyCatchwordRow,
+      $$ShamarlyCatchwordTableFilterComposer,
+      $$ShamarlyCatchwordTableOrderingComposer,
+      $$ShamarlyCatchwordTableAnnotationComposer,
+      $$ShamarlyCatchwordTableCreateCompanionBuilder,
+      $$ShamarlyCatchwordTableUpdateCompanionBuilder,
+      (
+        ShamarlyCatchwordRow,
+        BaseReferences<
+          _$ContentDatabase,
+          $ShamarlyCatchwordTable,
+          ShamarlyCatchwordRow
+        >,
+      ),
+      ShamarlyCatchwordRow,
+      PrefetchHooks Function()
+    >;
+typedef $$WordRootTableCreateCompanionBuilder = WordRootCompanion Function({
+  required int surah,
+  required int ayah,
+  required int word,
+  Value<String?> root,
+  Value<String?> lemma,
+  required String pos,
+});
+typedef $$WordRootTableUpdateCompanionBuilder = WordRootCompanion Function({
+  Value<int> surah,
+  Value<int> ayah,
+  Value<int> word,
+  Value<String?> root,
+  Value<String?> lemma,
+  Value<String> pos,
+});
+
+class $$WordRootTableFilterComposer
+    extends Composer<_$ContentDatabase, $WordRootTable> {
+  $$WordRootTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get root => $composableBuilder(
+    column: $table.root,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lemma => $composableBuilder(
+    column: $table.lemma,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pos => $composableBuilder(
+    column: $table.pos,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WordRootTableOrderingComposer
+    extends Composer<_$ContentDatabase, $WordRootTable> {
+  $$WordRootTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get root => $composableBuilder(
+    column: $table.root,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lemma => $composableBuilder(
+    column: $table.lemma,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pos => $composableBuilder(
+    column: $table.pos,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WordRootTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $WordRootTable> {
+  $$WordRootTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get word =>
+      $composableBuilder(column: $table.word, builder: (column) => column);
+
+  GeneratedColumn<String> get root =>
+      $composableBuilder(column: $table.root, builder: (column) => column);
+
+  GeneratedColumn<String> get lemma =>
+      $composableBuilder(column: $table.lemma, builder: (column) => column);
+
+  GeneratedColumn<String> get pos =>
+      $composableBuilder(column: $table.pos, builder: (column) => column);
+}
+
+class $$WordRootTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $WordRootTable,
+          WordRootRow,
+          $$WordRootTableFilterComposer,
+          $$WordRootTableOrderingComposer,
+          $$WordRootTableAnnotationComposer,
+          $$WordRootTableCreateCompanionBuilder,
+          $$WordRootTableUpdateCompanionBuilder,
+          (
+            WordRootRow,
+            BaseReferences<_$ContentDatabase, $WordRootTable, WordRootRow>,
+          ),
+          WordRootRow,
+          PrefetchHooks Function()
+        > {
+  $$WordRootTableTableManager(_$ContentDatabase db, $WordRootTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WordRootTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WordRootTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WordRootTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> word = const Value.absent(),
+                Value<String?> root = const Value.absent(),
+                Value<String?> lemma = const Value.absent(),
+                Value<String> pos = const Value.absent(),
+              }) => WordRootCompanion(
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                root: root,
+                lemma: lemma,
+                pos: pos,
+              ),
+          createCompanionCallback:
+              ({
+                required int surah,
+                required int ayah,
+                required int word,
+                Value<String?> root = const Value.absent(),
+                Value<String?> lemma = const Value.absent(),
+                required String pos,
+              }) => WordRootCompanion.insert(
+                surah: surah,
+                ayah: ayah,
+                word: word,
+                root: root,
+                lemma: lemma,
+                pos: pos,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$WordRootTable, WordRootRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $WordRootTable,
+                    WordRootRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WordRootTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $WordRootTable,
+      WordRootRow,
+      $$WordRootTableFilterComposer,
+      $$WordRootTableOrderingComposer,
+      $$WordRootTableAnnotationComposer,
+      $$WordRootTableCreateCompanionBuilder,
+      $$WordRootTableUpdateCompanionBuilder,
+      (
+        WordRootRow,
+        BaseReferences<_$ContentDatabase, $WordRootTable, WordRootRow>,
+      ),
+      WordRootRow,
+      PrefetchHooks Function()
+    >;
+typedef $$GharibTableCreateCompanionBuilder = GharibCompanion Function({
+  required int surah,
+  required int ayah,
+  required int ord,
+  Value<int?> wordFrom,
+  Value<int?> wordTo,
+  required String phrase,
+  required String body,
+});
+typedef $$GharibTableUpdateCompanionBuilder = GharibCompanion Function({
+  Value<int> surah,
+  Value<int> ayah,
+  Value<int> ord,
+  Value<int?> wordFrom,
+  Value<int?> wordTo,
+  Value<String> phrase,
+  Value<String> body,
+});
+
+class $$GharibTableFilterComposer
+    extends Composer<_$ContentDatabase, $GharibTable> {
+  $$GharibTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ord => $composableBuilder(
+    column: $table.ord,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wordFrom => $composableBuilder(
+    column: $table.wordFrom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wordTo => $composableBuilder(
+    column: $table.wordTo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get phrase => $composableBuilder(
+    column: $table.phrase,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$GharibTableOrderingComposer
+    extends Composer<_$ContentDatabase, $GharibTable> {
+  $$GharibTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surah => $composableBuilder(
+    column: $table.surah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayah => $composableBuilder(
+    column: $table.ayah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ord => $composableBuilder(
+    column: $table.ord,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get wordFrom => $composableBuilder(
+    column: $table.wordFrom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get wordTo => $composableBuilder(
+    column: $table.wordTo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phrase => $composableBuilder(
+    column: $table.phrase,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$GharibTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $GharibTable> {
+  $$GharibTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surah =>
+      $composableBuilder(column: $table.surah, builder: (column) => column);
+
+  GeneratedColumn<int> get ayah =>
+      $composableBuilder(column: $table.ayah, builder: (column) => column);
+
+  GeneratedColumn<int> get ord =>
+      $composableBuilder(column: $table.ord, builder: (column) => column);
+
+  GeneratedColumn<int> get wordFrom =>
+      $composableBuilder(column: $table.wordFrom, builder: (column) => column);
+
+  GeneratedColumn<int> get wordTo =>
+      $composableBuilder(column: $table.wordTo, builder: (column) => column);
+
+  GeneratedColumn<String> get phrase =>
+      $composableBuilder(column: $table.phrase, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+}
+
+class $$GharibTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $GharibTable,
+          GharibRow,
+          $$GharibTableFilterComposer,
+          $$GharibTableOrderingComposer,
+          $$GharibTableAnnotationComposer,
+          $$GharibTableCreateCompanionBuilder,
+          $$GharibTableUpdateCompanionBuilder,
+          (
+            GharibRow,
+            BaseReferences<_$ContentDatabase, $GharibTable, GharibRow>,
+          ),
+          GharibRow,
+          PrefetchHooks Function()
+        > {
+  $$GharibTableTableManager(_$ContentDatabase db, $GharibTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GharibTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GharibTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GharibTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> surah = const Value.absent(),
+                Value<int> ayah = const Value.absent(),
+                Value<int> ord = const Value.absent(),
+                Value<int?> wordFrom = const Value.absent(),
+                Value<int?> wordTo = const Value.absent(),
+                Value<String> phrase = const Value.absent(),
+                Value<String> body = const Value.absent(),
+              }) => GharibCompanion(
+                surah: surah,
+                ayah: ayah,
+                ord: ord,
+                wordFrom: wordFrom,
+                wordTo: wordTo,
+                phrase: phrase,
+                body: body,
+              ),
+          createCompanionCallback:
+              ({
+                required int surah,
+                required int ayah,
+                required int ord,
+                Value<int?> wordFrom = const Value.absent(),
+                Value<int?> wordTo = const Value.absent(),
+                required String phrase,
+                required String body,
+              }) => GharibCompanion.insert(
+                surah: surah,
+                ayah: ayah,
+                ord: ord,
+                wordFrom: wordFrom,
+                wordTo: wordTo,
+                phrase: phrase,
+                body: body,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$GharibTable, GharibRow>(table),
+                  BaseReferences<_$ContentDatabase, $GharibTable, GharibRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$GharibTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $GharibTable,
+      GharibRow,
+      $$GharibTableFilterComposer,
+      $$GharibTableOrderingComposer,
+      $$GharibTableAnnotationComposer,
+      $$GharibTableCreateCompanionBuilder,
+      $$GharibTableUpdateCompanionBuilder,
+      (GharibRow, BaseReferences<_$ContentDatabase, $GharibTable, GharibRow>),
+      GharibRow,
+      PrefetchHooks Function()
+    >;
+typedef $$MutashabihTableCreateCompanionBuilder = MutashabihCompanion Function({
+  Value<int> id,
+  required int srcFrom,
+  required int srcTo,
+  required int mutFrom,
+  required int mutTo,
+  required int context,
+  required int sourceId,
+});
+typedef $$MutashabihTableUpdateCompanionBuilder = MutashabihCompanion Function({
+  Value<int> id,
+  Value<int> srcFrom,
+  Value<int> srcTo,
+  Value<int> mutFrom,
+  Value<int> mutTo,
+  Value<int> context,
+  Value<int> sourceId,
+});
+
+class $$MutashabihTableFilterComposer
+    extends Composer<_$ContentDatabase, $MutashabihTable> {
+  $$MutashabihTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get srcFrom => $composableBuilder(
+    column: $table.srcFrom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get srcTo => $composableBuilder(
+    column: $table.srcTo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mutFrom => $composableBuilder(
+    column: $table.mutFrom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mutTo => $composableBuilder(
+    column: $table.mutTo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get context => $composableBuilder(
+    column: $table.context,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MutashabihTableOrderingComposer
+    extends Composer<_$ContentDatabase, $MutashabihTable> {
+  $$MutashabihTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get srcFrom => $composableBuilder(
+    column: $table.srcFrom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get srcTo => $composableBuilder(
+    column: $table.srcTo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mutFrom => $composableBuilder(
+    column: $table.mutFrom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mutTo => $composableBuilder(
+    column: $table.mutTo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get context => $composableBuilder(
+    column: $table.context,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceId => $composableBuilder(
+    column: $table.sourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MutashabihTableAnnotationComposer
+    extends Composer<_$ContentDatabase, $MutashabihTable> {
+  $$MutashabihTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get srcFrom =>
+      $composableBuilder(column: $table.srcFrom, builder: (column) => column);
+
+  GeneratedColumn<int> get srcTo =>
+      $composableBuilder(column: $table.srcTo, builder: (column) => column);
+
+  GeneratedColumn<int> get mutFrom =>
+      $composableBuilder(column: $table.mutFrom, builder: (column) => column);
+
+  GeneratedColumn<int> get mutTo =>
+      $composableBuilder(column: $table.mutTo, builder: (column) => column);
+
+  GeneratedColumn<int> get context =>
+      $composableBuilder(column: $table.context, builder: (column) => column);
+
+  GeneratedColumn<int> get sourceId =>
+      $composableBuilder(column: $table.sourceId, builder: (column) => column);
+}
+
+class $$MutashabihTableTableManager
+    extends
+        RootTableManager<
+          _$ContentDatabase,
+          $MutashabihTable,
+          MutashabihRow,
+          $$MutashabihTableFilterComposer,
+          $$MutashabihTableOrderingComposer,
+          $$MutashabihTableAnnotationComposer,
+          $$MutashabihTableCreateCompanionBuilder,
+          $$MutashabihTableUpdateCompanionBuilder,
+          (
+            MutashabihRow,
+            BaseReferences<_$ContentDatabase, $MutashabihTable, MutashabihRow>,
+          ),
+          MutashabihRow,
+          PrefetchHooks Function()
+        > {
+  $$MutashabihTableTableManager(_$ContentDatabase db, $MutashabihTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MutashabihTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MutashabihTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MutashabihTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> srcFrom = const Value.absent(),
+                Value<int> srcTo = const Value.absent(),
+                Value<int> mutFrom = const Value.absent(),
+                Value<int> mutTo = const Value.absent(),
+                Value<int> context = const Value.absent(),
+                Value<int> sourceId = const Value.absent(),
+              }) => MutashabihCompanion(
+                id: id,
+                srcFrom: srcFrom,
+                srcTo: srcTo,
+                mutFrom: mutFrom,
+                mutTo: mutTo,
+                context: context,
+                sourceId: sourceId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int srcFrom,
+                required int srcTo,
+                required int mutFrom,
+                required int mutTo,
+                required int context,
+                required int sourceId,
+              }) => MutashabihCompanion.insert(
+                id: id,
+                srcFrom: srcFrom,
+                srcTo: srcTo,
+                mutFrom: mutFrom,
+                mutTo: mutTo,
+                context: context,
+                sourceId: sourceId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MutashabihTable, MutashabihRow>(table),
+                  BaseReferences<
+                    _$ContentDatabase,
+                    $MutashabihTable,
+                    MutashabihRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MutashabihTableProcessedTableManager =
+    ProcessedTableManager<
+      _$ContentDatabase,
+      $MutashabihTable,
+      MutashabihRow,
+      $$MutashabihTableFilterComposer,
+      $$MutashabihTableOrderingComposer,
+      $$MutashabihTableAnnotationComposer,
+      $$MutashabihTableCreateCompanionBuilder,
+      $$MutashabihTableUpdateCompanionBuilder,
+      (
+        MutashabihRow,
+        BaseReferences<_$ContentDatabase, $MutashabihTable, MutashabihRow>,
+      ),
+      MutashabihRow,
+      PrefetchHooks Function()
+    >;
 
 class $ContentDatabaseManager {
   final _$ContentDatabase _db;
@@ -15065,4 +17784,12 @@ class $ContentDatabaseManager {
       $$ShamarlyVerseBoxTableTableManager(_db, _db.shamarlyVerseBox);
   $$ShamarlyWordBoxTableTableManager get shamarlyWordBox =>
       $$ShamarlyWordBoxTableTableManager(_db, _db.shamarlyWordBox);
+  $$ShamarlyCatchwordTableTableManager get shamarlyCatchword =>
+      $$ShamarlyCatchwordTableTableManager(_db, _db.shamarlyCatchword);
+  $$WordRootTableTableManager get wordRoot =>
+      $$WordRootTableTableManager(_db, _db.wordRoot);
+  $$GharibTableTableManager get gharib =>
+      $$GharibTableTableManager(_db, _db.gharib);
+  $$MutashabihTableTableManager get mutashabih =>
+      $$MutashabihTableTableManager(_db, _db.mutashabih);
 }

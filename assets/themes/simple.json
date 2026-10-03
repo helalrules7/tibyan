@@ -1,0 +1,113 @@
+{
+  "id": "simple",
+  "version": 1,
+  "name": {
+    "ar": "البسيط",
+    "en": "Simple"
+  },
+  "description": {
+    "ar": "بدون زخرفة: مربع للسورة والجزء والحزب، ودائرة لرقم الصفحة",
+    "en": "No ornament: a box for the surah, juz and hizb, and a circle for the page number"
+  },
+  "fonts": {
+    "surahHeader": "KFGQPCAN"
+  },
+  "frame": {
+    "outerWidth": 0,
+    "outerStyle": "plain",
+    "innerWidth": 0,
+    "gap": 0,
+    "radius": 10,
+    "innerRadius": 0,
+    "corner": "none"
+  },
+  "ornaments": {
+    "surahHeader": "none",
+    "ayahMarker": "traditional",
+    "density": "plain"
+  },
+  "radii": {
+    "card": 14,
+    "sheet": 24,
+    "chip": 18,
+    "surahHeader": 10
+  },
+  "modes": {
+    "light": {
+      "bg": "#F7F7F8",
+      "paper": "#FFFFFF",
+      "ink": "#1A1A1A",
+      "frame": "#2B2B2B",
+      "goldText": "#3F4A5A",
+      "border": "#E2E2E4",
+      "headBg": "#2B2B2B",
+      "headFg": "#FFFFFF",
+      "marker": "#6B7280",
+      "player": "#2B2B2B",
+      "playerFg": "#FFFFFF",
+      "accent": "#F3F4F6",
+      "accentFg": "#111827",
+      "muted": "#6B7280",
+      "highlight": "#6B728033",
+      "control": "#111827",
+      "onControl": "#FFFFFF"
+    },
+    "white": {
+      "bg": "#FFFFFF",
+      "paper": "#FFFFFF",
+      "ink": "#1A1A1A",
+      "frame": "#2B2B2B",
+      "goldText": "#3F4A5A",
+      "border": "#EAEAEC",
+      "headBg": "#2B2B2B",
+      "headFg": "#FFFFFF",
+      "marker": "#7C8494",
+      "player": "#2B2B2B",
+      "playerFg": "#FFFFFF",
+      "accent": "#F5F5F6",
+      "accentFg": "#111827",
+      "muted": "#6B7280",
+      "highlight": "#6B728033",
+      "control": "#111827",
+      "onControl": "#FFFFFF"
+    },
+    "night": {
+      "bg": "#0B0B0C",
+      "paper": "#121214",
+      "ink": "#E6E6E6",
+      "frame": "#8A8A8A",
+      "goldText": "#C7CBD1",
+      "border": "#26262A",
+      "headBg": "#1C1C20",
+      "headFg": "#E6E6E6",
+      "marker": "#9AA0A6",
+      "player": "#1C1C20",
+      "playerFg": "#E6E6E6",
+      "accent": "#1C1C20",
+      "accentFg": "#E6E6E6",
+      "muted": "#9AA0A6",
+      "highlight": "#9AA0A640",
+      "control": "#E6E6E6",
+      "onControl": "#0B0B0C"
+    },
+    "black": {
+      "bg": "#000000",
+      "paper": "#0A0A0B",
+      "ink": "#DEDEDE",
+      "frame": "#7A7A7A",
+      "goldText": "#B9BDC4",
+      "border": "#1E1E20",
+      "headBg": "#151517",
+      "headFg": "#DEDEDE",
+      "marker": "#8C9298",
+      "player": "#151517",
+      "playerFg": "#DEDEDE",
+      "accent": "#151517",
+      "accentFg": "#DEDEDE",
+      "muted": "#8C9298",
+      "highlight": "#8C929840",
+      "control": "#DEDEDE",
+      "onControl": "#000000"
+    }
+  }
+}

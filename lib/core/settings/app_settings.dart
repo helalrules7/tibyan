@@ -4,50 +4,55 @@ import '../theme/app_theme.dart';
 import '../theme/theme_tokens.dart';
 
 /// How the colour mode is chosen: by the device, or fixed by the user.
-enum ModeSetting { system, light, night, black }
+enum ModeSetting { system, light, white, night, black }
 
 /// Interface language: follow the device, or fixed by the user.
 enum LanguageSetting { system, ar, en }
 
 /// Mushaf edition shown in the page view: the two Madina prints and the
-/// Shamarly (Egyptian) print.
-enum MushafEdition { madina1441, madina1405, shamarly }
+/// Shamarly (Egyptian) print in the riwaya of Hafs, and the KFGQPC Madina
+/// mushafs of four other riwayat.
+enum MushafEdition {
+  madina1441,
+  madina1405,
+  shamarly,
+  warsh,
+  qalun,
+  douri,
+  shubah,
+}
+
+/// The riwaya an edition is printed in. Verse numbers follow the riwaya's
+/// own count; tafsir, translation and bookmarks use Hafs numbers, reached
+/// through each riwaya's verse map.
+enum Riwaya { hafs, warsh, qalun, douri, shubah }
 
 extension MushafEditionPages on MushafEdition {
   /// Pages of the printed mushaf, numbered from 1. Shamarly: page 1 is the
   /// cover and the text runs from page 2 to 522.
   int get pageCount => this == MushafEdition.shamarly ? 522 : 604;
+
+  Riwaya get riwaya => switch (this) {
+    MushafEdition.warsh => Riwaya.warsh,
+    MushafEdition.qalun => Riwaya.qalun,
+    MushafEdition.douri => Riwaya.douri,
+    MushafEdition.shubah => Riwaya.shubah,
+    _ => Riwaya.hafs,
+  };
+
+  /// A riwaya other than Hafs, numbered by its own count.
+  bool get isRiwaya => riwaya != Riwaya.hafs;
+
+  /// Drawn from KFGQPC's SVG page artwork (the new Madina edition and the
+  /// riwaya editions).
+  bool get isSvg => this == MushafEdition.madina1441 || isRiwaya;
 }
 
-/// Shape of the verse-end markers in the page view: the mushaf's own
-/// (default) or one of three rosettes drawn over it.
-enum MarkerStyle { traditional, rosette7, rosette9, rosette16 }
-
-/// The page frame's design. Every style frames its pages; this chooses
-/// the ornament: the Zakhrafa images, the plain rules, or one of the six
-/// designs drawn from the owner's SVGs
-/// (`assets/ornaments/frame_<set>_<piece>.svg`).
-enum FrameDesign {
-  zakhrafa,
-  plain,
-  abbasid,
-  umayyad,
-  andalusian,
-  ottoman,
-  egyptian,
-  modernIslamic,
-}
-
-/// Each style's own frame: Zakhrafa's illuminated frame, and a drawn
-/// design for the others (the plain frame for a style not listed).
-FrameDesign defaultFrameFor(String styleId) => switch (styleId) {
-  'zakhrafa' => FrameDesign.zakhrafa,
-  'royal' => FrameDesign.abbasid,
-  'classic' => FrameDesign.ottoman,
-  'manuscript' => FrameDesign.andalusian,
-  'calm' => FrameDesign.modernIslamic,
-  _ => FrameDesign.plain,
-};
+/// Shape of the verse-end markers in the page view: the theme's own marker
+/// (the default in the heritage themes; Zakhrafa's own is the 16-point
+/// rosette), the mushaf's printed marker, or one of three rosettes drawn
+/// over it.
+enum MarkerStyle { theme, traditional, rosette7, rosette9, rosette16 }
 
 /// Font of tafsir and translation texts.
 enum TafsirFont { naskh, interface }
@@ -66,13 +71,13 @@ class AppSettings {
   const AppSettings({
     required this.styleId,
     this.mode = ModeSetting.light,
-    this.uiFont = UiFont.kfgqpcAn,
+    this.uiFont = UiFont.changa,
     this.language = LanguageSetting.ar,
     this.crashReportsOptIn = false,
     this.onboardingDone = false,
     this.edition = MushafEdition.madina1441,
     this.keepScreenOn = true,
-    this.markerStyle = MarkerStyle.traditional,
+    this.markerStyle = MarkerStyle.rosette16,
     this.markerTint,
     this.highlightDivineNames = true,
     this.tafsirFont = TafsirFont.naskh,
@@ -80,9 +85,15 @@ class AppSettings {
     this.hiddenCommentaries = const {},
     this.tafsirKashida = false,
     this.reciterId = 1,
+    this.riwayaReciters = const {},
     this.followRecitation = true,
-    this.versePause = 0,
-    this.frameDesign,
+    this.touchReading = true,
+    this.versePause = 500,
+    this.repeat = 1,
+    this.repeatSilence = 0,
+    this.elderlyMode = false,
+    this.tajweedColors = false,
+    this.tajweedHues = const {},
   });
 
   final String styleId;
@@ -122,15 +133,42 @@ class AppSettings {
   /// Recitation chosen in the player (content.db `reciter.id`).
   final int reciterId;
 
+  /// Recitation chosen for each riwaya other than Hafs ([reciterId] is
+  /// Hafs's); a riwaya not listed plays its first recitation.
+  final Map<Riwaya, int> riwayaReciters;
+
+  /// The recitation chosen for [riwaya], or null for its first one.
+  int? reciterFor(Riwaya riwaya) =>
+      riwaya == Riwaya.hafs ? reciterId : riwayaReciters[riwaya];
+
   /// Turn pages to follow the verse being recited.
   final bool followRecitation;
+
+  /// Touch reading: tapping a verse shades it. Kept for the whole mushaf.
+  final bool touchReading;
 
   /// Longest pause kept between verses while listening, in ms; 0 plays
   /// the recording as it is.
   final int versePause;
 
-  /// The frame chosen by the reader; null uses the style's own.
-  final FrameDesign? frameDesign;
+  /// Times the player plays each verse, or the chosen stretch; 0 repeats
+  /// until stopped.
+  final int repeat;
+
+  /// Seconds of silence between repetitions, to repeat after the reciter.
+  final int repeatSilence;
+
+  /// «وضع كبار السن»: larger text and touch targets, stronger contrast, a
+  /// home with only the main tasks, the page as large as it can be, and
+  /// slower transitions.
+  final bool elderlyMode;
+
+  /// Colour the letters that tajweed rules apply to (off by default).
+  final bool tajweedColors;
+
+  /// The reader's colour for a rule, by the rule's data key: a hue name
+  /// (TajweedHue), or '' for no colour. Rules not listed use their default.
+  final Map<String, String> tajweedHues;
 
   AppSettings copyWith({
     String? styleId,
@@ -149,9 +187,15 @@ class AppSettings {
     Set<int>? hiddenCommentaries,
     bool? tafsirKashida,
     int? reciterId,
+    Map<Riwaya, int>? riwayaReciters,
     bool? followRecitation,
+    bool? touchReading,
     int? versePause,
-    FrameDesign? Function()? frameDesign,
+    int? repeat,
+    int? repeatSilence,
+    bool? elderlyMode,
+    bool? tajweedColors,
+    Map<String, String>? tajweedHues,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -169,15 +213,23 @@ class AppSettings {
     hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
     reciterId: reciterId ?? this.reciterId,
+    riwayaReciters: riwayaReciters ?? this.riwayaReciters,
     followRecitation: followRecitation ?? this.followRecitation,
+    touchReading: touchReading ?? this.touchReading,
     versePause: versePause ?? this.versePause,
-    frameDesign: frameDesign == null ? this.frameDesign : frameDesign(),
+    repeat: repeat ?? this.repeat,
+    repeatSilence: repeatSilence ?? this.repeatSilence,
+    elderlyMode: elderlyMode ?? this.elderlyMode,
+    tajweedColors: tajweedColors ?? this.tajweedColors,
+    tajweedHues: tajweedHues ?? this.tajweedHues,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure
-  /// white text); Black is only used when the user picks it.
+  /// white text); Bright white and Black are only used when the user picks
+  /// them.
   ThemeModeId resolveMode(Brightness platformBrightness) => switch (mode) {
     ModeSetting.light => ThemeModeId.light,
+    ModeSetting.white => ThemeModeId.white,
     ModeSetting.night => ThemeModeId.night,
     ModeSetting.black => ThemeModeId.black,
     ModeSetting.system =>

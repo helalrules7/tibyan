@@ -1,6 +1,10 @@
-"""Verse and word timings for Mahmoud Ali al-Banna (murattal) on the
-mp3quran surah files (https://server8.mp3quran.net/bna/), from
-QuranLab's word timings.
+"""Verse and word timings for Mahmoud Ali al-Banna (murattal, reciter 4)
+and Mustafa Ismail (murattal, reciter 5) on the mp3quran surah files
+(https://server8.mp3quran.net/bna/ and /mustafa/), from everyayah's
+per-verse files of the same recordings and QuranLab's word timings.
+Mustafa Ismail's verses are found the same way; QuranLab times the words
+of only 2,015 of his verses, so the others get verse timing only.
+The numbers in this note are al-Banna's.
 
 mp3quran publishes no verse timing for this recitation. QuranLab
 (quranlab/quran-audio, CC BY 4.0, see fetch_quranlab_timing.py) publishes
@@ -53,14 +57,17 @@ Nothing here touches the Quran text (verse letters are only counted, for
 12:67's length).
 
 Usage:
-  python3 tools/fetch_quranlab_timing.py
-  python3 tools/build_quranlab_timing.py
-Needs tools/.cache/audio/4/NNN.mp3 (the surah files) and
-tools/.cache/everyayah/mahmoud_ali_al_banna_32kbps/SSSAAA.mp3
-(https://everyayah.com/data/mahmoud_ali_al_banna_32kbps/). Writes
-tools/.cache/quranlab_ayah_timing.json ([reciter, surah, ayah, start_ms,
-end_ms]) and quranlab_word_timing.json ([reciter, surah, ayah, word,
-start_ms, end_ms]) and prints coverage and the surahs left out.
+  python3 tools/fetch_quranlab_timing.py mahmoud-ali-al-banna mustafa-ismail
+  python3 tools/fetch_recitation_audio.py surahs 4 5
+  python3 tools/fetch_recitation_audio.py verses mahmoud_ali_al_banna_32kbps Mustafa_Ismail_48kbps
+  python3 tools/build_quranlab_timing.py [reciter ...]    # default: 4 5
+Needs tools/.cache/audio/<reciter>/NNN.mp3 (the surah files) and
+tools/.cache/everyayah/<folder>/SSSAAA.mp3 (https://everyayah.com/data/<folder>/,
+folders in RECITERS below). Writes tools/.cache/quranlab_ayah_timing.json
+([reciter, surah, ayah, start_ms, end_ms]) and quranlab_word_timing.json
+([reciter, surah, ayah, word, start_ms, end_ms]), replacing only the rows
+of the reciters built (the others are kept), and prints coverage and the
+surahs left out.
 """
 import json
 import sqlite3
@@ -77,12 +84,29 @@ import build_word_timing as b
 ROOT = Path(__file__).resolve().parent
 CACHE = ROOT / '.cache'
 DB = ROOT.parent / 'assets' / 'db' / 'content.db'
-TIMING = CACHE / 'quranlab_banna_timing.json'
-VERSES = CACHE / 'everyayah' / 'mahmoud_ali_al_banna_32kbps'
+# content.db reciter id -> (QuranLab timing file, everyayah per-verse
+# folder, whether its word timings are kept). Mustafa Ismail's QuranLab
+# word timings failed the check (1.13% of words in a pause; al-Banna's
+# 0.16%): his verses get verse timing only.
+RECITERS = {
+    4: ('quranlab_banna_timing.json', 'mahmoud_ali_al_banna_32kbps', True),
+    5: ('quranlab_mustafa-ismail_timing.json', 'Mustafa_Ismail_48kbps', False),
+    11: (
+        'quranlab_abdul-rahman-al-sudais_timing.json',
+        'Abdurrahmaan_As-Sudais_192kbps',
+        True,
+    ),
+    12: ('quranlab_mishary-alafasy_timing.json', 'Alafasy_128kbps', True),
+    13: ('quranlab_saad-al-ghamdi_timing.json', 'Ghamadi_40kbps', True),
+    14: (
+        'quranlab_mohamed-al-tablawi_timing.json',
+        'Mohammad_al_Tablaway_128kbps',
+        True,
+    ),
+}
 AYAH_OUT = CACHE / 'quranlab_ayah_timing.json'
 WORD_OUT = CACHE / 'quranlab_word_timing.json'
 
-RECITER = 4
 RATE = 8000
 HOP = 10              # ms per envelope frame
 FLOOR_DB = -60        # the envelope is clipped here, so hiss does not count
@@ -242,12 +266,27 @@ def bridge(env, own, before, after, low, high):
         if len(rest) == 0:
             return None
         begin = before[1] + int(quiet[0]) + int(rest[0])
-    speech = np.flatnonzero(loud[begin:after[0]])
+    span = speak(loud, begin, after[0], own, before is None, low, high)
+    if span is None and before is not None:
+        # No pause heard after the previous verse (it runs straight on, or
+        # its tail was placed a little late): the first pause found was
+        # inside this verse. Start at the first sound after the previous
+        # verse instead; the length check still has to pass.
+        rest = np.flatnonzero(loud[before[1]:after[0]])
+        if len(rest):
+            span = speak(loud, before[1] + int(rest[0]), after[0], own, False, low, high)
+    return span
+
+
+def speak(loud, begin, stop, own, first, low, high):
+    """(begin, end of the last sound before stop), when its length is low
+    to high times own (verse 1: 0.2 to 1.1), else None."""
+    speech = np.flatnonzero(loud[begin:stop])
     if len(speech) == 0:
         return None
     end = begin + int(speech[-1]) + 1
     ratio = (end - begin) / own
-    if not (0.2 <= ratio <= 1.1 if before is None else low <= ratio <= high):
+    if not (0.2 <= ratio <= 1.1 if first else low <= ratio <= high):
         return None
     return begin, end
 
@@ -301,11 +340,11 @@ def place_words(segments, count, points):
 def build_surah(job):
     """Verse rows, word rows and a report for one surah; no rows when a
     verse cannot be placed."""
-    surah, audio, aligned, counts, letters = job
+    reciter, surah, audio, verse_dir, aligned, counts, letters = job
     env = envelope(audio)
     verses = range(1, len(counts) + 1)
     speech, missing, bridged_verses = {}, [], []
-    venvs = {a: envelope(VERSES / f'{surah:03d}{a:03d}.mp3') for a in verses}
+    venvs = {a: envelope(verse_dir / f'{surah:03d}{a:03d}.mp3') for a in verses}
     # A verse's own length (frames of its per-verse file from first to last
     # sound); estimated from its letters when that file is silent (12:67).
     own = {a: own_length(venvs[a]) for a in verses}
@@ -372,33 +411,37 @@ def build_surah(job):
         else:
             starts[a] = quietest(env, max(prev, s - LEAD), s)
     ends = {a: starts[a + 1] if a < len(counts) else len(env) for a in verses}
-    rows = [(RECITER, surah, 0, 0, starts[1] * HOP)] if starts[1] > 0 else []
-    rows += [(RECITER, surah, a, starts[a] * HOP, ends[a] * HOP) for a in verses]
+    rows = [(reciter, surah, 0, 0, starts[1] * HOP)] if starts[1] > 0 else []
+    rows += [(reciter, surah, a, starts[a] * HOP, ends[a] * HOP) for a in verses]
     words = []
     for a in verses:
         points = anchors(env, venvs[a], *speech[a])
         placed = place_words(aligned.get(a), counts[a], points)
         if placed and placed[0][0] >= starts[a] * HOP and placed[-1][1] <= ends[a] * HOP:
-            words += [(RECITER, surah, a, k, s, e) for k, (s, e) in enumerate(placed, start=1)]
+            words += [(reciter, surah, a, k, s, e) for k, (s, e) in enumerate(placed, start=1)]
     return surah, rows, words, {'bridged': bridged_verses, 'ratios': ratios}
 
 
-def main():
-    db = sqlite3.connect(DB)
-    counts = {}
-    for s, a, n in db.execute('SELECT surah, ayah, COUNT(*) FROM word_box GROUP BY surah, ayah'):
-        counts.setdefault(s, {})[a] = n
-    # letters per verse (search text, spaces left out): only its length is used
-    letters = {}
-    for s, a, text in db.execute('SELECT surah, number, text_search FROM ayah'):
-        letters.setdefault(s, {})[a] = len(text.replace(' ', ''))
-    timing = json.loads(TIMING.read_text(encoding='utf-8'))
-    jobs = []
+def build_reciter(reciter, counts, letters):
+    timing_file, folder, keep_words = RECITERS[reciter]
+    timing = json.loads((CACHE / timing_file).read_text(encoding='utf-8'))
+    verse_dir = CACHE / 'everyayah' / folder
+    jobs, unmatched = [], []
     for surah in range(1, 115):
-        aligned = {int(a): v for a, v in timing.get(str(surah), {}).items()}
-        audio = CACHE / 'audio' / str(RECITER) / f'{surah:03d}.mp3'
-        if audio.exists():
-            jobs.append((surah, audio, aligned, counts[surah], letters[surah]))
+        aligned = {int(a): v for a, v in timing.get(str(surah), {}).items()} if keep_words else {}
+        audio = CACHE / 'audio' / str(reciter) / f'{surah:03d}.mp3'
+        if not audio.exists():
+            continue
+        if not all((verse_dir / f'{surah:03d}{a:03d}.mp3').exists() for a in counts[surah]):
+            # everyayah has no per-verse files for this surah (Mustafa
+            # Ismail: surahs 3 to 45): nothing to find the verses by.
+            unmatched.append(surah)
+            continue
+        jobs.append((reciter, surah, audio, verse_dir, aligned, counts[surah], letters[surah]))
+    if not jobs:
+        return [], [], set()
+    if unmatched:
+        print(f'reciter {reciter}: no per-verse files for {len(unmatched)} surahs: {unmatched}')
     verses, words, skipped, ratios, bridged = [], [], [], [], 0
     with ProcessPoolExecutor() as pool:
         for surah, v, w, info in pool.map(build_surah, jobs):
@@ -410,15 +453,43 @@ def main():
             verses += v
             words += w
     ratios.sort()
-    print('verse length, surah file / per-verse file, 1% 5% 50% 95% 99%:',
+    print(f'reciter {reciter}: verse length, surah file / per-verse file, 1% 5% 50% 95% 99%:',
           ' '.join(f'{ratios[int(len(ratios) * p)]:.2f}' for p in (0.01, 0.05, 0.5, 0.95, 0.99)))
     print(f'{bridged} verses placed between their neighbours')
     timed = sum(1 for r in verses if r[2] > 0)
     worded = len({(r[1], r[2]) for r in words})
-    print(f'reciter {RECITER}: {114 - len(skipped)} surahs, {timed} verses with verse timing, '
+    print(f'reciter {reciter}: {len(jobs) - len(skipped)} of {len(jobs)} surahs, {timed} verses with verse timing, '
           f'{worded} with word timing ({len(words)} words)')
     for surah, info in skipped:
         print(f'  surah {surah}: no timing ({info})')
+    return verses, words, {j[1] for j in jobs}
+
+
+def main():
+    db = sqlite3.connect(DB)
+    counts = {}
+    for s, a, n in db.execute('SELECT surah, ayah, COUNT(*) FROM word_box GROUP BY surah, ayah'):
+        counts.setdefault(s, {})[a] = n
+    # letters per verse (search text, spaces left out): only its length is used
+    letters = {}
+    for s, a, text in db.execute('SELECT surah, number, text_search FROM ayah'):
+        letters.setdefault(s, {})[a] = len(text.replace(' ', ''))
+    built = [int(a) for a in sys.argv[1:]] or list(RECITERS)
+    old_verses = json.loads(AYAH_OUT.read_text(encoding='utf-8')) if AYAH_OUT.exists() else []
+    old_words = json.loads(WORD_OUT.read_text(encoding='utf-8')) if WORD_OUT.exists() else []
+    done = set()
+    verses, words = [], []
+    for reciter in built:
+        v, w, surahs = build_reciter(reciter, counts, letters)
+        if not surahs:
+            print(f'reciter {reciter}: no surah files cached, previous rows kept')
+        done |= {(reciter, s) for s in surahs}
+        verses += v
+        words += w
+    # Rows of surahs not built this time (reciter not asked for, or its
+    # files not cached) are kept as they are.
+    verses = [r for r in old_verses if (r[0], r[1]) not in done] + verses
+    words = [r for r in old_words if (r[0], r[1]) not in done] + words
     AYAH_OUT.write_text(json.dumps(verses, separators=(',', ':')), encoding='utf-8')
     WORD_OUT.write_text(json.dumps(words, separators=(',', ':')), encoding='utf-8')
     return 0
