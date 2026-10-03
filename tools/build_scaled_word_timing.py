@@ -26,6 +26,7 @@ import sys
 from pathlib import Path
 
 import build_quranlab_timing as q
+import timing_files
 
 ROOT = Path(__file__).resolve().parent
 DB = ROOT.parent / 'assets' / 'db' / 'content.db'
@@ -92,7 +93,13 @@ def main():
     ids = [int(a) for a in sys.argv[1:]] or sorted(q.RECITERS)
     db = sqlite3.connect(DB)
     counts = verse_counts(db)
+    kept = {r['id']: slug for slug, r in timing_files.published().items()}
     for reciter in ids:
+        if reciter in kept:
+            # Its timings live in data/timing now, corrected by hand there;
+            # build_content_db.py puts them in. Regenerating would undo that.
+            print(f'{reciter}: kept in data/timing/{kept[reciter]}, not regenerated')
+            continue
         entry = q.RECITERS.get(reciter)
         if entry is None:
             print(f'{reciter}: not in RECITERS')

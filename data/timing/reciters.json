@@ -1,0 +1,450 @@
+{
+  "format": 1,
+  "about": "Every recitation in content.db and whether its timing may be published here. licence: publishable | not-publishable. publish: true when data/timing/<slug>/ holds its files (they then replace the generated rows in content.db). See docs/TIMING.md.",
+  "licence_of_this_directory": "The timing files in data/timing are published under CC BY 4.0, with the attribution of each reciter's sources below. Corrections contributed by pull request are released under the same licence.",
+  "reciters": [
+    {
+      "slug": "minshawi",
+      "id": 1,
+      "name_ar": "محمد صديق المنشاوي",
+      "name_en": "Mohamed Siddiq al-Minshawi",
+      "riwaya": "hafs",
+      "folder_url": "https://server10.mp3quran.net/minsh/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": {
+        "source": "cpfair/quran-align (2016-11-24), placed on the mp3quran files by Tibyan (tools/build_word_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "© 2016 Collin Fair (quran-align), CC BY 4.0"
+      },
+      "note": "Phase 2: to be exported."
+    },
+    {
+      "slug": "husary",
+      "id": 2,
+      "name_ar": "محمود خليل الحصري",
+      "name_en": "Mahmoud Khalil al-Husary",
+      "riwaya": "hafs",
+      "folder_url": "https://server13.mp3quran.net/husr/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": {
+        "source": "cpfair/quran-align (2016-11-24), placed on the mp3quran files by Tibyan (tools/build_word_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "© 2016 Collin Fair (quran-align), CC BY 4.0"
+      },
+      "note": "Phase 2: to be exported."
+    },
+    {
+      "slug": "abdulbasit",
+      "id": 3,
+      "name_ar": "عبد الباسط عبد الصمد",
+      "name_en": "Abdul Basit Abdul Samad",
+      "riwaya": "hafs",
+      "folder_url": "https://server7.mp3quran.net/basit/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": {
+        "source": "cpfair/quran-align (2016-11-24), placed on the mp3quran files by Tibyan (tools/build_word_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "© 2016 Collin Fair (quran-align), CC BY 4.0"
+      },
+      "note": "Phase 2: to be exported."
+    },
+    {
+      "slug": "banna",
+      "id": 4,
+      "name_ar": "محمود علي البنا",
+      "name_en": "Mahmoud Ali al-Banna",
+      "riwaya": "hafs",
+      "folder_url": "https://server8.mp3quran.net/bna/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "verse boundaries derived by Tibyan from the audio (tools/build_quranlab_timing.py)",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
+      },
+      "word_timing": {
+        "source": "QuranLab word times placed on the mp3quran files by Tibyan (tools/build_quranlab_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+      },
+      "note": "Phase 2: to be exported once the al-Banna timing work is merged."
+    },
+    {
+      "slug": "mustafa-ismail",
+      "id": 5,
+      "name_ar": "مصطفى إسماعيل",
+      "name_en": "Mustafa Ismail",
+      "riwaya": "hafs",
+      "folder_url": "https://server8.mp3quran.net/mustafa/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "verse boundaries derived by Tibyan from the audio (tools/build_quranlab_timing.py)",
+        "licence": "Tibyan (published here under CC BY 4.0)",
+        "attribution": "Tibyan"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported."
+    },
+    {
+      "slug": "dosari",
+      "id": 10,
+      "name_ar": "ياسر الدوسري",
+      "name_en": "Yasser al-Dosari",
+      "riwaya": "hafs",
+      "folder_url": "https://download.quranicaudio.com/quran/yasser_ad-dussary/",
+      "licence": "not-publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "Quran.com QDC audio API (segments from Quranic Universal Library)",
+        "licence": "none published; permission requested (docs/MISSING_DATA.md إ15)",
+        "attribution": "Quran.com"
+      },
+      "word_timing": {
+        "source": "Quran.com QDC audio API (segments from Quranic Universal Library)",
+        "licence": "none published; permission requested (docs/MISSING_DATA.md إ15)",
+        "attribution": "Quran.com"
+      },
+      "note": "Stays generated from the private cache until Quran.com grants permission (letter 14)."
+    },
+    {
+      "slug": "sudais",
+      "id": 11,
+      "name_ar": "عبدالرحمن السديس",
+      "name_en": "Abdul-Rahman al-Sudais",
+      "riwaya": "hafs",
+      "folder_url": "https://server11.mp3quran.net/sds/",
+      "licence": "publishable",
+      "publish": true,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing (read 54)",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": {
+        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+      }
+    },
+    {
+      "slug": "afasy",
+      "id": 12,
+      "name_ar": "مشاري العفاسي",
+      "name_en": "Mishary Rashid al-Afasy",
+      "riwaya": "hafs",
+      "folder_url": "https://server8.mp3quran.net/afs/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": {
+        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+      },
+      "note": "Phase 2: to be exported."
+    },
+    {
+      "slug": "ghamdi",
+      "id": 13,
+      "name_ar": "سعد الغامدي",
+      "name_en": "Saad al-Ghamdi",
+      "riwaya": "hafs",
+      "folder_url": "https://server7.mp3quran.net/s_gmd/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": {
+        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+      },
+      "note": "Phase 2: to be exported."
+    },
+    {
+      "slug": "tablawi",
+      "id": 14,
+      "name_ar": "محمد الطبلاوي",
+      "name_en": "Muhammad al-Tablaway",
+      "riwaya": "hafs",
+      "folder_url": "https://server12.mp3quran.net/tblawi/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": {
+        "source": "QuranLab (quranlab/quran-audio) word times, kept in proportion inside the mp3quran verse windows by Tibyan (tools/build_scaled_word_timing.py)",
+        "licence": "CC BY 4.0",
+        "attribution": "QuranLab (huggingface.co/datasets/quranlab/quran-audio), CC BY 4.0"
+      },
+      "note": "Phase 2: to be exported."
+    },
+    {
+      "slug": "warsh-husary-101",
+      "id": 101,
+      "name_ar": "محمود خليل الحصري",
+      "name_en": "Mahmoud Khalil al-Husary",
+      "riwaya": "warsh",
+      "folder_url": "https://server13.mp3quran.net/husr/Rewayat-Warsh-A-n-Nafi/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "warsh-yasin-102",
+      "id": 102,
+      "name_ar": "القارئ ياسين",
+      "name_en": "al-Qari Yasin",
+      "riwaya": "warsh",
+      "folder_url": "https://server11.mp3quran.net/qari/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "warsh-koushi-103",
+      "id": 103,
+      "name_ar": "العيون الكوشي",
+      "name_en": "al-Oyoun al-Koushi",
+      "riwaya": "warsh",
+      "folder_url": "https://server11.mp3quran.net/koshi/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "warsh-qazabri-104",
+      "id": 104,
+      "name_ar": "عمر القزابري",
+      "name_en": "Omar al-Qazabri",
+      "riwaya": "warsh",
+      "folder_url": "https://server9.mp3quran.net/omar_warsh/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "warsh-msayed-105",
+      "id": 105,
+      "name_ar": "محمد سايد",
+      "name_en": "Mohammad Sayed",
+      "riwaya": "warsh",
+      "folder_url": "https://server16.mp3quran.net/m_sayed/Rewayat-Warsh-A-n-Nafi/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "warsh-abdulbasit-106",
+      "id": 106,
+      "name_ar": "عبد الباسط عبد الصمد",
+      "name_en": "Abdul Basit Abdul Samad",
+      "riwaya": "warsh",
+      "folder_url": "https://server7.mp3quran.net/basit/Rewayat-Warsh-A-n-Nafi/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "qalun-husary-111",
+      "id": 111,
+      "name_ar": "محمود خليل الحصري",
+      "name_en": "Mahmoud Khalil al-Husary",
+      "riwaya": "qalun",
+      "folder_url": "https://server13.mp3quran.net/husr/Rewayat-Qalon-A-n-Nafi/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "qalun-hudhaifi-112",
+      "id": 112,
+      "name_ar": "علي بن عبدالرحمن الحذيفي",
+      "name_en": "Ali al-Hudhaifi",
+      "riwaya": "qalun",
+      "folder_url": "https://server9.mp3quran.net/huthifi_qalon/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "qalun-dokali-113",
+      "id": 113,
+      "name_ar": "الدوكالي محمد العالم",
+      "name_en": "al-Dokali Mohammad al-Alim",
+      "riwaya": "qalun",
+      "folder_url": "https://server7.mp3quran.net/dokali/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "douri-husary-121",
+      "id": 121,
+      "name_ar": "محمود خليل الحصري",
+      "name_en": "Mahmoud Khalil al-Husary",
+      "riwaya": "douri",
+      "folder_url": "https://server13.mp3quran.net/husr/Rewayat-Aldori-A-n-Abi-Amr/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "douri-noreen-122",
+      "id": 122,
+      "name_ar": "نورين محمد صديق",
+      "name_en": "Noreen Mohammad Siddiq",
+      "riwaya": "douri",
+      "folder_url": "https://server16.mp3quran.net/nourin_siddig/Rewayat-Aldori-A-n-Abi-Amr/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "douri-zubair-123",
+      "id": 123,
+      "name_ar": "الفاتح محمد الزبير",
+      "name_en": "al-Fatih al-Zubair",
+      "riwaya": "douri",
+      "folder_url": "https://server6.mp3quran.net/fateh/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "shubah-hudhaifi-131",
+      "id": 131,
+      "name_ar": "علي بن عبدالرحمن الحذيفي",
+      "name_en": "Ali al-Hudhaifi",
+      "riwaya": "shubah",
+      "folder_url": "https://server9.mp3quran.net/hthfi/Rewayat-Sho-bah-A-n-Asim/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    },
+    {
+      "slug": "shubah-deban-132",
+      "id": 132,
+      "name_ar": "أحمد ديبان",
+      "name_en": "Ahmad Deban",
+      "riwaya": "shubah",
+      "folder_url": "https://server16.mp3quran.net/deban/Rewayat-Sho-bah-A-n-Asim/",
+      "licence": "publishable",
+      "publish": false,
+      "verse_timing": {
+        "source": "mp3quran.net ayat_timing",
+        "licence": "mp3quran.net general permission: \"we allow any visitor or developer to copy any material or use any link\" (docs/licenses/2026-09-28_mp3quran_privacy.pdf)",
+        "attribution": "mp3quran.net"
+      },
+      "word_timing": null,
+      "note": "Phase 2: to be exported (riwaya recitation; verses numbered by its riwaya)."
+    }
+  ]
+}

@@ -19,6 +19,8 @@ Inputs (downloaded and SHA-256-verified by fetch_sources.py):
   tools/.cache/quranlab_banna_timing.json QuranLab word timings, al-Banna (fetch_quranlab_timing.py)
   tools/.cache/quranlab_ayah_timing.json  al-Banna verse timings derived from it (build_quranlab_timing.py)
   tools/.cache/quranlab_word_timing.json  al-Banna word timings placed with it (build_quranlab_timing.py)
+  data/timing/<slug>/NNN.json            timings of the published reciters, which replace
+                                          the generated rows (timing_files.py, docs/TIMING.md)
   tools/.cache/shamarly_geometry.db       Shamarly page geometry (build_shamarly.py): page numbers,
                                           lines, verse, marker and word boxes; no text
   tools/.cache/shamarly_catchword.json    Shamarly catchword boxes (build_shamarly_catchword.py)
@@ -49,6 +51,7 @@ import build_tajweed
 import build_word_boxes
 import build_word_study
 import riwaya_reciters
+import timing_files
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
@@ -518,6 +521,10 @@ def main():
                    json.loads(qdc_ayah_path.read_text(encoding='utf-8')))
     db.executemany('INSERT INTO word_timing VALUES (?,?,?,?,?,?)',
                    json.loads(qdc_word_path.read_text(encoding='utf-8')))
+    # Timings kept as text in data/timing (the published reciters) replace
+    # the generated rows above: corrections merged there are the source.
+    for slug, (n_ayahs, n_words) in timing_files.apply(db).items():
+        print(f'timing from data/timing/{slug}: {n_ayahs} verses, {n_words} words')
     for reciter, surah in gaps:
         print(f'timing gap: reciter {reciter}, surah {surah} (plays without highlighting)')
     # Speech spans measured by tools/build_ayah_speech.py, which reads the

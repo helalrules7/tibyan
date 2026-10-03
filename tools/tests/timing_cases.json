@@ -1,0 +1,1123 @@
+{
+ "about": "Cases the timing checks must agree on: tools/timing_files.py and apps/timing-editor/js/model.js. Each expect entry is level:code:verse:word, sorted.",
+ "counts": [
+  2,
+  3
+ ],
+ "slug": "t",
+ "surah": 1,
+ "cases": [
+  {
+   "name": "valid",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": 5000,
+   "expect": []
+  },
+  {
+   "name": "valid with opening",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      0,
+      0,
+      900,
+      []
+     ],
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": 5000,
+   "expect": []
+  },
+  {
+   "name": "not an object",
+   "doc": [
+    1
+   ],
+   "duration_ms": null,
+   "expect": [
+    "error:schema::"
+   ]
+  },
+  {
+   "name": "wrong reciter, surah and format",
+   "doc": {
+    "format": 2,
+    "reciter": "x",
+    "surah": 2,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:schema::",
+    "error:schema::",
+    "error:schema::"
+   ]
+  },
+  {
+   "name": "verse shape",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:schema::",
+    "error:verse_missing:1:"
+   ]
+  },
+  {
+   "name": "float time",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000.5,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:schema::",
+    "error:verse_missing:1:"
+   ]
+  },
+  {
+   "name": "verse out of order",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ],
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:verse_missing:1:",
+    "error:verse_order:1:"
+   ]
+  },
+  {
+   "name": "verse not in surah",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ],
+     [
+      3,
+      4000,
+      5000,
+      []
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:verse_order:3:"
+   ]
+  },
+  {
+   "name": "verse missing",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:verse_missing:2:"
+   ]
+  },
+  {
+   "name": "verse span",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      1000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:verse_span:1:",
+    "error:word_outside:1:1",
+    "error:word_outside:1:2"
+   ]
+  },
+  {
+   "name": "verse overlap",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      1900,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:verse_overlap:2:"
+   ]
+  },
+  {
+   "name": "verse past audio",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": 3400,
+   "expect": [
+    "error:verse_duration:2:",
+    "error:word_duration:2:3"
+   ]
+  },
+  {
+   "name": "verse slightly past audio",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": 3900,
+   "expect": [
+    "warning:past_audio_end:2:",
+    "warning:past_audio_end:2:3"
+   ]
+  },
+  {
+   "name": "opening with words",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      0,
+      0,
+      900,
+      [
+       [
+        1,
+        0,
+        100
+       ]
+      ]
+     ],
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:schema:0:"
+   ]
+  },
+  {
+   "name": "words missing",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      []
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "warning:words_missing:2:"
+   ]
+  },
+  {
+   "name": "words partial",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:words_partial:2:"
+   ]
+  },
+  {
+   "name": "word span",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1000
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:word_span:1:1"
+   ]
+  },
+  {
+   "name": "word overlap in verse",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2499,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:word_overlap:2:2"
+   ]
+  },
+  {
+   "name": "small overlap across verses",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        1980,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "warning:word_outside_small:2:1",
+    "warning:word_overlap_small:2:1"
+   ]
+  },
+  {
+   "name": "large overlap across verses",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        1900,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        3990
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:word_outside:2:1",
+    "error:word_overlap:2:1"
+   ]
+  },
+  {
+   "name": "word slightly past verse end",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        4030
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "warning:word_outside_small:2:3"
+   ]
+  },
+  {
+   "name": "word far past verse end",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": [
+     [
+      1,
+      1000,
+      2000,
+      [
+       [
+        1,
+        1000,
+        1400
+       ],
+       [
+        2,
+        1500,
+        2000
+       ]
+      ]
+     ],
+     [
+      2,
+      2000,
+      4000,
+      [
+       [
+        1,
+        2010,
+        2500
+       ],
+       [
+        2,
+        2600,
+        3000
+       ],
+       [
+        3,
+        3100,
+        4100
+       ]
+      ]
+     ]
+    ]
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:word_outside:2:3"
+   ]
+  },
+  {
+   "name": "no verses",
+   "doc": {
+    "format": 1,
+    "reciter": "t",
+    "surah": 1,
+    "verses": []
+   },
+   "duration_ms": null,
+   "expect": [
+    "error:verse_missing::"
+   ]
+  }
+ ]
+}
