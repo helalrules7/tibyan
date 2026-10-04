@@ -1650,4 +1650,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String reciterOfRiwaya(String riwaya) {
     return 'رواية $riwaya';
   }
+
+  @override
+  String get copyVerses => 'نسخ';
+
+  @override
+  String get shareVerseText => 'مشاركة نصًا';
+
+  @override
+  String get shareVerseImage => 'مشاركة صورة';
+
+  @override
+  String get sharePreparing => 'جارٍ تجهيز الصورة…';
+
+  @override
+  String get shareImageFailed => 'تعذر تجهيز الصورة';
+
+  @override
+  String get shareVerseCredit =>
+      'نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان';
 }

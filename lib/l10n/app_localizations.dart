@@ -2922,6 +2922,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'رواية {riwaya}'**
   String reciterOfRiwaya(String riwaya);
+
+  /// No description provided for @copyVerses.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ'**
+  String get copyVerses;
+
+  /// No description provided for @shareVerseText.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة نصًا'**
+  String get shareVerseText;
+
+  /// No description provided for @shareVerseImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة صورة'**
+  String get shareVerseImage;
+
+  /// No description provided for @sharePreparing.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تجهيز الصورة…'**
+  String get sharePreparing;
+
+  /// No description provided for @shareImageFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تجهيز الصورة'**
+  String get shareImageFailed;
+
+  /// No description provided for @shareVerseCredit.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان'**
+  String get shareVerseCredit;
 }
 
 class _AppLocalizationsDelegate

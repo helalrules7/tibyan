@@ -4,6 +4,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../core/db/content_database.dart';
@@ -28,6 +29,8 @@ import '../../khatma/presentation/journal_screen.dart';
 import '../data/mushaf_repository.dart';
 import '../data/tajweed.dart';
 import '../data/riwaya_data.dart';
+import '../data/verse_image.dart';
+import '../data/verse_share.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'widgets/art_frame.dart';
@@ -89,6 +92,14 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Multi-verse selection: the handles are shown and every other control
   /// waits until the reader taps Done.
   bool _multi = false;
+
+  /// Each page is drawn inside its own boundary, so a picture of the
+  /// selected verses can be cut from the page being read (one key per page:
+  /// a key moving between pages would clash while pages turn).
+  final Map<int, GlobalKey> _captureKeys = {};
+
+  /// True while the page is drawn without its selection, for that picture.
+  bool _capturing = false;
 
   /// Recitation mode: verses stay covered until revealed.
   bool _recite = false;
@@ -345,7 +356,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           : null;
       final interaction = PageInteraction(
         // The reader's selection, or else the verse being recited.
-        selection: pg == _page && _selA != null
+        selection: _capturing
+            ? const {}
+            : pg == _page && _selA != null
             ? _selectionOn(pg)
             : recitation.active && recitation.ayah != null
             ? {(surah: recitation.surah, ayah: recitation.ayah!)}
@@ -399,7 +412,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               : _revealed.add(v),
         ),
         ornateOpening: openingSurah != null,
-        showHandles: _multi,
+        showHandles: _multi && !_capturing,
         divineNames: settings.highlightDivineNames
             ? ref.watch(divineNameBoxesProvider(pg)).value ?? const []
             : const [],
@@ -470,7 +483,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   .setTajweedColors(!settings.tajweedColors),
               onTajweedLegend: () => showTajweedLegend(context),
             );
-      final pageWidget = switch (edition) {
+      final pageBody = switch (edition) {
         MushafEdition.madina1405 => OldMushafPage(
           page: pg,
           interaction: interaction,
@@ -487,6 +500,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           interaction: interaction,
         ),
       };
+      final pageWidget = RepaintBoundary(
+        key: _captureKeys.putIfAbsent(pg, GlobalKey.new),
+        child: pageBody,
+      );
       final info = ref.watch(frameInfoProvider(pg)).value;
       void openIndex(String tab) {
         final a = ref.read(pageAyahsProvider(pg)).value?.firstOrNull;
@@ -807,6 +824,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   final h = hafsKeyOf(_riwaya, range.first);
                   showReflectionSheet(context, surah: h.surah, ayah: h.ayah);
                 },
+                // The text is Tanzil's, which is the Hafs text: a riwaya
+                // edition shares only the picture of its page.
+                onCopy: edition.isRiwaya ? null : () => _copyVerses(range),
+                onShareText: edition.isRiwaya
+                    ? null
+                    : () => _shareVerseText(range),
+                onShareImage: () => _shareVerseImage(range),
               ),
             ),
         ],
@@ -1201,6 +1225,73 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           content: Text(l.markRemoved),
         ),
       );
+  }
+
+  /// The selected verses as Tanzil's rows (Hafs editions).
+  String _verseText(List<VerseKey> range) {
+    final l = AppLocalizations.of(context);
+    final surahs = ref.read(surahsProvider).value;
+    final ayahs = ref.read(pageAyahsProvider(_page)).value ?? const [];
+    return composeVerseText(
+      verses: [
+        for (final k in range)
+          ...ayahs.where((a) => a.surah == k.surah && a.number == k.ayah),
+      ],
+      surahLabel: (s) =>
+          l.surahWord(surahs == null ? '' : surahName(context, surahs[s - 1])),
+      digits: NumberFormatter(Localizations.localeOf(context)).call,
+      range: (s, a, b) => l.verseRange(s, a, b),
+      credit: l.shareVerseCredit,
+    );
+  }
+
+  Future<void> _copyVerses(List<VerseKey> range) async {
+    final text = _verseText(range);
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    await Clipboard.setData(ClipboardData(text: text));
+    messenger.showSnackBar(SnackBar(content: Text(l.copied)));
+  }
+
+  Rect? _shareOrigin() {
+    final box = context.findRenderObject();
+    return box is RenderBox ? box.localToGlobal(Offset.zero) & box.size : null;
+  }
+
+  Future<void> _shareVerseText(List<VerseKey> range) async {
+    final origin = _shareOrigin();
+    await SharePlus.instance.share(
+      ShareParams(text: _verseText(range), sharePositionOrigin: origin),
+    );
+  }
+
+  /// A picture of the selected verses cut from the page as it is drawn
+  /// (its theme, ink and paper), without a frame or caption.
+  Future<void> _shareVerseImage(List<VerseKey> range) async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final paper = context.tokens.colors.paper;
+    final origin = _shareOrigin();
+    messenger.showSnackBar(SnackBar(content: Text(l.sharePreparing)));
+    final file = await captureSelectionImage(
+      key: _captureKeys.putIfAbsent(_page, GlobalKey.new),
+      paper: paper,
+      clean: () async {
+        setState(() => _capturing = true);
+        await SchedulerBinding.instance.endOfFrame;
+      },
+      restore: () async {
+        if (mounted) setState(() => _capturing = false);
+      },
+    );
+    messenger.hideCurrentSnackBar();
+    if (file == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l.shareImageFailed)));
+      return;
+    }
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(file.path)], sharePositionOrigin: origin),
+    );
   }
 
   Future<void> _goToPage() async {

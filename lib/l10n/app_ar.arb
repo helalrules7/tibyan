@@ -1236,5 +1236,11 @@
         "type": "String"
       }
     }
-  }
+  },
+  "copyVerses": "نسخ",
+  "shareVerseText": "مشاركة نصًا",
+  "shareVerseImage": "مشاركة صورة",
+  "sharePreparing": "جارٍ تجهيز الصورة…",
+  "shareImageFailed": "تعذر تجهيز الصورة",
+  "shareVerseCredit": "نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان"
 }

@@ -9,8 +9,8 @@ import 'illuminated_frame.dart';
 import 'mushaf_page.dart';
 
 /// Services for the selected verses: listening, tafsir and translation,
-/// the four one-tap marks and saving to a named fasil. Services whose
-/// data is not enabled yet (copy and share) are not shown.
+/// the four one-tap marks, copying and sharing (as text and as a picture of
+/// the page) and saving to a named fasil.
 class VerseServicesPanel extends StatelessWidget {
   const VerseServicesPanel({
     super.key,
@@ -25,6 +25,9 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onWordStudy,
     required this.onWordMeanings,
     this.onReflect,
+    this.onCopy,
+    this.onShareText,
+    this.onShareImage,
     this.similarCount = 0,
     this.onSimilar,
   });
@@ -53,6 +56,12 @@ class VerseServicesPanel extends StatelessWidget {
 
   /// Writes a note on the first selected verse (tadabbur journal).
   final VoidCallback? onReflect;
+
+  /// Copy and share the selected verses. A null callback hides its button
+  /// (the riwaya editions have no text that reads right outside the app).
+  final VoidCallback? onCopy;
+  final VoidCallback? onShareText;
+  final VoidCallback? onShareImage;
 
   @override
   Widget build(BuildContext context) {
@@ -246,6 +255,39 @@ class VerseServicesPanel extends StatelessWidget {
                   ],
                 ],
               ),
+              if (onCopy != null ||
+                  onShareText != null ||
+                  onShareImage != null) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (onCopy != null)
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.copy_outlined,
+                          label: l.copyVerses,
+                          onTap: onCopy!,
+                        ),
+                      ),
+                    if (onShareText != null)
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.ios_share,
+                          label: l.shareVerseText,
+                          onTap: onShareText!,
+                        ),
+                      ),
+                    if (onShareImage != null)
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.image_outlined,
+                          label: l.shareVerseImage,
+                          onTap: onShareImage!,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 8),
               FilledButton.tonalIcon(
                 onPressed: onSaveToFasil,
@@ -261,6 +303,43 @@ class VerseServicesPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ShareButton extends StatelessWidget {
+  const _ShareButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 3),
+    child: OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size.fromHeight(56),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _MarkButton extends StatelessWidget {

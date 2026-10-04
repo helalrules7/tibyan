@@ -736,5 +736,11 @@
   "unknownAuthor": "Unknown author",
   "otherRiwayaReciters": "Reciters of other riwayat",
   "otherRiwayaHint": "Chosen from the mushaf of their riwaya, whose verses are numbered differently.",
-  "reciterOfRiwaya": "Riwaya of {riwaya}"
+  "reciterOfRiwaya": "Riwaya of {riwaya}",
+  "copyVerses": "Copy",
+  "shareVerseText": "Share as text",
+  "shareVerseImage": "Share as image",
+  "sharePreparing": "Preparing the image…",
+  "shareImageFailed": "Could not prepare the image",
+  "shareVerseCredit": "Quran text: Tanzil Project (tanzil.net) · Tibyan app"
 }

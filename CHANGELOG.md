@@ -6,6 +6,11 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (copy and share verses)
+- «نسخ» (copy), «مشاركة نصًا» (share as text) and «مشاركة صورة» (share as image) in the verse services, for one verse or a selected stretch. The text is Tanzil's Uthmani text exactly as published (CC BY 3.0, no changes), with each verse's number in ornate brackets, a reference line per surah and Tanzil's credit; the basmala that Tanzil puts at the start of verse 1 is left out. The riwaya editions share the picture only: their text is encoded for the Complex's fonts and does not read right outside the app.
+- The picture is cut from the page as drawn (its edition, theme, ink and paper), with no frame and no caption. It is found by capturing the page with and without the selection, so it works in every edition without each page's drawing code reporting its boxes.
+- Known: Tanzil writes «مَا لِىَ» (separate) in an-Naml 20 and Ya-Sin 22 where the reviewers decided «مَالِيَ» (docs/review/DECISIONS.md 4 and 6); Tanzil's licence forbids changing its text, so the copied text keeps Tanzil's spelling.
+
 ### Added (recitation timings anyone can correct)
 - The timings of al-Sudais, al-Minshawi, al-Husary, Abdul Basit, al-Banna and Mustafa Ismail (verses and words), and of ten riwaya recitations (verses), are now text files in `data/timing/`, published under CC BY 4.0 with their sources' credit; content.db is built from them, with the same rows as before. Which reciters' timings may be published, and why, is in docs/TIMING.md.
 - A timing editor on the web (https://helalrules7.github.io/tibyan/, Arabic, works on a phone): listen with the waveform, the word being recited highlighted in the mushaf text, drag a word's start or end, tap to mark words while listening, nudge by 10 or 50 ms, loop a word or verse, slow down to half speed, undo, and see problems as you go. «اقترح التعديل» opens GitHub's editor with the new file, so the correction arrives as a pull request.

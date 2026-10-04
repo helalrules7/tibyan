@@ -1657,4 +1657,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String reciterOfRiwaya(String riwaya) {
     return 'Riwaya of $riwaya';
   }
+
+  @override
+  String get copyVerses => 'Copy';
+
+  @override
+  String get shareVerseText => 'Share as text';
+
+  @override
+  String get shareVerseImage => 'Share as image';
+
+  @override
+  String get sharePreparing => 'Preparing the image…';
+
+  @override
+  String get shareImageFailed => 'Could not prepare the image';
+
+  @override
+  String get shareVerseCredit =>
+      'Quran text: Tanzil Project (tanzil.net) · Tibyan app';
 }
