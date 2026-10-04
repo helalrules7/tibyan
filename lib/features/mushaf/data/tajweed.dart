@@ -1,3 +1,4 @@
+import 'dart:isolate';
 import 'dart:ui';
 
 import '../../../core/settings/app_settings.dart';
@@ -159,39 +160,212 @@ List<(TajweedRule, Rect)> parseTajweedRects(String data) => [
         ),
 ];
 
-/// The coloured letters of a new-edition page as one clip path per rule
-/// (page units), from the page's SVG text and its `tajweed_page` row.
-Map<TajweedRule, Path> tajweedPaths(String svg, List<TajweedContour> entries) {
-  final out = <TajweedRule, Path>{};
-  for (final (rule, p) in tajweedPieces(svg, entries)) {
-    (out[rule] ??= Path()).addPath(p, Offset.zero);
-  }
-  return out;
+/// One coloured piece of a new-edition page (page units): a contour of the
+/// page text, or the part of it inside [clip] when only part of it is the
+/// letter.
+class TajweedPiece {
+  TajweedPiece(this.rule, this.path, this.clip, this.bounds);
+
+  final TajweedRule rule;
+
+  /// The whole contour.
+  final Path path;
+
+  /// The letter's span, as wide as the letter and as tall as the contour
+  /// (and a unit more): what of [path] is coloured. Null for the whole
+  /// contour.
+  final Rect? clip;
+
+  /// The bounds of the coloured part: the line it is drawn with is the one
+  /// its centre falls on.
+  final Rect bounds;
 }
 
-/// Each coloured piece of a new-edition page (page units): a contour of
-/// the page text, or the part of it inside its letter's clip.
-List<(TajweedRule, Path)> tajweedPieces(
+/// A [TajweedPiece] as plain data, which a worker isolate can build.
+typedef TajweedPieceGeometry = ({
+  TajweedRule rule,
+  ContourGeometry contour,
+  Rect? clip,
+  Rect bounds,
+});
+
+/// Each coloured piece of a new-edition page, from the page's SVG text and
+/// its `tajweed_page` row. Reading the SVG is most of the work (the whole
+/// page text is read to count its contours); see [loadTajweedPieces],
+/// which does it off the main isolate.
+List<TajweedPiece> tajweedPieces(String svg, List<TajweedContour> entries) =>
+    _toPieces(tajweedPieceGeometry(svg, entries));
+
+List<TajweedPiece> _toPieces(List<TajweedPieceGeometry> geometry) => [
+  for (final g in geometry)
+    TajweedPiece(g.rule, g.contour.toPath(), g.clip, g.bounds),
+];
+
+/// [tajweedPieces] as plain data, without dart:ui: run on a worker isolate.
+List<TajweedPieceGeometry> tajweedPieceGeometry(
   String svg,
   List<TajweedContour> entries,
 ) {
-  final contours = pageContours(
+  final contours = pageContourGeometry(
     svg,
     wanted: {for (final e in entries) e.contour},
   );
-  final out = <(TajweedRule, Path)>[];
-  for (final e in entries) {
-    var p = contours[e.contour];
-    if (p == null) continue;
-    if (e.x0 != null && e.x1 != null) {
-      final b = p.getBounds();
-      p = Path.combine(
-        PathOperation.intersect,
-        p,
-        Path()..addRect(Rect.fromLTRB(e.x0!, b.top - 1, e.x1!, b.bottom + 1)),
-      );
-    }
-    out.add((e.rule, p));
-  }
-  return out;
+  return [
+    for (final e in entries)
+      if (contours[e.contour] case final c?)
+        // A span that runs backwards (x1 before x0) holds nothing: it was
+        // never coloured (its clip, built by Path.combine, was empty), and
+        // is still not.
+        if (e.x0 != null && e.x1 != null && e.x1! <= e.x0!)
+          ...const <TajweedPieceGeometry>[]
+        else if (e.x0 != null && e.x1 != null)
+          () {
+            final b = c.bounds;
+            final clip = Rect.fromLTRB(e.x0!, b.top - 1, e.x1!, b.bottom + 1);
+            return (
+              rule: e.rule,
+              contour: c,
+              clip: clip,
+              bounds: _clippedBounds(c, clip) ?? b.intersect(clip),
+            );
+          }()
+        else
+          (rule: e.rule, contour: c, clip: null, bounds: c.bounds),
+  ];
 }
+
+/// The bounds of the part of [c] inside [clip]'s x span, from its outline
+/// followed in short steps; null when none of it is inside.
+Rect? _clippedBounds(ContourGeometry c, Rect clip) {
+  final x0 = clip.left, x1 = clip.right;
+  double? l, t, r, b;
+  void take(double x, double y) {
+    if (x < x0 - 1e-9 || x > x1 + 1e-9) return;
+    l = l == null || x < l! ? x : l;
+    r = r == null || x > r! ? x : r;
+    t = t == null || y < t! ? y : t;
+    b = b == null || y > b! ? y : b;
+  }
+
+  var px = 0.0, py = 0.0, sx = 0.0, sy = 0.0;
+  // A step of the outline from (px, py) to (x, y): its ends, and where it
+  // crosses either edge of the span.
+  void step(double x, double y) {
+    take(x, y);
+    for (final edge in [x0, x1]) {
+      if ((px - edge) * (x - edge) < 0) {
+        take(edge, py + (y - py) * (edge - px) / (x - px));
+      }
+    }
+    px = x;
+    py = y;
+  }
+
+  const steps = 16;
+  final p = c.points;
+  var k = 0;
+  for (final v in c.verbs) {
+    switch (v) {
+      case ContourGeometry.moveVerb:
+        px = sx = p[k];
+        py = sy = p[k + 1];
+        take(px, py);
+        k += 2;
+      case ContourGeometry.lineVerb:
+        step(p[k], p[k + 1]);
+        k += 2;
+      case ContourGeometry.quadVerb:
+        final (ax, ay) = (px, py);
+        for (var i = 1; i <= steps; i++) {
+          final s = i / steps, u = 1 - s;
+          step(
+            u * u * ax + 2 * u * s * p[k] + s * s * p[k + 2],
+            u * u * ay + 2 * u * s * p[k + 1] + s * s * p[k + 3],
+          );
+        }
+        k += 4;
+      case ContourGeometry.cubicVerb:
+        final (ax, ay) = (px, py);
+        for (var i = 1; i <= steps; i++) {
+          final s = i / steps, u = 1 - s;
+          step(
+            u * u * u * ax +
+                3 * u * u * s * p[k] +
+                3 * u * s * s * p[k + 2] +
+                s * s * s * p[k + 4],
+            u * u * u * ay +
+                3 * u * u * s * p[k + 1] +
+                3 * u * s * s * p[k + 3] +
+                s * s * s * p[k + 5],
+          );
+        }
+        k += 6;
+      default:
+        step(sx, sy);
+    }
+  }
+  if (l == null) return null;
+  return Rect.fromLTRB(l!, t!, r!, b!);
+}
+
+/// The coloured pieces of page [page] for its `tajweed_page` row [data],
+/// with [svg] its text. The SVG is read on a worker isolate, so the main
+/// isolate only builds the pieces' few paths; the pages read last are kept,
+/// so a page turned back to, or built again, costs nothing.
+Future<List<TajweedPiece>> loadTajweedPieces(
+  int page,
+  String svg,
+  String data,
+) {
+  final key = (page, svg.length, data);
+  final hit = _piecesCache.remove(key);
+  if (hit != null) return _piecesCache[key] = hit;
+  final load = _readOffMain(
+    svg,
+    parseTajweedContours(data),
+    page,
+  ).then(_toPieces);
+  _piecesCache[key] = load;
+  if (_piecesCache.length > _piecesCacheSize) {
+    _piecesCache.remove(_piecesCache.keys.first);
+  }
+  // A failed read is not kept.
+  load.catchError((Object _) {
+    if (identical(_piecesCache[key], load)) _piecesCache.remove(key);
+    return const <TajweedPiece>[];
+  });
+  return load;
+}
+
+/// [tajweedPieceGeometry] on a worker isolate. A function of its own, so
+/// the closure sent to the worker holds nothing but its arguments.
+Future<List<TajweedPieceGeometry>> _readOffMain(
+  String svg,
+  List<TajweedContour> entries,
+  int page,
+) => Isolate.run(
+  () => tajweedPieceGeometry(svg, entries),
+  debugName: 'tajweed $page',
+);
+
+/// The page, its SVG's length and the row; most recently used last.
+final _piecesCache = <(int, int, String), Future<List<TajweedPiece>>>{};
+
+/// The page on screen, its neighbours, and a few turned back to.
+const _piecesCacheSize = 6;
+
+/// The parsed rows of [parseTajweedRects], by row: an image page is built
+/// again on every touch and every recitation step, and a row runs to
+/// thousands of numbers.
+List<(TajweedRule, Rect)> tajweedRectsOf(String data) {
+  final hit = _rectsCache.remove(data);
+  if (hit != null) return _rectsCache[data] = hit;
+  final rects = parseTajweedRects(data);
+  _rectsCache[data] = rects;
+  if (_rectsCache.length > _piecesCacheSize) {
+    _rectsCache.remove(_rectsCache.keys.first);
+  }
+  return rects;
+}
+
+final _rectsCache = <String, List<(TajweedRule, Rect)>>{};

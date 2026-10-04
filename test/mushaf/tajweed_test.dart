@@ -219,8 +219,9 @@ void main() {
       }
       // Al-Baqara 2:6 opens page 3: «إِنَّ» has a ghunnah.
       expect(rows.any((r) => r.rule == TajweedRule.ghunnah), isTrue);
-      final paths = tajweedPaths(svg, rows);
-      expect(paths.keys, contains(TajweedRule.hamzatWasl));
+      final pieces = tajweedPieces(svg, rows);
+      expect(pieces, hasLength(rows.length));
+      expect(pieces.map((p) => p.rule), contains(TajweedRule.hamzatWasl));
 
       for (final edition in [
         MushafEdition.madina1405,

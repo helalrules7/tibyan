@@ -822,7 +822,7 @@ List<(Rect, Color)> tajweedOf(PageInteraction x) {
   final colour = x.tajweedColor;
   if (colour == null || x.tajweed.isEmpty) return const [];
   return [
-    for (final (rule, r) in parseTajweedRects(x.tajweed))
+    for (final (rule, r) in tajweedRectsOf(x.tajweed))
       if (colour(rule) case final c?) (r, c),
   ];
 }

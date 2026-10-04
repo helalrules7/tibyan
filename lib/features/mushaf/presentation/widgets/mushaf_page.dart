@@ -366,7 +366,8 @@ class _MushafPageState extends ConsumerState<MushafPage> {
     void Function(Canvas, bool, int)? markers,
     required Set<int> emphasis,
   }) {
-    if (_artKey == key) return;
+    // The colouring is still being read: bake once, when it is in.
+    if (_tajweedPending || _artKey == key) return;
     _artKey = key;
     final width = (layout.size.width * dpr).ceil();
     final height = (layout.size.height * dpr).ceil();
@@ -416,22 +417,60 @@ class _MushafPageState extends ConsumerState<MushafPage> {
 
   /// Tajweed colouring: each coloured piece of the page (page units), for
   /// [_tajweedKey] (page and data row).
-  List<(TajweedRule, Path)> _tajweed = const [];
+  List<TajweedPiece> _tajweed = const [];
   (int, String)? _tajweedKey;
 
-  /// Reads the contours the page's tajweed row points at, once per page.
-  void _loadTajweed(String data) {
+  /// The pieces for [_tajweedKey] are still being read. The page is not
+  /// baked again until they are in: baking it without them and again with
+  /// them drew it twice.
+  bool _tajweedPending = false;
+
+  /// [_tajweed] grouped by line and colour, for [_tajweedGroupsKey].
+  Map<int, Map<Color, List<TajweedPiece>>> _tajweedGroups = const {};
+  Object? _tajweedGroupsKey;
+
+  /// Reads the contours the page's tajweed row points at, once per page,
+  /// on a worker isolate ([loadTajweedPieces]).
+  Future<void> _loadTajweed(String data, {String? svg}) async {
     final key = (widget.page, data);
     if (_tajweedKey == key) return;
     _tajweedKey = key;
     _tajweed = const [];
+    _tajweedPending = data.isNotEmpty;
     if (data.isEmpty) return;
     final page = widget.page;
-    () async {
-      final svg = await ref.read(pageStoreProvider).svg(page);
-      final pieces = tajweedPieces(svg, parseTajweedContours(data));
-      if (mounted && _tajweedKey == key) setState(() => _tajweed = pieces);
-    }();
+    try {
+      final text = svg ?? await ref.read(pageStoreProvider).svg(page);
+      final pieces = await loadTajweedPieces(page, text, data);
+      if (!mounted || _tajweedKey != key) return;
+      setState(() {
+        _tajweed = pieces;
+        _tajweedPending = false;
+      });
+    } catch (_) {
+      // No colouring for this page; the page itself is still drawn.
+      if (mounted && _tajweedKey == key) {
+        setState(() => _tajweedPending = false);
+      }
+    }
+  }
+
+  /// Starts reading the page's tajweed pieces when the colouring is on. The
+  /// row is the reader's ([PageInteraction.tajweed]) or, when that has not
+  /// come in yet, read here from the same provider.
+  Future<void> _preloadTajweed(String svg) async {
+    final x = widget.interaction;
+    if (x.tajweedColor == null) return;
+    var row = x.tajweed;
+    if (row.isEmpty) {
+      try {
+        row = await ref.read(tajweedPageProvider(widget.page).future);
+      } catch (_) {
+        return;
+      }
+    }
+    if (!mounted || row.isEmpty) return;
+    await _loadTajweed(row, svg: svg);
   }
 
   /// A rosette replaces the printed marker, so the printed one is removed.
@@ -463,6 +502,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
   Future<_PageData> _fetch() async {
     _loadId += 1;
     final svg = await ref.read(pageStoreProvider).svg(widget.page);
+    // The tajweed pieces are read on a worker while the page compiles, and
+    // the page is shown with them, so it is baked once, coloured.
+    final tajweed = _preloadTajweed(svg);
     // Compiling these on the main isolate cost a few hundred milliseconds a
     // page; see [compiledSvgPicture]. The page and its markers do not depend
     // on each other, so both are asked for at once.
@@ -499,6 +541,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
       overflow.putIfAbsent(line, () => []).add(parseOutline(path));
     }
     final viewBox = _viewBox(svg);
+    await tajweed;
     return (
       info,
       viewBox,
@@ -733,25 +776,28 @@ class _MushafPageState extends ConsumerState<MushafPage> {
             // The ink is drawn once at the screen's pixel size; a frame
             // only blits it. Everything the drawing depends on is in the
             // key, so a change to any of it re-bakes.
-            // Tajweed: the coloured pieces as one clip path per line and
-            // colour, so a line band draws only its own.
+            // Tajweed: the coloured pieces by line and colour, so a line band
+            // draws only its own; grouped once per page, size and colours.
             final tajweedColor = x.tajweedColor;
             if (tajweedColor != null) _loadTajweed(x.tajweed);
-            final tajweedByLine = <int, Map<Color, Path>>{};
-            if (tajweedColor != null) {
-              for (final (rule, path) in _tajweed) {
-                final colour = tajweedColor(rule);
-                if (colour == null) continue;
-                final j = layout._lineOf(path.getBounds().center.dy);
-                ((tajweedByLine[j] ??= {})[colour] ??= Path()).addPath(
-                  path,
-                  Offset.zero,
-                );
-              }
-            }
             final tajweedSig = tajweedColor == null
                 ? ''
                 : '${_tajweed.length}:${[for (final r in TajweedRule.values) tajweedColor(r)?.toARGB32()].join(',')}';
+            final groupsKey = (_tajweed, box.biggest, tajweedSig);
+            if (_tajweedGroupsKey != groupsKey) {
+              _tajweedGroupsKey = groupsKey;
+              final groups = <int, Map<Color, List<TajweedPiece>>>{};
+              if (tajweedColor != null) {
+                for (final piece in _tajweed) {
+                  final colour = tajweedColor(piece.rule);
+                  if (colour == null) continue;
+                  final j = layout._lineOf(piece.bounds.center.dy);
+                  ((groups[j] ??= {})[colour] ??= []).add(piece);
+                }
+              }
+              _tajweedGroups = groups;
+            }
+            final tajweedByLine = _tajweedGroups;
             final dpr = MediaQuery.devicePixelRatioOf(context);
             final emphasisLines = x.emphasisLines.toList()..sort();
             _bakeArt(
@@ -1308,8 +1354,15 @@ void _paintInk(
   required Color? divineColor,
   required List<Rect> divineNames,
   required Map<int, List<Rect>> divineByLine,
-  Map<int, Map<Color, Path>> tajweedByLine = const {},
+  Map<int, Map<Color, List<TajweedPiece>>> tajweedByLine = const {},
 }) {
+  // Tajweed: only the letters (and marks) a rule applies to. This line's,
+  // or every line's when the page is drawn whole.
+  final tajweed = line < 0
+      ? [for (final m in tajweedByLine.values) ...m.entries]
+      : (tajweedByLine[line] ?? const <Color, List<TajweedPiece>>{}).entries;
+  // A layer of its own, holding only the ink, for the colours to land on.
+  if (tajweed.isNotEmpty) c.saveLayer(null, Paint());
   // The page itself, recoloured outside light mode.
   if (ink != null) {
     c.saveLayer(
@@ -1353,22 +1406,27 @@ void _paintInk(
       c.restore();
     }
   }
-  // Tajweed: only the letters (and marks) a rule applies to, recoloured in
-  // place. This line's, or every line's when the page is drawn whole.
-  final tajweed = line < 0
-      ? [for (final m in tajweedByLine.values) ...m.entries]
-      : (tajweedByLine[line] ?? const <Color, Path>{}).entries;
-  for (final MapEntry(key: colour, value: path) in tajweed) {
-    c.save();
-    c.clipPath(path);
-    c.saveLayer(
-      path.getBounds(),
-      Paint()..colorFilter = ColorFilter.mode(colour, BlendMode.srcIn),
-    );
-    page();
-    c.restore();
-    c.restore();
+  // Each piece filled with its colour only where ink already is (srcATop):
+  // the letter is recoloured and its holes stay empty, without drawing the
+  // page again (that was a whole page per colour per line).
+  for (final MapEntry(key: colour, value: pieces) in tajweed) {
+    final paint = Paint()
+      ..color = colour
+      ..blendMode = BlendMode.srcATop;
+    final whole = Path();
+    for (final p in pieces) {
+      if (p.clip == null) {
+        whole.addPath(p.path, Offset.zero);
+      } else {
+        c.save();
+        c.clipRect(p.clip!);
+        c.drawPath(p.path, paint);
+        c.restore();
+      }
+    }
+    c.drawPath(whole, paint);
   }
+  if (tajweed.isNotEmpty) c.restore();
 }
 
 /// The printed verse markers alone, drawn again over the recitation covers.
