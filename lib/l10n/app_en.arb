@@ -33,7 +33,7 @@
   "crashReportsLabel": "Send crash reports",
   "crashReportsHint": "Sends technical crash details only, with no personal data. Off until you agree.",
   "aboutTitle": "About",
-  "aboutBody": "Tibyan is a free, non-profit app with no ads and no purchases, and its code is open. Every text in it comes from a verified source, shown next to it.",
+  "aboutBody": "Tibyan is an app for reading and reflecting on the Quran, and its code is open. Every text in it comes from a verified source, shown next to it.",
   "versionLabel": "Version {version}",
   "selected": "Selected",
   "onbLanguageTitle": "اختر اللغة\nChoose your language",

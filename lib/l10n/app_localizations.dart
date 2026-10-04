@@ -299,7 +299,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutBody.
   ///
   /// In ar, this message translates to:
-  /// **'تبيان تطبيق مجاني غير ربحي، بلا إعلانات ولا مشتريات، وشيفرته مفتوحة. كل نص فيه من مصدر موثق مذكور بجانبه.'**
+  /// **'تبيان تطبيق لقراءة القرآن الكريم وتدبّره، وشيفرته مفتوحة. كل نص فيه من مصدر موثق مذكور بجانبه.'**
   String get aboutBody;
 
   /// No description provided for @versionLabel.
