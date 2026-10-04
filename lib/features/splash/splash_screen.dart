@@ -22,6 +22,10 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
+/// Where the splash leads: home, or for store screenshots the screen given
+/// with `--dart-define=TIBYAN_START=/settings` (tools/store_screenshots.sh).
+const _start = String.fromEnvironment('TIBYAN_START', defaultValue: '/');
+
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   Timer? _timer;
 
@@ -29,7 +33,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     _timer = Timer(widget.duration, () {
-      if (mounted) context.go('/');
+      if (mounted) context.go(_start);
     });
   }
 
