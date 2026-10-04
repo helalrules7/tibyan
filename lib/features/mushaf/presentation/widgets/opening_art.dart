@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/duotone.dart';
 import '../../../../core/theme/theme_tokens.dart';
 
 /// Where things sit in the opening-page frames (docs/design/fateha-themes,
@@ -289,15 +290,24 @@ class _SlicedArtState extends State<_SlicedArt> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      CustomPaint(painter: _SlicedArtPainter(_info?.image, widget.geometry));
+  Widget build(BuildContext context) => CustomPaint(
+    painter: _SlicedArtPainter(
+      _info?.image,
+      widget.geometry,
+      context.tokens.colors.artTint,
+    ),
+  );
 }
 
 class _SlicedArtPainter extends CustomPainter {
-  _SlicedArtPainter(this.image, this.geometry);
+  _SlicedArtPainter(this.image, this.geometry, this.tint);
 
   final ui.Image? image;
   final OpeningArtGeometry geometry;
+
+  /// The mode's [ModeTokens.artTint]: the drawing recoloured to match the
+  /// page frame, or its own colours when null.
+  final (Color, Color)? tint;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -307,6 +317,7 @@ class _SlicedArtPainter extends CustomPainter {
     final sx = image.width / OpeningArtLayout.size.width;
     final sy = image.height / OpeningArtLayout.size.height;
     final paint = Paint()..filterQuality = FilterQuality.medium;
+    if (tint case final t?) paint.colorFilter = duotoneFilter(t);
     final slices = geometry.slices();
     for (var i = 0; i < slices.length; i++) {
       final (src, dst) = slices[i];
@@ -328,6 +339,7 @@ class _SlicedArtPainter extends CustomPainter {
   @override
   bool shouldRepaint(_SlicedArtPainter old) =>
       old.image != image ||
+      old.tint != tint ||
       old.geometry.frame != geometry.frame ||
       old.geometry.repeats != geometry.repeats;
 }

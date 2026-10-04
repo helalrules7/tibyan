@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/app_settings.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/duotone.dart';
 import '../../data/tajweed.dart';
 import 'mushaf_page.dart';
 import 'theme_art.dart';
@@ -343,6 +344,7 @@ class MarkerLook {
     required this.paper,
     required this.ink,
     this.art,
+    this.artTint,
   });
 
   /// The shape drawn: [MarkerStyle.theme] only with [art].
@@ -356,6 +358,10 @@ class MarkerLook {
   final Color? tint;
   final Color paper;
   final Color ink;
+
+  /// The theme's [ModeTokens.artTint]: the rosettes recoloured to match its
+  /// frame, or their own colours when null.
+  final (Color, Color)? artTint;
 
   /// Under the page ink: a tint that shows inside the printed marker.
   void paintUnder(Canvas canvas, Offset c, double r) {
@@ -401,7 +407,9 @@ class MarkerLook {
       img,
       Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
       Rect.fromCenter(center: c, width: size, height: size),
-      Paint()..filterQuality = FilterQuality.medium,
+      Paint()
+        ..filterQuality = FilterQuality.medium
+        ..colorFilter = artTint == null ? null : duotoneFilter(artTint!),
     );
     final fill = marked ?? tint;
     canvas.drawCircle(c, r * 0.86, Paint()..color = fill ?? paper);
@@ -411,7 +419,7 @@ class MarkerLook {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = r * 0.1
-        ..color = const Color(0xFF1C2F45),
+        ..color = artTint?.$1 ?? const Color(0xFF1C2F45),
     );
     final digits = number
         .toString()

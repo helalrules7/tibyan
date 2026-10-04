@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/duotone.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'art_frame.dart';
 import 'catchword_view.dart';
@@ -78,27 +79,9 @@ final frameImagesProvider = FutureProvider.family<FrameImages, (Color, Color)?>(
   },
 );
 
-/// [image] in two colours: each pixel's luminance placed between [tint]'s
-/// dark and light colour, its alpha kept. Done once per tint, not per frame.
+/// [image] through [duotoneFilter], once per tint rather than per frame.
 Future<ui.Image> _duotone(ui.Image image, (Color, Color) tint) async {
-  final (dark, light) = tint;
-  // Rec. 709 luminance of the source pixel, 0..1.
-  const lr = 0.2126, lg = 0.7152, lb = 0.0722;
-  List<double> row(double d, double l) {
-    final span = l - d;
-    return [span * lr, span * lg, span * lb, 0, d * 255];
-  }
-
-  final filter = ColorFilter.matrix([
-    ...row(dark.r, light.r),
-    ...row(dark.g, light.g),
-    ...row(dark.b, light.b),
-    0,
-    0,
-    0,
-    1,
-    0,
-  ]);
+  final filter = duotoneFilter(tint);
   final recorder = ui.PictureRecorder();
   Canvas(recorder).drawImage(image, Offset.zero, Paint()..colorFilter = filter);
   final picture = recorder.endRecording();

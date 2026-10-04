@@ -322,6 +322,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 : Color(settings.markerTint!),
             paper: t.paper,
             ink: t.ink,
+            artTint: t.artTint,
           );
 
     Widget pageAt(int i) {
