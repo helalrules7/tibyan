@@ -128,13 +128,14 @@ class RealPagePreview extends ConsumerWidget {
       );
     } else {
       // Zakhrafa: its own illuminated frame, drawn at the same size.
-      ready = ready && ref.watch(frameImagesProvider).value != null;
+      ready = ready && ref.watch(frameImagesProvider(t.artTint)).value != null;
       body = FittedBox(
         child: SizedBox.fromSize(
           size: _artSize,
           child: ZakhrafaFramePreview(
             paper: t.paper,
             rule: t.marker,
+            tint: t.artTint,
             child: Padding(padding: const EdgeInsets.all(6), child: inked),
           ),
         ),

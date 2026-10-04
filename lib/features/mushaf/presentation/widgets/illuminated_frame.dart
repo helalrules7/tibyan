@@ -52,25 +52,63 @@ Future<ui.Image> _load(String name) async {
   return (await codec.getNextFrame()).image;
 }
 
-/// The Zakhrafa frame's ornament images.
-final frameImagesProvider = FutureProvider<FrameImages>((ref) async {
-  final images = await Future.wait([
-    _load('frame_corner.png'),
-    _load('frame_edge_h.png'),
-    _load('frame_edge_v.png'),
-    _load('rosette_cartouche.png'),
-    _load('rosette_margin.png'),
-    _load('mosaic_tile.png'),
+/// The Zakhrafa frame's ornament images, recoloured by the mode's
+/// [ModeTokens.artTint] when it has one.
+final frameImagesProvider = FutureProvider.family<FrameImages, (Color, Color)?>(
+  (ref, tint) async {
+    final images = await Future.wait([
+      _load('frame_corner.png'),
+      _load('frame_edge_h.png'),
+      _load('frame_edge_v.png'),
+      _load('rosette_cartouche.png'),
+      _load('rosette_margin.png'),
+      _load('mosaic_tile.png'),
+    ]);
+    final art = tint == null
+        ? images
+        : await Future.wait([for (final i in images) _duotone(i, tint)]);
+    return FrameImages(
+      corner: art[0],
+      edgeH: art[1],
+      edgeV: art[2],
+      rosette: art[3],
+      margin: art[4],
+      mosaic: art[5],
+    );
+  },
+);
+
+/// [image] in two colours: each pixel's luminance placed between [tint]'s
+/// dark and light colour, its alpha kept. Done once per tint, not per frame.
+Future<ui.Image> _duotone(ui.Image image, (Color, Color) tint) async {
+  final (dark, light) = tint;
+  // Rec. 709 luminance of the source pixel, 0..1.
+  const lr = 0.2126, lg = 0.7152, lb = 0.0722;
+  List<double> row(double d, double l) {
+    final span = l - d;
+    return [span * lr, span * lg, span * lb, 0, d * 255];
+  }
+
+  final filter = ColorFilter.matrix([
+    ...row(dark.r, light.r),
+    ...row(dark.g, light.g),
+    ...row(dark.b, light.b),
+    0,
+    0,
+    0,
+    1,
+    0,
   ]);
-  return FrameImages(
-    corner: images[0],
-    edgeH: images[1],
-    edgeV: images[2],
-    rosette: images[3],
-    margin: images[4],
-    mosaic: images[5],
-  );
-});
+  final recorder = ui.PictureRecorder();
+  Canvas(recorder).drawImage(image, Offset.zero, Paint()..colorFilter = filter);
+  final picture = recorder.endRecording();
+  try {
+    return await picture.toImage(image.width, image.height);
+  } finally {
+    picture.dispose();
+    image.dispose();
+  }
+}
 
 /// What the frame shows around one page.
 class FrameInfo {
@@ -233,7 +271,9 @@ class IlluminatedFrame extends ConsumerWidget {
         child: child,
       );
     }
-    final images = ref.watch(frameImagesProvider).value;
+    final images = ref
+        .watch(frameImagesProvider(context.tokens.colors.artTint))
+        .value;
     final overlays = LayoutBuilder(
       builder: (context, box) {
         const inset = band + 6;
@@ -546,16 +586,20 @@ class ZakhrafaFramePreview extends ConsumerWidget {
     required this.paper,
     required this.rule,
     required this.child,
+    this.tint,
   });
 
   final Color paper;
   final Color rule;
   final Widget child;
 
+  /// The previewed mode's [ModeTokens.artTint].
+  final (Color, Color)? tint;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) => CustomPaint(
     painter: _FramePainter(
-      images: ref.watch(frameImagesProvider).value,
+      images: ref.watch(frameImagesProvider(tint)).value,
       rule: rule,
       paper: paper,
     ),
@@ -932,7 +976,9 @@ class OrnateFrame extends ConsumerWidget {
         child: child,
       );
     }
-    final images = ref.watch(frameImagesProvider).value;
+    final images = ref
+        .watch(frameImagesProvider(context.tokens.colors.artTint))
+        .value;
     final t = context.tokens.colors;
     final l = AppLocalizations.of(context);
     final digits = NumberFormatter(Localizations.localeOf(context));

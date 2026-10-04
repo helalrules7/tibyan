@@ -201,6 +201,7 @@ class ModeTokens {
     required this.highlight,
     required this.control,
     required this.onControl,
+    this.artTint,
   });
 
   /// Screen background.
@@ -249,6 +250,11 @@ class ModeTokens {
   /// Text and icons drawn on [control]. Must be at least 4.5:1 against it.
   final Color onControl;
 
+  /// The frame's ornament images recoloured as a duotone: their darkest
+  /// tones become the first colour and their lightest the second. Null
+  /// keeps the images' own colours.
+  final (Color, Color)? artTint;
+
   factory ModeTokens.fromJson(Map<String, dynamic> json) {
     Color c(String key) => parseHexColor(json[key] as String);
     return ModeTokens(
@@ -269,6 +275,13 @@ class ModeTokens {
       highlight: c('highlight'),
       control: c('control'),
       onControl: c('onControl'),
+      artTint: switch (json['artTint']) {
+        [final String dark, final String light] => (
+          parseHexColor(dark),
+          parseHexColor(light),
+        ),
+        _ => null,
+      },
     );
   }
 }
