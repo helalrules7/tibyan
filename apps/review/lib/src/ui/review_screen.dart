@@ -173,11 +173,9 @@ class _EntryListState extends State<_EntryList> {
               DropdownButton<String?>(
                 value: f.kind,
                 hint: const Text('كل الأنواع'),
-                items: const [
-                  DropdownMenuItem(value: null, child: Text('كل الأنواع')),
-                  DropdownMenuItem(value: 'passage', child: Text('مقاطع')),
-                  DropdownMenuItem(value: 'surah_intro', child: Text('مطالع السور')),
-                  DropdownMenuItem(value: 'front_matter', child: Text('مقدمة الكتاب')),
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('كل الأنواع')),
+                  for (final k in c.kinds) DropdownMenuItem(value: k, child: Text(entryKindLabel(k))),
                 ],
                 onChanged: (v) => _set(kind: v),
               ),
@@ -395,7 +393,7 @@ class _EntryDetailState extends State<_EntryDetail> {
           Text(
             '${source.title}، ${source.author}. تحقيق: ${source.tahqiq ?? 'غير مذكور'}. '
             '${source.publisher ?? ''}، ${source.edition ?? ''}. '
-            '${e.volume != null ? 'ج${e.volume} ' : ''}ص ${e.page ?? '?'}'
+            '${e.page == null ? 'بلا أرقام صفحات في المصدر' : '${e.volume != null ? 'ج${e.volume} ' : ''}ص ${e.page}'}'
             '${e.pageEnd != null && e.pageEnd != e.page ? '-${e.pageEnd}' : ''}',
             style: theme.textTheme.bodySmall,
           ),

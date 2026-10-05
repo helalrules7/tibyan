@@ -64,6 +64,12 @@ class SqliteReviewStore implements ReviewStore {
   }
 
   @override
+  Future<List<String>> kinds() async => [
+        for (final r in db.select('SELECT kind FROM entry GROUP BY kind ORDER BY min(source_id * 1000000 + seq)'))
+          r['kind'] as String,
+      ];
+
+  @override
   Future<List<EntrySummary>> entries(EntryFilter f) async {
     final where = <String>[];
     final args = <Object?>[];

@@ -14,6 +14,7 @@ class ReviewController extends ChangeNotifier {
 
   List<Source> sources = const [];
   List<SurahInfo> surahs = const [];
+  List<String> kinds = const [];
   Map<ReviewState, int> counts = const {};
   EntryFilter filter = const EntryFilter();
   List<EntrySummary> list = const [];
@@ -31,6 +32,7 @@ class ReviewController extends ChangeNotifier {
   Future<void> load() async {
     sources = await store.sources();
     surahs = await store.surahs();
+    kinds = await store.kinds();
     await refresh();
   }
 
