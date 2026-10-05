@@ -18,8 +18,13 @@ This script therefore:
      audio URLs found in the responses (or, if a book's responses carry
      none, fills the confirmed template in PATTERNS), checks that each verse
      gets exactly one URL, and HEAD-checks a sample.
-Output: tools/.cache/staging/nuqayah/<book>/ with index.json, head_checks.json,
-SHA256SUMS and manifest.json. No text from the responses is kept.
+     A book whose files turn out to be one per surah gets its template in
+     SURAH_PATTERNS instead ({surah} or {s3}); the index then lists the
+     surah files, and per-verse offsets only if Nuqayah provides them.
+Output: tools/.cache/staging/nuqayah/<book>/ with index.json (the verse
+audio index the app reads, format 1: tools/audio_index.py and
+docs/features/audio_content.md), head_checks.json, SHA256SUMS and
+manifest.json. No text from the responses is kept.
 
 A third-party page links per-surah files of another book
 (https://mirrors.quranicaudio.com/tafsir.one/ibn-juzay/001.mp3), so the
@@ -35,6 +40,7 @@ import re
 import sys
 import time
 
+import audio_index
 import staging
 
 READER = 'https://read.tafsir.one/'
@@ -47,6 +53,17 @@ BOOKS = {'almuyassar': 'almuyassar', 'saadi': 'saadi'}
 # Book -> confirmed URL template ({surah}, {ayah}, {s3}, {a3}), filled
 # after `probe` only if the get.php responses carry no URL themselves.
 PATTERNS = {}
+# Book -> confirmed per-surah file template ({surah}, {s3}), when the
+# recordings are one file a surah. Offsets of the verses in those files
+# are not published; they are added only if Nuqayah sends them.
+SURAH_PATTERNS = {}
+# The index's names, for the app (the book titles, as Nuqayah names them).
+TITLES = {
+    'almuyassar': ('التفسير الميسر', 'Al-Tafsir al-Muyassar'),
+    'saadi': ('تفسير السعدي', 'Tafsir al-Sa\'di'),
+}
+# Credit key in lib/features/mushaf/presentation/source_names.dart.
+SOURCE_KEY = 'nuqayah-tafsir-audio'
 STATUS = ('APPROVED with conditions (no ads, no profit), attribution wording and '
           'file access pending (letter 8). Index staged only; audio not mirrored.')
 AUDIO_RE = re.compile(r'''(?:https?:)?//[^\s"'<>()]+?\.(?:mp3|m4a|ogg|opus|aac|wav)(?:\?[^\s"'<>()]*)?''', re.I)
@@ -86,6 +103,14 @@ def find_templates(js):
 
 def fill(pattern, surah, ayah):
     return pattern.format(surah=surah, ayah=ayah, s3=f'{surah:03d}', a3=f'{ayah:03d}')
+
+
+def index_payload(book, verses=(), surahs=(), offsets=(), **meta):
+    """The app's verse audio index (format 1) for one book."""
+    ar, en = TITLES.get(book, (book, book))
+    return audio_index.make_index(
+        f'nuqayah-{book}', 'tafsir_audio', SOURCE_KEY, verses=verses, surahs=surahs,
+        offsets=offsets, title_ar=ar, title_en=en, book=book, src=BOOKS.get(book), **meta)
 
 
 def page_span(response, ayah):
@@ -129,7 +154,26 @@ def probe():
     print(json.dumps(report, indent=1))
 
 
+def build_surah_book(book, sample=10):
+    """A book recorded one file a surah: the index lists the 114 files."""
+    surahs = [[s, fill(SURAH_PATTERNS[book], s, 0)] for s in range(1, 115)]
+    d = OUT / book
+    d.mkdir(parents=True, exist_ok=True)
+    audio_index.write(d / 'index.json', index_payload(book, surahs=surahs))
+    picks = surahs[:1] + surahs[-1:] + random.Random(20261005).sample(surahs, min(sample, 114))
+    checks = [dict(staging.head_record(u), surah=s) for s, u in picks]
+    (d / 'head_checks.json').write_text(json.dumps(checks, indent=1) + '\n', encoding='utf-8')
+    staging.write_sums(d)
+    ok = sum(1 for c in checks if c['status'] == 200)
+    staging.write_manifest(d, book=book, source=SURAH_PATTERNS[book], surahs_indexed=114,
+                           per_verse_offsets=False, head_checked=len(checks), head_ok=ok,
+                           mirrored=False, status=STATUS)
+    print(f'{book}: 114 surah files indexed, HEAD {ok}/{len(checks)}')
+
+
 def build_book(book, sample=10):
+    if book in SURAH_PATTERNS:
+        return build_surah_book(book, sample)
     src = BOOKS[book]
     index, unassigned = {}, []
     for surah, count in enumerate(staging.VERSE_COUNTS, 1):
@@ -150,9 +194,8 @@ def build_book(book, sample=10):
     d = OUT / book
     d.mkdir(parents=True, exist_ok=True)
     rows = [[s, a, u] for (s, a), u in sorted(index.items())]
-    (d / 'index.json').write_text(json.dumps({'book': book, 'src': src, 'verses': rows,
-                                              'unassigned_pages': unassigned},
-                                             separators=(',', ':')) + '\n', encoding='utf-8')
+    audio_index.write(d / 'index.json',
+                      index_payload(book, verses=rows, unassigned_pages=unassigned))
     picks = rows[:1] + rows[-1:] + random.Random(20261005).sample(rows, min(sample, len(rows)))
     checks = [dict(staging.head_record(u), surah=s, ayah=a) for s, a, u in picks]
     (d / 'head_checks.json').write_text(json.dumps(checks, indent=1) + '\n', encoding='utf-8')
