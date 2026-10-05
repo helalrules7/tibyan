@@ -24,6 +24,7 @@ import 'core/router/app_router.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
 import 'features/audio/car_browser.dart';
+import 'features/audio/car_channel.dart';
 import 'features/audio/recitation.dart';
 import 'features/audio/timing_updates.dart';
 import 'features/khatma/khatma_providers.dart';
@@ -225,14 +226,17 @@ void _startKhatma(ProviderContainer container) {
   }
 }
 
-/// Android Auto: the reciters and surahs to choose from in the car, and
-/// «continue» from the reading position (lib/features/audio/car_browser.dart).
+/// Android Auto and CarPlay: the reciters and surahs to choose from in the
+/// car, and «continue» from the reading position
+/// (lib/features/audio/car_browser.dart). Android Auto asks through the
+/// audio service; CarPlay through `app.tibyan/car` (car_channel.dart).
 void _startCarBrowsing(ProviderContainer container) {
-  if (defaultTargetPlatform != TargetPlatform.android) return;
+  final android = defaultTargetPlatform == TargetPlatform.android;
+  if (!android && defaultTargetPlatform != TargetPlatform.iOS) return;
   final text = lookupAppLocalizations(
     container.read(settingsProvider).locale ?? const Locale('ar'),
   );
-  JustAudioBackground.browser = CarBrowser(
+  final browser = CarBrowser(
     reciters: () => container.read(recitersProvider.future),
     surahs: () => container.read(surahsProvider.future),
     position: () async {
@@ -250,4 +254,9 @@ void _startCarBrowsing(ProviderContainer container) {
       surah: (n, name) => '$n. ${text.surahWord(name)}',
     ),
   );
+  if (android) {
+    JustAudioBackground.browser = browser;
+  } else {
+    unawaited(CarChannel(browser).attach());
+  }
 }
