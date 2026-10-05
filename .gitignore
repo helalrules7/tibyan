@@ -29,6 +29,8 @@ key.properties
 # al-Damghani (5.5 MB): `python3 tools/import_damghani_wujuh.py`. LFS uploads are
 # refused from the cloud session, so it waits here with the others.
 /data/review/wujuh_damghani.review.db
+# The tajweed sample (ن15): `python3 tools/import_tajweed_review.py`.
+/data/review/tajweed_hafs.review.db
 
 # ── Flutter / Dart ─────────────────────────────────────────────────
 .dart_tool/

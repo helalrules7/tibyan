@@ -6,6 +6,7 @@ import '../platform/file_io.dart';
 import 'controller.dart';
 import 'link_dialog.dart';
 import 'verse_view.dart';
+import 'tajweed_view.dart';
 
 /// The book's text (Uthman Taha Naskh) and the mushaf text (KFGQPC Hafs).
 const bookFont = 'UthmanTaha';
@@ -403,7 +404,19 @@ class _EntryDetailState extends State<_EntryDetail> {
           style: theme.textTheme.bodySmall,
         ),
         const Divider(height: 32),
-        Text('نص الكتاب (كما هو، لا يُعدَّل)', style: theme.textTheme.labelLarge),
+        if (e.kind == 'tajweed_verse' && e.links.isNotEmpty) ...[
+          Text('الآية ملونة بأحكام البيانات', style: theme.textTheme.labelLarge),
+          const SizedBox(height: 8),
+          FutureBuilder<List<Verse>>(
+            future: c.verses(e.links.first.surah, e.links.first.ayahFrom, e.links.first.ayahFrom),
+            builder: (context, snap) => snap.hasData && snap.data!.isNotEmpty
+                ? TajweedVerseView(verse: snap.data!.first, marks: TajweedMark.parse(e.text))
+                : const LinearProgressIndicator(),
+          ),
+          const Divider(height: 32),
+        ],
+        Text(e.kind == 'tajweed_verse' ? 'الأحكام كما في البيانات (لا تُعدَّل)' : 'نص الكتاب (كما هو، لا يُعدَّل)',
+            style: theme.textTheme.labelLarge),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(16),

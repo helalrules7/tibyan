@@ -6,6 +6,13 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (tajweed review)
+- The tajweed rules the app colours with can now be reviewed by a qualified reader: `tools/import_tajweed_review.py` puts Juz' 'Amma and a fixed sample of 300 other verses (864 verses, 5,715 rules) in a review file, and the review tool shows each verse coloured by its rules with the list under it.
+
+### Added (recitation timing)
+- `timing_files.py fix-known`: two rules that fix 30 of the 76 known source timing errors without listening (not yet applied: they go in with a rebuilt content.db).
+- A `timing-measure` workflow, run by hand, measures missing verse and word timings by forced alignment on the files the app plays, riwaya recitations by their own count, and produces files for review; it never publishes.
+
 ### Added (review drafts, not shown in the app)
 - The five tafsirs (al-Tabari, al-Qurtubi, Ibn Kathir, al-Baghawi, al-Saadi) and al-Biqa'i's Nazm al-Durar imported as review drafts from OpenITI's altafsir.com copies: one entry per verse group, each linked to its verses (`tools/import_altafsir.py`). The files are rebuilt locally and stay out of the repository until review starts.
 - al-Damghani's «إصلاح الوجوه والنظائر» imported as 2,744 drafts (481 words, 2,236 senses), rebuilt with `tools/import_damghani_wujuh.py`.

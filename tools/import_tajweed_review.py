@@ -157,7 +157,7 @@ def build(out, content_db, sample):
         entry = {'seq': seq, 'kind': KIND, 'section': f'{names[s]} {a}', 'volume': None,
                  'page': v['page'], 'page_end': None, 'text': entry_text(words, rs),
                  'notes': notes}
-        link = {'surah': s, 'ayah_from': a, 'ayah_to': a, 'basis': 'data', 'confidence': 1.0}
+        link = {'surah': s, 'ayah_from': a, 'ayah_to': a, 'basis': 'marker', 'confidence': 1.0}
         review_db.add_draft(db, source_id, row['key'], entry, [link], SCRIPT)
         stats['entries'] += 1
         stats['rules'] += len(rs)
