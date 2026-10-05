@@ -8,6 +8,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,12 +46,20 @@ Future<void> main() async {
       }
     });
   }
-  // Recitation keeps playing with the screen off, with lock-screen controls.
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'app.tibyan.recitation',
-    androidNotificationChannelName: 'التلاوة',
-    androidNotificationOngoing: true,
-  );
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.windows || TargetPlatform.linux:
+      // No system media session package for these: just_audio plays
+      // through libmpv (just_audio_media_kit).
+      JustAudioMediaKit.ensureInitialized(linux: true, windows: true);
+    default:
+      // Recitation keeps playing with the screen off, with lock-screen
+      // controls.
+      await JustAudioBackground.init(
+        androidNotificationChannelId: 'app.tibyan.recitation',
+        androidNotificationChannelName: 'التلاوة',
+        androidNotificationOngoing: true,
+      );
+  }
 
   final registry = await ThemeRegistry.load(rootBundle);
   final flags = await FeatureFlags.load(rootBundle);

@@ -1,8 +1,8 @@
 name: Native builds
 
-# Builds the platforms CI's Linux job does not: the Android widgets, and the
-# iOS and macOS apps with their WidgetKit extensions (apple/). Only when
-# something native changes, or by hand.
+# Builds the platforms CI's Linux job does not: the Android widgets, the iOS
+# and macOS apps with their WidgetKit extensions (apple/), and the Windows
+# and Linux desktop apps. Only when something native changes, or by hand.
 on:
   push:
     branches: ['**']
@@ -10,9 +10,12 @@ on:
       - 'android/**'
       - 'ios/**'
       - 'macos/**'
+      - 'windows/**'
+      - 'linux/**'
       - 'apple/**'
       - 'tools/apple/**'
       - 'pubspec.yaml'
+      - 'lib/main.dart'
       - '.github/workflows/native.yml'
   workflow_dispatch:
 
@@ -80,3 +83,42 @@ jobs:
           ls "$app/Contents/PlugIns"
           test -d "$app/Contents/PlugIns/TibyanWidget.appex"
           test -d "$app/Contents/PlugIns/TibyanActions.appex"
+
+  linux:
+    name: Linux desktop
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - name: Build tools (GTK, and libmpv for the recitation player)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev libmpv-dev mpv libsecret-1-dev libjsoncpp-dev
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter config --enable-linux-desktop
+      - run: flutter pub get
+      - run: flutter build linux --release
+
+  windows:
+    name: Windows desktop
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter config --enable-windows-desktop
+      - run: flutter pub get
+      - run: flutter build windows --release
