@@ -751,5 +751,8 @@
   "backupDone": "Restored: {added} new, {updated} updated",
   "@backupDone": {"placeholders": {"added": {"type": "String"}, "updated": {"type": "String"}}},
   "backupInvalid": "This file is not a Tibyan backup",
-  "backupFailed": "That did not work"
+  "backupFailed": "That did not work",
+  "playbackSpeedLabel": "Recitation speed",
+  "playbackSpeedValue": "×{value}",
+  "@playbackSpeedValue": {"placeholders": {"value": {"type": "String"}}}
 }

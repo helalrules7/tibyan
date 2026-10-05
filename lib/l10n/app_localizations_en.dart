@@ -1705,4 +1705,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupFailed => 'That did not work';
+
+  @override
+  String get playbackSpeedLabel => 'Recitation speed';
+
+  @override
+  String playbackSpeedValue(String value) {
+    return '×$value';
+  }
 }

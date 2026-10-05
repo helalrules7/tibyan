@@ -3006,6 +3006,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعذرت العملية'**
   String get backupFailed;
+
+  /// No description provided for @playbackSpeedLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'سرعة التلاوة'**
+  String get playbackSpeedLabel;
+
+  /// No description provided for @playbackSpeedValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'×{value}'**
+  String playbackSpeedValue(String value);
 }
 
 class _AppLocalizationsDelegate

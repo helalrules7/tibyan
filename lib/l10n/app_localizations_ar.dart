@@ -1698,4 +1698,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backupFailed => 'تعذرت العملية';
+
+  @override
+  String get playbackSpeedLabel => 'سرعة التلاوة';
+
+  @override
+  String playbackSpeedValue(String value) {
+    return '×$value';
+  }
 }

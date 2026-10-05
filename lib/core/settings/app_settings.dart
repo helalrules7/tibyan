@@ -91,6 +91,7 @@ class AppSettings {
     this.versePause = 500,
     this.repeat = 1,
     this.repeatSilence = 0,
+    this.playbackSpeed = 1.0,
     this.elderlyMode = false,
     this.tajweedColors = false,
     this.tajweedHues = const {},
@@ -158,6 +159,9 @@ class AppSettings {
   /// Seconds of silence between repetitions, to repeat after the reciter.
   final int repeatSilence;
 
+  /// Recitation speed (1.0 as recorded).
+  final double playbackSpeed;
+
   /// «وضع كبار السن»: larger text and touch targets, stronger contrast, a
   /// home with only the main tasks, the page as large as it can be, and
   /// slower transitions.
@@ -193,6 +197,7 @@ class AppSettings {
     int? versePause,
     int? repeat,
     int? repeatSilence,
+    double? playbackSpeed,
     bool? elderlyMode,
     bool? tajweedColors,
     Map<String, String>? tajweedHues,
@@ -219,6 +224,7 @@ class AppSettings {
     versePause: versePause ?? this.versePause,
     repeat: repeat ?? this.repeat,
     repeatSilence: repeatSilence ?? this.repeatSilence,
+    playbackSpeed: playbackSpeed ?? this.playbackSpeed,
     elderlyMode: elderlyMode ?? this.elderlyMode,
     tajweedColors: tajweedColors ?? this.tajweedColors,
     tajweedHues: tajweedHues ?? this.tajweedHues,

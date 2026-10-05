@@ -437,6 +437,25 @@ class PlayerOptions extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
         ],
+        Semantics(
+          header: true,
+          child: Text(l.playbackSpeedLabel, style: title),
+        ),
+        const SizedBox(height: 6),
+        chips<double>(
+          [
+            for (final v in [0.75, 1.0, 1.25, 1.5, 2.0])
+              (
+                v,
+                l.playbackSpeedValue(
+                  v == v.roundToDouble() ? digits(v.toInt()) : v.toString(),
+                ),
+              ),
+          ],
+          settings.playbackSpeed,
+          c.setSpeed,
+        ),
+        const SizedBox(height: 12),
         // A sleep timer belongs to one listening, so it is set only then.
         if (playing) ...[
           Semantics(header: true, child: Text(l.sleepLabel, style: title)),

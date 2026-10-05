@@ -447,6 +447,9 @@ abstract class RecitationAudio {
   Future<void> pause();
   Future<void> seek(Duration position);
   Future<void> stop();
+
+  /// Playback speed, 1.0 as recorded.
+  Future<void> setSpeed(double speed);
   Future<void> dispose();
 }
 
@@ -464,6 +467,9 @@ class _JustAudio implements RecitationAudio {
 
   @override
   ProcessingState get processingState => _p.processingState;
+
+  @override
+  Future<void> setSpeed(double speed) => _p.setSpeed(speed);
 
   @override
   Future<void> load(Uri uri, MediaItem tag, Duration initial) => _p
@@ -658,6 +664,7 @@ class RecitationController extends Notifier<RecitationState> {
           at,
         );
         if (load != _loads) return;
+        unawaited(_p.setSpeed(ref.read(settingsProvider).playbackSpeed));
         _loading = false;
         _resumeMs = at > Duration.zero ? at.inMilliseconds : null;
         state = state.copyWith(loading: false);
@@ -942,6 +949,12 @@ class RecitationController extends Notifier<RecitationState> {
   void setRepeat(int times) {
     state = state.copyWith(repeat: times);
     unawaited(ref.read(settingsProvider.notifier).setRepeat(times));
+  }
+
+  /// Sets the recitation speed, now and for the next time.
+  void setSpeed(double speed) {
+    unawaited(_p.setSpeed(speed));
+    unawaited(ref.read(settingsProvider.notifier).setPlaybackSpeed(speed));
   }
 
   /// Sets the silence between repetitions, and keeps it for the next time.

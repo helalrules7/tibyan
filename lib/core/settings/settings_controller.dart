@@ -40,6 +40,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kVersePause = 'settings.versePause';
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
+  static const _kPlaybackSpeed = 'settings.playbackSpeed';
   static const _kElderly = 'settings.elderlyMode';
   static const _kTajweed = 'settings.tajweedColors';
   static const _kTajweedHues = 'settings.tajweedHues';
@@ -97,6 +98,7 @@ class SettingsController extends Notifier<AppSettings> {
       versePause: _prefs.getInt(_kVersePause) ?? 500,
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
+      playbackSpeed: _prefs.getDouble(_kPlaybackSpeed) ?? 1.0,
       elderlyMode: _prefs.getBool(_kElderly) ?? false,
       tajweedColors: _prefs.getBool(_kTajweed) ?? false,
       tajweedHues: {
@@ -236,6 +238,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setRepeat(int times) async {
     state = state.copyWith(repeat: times);
     await _prefs.setInt(_kRepeat, times);
+  }
+
+  Future<void> setPlaybackSpeed(double speed) async {
+    state = state.copyWith(playbackSpeed: speed);
+    await _prefs.setDouble(_kPlaybackSpeed, speed);
   }
 
   Future<void> setRepeatSilence(int seconds) async {
