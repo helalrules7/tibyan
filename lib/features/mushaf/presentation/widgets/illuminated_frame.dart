@@ -306,27 +306,32 @@ class IlluminatedFrame extends ConsumerWidget {
                           fontSize: 15,
                           color: t.ink,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            FrameTap(
-                              label: l.juzLabel(digits(info!.juz)),
-                              onTap: onJuzTap,
-                            ),
-                            FrameStar(color: t.marker),
-                            if (info!.hizb case final hizb?) ...[
+                        // A long surah name or large system text shrinks
+                        // to the cartouche instead of overflowing it.
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
                               FrameTap(
-                                label: l.hizbLabel(digits(hizb)),
-                                onTap: onHizbTap,
+                                label: l.juzLabel(digits(info!.juz)),
+                                onTap: onJuzTap,
                               ),
                               FrameStar(color: t.marker),
+                              if (info!.hizb case final hizb?) ...[
+                                FrameTap(
+                                  label: l.hizbLabel(digits(hizb)),
+                                  onTap: onHizbTap,
+                                ),
+                                FrameStar(color: t.marker),
+                              ],
+                              FrameTap(
+                                label: info!.surahName,
+                                bold: true,
+                                onTap: onSurahTap,
+                              ),
                             ],
-                            FrameTap(
-                              label: info!.surahName,
-                              bold: true,
-                              onTap: onSurahTap,
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),

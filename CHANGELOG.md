@@ -11,6 +11,12 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Fixed
+- The juz, hizb and surah in the frame's top cartouche overflowed it with a long surah name or large system text; they now shrink to fit.
+
+### Added (flow tests)
+- Tests that go through the whole app from the router: open the mushaf, select a verse with a screen reader's double tap and copy it (with its link and credit), and turn pages with the arrow keys while the reading position follows (test/flows/).
+
 ### Added (recitation in the car)
 - Android Auto: the car shows «تابع من موضع القراءة» (the recitation from the last reading position) and the reciters, each with the 114 surahs to play. This needs a hook that just_audio_background does not offer, so the package is vendored in `packages/just_audio_background` with that addition only (TIBYAN.md there). CarPlay needs an entitlement from Apple and is not set up.
 
