@@ -55,8 +55,14 @@ word, start_ms, end_ms], ...], "flagged": [[ayah, why], ...], "speech":
 [[ayah, first letter ms, last letter ms], ...]}}. `apply`
 replaces the reciter's ayah_timing and word_timing rows with them.
 Check with `python3 tools/verify_word_timing.py --db <reciter>`.
+
+tools/measure_timing.py (the timing-measure workflow) drives the same
+steps for other recitations and riwayat (`align` with another text, no
+basmala unit) and for the words of single verses in their windows
+(`align_verse`, `word_spans`).
 """
 import json
+import multiprocessing
 import sqlite3
 import subprocess
 import sys
@@ -95,9 +101,15 @@ LEAD_IN = 1000        # ms before a verse's first letter searched for its pause
 REACH = 250           # ms either side of the aligned gap searched for the pause
 SMOOTH = 10           # 10 ms frames: smoothing of the loudness for the quietest point
 
-# Letters the model's vocabulary knows; ٱ (alif wasla) is read as ا.
+# Letters the model's vocabulary knows; ٱ (alif wasla) is read as ا. The
+# KFGQPC texts of Warsh, Qalun, al-Duri and Shu'bah also write letters in
+# their Maghribi or Persian forms (fa with its dot below, qaf with one dot,
+# dotless final fa, qaf and nun, Persian ya and kaf, alif with a wavy
+# hamza): each is read as the letter it is. None of them is in the Hafs
+# text, whose reading is unchanged.
 LETTERS = set('ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوىي')
-MAP = {'ٱ': 'ا'}
+MAP = {'ٱ': 'ا', 'ڢ': 'ف', 'ڡ': 'ف', 'ڧ': 'ق', 'ٯ': 'ق', 'ں': 'ن', 'ی': 'ي', 'ے': 'ي',
+       'ک': 'ك', 'ٲ': 'أ', 'ٳ': 'إ'}
 
 
 def words_of(text):
@@ -136,57 +148,77 @@ def audio(path):
 
 # ---------------------------------------------------------------- emit
 
-def emit(reciter, surahs):
+def load_model():
+    """(model, device): the CTC model, on Apple's GPU when there is one."""
     import torch
     from transformers import Wav2Vec2ForCTC
     device = 'mps' if torch.backends.mps.is_available() else 'cpu'
     model = Wav2Vec2ForCTC.from_pretrained(MODEL).eval().to(device)
     if device == 'mps':
         model = model.half()
-    out_dir = CACHE / 'emissions' / str(reciter)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    return model, device
+
+
+def emissions(model, device, a, ctx_before=None, ctx_after=None):
+    """Log-probabilities per 20 ms frame (frames x tokens) of audio a
+    (16 kHz mono), read CHUNK_S seconds at a time with CONTEXT_S seconds
+    either side. [ctx_before] and [ctx_after], when given, are audio just
+    before and after a (a verse's window cut from its surah): read as
+    context for its first and last chunks, and dropped."""
+    import torch
     step = CHUNK_S * RATE
     ctx = CONTEXT_S * RATE
     hop = RATE * FRAME_MS // 1000
+    pre = np.zeros(0, np.float32) if ctx_before is None else ctx_before[-ctx:]
+    post = np.zeros(0, np.float32) if ctx_after is None else ctx_after[:ctx]
+    full = np.concatenate([pre, a, post]) if len(pre) or len(post) else a
+    base = len(pre)
+    frames = len(a) // hop
+    pieces = []
+    for i in range(base, base + len(a), step):
+        lo, hi = max(0, i - ctx), min(len(full), i + step + ctx)
+        if hi - lo >= 400:
+            pieces.append((lo, hi, (i - lo) // hop, min(step, base + len(a) - i) // hop))
+    parts = []
+    with torch.inference_mode():
+        k = 0
+        while k < len(pieces):
+            # chunks of the same length go through the model together
+            n = 1
+            while (n < BATCH_CHUNKS and k + n < len(pieces)
+                   and pieces[k + n][1] - pieces[k + n][0] == pieces[k][1] - pieces[k][0]):
+                n += 1
+            xs = []
+            for lo, hi, _, _ in pieces[k:k + n]:
+                x = torch.from_numpy(full[lo:hi].copy())
+                xs.append((x - x.mean()) / (x.std() + 1e-7))
+            x = torch.stack(xs).to(device)
+            if device == 'mps':
+                x = x.half()
+            lp = model(x).logits.float().log_softmax(-1).cpu().numpy()
+            for row, (_, _, first, keep) in zip(lp, pieces[k:k + n]):
+                parts.append(row[first:first + keep])
+            k += n
+    e = np.concatenate(parts)[:frames]
+    if len(e) < frames:
+        e = np.concatenate([e, np.repeat(e[-1:], frames - len(e), axis=0)])
+    return e
+
+
+def emit(reciter, surahs):
+    model, device = load_model()
+    out_dir = CACHE / 'emissions' / str(reciter)
+    out_dir.mkdir(parents=True, exist_ok=True)
     for surah in surahs:
         target = out_dir / f'{surah:03d}.npy'
         src = CACHE / 'audio' / str(reciter) / f'{surah:03d}.mp3'
         if target.exists() or not src.exists():
             continue
-        a = audio(src)
-        frames = len(a) // hop
-        pieces = []
-        for i in range(0, len(a), step):
-            lo, hi = max(0, i - ctx), min(len(a), i + step + ctx)
-            if hi - lo >= 400:
-                pieces.append((lo, hi, (i - lo) // hop, min(step, len(a) - i) // hop))
-        parts = []
-        with torch.inference_mode():
-            k = 0
-            while k < len(pieces):
-                # chunks of the same length go through the model together
-                n = 1
-                while (n < BATCH_CHUNKS and k + n < len(pieces)
-                       and pieces[k + n][1] - pieces[k + n][0] == pieces[k][1] - pieces[k][0]):
-                    n += 1
-                xs = []
-                for lo, hi, _, _ in pieces[k:k + n]:
-                    x = torch.from_numpy(a[lo:hi].copy())
-                    xs.append((x - x.mean()) / (x.std() + 1e-7))
-                x = torch.stack(xs).to(device)
-                if device == 'mps':
-                    x = x.half()
-                lp = model(x).logits.float().log_softmax(-1).cpu().numpy()
-                for row, (_, _, first, keep) in zip(lp, pieces[k:k + n]):
-                    parts.append(row[first:first + keep])
-                k += n
-        e = np.concatenate(parts)[:frames]
-        if len(e) < frames:
-            e = np.concatenate([e, np.repeat(e[-1:], frames - len(e), axis=0)])
+        e = emissions(model, device, audio(src))
         tmp = target.with_suffix('.part.npy')
         np.save(tmp, e.astype(np.float16))
         tmp.rename(target)
-        print(f'reciter {reciter} surah {surah}: {frames} frames', flush=True)
+        print(f'reciter {reciter} surah {surah}: {len(e)} frames', flush=True)
 
 
 
@@ -261,10 +293,7 @@ def place(spans, owner, units, lo):
 def align_surah(e, units, ids):
     """Word spans (frames) for every unit, aligned a few units at a time."""
     star = e.shape[1]
-    e = e.astype(np.float32)
-    best = e.max(axis=1, keepdims=True)
-    e = np.concatenate([e, best - STAR_IN, best - STAR_VERSE, best - STAR_LEAD, best - STAR_TAIL],
-                       axis=1)
+    e = with_stars(e)
     sizes = [sum(len(letters(w)) for w in words) for words in units]
     placed = [None] * len(units)
     cursor, i = 0, 0
@@ -316,6 +345,28 @@ def align_surah(e, units, ids):
     return placed
 
 
+def with_stars(e):
+    """e (frames x tokens) with the four star columns align_surah adds."""
+    e = e.astype(np.float32)
+    best = e.max(axis=1, keepdims=True)
+    return np.concatenate([e, best - STAR_IN, best - STAR_VERSE, best - STAR_LEAD, best - STAR_TAIL], axis=1)
+
+
+def align_verse(e, words, ids):
+    """Word spans [(first frame, end frame, score)], frames of e, of one
+    verse whose window e is (measure_timing.py, `verses`): the verse's
+    words with the same stars as align_surah, a star before them (the
+    window's dear first one) and after (its nearly free last one). None
+    when the window is too short for the letters."""
+    star = e.shape[1]
+    targets, owner = tokens_for([words], ids, star)
+    targets[0], targets[-1] = star + 2, star + 3
+    spans = force(with_stars(e), targets)
+    if spans is None:
+        return None
+    return place(spans, owner, [words], 0)[0]
+
+
 
 # ---------------------------------------------------------------- timings
 
@@ -326,19 +377,63 @@ def quiet_runs(env, level, shortest):
     return [(int(a), int(b)) for a, b in zip(edges[::2], edges[1::2]) if b - a >= shortest]
 
 
-def timings(path, units, placed, opening):
-    """Verse rows [(ayah, start, end)] and word rows [(ayah, word, start,
-    end)] in ms, and the flagged verses [(ayah, why)]. units[0] is the
-    basmala when opening is True; ayah numbers follow."""
+def listen(path):
+    """(env, sm, heard) of a surah file: its loudness per 10 ms frame, the
+    same smoothed (SMOOTH frames), and the pauses heard in it, PAUSE ms or
+    longer, [(start_ms, end_ms)] in order."""
     import build_quranlab_timing as ql
     import build_word_timing as b
     env = ql.envelope(path)                       # 10 ms frames
     sm = np.convolve(env, np.ones(SMOOTH) / SMOOTH, mode='same')
-    total_ms = len(env) * 10
     heard = [q for q in b.silences(path) if q[1] - q[0] >= PAUSE]
     level = b.quiet_db(path, ql.SPEECH_DB)
     heard += [(a * 10, z * 10) for a, z in quiet_runs(sm, level, PAUSE // 10)]
     heard.sort()
+    return env, sm, heard
+
+
+def word_spans(v, start_ms, stop_ms, heard):
+    """[(start_ms, end_ms)] of a verse's words from their aligned spans v
+    ([(first frame, end frame, score)], absolute 20 ms frames), inside the
+    verse's window start_ms..stop_ms: from a word's first letter to the
+    next word's first letter, or to the first pause heard after its sound
+    when that comes sooner. None when the words come out of order."""
+    import bisect
+    f2ms = FRAME_MS
+    starts_heard = [q[0] for q in heard]
+    spans = []
+    for w, (s, e, _) in enumerate(v):
+        s_ms, e_ms = s * f2ms, e * f2ms
+        nxt = v[w + 1][0] * f2ms if w + 1 < len(v) else stop_ms
+        # the first heard pause that starts after this word's sound
+        i = bisect.bisect_left(starts_heard, e_ms - 10)
+        stop = nxt
+        if i < len(heard) and heard[i][0] < nxt:
+            stop = max(e_ms, heard[i][0])
+        spans.append((max(s_ms, start_ms), max(min(stop, stop_ms), s_ms + f2ms)))
+    if any(spans[n][0] < spans[n - 1][0] for n in range(1, len(spans))):
+        return None
+    return spans
+
+
+def loud_span(env, start_ms, stop_ms):
+    """(first, last loud 10 ms frame) of a window, in ms, or None: the word
+    of a one-word verse the model hears poorly (حم, طسم said by name)."""
+    import build_quranlab_timing as ql
+    a, z = start_ms // 10, stop_ms // 10
+    seg = env[a:z]
+    loud = np.flatnonzero(seg > max(ql.SPEECH_DB, np.percentile(seg, 90) - 20)) if len(seg) else []
+    if len(loud):
+        return (a + int(loud[0])) * 10, (a + int(loud[-1]) + 1) * 10
+    return None
+
+
+def timings(path, units, placed, opening):
+    """Verse rows [(ayah, start, end)] and word rows [(ayah, word, start,
+    end)] in ms, and the flagged verses [(ayah, why)]. units[0] is the
+    basmala when opening is True; ayah numbers follow."""
+    env, sm, heard = listen(path)
+    total_ms = len(env) * 10
     f2ms = FRAME_MS
     first = 1 if opening else 0
     verses = placed[first:]
@@ -382,34 +477,21 @@ def timings(path, units, placed, opening):
         rows.append((0, 0, bounds[0]))
     rows += [(k + 1, bounds[k], max(stops[k], bounds[k] + 1)) for k in range(len(verses))]
     words = []
-    starts_heard = [q[0] for q in heard]
-    import bisect
     for k, v in enumerate(verses):
         score = float(np.mean([w[2] for w in v]))
         if score < MIN_SCORE and len(v) == 1:
             # A verse of one word (mostly opening letters, حم, طسم, said by
             # name, which the model hears poorly) is that word: from its
             # first to its last loud frame inside the verse.
-            a, z = bounds[k] // 10, stops[k] // 10
-            seg = env[a:z]
-            loud = np.flatnonzero(seg > max(ql.SPEECH_DB, np.percentile(seg, 90) - 20)) if len(seg) else []
-            if len(loud):
-                words.append((k + 1, 1, (a + int(loud[0])) * 10, (a + int(loud[-1]) + 1) * 10))
+            span = loud_span(env, bounds[k], stops[k])
+            if span:
+                words.append((k + 1, 1, *span))
                 continue
         if score < MIN_SCORE:
             flagged.append((k + 1, f'mean letter log-probability {score:.2f}'))
             continue
-        spans = []
-        for w, (s, e, _) in enumerate(v):
-            s_ms, e_ms = s * f2ms, e * f2ms
-            nxt = v[w + 1][0] * f2ms if w + 1 < len(v) else stops[k]
-            # the first heard pause that starts after this word's sound
-            i = bisect.bisect_left(starts_heard, e_ms - 10)
-            stop = nxt
-            if i < len(heard) and heard[i][0] < nxt:
-                stop = max(e_ms, heard[i][0])
-            spans.append((max(s_ms, bounds[k]), max(min(stop, stops[k]), s_ms + f2ms)))
-        if any(spans[n][0] < spans[n - 1][0] for n in range(1, len(spans))):
+        spans = word_spans(v, bounds[k], stops[k], heard)
+        if spans is None:
             flagged.append((k + 1, 'words out of order'))
             continue
         words += [(k + 1, n + 1, a, z) for n, (a, z) in enumerate(spans)]
@@ -418,28 +500,45 @@ def timings(path, units, placed, opening):
 
 
 def align_job(job):
+    """job: (reciter, surah, {ayah: [word, ...]}, opening words or None).
+    The opening (the basmala, as a unit of its own) is aligned before
+    verse 1 when given; without it the first star takes whatever comes
+    before verse 1."""
     reciter, surah, text, basmala = job
     path = CACHE / 'audio' / str(reciter) / f'{surah:03d}.mp3'
     e = np.load(CACHE / 'emissions' / str(reciter) / f'{surah:03d}.npy')
     ids = vocab()
-    opening = surah not in (1, 9)
+    opening = basmala is not None
     units = ([basmala] if opening else []) + [text[a] for a in sorted(text)]
     placed = align_surah(e, units, ids)
     rows, words, flagged, speech = timings(path, units, placed, opening)
     return surah, rows, words, flagged, speech
 
 
-def align(reciter, surahs):
-    db = sqlite3.connect(DB)
-    text = load_text(db)
-    basmala = text[1][1]
+def align(reciter, surahs, text=None, opening=None, out_path=None):
+    """Aligns these surahs of a reciter (their emissions cached) and writes
+    tools/.cache/aligned_<reciter>.json, or [out_path]. [text] is
+    {surah: {ayah: [word, ...]}}, by default the Hafs words of our word
+    boxes; [opening] gives the words aligned before verse 1 of a surah, or
+    None (by default the basmala, except in al-Fatiha, where it is verse
+    1, and at-Tawba)."""
+    if text is None:
+        db = sqlite3.connect(DB)
+        text = load_text(db)
+    if opening is None:
+        basmala = text[1][1]
+
+        def opening(s):
+            return None if s in (1, 9) else basmala
     jobs = []
     for s in surahs:
         if (CACHE / 'emissions' / str(reciter) / f'{s:03d}.npy').exists():
-            jobs.append((reciter, s, text[s], basmala))
-    out_path = CACHE / f'aligned_{reciter}.json'
+            jobs.append((reciter, s, text[s], opening(s)))
+    out_path = out_path or CACHE / f'aligned_{reciter}.json'
     out = json.loads(out_path.read_text(encoding='utf-8')) if out_path.exists() else {}
-    with ProcessPoolExecutor(4) as pool:
+    # spawned, not forked: the caller may already have torch running threads
+    # (measure_timing.py emits first), which a forked child can deadlock on
+    with ProcessPoolExecutor(4, mp_context=multiprocessing.get_context('spawn')) as pool:
         for surah, rows, words, flagged, speech in pool.map(align_job, jobs):
             if rows is None:
                 print(f'reciter {reciter} surah {surah}: not aligned {flagged[:3]}', flush=True)
@@ -463,7 +562,8 @@ def source_row(today):
     """content.db source row: these timings are measured in Tibyan."""
     return (SOURCE_ID, 'forced-alignment-timing',
             'Verse and word timings measured by forced alignment on the surah files played '
-            '(al-Dosari, al-Sudais, al-Afasy, al-Ghamdi, al-Tablaway)',
+            '(al-Dosari, al-Sudais, al-Afasy, al-Ghamdi, al-Tablaway; and what data/timing/reciters.json '
+            'lists as measured, by tools/measure_timing.py)',
             'Tibyan (tools/build_aligned_timing.py), with jonatasgrosman/wav2vec2-large-xlsr-53-arabic',
             MODEL_REVISION,
             'Timings: measured in Tibyan from the recitations; model Apache-2.0',
