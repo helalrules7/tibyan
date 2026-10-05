@@ -555,7 +555,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get multiSelect => 'تحديد عدة آيات';
 
   @override
-  String get multiSelectHint => 'اسحب المقبضين لتحديد الآيات';
+  String get multiSelectHint =>
+      'اسحب المقبضين، أو اقلب الصفحة واضغط آية لتمديد التحديد إليها';
 
   @override
   String get doneLabel => 'تم';

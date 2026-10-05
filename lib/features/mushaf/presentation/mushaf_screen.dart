@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
@@ -97,6 +100,18 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Multi-verse selection: the handles are shown and every other control
   /// waits until the reader taps Done.
   bool _multi = false;
+
+  /// The pages of the selection's two ends: a stretch of verses may run
+  /// over page breaks (turn the page while selecting, tap a verse to extend).
+  int _pageA = 1;
+  int _pageB = 1;
+
+  /// A picture of a selection over several pages turns the pages itself:
+  /// the selection must survive that.
+  bool _stacking = false;
+
+  /// Most pages one selection may cover.
+  static const _maxSelectionPages = 6;
 
   /// Each page is drawn inside its own boundary, so a picture of the
   /// selected verses can be cut from the page being read (one key per page:
@@ -202,6 +217,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (!mounted) return;
     setState(() {
       _page = start;
+      if (_selA != null) _pageA = _pageB = start;
       _controller = PageController(initialPage: start - _first);
     });
     _trackPage();
@@ -235,8 +251,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   Future<void> _onPageChanged(int index) async {
     setState(() {
       _page = index + _first;
-      _selA = _selB = null;
-      _multi = false;
+      // Turning the page while selecting keeps the selection, so it can be
+      // extended onto the next page.
+      if (!_multi && !_stacking) _selA = _selB = null;
       _pickWord = false;
       // Recitation mode is for one page: turning the page ends it.
       _recite = false;
@@ -380,11 +397,16 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           _setChrome(false);
           setState(() {
             _selA = _selB = v;
+            _pageA = _pageB = pg;
             _pickWord = false;
           });
         },
         onMarkerTap: (v) => _toggleMark(v, pg),
-        onVerseTap: _touchReading && !_multi
+        // Selecting several verses: a tap on a verse (on this page or a later
+        // or earlier one) extends the selection to it.
+        onVerseTap: _multi
+            ? (v) => _extendTo(v, pg)
+            : _touchReading
             ? (v) => setState(() => _touched = v)
             : null,
         touched: _touchReading ? _touched : null,
@@ -393,8 +415,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   ? const Color(0x33D0453B)
                   : const Color(0x40FF8A80))
             : null,
-        onHandleDrag: (start, v) =>
-            setState(() => start ? _selA = v : _selB = v),
+        onHandleDrag: (start, v) => setState(() {
+          if (start) {
+            _selA = v;
+            _pageA = pg;
+          } else {
+            _selB = v;
+            _pageB = pg;
+          }
+        }),
         markerLook: markerLook,
         // Recitation mode covers the page being drawn, whatever the page
         // count says: after an edition change the two can differ for a
@@ -759,12 +788,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               child: VerseServicesPanel(
                 verses: range,
                 surahs: surahs,
-                onMark: (kind) => _setMark(kind, range.first, _page),
+                onMark: (kind) =>
+                    _setMark(kind, range.first, _rangeFirstPage(range)),
                 onSaveToFasil: () => showSaveToFasil(
                   context,
                   ref,
                   verse: hafsKeyOf(_riwaya, range.first),
-                  page: _page,
+                  page: _rangeFirstPage(range),
                 ),
                 onClose: () => setState(() => _selA = _selB = null),
                 onMultiSelect: () {
@@ -848,16 +878,45 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     );
   }
 
-  /// Verses between the two selection ends on the current page, in order.
+  /// Extends the selection to [v] on [page] (selecting several verses).
+  void _extendTo(VerseKey v, int page) {
+    if ((page - _pageA).abs() >= _maxSelectionPages) return;
+    setState(() {
+      _selB = v;
+      _pageB = page;
+    });
+  }
+
+  int get _firstSelPage => _pageA < _pageB ? _pageA : _pageB;
+  int get _lastSelPage => _pageA < _pageB ? _pageB : _pageA;
+
+  /// The verses between the two selection ends, in order, over the pages
+  /// they lie on.
   List<VerseKey>? _range() {
     if (_selA == null || _selB == null) return null;
-    final ayahs = ref.watch(pageAyahsProvider(_page)).value;
-    if (ayahs == null) return [_selA!];
-    final keys = [for (final a in ayahs) (surah: a.surah, ayah: a.number)];
+    final keys = <VerseKey>[];
+    for (var p = _firstSelPage; p <= _lastSelPage; p++) {
+      final ayahs = ref.watch(pageAyahsProvider(p)).value;
+      if (ayahs == null) return [_selA!];
+      keys.addAll([for (final a in ayahs) (surah: a.surah, ayah: a.number)]);
+    }
     final ia = keys.indexOf(_selA!);
     final ib = keys.indexOf(_selB!);
     if (ia < 0 || ib < 0) return [_selA!];
     return keys.sublist(ia < ib ? ia : ib, (ia < ib ? ib : ia) + 1);
+  }
+
+  /// The page the selection's first verse is on.
+  int _rangeFirstPage(List<VerseKey> range) {
+    for (var p = _firstSelPage; p <= _lastSelPage; p++) {
+      final ayahs = ref.read(pageAyahsProvider(p)).value ?? const [];
+      if (ayahs.any(
+        (a) => a.surah == range.first.surah && a.number == range.first.ayah,
+      )) {
+        return p;
+      }
+    }
+    return _page;
   }
 
   Set<VerseKey> _selectionOn(int page) => {...?_range()};
@@ -1241,7 +1300,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   String _verseText(List<VerseKey> range) {
     final l = AppLocalizations.of(context);
     final surahs = ref.read(surahsProvider).value;
-    final ayahs = ref.read(pageAyahsProvider(_page)).value ?? const [];
+    final ayahs = [
+      for (var p = _firstSelPage; p <= _lastSelPage; p++)
+        ...?ref.read(pageAyahsProvider(p)).value,
+    ];
     return composeVerseText(
       verses: [
         for (final k in range)
@@ -1276,24 +1338,64 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   /// A picture of the selected verses cut from the page as it is drawn
-  /// (its theme, ink and paper), without a frame or caption.
+  /// (its theme, ink and paper), without a frame or caption. A stretch over
+  /// a page break turns the pages and joins the pieces in one picture.
   Future<void> _shareVerseImage(List<VerseKey> range) async {
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final paper = context.tokens.colors.paper;
     final origin = _shareOrigin();
+    final from = _firstSelPage;
+    final to = _lastSelPage;
+    final startPage = _page;
     messenger.showSnackBar(SnackBar(content: Text(l.sharePreparing)));
-    final file = await captureSelectionImage(
-      key: _captureKeys.putIfAbsent(_page, GlobalKey.new),
-      paper: paper,
-      clean: () async {
-        setState(() => _capturing = true);
+
+    final pieces = <ui.Image>[];
+    _stacking = true;
+    try {
+      for (var p = from; p <= to; p++) {
+        if (p != _page) {
+          _controller?.jumpToPage(p - _first);
+          // The page builds, and its verses load.
+          for (var i = 0; i < 20 && (_page != p || !mounted); i++) {
+            await SchedulerBinding.instance.endOfFrame;
+          }
+          if (!mounted) return;
+          await ref.read(pageAyahsProvider(p).future);
+          await SchedulerBinding.instance.endOfFrame;
+          await SchedulerBinding.instance.endOfFrame;
+        }
+        final piece = await captureSelectionPicture(
+          key: _captureKeys.putIfAbsent(p, GlobalKey.new),
+          paper: paper,
+          clean: () async {
+            setState(() => _capturing = true);
+            await SchedulerBinding.instance.endOfFrame;
+          },
+          restore: () async {
+            if (mounted) setState(() => _capturing = false);
+          },
+        );
+        if (piece != null) pieces.add(piece);
+      }
+      if (_page != startPage && mounted) {
+        _controller?.jumpToPage(startPage - _first);
         await SchedulerBinding.instance.endOfFrame;
-      },
-      restore: () async {
-        if (mounted) setState(() => _capturing = false);
-      },
-    );
+      }
+    } finally {
+      _stacking = false;
+    }
+    File? file;
+    if (pieces.isNotEmpty) {
+      final one = pieces.length == 1
+          ? pieces.first
+          : await stackVertically(pieces, paper);
+      file = await savePng(one);
+      for (final p in pieces) {
+        p.dispose();
+      }
+      if (!identical(one, pieces.first)) one.dispose();
+    }
     messenger.hideCurrentSnackBar();
     if (file == null) {
       messenger.showSnackBar(SnackBar(content: Text(l.shareImageFailed)));

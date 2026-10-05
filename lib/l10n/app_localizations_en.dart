@@ -556,7 +556,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get multiSelect => 'Select several verses';
 
   @override
-  String get multiSelectHint => 'Drag the handles to select verses';
+  String get multiSelectHint =>
+      'Drag the handles, or turn the page and tap a verse to extend the selection to it';
 
   @override
   String get doneLabel => 'Done';

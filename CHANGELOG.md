@@ -11,6 +11,9 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (selection over page breaks)
+- «تحديد عدة آيات»: turn the page while selecting and tap a verse to extend the selection to it (up to six pages); the services then work on the whole stretch: copy and share as text, marks and the fasil at its first verse. A picture of such a stretch turns the pages itself and joins the pieces in one image.
+
 ### Added (copy and share verses)
 - «نسخ» (copy), «مشاركة نصًا» (share as text) and «مشاركة صورة» (share as image) in the verse services, for one verse or a selected stretch. The text is Tanzil's Uthmani text exactly as published (CC BY 3.0, no changes), with each verse's number in ornate brackets, a reference line per surah and Tanzil's credit; the basmala that Tanzil puts at the start of verse 1 is left out. The riwaya editions share the picture only: their text is encoded for the Complex's fonts and does not read right outside the app.
 - The picture is cut from the page as drawn (its edition, theme, ink and paper), with no frame and no caption. It is found by capturing the page with and without the selection, so it works in every edition without each page's drawing code reporting its boxes.

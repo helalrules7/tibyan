@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,7 @@ import 'package:tibyan/features/mushaf/data/verse_image.dart';
 
 void main() {
   captureTest();
+  stackTest();
   test('changedBounds finds the box of what differs', () {
     const w = 6, h = 5;
     final a = Uint8List(w * h * 4);
@@ -57,6 +59,31 @@ class _PageState extends State<_Page> {
       ),
     ),
   );
+}
+
+void stackTest() {
+  testWidgets('stackVertically joins pieces with a gap, centred', (
+    tester,
+  ) async {
+    final result = await tester.runAsync(() async {
+      Future<ui.Image> solid(int w, int h) async {
+        final r = ui.PictureRecorder();
+        Canvas(r).drawRect(
+          Rect.fromLTWH(0, 0, w.toDouble(), h.toDouble()),
+          Paint()..color = const Color(0xFF000000),
+        );
+        return r.endRecording().toImage(w, h);
+      }
+
+      final stacked = await stackVertically(
+        [await solid(100, 40), await solid(60, 30)],
+        const Color(0xFFFFFFFF),
+        gap: 10,
+      );
+      return (stacked.width, stacked.height);
+    });
+    expect(result, (100, 80));
+  });
 }
 
 void captureTest() {

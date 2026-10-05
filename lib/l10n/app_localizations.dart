@@ -1031,7 +1031,7 @@ abstract class AppLocalizations {
   /// No description provided for @multiSelectHint.
   ///
   /// In ar, this message translates to:
-  /// **'اسحب المقبضين لتحديد الآيات'**
+  /// **'اسحب المقبضين، أو اقلب الصفحة واضغط آية لتمديد التحديد إليها'**
   String get multiSelectHint;
 
   /// No description provided for @doneLabel.

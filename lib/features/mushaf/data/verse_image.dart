@@ -70,15 +70,14 @@ Future<ui.Image> cropOnPaper(
 
 /// Draws the page under [key] twice, once as it is and once after [clean]
 /// has run (it clears the selection and waits for the frame), and returns
-/// the page's picture cut to the selection, as a PNG file in the temporary
-/// directory. Null when nothing was selected on the page.
-Future<File?> captureSelectionImage({
+/// the page's picture cut to the selection. Null when nothing was selected
+/// on the page. [restore] always runs at the end.
+Future<ui.Image?> captureSelectionPicture({
   required GlobalKey key,
   required Color paper,
   required Future<void> Function() clean,
   required Future<void> Function() restore,
   double pixelRatio = 3,
-  Directory? into,
 }) async {
   RenderRepaintBoundary? boundary() =>
       key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -96,7 +95,10 @@ Future<File?> captureSelectionImage({
   }
 
   final withSelection = await grab();
-  if (withSelection == null) return null;
+  if (withSelection == null) {
+    await restore();
+    return null;
+  }
   ui.Image? without;
   try {
     await clean();
@@ -114,20 +116,76 @@ Future<File?> captureSelectionImage({
       selected.height,
     );
     if (box == null) return null;
-    final cut = await cropOnPaper(without, box, paper, pad: 4 * pixelRatio);
-    final png = await cut.toByteData(format: ui.ImageByteFormat.png);
-    cut.dispose();
-    if (png == null) return null;
-    final dir = into ?? await getTemporaryDirectory();
-    final file = File(
-      '${dir.path}${Platform.pathSeparator}tibyan_verses_'
-      '${DateTime.now().millisecondsSinceEpoch}.png',
-    );
-    await file.writeAsBytes(png.buffer.asUint8List(), flush: true);
-    return file;
+    return await cropOnPaper(without, box, paper, pad: 4 * pixelRatio);
   } finally {
     withSelection.$1.dispose();
     without?.dispose();
     await restore();
+  }
+}
+
+/// [images] one above the other (the first on top), centred on [paper]:
+/// a stretch of verses that runs over a page break is one picture.
+Future<ui.Image> stackVertically(
+  List<ui.Image> images,
+  Color paper, {
+  double gap = 24,
+}) {
+  final width = images.map((i) => i.width).reduce((a, b) => a > b ? a : b);
+  final height =
+      images.fold<int>(0, (sum, i) => sum + i.height) +
+      (gap * (images.length - 1)).round();
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder)
+    ..drawRect(
+      Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+      Paint()..color = paper,
+    );
+  var y = 0.0;
+  for (final image in images) {
+    canvas.drawImage(
+      image,
+      Offset((width - image.width) / 2, y),
+      Paint()..filterQuality = FilterQuality.high,
+    );
+    y += image.height + gap;
+  }
+  return recorder.endRecording().toImage(width, height);
+}
+
+/// [image] as a PNG file in the temporary directory.
+Future<File?> savePng(ui.Image image, {Directory? into}) async {
+  final png = await image.toByteData(format: ui.ImageByteFormat.png);
+  if (png == null) return null;
+  final dir = into ?? await getTemporaryDirectory();
+  final file = File(
+    '${dir.path}${Platform.pathSeparator}tibyan_verses_'
+    '${DateTime.now().millisecondsSinceEpoch}.png',
+  );
+  await file.writeAsBytes(png.buffer.asUint8List(), flush: true);
+  return file;
+}
+
+/// One page's selection as a PNG file; null when nothing was selected.
+Future<File?> captureSelectionImage({
+  required GlobalKey key,
+  required Color paper,
+  required Future<void> Function() clean,
+  required Future<void> Function() restore,
+  double pixelRatio = 3,
+  Directory? into,
+}) async {
+  final cut = await captureSelectionPicture(
+    key: key,
+    paper: paper,
+    clean: clean,
+    restore: restore,
+    pixelRatio: pixelRatio,
+  );
+  if (cut == null) return null;
+  try {
+    return await savePng(cut, into: into);
+  } finally {
+    cut.dispose();
   }
 }

@@ -313,7 +313,7 @@
     }
   },
   "multiSelect": "Select several verses",
-  "multiSelectHint": "Drag the handles to select verses",
+  "multiSelectHint": "Drag the handles, or turn the page and tap a verse to extend the selection to it",
   "doneLabel": "Done",
   "markRemoved": "Mark removed",
   "tabMarks": "Reading marks",
