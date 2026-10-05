@@ -36,174 +36,183 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 32),
-          children: [
-            Row(
+        // A wide window (a tablet, the Mac) keeps a phone's column: the
+        // tiles stay their size instead of growing with the width.
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: ListView(
+              padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 32),
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Semantics(
-                        header: true,
-                        child: Text(
-                          l.appTitle,
-                          style: TextStyle(
-                            fontFamily: 'ArefRuqaa',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 38,
-                            height: 1.2,
-                            color: t.headBg == t.paper ? t.headFg : t.ink,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        l.appTagline,
-                        style: Theme.of(context).textTheme.bodyMedium
-                            ?.copyWith(color: t.muted),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton.outlined(
-                  tooltip: l.openSettings,
-                  onPressed: () => context.go('/settings'),
-                  icon: const Icon(Icons.settings_outlined),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Card(
-              child: ListTile(
-                contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
-                leading: Icon(Icons.menu_book, color: t.goldText, size: 30),
-                title: Text(
-                  l.continueReading,
-                  style: TextStyle(
-                    color: t.goldText,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                subtitle: position == null || surahs == null
-                    ? null
-                    : Text(
-                        l.continueReadingAt(
-                          surahName(context, surahs[position.surah - 1]),
-                          digits(position.ayah),
-                          digits(position.page),
-                        ),
-                      ),
-                trailing: FilledButton(
-                  onPressed: () => context.go('/mushaf'),
-                  child: Text(l.openLabel),
-                ),
-              ),
-            ),
-            if (khatma != null && portion != null) ...[
-              const SizedBox(height: 12),
-              // The «Today» card: the khatma's portion for today.
-              Card(
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  onTap: () => context.push('/khatma'),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l.homeTodayTitle,
-                                style: TextStyle(
-                                  color: t.goldText,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Semantics(
+                            header: true,
+                            child: Text(
+                              l.appTitle,
+                              style: TextStyle(
+                                fontFamily: 'ArefRuqaa',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 38,
+                                height: 1.2,
+                                color: t.headBg == t.paper ? t.headFg : t.ink,
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${l.khatmaToday}: ${l.khatmaPagesRange(digits(portion.range.from), digits(portion.range.to))}',
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                        FilledButton(
-                          onPressed: () async => context.go(
-                            await ref
-                                .read(khatmaServiceProvider)
-                                .routeFor(
-                                  Uri(
-                                    queryParameters: {
-                                      'page': '${portion.range.from}',
-                                      'edition': khatma.row.edition,
-                                    },
-                                  ),
-                                ),
+                          Text(
+                            l.appTagline,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: t.muted),
                           ),
-                          child: Text(l.khatmaReadNow),
-                        ),
-                      ],
+                        ],
+                      ),
+                    ),
+                    IconButton.outlined(
+                      tooltip: l.openSettings,
+                      onPressed: () => context.go('/settings'),
+                      icon: const Icon(Icons.settings_outlined),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Card(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 12, 8),
+                    leading: Icon(Icons.menu_book, color: t.goldText, size: 30),
+                    title: Text(
+                      l.continueReading,
+                      style: TextStyle(
+                        color: t.goldText,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: position == null || surahs == null
+                        ? null
+                        : Text(
+                            l.continueReadingAt(
+                              surahName(context, surahs[position.surah - 1]),
+                              digits(position.ayah),
+                              digits(position.page),
+                            ),
+                          ),
+                    trailing: FilledButton(
+                      onPressed: () => context.go('/mushaf'),
+                      child: Text(l.openLabel),
                     ),
                   ),
                 ),
-              ),
-            ],
-            const SizedBox(height: 20),
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 1,
-              children: [
-                _SectionTile(
-                  icon: Icons.menu_book_outlined,
-                  label: l.sectionMushaf,
-                  note: l.mushafOpen,
-                  onTap: () => context.go('/mushaf'),
-                ),
-                _SectionTile(
-                  icon: Icons.search_outlined,
-                  label: l.sectionSearch,
-                  note: l.openLabel,
-                  onTap: () => context.go('/search'),
-                ),
-                _SectionTile(
-                  icon: Icons.auto_stories_outlined,
-                  label: l.sectionTafsir,
-                  note: l.openLabel,
-                  onTap: () => context.push('/mushaf/tafsir?s=$surah&a=$ayah'),
-                ),
-                _SectionTile(
-                  icon: Icons.headphones_outlined,
-                  label: l.sectionListen,
-                  note: l.openLabel,
-                  onTap: () => context.push('/mushaf/audio'),
-                ),
-                _SectionTile(
-                  icon: Icons.groups_outlined,
-                  label: l.sectionKhatma,
-                  note: portion != null
-                      ? l.khatmaTilePages(digits(portion.pages))
-                      : khatma != null
-                      ? l.khatmaTodayDone
-                      : l.khatmaTileStart,
-                  onTap: () => context.push('/khatma'),
-                ),
-                _SectionTile(
-                  icon: Icons.task_alt_outlined,
-                  label: l.sectionHifz,
-                  note: due > 0
-                      ? '${l.hifzToday} ${digits(due)}'
-                      : l.hifzTileNote,
-                  onTap: () => context.push('/hifz'),
+                if (khatma != null && portion != null) ...[
+                  const SizedBox(height: 12),
+                  // The «Today» card: the khatma's portion for today.
+                  Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () => context.push('/khatma'),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l.homeTodayTitle,
+                                    style: TextStyle(
+                                      color: t.goldText,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${l.khatmaToday}: ${l.khatmaPagesRange(digits(portion.range.from), digits(portion.range.to))}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            FilledButton(
+                              onPressed: () async => context.go(
+                                await ref
+                                    .read(khatmaServiceProvider)
+                                    .routeFor(
+                                      Uri(
+                                        queryParameters: {
+                                          'page': '${portion.range.from}',
+                                          'edition': khatma.row.edition,
+                                        },
+                                      ),
+                                    ),
+                              ),
+                              child: Text(l.khatmaReadNow),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 20),
+                GridView.count(
+                  crossAxisCount: 3,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 1,
+                  children: [
+                    _SectionTile(
+                      icon: Icons.menu_book_outlined,
+                      label: l.sectionMushaf,
+                      note: l.mushafOpen,
+                      onTap: () => context.go('/mushaf'),
+                    ),
+                    _SectionTile(
+                      icon: Icons.search_outlined,
+                      label: l.sectionSearch,
+                      note: l.openLabel,
+                      onTap: () => context.go('/search'),
+                    ),
+                    _SectionTile(
+                      icon: Icons.auto_stories_outlined,
+                      label: l.sectionTafsir,
+                      note: l.openLabel,
+                      onTap: () =>
+                          context.push('/mushaf/tafsir?s=$surah&a=$ayah'),
+                    ),
+                    _SectionTile(
+                      icon: Icons.headphones_outlined,
+                      label: l.sectionListen,
+                      note: l.openLabel,
+                      onTap: () => context.push('/mushaf/audio'),
+                    ),
+                    _SectionTile(
+                      icon: Icons.groups_outlined,
+                      label: l.sectionKhatma,
+                      note: portion != null
+                          ? l.khatmaTilePages(digits(portion.pages))
+                          : khatma != null
+                          ? l.khatmaTodayDone
+                          : l.khatmaTileStart,
+                      onTap: () => context.push('/khatma'),
+                    ),
+                    _SectionTile(
+                      icon: Icons.task_alt_outlined,
+                      label: l.sectionHifz,
+                      note: due > 0
+                          ? '${l.hifzToday} ${digits(due)}'
+                          : l.hifzTileNote,
+                      onTap: () => context.push('/hifz'),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -238,8 +247,18 @@ class _SectionTile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: t.goldText, size: 26),
-              const SizedBox(height: 6),
+              // A translucent disc behind the icon.
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: t.goldText.withValues(alpha: 0.12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(icon, color: t.goldText, size: 24),
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 label,
                 style: TextStyle(color: t.ink, fontWeight: FontWeight.w600),

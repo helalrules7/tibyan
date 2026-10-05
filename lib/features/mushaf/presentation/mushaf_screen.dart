@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
@@ -716,29 +717,42 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                                           (_) => _setSpread(spread),
                                         );
                                   }
-                                  return PageView.builder(
-                                    controller: _controller,
-                                    itemCount: _spreads.count,
-                                    // The pages either side are built and their images
-                                    // decoded before they are turned to, so a page turn
-                                    // does not stop on a spinner.
-                                    allowImplicitScrolling: true,
-                                    onPageChanged: _onPageChanged,
-                                    itemBuilder: (context, i) {
-                                      final pages = _pagesAt(i);
-                                      if (pages.length == 1) {
-                                        return pageOf(pages.single);
-                                      }
-                                      // Right page first: the mushaf opens
-                                      // from the right.
-                                      return Row(
-                                        textDirection: TextDirection.rtl,
-                                        children: [
-                                          for (final pg in pages)
-                                            Expanded(child: pageOf(pg)),
-                                        ],
-                                      );
-                                    },
+                                  // A mouse and a trackpad drag the pages
+                                  // like a finger; the wheel turns them.
+                                  return Listener(
+                                    onPointerSignal: _onWheel,
+                                    child: ScrollConfiguration(
+                                      behavior: ScrollConfiguration.of(context)
+                                          .copyWith(
+                                            dragDevices: PointerDeviceKind
+                                                .values
+                                                .toSet(),
+                                          ),
+                                      child: PageView.builder(
+                                        controller: _controller,
+                                        itemCount: _spreads.count,
+                                        // The pages either side are built and their images
+                                        // decoded before they are turned to, so a page turn
+                                        // does not stop on a spinner.
+                                        allowImplicitScrolling: true,
+                                        onPageChanged: _onPageChanged,
+                                        itemBuilder: (context, i) {
+                                          final pages = _pagesAt(i);
+                                          if (pages.length == 1) {
+                                            return pageOf(pages.single);
+                                          }
+                                          // Right page first: the mushaf opens
+                                          // from the right.
+                                          return Row(
+                                            textDirection: TextDirection.rtl,
+                                            children: [
+                                              for (final pg in pages)
+                                                Expanded(child: pageOf(pg)),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
                                   );
                                 },
                               ),
@@ -1057,16 +1071,40 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// keys turn the page (the mushaf opens from the right, so left is
   /// forward), space starts and pauses the recitation, G goes to a page,
   /// / or Ctrl/Cmd+F searches, Escape clears the selection or the menus.
-  Widget _keyboard(Widget child) {
-    void turn(int by) {
-      final c = _controller;
-      if (c == null || _autoScroll) return;
-      c.animateToPage(
-        (c.page?.round() ?? 0) + by,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-      );
+  /// Turns [by] pages (positive is forward: to the left).
+  void _turn(int by) {
+    final c = _controller;
+    if (c == null || _autoScroll) return;
+    c.animateToPage(
+      (c.page?.round() ?? 0) + by,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// When the mouse wheel last turned a page: one notch, one page.
+  DateTime _lastWheelTurn = DateTime(0);
+
+  /// The mouse wheel turns the page: down or right is forward. A trackpad
+  /// swipe comes as a drag instead (see the page view's scroll behaviour).
+  void _onWheel(PointerSignalEvent e) {
+    if (e is! PointerScrollEvent || e.kind == PointerDeviceKind.trackpad) {
+      return;
     }
+    final now = DateTime.now();
+    if (now.difference(_lastWheelTurn) < const Duration(milliseconds: 350)) {
+      return;
+    }
+    final d = e.scrollDelta.dy.abs() >= e.scrollDelta.dx.abs()
+        ? e.scrollDelta.dy
+        : -e.scrollDelta.dx;
+    if (d.abs() < 1) return;
+    _lastWheelTurn = now;
+    _turn(d > 0 ? 1 : -1);
+  }
+
+  Widget _keyboard(Widget child) {
+    void turn(int by) => _turn(by);
 
     return CallbackShortcuts(
       bindings: {
