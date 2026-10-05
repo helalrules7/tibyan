@@ -113,6 +113,7 @@ struct ActionsView: View {
   }
 
   var body: some View {
+    #if os(iOS)
     if family == .accessoryCircular {
       // Lock screen: one tap to listen from where the reader stopped.
       Link(destination: URL(string: "tibyan://action/listen?homeWidget")!) {
@@ -125,6 +126,9 @@ struct ActionsView: View {
     } else {
       homeBody
     }
+    #else
+    homeBody
+    #endif
   }
 
   private var homeBody: some View {
@@ -150,6 +154,13 @@ struct ActionsView: View {
   }
 }
 
+// The lock screen's circular widget exists on iOS only.
+#if os(iOS)
+private let families: [WidgetFamily] = [.systemSmall, .systemMedium, .accessoryCircular]
+#else
+private let families: [WidgetFamily] = [.systemSmall, .systemMedium]
+#endif
+
 @main
 struct TibyanActionsWidget: Widget {
   // Must match PluginHomeWidgetSync.iosActionsKind.
@@ -161,6 +172,6 @@ struct TibyanActionsWidget: Widget {
     }
     .configurationDisplayName("تبيان: اختصارات")
     .description("متابعة القراءة، الاستماع، البحث، وتسجيل ورد اليوم")
-    .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular])
+    .supportedFamilies(families)
   }
 }

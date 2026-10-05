@@ -58,6 +58,7 @@ struct KhatmaWidgetView: View {
 
   var body: some View {
     switch family {
+    #if os(iOS)
     case .accessoryInline:
       // Lock screen, one line above the clock.
       Text(entry.portion)
@@ -81,6 +82,7 @@ struct KhatmaWidgetView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .widgetURL(entry.url)
       .containerBackground(.clear, for: .widget)
+    #endif
     default:
       homeBody
     }
@@ -108,6 +110,16 @@ struct KhatmaWidgetView: View {
   }
 }
 
+// Lock screen widgets exist on iOS only.
+#if os(iOS)
+private let families: [WidgetFamily] = [
+  .systemSmall, .systemMedium,
+  .accessoryInline, .accessoryCircular, .accessoryRectangular,
+]
+#else
+private let families: [WidgetFamily] = [.systemSmall, .systemMedium]
+#endif
+
 @main
 struct TibyanWidget: Widget {
   // Must match PluginHomeWidgetSync.iosKind.
@@ -119,10 +131,6 @@ struct TibyanWidget: Widget {
     }
     .configurationDisplayName("الختمة")
     .description("ورد اليوم من الختمة")
-    .supportedFamilies([
-      .systemSmall, .systemMedium,
-      // Lock screen (iOS) and Notification Center / lock screen widgets.
-      .accessoryInline, .accessoryCircular, .accessoryRectangular,
-    ])
+    .supportedFamilies(families)
   }
 }
