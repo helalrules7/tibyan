@@ -10,4 +10,5 @@
     <string name="actions_search">Search</string>
     <string name="actions_read">Read</string>
     <string name="actions_done">Done</string>
+    <string name="tile_listen_label">Listen</string>
 </resources>

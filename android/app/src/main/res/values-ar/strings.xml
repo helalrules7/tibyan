@@ -10,4 +10,5 @@
     <string name="actions_search">بحث</string>
     <string name="actions_read">قرأت الورد</string>
     <string name="actions_done">تم</string>
+    <string name="tile_listen_label">استماع</string>
 </resources>

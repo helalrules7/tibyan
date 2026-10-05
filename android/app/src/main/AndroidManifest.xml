@@ -87,6 +87,17 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/khatma_widget_info"/>
         </receiver>
+        <!-- Quick Settings tile: listen from where the reader stopped. -->
+        <service
+            android:name=".ListenTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_action_play"
+            android:label="@string/tile_listen_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+        </service>
         <!-- Actions widget: its own widget, with the portion-read button
              answering by broadcast, so it needs no app launch. -->
         <receiver

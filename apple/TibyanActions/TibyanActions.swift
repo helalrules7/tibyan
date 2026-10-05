@@ -113,6 +113,21 @@ struct ActionsView: View {
   }
 
   var body: some View {
+    if family == .accessoryCircular {
+      // Lock screen: one tap to listen from where the reader stopped.
+      Link(destination: URL(string: "tibyan://action/listen?homeWidget")!) {
+        ZStack {
+          AccessoryWidgetBackground()
+          Image(systemName: "play.fill").font(.title3)
+        }
+      }
+      .containerBackground(.clear, for: .widget)
+    } else {
+      homeBody
+    }
+  }
+
+  private var homeBody: some View {
     VStack(alignment: .leading, spacing: 8) {
       Text(entry.title)
         .font(.caption.bold())
@@ -146,6 +161,6 @@ struct TibyanActionsWidget: Widget {
     }
     .configurationDisplayName("تبيان: اختصارات")
     .description("متابعة القراءة، الاستماع، البحث، وتسجيل ورد اليوم")
-    .supportedFamilies([.systemSmall, .systemMedium])
+    .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular])
   }
 }

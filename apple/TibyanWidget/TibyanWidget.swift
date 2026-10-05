@@ -54,8 +54,39 @@ struct Provider: TimelineProvider {
 
 struct KhatmaWidgetView: View {
   var entry: KhatmaEntry
+  @Environment(\.widgetFamily) private var family
 
   var body: some View {
+    switch family {
+    case .accessoryInline:
+      // Lock screen, one line above the clock.
+      Text(entry.portion)
+        .widgetURL(entry.url)
+        .containerBackground(.clear, for: .widget)
+    case .accessoryCircular:
+      ZStack {
+        AccessoryWidgetBackground()
+        Image(systemName: "book.fill").font(.title3)
+      }
+      .widgetURL(entry.url)
+      .containerBackground(.clear, for: .widget)
+    case .accessoryRectangular:
+      VStack(alignment: .leading, spacing: 2) {
+        Text(entry.title).font(.caption.bold()).lineLimit(1)
+        Text(entry.portion).font(.footnote).lineLimit(2)
+        if !entry.reference.isEmpty {
+          Text(entry.reference).font(.caption2).lineLimit(1)
+        }
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .widgetURL(entry.url)
+      .containerBackground(.clear, for: .widget)
+    default:
+      homeBody
+    }
+  }
+
+  private var homeBody: some View {
     VStack(alignment: .leading, spacing: 4) {
       Text(entry.title)
         .font(.caption.bold())
@@ -88,6 +119,10 @@ struct TibyanWidget: Widget {
     }
     .configurationDisplayName("الختمة")
     .description("ورد اليوم من الختمة")
-    .supportedFamilies([.systemSmall, .systemMedium])
+    .supportedFamilies([
+      .systemSmall, .systemMedium,
+      // Lock screen (iOS) and Notification Center / lock screen widgets.
+      .accessoryInline, .accessoryCircular, .accessoryRectangular,
+    ])
   }
 }
