@@ -6,6 +6,12 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (riwaya word boxes)
+- Riwaya editions (Warsh, Qalun, al-Duri, Shu'bah): word boxes derived from each riwaya's KFGQPC page geometry, text and font (`tools/build_riwaya_word_boxes.py`), carried in the v2 page packs. With a v2 pack, the divine names are coloured on riwaya pages, recitation and test modes cover verses word by word, and word study opens for a word that is exactly a Hafs word (same verse, word count and letters); other words say why there is none. The packs on the mirror are still v1.
+
+### Fixed
+- The riwaya sources lost from `tools/sources.json` in the riwayat merge are restored.
+
 ### Added (tajweed review)
 - The tajweed rules the app colours with can now be reviewed by a qualified reader: `tools/import_tajweed_review.py` puts Juz' 'Amma and a fixed sample of 300 other verses (864 verses, 5,715 rules) in a review file, and the review tool shows each verse coloured by its rules with the list under it.
 
