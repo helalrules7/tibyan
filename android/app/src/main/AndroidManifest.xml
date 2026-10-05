@@ -87,6 +87,19 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/khatma_widget_info"/>
         </receiver>
+        <!-- Actions widget: its own widget, with the portion-read button
+             answering by broadcast, so it needs no app launch. -->
+        <receiver
+            android:name=".ActionsWidgetProvider"
+            android:label="@string/actions_widget_label"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/actions_widget_info"/>
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

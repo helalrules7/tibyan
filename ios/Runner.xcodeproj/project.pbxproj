@@ -8,14 +8,28 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		1EA764A18BB7BB06BEA4884F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13824F0867040AB486B86E68 /* WidgetKit.framework */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		3BDBA187D556D7403694703C /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BF630D919A0D4630FDCF759 /* AppIntents.framework */; };
+		4F0C98C481D19BA6E2C484E2 /* TibyanActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F06D2079F7027187E78722 /* TibyanActions.swift */; };
+		5091867B69375D18323D65FE /* TibyanWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4CB4CFC4A6CC084D956EFE89 /* TibyanWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		5AE294F754E5AD56F6E3CAF3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FDD5F468BDB412A9057B04 /* SwiftUI.framework */; };
+		5B624BB0F7F63BFB563D748F /* WidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85040AE8A0E0E7DE3F495F98 /* WidgetStore.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		8DD319DA4AB9BF0BCA77EAF7 /* TibyanActions.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8CA00C4737B18EA119837B36 /* TibyanActions.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		A217ACC3FC4E2FF65544964B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 373A34BB71DBFB805129B4C0 /* Foundation.framework */; };
+		B16D4F6A472F082461FA7611 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FDD5F468BDB412A9057B04 /* SwiftUI.framework */; };
+		B8FFA3BFE0B404B983065FDC /* WidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85040AE8A0E0E7DE3F495F98 /* WidgetStore.swift */; };
+		C1F6BA8C22C69BD3B4E34F52 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 373A34BB71DBFB805129B4C0 /* Foundation.framework */; };
+		CD4816D0F99491E7160B79AC /* TibyanWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07AE7E1ABA1160CBF1B89F7 /* TibyanWidget.swift */; };
+		D7247A9032DDA0A1F0EAC1A0 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BF630D919A0D4630FDCF759 /* AppIntents.framework */; };
+		F68C29322ED37F8557B38023 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13824F0867040AB486B86E68 /* WidgetKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,9 +40,35 @@
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
 		};
+		81C50D555A42AE8BF0237348 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0FC9D756799A1F12FF410D36;
+			remoteInfo = TibyanActions;
+		};
+		E48913E9E393C99EFBEFA1AB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D473E17FAC7E32AD595B680E;
+			remoteInfo = TibyanWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		088F05633F2C71A072AC8C80 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				5091867B69375D18323D65FE /* TibyanWidget.appex in Embed Foundation Extensions */,
+				8DD319DA4AB9BF0BCA77EAF7 /* TibyanActions.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9705A1C41CF9048500538489 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,16 +82,24 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0BF630D919A0D4630FDCF759 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/AppIntents.framework; sourceTree = DEVELOPER_DIR; };
+		13824F0867040AB486B86E68 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/WidgetKit.framework; sourceTree = DEVELOPER_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		22F06D2079F7027187E78722 /* TibyanActions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TibyanActions.swift; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		373A34BB71DBFB805129B4C0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		4CB4CFC4A6CC084D956EFE89 /* TibyanWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TibyanWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		7D66178CD3466430EC45D15F /* Extension-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Extension-Info.plist"; sourceTree = "<group>"; };
+		85040AE8A0E0E7DE3F495F98 /* WidgetStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetStore.swift; sourceTree = "<group>"; };
+		8CA00C4737B18EA119837B36 /* TibyanActions.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TibyanActions.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,9 +107,25 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0A98497B216B9179AE3AC8F /* Widget-ios.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = "Widget-ios.entitlements"; sourceTree = "<group>"; };
+		C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Widget-ios.xcconfig"; sourceTree = "<group>"; };
+		D07AE7E1ABA1160CBF1B89F7 /* TibyanWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TibyanWidget.swift; sourceTree = "<group>"; };
+		E0FBA031405A896DBB55CC1F /* Runner.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		E1FDD5F468BDB412A9057B04 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/SwiftUI.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0F65E965BCB7288F1BE41CEF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A217ACC3FC4E2FF65544964B /* Foundation.framework in Frameworks */,
+				F68C29322ED37F8557B38023 /* WidgetKit.framework in Frameworks */,
+				B16D4F6A472F082461FA7611 /* SwiftUI.framework in Frameworks */,
+				D7247A9032DDA0A1F0EAC1A0 /* AppIntents.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97C146EB1CF9000F007C117D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -70,15 +134,86 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E0F71CBEABF8199C21F1E2A9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1F6BA8C22C69BD3B4E34F52 /* Foundation.framework in Frameworks */,
+				1EA764A18BB7BB06BEA4884F /* WidgetKit.framework in Frameworks */,
+				5AE294F754E5AD56F6E3CAF3 /* SwiftUI.framework in Frameworks */,
+				3BDBA187D556D7403694703C /* AppIntents.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2E0748160D9AC4213951DEFC /* TibyanActions */ = {
+			isa = PBXGroup;
+			children = (
+				22F06D2079F7027187E78722 /* TibyanActions.swift */,
+			);
+			name = TibyanActions;
+			path = TibyanActions;
+			sourceTree = "<group>";
+		};
 		331C8082294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
 			);
 			path = RunnerTests;
+			sourceTree = "<group>";
+		};
+		44D1104985813DABF7F2EDCB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5C9134B7EC7392BE918BAC68 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5C9134B7EC7392BE918BAC68 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				373A34BB71DBFB805129B4C0 /* Foundation.framework */,
+				13824F0867040AB486B86E68 /* WidgetKit.framework */,
+				E1FDD5F468BDB412A9057B04 /* SwiftUI.framework */,
+				0BF630D919A0D4630FDCF759 /* AppIntents.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		684A0ED5570A9C53A6D006C9 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				85040AE8A0E0E7DE3F495F98 /* WidgetStore.swift */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		83AAC4FA87662936753CAB76 /* TibyanWidget */ = {
+			isa = PBXGroup;
+			children = (
+				D07AE7E1ABA1160CBF1B89F7 /* TibyanWidget.swift */,
+			);
+			name = TibyanWidget;
+			path = TibyanWidget;
+			sourceTree = "<group>";
+		};
+		903003565006434EA81C94B8 /* Apple */ = {
+			isa = PBXGroup;
+			children = (
+				684A0ED5570A9C53A6D006C9 /* Shared */,
+				C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */,
+				B0A98497B216B9179AE3AC8F /* Widget-ios.entitlements */,
+				7D66178CD3466430EC45D15F /* Extension-Info.plist */,
+				83AAC4FA87662936753CAB76 /* TibyanWidget */,
+				2E0748160D9AC4213951DEFC /* TibyanActions */,
+			);
+			name = Apple;
+			path = ../apple;
 			sourceTree = "<group>";
 		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
@@ -100,6 +235,8 @@
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				903003565006434EA81C94B8 /* Apple */,
+				44D1104985813DABF7F2EDCB /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +245,8 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				4CB4CFC4A6CC084D956EFE89 /* TibyanWidget.appex */,
+				8CA00C4737B18EA119837B36 /* TibyanActions.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -124,6 +263,7 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				E0FBA031405A896DBB55CC1F /* Runner.entitlements */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -131,6 +271,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0FC9D756799A1F12FF410D36 /* TibyanActions */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9BC65DBD8913A4A24CF7B62B /* Build configuration list for PBXNativeTarget "TibyanActions" */;
+			buildPhases = (
+				D50F4826F72ADCED414F536D /* Sources */,
+				0F65E965BCB7288F1BE41CEF /* Frameworks */,
+				EBDFB03ABD40B2CD0DA262B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TibyanActions;
+			productName = TibyanActions;
+			productReference = 8CA00C4737B18EA119837B36 /* TibyanActions.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		331C8080294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
@@ -157,11 +314,14 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				088F05633F2C71A072AC8C80 /* Embed Foundation Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				43EAFD216FB089F4F1587FC2 /* PBXTargetDependency */,
+				79F012C1B20325B97502F885 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -170,6 +330,23 @@
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
+		};
+		D473E17FAC7E32AD595B680E /* TibyanWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53C12C295DAF5BA0E5A2C0C5 /* Build configuration list for PBXNativeTarget "TibyanWidget" */;
+			buildPhases = (
+				94A5562D18CC45BA5C97585B /* Sources */,
+				E0F71CBEABF8199C21F1E2A9 /* Frameworks */,
+				54410952585639F0316CCB81 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TibyanWidget;
+			productName = TibyanWidget;
+			productReference = 4CB4CFC4A6CC084D956EFE89 /* TibyanWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -201,7 +378,7 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -209,12 +386,21 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				D473E17FAC7E32AD595B680E /* TibyanWidget */,
+				0FC9D756799A1F12FF410D36 /* TibyanActions */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		331C807F294A63A400263BE5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		54410952585639F0316CCB81 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -229,6 +415,13 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EBDFB03ABD40B2CD0DA262B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +470,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		94A5562D18CC45BA5C97585B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD4816D0F99491E7160B79AC /* TibyanWidget.swift in Sources */,
+				5B624BB0F7F63BFB563D748F /* WidgetStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97C146EA1CF9000F007C117D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -287,6 +489,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D50F4826F72ADCED414F536D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F0C98C481D19BA6E2C484E2 /* TibyanActions.swift in Sources */,
+				B8FFA3BFE0B404B983065FDC /* WidgetStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -294,6 +505,18 @@
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		43EAFD216FB089F4F1587FC2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TibyanWidget;
+			target = D473E17FAC7E32AD595B680E /* TibyanWidget */;
+			targetProxy = E48913E9E393C99EFBEFA1AB /* PBXContainerItemProxy */;
+		};
+		79F012C1B20325B97502F885 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TibyanActions;
+			target = 0FC9D756799A1F12FF410D36 /* TibyanActions */;
+			targetProxy = 81C50D555A42AE8BF0237348 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -317,6 +540,33 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		0A4530C2D606912F0129F916 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "../apple/Widget-ios.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../apple/Extension-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tibyan.tibyan.TibyanActions;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TIBYAN_WIDGET_NAME = "تبيان: اختصارات";
+			};
+			name = Debug;
+		};
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -376,6 +626,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = T958VWM76Z;
 				ENABLE_BITCODE = NO;
@@ -436,6 +687,34 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
+			};
+			name = Profile;
+		};
+		7E1C80739F94130617258D06 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "../apple/Widget-ios.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../apple/Extension-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tibyan.tibyan.TibyanWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TIBYAN_WIDGET_NAME = "الختمة";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Profile;
 		};
@@ -558,6 +837,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = T958VWM76Z;
 				ENABLE_BITCODE = NO;
@@ -581,6 +861,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = T958VWM76Z;
 				ENABLE_BITCODE = NO;
@@ -597,6 +878,117 @@
 			};
 			name = Release;
 		};
+		B8CB74D05C58FFFAB67680EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "../apple/Widget-ios.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../apple/Extension-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tibyan.tibyan.TibyanWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TIBYAN_WIDGET_NAME = "الختمة";
+			};
+			name = Debug;
+		};
+		C9368DAD65EB3D0AD003767B /* Profile */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "../apple/Widget-ios.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../apple/Extension-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tibyan.tibyan.TibyanActions;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TIBYAN_WIDGET_NAME = "تبيان: اختصارات";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
+		CB0DF06CC51EA4D3F014C4F0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "../apple/Widget-ios.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../apple/Extension-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tibyan.tibyan.TibyanWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TIBYAN_WIDGET_NAME = "الختمة";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D48301C8BB1F8C75A70325A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8EE5BC516288244E69F4C69 /* Widget-ios.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "../apple/Widget-ios.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "../apple/Extension-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.tibyan.tibyan.TibyanActions;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TIBYAN_WIDGET_NAME = "تبيان: اختصارات";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -606,6 +998,16 @@
 				331C8088294A63A400263BE5 /* Debug */,
 				331C8089294A63A400263BE5 /* Release */,
 				331C808A294A63A400263BE5 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53C12C295DAF5BA0E5A2C0C5 /* Build configuration list for PBXNativeTarget "TibyanWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB0DF06CC51EA4D3F014C4F0 /* Release */,
+				B8CB74D05C58FFFAB67680EE /* Debug */,
+				7E1C80739F94130617258D06 /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -630,10 +1032,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		9BC65DBD8913A4A24CF7B62B /* Build configuration list for PBXNativeTarget "TibyanActions" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D48301C8BB1F8C75A70325A4 /* Release */,
+				0A4530C2D606912F0129F916 /* Debug */,
+				C9368DAD65EB3D0AD003767B /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};

@@ -1,0 +1,82 @@
+name: Native builds
+
+# Builds the platforms CI's Linux job does not: the Android widgets, and the
+# iOS and macOS apps with their WidgetKit extensions (apple/). Only when
+# something native changes, or by hand.
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'android/**'
+      - 'ios/**'
+      - 'macos/**'
+      - 'apple/**'
+      - 'tools/apple/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/native.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android (debug APK)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --debug
+
+  ios:
+    name: iOS (unsigned) with widget extensions
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - name: Both widget extensions are in the app
+        run: |
+          ls build/ios/iphoneos/Runner.app/PlugIns
+          test -d build/ios/iphoneos/Runner.app/PlugIns/TibyanWidget.appex
+          test -d build/ios/iphoneos/Runner.app/PlugIns/TibyanActions.appex
+
+  macos:
+    name: macOS with widget extensions
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter config --enable-macos-desktop
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - name: Both widget extensions are in the app
+        run: |
+          app=$(ls -d build/macos/Build/Products/Release/*.app | head -1)
+          ls "$app/Contents/PlugIns"
+          test -d "$app/Contents/PlugIns/TibyanWidget.appex"
+          test -d "$app/Contents/PlugIns/TibyanActions.appex"

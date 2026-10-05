@@ -3,4 +3,11 @@
     <string name="khatma_widget_label">Khatma</string>
     <string name="khatma_widget_description">Today\'s khatma portion</string>
     <string name="khatma_widget_open">Open Tibyan</string>
+    <string name="actions_widget_label">Tibyan</string>
+    <string name="actions_widget_description">Continue reading, listen, search, mark today\'s portion read</string>
+    <string name="actions_continue">Continue</string>
+    <string name="actions_listen">Listen</string>
+    <string name="actions_search">Search</string>
+    <string name="actions_read">Read</string>
+    <string name="actions_done">Done</string>
 </resources>
