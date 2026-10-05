@@ -80,13 +80,16 @@ class RiwayaData {
     required this.verses,
     required this.polygonsByPage,
     required this.linesByPage,
+    this.wordBoxesByPage = const {},
   }) {
     for (var i = 0; i < verses.length; i++) {
       final v = verses[i];
       _index[v.key] = i;
       (_byPage[v.page] ??= []).add(i);
       for (var h = v.hafsFrom; h > 0 && h <= v.hafsTo; h++) {
-        _fromHafs.putIfAbsent((surah: v.surah, ayah: h), () => v.key);
+        final k = (surah: v.surah, ayah: h);
+        _fromHafs.putIfAbsent(k, () => v.key);
+        _hafsCovers[k] = (_hafsCovers[k] ?? 0) + 1;
       }
     }
   }
@@ -116,9 +119,55 @@ class RiwayaData {
   /// Verse outlines and line cuts, by page.
   final Map<int, List<AyahPolygonRow>> polygonsByPage;
   final Map<int, RiwayaPageLines> linesByPage;
+
+  /// The box of each word, by page, keyed by (surah, verse, word) in the
+  /// riwaya's count, in page units (`words.json.xz`, from
+  /// tools/build_riwaya_word_boxes.py). Empty for a pack built before the
+  /// word boxes (v1).
+  final Map<int, Map<(int, int, int), Rect>> wordBoxesByPage;
   final _index = <RiwayaKey, int>{};
   final _byPage = <int, List<int>>{};
   final _fromHafs = <RiwayaKey, RiwayaKey>{};
+  final _hafsCovers = <RiwayaKey, int>{};
+
+  /// Whether the pack carries word boxes.
+  bool get hasWordBoxes => wordBoxesByPage.isNotEmpty;
+
+  /// The word boxes on [page]; empty without them.
+  Map<(int, int, int), Rect> wordBoxes(int page) =>
+      wordBoxesByPage[page] ?? const {};
+
+  /// The words of a verse, numbered from 1 as in [wordBoxes]: its text
+  /// split at its spaces, without the verse number and without ۞.
+  List<String> words(int surah, int ayah) {
+    final v = verse(surah, ayah);
+    return v == null ? const [] : riwayaWords(v.text);
+  }
+
+  /// The Hafs word (surah, verse, word) that word [word] of a riwaya verse
+  /// is, only when that is certain: the verse is the whole of one Hafs
+  /// verse and no other riwaya verse shares it, both have the same number
+  /// of words, and the two words have the same letters ([hafsWords] are
+  /// the Hafs verse's words, numbered as the word study numbers them).
+  /// Otherwise null, and no Hafs word data is shown for it.
+  (int, int, int)? hafsWord(
+    int surah,
+    int ayah,
+    int word,
+    List<String> hafsWords,
+  ) {
+    final v = verse(surah, ayah);
+    if (v == null || v.hafsFrom == 0 || v.hafsFrom != v.hafsTo) return null;
+    if (_hafsCovers[(surah: surah, ayah: v.hafsFrom)] != 1) return null;
+    final own = riwayaWords(v.text);
+    if (own.length != hafsWords.length || word < 1 || word > own.length) {
+      return null;
+    }
+    if (wordLetters(own[word - 1]) != wordLetters(hafsWords[word - 1])) {
+      return null;
+    }
+    return (surah, v.hafsFrom, word);
+  }
 
   RiwayaVerse? verse(int surah, int ayah) {
     final i = _index[(surah: surah, ayah: ayah)];
@@ -205,6 +254,38 @@ class RiwayaData {
     return out;
   }
 
+  static final _spaces = RegExp('[  ]');
+  static final _numberGlyphs = RegExp('[ﰀ-﷿]+\$');
+  static final _arabicDigits = RegExp('^[٠-٩]+\$');
+  static final _notLetter = RegExp('[^ء-غف-يٱے]');
+
+  /// A verse's words: [text] (verbatim) split at its spaces and no-break
+  /// spaces, without the verse number at its end (the number glyph of the
+  /// KFGQPC font, joined to the last word in Warsh 16:123; Arabic-Indic
+  /// numerals in Shu'bah 2:286) and without ۞. As
+  /// tools/build_riwaya_word_boxes.py splits it.
+  static List<String> riwayaWords(String text) {
+    final tokens = [
+      for (final t in text.split(_spaces))
+        if (t.isNotEmpty) t,
+    ];
+    if (tokens.isEmpty) return const [];
+    final last = tokens.removeLast().replaceAll(_numberGlyphs, '');
+    if (last.isNotEmpty && !_arabicDigits.hasMatch(last)) tokens.add(last);
+    return [
+      for (final t in tokens)
+        if (t != '۞') t,
+    ];
+  }
+
+  /// A word's letters only (no marks, signs or small letters), as
+  /// written: two words are the same word only when these are equal. The
+  /// alif wasla is an alif with a sign (ٱ = ا) and the yeh barree a form
+  /// of yeh (ے = ي); every other letter must be the same (يؤمنون and
+  /// يومنون differ).
+  static String wordLetters(String word) =>
+      word.replaceAll(_notLetter, '').replaceAll('ٱ', 'ا').replaceAll('ے', 'ي');
+
   static Rect _rect(List<dynamic> v) => Rect.fromLTRB(
     (v[0] as num).toDouble(),
     (v[1] as num).toDouble(),
@@ -212,8 +293,9 @@ class RiwayaData {
     (v[3] as num).toDouble(),
   );
 
-  /// Parses the pack's `riwaya.json`.
-  static RiwayaData parse(String json) {
+  /// Parses the pack's `riwaya.json`, and its `words.json` when the pack
+  /// has one.
+  static RiwayaData parse(String json, [String? wordsJson]) {
     final d = jsonDecode(json) as Map<String, dynamic>;
     final grid = d['grid'] as List<dynamic>;
     final opening = d['opening'] as List<dynamic>;
@@ -245,7 +327,7 @@ class RiwayaData {
           ],
         ),
     };
-    return RiwayaData(
+    final data = RiwayaData(
       id: d['id'] as String,
       nameAr: d['name_ar'] as String,
       nameEn: d['name_en'] as String,
@@ -272,16 +354,66 @@ class RiwayaData {
       polygonsByPage: polygons,
       linesByPage: lines,
     );
+    if (wordsJson == null) return data;
+    return RiwayaData(
+      id: data.id,
+      nameAr: data.nameAr,
+      nameEn: data.nameEn,
+      pageCount: data.pageCount,
+      firstLine: data.firstLine,
+      pitch: data.pitch,
+      openingInk: data.openingInk,
+      openingBody: data.openingBody,
+      fontFile: data.fontFile,
+      surahCounts: data.surahCounts,
+      surahStartPages: data.surahStartPages,
+      verses: data.verses,
+      polygonsByPage: data.polygonsByPage,
+      linesByPage: data.linesByPage,
+      wordBoxesByPage: parseWordBoxes(wordsJson, data),
+    );
   }
 
-  /// Reads and parses `riwaya.json.xz` from an installed pack, off the UI
-  /// thread.
+  /// The boxes of `words.json` (boxes in tenths of the page's units), by
+  /// page. A verse is kept only when it has one box for each of its words
+  /// in [data] ([words]); a format this version does not know gives none.
+  static Map<int, Map<(int, int, int), Rect>> parseWordBoxes(
+    String json,
+    RiwayaData data,
+  ) {
+    final d = jsonDecode(json) as Map<String, dynamic>;
+    if (d['format'] != 1) return const {};
+    final out = <int, Map<(int, int, int), Rect>>{};
+    for (final raw in d['verses'] as List<dynamic>) {
+      final v = raw as List<dynamic>;
+      final surah = v[0] as int;
+      final ayah = v[1] as int;
+      final boxes = v[4] as List<dynamic>;
+      final count = data.words(surah, ayah).length;
+      if (count == 0 || v[3] != count || boxes.length != count) continue;
+      for (var i = 0; i < boxes.length; i++) {
+        final b = boxes[i] as List<dynamic>;
+        (out[b[0] as int] ??= {})[(surah, ayah, i + 1)] = Rect.fromLTRB(
+          (b[1] as num) / 10,
+          (b[2] as num) / 10,
+          (b[3] as num) / 10,
+          (b[4] as num) / 10,
+        );
+      }
+    }
+    return out;
+  }
+
+  /// Reads and parses `riwaya.json.xz`, and `words.json.xz` when the pack
+  /// has it (packs v2), from an installed pack, off the UI thread.
   static Future<RiwayaData> load(Directory packDir) {
     final path = p.join(packDir.path, 'riwaya.json.xz');
-    return Isolate.run(
-      () => parse(
-        utf8.decode(XZDecoder().decodeBytes(File(path).readAsBytesSync())),
-      ),
-    );
+    final wordsPath = p.join(packDir.path, 'words.json.xz');
+    return Isolate.run(() {
+      String read(String path) =>
+          utf8.decode(XZDecoder().decodeBytes(File(path).readAsBytesSync()));
+      final words = File(wordsPath).existsSync() ? read(wordsPath) : null;
+      return parse(read(path), words);
+    });
   }
 }

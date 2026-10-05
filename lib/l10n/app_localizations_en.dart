@@ -1594,7 +1594,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get riwayaGaps =>
-      'In the riwaya editions: no word highlighting while listening, no colouring of the divine names, and no hizb or quarter in the frame (the page carries its own printed signs).';
+      'In the riwaya editions: no word highlighting while listening (their recitations are timed by verse only), and no hizb or quarter in the frame (the page carries its own printed signs).';
+
+  @override
+  String get riwayaNoWordBoxes =>
+      'This riwaya\'s downloaded pages carry no word boxes, so the divine names are not coloured and words cannot be picked. The newer page pack carries them.';
+
+  @override
+  String get riwayaWordNoStudy =>
+      'No word study for this word here: word study is built on the words of Hafs, and opens for a riwaya\'s word only when it is the same word, letter for letter, in the same verse of Hafs.';
 
   @override
   String riwayaTafsirNote(

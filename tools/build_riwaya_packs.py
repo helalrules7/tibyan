@@ -5,6 +5,7 @@ Each pack holds:
   NNN.svg.xz     the 604 page SVGs from quran-ws/quran-svg v1.1.1, unchanged
                  (the KFGQPC page artwork), each xz-compressed on its own
   riwaya.json.xz the riwaya's verses and page geometry (below)
+  words.json.xz  the boxes of the words on the pages (below)
   <font>.ttf     the riwaya's KFGQPC font, unchanged (catchwords)
   manifest.json  every file's SHA-256 (of the stored bytes)
 
@@ -22,6 +23,14 @@ riwaya.json:
   grid     [first line centre, line pitch], opening [ink box, body box] of
            pages 1-2, all in the page's units
 
+words.json (tools/build_riwaya_word_boxes.py):
+  verses   [surah, ayah, exact, word count, [[page, x0, y0, x1, y1] per
+           word]] with boxes in tenths of the page's units, words as the
+           verse text of riwaya.json splits at its spaces (verse number and
+           ۞ left out). exact = 1 when every word matched its predicted
+           letter groups. A verse is left out unless its words are exactly
+           those of its text in riwaya.json.
+
 Where the KFGQPC text file and the printed pages count a surah differently
 (al-Duri, al-Mulk: 30 in the text file, 31 markers on the printed page),
 that surah's verses, text and Hafs map come from Quranpedia, whose count
@@ -30,7 +39,7 @@ matches the printed page; the manifest lists such surahs.
 Nothing in the artwork or the texts is modified.
 
 Usage: python3 tools/build_riwaya_packs.py [warsh,qalun,...]
-Output: tools/out/pages-<riwaya>-v1.zip
+Output: tools/out/pages-<riwaya>-v2.zip
 """
 import gzip
 import hashlib
@@ -42,11 +51,14 @@ import sys
 import zipfile
 
 import build_line_cuts
+import build_riwaya_word_boxes as W
 import build_word_boxes as B
 import riwayat as R
 
 OUT_DIR = R.ROOT / 'out'
-VERSION = 1
+# 1: pages, riwaya.json and font. 2: also words.json. A new version is a
+# new file name: apps that know the old SHA-256 keep downloading v1.
+VERSION = 2
 
 
 def measure_grid(z, names):
@@ -88,6 +100,25 @@ def opening_boxes(z, name, polygons):
     return [round(v, 2) for v in ink], [round(v, 2) for v in body]
 
 
+def word_boxes(riwaya, verses):
+    """words.json: the word boxes of every verse whose words in the box
+    build are exactly the words of its text in riwaya.json."""
+    built = W.build(riwaya)
+    keep, left_out = {}, []
+    for s, a, *_, text in verses:
+        entry = built.get((s, a))
+        if entry and entry[1] == W.words_of(W.verse_tokens(text)):
+            keep[(s, a)] = entry
+        else:
+            left_out.append([s, a])
+    out = W.to_json(keep)
+    out['left_out'] = left_out
+    st = W.stats(riwaya, keep)
+    print(f"{riwaya}: word boxes for {st['verses']} verses ({st['words']} words), "
+          f"{st['exact']} exact ({st['exact_pct']}%); left out {left_out}")
+    return out
+
+
 def build(riwaya):
     spec = R.RIWAYAT[riwaya]
     pack_id = f'pages-{riwaya}-v{VERSION}'
@@ -95,13 +126,13 @@ def build(riwaya):
     text = R.kfgqpc_text(riwaya)
     rows = {(r['sura_no'], r['aya_no']): r for r in R.kfgqpc_rows(riwaya)}
     hafs_map = R.hafs_map(riwaya)
-    qp = R.quranpedia(riwaya)
     qws_counts, k_counts = R.counts(qws), R.counts(text)
 
     # Surahs where the text file and the printed page count differently.
     from_qp = [s for s in range(1, 115) if qws_counts[s] != k_counts[s]]
     qp_text = {}
     if from_qp:
+        qp = R.quranpedia(riwaya)
         n = spec[4]
         d = json.load(gzip.open(R.RCACHE / 'quranpedia' / f'mushafs-{n}.json.gz'))['data']
         for s in d['surahs']:
@@ -123,6 +154,8 @@ def build(riwaya):
             juz = rows[key]['jozz']
             t = text[key]
         verses.append([s, a, qws[key]['page'], juz, hs[0] if hs else 0, hs[-1] if hs else 0, t])
+
+    words = word_boxes(riwaya, verses)
 
     surah_list = R.qws_surahs(riwaya)
     surahs = [[qws_counts[s], qws[(s, 1)]['page']] for s in range(1, 115)]
@@ -177,6 +210,11 @@ def build(riwaya):
             dst.writestr('riwaya.json.xz', packed)
             files.append(dict(file='riwaya.json.xz', json_sha256=hashlib.sha256(raw).hexdigest(),
                               xz_sha256=hashlib.sha256(packed).hexdigest(), xz_bytes=len(packed)))
+            raw = json.dumps(words, ensure_ascii=False, separators=(',', ':')).encode()
+            packed = lzma.compress(raw, preset=9 | lzma.PRESET_EXTREME)
+            dst.writestr('words.json.xz', packed)
+            files.append(dict(file='words.json.xz', json_sha256=hashlib.sha256(raw).hexdigest(),
+                              xz_sha256=hashlib.sha256(packed).hexdigest(), xz_bytes=len(packed)))
             font_name, font = R.kfgqpc_font(riwaya)
             dst.writestr(font_name, font)
             # xz_sha256 is the SHA-256 of the stored bytes; the font is stored as is.
@@ -201,7 +239,8 @@ def build(riwaya):
             dst.writestr('manifest.json', json.dumps(manifest, ensure_ascii=False, indent=1))
     digest = R.sha256(out)
     print(f'{out.name}: {out.stat().st_size} bytes, sha256 {digest}, grid {grid}, '
-          f'verses {len(verses)}, polygons {len(polygons)}, overflow pages {len(overflow)}')
+          f'verses {len(verses)}, polygons {len(polygons)}, overflow pages {len(overflow)}, '
+          f'verses with word boxes {len(words["verses"])}')
     return out, digest
 
 

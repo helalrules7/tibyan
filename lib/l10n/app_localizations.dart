@@ -2831,8 +2831,20 @@ abstract class AppLocalizations {
   /// No description provided for @riwayaGaps.
   ///
   /// In ar, this message translates to:
-  /// **'في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة ولا تلوين للفظ الجلالة، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).'**
+  /// **'في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة (تلاواتها موقّتة بالآيات وحدها)، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).'**
   String get riwayaGaps;
+
+  /// No description provided for @riwayaNoWordBoxes.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحات هذه الرواية المنزّلة لا تحمل مربعات الكلمات، فلا تلوين فيها للفظ الجلالة ولا اختيار للكلمة. تحملها حزمة الصفحات الأحدث.'**
+  String get riwayaNoWordBoxes;
+
+  /// No description provided for @riwayaWordNoStudy.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا دراسة لهذه الكلمة هنا: دراسة الكلمة مبنية على كلمات رواية حفص، وتُفتح لكلمة الرواية حين تكون هي كلمة حفص نفسها في الآية نفسها، بحروفها.'**
+  String get riwayaWordNoStudy;
 
   /// No description provided for @riwayaTafsirNote.
   ///
