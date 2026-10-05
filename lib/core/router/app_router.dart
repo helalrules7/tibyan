@@ -127,6 +127,7 @@ final appRouterProvider = Provider<GoRouter>(
           hifzUnit: state.uri.queryParameters['hifz'],
           hifzFrom: state.uri.queryParameters['from'],
           hifzTo: state.uri.queryParameters['to'],
+          listen: state.uri.queryParameters['listen'] == '1',
         ),
         routes: [
           GoRoute(

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
@@ -67,7 +69,11 @@ Future<void> main() async {
       packRootProvider.overrideWithValue(packRoot),
       timingOverridesProvider.overrideWithValue(timing),
       reminderSchedulerProvider.overrideWithValue(LocalReminderScheduler()),
-      homeWidgetSyncProvider.overrideWithValue(PluginHomeWidgetSync()),
+      homeWidgetSyncProvider.overrideWithValue(
+        defaultTargetPlatform == TargetPlatform.macOS
+            ? MacHomeWidgetSync()
+            : PluginHomeWidgetSync(),
+      ),
     ],
   );
 
@@ -137,13 +143,26 @@ Future<void> _refreshTimings(
 /// date, and opens the page a reminder or the widget points to.
 void _startKhatma(ProviderContainer container) {
   final service = container.read(khatmaServiceProvider);
-  Future<void> refresh() => service.refresh().catchError((_) {});
+  final widget = container.read(homeWidgetSyncProvider);
+  // Queued widget buttons first (the day's portion marked read), then the
+  // reminders and the widget's own entries are rewritten.
+  Future<void> refresh() async {
+    try {
+      for (final a in await widget.takePending()) {
+        if (a == WidgetAction.portionDone) await service.markTodayRead();
+      }
+      await service.refresh();
+    } catch (_) {}
+  }
+
   unawaited(refresh());
   AppLifecycleListener(onResume: refresh);
 
   Future<void> open(Uri? uri, {bool launch = false}) async {
-    if (uri == null || uri.host != 'khatma') return;
-    final route = await service.routeFor(uri);
+    if (uri == null) return;
+    final action = widgetActionOf(uri);
+    if (uri.host != 'khatma' && action == null) return;
+    final route = action?.route ?? await service.routeFor(uri);
     // Opened the app: after the splash screen has handed over to home.
     if (launch) await Future<void>.delayed(const Duration(milliseconds: 2200));
     container.read(appRouterProvider).go(route);
@@ -157,7 +176,6 @@ void _startKhatma(ProviderContainer container) {
         .then((p) => open(p == null ? null : Uri.tryParse(p), launch: true))
         .catchError((_) {}),
   );
-  final widget = container.read(homeWidgetSyncProvider);
   unawaited(
     widget.launchUri().then((u) => open(u, launch: true)).catchError((_) {}),
   );

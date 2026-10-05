@@ -59,7 +59,12 @@ class MushafScreen extends ConsumerStatefulWidget {
     this.hifzUnit,
     this.hifzFrom,
     this.hifzTo,
+    this.listen = false,
   });
+
+  /// Start the recitation from the first verse of the opening page (the
+  /// home screen widget's «استماع» button).
+  final bool listen;
 
   final int? initialPage;
   final int? selectSurah;
@@ -200,6 +205,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _controller = PageController(initialPage: start - _first);
     });
     _trackPage();
+    if (widget.listen) {
+      // After the page's verses are loaded.
+      await ref.read(pageAyahsProvider(_page).future);
+      if (mounted) _listenFromPage();
+    }
   }
 
   void _trackPage() {
