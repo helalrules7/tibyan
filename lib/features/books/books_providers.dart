@@ -50,18 +50,150 @@ final installedBookPacksProvider = Provider<List<BookPack>>((ref) {
   return packs;
 });
 
+/// What one book section of the app shows: the kind of book, the flag
+/// that hides it (null: shown whenever a reviewed pack is installed), and
+/// which of the book's entries it takes.
+class BookSectionSpec {
+  const BookSectionSpec({
+    required this.kind,
+    required this.feature,
+    this.entryKinds,
+    this.parentKind,
+    this.showRange = false,
+    this.firstVerseOnly = const {},
+  });
+
+  /// [BookKind].
+  final String kind;
+  final Feature? feature;
+
+  /// [EntryKind]s shown (null: all).
+  final Set<String>? entryKinds;
+
+  /// Each entry is shown under the entry of this kind it belongs to
+  /// (al-Damghani's word header above its senses).
+  final String? parentKind;
+
+  /// An entry linked to several verses says which ones.
+  final bool showRange;
+
+  /// [EntryKind]s shown on the first verse of their link only (a surah's
+  /// introduction is linked to the whole surah).
+  final Set<String> firstVerseOnly;
+
+  static const asbab = BookSectionSpec(
+    kind: BookKind.asbabNuzul,
+    feature: Feature.asbabNuzul,
+  );
+
+  /// The tafsir screen already lets the reader choose tafsirs: a book
+  /// tafsir is one more choice once its reviewed pack is installed.
+  static const tafsir = BookSectionSpec(
+    kind: BookKind.tafsir,
+    feature: null,
+    showRange: true,
+    firstVerseOnly: {EntryKind.surahIntro},
+  );
+
+  static const munasabat = BookSectionSpec(
+    kind: BookKind.munasabat,
+    feature: Feature.munasabat,
+    showRange: true,
+    firstVerseOnly: {EntryKind.surahIntro},
+  );
+
+  static const wujuh = BookSectionSpec(
+    kind: BookKind.wujuhNazair,
+    feature: Feature.wujuhNazair,
+    entryKinds: {EntryKind.wajh},
+    parentKind: EntryKind.word,
+  );
+
+  /// On: its flag (if any) is on. The section still needs a pack.
+  bool isOn(FeatureFlags flags) => feature == null || flags.isOn(feature!);
+}
+
+/// Entries of one book section for a (Hafs) verse: [source] keeps one
+/// book, [word] (1-based) one word of the verse.
+typedef BookQuery = ({
+  BookSectionSpec spec,
+  int surah,
+  int ayah,
+  String? source,
+  int? word,
+});
+
+/// The reviewed entries of a book section for a verse, from the installed
+/// packs; empty when the section's flag is off.
+final bookEntriesProvider = Provider.autoDispose
+    .family<List<BookEntry>, BookQuery>((ref, q) {
+      if (!q.spec.isOn(ref.watch(featureFlagsProvider))) return const [];
+      return [
+        for (final pack in ref.watch(installedBookPacksProvider))
+          for (final e in pack.entriesFor(
+            q.surah,
+            q.ayah,
+            kind: q.spec.kind,
+            source: q.source,
+            entryKinds: q.spec.entryKinds,
+            word: q.word,
+          ))
+            if (!q.spec.firstVerseOnly.contains(e.kind) ||
+                e.link?.ayahFrom == q.ayah)
+              e,
+      ];
+    });
+
+/// The books of [kind] in the installed reviewed packs.
+final installedBookSourcesProvider = Provider.autoDispose
+    .family<List<BookSource>, String>(
+      (ref, kind) => [
+        for (final pack in ref.watch(installedBookPacksProvider))
+          ...pack.sourcesOf(kind),
+      ],
+    );
+
+/// The entry [entry] belongs under in its pack (see [BookPack.parentOf]).
+BookEntry? bookParentOf(
+  List<BookPack> packs,
+  BookEntry entry, {
+  required String kind,
+}) {
+  for (final pack in packs) {
+    if (pack.sources[entry.source.id] != entry.source) continue;
+    return pack.parentOf(entry, kind: kind);
+  }
+  return null;
+}
+
 /// The occasions of revelation of a (Hafs) verse from the installed
 /// reviewed packs; empty unless [Feature.asbabNuzul] is on.
 final asbabProvider = Provider.autoDispose
-    .family<List<BookEntry>, ({int surah, int ayah})>((ref, v) {
-      if (!ref.watch(featureFlagsProvider).isOn(Feature.asbabNuzul)) {
-        return const [];
-      }
-      return [
-        for (final pack in ref.watch(installedBookPacksProvider))
-          ...pack.entriesFor(v.surah, v.ayah, kind: BookKind.asbabNuzul),
-      ];
-    });
+    .family<List<BookEntry>, ({int surah, int ayah})>(
+      (ref, v) => ref.watch(
+        bookEntriesProvider((
+          spec: BookSectionSpec.asbab,
+          surah: v.surah,
+          ayah: v.ayah,
+          source: null,
+          word: null,
+        )),
+      ),
+    );
+
+/// The munasabat of a (Hafs) verse; empty unless [Feature.munasabat] is on.
+final munasabatProvider = Provider.autoDispose
+    .family<List<BookEntry>, ({int surah, int ayah})>(
+      (ref, v) => ref.watch(
+        bookEntriesProvider((
+          spec: BookSectionSpec.munasabat,
+          surah: v.surah,
+          ayah: v.ayah,
+          source: null,
+          word: null,
+        )),
+      ),
+    );
 
 /// Downloads of the book packs, by pack id, run by the system like the
 /// page packs.

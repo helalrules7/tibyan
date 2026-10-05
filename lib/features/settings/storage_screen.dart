@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../audio/recitation.dart';
 import '../books/books_providers.dart';
+import '../books/presentation/book_section.dart' show bookKindTitle;
 import '../../core/settings/app_settings.dart';
 import '../mushaf/data/page_pack.dart';
 import '../mushaf/mushaf_providers.dart';
@@ -67,6 +68,15 @@ class StorageScreen extends ConsumerWidget {
         case StorageKind.partial:
           return l.storagePartial;
       }
+    }
+
+    // A book pack says what kind of book it is.
+    String? bookKind(StorageEntry e) {
+      if (e.kind != StorageKind.pack) return null;
+      for (final b in books) {
+        if (b.id == e.id) return bookKindTitle(l, b.kind);
+      }
+      return null;
     }
 
     // The edition that ships with the app is put back at launch.
@@ -139,7 +149,7 @@ class StorageScreen extends ConsumerWidget {
                           ? '${size(e.bytes)} · ${l.storagePartialHint}'
                           : bundled(e)
                           ? '${size(e.bytes)} · ${l.storageBundled}'
-                          : size(e.bytes),
+                          : [size(e.bytes), ?bookKind(e)].join(' · '),
                       style: TextStyle(color: t.muted),
                     ),
                     trailing: bundled(e)
@@ -172,7 +182,7 @@ class StorageScreen extends ConsumerWidget {
                 for (final b in notInstalled)
                   _BookOffer(
                     title: l.storageBook(b.title),
-                    size: size(b.bytes),
+                    size: '${size(b.bytes)} · ${bookKindTitle(l, b.kind)}',
                     progress: downloads[b.id],
                     onDownload: () =>
                         ref.read(bookDownloadsProvider.notifier).start(b),
