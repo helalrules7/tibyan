@@ -4,7 +4,22 @@ import 'dart:io';
 import 'package:background_downloader/background_downloader.dart';
 
 import '../../books/data/book_pack.dart';
+import '../../content_extras/english_tafsir.dart';
 import 'page_pack.dart';
+
+/// The pack the background downloader knows as [id]: a page pack, a book
+/// pack or an English tafsir pack (all installed by the same code). A
+/// finished download of an id not found here is never installed.
+PagePackSpec? downloadablePackSpec(String id) {
+  for (final s in [
+    ...PagePackSpec.all,
+    for (final b in BookPackSpec.all) b.pack,
+    for (final t in TafsirTextPackSpec.english) t.pack,
+  ]) {
+    if (s.id == id) return s;
+  }
+  return null;
+}
 
 /// Page packs downloaded by the system (WorkManager / a user-initiated job
 /// on Android, a background URLSession on iOS), so a download goes on when
@@ -59,15 +74,7 @@ class BackgroundPacks {
     }
   }
 
-  PagePackSpec? _spec(String id) {
-    for (final s in [
-      ...PagePackSpec.all,
-      for (final b in BookPackSpec.all) b.pack,
-    ]) {
-      if (s.id == id) return s;
-    }
-    return null;
-  }
+  PagePackSpec? _spec(String id) => downloadablePackSpec(id);
 
   PagePackInstaller _installer(PagePackSpec spec) =>
       PagePackInstaller(root: root, spec: spec);

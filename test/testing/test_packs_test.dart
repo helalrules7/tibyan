@@ -3,6 +3,7 @@ import 'package:tibyan/core/testing/test_packs.dart';
 import 'package:tibyan/features/books/data/book_pack.dart';
 import 'package:tibyan/features/content_extras/english_tafsir.dart';
 import 'package:tibyan/features/content_extras/verse_audio_index.dart';
+import 'package:tibyan/features/mushaf/data/background_packs.dart';
 
 /// The closed-test packs (lib/core/testing/test_packs.dart): all on our
 /// server's test area, all titled as test drafts, all in the app's lists,
@@ -44,6 +45,15 @@ void main() {
       expect(s.title, contains(testTitleMarkEn), reason: s.title);
       expect(s.sha256, matches(hex));
       expect(TafsirTextPackSpec.english, contains(s));
+    }
+  });
+
+  test('the background downloader installs every test pack', () {
+    for (final s in [
+      for (final b in testBookPacks) b.pack,
+      for (final t in testEnglishTafsirPacks) t.pack,
+    ]) {
+      expect(downloadablePackSpec(s.id)?.url, s.url, reason: s.id);
     }
   });
 
