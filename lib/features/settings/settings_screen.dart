@@ -268,7 +268,10 @@ Future<void> _export(BuildContext context, WidgetRef ref) async {
   final l = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   try {
-    final text = await Backup(ref.read(userDatabaseProvider)).export();
+    final text = await Backup(
+      ref.read(userDatabaseProvider),
+      prefs: ref.read(sharedPreferencesProvider),
+    ).export();
     final dir = await getTemporaryDirectory();
     final day = DateTime.now().toIso8601String().substring(0, 10);
     final file = File('${dir.path}/tibyan-backup-$day.json');
@@ -291,7 +294,12 @@ Future<void> _import(BuildContext context, WidgetRef ref) async {
     );
     if (picked == null) return;
     final text = utf8.decode(await picked.readAsBytes());
-    final r = await Backup(ref.read(userDatabaseProvider)).import(text);
+    final r = await Backup(
+      ref.read(userDatabaseProvider),
+      prefs: ref.read(sharedPreferencesProvider),
+    ).import(text);
+    // The restored settings take effect now.
+    if (r.settings > 0) ref.invalidate(settingsProvider);
     messenger.showSnackBar(
       SnackBar(content: Text(l.backupDone(digits(r.added), digits(r.updated)))),
     );

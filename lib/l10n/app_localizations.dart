@@ -2968,7 +2968,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupExportHint.
   ///
   /// In ar, this message translates to:
-  /// **'ملف واحد فيه فواصلك وعلاماتك وموضع القراءة والختمة والتقارير وملاحظات التدبر وتقدم الحفظ. احتفظ به أو أرسله لنفسك.'**
+  /// **'ملف واحد فيه فواصلك وعلاماتك وموضع القراءة والختمة والتقارير وملاحظات التدبر وتقدم الحفظ، وإعداداتك. احتفظ به أو أرسله لنفسك.'**
   String get backupExportHint;
 
   /// No description provided for @backupImport.
@@ -2980,7 +2980,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupImportHint.
   ///
   /// In ar, this message translates to:
-  /// **'يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض.'**
+  /// **'يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض، ويعيد الإعدادات كما كانت في النسخة.'**
   String get backupImportHint;
 
   /// No description provided for @backupDone.

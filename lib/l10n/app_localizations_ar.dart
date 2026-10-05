@@ -1676,14 +1676,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backupExportHint =>
-      'ملف واحد فيه فواصلك وعلاماتك وموضع القراءة والختمة والتقارير وملاحظات التدبر وتقدم الحفظ. احتفظ به أو أرسله لنفسك.';
+      'ملف واحد فيه فواصلك وعلاماتك وموضع القراءة والختمة والتقارير وملاحظات التدبر وتقدم الحفظ، وإعداداتك. احتفظ به أو أرسله لنفسك.';
 
   @override
   String get backupImport => 'استعادة من نسخة';
 
   @override
   String get backupImportHint =>
-      'يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض.';
+      'يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض، ويعيد الإعدادات كما كانت في النسخة.';
 
   @override
   String backupDone(String added, String updated) {

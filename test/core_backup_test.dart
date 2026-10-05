@@ -1,12 +1,14 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tibyan/core/backup/backup.dart';
 import 'package:tibyan/core/db/user_database.dart';
 
 UserDatabase _db() => UserDatabase(NativeDatabase.memory());
 
 void main() {
+  group('settings and outbox', settingsAndOutbox);
   late UserDatabase a;
   late UserDatabase b;
   setUp(() {
@@ -103,5 +105,47 @@ void main() {
       Backup(b).import('{"app":"tibyan","format":99,"tables":{}}'),
       throwsA(isA<BackupException>()),
     );
+  });
+}
+
+void settingsAndOutbox() {
+  test('settings travel with the backup and come back on restore', () async {
+    SharedPreferences.setMockInitialValues({
+      'settings.style': 'seljuk',
+      'settings.playbackSpeed': 1.25,
+      'settings.underVerse': ['8', '9'],
+      'search.history': ['x'], // not a setting: stays out
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final a = _db();
+    final text = await Backup(a, prefs: prefs).export();
+    await a.close();
+
+    SharedPreferences.setMockInitialValues({'settings.style': 'zakhrafa'});
+    final fresh = await SharedPreferences.getInstance();
+    final b = _db();
+    final r = await Backup(b, prefs: fresh).import(text);
+    await b.close();
+    expect(r.settings, 3);
+    expect(fresh.getString('settings.style'), 'seljuk');
+    expect(fresh.getDouble('settings.playbackSpeed'), 1.25);
+    expect(fresh.getStringList('settings.underVerse'), ['8', '9']);
+    expect(fresh.getStringList('search.history'), isNull);
+  });
+
+  test('a restored note is queued for sync like any other write', () async {
+    final a = _db();
+    final b = _db();
+    await a
+        .into(a.reflections)
+        .insert(ReflectionsCompanion.insert(surah: 2, ayah: 3, body: 'x'));
+    final uuid = (await a.select(a.reflections).get()).single.uuid;
+    await Backup(b).import(await Backup(a).export());
+    final queued = await b.select(b.outbox).get();
+    expect(queued.single.entity, 'reflection');
+    expect(queued.single.rowUuid, uuid);
+    expect(queued.single.payload, contains('"body":"x"'));
+    await a.close();
+    await b.close();
   });
 }

@@ -1683,14 +1683,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupExportHint =>
-      'One file with your bookmarks, marks, reading position, khatma, reports, tadabbur notes and hifz progress. Keep it, or send it to yourself.';
+      'One file with your bookmarks, marks, reading position, khatma, reports, tadabbur notes and hifz progress, and your settings. Keep it, or send it to yourself.';
 
   @override
   String get backupImport => 'Restore from a backup';
 
   @override
   String get backupImportHint =>
-      'Merges the backup with what is on this device: nothing is deleted, and the newer copy wins where they differ.';
+      'Merges the backup with what is on this device: nothing is deleted, the newer copy wins where they differ, and the settings come back as they were in the backup.';
 
   @override
   String backupDone(String added, String updated) {
