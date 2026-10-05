@@ -5,6 +5,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -20,6 +21,14 @@ import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
+
+/// The app's version as built (pubspec.yaml), e.g. `0.4.0 (5)`.
+final appVersionProvider = FutureProvider<String>((ref) async {
+  final info = await PackageInfo.fromPlatform();
+  return info.buildNumber.isEmpty
+      ? info.version
+      : '${info.version} (${info.buildNumber})';
+});
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -242,7 +251,7 @@ class SettingsScreen extends ConsumerWidget {
                   Text(l.aboutBody),
                   const SizedBox(height: 8),
                   Text(
-                    l.versionLabel('0.1.1'),
+                    l.versionLabel(ref.watch(appVersionProvider).value ?? ''),
                     style: TextStyle(color: t.muted),
                   ),
                 ],
