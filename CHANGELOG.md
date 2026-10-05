@@ -6,6 +6,9 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (qiraat audio, off)
+- A verse-level index of the AQQD qiraat clips in `data/qiraat_audio/` (`tools/qiraat_audio.py` builds it from the OSF listing and checks contributions in CI), a guide for contributors who mark where the differing word falls in a clip (`docs/QIRAAT_AUDIO.md`, with a second reviewer), and an app data layer that streams the verse clip, or only the reviewed word range, from sources with a clear licence only. Behind the `qiraat_audio` flag, off.
+
 ### Added (riwaya word boxes)
 - Riwaya editions (Warsh, Qalun, al-Duri, Shu'bah): word boxes derived from each riwaya's KFGQPC page geometry, text and font (`tools/build_riwaya_word_boxes.py`), carried in the v2 page packs. With a v2 pack, the divine names are coloured on riwaya pages, recitation and test modes cover verses word by word, and word study opens for a word that is exactly a Hafs word (same verse, word count and letters); other words say why there is none. The packs on the mirror are still v1.
 
