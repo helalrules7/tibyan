@@ -8,6 +8,7 @@
 - روابط المصادر: `docs/SOURCE_LINKS.md`
 - المصادر المعتمدة وتراخيصها: `docs/DATA_SOURCES.md`
 - رسائل الإذن: `docs/outreach/PERMISSION_REQUESTS.md`
+- سجل الموافقات وما يفتحه كل رد: `docs/outreach/APPROVALS.md`
 - نسخ صفحات الأذونات: `docs/licenses/`
 
 معاني الحالات:
