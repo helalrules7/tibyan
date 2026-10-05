@@ -6,6 +6,13 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (CarPlay, waiting for Apple)
+- CarPlay (iOS) is ready: choose a reciter and surah, or continue from where you stopped reading, with Now Playing. It switches on once Apple grants the CarPlay Audio entitlement (`tools/apple/carplay.rb enable`; the request steps are in docs/CARPLAY.md). Android Auto and CarPlay share one browsing tree (`CarBrowser`); CarPlay reaches it over the `app.tibyan/car` channel.
+
+### Added (staging content that waits for permission)
+- Tools that download pending sources into a git-ignored staging folder with their hashes, without shipping anything: `english_mokhtasar` and the `english_rwwad` audio index (QuranEnc), the Nuqayah tafsir audio index, the Quranpedia dumps and topics check, and the AQQD coverage measure. Reports in `docs/verification/2026-10-05_*`.
+- `docs/outreach/APPROVALS.md`: how each reply is recorded, and what it switches on or what replaces it if refused.
+
 ### Added (widgets: iOS, macOS and an actions widget)
 - The khatma widget as a WidgetKit extension on iOS 17 and macOS 14 (desktop widgets), generated into the Xcode projects by `tools/apple/add_widget_targets.rb` from `apple/`. The macOS app is new (`macos/`): it carries a channel that writes the widgets' keys into the App Group and receives `tibyan://` links, since `home_widget` has no macOS support.
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
@@ -18,7 +25,7 @@ All notable changes to Tibyan are recorded here. The format follows
 - Tests that go through the whole app from the router: open the mushaf, select a verse with a screen reader's double tap and copy it (with its link and credit), and turn pages with the arrow keys while the reading position follows (test/flows/).
 
 ### Added (recitation in the car)
-- Android Auto: the car shows «تابع من موضع القراءة» (the recitation from the last reading position) and the reciters, each with the 114 surahs to play. This needs a hook that just_audio_background does not offer, so the package is vendored in `packages/just_audio_background` with that addition only (TIBYAN.md there). CarPlay needs an entitlement from Apple and is not set up.
+- Android Auto: the car shows «تابع من موضع القراءة» (the recitation from the last reading position) and the reciters, each with the 114 surahs to play. This needs a hook that just_audio_background does not offer, so the package is vendored in `packages/just_audio_background` with that addition only (TIBYAN.md there).
 
 ### Added (verse links)
 - `tibyan://verse?s=2&a=255` opens the app on that verse's page with the verse selected (in a riwaya edition, the riwaya verse holding it), on Android, iOS and macOS. Copied and shared verse text carries the link to its first verse. Flutter's own deep linking is switched off, so every link goes through the same handler as the widgets'. Windows and Linux do not register the scheme yet.
