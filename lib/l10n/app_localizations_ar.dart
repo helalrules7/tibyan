@@ -716,6 +716,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get audioCredit => 'التلاوات وتوقيت الآيات: mp3quran.net';
 
   @override
+  String get tafsirAudioListen => 'استمع للتفسير';
+
+  @override
+  String get tafsirAudioListenSurah => 'استمع لتفسير السورة';
+
+  @override
+  String get translationAudioAfterVerse => 'الترجمة المسموعة بعد كل آية';
+
+  @override
+  String get translationAudioHint =>
+      'تُسمع ترجمة كل آية بعد تلاوتها، حين تتوالى الآيات بلا تكرار';
+
+  @override
+  String clipTranslationOf(String ayah) {
+    return 'ترجمة الآية $ayah';
+  }
+
+  @override
+  String englishTafsirOffer(String title) {
+    return 'تنزيل التفسير الإنجليزي: $title';
+  }
+
+  @override
   String get touchReading => 'القراءة اللمسية';
 
   @override

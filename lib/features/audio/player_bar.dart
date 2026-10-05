@@ -8,11 +8,14 @@ import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/theme_tokens.dart';
 import '../../l10n/app_localizations.dart';
+import '../content_extras/credits.dart';
+import '../content_extras/verse_audio_index.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'recitation.dart';
 import 'reciter_avatar.dart';
+import 'verse_queue.dart';
 
 String reciterLabel(BuildContext context, ReciterRow r) {
   final l = AppLocalizations.of(context);
@@ -36,7 +39,17 @@ class PlayerBar extends ConsumerWidget {
     final surahs = ref.watch(surahsProvider).value;
     final reciter = ref.watch(currentReciterProvider).value;
     final surah = surahs == null ? '' : surahName(context, surahs[s.surah - 1]);
-    final where = s.ayah == null
+    final lang = Localizations.localeOf(context).languageCode;
+    final clip = s.clip;
+    // A clip (the translation after a verse, or a tafsir) is named with
+    // its source's credit line under it while it plays.
+    final where = clip != null
+        ? clip.kind == VerseAudioKind.translation
+              ? '${l.surahWord(surah)} · ${l.clipTranslationOf(digits(clip.ayah))}'
+              : clip.wholeSurah
+              ? '${clip.title(lang)} · ${l.surahWord(surah)}'
+              : '${clip.title(lang)} · ${l.surahWord(surah)} · ${digits(clip.ayah)}'
+        : s.ayah == null
         ? l.surahWord(surah)
         : '${l.surahWord(surah)} · ${digits(s.ayah!)}';
     final repeating = s.timed && s.repeat != 1;
@@ -84,6 +97,8 @@ class PlayerBar extends ConsumerWidget {
                         child: Text(
                           s.error != null
                               ? l.playerError
+                              : clip != null
+                              ? contentCredit(clip.source, lang)
                               : repeating
                               ? l.repeatProgress(
                                   digits(s.repeatDone + 1),
@@ -495,6 +510,20 @@ class PlayerOptions extends ConsumerWidget {
           value: settings.followRecitation,
           onChanged: ref.read(settingsProvider.notifier).setFollowRecitation,
         ),
+        // Offered only while its flag is on and its index is available, and
+        // for Hafs, whose verse numbers the translation follows.
+        if (riwaya == Riwaya.hafs)
+          if (ref.watch(translationAudioIndexProvider).value case final idx?)
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l.translationAudioAfterVerse),
+              subtitle: Text(
+                '${l.translationAudioHint}\n'
+                '${contentCredit(idx.source, Localizations.localeOf(context).languageCode)}',
+              ),
+              value: ref.watch(translationAudioChoiceProvider),
+              onChanged: c.setTranslationAfterVerses,
+            ),
         OutlinedButton.icon(
           onPressed: () {
             if (inSheet) Navigator.pop(context);

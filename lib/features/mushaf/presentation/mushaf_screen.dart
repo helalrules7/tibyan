@@ -19,6 +19,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../books/books_providers.dart';
 import '../../books/presentation/asbab_section.dart';
+import '../../content_extras/verse_audio_index.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
 import '../../hifz/data/hifz_repository.dart';
@@ -985,6 +986,27 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     final h = hafsKeyOf(_riwaya, range.first);
                     showAsbabSheet(context, surah: h.surah, ayah: h.ayah);
                   },
+                  // A tafsir read aloud, by Hafs verse (flag tafsir_audio).
+                  onTafsirAudio: range.length != 1
+                      ? null
+                      : switch (ref
+                            .watch(
+                              tafsirAudioForVerseProvider((
+                                surah: hafsKeyOf(_riwaya, range.first).surah,
+                                ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                              )),
+                            )
+                            .value
+                            ?.firstOrNull) {
+                          (final index, _) => () {
+                            final h = hafsKeyOf(_riwaya, range.first);
+                            setState(() => _selA = _selB = null);
+                            ref
+                                .read(recitationProvider.notifier)
+                                .playTafsir(index, h.surah, h.ayah);
+                          },
+                          null => null,
+                        },
                   onReflect: () {
                     final h = hafsKeyOf(_riwaya, range.first);
                     showReflectionSheet(context, surah: h.surah, ayah: h.ayah);

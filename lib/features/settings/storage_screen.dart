@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../audio/recitation.dart';
 import '../books/books_providers.dart';
+import '../content_extras/english_tafsir.dart';
 import '../../core/settings/app_settings.dart';
 import '../mushaf/data/page_pack.dart';
 import '../mushaf/mushaf_providers.dart';
@@ -48,6 +49,9 @@ class StorageScreen extends ConsumerWidget {
         case StorageKind.pack:
           if (e.id == PagePackSpec.semantic.id) return l.storageSemantic;
           for (final b in books) {
+            if (b.id == e.id) return l.storageBook(b.title);
+          }
+          for (final b in ref.read(englishTafsirSpecsProvider)) {
             if (b.id == e.id) return l.storageBook(b.title);
           }
           for (final ed in MushafEdition.values) {

@@ -540,6 +540,26 @@
     }
   },
   "audioCredit": "التلاوات وتوقيت الآيات: mp3quran.net",
+  "tafsirAudioListen": "استمع للتفسير",
+  "tafsirAudioListenSurah": "استمع لتفسير السورة",
+  "translationAudioAfterVerse": "الترجمة المسموعة بعد كل آية",
+  "translationAudioHint": "تُسمع ترجمة كل آية بعد تلاوتها، حين تتوالى الآيات بلا تكرار",
+  "clipTranslationOf": "ترجمة الآية {ayah}",
+  "@clipTranslationOf": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "englishTafsirOffer": "تنزيل التفسير الإنجليزي: {title}",
+  "@englishTafsirOffer": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "touchReading": "القراءة اللمسية",
   "touchReadingOn": "القراءة اللمسية: المس الآية التي تقرؤها",
   "editionOnDevice": "على الجهاز",

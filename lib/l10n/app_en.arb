@@ -406,6 +406,12 @@
     }
   },
   "audioCredit": "Recitations and verse timings: mp3quran.net",
+  "tafsirAudioListen": "Listen to the tafsir",
+  "tafsirAudioListenSurah": "Listen to the surah's tafsir",
+  "translationAudioAfterVerse": "Translation audio after each verse",
+  "translationAudioHint": "Each verse's translation is heard after it is recited, when verses play on without repeating",
+  "clipTranslationOf": "Translation of verse {ayah}",
+  "englishTafsirOffer": "Download the English tafsir: {title}",
   "touchReading": "Touch reading",
   "touchReadingOn": "Touch reading: tap the verse you are reading",
   "editionOnDevice": "On this device",

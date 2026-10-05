@@ -102,6 +102,29 @@ const _ar = <String, SourceText>{
     license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
     credit: 'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
   ),
+  // Streamed audio and an optional pack, each behind its flag
+  // (docs/features/audio_content.md); not in content.db, so not listed in
+  // «عن المصحف» until published.
+  'nuqayah-tafsir-audio': (
+    title: 'التفسير المسموع (الميسر والسعدي)',
+    publisher: 'نقاية (التفسير التفاعلي read.tafsir.one)، بإذن مكتوب',
+    license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
+    credit: 'التفسير المسموع: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم، بلا إعلانات ولا ربح',
+  ),
+  'quranenc-english-rwwad-audio': (
+    title: 'الترجمة الإنجليزية المسموعة (مركز رواد الترجمة)',
+    publisher: 'مركز رواد الترجمة، عبر موقع QuranEnc.com',
+    license:
+        'شروط موسوعة القرآن الكريم (QuranEnc)، وسُئلوا عن الصوت (الرسالة 12)',
+    credit:
+        'الترجمة الإنجليزية المسموعة: مركز رواد الترجمة، عبر موقع QuranEnc.com',
+  ),
+  'quranenc-english-mokhtasar': (
+    title: 'المختصر في تفسير القرآن الكريم، بالإنجليزية',
+    publisher: 'مركز تفسير للدراسات القرآنية، عبر موقع QuranEnc.com',
+    license: 'شروط موسوعة القرآن الكريم (QuranEnc): دون تعديل أو إضافة أو حذف، مع ذكر الناشر والموقع ورقم الإصدار',
+    credit: 'المختصر في تفسير القرآن الكريم (بالإنجليزية): مركز تفسير للدراسات القرآنية، عبر موقع QuranEnc.com',
+  ),
   'quranicaudio': (
     title: 'تلاوة ياسر الدوسري (مرتل)',
     publisher: 'موقع quranicaudio.com (صوت Quran.com)',
@@ -233,6 +256,24 @@ const _en = <String, SourceText>{
     publisher: 'Nuqayah (read.tafsir.one), by written permission',
     license: 'Written permission from Nuqayah: no ads and no profit',
     credit: 'Al-Muyassar fi Gharib al-Quran: from Nuqayah\'s read.tafsir.one, by permission',
+  ),
+  'nuqayah-tafsir-audio': (
+    title: 'Tafsir audio (al-Muyassar and al-Sa\'di)',
+    publisher: 'Nuqayah (read.tafsir.one), by written permission',
+    license: 'Written permission from Nuqayah: no ads and no profit',
+    credit: 'Tafsir audio: from Nuqayah\'s read.tafsir.one, by permission, with no ads and no profit',
+  ),
+  'quranenc-english-rwwad-audio': (
+    title: 'English translation audio (Rowwad Translation Center)',
+    publisher: 'Rowwad Translation Center, via QuranEnc.com',
+    license: 'QuranEnc terms; asked about the audio (letter 12)',
+    credit: 'English translation audio: Rowwad Translation Center, via QuranEnc.com',
+  ),
+  'quranenc-english-mokhtasar': (
+    title: 'Al-Mukhtasar fi Tafsir al-Quran al-Karim (English)',
+    publisher: 'Tafsir Center for Quranic Studies, via QuranEnc.com',
+    license: 'QuranEnc terms: no change, addition or deletion; publisher, site and version named',
+    credit: 'Al-Mukhtasar in Tafsir (English): Tafsir Center for Quranic Studies, via QuranEnc.com',
   ),
   'quranicaudio': (
     title: 'Yasser al-Dosari (murattal)',

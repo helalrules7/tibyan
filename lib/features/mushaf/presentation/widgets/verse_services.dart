@@ -33,7 +33,12 @@ class VerseServicesPanel extends StatelessWidget {
     this.onSimilar,
     this.asbabCount = 0,
     this.onAsbab,
+    this.onTafsirAudio,
   });
+
+  /// «استمع للتفسير»: shown only when a tafsir recording has the selected
+  /// verse (the feature is on and its index lists the verse).
+  final VoidCallback? onTafsirAudio;
 
   /// Reviewed occasions of revelation of the selected verse («أسباب
   /// النزول»); the button shows only when there are some (the feature is
@@ -219,6 +224,17 @@ class VerseServicesPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (onTafsirAudio != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onTafsirAudio,
+                  icon: const Icon(Icons.headphones_outlined),
+                  label: Text(l.tafsirAudioListen),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
               if (asbabCount > 0 && onAsbab != null) ...[
                 const SizedBox(height: 8),
                 OutlinedButton.icon(

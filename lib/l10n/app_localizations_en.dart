@@ -719,6 +719,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audioCredit => 'Recitations and verse timings: mp3quran.net';
 
   @override
+  String get tafsirAudioListen => 'Listen to the tafsir';
+
+  @override
+  String get tafsirAudioListenSurah => 'Listen to the surah\'s tafsir';
+
+  @override
+  String get translationAudioAfterVerse => 'Translation audio after each verse';
+
+  @override
+  String get translationAudioHint =>
+      'Each verse\'s translation is heard after it is recited, when verses play on without repeating';
+
+  @override
+  String clipTranslationOf(String ayah) {
+    return 'Translation of verse $ayah';
+  }
+
+  @override
+  String englishTafsirOffer(String title) {
+    return 'Download the English tafsir: $title';
+  }
+
+  @override
   String get touchReading => 'Touch reading';
 
   @override

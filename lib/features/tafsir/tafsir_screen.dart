@@ -8,6 +8,8 @@ import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../books/presentation/asbab_section.dart';
+import '../content_extras/english_tafsir.dart';
+import '../content_extras/tafsir_audio_button.dart';
 import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
@@ -296,6 +298,9 @@ class _VersePage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // «استمع للتفسير» (flag tafsir_audio), when a recording has
+              // the verse; nothing otherwise.
+              TafsirAudioButtons(surah: ayah.surah, ayah: ayah.number),
               if (cards.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(24),
@@ -322,6 +327,15 @@ class _VersePage extends ConsumerWidget {
                   if (i > 0) const SizedBox(height: 12),
                   c,
                 ],
+              // The English tafsir pack (flag english_tafsir), English
+              // interface only; nothing otherwise.
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: EnglishTafsirSection(
+                  surah: ayah.surah,
+                  ayah: ayah.number,
+                ),
+              ),
               // Reviewed occasions of revelation, when the feature is on
               // and a pack has some for this verse; nothing otherwise.
               Padding(

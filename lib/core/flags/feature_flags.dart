@@ -16,6 +16,8 @@ enum Feature {
   topics,
   library,
   tafsirAudio('tafsir_audio'),
+  translationAudio('translation_audio'),
+  englishTafsir('english_tafsir'),
   oldMadinaEdition('old_madina_edition'),
   meaningSearch('meaning_search'),
   accountsSync('accounts_sync'),

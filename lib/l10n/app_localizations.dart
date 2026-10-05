@@ -1316,6 +1316,42 @@ abstract class AppLocalizations {
   /// **'التلاوات وتوقيت الآيات: mp3quran.net'**
   String get audioCredit;
 
+  /// No description provided for @tafsirAudioListen.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمع للتفسير'**
+  String get tafsirAudioListen;
+
+  /// No description provided for @tafsirAudioListenSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمع لتفسير السورة'**
+  String get tafsirAudioListenSurah;
+
+  /// No description provided for @translationAudioAfterVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترجمة المسموعة بعد كل آية'**
+  String get translationAudioAfterVerse;
+
+  /// No description provided for @translationAudioHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُسمع ترجمة كل آية بعد تلاوتها، حين تتوالى الآيات بلا تكرار'**
+  String get translationAudioHint;
+
+  /// No description provided for @clipTranslationOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترجمة الآية {ayah}'**
+  String clipTranslationOf(String ayah);
+
+  /// No description provided for @englishTafsirOffer.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل التفسير الإنجليزي: {title}'**
+  String englishTafsirOffer(String title);
+
   /// No description provided for @touchReading.
   ///
   /// In ar, this message translates to:

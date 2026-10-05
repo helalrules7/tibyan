@@ -11,6 +11,8 @@
   "topics": false,
   "library": false,
   "tafsir_audio": false,
+  "translation_audio": false,
+  "english_tafsir": false,
   "old_madina_edition": false,
   "meaning_search": false,
   "accounts_sync": false,
