@@ -1807,4 +1807,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get twoPageSpreadHint =>
       'على الشاشات العريضة في الوضع الأفقي، كالمصحف المفتوح';
+
+  @override
+  String get oneVerse => 'آية آية';
+
+  @override
+  String get oneVerseHint => 'آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض';
 }

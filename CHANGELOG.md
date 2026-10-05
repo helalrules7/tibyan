@@ -11,6 +11,9 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (verse by verse, for older eyes)
+- «آية آية»: a button under the page (the first, labelled one in elderly mode) turns the phone sideways and shows one verse a screen, as large as it fits (long verses at a readable minimum, scrolling). Large buttons go to the previous or next verse, or swipe; «استماع» recites from that verse and the screen follows the recitation; the screen stays on. Closing it (or Back) returns to the mushaf at the last verse shown, and the phone turns back. The text is the Hafs text in every edition.
+
 ### Added (two facing pages)
 - On a wide screen held sideways (a tablet, a desktop window), the mushaf shows two facing pages like an open copy: the right page first, pages 1 and 2 together (2 and 3 in the Shamarly edition), the covers alone. Selection, sharing, following the recitation, going to a page and the page scrubber work across the spread; both pages count for the khatma once they have been on screen for twice a page's time. Off in a hifz test, and switchable in settings («صفحتان متقابلتان», on by default).
 

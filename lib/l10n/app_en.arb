@@ -788,5 +788,7 @@
   "previousSurah": "Previous surah",
   "hafsTextNote": "The text here is in the Hafs riwaya",
   "twoPageSpread": "Two facing pages",
-  "twoPageSpreadHint": "On wide screens held sideways, like an open mushaf"
+  "twoPageSpreadHint": "On wide screens held sideways, like an open mushaf",
+  "oneVerse": "Verse by verse",
+  "oneVerseHint": "One verse a screen in large print, the phone sideways"
 }

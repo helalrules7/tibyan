@@ -57,6 +57,10 @@ class MushafRepository {
             ..orderBy([(t) => OrderingTerm.asc(t.number)]))
           .get();
 
+  /// A verse by its row id (1 … 6236, in mushaf order).
+  Future<AyahRow> ayahById(int id) =>
+      (_db.select(_db.ayah)..where((t) => t.id.equals(id))).getSingle();
+
   Future<AyahRow> ayah(int surah, int number) => (_db.select(
     _db.ayah,
   )..where((t) => t.surah.equals(surah) & t.number.equals(number))).getSingle();

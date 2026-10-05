@@ -805,6 +805,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   onGoTo: _goToPage,
                   onAutoScroll: _startAutoScroll,
                   onContinuous: _openContinuous,
+                  onOneVerse: _openOneVerse,
                   touchReading: _touchReading,
                   onTouchReading: _toggleTouchReading,
                   recite: _recite,
@@ -1560,6 +1561,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     );
   }
 
+  /// «آية آية» at the first verse of this page (Hafs numbers).
+  Future<void> _openOneVerse() async {
+    final a = ref.read(pageAyahsProvider(_page)).value?.firstOrNull;
+    if (a == null) return;
+    final h = hafsKeyOf(_riwaya, (surah: a.surah, ayah: a.number));
+    _setChrome(false);
+    context.go('/verse?s=${h.surah}&a=${h.ayah}');
+  }
+
   /// The continuous view at the first verse of this page (Hafs numbers).
   Future<void> _openContinuous() async {
     final a = ref.read(pageAyahsProvider(_page)).value?.firstOrNull;
@@ -1769,6 +1779,7 @@ class _BottomControls extends StatelessWidget {
     required this.onGoTo,
     required this.onAutoScroll,
     required this.onContinuous,
+    required this.onOneVerse,
     required this.touchReading,
     required this.onTouchReading,
     required this.recite,
@@ -1792,6 +1803,9 @@ class _BottomControls extends StatelessWidget {
   /// Opens the continuous view (with the texts under each verse).
   final VoidCallback onContinuous;
 
+  /// Opens «آية آية»: one verse a screen, sideways, in large print.
+  final VoidCallback onOneVerse;
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens.colors;
@@ -1814,6 +1828,11 @@ class _BottomControls extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
+                    FilledButton.icon(
+                      onPressed: onOneVerse,
+                      icon: const Icon(Icons.screen_rotation_outlined),
+                      label: Text(l.oneVerse),
+                    ),
                     FilledButton.tonalIcon(
                       onPressed: onListen,
                       icon: const Icon(Icons.headphones_outlined),
@@ -1879,6 +1898,12 @@ class _BottomControls extends StatelessWidget {
                       label: Text(l.goToPage),
                     ),
                     const Spacer(),
+                    IconButton.filledTonal(
+                      tooltip: l.oneVerse,
+                      onPressed: onOneVerse,
+                      icon: const Icon(Icons.screen_rotation_outlined),
+                    ),
+                    const SizedBox(width: 8),
                     IconButton.filledTonal(
                       tooltip: l.continuousView,
                       onPressed: onContinuous,

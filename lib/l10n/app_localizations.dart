@@ -3192,6 +3192,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'على الشاشات العريضة في الوضع الأفقي، كالمصحف المفتوح'**
   String get twoPageSpreadHint;
+
+  /// No description provided for @oneVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية آية'**
+  String get oneVerse;
+
+  /// No description provided for @oneVerseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض'**
+  String get oneVerseHint;
 }
 
 class _AppLocalizationsDelegate

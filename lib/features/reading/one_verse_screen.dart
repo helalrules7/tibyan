@@ -1,0 +1,368 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '../../core/db/content_database.dart';
+import '../../core/settings/app_settings.dart';
+import '../../core/settings/settings_controller.dart';
+import '../../core/theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
+import '../audio/recitation.dart';
+import '../mushaf/data/mushaf_repository.dart';
+import '../mushaf/mushaf_providers.dart';
+import '../mushaf/presentation/mushaf_screen.dart' show surahName;
+import '../mushaf/presentation/navigation.dart';
+import '../mushaf/presentation/widgets/illuminated_frame.dart'
+    show NumberFormatter;
+
+/// Every verse, by its row id (1 = al-Fatiha 1 … 6236 = an-Nas 6).
+final verseByIdProvider = FutureProvider.family<AyahRow, int>(
+  (ref, id) => ref.watch(mushafRepositoryProvider).ayahById(id),
+);
+
+/// How many verses there are (6236).
+const verseCount = 6236;
+
+/// The largest font size, between [min] and [max], at which [text] fits in
+/// [box] (rtl, KFGQPC Hafs). Long verses get [min] and scroll.
+double fitFontSize(
+  String text,
+  Size box, {
+  double min = 28,
+  double max = 120,
+  double height = 1.9,
+  TextScaler scaler = TextScaler.noScaling,
+}) {
+  bool fits(double size) {
+    final p = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          fontFamily: 'UthmanicHafs',
+          fontSize: size,
+          height: height,
+        ),
+      ),
+      textDirection: TextDirection.rtl,
+      textAlign: TextAlign.center,
+      textScaler: scaler,
+    )..layout(maxWidth: box.width);
+    final ok = p.height <= box.height;
+    p.dispose();
+    return ok;
+  }
+
+  if (!fits(min)) return min;
+  var lo = min, hi = max;
+  while (hi - lo > 1) {
+    final mid = (lo + hi) / 2;
+    fits(mid) ? lo = mid : hi = mid;
+  }
+  return lo;
+}
+
+/// «آية آية»: reading for older eyes. The phone turns sideways and each
+/// screen holds one verse, as large as it fits; a swipe or the big
+/// buttons go to the next or the previous verse. The verse can be heard,
+/// and while the recitation plays the screen follows it. Leaving goes back
+/// to the mushaf at the last verse shown. The text is the Hafs text.
+class OneVerseScreen extends ConsumerStatefulWidget {
+  const OneVerseScreen({super.key, required this.surah, required this.ayah});
+
+  final int surah;
+  final int ayah;
+
+  @override
+  ConsumerState<OneVerseScreen> createState() => _OneVerseScreenState();
+}
+
+class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
+  PageController? _controller;
+  int _id = 1;
+
+  /// The reader's own choice, put back on leaving.
+  late final bool _keepScreenOn = ref.read(settingsProvider).keepScreenOn;
+
+  @override
+  void initState() {
+    super.initState();
+    // Sideways, the whole screen for the verse.
+    SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    unawaited(WakelockPlus.enable().catchError((_) {}));
+    _keepScreenOn; // read now: ref is not usable in dispose
+    _open();
+  }
+
+  Future<void> _open() async {
+    final row = await ref
+        .read(mushafRepositoryProvider)
+        .ayah(widget.surah, widget.ayah);
+    if (!mounted) return;
+    setState(() {
+      _id = row.id;
+      _controller = PageController(initialPage: row.id - 1);
+    });
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations(const []);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    if (!_keepScreenOn) {
+      unawaited(WakelockPlus.disable().catchError((_) {}));
+    }
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  void _go(int by) {
+    final next = (_id + by).clamp(1, verseCount);
+    _controller?.animateToPage(
+      next - 1,
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Future<void> _leave() async {
+    final row = ref.read(verseByIdProvider(_id)).value;
+    if (row == null) {
+      if (mounted) Navigator.of(context).maybePop();
+      return;
+    }
+    await openVerse(context, ref, surah: row.surah, ayah: row.number);
+  }
+
+  void _listen(AyahRow row) {
+    final r = ref.read(recitationProvider);
+    final c = ref.read(recitationProvider.notifier);
+    if (r.active && r.surah == row.surah && r.ayah == row.number) {
+      unawaited(c.toggle());
+      return;
+    }
+    // From this verse on; the screen follows the recitation.
+    unawaited(c.play(row.surah, from: row.number));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    // Follow the recitation: the verse being recited is the one shown.
+    ref.listen(recitationProvider, (before, now) {
+      final a = now.ayah;
+      if (!now.active || a == null) return;
+      if (before?.ayah == a && before?.surah == now.surah) return;
+      unawaited(() async {
+        final row = await ref.read(mushafRepositoryProvider).ayah(now.surah, a);
+        if (mounted && row.id != _id) {
+          _controller?.animateToPage(
+            row.id - 1,
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeInOut,
+          );
+        }
+      }());
+    });
+
+    final c = _controller;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) unawaited(_leave());
+      },
+      child: Scaffold(
+        backgroundColor: t.paper,
+        body: c == null
+            ? Center(
+                child: CircularProgressIndicator(
+                  semanticsLabel: l.loadingLabel,
+                ),
+              )
+            : CallbackShortcuts(
+                bindings: {
+                  const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+                      _go(1),
+                  const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+                      _go(-1),
+                  const SingleActivator(LogicalKeyboardKey.escape): _leave,
+                },
+                child: Focus(
+                  autofocus: true,
+                  child: Directionality(
+                    // Verses run from right to left: the next is on the left.
+                    textDirection: TextDirection.rtl,
+                    child: PageView.builder(
+                      controller: c,
+                      itemCount: verseCount,
+                      onPageChanged: (i) => setState(() => _id = i + 1),
+                      itemBuilder: (context, i) => _VersePage(
+                        id: i + 1,
+                        onListen: _listen,
+                        onNext: () => _go(1),
+                        onPrevious: () => _go(-1),
+                        onLeave: _leave,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+class _VersePage extends ConsumerWidget {
+  const _VersePage({
+    required this.id,
+    required this.onListen,
+    required this.onNext,
+    required this.onPrevious,
+    required this.onLeave,
+  });
+
+  final int id;
+  final void Function(AyahRow row) onListen;
+  final VoidCallback onNext;
+  final VoidCallback onPrevious;
+  final VoidCallback onLeave;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final row = ref.watch(verseByIdProvider(id)).value;
+    final surahs = ref.watch(surahsProvider).value;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final riwaya = ref.watch(editionProvider).isRiwaya;
+    if (row == null) return const SizedBox.shrink();
+    final r = ref.watch(recitationProvider);
+    final playing =
+        r.active && r.playing && r.surah == row.surah && r.ayah == row.number;
+    final name = surahs == null
+        ? ''
+        : surahName(context, surahs[row.surah - 1]);
+
+    Widget big(IconData icon, String label, VoidCallback? onTap) => Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: 72,
+        height: 72,
+        child: IconButton.filledTonal(
+          onPressed: onTap,
+          iconSize: 40,
+          tooltip: label,
+          icon: Icon(icon),
+        ),
+      ),
+    );
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+        child: Column(
+          children: [
+            // Where this verse is, in large print.
+            Row(
+              children: [
+                big(
+                  Icons.close,
+                  MaterialLocalizations.of(context).closeButtonTooltip,
+                  onLeave,
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        '${l.surahWord(name)} · ${digits(row.number)}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: t.goldText,
+                        ),
+                      ),
+                      if (riwaya)
+                        Text(
+                          l.hafsTextNote,
+                          style: TextStyle(fontSize: 14, color: t.muted),
+                        ),
+                    ],
+                  ),
+                ),
+                big(
+                  playing ? Icons.pause : Icons.play_arrow,
+                  playing ? l.pause : l.listen,
+                  () => onListen(row),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Row(
+                children: [
+                  // Right: back to the verse before (reading order).
+                  big(
+                    Icons.chevron_right,
+                    l.previousVerse,
+                    id > 1 ? onPrevious : null,
+                  ),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, box) {
+                        final text = '${row.displayBody} ${row.displayNumber}';
+                        final scaler = MediaQuery.textScalerOf(context);
+                        final size = fitFontSize(
+                          text,
+                          Size(box.maxWidth - 16, box.maxHeight - 8),
+                          scaler: scaler,
+                        );
+                        return Center(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(text: '${row.displayBody} '),
+                                  TextSpan(
+                                    text: row.displayNumber,
+                                    style: TextStyle(color: t.marker),
+                                  ),
+                                ],
+                              ),
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'UthmanicHafs',
+                                fontSize: size,
+                                height: 1.9,
+                                color: t.ink,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  big(
+                    Icons.chevron_left,
+                    l.nextVerse,
+                    id < verseCount ? onNext : null,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

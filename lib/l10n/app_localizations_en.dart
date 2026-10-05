@@ -1816,4 +1816,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get twoPageSpreadHint =>
       'On wide screens held sideways, like an open mushaf';
+
+  @override
+  String get oneVerse => 'Verse by verse';
+
+  @override
+  String get oneVerseHint =>
+      'One verse a screen in large print, the phone sideways';
 }
