@@ -40,6 +40,12 @@ A free, non-profit Quran app for Android, iOS, macOS, Windows and Linux: mushaf,
 
 If a word lights up early or late, fix it by ear in your browser: [the editor](https://helalrules7.github.io/tibyan/) and [the step-by-step guide](docs/TIMING_GUIDE.md). No programming needed.
 
+## ساهم في صوت القراءات · Help with qiraat audio
+
+إن كنت تعرف القراءات، استمع إلى مقطع آية بقراءة ما وحدد موضع الكلمة المختلف فيها بالمللي ثانية، ثم أرسله في طلب دمج يراجعه شخص ثانٍ: [الدليل](docs/QIRAAT_AUDIO.md).
+
+If you know the qiraat, mark where the differing word sits in a verse clip and send it in a pull request; a second person reviews it: [the guide (Arabic)](docs/QIRAAT_AUDIO.md).
+
 ---
 
 ## Folder layout
