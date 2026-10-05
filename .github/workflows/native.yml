@@ -83,6 +83,12 @@ jobs:
           ls "$app/Contents/PlugIns"
           test -d "$app/Contents/PlugIns/TibyanWidget.appex"
           test -d "$app/Contents/PlugIns/TibyanActions.appex"
+      # The same packaging as the release workflow, so it is checked here.
+      - name: Disk image
+        run: |
+          app=$(ls -d build/macos/Build/Products/Release/*.app | head -1)
+          hdiutil create -volname Tibyan -srcfolder "$app" -ov -format UDZO tibyan.dmg
+          test -s tibyan.dmg
 
   linux:
     name: Linux desktop
@@ -106,6 +112,10 @@ jobs:
       - run: flutter config --enable-linux-desktop
       - run: flutter pub get
       - run: flutter build linux --release
+      - name: Archive the bundle (as the release does)
+        run: |
+          tar -C build/linux/x64/release/bundle -czf tibyan-linux-x64.tar.gz .
+          tar -tzf tibyan-linux-x64.tar.gz | grep -q '^./tibyan$'
 
   windows:
     name: Windows desktop
@@ -123,3 +133,8 @@ jobs:
       - run: flutter config --enable-windows-desktop
       - run: flutter pub get
       - run: flutter build windows --release
+      - name: Zip the app (as the release does)
+        shell: pwsh
+        run: |
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath tibyan-windows-x64.zip
+          if (-not (Test-Path build/windows/x64/runner/Release/tibyan.exe)) { exit 1 }

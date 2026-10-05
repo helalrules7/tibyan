@@ -11,6 +11,9 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Changed (releases)
+- A release now also carries the Windows app (zip), the Linux bundle (tar.gz; the recitation needs libmpv on the system) and a macOS disk image, all unsigned; the native build workflow packages them the same way on every native change.
+
 ### Changed (backup)
 - The backup file now carries your settings too (style, edition, reciter, speed, what shows under the verse…), and restoring it puts them back. Restored khatmas, notes and hifz progress are queued for sync like the app's own changes, so they reach your account once accounts are switched on.
 
