@@ -40,6 +40,17 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Verse links: tibyan://verse?s=2&a=255 (app_links). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="tibyan" android:host="verse"/>
+            </intent-filter>
+            <!-- Links are handled by the app (main.dart), not the router. -->
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="false"/>
         </activity>
         <service
             android:name="com.ryanheise.audioservice.AudioService"

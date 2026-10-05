@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:app_links/app_links.dart';
+
 import 'package:flutter/foundation.dart'
     show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/services.dart';
@@ -29,6 +31,7 @@ import 'features/khatma/services/reminder_scheduler.dart';
 import 'features/mushaf/data/background_packs.dart';
 import 'features/mushaf/data/bundled_pack.dart';
 import 'features/mushaf/mushaf_providers.dart';
+import 'features/mushaf/presentation/navigation.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
@@ -170,8 +173,19 @@ void _startKhatma(ProviderContainer container) {
   Future<void> open(Uri? uri, {bool launch = false}) async {
     if (uri == null) return;
     final action = widgetActionOf(uri);
-    if (uri.host != 'khatma' && action == null) return;
-    final route = action?.route ?? await service.routeFor(uri);
+    final verse = verseOfLink(uri);
+    if (uri.host != 'khatma' && action == null && verse == null) return;
+    final route =
+        action?.route ??
+        (verse != null
+            ? mushafLocation(
+                await container.read(
+                  versePageProvider((verse.surah, verse.ayah)).future,
+                ),
+                surah: verse.surah,
+                ayah: verse.ayah,
+              )
+            : await service.routeFor(uri));
     // Opened the app: after the splash screen has handed over to home.
     if (launch) await Future<void>.delayed(const Duration(milliseconds: 2200));
     container.read(appRouterProvider).go(route);
@@ -189,4 +203,22 @@ void _startKhatma(ProviderContainer container) {
     widget.launchUri().then((u) => open(u, launch: true)).catchError((_) {}),
   );
   widget.taps.listen(open, onError: (_) {});
+
+  // Other `tibyan://` links (a verse link from a message or another app).
+  // The widgets' own links carry `homeWidget` and arrive above; on macOS
+  // every link comes through the app's channel (MacHomeWidgetSync).
+  if (defaultTargetPlatform != TargetPlatform.macOS) {
+    bool mine(Uri? u) =>
+        u != null && !u.queryParameters.containsKey('homeWidget');
+    final links = AppLinks();
+    unawaited(
+      links
+          .getInitialLink()
+          .then((u) => mine(u) ? open(u, launch: true) : null)
+          .catchError((_) {}),
+    );
+    links.uriLinkStream.listen((u) {
+      if (mine(u)) open(u);
+    }, onError: (_) {});
+  }
 }

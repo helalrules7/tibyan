@@ -57,4 +57,16 @@ void main() {
     expect(out, contains('[S1 7]'));
     expect(out, contains('[S2 1]'));
   });
+
+  test('a link to the first verse comes before the credit', () {
+    final out = composeVerseText(
+      verses: [_ayah(2, 255, 'x')],
+      surahLabel: (s) => 'S$s',
+      digits: (n) => '$n',
+      range: (s, a, b) => '$s $a-$b',
+      credit: 'credit',
+      link: 'tibyan://verse?s=2&a=255',
+    );
+    expect(out, endsWith('[S2 255]\ntibyan://verse?s=2&a=255\n\ncredit'));
+  });
 }

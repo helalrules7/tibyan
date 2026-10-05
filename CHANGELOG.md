@@ -11,6 +11,9 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (verse links)
+- `tibyan://verse?s=2&a=255` opens the app on that verse's page with the verse selected (in a riwaya edition, the riwaya verse holding it), on Android, iOS and macOS. Copied and shared verse text carries the link to its first verse. Flutter's own deep linking is switched off, so every link goes through the same handler as the widgets'. Windows and Linux do not register the scheme yet.
+
 ### Added (what's new)
 - After an update, the home screen opens a short «ما الجديد» once, listing what came in it; a first install never shows it. It can be opened again from the settings.
 

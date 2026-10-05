@@ -13,6 +13,7 @@ String composeVerseText({
   required String Function(int n) digits,
   required String Function(String surah, String from, String to) range,
   required String credit,
+  String? link,
 }) {
   final out = StringBuffer();
   var i = 0;
@@ -37,6 +38,8 @@ String composeVerseText({
     );
     i = j;
   }
+  // The link opens the first verse in Tibyan.
+  if (link != null) out.write('\n$link');
   out
     ..write('\n\n')
     ..write(credit);
