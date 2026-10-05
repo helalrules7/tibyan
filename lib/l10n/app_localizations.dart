@@ -3127,6 +3127,60 @@ abstract class AppLocalizations {
   /// **'ملفات أخرى'**
   String get storageUnknown;
 
+  /// No description provided for @asbabTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسباب النزول'**
+  String get asbabTitle;
+
+  /// No description provided for @asbabCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسباب النزول ({count})'**
+  String asbabCount(String count);
+
+  /// No description provided for @bookCitationTahqiq.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحقيق {name}'**
+  String bookCitationTahqiq(String name);
+
+  /// No description provided for @bookCitationVolume.
+  ///
+  /// In ar, this message translates to:
+  /// **'ج {volume}'**
+  String bookCitationVolume(String volume);
+
+  /// No description provided for @bookCitationPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'ص {page}'**
+  String bookCitationPage(String page);
+
+  /// No description provided for @bookCitationPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'ص {from}–{to}'**
+  String bookCitationPages(String from, String to);
+
+  /// No description provided for @storageBook.
+  ///
+  /// In ar, this message translates to:
+  /// **'كتاب «{title}»'**
+  String storageBook(String title);
+
+  /// No description provided for @storageBooksAvailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'كتب يمكن تنزيلها'**
+  String get storageBooksAvailable;
+
+  /// No description provided for @bookPackDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل'**
+  String get bookPackDownload;
+
   /// No description provided for @continuousView.
   ///
   /// In ar, this message translates to:

@@ -1785,6 +1785,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storageUnknown => 'Other files';
 
   @override
+  String get asbabTitle => 'Occasions of revelation';
+
+  @override
+  String asbabCount(String count) {
+    return 'Occasions of revelation ($count)';
+  }
+
+  @override
+  String bookCitationTahqiq(String name) {
+    return 'ed. $name';
+  }
+
+  @override
+  String bookCitationVolume(String volume) {
+    return 'vol. $volume';
+  }
+
+  @override
+  String bookCitationPage(String page) {
+    return 'p. $page';
+  }
+
+  @override
+  String bookCitationPages(String from, String to) {
+    return 'pp. $from–$to';
+  }
+
+  @override
+  String storageBook(String title) {
+    return 'Book: $title';
+  }
+
+  @override
+  String get storageBooksAvailable => 'Books you can download';
+
+  @override
+  String get bookPackDownload => 'Download';
+
+  @override
   String get continuousView => 'Continuous view';
 
   @override

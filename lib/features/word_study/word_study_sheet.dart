@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/db/content_database.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../books/presentation/quran_quotes.dart';
 import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
@@ -323,21 +324,14 @@ class _GharibEntry extends StatelessWidget {
           children: [
             // The brackets in the text font: the Hafs font draws them as
             // verse ornaments.
-            TextSpan(
-              text: '﴿',
-              style: TextStyle(color: t.goldText),
-            ),
-            TextSpan(
-              text: entry.phrase,
-              style: TextStyle(
+            ...quranQuoteSpans(
+              '$quoteOpen${entry.phrase}$quoteClose',
+              quoteStyle: TextStyle(
                 fontFamily: 'UthmanicHafs',
                 fontSize: 20,
                 color: t.goldText,
               ),
-            ),
-            TextSpan(
-              text: '﴾',
-              style: TextStyle(color: t.goldText),
+              bracketStyle: TextStyle(color: t.goldText),
             ),
             const TextSpan(text: ': '),
             TextSpan(text: entry.body),

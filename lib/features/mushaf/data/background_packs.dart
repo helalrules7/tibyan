@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
 
+import '../../books/data/book_pack.dart';
 import 'page_pack.dart';
 
 /// Page packs downloaded by the system (WorkManager / a user-initiated job
@@ -59,7 +60,10 @@ class BackgroundPacks {
   }
 
   PagePackSpec? _spec(String id) {
-    for (final s in PagePackSpec.all) {
+    for (final s in [
+      ...PagePackSpec.all,
+      for (final b in BookPackSpec.all) b.pack,
+    ]) {
       if (s.id == id) return s;
     }
     return null;

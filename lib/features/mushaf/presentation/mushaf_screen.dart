@@ -17,6 +17,8 @@ import '../../../core/settings/app_settings.dart';
 import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../books/books_providers.dart';
+import '../../books/presentation/asbab_section.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
 import '../../hifz/data/hifz_repository.dart';
@@ -967,6 +969,21 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   onSimilar: () {
                     final h = hafsKeyOf(_riwaya, range.first);
                     showSimilarSheet(context, surah: h.surah, ayah: h.ayah);
+                  },
+                  // Occasions of revelation are kept by Hafs verse.
+                  asbabCount: range.length == 1
+                      ? ref
+                            .watch(
+                              asbabProvider((
+                                surah: hafsKeyOf(_riwaya, range.first).surah,
+                                ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                              )),
+                            )
+                            .length
+                      : 0,
+                  onAsbab: () {
+                    final h = hafsKeyOf(_riwaya, range.first);
+                    showAsbabSheet(context, surah: h.surah, ayah: h.ayah);
                   },
                   onReflect: () {
                     final h = hafsKeyOf(_riwaya, range.first);

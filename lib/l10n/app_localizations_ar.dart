@@ -1776,6 +1776,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get storageUnknown => 'ملفات أخرى';
 
   @override
+  String get asbabTitle => 'أسباب النزول';
+
+  @override
+  String asbabCount(String count) {
+    return 'أسباب النزول ($count)';
+  }
+
+  @override
+  String bookCitationTahqiq(String name) {
+    return 'تحقيق $name';
+  }
+
+  @override
+  String bookCitationVolume(String volume) {
+    return 'ج $volume';
+  }
+
+  @override
+  String bookCitationPage(String page) {
+    return 'ص $page';
+  }
+
+  @override
+  String bookCitationPages(String from, String to) {
+    return 'ص $from–$to';
+  }
+
+  @override
+  String storageBook(String title) {
+    return 'كتاب «$title»';
+  }
+
+  @override
+  String get storageBooksAvailable => 'كتب يمكن تنزيلها';
+
+  @override
+  String get bookPackDownload => 'تنزيل';
+
+  @override
   String get continuousView => 'عرض متتالي';
 
   @override

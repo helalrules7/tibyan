@@ -7,6 +7,7 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../books/presentation/asbab_section.dart';
 import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
@@ -321,6 +322,12 @@ class _VersePage extends ConsumerWidget {
                   if (i > 0) const SizedBox(height: 12),
                   c,
                 ],
+              // Reviewed occasions of revelation, when the feature is on
+              // and a pack has some for this verse; nothing otherwise.
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: AsbabSection(surah: ayah.surah, ayah: ayah.number),
+              ),
             ],
           );
         },
