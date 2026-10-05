@@ -14,6 +14,11 @@ import UserNotifications
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    // CarPlay may have started the app first: the phone's view controller
+    // then adopted the launch engine CarPlay set up (CarPlaySceneDelegate
+    // .swift), whose plugins and car channel are already registered.
+    if engineBridge.pluginRegistry.hasPlugin(CarPlayBridge.pluginKey) { return }
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    CarPlayBridge.shared.attach(engineBridge.applicationRegistrar.messenger())
   }
 }

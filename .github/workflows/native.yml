@@ -60,6 +60,12 @@ jobs:
           ls build/ios/iphoneos/Runner.app/PlugIns
           test -d build/ios/iphoneos/Runner.app/PlugIns/TibyanWidget.appex
           test -d build/ios/iphoneos/Runner.app/PlugIns/TibyanActions.appex
+      # docs/CARPLAY.md: the scene is always built; only the entitlement waits.
+      - name: The CarPlay scene is in the app
+        run: |
+          app=build/ios/iphoneos/Runner.app
+          strings -a "$app/Runner" | grep -q CarPlaySceneDelegate
+          plutil -extract UIApplicationSceneManifest.UISceneConfigurations.CPTemplateApplicationSceneSessionRoleApplication xml1 -o - "$app/Info.plist" | grep -q CarPlaySceneDelegate
 
   macos:
     name: macOS with widget extensions

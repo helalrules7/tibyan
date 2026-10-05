@@ -3,7 +3,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 
 import '../../core/db/content_database.dart';
 
-/// What a car (Android Auto) shows to choose a recitation:
+/// What a car (Android Auto, CarPlay) shows to choose a recitation:
 ///
 ///     root ─ «تابع من موضع القراءة»   (plays)
 ///          └ «القراء» ─ a reciter ─ a surah   (plays)
