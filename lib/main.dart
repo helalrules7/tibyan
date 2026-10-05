@@ -23,6 +23,7 @@ import 'core/flags/feature_flags.dart';
 import 'core/router/app_router.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
+import 'features/audio/car_browser.dart';
 import 'features/audio/recitation.dart';
 import 'features/audio/timing_updates.dart';
 import 'features/khatma/khatma_providers.dart';
@@ -130,6 +131,7 @@ Future<void> main() async {
   // Which audio host is faster for this reader, measured in the background.
   unawaited(measureAudioHosts(container));
   unawaited(_refreshTimings(container, timing));
+  _startCarBrowsing(container);
   _startKhatma(container);
 }
 
@@ -221,4 +223,31 @@ void _startKhatma(ProviderContainer container) {
       if (mine(u)) open(u);
     }, onError: (_) {});
   }
+}
+
+/// Android Auto: the reciters and surahs to choose from in the car, and
+/// «continue» from the reading position (lib/features/audio/car_browser.dart).
+void _startCarBrowsing(ProviderContainer container) {
+  if (defaultTargetPlatform != TargetPlatform.android) return;
+  final text = lookupAppLocalizations(
+    container.read(settingsProvider).locale ?? const Locale('ar'),
+  );
+  JustAudioBackground.browser = CarBrowser(
+    reciters: () => container.read(recitersProvider.future),
+    surahs: () => container.read(surahsProvider.future),
+    position: () async {
+      final p = await container.read(userDatabaseProvider).position();
+      return p == null ? null : (surah: p.surah, ayah: p.ayah);
+    },
+    start: ({int? reciter, required int surah, int? ayah}) async {
+      final c = container.read(recitationProvider.notifier);
+      if (reciter != null) await c.changeReciter(reciter);
+      await c.play(surah, from: ayah);
+    },
+    text: CarText(
+      continueReading: text.carContinue,
+      reciters: text.carReciters,
+      surah: (n, name) => '$n. ${text.surahWord(name)}',
+    ),
+  );
 }

@@ -1886,4 +1886,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get newBackupBody =>
       'احفظ فواصلك وختمتك وملاحظاتك وإعداداتك في ملف واحد، واستعدها على أي جهاز.';
+
+  @override
+  String get carContinue => 'تابع من موضع القراءة';
+
+  @override
+  String get carReciters => 'القراء';
 }

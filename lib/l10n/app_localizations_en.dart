@@ -1896,4 +1896,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get newBackupBody =>
       'Save your bookmarks, khatma, notes and settings in one file, and restore them on any device.';
+
+  @override
+  String get carContinue => 'Continue where you stopped reading';
+
+  @override
+  String get carReciters => 'Reciters';
 }

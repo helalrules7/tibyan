@@ -69,6 +69,7 @@ dependencies:
   media_kit_libs_linux: ^1.2.1
   media_kit_libs_windows_audio: ^1.0.9
   app_links: ^7.2.1
+  audio_service: ^0.18.18
 
 dev_dependencies:
   flutter_test:
@@ -151,3 +152,9 @@ flutter:
     - family: KFGQPCKufiExtended
       fonts:
         - asset: assets/fonts/kfgqpc/KFGQPC-KufiExtV14.ttf
+
+# Media browsing (Android Auto) needs a hook the package does not offer:
+# packages/just_audio_background/TIBYAN.md.
+dependency_overrides:
+  just_audio_background:
+    path: packages/just_audio_background

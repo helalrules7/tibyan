@@ -3330,6 +3330,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'احفظ فواصلك وختمتك وملاحظاتك وإعداداتك في ملف واحد، واستعدها على أي جهاز.'**
   String get newBackupBody;
+
+  /// No description provided for @carContinue.
+  ///
+  /// In ar, this message translates to:
+  /// **'تابع من موضع القراءة'**
+  String get carContinue;
+
+  /// No description provided for @carReciters.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراء'**
+  String get carReciters;
 }
 
 class _AppLocalizationsDelegate

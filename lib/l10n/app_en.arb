@@ -813,5 +813,7 @@
   "newWidgets": "Widgets",
   "newWidgetsBody": "Today's khatma portion and reading shortcuts on the home screen, and a Listen tile in Quick Settings.",
   "newBackup": "Backup",
-  "newBackupBody": "Save your bookmarks, khatma, notes and settings in one file, and restore them on any device."
+  "newBackupBody": "Save your bookmarks, khatma, notes and settings in one file, and restore them on any device.",
+  "carContinue": "Continue where you stopped reading",
+  "carReciters": "Reciters"
 }
