@@ -30,6 +30,12 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `fetch_riwaya_timing.py` | Downloads mp3quran's verse timings of the riwaya recitations into `.cache/mp3quran_riwaya_timing.json` |
 | `riwaya_reciters.py` | The riwaya recitations, their timings and sources in `content.db` (called by `build_content_db.py`; also adds them to a built file) |
 | `export_pack.py` | Builds a data pack from a review database with reviewed entries only, after re-checking each one's hash and approval; writes the pack's index |
+| `staging.py` | Helpers for staged sources (downloaded and verified, never shipped while a permission is pending): `tools/.cache/staging/<source>/` with `SHA256SUMS` and `manifest.json` |
+| `fetch_quranenc_extra.py` | Stages QuranEnc `english_mokhtasar` (each surah's API response byte for byte) and the `english_rwwad` per-verse audio URL index with HEAD checks of a sample; the audio is not downloaded |
+| `build_nuqayah_audio_index.py` | `probe` finds where read.tafsir.one keeps its tafsir audio; `build` indexes al-Muyassar and al-Saadi verse by verse and HEAD-checks a sample; the audio is not downloaded |
+| `fetch_quranpedia_dumps.py` | Downloads Quranpedia dump files (e.g. `qiraat.json.gz`, `topics.json.gz`) into `.cache/quranpedia/` and compares them with the hashes recorded on 2026-09-28 |
+| `measure_aqqd_coverage.py` | `listing` reads the AQQD file list from OSF (no audio); `measure` counts, per qira'a style, the Quranpedia qiraat verses and words that have AQQD clips (verse level: an upper bound for words) |
+| `inspect_quranpedia_topics.py` | Depth, counts, verse and surah coverage, source fields and the first levels' titles of Quranpedia's `topics.json` |
 
 Tests: `python3 -m unittest discover -s tools/tests`. The review workflow is in `docs/review/README.md`.
 
