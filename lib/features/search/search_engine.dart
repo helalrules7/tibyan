@@ -37,7 +37,7 @@ String asciiDigits(String s) => s.replaceAllMapped(RegExp('[٠-٩۰-۹]'), (m) {
 
 /// One verse as searched.
 class SearchVerse {
-  SearchVerse(this.surah, this.ayah, String text)
+  SearchVerse(this.surah, this.ayah, String text, {this.juz = 0})
     : words = text.split(' '),
       folded = normalize(text) {
     foldedWords = folded.split(' ');
@@ -45,6 +45,9 @@ class SearchVerse {
 
   final int surah;
   final int ayah;
+
+  /// The juz the verse is in (0 when unknown).
+  final int juz;
 
   /// The verse's words as stored (without the basmala prefix).
   final List<String> words;
@@ -130,3 +133,56 @@ List<SearchHit> search(List<SearchVerse> verses, String query) {
   }
   return hits;
 }
+
+/// Where a search looks: the whole mushaf, one surah, or one juz.
+sealed class SearchScope {
+  const SearchScope();
+  bool contains(SearchVerse v);
+}
+
+class WholeMushaf extends SearchScope {
+  const WholeMushaf();
+  @override
+  bool contains(SearchVerse v) => true;
+  @override
+  bool operator ==(Object other) => other is WholeMushaf;
+  @override
+  int get hashCode => 0;
+}
+
+class InSurah extends SearchScope {
+  const InSurah(this.surah);
+  final int surah;
+  @override
+  bool contains(SearchVerse v) => v.surah == surah;
+  @override
+  bool operator ==(Object other) => other is InSurah && other.surah == surah;
+  @override
+  int get hashCode => surah;
+}
+
+class InJuz extends SearchScope {
+  const InJuz(this.juz);
+  final int juz;
+  @override
+  bool contains(SearchVerse v) => v.juz == juz;
+  @override
+  bool operator ==(Object other) => other is InJuz && other.juz == juz;
+  @override
+  int get hashCode => 1000 + juz;
+}
+
+/// [search] within [scope].
+List<SearchHit> searchIn(
+  List<SearchVerse> verses,
+  String query,
+  SearchScope scope,
+) => search(
+  scope is WholeMushaf
+      ? verses
+      : [
+          for (final v in verses)
+            if (scope.contains(v)) v,
+        ],
+  query,
+);

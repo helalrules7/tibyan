@@ -796,5 +796,8 @@
   "@oneVerseAutoOn": {"placeholders": {"seconds": {"type": "String"}}},
   "oneVerseAutoShort": "Auto",
   "secondsShort": "{n} s",
-  "@secondsShort": {"placeholders": {"n": {"type": "String"}}}
+  "@secondsShort": {"placeholders": {"n": {"type": "String"}}},
+  "searchScopeAll": "The whole mushaf",
+  "searchScopeJuz": "In a juz",
+  "searchScopeSurah": "In a surah"
 }

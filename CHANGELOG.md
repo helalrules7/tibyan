@@ -11,6 +11,9 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (search scope)
+- Search by words can be kept to one surah or one juz: a chip under the search box opens the choice, and its × goes back to the whole mushaf.
+
 ### Added (verse by verse, for older eyes)
 - «آية آية»: a button under the page (the first, labelled one in elderly mode) turns the phone sideways and shows one verse a screen, as large as it fits (long verses at a readable minimum, scrolling). Large buttons go to the previous or next verse, or swipe; «استماع» recites from that verse and the screen follows the recitation; the screen stays on. Closing it (or Back) returns to the mushaf at the last verse shown, and the phone turns back. The text is the Hafs text in every edition.
 

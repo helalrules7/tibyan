@@ -3228,6 +3228,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{n} ث'**
   String secondsShort(String n);
+
+  /// No description provided for @searchScopeAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل المصحف'**
+  String get searchScopeAll;
+
+  /// No description provided for @searchScopeJuz.
+  ///
+  /// In ar, this message translates to:
+  /// **'في جزء'**
+  String get searchScopeJuz;
+
+  /// No description provided for @searchScopeSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'في سورة'**
+  String get searchScopeSurah;
 }
 
 class _AppLocalizationsDelegate

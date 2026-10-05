@@ -25,6 +25,7 @@ final searchVersesProvider = FutureProvider<List<SearchVerse>>((ref) async {
         r.surah,
         r.number,
         r.textSearch.substring(r.searchBasmalaPrefix),
+        juz: r.juz,
       ),
   ];
 });
@@ -54,6 +55,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _field = TextEditingController();
   Timer? _debounce;
   String _query = '';
+
+  /// Where the words are looked for.
+  SearchScope _scope = const WholeMushaf();
   late SearchMode _mode =
       ref.read(sharedPreferencesProvider).getString(_modeKey) ==
           SearchMode.meaning.name
@@ -99,6 +103,70 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     context.go(mushafLocation(page, surah: surah, ayah: ayah));
   }
 
+  String _scopeLabel(
+    AppLocalizations l,
+    List<SurahRow>? surahs,
+    NumberFormatter digits,
+  ) => switch (_scope) {
+    WholeMushaf() => l.searchScopeAll,
+    InSurah(:final surah) => l.surahWord(
+      surahs == null ? '' : surahName(context, surahs[surah - 1]),
+    ),
+    InJuz(:final juz) => l.juzLabel(digits(juz)),
+  };
+
+  /// The whole mushaf, a juz or a surah.
+  Future<void> _pickScope(List<SurahRow>? surahs) async {
+    final l = AppLocalizations.of(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final picked = await showModalBottomSheet<SearchScope>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.7,
+        builder: (context, controller) => ListView(
+          controller: controller,
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          children: [
+            ListTile(
+              title: Text(l.searchScopeAll),
+              selected: _scope is WholeMushaf,
+              onTap: () => Navigator.pop(context, const WholeMushaf()),
+            ),
+            const Divider(),
+            Text(l.searchScopeJuz),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (var j = 1; j <= 30; j++)
+                  ChoiceChip(
+                    label: Text(digits(j)),
+                    selected: _scope == InJuz(j),
+                    onSelected: (_) => Navigator.pop(context, InJuz(j)),
+                  ),
+              ],
+            ),
+            const Divider(),
+            Text(l.searchScopeSurah),
+            for (final s in surahs ?? const <SurahRow>[])
+              ListTile(
+                dense: true,
+                leading: Text(digits(s.id)),
+                title: Text(surahName(context, s)),
+                selected: _scope == InSurah(s.id),
+                onTap: () => Navigator.pop(context, InSurah(s.id)),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (picked != null && mounted) setState(() => _scope = picked);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -115,7 +183,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         : parseReference(_query, names);
     final hits = verses == null || _query.isEmpty || meaning
         ? const <SearchHit>[]
-        : search(verses, _query);
+        : searchIn(verses, _query, _scope);
     final total = hits.fold<int>(0, (n, h) => n + h.count);
 
     return Scaffold(
@@ -146,28 +214,53 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
         ],
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(context.tokens.elderly ? 72 : 56),
+          preferredSize: Size.fromHeight(
+            (context.tokens.elderly ? 72 : 56) + (meaning ? 0 : 48),
+          ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: SizedBox(
-              width: double.infinity,
-              child: SegmentedButton<SearchMode>(
-                showSelectedIcon: false,
-                segments: [
-                  ButtonSegment(
-                    value: SearchMode.words,
-                    icon: const Icon(Icons.text_fields),
-                    label: Text(l.searchModeWords),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: SegmentedButton<SearchMode>(
+                    showSelectedIcon: false,
+                    segments: [
+                      ButtonSegment(
+                        value: SearchMode.words,
+                        icon: const Icon(Icons.text_fields),
+                        label: Text(l.searchModeWords),
+                      ),
+                      ButtonSegment(
+                        value: SearchMode.meaning,
+                        icon: const Icon(Icons.lightbulb_outline),
+                        label: Text(l.searchModeMeaning),
+                      ),
+                    ],
+                    selected: {_mode},
+                    onSelectionChanged: (s) => _setMode(s.single),
                   ),
-                  ButtonSegment(
-                    value: SearchMode.meaning,
-                    icon: const Icon(Icons.lightbulb_outline),
-                    label: Text(l.searchModeMeaning),
+                ),
+                // Words only: the meaning search ranks the whole mushaf.
+                if (!meaning)
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: InputChip(
+                        avatar: const Icon(Icons.filter_list, size: 18),
+                        label: Text(_scopeLabel(l, surahs, digits)),
+                        onPressed: () => _pickScope(surahs),
+                        onDeleted: _scope is WholeMushaf
+                            ? null
+                            : () =>
+                                  setState(() => _scope = const WholeMushaf()),
+                        deleteButtonTooltipMessage: l.searchScopeAll,
+                      ),
+                    ),
                   ),
-                ],
-                selected: {_mode},
-                onSelectionChanged: (s) => _setMode(s.single),
-              ),
+              ],
             ),
           ),
         ),

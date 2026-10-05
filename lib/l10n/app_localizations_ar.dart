@@ -1829,4 +1829,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String secondsShort(String n) {
     return '$n ث';
   }
+
+  @override
+  String get searchScopeAll => 'كل المصحف';
+
+  @override
+  String get searchScopeJuz => 'في جزء';
+
+  @override
+  String get searchScopeSurah => 'في سورة';
 }

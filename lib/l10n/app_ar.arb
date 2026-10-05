@@ -1296,5 +1296,8 @@
   "@oneVerseAutoOn": {"placeholders": {"seconds": {"type": "String"}}},
   "oneVerseAutoShort": "تلقائي",
   "secondsShort": "{n} ث",
-  "@secondsShort": {"placeholders": {"n": {"type": "String"}}}
+  "@secondsShort": {"placeholders": {"n": {"type": "String"}}},
+  "searchScopeAll": "كل المصحف",
+  "searchScopeJuz": "في جزء",
+  "searchScopeSurah": "في سورة"
 }

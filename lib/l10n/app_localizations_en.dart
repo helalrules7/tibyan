@@ -1839,4 +1839,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String secondsShort(String n) {
     return '$n s';
   }
+
+  @override
+  String get searchScopeAll => 'The whole mushaf';
+
+  @override
+  String get searchScopeJuz => 'In a juz';
+
+  @override
+  String get searchScopeSurah => 'In a surah';
 }
