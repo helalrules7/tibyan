@@ -6,6 +6,11 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (review drafts, not shown in the app)
+- The five tafsirs (al-Tabari, al-Qurtubi, Ibn Kathir, al-Baghawi, al-Saadi) and al-Biqa'i's Nazm al-Durar imported as review drafts from OpenITI's altafsir.com copies: one entry per verse group, each linked to its verses (`tools/import_altafsir.py`). The files are rebuilt locally and stay out of the repository until review starts.
+- al-Damghani's «إصلاح الوجوه والنظائر» imported as 2,744 drafts (481 words, 2,236 senses), rebuilt with `tools/import_damghani_wujuh.py`.
+- The review tool shows the entry kinds of al-wujuh wa-l-nazair (باب، كلمة، وجه) and lists the kinds present in each file.
+
 ### Added (CarPlay, waiting for Apple)
 - CarPlay (iOS) is ready: choose a reciter and surah, or continue from where you stopped reading, with Now Playing. It switches on once Apple grants the CarPlay Audio entitlement (`tools/apple/carplay.rb enable`; the request steps are in docs/CARPLAY.md). Android Auto and CarPlay share one browsing tree (`CarBrowser`); CarPlay reaches it over the `app.tibyan/car` channel.
 
