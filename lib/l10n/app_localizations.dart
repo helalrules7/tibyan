@@ -158,12 +158,6 @@ abstract class AppLocalizations {
   /// **'البحث'**
   String get sectionSearch;
 
-  /// No description provided for @comingSoon.
-  ///
-  /// In ar, this message translates to:
-  /// **'قريبا'**
-  String get comingSoon;
-
   /// No description provided for @settingsTitle.
   ///
   /// In ar, this message translates to:

@@ -41,9 +41,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sectionSearch => 'البحث';
 
   @override
-  String get comingSoon => 'قريبا';
-
-  @override
   String get settingsTitle => 'الإعدادات';
 
   @override

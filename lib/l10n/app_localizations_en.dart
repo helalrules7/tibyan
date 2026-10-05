@@ -41,9 +41,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionSearch => 'Search';
 
   @override
-  String get comingSoon => 'Coming soon';
-
-  @override
   String get settingsTitle => 'Settings';
 
   @override
