@@ -16,6 +16,7 @@ sys.path.insert(0, str(TOOLS))
 import audio_index  # noqa: E402
 import build_nuqayah_audio_index as nuq  # noqa: E402
 import fetch_quranenc_extra as qe  # noqa: E402
+import stamp_test_packs as stamp  # noqa: E402
 import staging  # noqa: E402
 
 # The fixtures the app's tests read: they must be valid format 1 indexes.
@@ -83,6 +84,74 @@ class ToolPayloadTest(unittest.TestCase):
             'saadi', surahs=[[s, nuq.fill('https://n/saadi/{s3}.mp3', s, 0)] for s in range(1, 115)])
         self.assertEqual(per_surah['surahs'][1], [2, 'https://n/saadi/002.mp3'])
         self.assertNotIn('verses', per_surah)
+
+
+class NuqayahTimesTest(unittest.TestCase):
+    def _times(self, lines):
+        return '|'.join(lines + [''] * (114 - len(lines)))
+
+    def test_offsets_from_times(self):
+        # Surah 1 (7 verses): verse 3 has no time of its own (read with 2),
+        # verse 7 runs to the end of the file. Surah 2: a short line, its
+        # untimed tail shares the last span. Surah 3: no time, no offsets.
+        text = self._times(['0.66,97.2,,159.54,195.208,243.54,290.19', '1.5,10'])
+        offsets, problems = nuq.offsets_from_times(text, {1: 389634, 2: 50000})
+        self.assertEqual(problems, [])
+        by = {(s, a): (b, e) for s, a, b, e in offsets}
+        self.assertEqual(by[(1, 1)], (660, 97200))
+        self.assertEqual(by[(1, 2)], (97200, 159540))
+        self.assertEqual(by[(1, 3)], (97200, 159540))
+        self.assertEqual(by[(1, 7)], (290190, 389634))
+        self.assertEqual(by[(2, 1)], (1500, 10000))
+        self.assertEqual(by[(2, 2)], (10000, 50000))
+        self.assertEqual(by[(2, 286)], (10000, 50000))
+        self.assertFalse(any(s == 3 for s, *_ in offsets))
+        # A valid index for the app.
+        audio_index.make_index('x', 'tafsir_audio', 's',
+                               surahs=[[s, f'https://h/{s:03d}.mp3'] for s in range(1, 115)],
+                               offsets=offsets)
+
+    def test_no_duration_no_last_span_and_bad_spans_reported(self):
+        offsets, problems = nuq.offsets_from_times(self._times(['5,3,,,,,9']), {})
+        # 1:1 runs backwards (reported, left out); 2-6 run to 7; 7 has no end.
+        self.assertEqual(offsets, [[1, a, 3000, 9000] for a in range(2, 7)])
+        self.assertEqual(problems, [[1, 1, 5000, 3000]])
+        with self.assertRaises(ValueError):
+            nuq.offsets_from_times('1|2', {})
+        with self.assertRaises(ValueError):
+            nuq.offsets_from_times(self._times([','.join(['1'] * 8)]), {})
+
+
+class StampTestPacksTest(unittest.TestCase):
+    def test_audio_index(self):
+        src = nuq.index_payload('almuyassar', surahs=[[1, 'https://h/001.mp3']])
+        out = stamp.stamp_audio_index(src, 'test-nuqayah-almuyassar')
+        self.assertEqual(out['id'], 'test-nuqayah-almuyassar')
+        self.assertEqual(out['status'], 'test')
+        self.assertTrue(out['title_ar'].endswith(stamp.TITLE_MARK_AR))
+        self.assertTrue(out['title_en'].endswith(stamp.TITLE_MARK_EN))
+        self.assertEqual(out['surahs'], src['surahs'])
+        self.assertNotIn('status', src)
+
+    def test_text_pack(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            (d / 'raw').mkdir()
+            TextPackTest()._raw(d / 'raw')
+            src = d / 'p.pack.db'
+            qe.build_text_pack(d / 'raw', src, version='1.0.1')
+            out = d / 'test.pack.db'
+            index = stamp.stamp_text_pack(src, out)
+            self.assertEqual(index['pack_sha256'], staging.sha256_file(out))
+            db = sqlite3.connect(out)
+            meta = dict(db.execute('SELECT key, value FROM pack_index'))
+            self.assertEqual(meta['status'], 'test')
+            self.assertTrue(meta['title'].endswith(stamp.TITLE_MARK_EN))
+            self.assertEqual(db.execute('SELECT text FROM verse WHERE surah=2 AND ayah=255')
+                             .fetchone()[0], 'T 2:255  kept as is ')
+            db.close()
+            with self.assertRaises(FileExistsError):
+                stamp.stamp_text_pack(src, out)
 
 
 class TextPackTest(unittest.TestCase):
