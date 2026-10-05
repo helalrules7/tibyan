@@ -28,7 +28,14 @@ enum PackFormat {
   /// encoder, its vocabulary and the verse vectors, with a manifest
   /// listing each file's SHA-256.
   semantic,
+
+  /// A reviewed book pack (tools/export_pack.py): one SQLite file, not a
+  /// zip, installed as [bookPackFile].
+  book,
 }
+
+/// The file a reviewed book pack is installed as, in its pack folder.
+const bookPackFile = 'book.db';
 
 /// A downloadable set of mushaf pages.
 class PagePackSpec {
@@ -290,6 +297,7 @@ class PagePackInstaller {
         PackFormat.pngQuranCom => _extractQuranCom(path, target),
         PackFormat.pngShamarly => _extractShamarly(path, target),
         PackFormat.semantic => _extractSemantic(path, target),
+        PackFormat.book => _installBook(path, target),
       },
     );
     _done.writeAsStringSync(DateTime.now().toIso8601String());
@@ -399,6 +407,13 @@ void _extractSemantic(String zipPath, String targetDir) {
   File(p.join(targetDir, 'manifest.json'))
       .writeAsBytesSync(manifestFile.content, flush: true);
   input.closeSync();
+}
+
+/// Copies a book pack's SQLite file into its folder. The file was already
+/// checked against its SHA-256.
+void _installBook(String path, String targetDir) {
+  Directory(targetDir).createSync(recursive: true);
+  File(path).copySync(p.join(targetDir, bookPackFile));
 }
 
 /// SHA-256 of a file, read in 1 MB pieces.

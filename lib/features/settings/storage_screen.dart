@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../audio/recitation.dart';
+import '../books/books_providers.dart';
 import '../../core/settings/app_settings.dart';
 import '../mushaf/data/page_pack.dart';
 import '../mushaf/mushaf_providers.dart';
@@ -28,6 +29,15 @@ class StorageScreen extends ConsumerWidget {
     final entries = ref.watch(_storageProvider);
     final digits = NumberFormatter(Localizations.localeOf(context));
     final reciters = ref.watch(allRecitersProvider).value ?? const [];
+    final books = ref.watch(bookPackSpecsProvider);
+    final packsDir = ref.watch(packsDirProvider);
+    final notInstalled = [
+      for (final b in books)
+        if (!bookInstaller(packsDir, b).isInstalled) b,
+    ];
+    final downloads = notInstalled.isEmpty
+        ? const <String, PackProgress>{}
+        : ref.watch(bookDownloadsProvider);
 
     String size(int bytes) => l.storageSize(
       digits.decimal((bytes / 1e6).toStringAsFixed(bytes < 1e7 ? 1 : 0)),
@@ -37,6 +47,9 @@ class StorageScreen extends ConsumerWidget {
       switch (e.kind) {
         case StorageKind.pack:
           if (e.id == PagePackSpec.semantic.id) return l.storageSemantic;
+          for (final b in books) {
+            if (b.id == e.id) return l.storageBook(b.title);
+          }
           for (final ed in MushafEdition.values) {
             if (PagePackSpec.of(ed).id == e.id) return editionName(l, ed);
           }
@@ -143,9 +156,85 @@ class StorageScreen extends ConsumerWidget {
                           ),
                   ),
                 ),
+              if (notInstalled.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Semantics(
+                  header: true,
+                  child: Text(
+                    l.storageBooksAvailable,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                for (final b in notInstalled)
+                  _BookOffer(
+                    title: l.storageBook(b.title),
+                    size: size(b.bytes),
+                    progress: downloads[b.id],
+                    onDownload: () =>
+                        ref.read(bookDownloadsProvider.notifier).start(b),
+                  ),
+              ],
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// A reviewed book pack that is not on the device yet.
+class _BookOffer extends StatelessWidget {
+  const _BookOffer({
+    required this.title,
+    required this.size,
+    required this.progress,
+    required this.onDownload,
+  });
+
+  final String title;
+  final String size;
+  final PackProgress? progress;
+  final VoidCallback onDownload;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final phase = progress?.phase ?? PackPhase.idle;
+    final busy =
+        phase == PackPhase.downloading ||
+        phase == PackPhase.verifying ||
+        phase == PackPhase.installing;
+    final status = switch (phase) {
+      PackPhase.downloading => l.semanticPackDownloading(
+        digits((progress!.fraction * 100).round()),
+      ),
+      PackPhase.verifying || PackPhase.installing => l.semanticPackVerifying,
+      PackPhase.failed => l.semanticPackFailed,
+      _ => size,
+    };
+    return Card(
+      child: ListTile(
+        title: Text(title),
+        subtitle: Semantics(
+          liveRegion: busy,
+          child: Text(status, style: TextStyle(color: t.muted)),
+        ),
+        trailing: busy
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
+              )
+            : TextButton(
+                onPressed: onDownload,
+                child: Text(l.bookPackDownload),
+              ),
       ),
     );
   }

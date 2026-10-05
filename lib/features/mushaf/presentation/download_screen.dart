@@ -143,7 +143,7 @@ class _DownloadScreenState extends ConsumerState<DownloadScreen> {
                 PackFormat.pngQuranCom => l.pagesCreditOld,
                 PackFormat.pngShamarly => l.pagesCreditShamarly,
                 // Not an edition: never shown here.
-                PackFormat.semantic => '',
+                PackFormat.semantic || PackFormat.book => '',
               },
               textAlign: TextAlign.center,
               style: TextStyle(color: t.muted, fontSize: 12),

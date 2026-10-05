@@ -31,7 +31,15 @@ class VerseServicesPanel extends StatelessWidget {
     this.preview,
     this.similarCount = 0,
     this.onSimilar,
+    this.asbabCount = 0,
+    this.onAsbab,
   });
+
+  /// Reviewed occasions of revelation of the selected verse («أسباب
+  /// النزول»); the button shows only when there are some (the feature is
+  /// on and a reviewed pack has entries for the verse).
+  final int asbabCount;
+  final VoidCallback? onAsbab;
 
   /// Passages similar to the selected verse (mutashabihat); the button
   /// shows only when there are some.
@@ -211,6 +219,17 @@ class VerseServicesPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (asbabCount > 0 && onAsbab != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onAsbab,
+                  icon: const Icon(Icons.history_edu_outlined),
+                  label: Text(l.asbabCount(digits(asbabCount))),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
               if (similarCount > 0 && onSimilar != null) ...[
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
