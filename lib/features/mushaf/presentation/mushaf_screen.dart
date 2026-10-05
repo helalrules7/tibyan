@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
@@ -20,7 +22,9 @@ import '../../hifz/domain/strength.dart';
 import '../../hifz/hifz_providers.dart';
 import '../../hifz/presentation/hifz_sheets.dart';
 import '../../hifz/presentation/similar_sheet.dart';
+import '../../word_study/data/word_study_repository.dart';
 import '../../word_study/word_pick.dart';
+import '../../word_study/word_study_providers.dart';
 import '../../word_study/word_study_sheet.dart';
 import '../../khatma/domain/reading_tracker.dart';
 import '../../khatma/khatma_providers.dart';
@@ -767,9 +771,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     '${r == Riwaya.hafs ? '' : '&r=${r.name}&ra=${v.ayah}'}',
                   );
                 },
-                // Word study reads the Hafs text's words: not offered on a
-                // riwaya's pages.
-                onWordStudy: edition.isRiwaya
+                // Word study reads the Hafs text's words: on a riwaya's
+                // pages it needs the pack's word boxes, and opens only
+                // for a word that is exactly a Hafs word (_pickAt).
+                onWordStudy:
+                    edition.isRiwaya && !(_riwaya?.hasWordBoxes ?? false)
                     ? null
                     : () {
                         _setChrome(false);
@@ -830,15 +836,24 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   /// Word study: the word under [point] (edition units) on [page]. A verse
   /// without word boxes there opens with its words to choose from; a tap
-  /// outside any verse keeps waiting for a word.
+  /// outside any verse keeps waiting for a word. On a riwaya's pages only
+  /// a word is taken ([_pickRiwayaWord]): the verse's words to choose
+  /// from would be Hafs's.
   void _pickAt(int page, Offset point, VerseKey? verse) {
     final boxes = ref.read(pageWordBoxesProvider(page)).value ?? const {};
-    final slop = ref.read(editionProvider) == MushafEdition.madina1441
+    final edition = ref.read(editionProvider);
+    // Page units in the SVG editions, image pixels in the others.
+    final slop = edition == MushafEdition.madina1441 || edition.isRiwaya
         ? 2.0
         : 6.0;
     final hit =
         wordUnder(boxes, point, verse: verse, slop: slop) ??
         wordUnder(boxes, point, slop: slop);
+    final riwaya = _riwaya;
+    if (edition.isRiwaya && riwaya != null) {
+      if (hit != null) unawaited(_pickRiwayaWord(riwaya, hit));
+      return;
+    }
     if (hit == null && verse == null) return;
     HapticFeedback.selectionClick();
     setState(() => _pickWord = false);
@@ -848,6 +863,32 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       ayah: hit?.$2 ?? verse!.ayah,
       word: hit?.$3,
     );
+  }
+
+  /// Word study from a riwaya's page: the word picked is studied as the
+  /// Hafs word it is when that is certain ([RiwayaData.hafsWord]: the
+  /// same verse, word and letters); any other word says why it has none.
+  Future<void> _pickRiwayaWord(RiwayaData riwaya, (int, int, int) hit) async {
+    final (surah, ayah, word) = hit;
+    HapticFeedback.selectionClick();
+    setState(() => _pickWord = false);
+    final hafs = riwaya.toHafs(surah, ayah);
+    (int, int, int)? target;
+    if (hafs.length == 1) {
+      final row = await ref.read(
+        verseRowProvider((surah: hafs.first.surah, ayah: hafs.first.ayah))
+            .future,
+      );
+      target = riwaya.hafsWord(surah, ayah, word, verseWords(row));
+    }
+    if (!mounted) return;
+    if (target == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).riwayaWordNoStudy)),
+      );
+      return;
+    }
+    showWordStudy(context, surah: target.$1, ayah: target.$2, word: target.$3);
   }
 
   /// Word boxes of [verses] on [page], by verse (edition units).

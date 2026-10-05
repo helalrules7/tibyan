@@ -771,7 +771,16 @@ final hizbStartsProvider = FutureProvider<List<AyahRow>>(
 /// words of the KFGQPC text, without the hizb sign.
 Future<Map<(int, int), List<String>>> _pageWords(Ref ref, int page) async {
   final edition = ref.watch(editionProvider);
-  if (edition.isRiwaya) return const {};
+  if (edition.isRiwaya) {
+    // Every verse with words on the page, also one that began before it,
+    // split as the pack's word boxes are.
+    final data = await ref.watch(riwayaDataProvider.future);
+    if (data == null) return const {};
+    return {
+      for (final (s, a, _) in data.wordBoxes(page).keys)
+        (s, a): data.words(s, a),
+    };
+  }
   final ayahs = await ref
       .watch(mushafRepositoryProvider)
       .ayahsOnPage(page, edition);
@@ -782,7 +791,9 @@ Future<Map<(int, int), List<String>>> _pageWords(Ref ref, int page) async {
 /// box in page units in the new edition (tools/build_word_boxes.py); the
 /// word's glyph boxes in image pixels in the old one (quran.com's glyph
 /// boxes matched to the words); one box in image pixels in the Shamarly
-/// edition, for verses split surely enough (`shamarlyWordLevel`).
+/// edition, for verses split surely enough (`shamarlyWordLevel`); one box
+/// in page units, in the riwaya's count, on a riwaya's pages when its pack
+/// carries them (tools/build_riwaya_word_boxes.py; packs v2).
 final pageWordBoxesProvider =
     FutureProvider.family<Map<(int, int, int), List<Rect>>, int>((
       ref,
@@ -790,8 +801,13 @@ final pageWordBoxesProvider =
     ) async {
       final edition = ref.watch(editionProvider);
       final out = <(int, int, int), List<Rect>>{};
-      // No word geometry for the riwaya pages yet.
-      if (edition.isRiwaya) return out;
+      if (edition.isRiwaya) {
+        final data = await ref.watch(riwayaDataProvider.future);
+        for (final e in (data?.wordBoxes(page) ?? const {}).entries) {
+          out[e.key] = [e.value];
+        }
+        return out;
+      }
       if (edition == MushafEdition.madina1441) {
         for (final b
             in await ref.watch(mushafRepositoryProvider).wordBoxes(page)) {
