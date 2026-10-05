@@ -16,6 +16,7 @@ import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
 import 'credits.dart';
+import '../../core/testing/test_packs.dart';
 
 /// A tafsir text pack on Tibyan's mirror: one SQLite file written by
 /// `tools/fetch_quranenc_extra.py pack` (the English «المختصر في تفسير
@@ -54,8 +55,9 @@ class TafsirTextPackSpec {
 
   /// The English tafsir packs the app can download. Empty until QuranEnc
   /// answers (letter 12) and the pack is published
-  /// (docs/features/audio_content.md).
-  static const english = <TafsirTextPackSpec>[];
+  /// (docs/features/audio_content.md), apart from the closed-test pack
+  /// ([testEnglishTafsirPacks], removed before a public release).
+  static const english = <TafsirTextPackSpec>[...testEnglishTafsirPacks];
 }
 
 /// One verse of a tafsir text pack.

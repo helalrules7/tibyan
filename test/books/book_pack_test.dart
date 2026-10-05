@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
+import 'package:tibyan/core/testing/test_packs.dart';
 import 'package:tibyan/features/books/data/book_pack.dart';
 import 'package:tibyan/features/books/presentation/quran_quotes.dart';
 import 'package:tibyan/features/mushaf/data/page_pack.dart';
@@ -125,8 +126,29 @@ void main() {
     expect(other.isInstalled, isFalse);
   });
 
-  test('the spec list is empty until a pack is published', () {
-    expect(BookPackSpec.all, isEmpty);
+  test('the spec list holds no reviewed pack yet, only the test packs', () {
+    expect(BookPackSpec.all.where((s) => !testBookPacks.contains(s)), isEmpty);
+  });
+
+  test('a test-drafts pack shows its unreviewed entries; others never', () {
+    final normal = fakePack();
+    addTearDown(normal.close);
+    expect(normal.isTestDrafts, isFalse);
+    expect(
+      normal.entriesFor(2, 3, kind: null).map((e) => e.text),
+      isNot(contains(fakeText3)),
+    );
+    final db = fakePackDb();
+    db.execute("INSERT INTO pack_index VALUES ('status', ?)", [
+      BookPack.testDraftsStatus,
+    ]);
+    final drafts = BookPack(db);
+    addTearDown(drafts.close);
+    expect(drafts.isTestDrafts, isTrue);
+    expect(
+      drafts.entriesFor(2, 3, kind: null).map((e) => e.text),
+      contains(fakeText3),
+    );
   });
 
   group('verses quoted between ﴿ ﴾', () {

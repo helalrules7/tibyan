@@ -30,6 +30,21 @@ A third-party page links per-surah files of another book
 (https://mirrors.quranicaudio.com/tafsir.one/ibn-juzay/001.mp3), so the
 recordings may be per surah rather than per verse; `probe` settles this.
 
+Probe of 2026-10-05 (from the reader's own script, not from get.php): the
+recordings are one file a surah, at
+  https://read.tafsir.one/audio/<key>/<s3>.mp3   (key: almuyassar, alsidi)
+and the reader seeks inside them from a times file,
+  https://read.tafsir.one/data/times-<key>.txt
+114 surahs split by «|», each a comma list of the start (seconds) of each
+verse's tafsir in its surah file; an empty value means the verse has no
+time of its own (the reader says «choose the previous verse»: it is read
+with the verse before). `build` keeps the times file as served and turns it
+into offsets (offsets_from_times): a timed verse runs to the next timed
+verse, an untimed verse (empty, or past the end of a short line) shares
+the span of the timed verse before it, and the last timed verse of a surah
+runs to the end of the file (its duration, read with ffprobe). A surah
+with no time at all gets no offsets (the app then plays its file whole).
+
 Usage:
   python3 tools/build_nuqayah_audio_index.py probe
   python3 tools/build_nuqayah_audio_index.py build [almuyassar saadi]
@@ -37,6 +52,7 @@ Usage:
 import json
 import random
 import re
+import subprocess
 import sys
 import time
 
@@ -56,7 +72,15 @@ PATTERNS = {}
 # Book -> confirmed per-surah file template ({surah}, {s3}), when the
 # recordings are one file a surah. Offsets of the verses in those files
 # are not published; they are added only if Nuqayah sends them.
-SURAH_PATTERNS = {}
+SURAH_PATTERNS = {
+    'almuyassar': 'https://read.tafsir.one/audio/almuyassar/{s3}.mp3',
+    'saadi': 'https://read.tafsir.one/audio/alsidi/{s3}.mp3',
+}
+# Book -> the reader's times file for its surah files (see the docstring).
+TIMES = {
+    'almuyassar': 'https://read.tafsir.one/data/times-almuyassar.txt',
+    'saadi': 'https://read.tafsir.one/data/times-alsidi.txt',
+}
 # The index's names, for the app (the book titles, as Nuqayah names them).
 TITLES = {
     'almuyassar': ('التفسير الميسر', 'Al-Tafsir al-Muyassar'),
@@ -154,21 +178,77 @@ def probe():
     print(json.dumps(report, indent=1))
 
 
+def offsets_from_times(text, durations):
+    """[surah, ayah, start_ms, end_ms] rows from a reader times file (see
+    the docstring) and the surah files' durations in ms ({surah: ms}, a
+    surah missing from it gets no offset for its last timed verse).
+    Returns (offsets, problems); a span that is not increasing is left out
+    and reported, never guessed."""
+    lines = text.strip().split('|')
+    if len(lines) != 114:
+        raise ValueError(f'times: {len(lines)} surahs, not 114')
+    offsets, problems = [], []
+    for surah, line in enumerate(lines, 1):
+        count = staging.VERSE_COUNTS[surah - 1]
+        values = line.split(',')
+        if len(values) > count:
+            raise ValueError(f'times: surah {surah} has {len(values)} values for {count} verses')
+        starts = [(a, round(float(v) * 1000)) for a, v in enumerate(values, 1) if v.strip()]
+        for i, (ayah, start) in enumerate(starts):
+            if i + 1 < len(starts):
+                end, last = starts[i + 1][1], starts[i + 1][0] - 1
+            elif surah in durations:
+                end, last = durations[surah], count
+            else:
+                continue  # end unknown: the app plays the surah file whole
+            if not 0 <= start < end:
+                problems.append([surah, ayah, start, end])
+                continue
+            offsets.extend([surah, a, start, end] for a in range(ayah, last + 1))
+    return offsets, problems
+
+
+def duration_ms(url):
+    """The duration of a remote audio file in ms (ffprobe reads its head)."""
+    out = subprocess.run(
+        ['ffprobe', '-v', 'error', '-user_agent', staging.USER_AGENT, '-show_entries',
+         'format=duration', '-of', 'default=nw=1:nk=1', url],
+        capture_output=True, text=True, timeout=120, check=True).stdout
+    return round(float(out.strip()) * 1000)
+
+
 def build_surah_book(book, sample=10):
-    """A book recorded one file a surah: the index lists the 114 files."""
+    """A book recorded one file a surah: the index lists the 114 files, and
+    the verses' offsets in them when the reader has a times file."""
     surahs = [[s, fill(SURAH_PATTERNS[book], s, 0)] for s in range(1, 115)]
     d = OUT / book
     d.mkdir(parents=True, exist_ok=True)
-    audio_index.write(d / 'index.json', index_payload(book, surahs=surahs))
+    offsets, problems, durations = [], [], {}
+    if book in TIMES:
+        times = staging.get(TIMES[book])
+        (d / 'times.txt').write_bytes(times)
+        for s, u in surahs:
+            try:
+                durations[s] = duration_ms(u)
+            except (subprocess.SubprocessError, ValueError, OSError) as e:
+                problems.append([s, 'duration', str(e)])
+        (d / 'durations.json').write_text(json.dumps(durations, indent=0) + '\n',
+                                          encoding='utf-8')
+        offsets, bad = offsets_from_times(times.decode('utf-8'), durations)
+        problems += bad
+    audio_index.write(d / 'index.json', index_payload(book, surahs=surahs, offsets=offsets,
+                                                      times=TIMES.get(book)))
     picks = surahs[:1] + surahs[-1:] + random.Random(20261005).sample(surahs, min(sample, 114))
     checks = [dict(staging.head_record(u), surah=s) for s, u in picks]
     (d / 'head_checks.json').write_text(json.dumps(checks, indent=1) + '\n', encoding='utf-8')
     staging.write_sums(d)
     ok = sum(1 for c in checks if c['status'] == 200)
     staging.write_manifest(d, book=book, source=SURAH_PATTERNS[book], surahs_indexed=114,
-                           per_verse_offsets=False, head_checked=len(checks), head_ok=ok,
+                           times=TIMES.get(book), verses_with_offsets=len(offsets),
+                           offset_problems=problems, head_checked=len(checks), head_ok=ok,
                            mirrored=False, status=STATUS)
-    print(f'{book}: 114 surah files indexed, HEAD {ok}/{len(checks)}')
+    print(f'{book}: 114 surah files indexed, {len(offsets)} verses with offsets, '
+          f'{len(problems)} problems, HEAD {ok}/{len(checks)}')
 
 
 def build_book(book, sample=10):
