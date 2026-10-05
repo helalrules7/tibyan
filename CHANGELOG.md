@@ -6,6 +6,11 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (widgets: iOS, macOS and an actions widget)
+- The khatma widget as a WidgetKit extension on iOS 17 and macOS 14 (desktop widgets), generated into the Xcode projects by `tools/apple/add_widget_targets.rb` from `apple/`. The macOS app is new (`macos/`): it carries a channel that writes the widgets' keys into the App Group and receives `tibyan://` links, since `home_widget` has no macOS support.
+- An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
+- `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
+
 ### Added (copy and share verses)
 - «نسخ» (copy), «مشاركة نصًا» (share as text) and «مشاركة صورة» (share as image) in the verse services, for one verse or a selected stretch. The text is Tanzil's Uthmani text exactly as published (CC BY 3.0, no changes), with each verse's number in ornate brackets, a reference line per surah and Tanzil's credit; the basmala that Tanzil puts at the start of verse 1 is left out. The riwaya editions share the picture only: their text is encoded for the Complex's fonts and does not read right outside the app.
 - The picture is cut from the page as drawn (its edition, theme, ink and paper), with no frame and no caption. It is found by capturing the page with and without the selection, so it works in every edition without each page's drawing code reporting its boxes.
