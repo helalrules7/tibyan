@@ -742,5 +742,14 @@
   "shareVerseImage": "Share as image",
   "sharePreparing": "Preparing the image…",
   "shareImageFailed": "Could not prepare the image",
-  "shareVerseCredit": "Quran text: Tanzil Project (tanzil.net) · Tibyan app"
+  "shareVerseCredit": "Quran text: Tanzil Project (tanzil.net) · Tibyan app",
+  "backupTitle": "Backup",
+  "backupExport": "Save a backup",
+  "backupExportHint": "One file with your bookmarks, marks, reading position, khatma, reports, tadabbur notes and hifz progress. Keep it, or send it to yourself.",
+  "backupImport": "Restore from a backup",
+  "backupImportHint": "Merges the backup with what is on this device: nothing is deleted, and the newer copy wins where they differ.",
+  "backupDone": "Restored: {added} new, {updated} updated",
+  "@backupDone": {"placeholders": {"added": {"type": "String"}, "updated": {"type": "String"}}},
+  "backupInvalid": "This file is not a Tibyan backup",
+  "backupFailed": "That did not work"
 }

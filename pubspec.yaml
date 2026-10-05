@@ -64,6 +64,7 @@ dependencies:
   just_audio_background: ^0.0.1-beta.17
   background_downloader: ^9.6.3
   share_plus: ^13.3.1
+  file_selector: ^1.1.0
 
 dev_dependencies:
   flutter_test:

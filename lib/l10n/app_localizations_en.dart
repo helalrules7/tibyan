@@ -1677,4 +1677,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get shareVerseCredit =>
       'Quran text: Tanzil Project (tanzil.net) · Tibyan app';
+
+  @override
+  String get backupTitle => 'Backup';
+
+  @override
+  String get backupExport => 'Save a backup';
+
+  @override
+  String get backupExportHint =>
+      'One file with your bookmarks, marks, reading position, khatma, reports, tadabbur notes and hifz progress. Keep it, or send it to yourself.';
+
+  @override
+  String get backupImport => 'Restore from a backup';
+
+  @override
+  String get backupImportHint =>
+      'Merges the backup with what is on this device: nothing is deleted, and the newer copy wins where they differ.';
+
+  @override
+  String backupDone(String added, String updated) {
+    return 'Restored: $added new, $updated updated';
+  }
+
+  @override
+  String get backupInvalid => 'This file is not a Tibyan backup';
+
+  @override
+  String get backupFailed => 'That did not work';
 }

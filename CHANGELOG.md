@@ -11,6 +11,12 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (backup and restore)
+- Settings › «النسخ الاحتياطي»: save one JSON file with your bookmarks and marks, reading position, khatmas, reading and listening reports, tadabbur notes and hifz progress (through the system share sheet), and restore it on this or another device. Restoring merges: nothing is deleted and the newer copy of a row wins; restoring the same file twice adds nothing. No account is needed. Settings (theme, edition, reciter) are not part of it.
+
+### Added (release pipeline)
+- `tools/release/prepare.py` cuts a release (pubspec version and build, changelog section, compare links); the release workflow checks the tag against both, builds a signed Android APK and AAB when the keystore secrets exist, uploads the bundle to Google Play's internal track when the service account exists, and attaches unsigned iOS and macOS builds. docs/RELEASE.md lists what needs the owner's accounts.
+
 ### Added (selection over page breaks)
 - «تحديد عدة آيات»: turn the page while selecting and tap a verse to extend the selection to it (up to six pages); the services then work on the whole stretch: copy and share as text, marks and the fasil at its first verse. A picture of such a stretch turns the pages itself and joins the pieces in one image.
 

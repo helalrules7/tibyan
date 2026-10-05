@@ -1,7 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../core/backup/backup.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
@@ -11,6 +18,8 @@ import '../audio/recitation.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
+import '../mushaf/presentation/widgets/illuminated_frame.dart'
+    show NumberFormatter;
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -170,6 +179,33 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+          _SectionTitle(l.backupTitle),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.ios_share),
+                  title: Text(l.backupExport),
+                  subtitle: Text(
+                    l.backupExportHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  onTap: () => _export(context, ref),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.restore),
+                  title: Text(l.backupImport),
+                  subtitle: Text(
+                    l.backupImportHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  onTap: () => _import(context, ref),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           _SectionTitle(l.privacyTitle),
           Card(
             child: SwitchListTile(
@@ -203,6 +239,44 @@ class SettingsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+Future<void> _export(BuildContext context, WidgetRef ref) async {
+  final l = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final text = await Backup(ref.read(userDatabaseProvider)).export();
+    final dir = await getTemporaryDirectory();
+    final day = DateTime.now().toIso8601String().substring(0, 10);
+    final file = File('${dir.path}/tibyan-backup-$day.json');
+    await file.writeAsString(text, flush: true);
+    await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
+  } catch (_) {
+    messenger.showSnackBar(SnackBar(content: Text(l.backupFailed)));
+  }
+}
+
+Future<void> _import(BuildContext context, WidgetRef ref) async {
+  final l = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final digits = NumberFormatter(Localizations.localeOf(context));
+  try {
+    final picked = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(label: 'Tibyan backup', extensions: ['json']),
+      ],
+    );
+    if (picked == null) return;
+    final text = utf8.decode(await picked.readAsBytes());
+    final r = await Backup(ref.read(userDatabaseProvider)).import(text);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l.backupDone(digits(r.added), digits(r.updated)))),
+    );
+  } on BackupException {
+    messenger.showSnackBar(SnackBar(content: Text(l.backupInvalid)));
+  } catch (_) {
+    messenger.showSnackBar(SnackBar(content: Text(l.backupFailed)));
   }
 }
 

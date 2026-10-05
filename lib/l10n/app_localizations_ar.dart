@@ -1670,4 +1670,32 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get shareVerseCredit =>
       'نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان';
+
+  @override
+  String get backupTitle => 'النسخ الاحتياطي';
+
+  @override
+  String get backupExport => 'حفظ نسخة احتياطية';
+
+  @override
+  String get backupExportHint =>
+      'ملف واحد فيه فواصلك وعلاماتك وموضع القراءة والختمة والتقارير وملاحظات التدبر وتقدم الحفظ. احتفظ به أو أرسله لنفسك.';
+
+  @override
+  String get backupImport => 'استعادة من نسخة';
+
+  @override
+  String get backupImportHint =>
+      'يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض.';
+
+  @override
+  String backupDone(String added, String updated) {
+    return 'تمت الاستعادة: $added جديد، $updated محدَّث';
+  }
+
+  @override
+  String get backupInvalid => 'هذا الملف ليس نسخة احتياطية من تبيان';
+
+  @override
+  String get backupFailed => 'تعذرت العملية';
 }

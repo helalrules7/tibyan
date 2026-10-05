@@ -2958,6 +2958,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان'**
   String get shareVerseCredit;
+
+  /// No description provided for @backupTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخ الاحتياطي'**
+  String get backupTitle;
+
+  /// No description provided for @backupExport.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ نسخة احتياطية'**
+  String get backupExport;
+
+  /// No description provided for @backupExportHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملف واحد فيه فواصلك وعلاماتك وموضع القراءة والختمة والتقارير وملاحظات التدبر وتقدم الحفظ. احتفظ به أو أرسله لنفسك.'**
+  String get backupExportHint;
+
+  /// No description provided for @backupImport.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة من نسخة'**
+  String get backupImport;
+
+  /// No description provided for @backupImportHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض.'**
+  String get backupImportHint;
+
+  /// No description provided for @backupDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت الاستعادة: {added} جديد، {updated} محدَّث'**
+  String backupDone(String added, String updated);
+
+  /// No description provided for @backupInvalid.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الملف ليس نسخة احتياطية من تبيان'**
+  String get backupInvalid;
+
+  /// No description provided for @backupFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذرت العملية'**
+  String get backupFailed;
 }
 
 class _AppLocalizationsDelegate
