@@ -6,6 +6,9 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (closed testing only — remove before a public release)
+- Test packs on our server under `/mirror/test/`, listed in one place (`lib/core/testing/test_packs.dart`, one switch): the unreviewed drafts of al-Wahidi's asbab, al-Biqa'i, al-Damghani and the five tafsir books, the Nuqayah tafsir audio indexes (al-Muyassar, al-Sa'di, with per-verse offsets from the reader's times files), the QuranEnc English audio index and the English al-Mukhtasar pack. Every title says «(مسودة للاختبار)» / «(test draft)»; text copied exactly as imported. `tools/export_pack.py --test-drafts` and `tools/stamp_test_packs.py` stamp them; docs/MISSING_DATA.md (section 0) lists what to remove and which flags to turn off.
+
 ### Added (content ready, all hidden until reviewed and permitted)
 - Book sections from reviewed packs, all through one section widget: the tafsir books (al-Tabari, al-Qurtubi, Ibn Kathir, al-Baghawi, al-Saadi) as extra choices on the tafsir screen, «المناسبات» (al-Biqa'i), and al-Damghani's wujuh in word study. Text verbatim with its citation; the storage screen names each pack's kind.
 - «استمع للتفسير» (tafsir audio), the English translation heard after each verse during recitation, and the English tafsir (al-Mukhtasar) for the English interface, each behind a flag that is off, streamed from a small link index or an optional hash-checked pack, with its source line.

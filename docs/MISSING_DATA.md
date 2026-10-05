@@ -23,6 +23,39 @@
 
 ---
 
+## 0. قبل النشر العام: حزم الاختبار والأعلام
+
+**قرار أحمد 2026-10-05:** التطبيق في اختبار مغلق (غير منشور للعامة)، وكل الأعلام مفعّلة، والمختبرون يرون الأقسام الآن من مسودات غير مراجعة ومن مصادر تنتظر إذنا، وكل عنوان فيها يقول «(مسودة للاختبار)» أو «(test draft)». النص منقول كما استُورد حرفا بحرف مع سطر مصدره؛ لم يُكتب ولم يُغيَّر شيء منه.
+
+**قبل أي نشر عام، كل ما يلي إلزامي:**
+
+1. **حذف حزم الاختبار كلها:** `includeTestPacks = false` في `lib/core/testing/test_packs.dart` (أو حذف الملف والسطور الثلاثة التي تنشره في `BookPackSpec.all` و`AudioIndexSpec.all` و`TafsirTextPackSpec.english`)، ثم حذف `public_html/mirror/test/` من الخادم.
+2. **إطفاء الأعلام** في `assets/config/feature_flags.json` لكل ميزة ليس لها بيانات مراجعة وإذن: `asbab_nuzul`، `munasabat`، `wujuh_nazair`، `tafsir_audio`، `translation_audio`، `english_tafsir`، `qiraat_audio`، `qiraat`، `tawjih`، `stories`، `topics`، `library`، `meaning_search`، وكل علم آخر فُتح للاختبار فقط (قائمة الأعلام كلها في الملف نفسه، وكلها `true` منذ 4906680).
+3. التفاسير الخمسة من الكتب لا علم لها: تختفي بحذف حزمها في الخطوة 1.
+
+| حزمة الاختبار | على الخادم (`https://tibyan.ahmedhelal.dev/mirror/test/…`) | ما فيها | العلم | المصدر وحالة الإذن |
+|---|---|---|---|---|
+| `test-asbab-wahidi` | `books/test-asbab-wahidi.pack.db` | 534 مدخلا (452 مقطعا، 78 مقدمة سورة)، 467 رابطا | `asbab_nuzul` | الواحدي من OpenITI (طبعة دار الإصلاح، تحقيق الحميدان): إذن المحقق لم يُطلب (إ16)، والمراجعة لم تبدأ (غ4) |
+| `test-munasabat-biqai` | `books/test-munasabat-biqai.pack.db` | 1,356 مدخلا، 1,356 رابطا | `munasabat` | البقاعي من نسخة altafsir.com في OpenITI: الطبعة والمحقق غير معروفين، وشروط altafsir غير معروفة (غ1) |
+| `test-wujuh-damghani` | `books/test-wujuh-damghani.pack.db` | 2,744 مدخلا (481 كلمة، 2,236 وجها)، 3,231 رابطا | `wujuh_nazair` | الدامغاني من OpenITI (دار العلم للملايين 1980، تحقيق سيد الأهل): إذن المحقق لم يُطلب (غ3) |
+| `test-tafsir-tabari` | `books/test-tafsir-tabari.pack.db` | 3,967 مدخلا | لا علم (اختيار في شاشة التفسير) | altafsir.com عبر OpenITI: لا ترخيص (ث1) |
+| `test-tafsir-qurtubi` | `books/test-tafsir-qurtubi.pack.db` | 3,262 مدخلا | لا علم | كذلك (ث1) |
+| `test-tafsir-ibn-kathir` | `books/test-tafsir-ibn-kathir.pack.db` | 1,893 مدخلا | لا علم | كذلك (ث1) |
+| `test-tafsir-baghawi` | `books/test-tafsir-baghawi.pack.db` | 1,930 مدخلا | لا علم | كذلك (ث1) |
+| `test-tafsir-saadi` | `books/test-tafsir-saadi.pack.db` | 1,756 مدخلا | لا علم | كذلك (ث1) |
+| `test-english-mokhtasar` | `books/test-english-mokhtasar.pack.db` | 6,236 آية | `english_tafsir` | QuranEnc `english_mokhtasar`: بلا صفحة عامة، ننتظر رد الرسالة 12 (ن12، إ12) |
+| `test-nuqayah-almuyassar` | `audio-index/test-nuqayah-almuyassar.json` | 114 ملف سورة، ومواضع 5,762 آية | `tafsir_audio` | نقاية: موافقة مشروطة (بلا إعلانات ولا ربح)، وننتظر صيغة ذكر المصدر وطريقة جلب الملفات (ن6، إ9). الصوت يُبث من `read.tafsir.one` مباشرة |
+| `test-nuqayah-saadi` | `audio-index/test-nuqayah-saadi.json` | 114 ملف سورة، ومواضع 6,233 آية | `tafsir_audio` | كذلك |
+| `test-quranenc-english-rwwad` | `audio-index/test-quranenc-english-rwwad.json` | 6,236 رابطا (ملف لكل آية) | `translation_audio` | QuranEnc `english_rwwad`: الشروط لا تذكر الصوت، ننتظر رد الرسالة 12 (ن13، إ12). الصوت يُبث من `d.quranenc.com` |
+
+كل مجلد على الخادم فيه `SHA256SUMS` (فُحص بـ `sha256sum -c` على الخادم). المسودات تُعاد من مصادرها المثبتة بـ `tools/import_altafsir.py` و`tools/import_damghani_wujuh.py` (والواحدي في `data/review/`)، والحزم بـ `tools/export_pack.py --test-drafts`، والفهارس بـ `tools/build_nuqayah_audio_index.py build` و`tools/fetch_quranenc_extra.py all`/`pack` ثم `tools/stamp_test_packs.py`.
+
+**لم يُبنَ للاختبار:**
+- **دار الآثار (الصحيح المسند من أسباب النزول):** ملفهم لم يصل بعد (إ3)، فلا مسودة.
+- **صوت القراءات (AQQD):** فهرسه غير مبني أصلا (`data/qiraat_audio/index/` فارغ إلا `.gitkeep`، وفي الفرع الرئيسي بعد دمج #32 كذلك)، ولا قارئ منسوب إلى مجموعة واضحة الترخيص في `provenance.json` فلا يُشغَّل أي مقطع، ولا واجهة في التطبيق تستعمل مزوّداته بعد (ن1، ن2).
+
+---
+
 ## 1. ناقص: يحتاج أشخاصا مؤهلين
 
 | # | البيانات | الميزة المتوقفة | الموجود اليوم | المطلوب | من يستطيع |
