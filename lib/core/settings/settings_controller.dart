@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/theme_registry.dart';
+import '../../features/home/whats_new.dart' show whatsNewId, whatsNewSeenKey;
 import 'app_settings.dart';
 
 /// Overridden in `main()` once assets and preferences are loaded.
@@ -162,6 +163,8 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> completeOnboarding() async {
     state = state.copyWith(onboardingDone: true);
     await _prefs.setBool(_kOnboarding, true);
+    // A new reader meets everything at once: no «what's new» for them.
+    await _prefs.setString(whatsNewSeenKey, whatsNewId);
   }
 
   Future<void> setEdition(MushafEdition edition) async {

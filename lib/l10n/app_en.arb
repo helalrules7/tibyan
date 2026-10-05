@@ -799,5 +799,19 @@
   "@secondsShort": {"placeholders": {"n": {"type": "String"}}},
   "searchScopeAll": "The whole mushaf",
   "searchScopeJuz": "In a juz",
-  "searchScopeSurah": "In a surah"
+  "searchScopeSurah": "In a surah",
+  "whatsNewTitle": "What's new",
+  "whatsNewDone": "OK",
+  "newOneVerse": "Verse by verse",
+  "newOneVerseBody": "A button under the page turns the phone sideways and shows one verse in large print, with an optional auto-turn.",
+  "newUnderVerse": "Translation under the verse",
+  "newUnderVerseBody": "The continuous view, from the page's tools: one or two translations, or al-Muyassar, under each verse.",
+  "newShare": "Copy and share",
+  "newShareBody": "Copy a verse, or share it as text or as a picture of the mushaf page, even over a page break.",
+  "newSpread": "Two facing pages",
+  "newSpreadBody": "On a tablet or a wide screen held sideways, the mushaf opens like a printed copy.",
+  "newWidgets": "Widgets",
+  "newWidgetsBody": "Today's khatma portion and reading shortcuts on the home screen, and a Listen tile in Quick Settings.",
+  "newBackup": "Backup",
+  "newBackupBody": "Save your bookmarks, khatma, notes and settings in one file, and restore them on any device."
 }

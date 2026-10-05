@@ -3246,6 +3246,90 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'في سورة'**
   String get searchScopeSurah;
+
+  /// No description provided for @whatsNewTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما الجديد'**
+  String get whatsNewTitle;
+
+  /// No description provided for @whatsNewDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسنا'**
+  String get whatsNewDone;
+
+  /// No description provided for @newOneVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية آية'**
+  String get newOneVerse;
+
+  /// No description provided for @newOneVerseBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'زر تحت الصفحة يقلب الموبايل بالعرض ويعرض آية واحدة بخط كبير، مع انتقال تلقائي اختياري.'**
+  String get newOneVerseBody;
+
+  /// No description provided for @newUnderVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترجمة تحت الآية'**
+  String get newUnderVerse;
+
+  /// No description provided for @newUnderVerseBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'العرض المتتالي من أدوات الصفحة: ترجمة أو اثنتان أو التفسير الميسر تحت كل آية.'**
+  String get newUnderVerseBody;
+
+  /// No description provided for @newShare.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخ والمشاركة'**
+  String get newShare;
+
+  /// No description provided for @newShareBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'انسخ الآية أو شاركها نصا أو صورة من صفحة المصحف، ولو امتدت على صفحتين.'**
+  String get newShareBody;
+
+  /// No description provided for @newSpread.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحتان متقابلتان'**
+  String get newSpread;
+
+  /// No description provided for @newSpreadBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'على التابلت والشاشات العريضة بالعرض يظهر المصحف مفتوحا.'**
+  String get newSpreadBody;
+
+  /// No description provided for @newWidgets.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدوات الشاشة'**
+  String get newWidgets;
+
+  /// No description provided for @newWidgetsBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد الختمة واختصارات القراءة والاستماع على الشاشة الرئيسية، وزر استماع في الإعدادات السريعة.'**
+  String get newWidgetsBody;
+
+  /// No description provided for @newBackup.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخة الاحتياطية'**
+  String get newBackup;
+
+  /// No description provided for @newBackupBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'احفظ فواصلك وختمتك وملاحظاتك وإعداداتك في ملف واحد، واستعدها على أي جهاز.'**
+  String get newBackupBody;
 }
 
 class _AppLocalizationsDelegate

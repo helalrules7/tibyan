@@ -11,6 +11,9 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (what's new)
+- After an update, the home screen opens a short «ما الجديد» once, listing what came in it; a first install never shows it. It can be opened again from the settings.
+
 ### Added (search scope)
 - Search by words can be kept to one surah or one juz: a chip under the search box opens the choice, and its × goes back to the whole mushaf.
 

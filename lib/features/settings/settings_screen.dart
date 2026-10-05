@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/backup/backup.dart';
+import '../home/whats_new.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
@@ -251,6 +252,15 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           _SectionTitle(l.aboutTitle),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.new_releases_outlined),
+              title: Text(l.whatsNewTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showWhatsNew(context),
+            ),
+          ),
+          const SizedBox(height: 8),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),

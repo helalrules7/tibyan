@@ -1848,4 +1848,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchScopeSurah => 'In a surah';
+
+  @override
+  String get whatsNewTitle => 'What\'s new';
+
+  @override
+  String get whatsNewDone => 'OK';
+
+  @override
+  String get newOneVerse => 'Verse by verse';
+
+  @override
+  String get newOneVerseBody =>
+      'A button under the page turns the phone sideways and shows one verse in large print, with an optional auto-turn.';
+
+  @override
+  String get newUnderVerse => 'Translation under the verse';
+
+  @override
+  String get newUnderVerseBody =>
+      'The continuous view, from the page\'s tools: one or two translations, or al-Muyassar, under each verse.';
+
+  @override
+  String get newShare => 'Copy and share';
+
+  @override
+  String get newShareBody =>
+      'Copy a verse, or share it as text or as a picture of the mushaf page, even over a page break.';
+
+  @override
+  String get newSpread => 'Two facing pages';
+
+  @override
+  String get newSpreadBody =>
+      'On a tablet or a wide screen held sideways, the mushaf opens like a printed copy.';
+
+  @override
+  String get newWidgets => 'Widgets';
+
+  @override
+  String get newWidgetsBody =>
+      'Today\'s khatma portion and reading shortcuts on the home screen, and a Listen tile in Quick Settings.';
+
+  @override
+  String get newBackup => 'Backup';
+
+  @override
+  String get newBackupBody =>
+      'Save your bookmarks, khatma, notes and settings in one file, and restore them on any device.';
 }

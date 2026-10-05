@@ -1838,4 +1838,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get searchScopeSurah => 'في سورة';
+
+  @override
+  String get whatsNewTitle => 'ما الجديد';
+
+  @override
+  String get whatsNewDone => 'حسنا';
+
+  @override
+  String get newOneVerse => 'آية آية';
+
+  @override
+  String get newOneVerseBody =>
+      'زر تحت الصفحة يقلب الموبايل بالعرض ويعرض آية واحدة بخط كبير، مع انتقال تلقائي اختياري.';
+
+  @override
+  String get newUnderVerse => 'الترجمة تحت الآية';
+
+  @override
+  String get newUnderVerseBody =>
+      'العرض المتتالي من أدوات الصفحة: ترجمة أو اثنتان أو التفسير الميسر تحت كل آية.';
+
+  @override
+  String get newShare => 'النسخ والمشاركة';
+
+  @override
+  String get newShareBody =>
+      'انسخ الآية أو شاركها نصا أو صورة من صفحة المصحف، ولو امتدت على صفحتين.';
+
+  @override
+  String get newSpread => 'صفحتان متقابلتان';
+
+  @override
+  String get newSpreadBody =>
+      'على التابلت والشاشات العريضة بالعرض يظهر المصحف مفتوحا.';
+
+  @override
+  String get newWidgets => 'أدوات الشاشة';
+
+  @override
+  String get newWidgetsBody =>
+      'ورد الختمة واختصارات القراءة والاستماع على الشاشة الرئيسية، وزر استماع في الإعدادات السريعة.';
+
+  @override
+  String get newBackup => 'النسخة الاحتياطية';
+
+  @override
+  String get newBackupBody =>
+      'احفظ فواصلك وختمتك وملاحظاتك وإعداداتك في ملف واحد، واستعدها على أي جهاز.';
 }

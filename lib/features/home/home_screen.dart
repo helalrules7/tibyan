@@ -9,6 +9,7 @@ import '../khatma/khatma_providers.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
+import 'whats_new.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -22,6 +23,7 @@ class HomeScreen extends ConsumerWidget {
     final surahs = ref.watch(surahsProvider).value;
     final surah = position == null || surahs == null ? 1 : position.surah;
     final ayah = position?.ayah ?? 1;
+    maybeShowWhatsNew(context, ref);
     if (context.tokens.elderly) {
       return const _ElderlyHome();
     }
