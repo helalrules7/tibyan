@@ -28,6 +28,8 @@ import 'package:tibyan/l10n/app_localizations.dart';
 
 import '../audio/player_test.dart' show FakeAudio, FakeRepo;
 
+import 'package:tibyan/core/testing/test_packs.dart';
+
 String fixtureText(String name) =>
     File('test/fixtures/audio_content/$name.json').readAsStringSync();
 VerseAudioIndex fixture(String name) =>
@@ -235,9 +237,17 @@ void main() {
       );
     });
 
-    test('no index is published yet', () {
-      expect(AudioIndexSpec.all, isEmpty);
-      expect(TafsirTextPackSpec.english, isEmpty);
+    test('no index is published yet, only the test ones', () {
+      expect(
+        AudioIndexSpec.all.where((s) => !testAudioIndexes.contains(s)),
+        isEmpty,
+      );
+      expect(
+        TafsirTextPackSpec.english.where(
+          (s) => !testEnglishTafsirPacks.contains(s),
+        ),
+        isEmpty,
+      );
     });
   });
 

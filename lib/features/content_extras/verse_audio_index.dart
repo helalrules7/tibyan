@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 
 import '../../core/flags/feature_flags.dart';
 import '../mushaf/mushaf_providers.dart';
+import '../../core/testing/test_packs.dart';
 
 /// What an index holds; matches `kind` in tools/audio_index.py.
 abstract final class VerseAudioKind {
@@ -196,8 +197,10 @@ class AudioIndexSpec {
   final String sha256;
 
   /// Every index the app may fetch. Empty until the permission arrives
-  /// and the index is published (docs/features/audio_content.md).
-  static const all = <AudioIndexSpec>[];
+  /// and the index is published (docs/features/audio_content.md), apart
+  /// from the closed-test indexes ([testAudioIndexes], removed before a
+  /// public release).
+  static const all = <AudioIndexSpec>[...testAudioIndexes];
 }
 
 /// Fetches and keeps the indexes, under `<app support>/audio-index/` (not

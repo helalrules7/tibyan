@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../mushaf/data/page_pack.dart';
+import '../../../core/testing/test_packs.dart';
 
 /// What a reviewed book pack holds; matches the source `kind` in the
 /// review database (tools/review_schema.sql).
@@ -70,8 +71,9 @@ class BookPackSpec {
   );
 
   /// Every reviewed book pack the app can download. Empty until a pack is
-  /// reviewed, exported and put on the mirror.
-  static const all = <BookPackSpec>[];
+  /// reviewed, exported and put on the mirror, apart from the closed-test
+  /// packs of drafts ([testBookPacks], removed before a public release).
+  static const all = <BookPackSpec>[...testBookPacks];
 }
 
 /// The book an entry is from, as the pack's `source` row gives it.
@@ -186,6 +188,11 @@ class BookPack {
     if (format.isEmpty || format.first['value'] != supportedFormat) {
       throw const FormatException('Unknown book pack format');
     }
+    isTestDrafts =
+        _db
+            .select("SELECT value FROM pack_index WHERE key = 'status'")
+            .firstOrNull?['value'] ==
+        testDraftsStatus;
     final hasCitation = _db
         .select('PRAGMA table_info(source)')
         .any((r) => r['name'] == 'citation');
@@ -221,6 +228,15 @@ class BookPack {
   /// The `format` in pack_index that tools/export_pack.py writes.
   static const supportedFormat = '1';
 
+  /// pack_index `status` of a test pack (`export_pack.py --test-drafts`):
+  /// unreviewed drafts for the closed testing phase only, its book titles
+  /// marked «(مسودة للاختبار)». Such a pack shows its drafts; it must be
+  /// listed only among the test packs (lib/core/testing/test_packs.dart).
+  static const testDraftsStatus = 'test-drafts';
+
+  /// A test pack of unreviewed drafts ([testDraftsStatus]).
+  late final bool isTestDrafts;
+
   final Database _db;
   final BookPackSpec? spec;
   final Map<int, BookSource> sources = {};
@@ -232,7 +248,8 @@ class BookPack {
   /// [source] one book (its key), [entryKinds] some kinds of entries;
   /// with [word], a link that names words must cover that word.
   /// An entry without a reviewer other than its editor is never returned
-  /// (export_pack.py exports none; this guards a hand-made file).
+  /// (export_pack.py exports none; this guards a hand-made file), except
+  /// from a test pack of drafts ([isTestDrafts]).
   List<BookEntry> entriesFor(
     int surah,
     int ayah, {
@@ -248,7 +265,7 @@ class BookPack {
       'JOIN entry e ON e.id = l.entry_id '
       'JOIN source s ON s.id = e.source_id '
       'WHERE l.surah = ? AND l.ayah_from <= ? AND l.ayah_to >= ? '
-      '$_reviewed '
+      '${isTestDrafts ? '' : _reviewed} '
       '${kind == null ? '' : 'AND s.kind = ? '}'
       '${source == null ? '' : 'AND s.key = ? '}'
       'ORDER BY e.source_id, e.seq, l.ayah_from, l.ayah_to',
@@ -290,7 +307,8 @@ class BookPack {
     if (rows.isEmpty) return null;
     final r = rows.first;
     final reviewer = r['reviewer'] as String?;
-    if (reviewer == null || reviewer.isEmpty || reviewer == r['editor']) {
+    if (!isTestDrafts &&
+        (reviewer == null || reviewer.isEmpty || reviewer == r['editor'])) {
       return null;
     }
     if (r['section'] != entry.section) return null;
