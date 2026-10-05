@@ -2,6 +2,7 @@
   "_comment": "A flagged feature appears only when its flag is true AND its reviewed data pack is installed. Scholarly features stay false until reviewed data exists.",
   "tajweed": false,
   "qiraat": false,
+  "qiraat_audio": false,
   "tawjih": false,
   "munasabat": false,
   "wujuh_nazair": false,
