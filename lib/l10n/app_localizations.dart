@@ -3180,6 +3180,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'النص هنا برواية حفص'**
   String get hafsTextNote;
+
+  /// No description provided for @twoPageSpread.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحتان متقابلتان'**
+  String get twoPageSpread;
+
+  /// No description provided for @twoPageSpreadHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'على الشاشات العريضة في الوضع الأفقي، كالمصحف المفتوح'**
+  String get twoPageSpreadHint;
 }
 
 class _AppLocalizationsDelegate

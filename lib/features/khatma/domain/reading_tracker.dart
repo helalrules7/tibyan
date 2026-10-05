@@ -34,17 +34,23 @@ class ReadingTracker {
   DateTime? _sessionStart;
   String? _edition;
   int? _page;
+
+  /// The facing page of a spread, shown with [_page].
+  int? _also;
   DateTime? _shownAt;
   final Set<int> _read = {};
 
-  /// [page] of [edition] is now on screen.
-  void show(int page, String edition) {
+  /// [page] of [edition] is now on screen; [also], the page facing it in
+  /// a spread. Two pages on screen both count once they have stayed twice
+  /// as long ([minDwell] for each).
+  void show(int page, String edition, {int? also}) {
     final now = _now();
     _commit(now);
     if (_edition != null && _edition != edition) end();
     _sessionStart ??= now;
     _edition = edition;
     _page = page;
+    _also = also;
     _shownAt = now;
   }
 
@@ -53,6 +59,7 @@ class ReadingTracker {
   void leavePage() {
     _commit(_now());
     _page = null;
+    _also = null;
   }
 
   /// The page view is left or hidden: the page on screen counts if it
@@ -80,8 +87,11 @@ class ReadingTracker {
     final page = _page;
     final shown = _shownAt;
     if (page == null || shown == null) return;
-    if (now.difference(shown) >= minDwell && _read.add(page)) {
-      onPageRead((page: page, edition: _edition!, at: now));
+    final pages = [page, ?_also];
+    if (now.difference(shown) >= minDwell * pages.length) {
+      for (final p in pages) {
+        if (_read.add(p)) onPageRead((page: p, edition: _edition!, at: now));
+      }
     }
     // Counted once per showing.
     _shownAt = null;

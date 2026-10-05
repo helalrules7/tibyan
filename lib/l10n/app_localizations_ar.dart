@@ -1800,4 +1800,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hafsTextNote => 'النص هنا برواية حفص';
+
+  @override
+  String get twoPageSpread => 'صفحتان متقابلتان';
+
+  @override
+  String get twoPageSpreadHint =>
+      'على الشاشات العريضة في الوضع الأفقي، كالمصحف المفتوح';
 }

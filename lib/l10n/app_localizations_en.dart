@@ -1809,4 +1809,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hafsTextNote => 'The text here is in the Hafs riwaya';
+
+  @override
+  String get twoPageSpread => 'Two facing pages';
+
+  @override
+  String get twoPageSpreadHint =>
+      'On wide screens held sideways, like an open mushaf';
 }

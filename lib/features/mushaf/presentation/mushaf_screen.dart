@@ -38,6 +38,7 @@ import '../data/verse_share.dart';
 import '../../reading/under_verse.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
+import 'page_spreads.dart';
 import 'widgets/art_frame.dart';
 import 'widgets/fasil_sheet.dart';
 import 'widgets/go_to_page.dart';
@@ -114,6 +115,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   /// Most pages one selection may cover.
   static const _maxSelectionPages = 6;
+
+  /// Two pages side by side, like an open mushaf (a wide screen held
+  /// sideways); [_controller]'s index is then a spread, not a page.
+  bool _spread = false;
 
   /// Each page is drawn inside its own boundary, so a picture of the
   /// selected verses can be cut from the page being read (one key per page:
@@ -220,7 +225,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     setState(() {
       _page = start;
       if (_selA != null) _pageA = _pageB = start;
-      _controller = PageController(initialPage: start - _first);
+      _controller = PageController(initialPage: _indexOf(start));
     });
     _trackPage();
     if (widget.listen) {
@@ -232,7 +237,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   void _trackPage() {
     if (_page >= 1) {
-      _tracker.show(_page, ref.read(editionProvider).name);
+      final shown = _pagesAt(_indexOf(_page));
+      _tracker.show(
+        _page,
+        ref.read(editionProvider).name,
+        also: shown.length > 1 ? shown.last : null,
+      );
     } else {
       _tracker.leavePage();
     }
@@ -250,9 +260,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     super.dispose();
   }
 
-  Future<void> _onPageChanged(int index) async {
+  /// The pager turned to [index] (a page, or a spread).
+  Future<void> _onPageChanged(int index) => _showPage(_pagesAt(index).first);
+
+  Future<void> _showPage(int page) async {
     setState(() {
-      _page = index + _first;
+      _page = page;
       // Turning the page while selecting keeps the selection, so it can be
       // extended onto the next page.
       if (!_multi && !_stacking) _selA = _selB = null;
@@ -293,6 +306,40 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// The riwaya data of the edition being read, once loaded; null in the
   /// Hafs editions.
   RiwayaData? get _riwaya => ref.read(riwayaDataProvider).value;
+
+  /// The first page that opens a spread: pages 1 and 2 (the opening
+  /// pages) face each other in the Madina editions, 2 and 3 in the
+  /// Shamarly; the pages before it (the covers) stand alone.
+  int get _spreadBase =>
+      ref.read(editionProvider) == MushafEdition.shamarly ? 2 : 1;
+
+  PageSpreads get _spreads => PageSpreads(
+    first: _first,
+    base: _spreadBase,
+    pageCount: ref.read(editionProvider).pageCount,
+    spread: _spread,
+  );
+
+  /// The pager's index of [page].
+  int _indexOf(int page) => _spreads.indexOf(page);
+
+  /// The pages shown at the pager's [index], right to left.
+  List<int> _pagesAt(int index) => _spreads.pagesAt(index);
+
+  /// Whether [page] is on screen now (in a spread, either page).
+  bool _onScreen(int page) => _pagesAt(_indexOf(_page)).contains(page);
+
+  /// Switches between single pages and spreads, keeping the page.
+  void _setSpread(bool on) {
+    if (on == _spread || !mounted) return;
+    final page = _page;
+    final old = _controller;
+    setState(() {
+      _spread = on;
+      _controller = PageController(initialPage: _indexOf(page));
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => old?.dispose());
+  }
 
   /// In the Zakhrafa style the mushaf opens with a cover as page 0.
   /// The Madina editions open with the app's cover as page 0. The
@@ -364,8 +411,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             ink: t.ink,
           );
 
-    Widget pageAt(int i) {
-      final pg = i + _first;
+    Widget pageOf(int pg) {
       if (pg == 0) return CoverPage(onTap: () => _setChrome(!_chrome));
       if (edition == MushafEdition.shamarly && pg == 1) {
         return CoverPage(onTap: () => _setChrome(!_chrome));
@@ -387,7 +433,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         // The reader's selection, or else the verse being recited.
         selection: _capturing
             ? const {}
-            : pg == _page && _selA != null
+            : _selA != null
             ? _selectionOn(pg)
             : recitation.active && recitation.ayah != null
             ? {(surah: recitation.surah, ayah: recitation.ayah!)}
@@ -590,6 +636,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       );
     }
 
+    Widget pageAt(int i) => pageOf(i + _first);
+
     final scrubbing = _scrubPage ?? _page;
     final range = _range();
     return _keyboard(
@@ -640,15 +688,47 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                           // The mushaf opens from the right in every interface language.
                           : Directionality(
                               textDirection: TextDirection.rtl,
-                              child: PageView.builder(
-                                controller: _controller,
-                                itemCount: pageCount + 1 - _first,
-                                // The pages either side are built and their images
-                                // decoded before they are turned to, so a page turn
-                                // does not stop on a spinner.
-                                allowImplicitScrolling: true,
-                                onPageChanged: _onPageChanged,
-                                itemBuilder: (context, i) => pageAt(i),
+                              child: LayoutBuilder(
+                                builder: (context, box) {
+                                  // A wide screen held sideways shows two
+                                  // pages; not in a hifz test, which is one
+                                  // page at a time.
+                                  final spread =
+                                      settings.twoPageSpread &&
+                                      !_testing &&
+                                      box.maxWidth > box.maxHeight &&
+                                      box.maxWidth >= 800;
+                                  if (spread != _spread) {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback(
+                                          (_) => _setSpread(spread),
+                                        );
+                                  }
+                                  return PageView.builder(
+                                    controller: _controller,
+                                    itemCount: _spreads.count,
+                                    // The pages either side are built and their images
+                                    // decoded before they are turned to, so a page turn
+                                    // does not stop on a spinner.
+                                    allowImplicitScrolling: true,
+                                    onPageChanged: _onPageChanged,
+                                    itemBuilder: (context, i) {
+                                      final pages = _pagesAt(i);
+                                      if (pages.length == 1) {
+                                        return pageOf(pages.single);
+                                      }
+                                      // Right page first: the mushaf opens
+                                      // from the right.
+                                      return Row(
+                                        textDirection: TextDirection.rtl,
+                                        children: [
+                                          for (final pg in pages)
+                                            Expanded(child: pageOf(pg)),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
                               ),
                             ),
                     ),
@@ -718,7 +798,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   onChanged: (p) => setState(() => _scrubPage = p),
                   onChangeEnd: (p) {
                     setState(() => _scrubPage = null);
-                    _controller?.jumpToPage(p - _first);
+                    _controller?.jumpToPage(_indexOf(p));
                   },
                   onRecite: _startRecite,
                   onListen: _listenFromPage,
@@ -1050,9 +1130,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (edition.isRiwaya) {
       // A riwaya's recitations are numbered by the riwaya, like its pages.
       final page = _riwaya?.pageOf(v.surah, v.ayah);
-      if (!mounted || page == null || page == _page) return;
+      if (!mounted || page == null || _onScreen(page)) return;
       _controller?.animateToPage(
-        page - _first,
+        _indexOf(page),
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
       );
@@ -1068,9 +1148,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         return; // already on a page of this verse
       }
     }
-    if (!mounted || page == _page) return;
+    if (!mounted || _onScreen(page)) return;
     _controller?.animateToPage(
-      page - _first,
+      _indexOf(page),
       // Elderly mode: a slower turn that is easy to follow.
       duration: Duration(milliseconds: context.tokens.elderly ? 700 : 350),
       curve: Curves.easeInOut,
@@ -1329,7 +1409,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     );
     c.jumpTo(next);
     final page = (next / _pageExtent + 0.5).floor() + _first;
-    if (page != _page) _onPageChanged(page - _first);
+    if (page != _page) _showPage(page);
   }
 
   void _stopAutoScroll() {
@@ -1338,7 +1418,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     setState(() {
       _autoScroll = false;
       _controller?.dispose();
-      _controller = PageController(initialPage: page - _first);
+      _controller = PageController(initialPage: _indexOf(page));
     });
   }
 
@@ -1428,10 +1508,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     _stacking = true;
     try {
       for (var p = from; p <= to; p++) {
-        if (p != _page) {
-          _controller?.jumpToPage(p - _first);
+        if (!_onScreen(p)) {
+          _controller?.jumpToPage(_indexOf(p));
           // The page builds, and its verses load.
-          for (var i = 0; i < 20 && (_page != p || !mounted); i++) {
+          for (var i = 0; i < 20 && (!_onScreen(p) || !mounted); i++) {
             await SchedulerBinding.instance.endOfFrame;
           }
           if (!mounted) return;
@@ -1453,7 +1533,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         if (piece != null) pieces.add(piece);
       }
       if (_page != startPage && mounted) {
-        _controller?.jumpToPage(startPage - _first);
+        _controller?.jumpToPage(_indexOf(startPage));
         await SchedulerBinding.instance.endOfFrame;
       }
     } finally {
@@ -1495,7 +1575,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       current: _page,
       max: ref.read(editionProvider).pageCount,
     );
-    if (page != null) _controller?.jumpToPage(page - _first);
+    if (page != null) _controller?.jumpToPage(_indexOf(page));
   }
 
   String _scrubLabel(BuildContext context, int page, List<SurahRow>? surahs) {

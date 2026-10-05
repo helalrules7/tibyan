@@ -1286,5 +1286,7 @@
   "splitTranslationHint": "الصفحة كما هي، وبجانبها ما اخترته لآياتها",
   "nextSurah": "السورة التالية",
   "previousSurah": "السورة السابقة",
-  "hafsTextNote": "النص هنا برواية حفص"
+  "hafsTextNote": "النص هنا برواية حفص",
+  "twoPageSpread": "صفحتان متقابلتان",
+  "twoPageSpreadHint": "على الشاشات العريضة في الوضع الأفقي، كالمصحف المفتوح"
 }

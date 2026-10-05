@@ -786,5 +786,7 @@
   "splitTranslationHint": "The page as printed, with your choice for its verses beside it",
   "nextSurah": "Next surah",
   "previousSurah": "Previous surah",
-  "hafsTextNote": "The text here is in the Hafs riwaya"
+  "hafsTextNote": "The text here is in the Hafs riwaya",
+  "twoPageSpread": "Two facing pages",
+  "twoPageSpreadHint": "On wide screens held sideways, like an open mushaf"
 }

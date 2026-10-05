@@ -86,6 +86,16 @@ void main() {
       expect(spans.single.end.difference(spans.single.start).inSeconds, 63);
     });
 
+    test('two facing pages both count after twice the time', () {
+      tracker.show(2, 'madina1441', also: 3);
+      wait(20); // long enough for one page, not two
+      tracker.show(4, 'madina1441', also: 5);
+      wait(31);
+      tracker.end();
+      expect(reads.map((r) => r.page), [4, 5]);
+      expect(spans.single.pages, 2);
+    });
+
     test('a page read twice in a session counts once', () {
       tracker.show(10, 'madina1441');
       wait(20);

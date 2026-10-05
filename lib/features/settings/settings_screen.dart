@@ -184,6 +184,15 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.highlightDivineNames,
                   onChanged: controller.setHighlightDivineNames,
                 ),
+                SwitchListTile(
+                  title: Text(l.twoPageSpread),
+                  subtitle: Text(
+                    l.twoPageSpreadHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  value: settings.twoPageSpread,
+                  onChanged: controller.setTwoPageSpread,
+                ),
               ],
             ),
           ),

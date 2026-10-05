@@ -43,6 +43,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kPlaybackSpeed = 'settings.playbackSpeed';
   static const _kUnderVerse = 'settings.underVerse';
   static const _kSplitTranslation = 'settings.splitTranslation';
+  static const _kTwoPageSpread = 'settings.twoPageSpread';
   static const _kElderly = 'settings.elderlyMode';
   static const _kTajweed = 'settings.tajweedColors';
   static const _kTajweedHues = 'settings.tajweedHues';
@@ -106,6 +107,7 @@ class SettingsController extends Notifier<AppSettings> {
           ?int.tryParse(id),
       ],
       splitTranslation: _prefs.getBool(_kSplitTranslation) ?? false,
+      twoPageSpread: _prefs.getBool(_kTwoPageSpread) ?? true,
       elderlyMode: _prefs.getBool(_kElderly) ?? false,
       tajweedColors: _prefs.getBool(_kTajweed) ?? false,
       tajweedHues: {
@@ -253,6 +255,11 @@ class SettingsController extends Notifier<AppSettings> {
     final ids = sourceIds.take(2).toList();
     state = state.copyWith(underVerse: ids);
     await _prefs.setStringList(_kUnderVerse, [for (final i in ids) '$i']);
+  }
+
+  Future<void> setTwoPageSpread(bool on) async {
+    state = state.copyWith(twoPageSpread: on);
+    await _prefs.setBool(_kTwoPageSpread, on);
   }
 
   Future<void> setSplitTranslation(bool on) async {
