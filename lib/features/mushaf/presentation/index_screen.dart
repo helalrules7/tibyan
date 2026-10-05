@@ -125,7 +125,12 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.all(32),
-                        child: Text(l.riwayaGaps, textAlign: TextAlign.center),
+                        child: Text(
+                          riwaya.hasWordBoxes
+                              ? l.riwayaGaps
+                              : '${l.riwayaGaps}\n\n${l.riwayaNoWordBoxes}',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     )
                   else

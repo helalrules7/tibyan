@@ -223,6 +223,18 @@ def add_qul_timing(db, today):
     verses = json.loads((CACHE / 'qul_ayah_timing.json').read_text(encoding='utf-8'))
     words = json.loads((CACHE / 'qul_word_timing.json').read_text(encoding='utf-8'))
     reciters = sorted({r[0] for r in verses})
+    # Verses QUL gives no usable words (MISSING_DATA ث10), measured in
+    # Tibyan inside QUL's verse windows (measure_timing.py verses, the
+    # timing-measure workflow's private/ output): only where QUL has none.
+    for reciter in reciters:
+        measured = CACHE / f'aligned_words_{reciter}.json'
+        if measured.exists():
+            have = {(r[1], r[2]) for r in words if r[0] == reciter}
+            extra = [tuple(r) for r in json.loads(measured.read_text(encoding='utf-8'))
+                     if r[0] == reciter and (r[1], r[2]) not in have]
+            words += extra
+            print(f'QUL reciter {reciter}: words of {len({(r[1], r[2]) for r in extra})} verses '
+                  f'measured in Tibyan ({measured.name})')
     marks = ','.join('?' * len(reciters))
     db.execute('DELETE FROM source WHERE id = ?', (QUL_SOURCE_ID,))
     db.execute(f'DELETE FROM ayah_timing WHERE reciter IN ({marks})', reciters)

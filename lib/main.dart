@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:app_links/app_links.dart';
+
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +23,8 @@ import 'core/flags/feature_flags.dart';
 import 'core/router/app_router.dart';
 import 'core/settings/settings_controller.dart';
 import 'core/theme/theme_registry.dart';
+import 'features/audio/car_browser.dart';
+import 'features/audio/car_channel.dart';
 import 'features/audio/recitation.dart';
 import 'features/audio/timing_updates.dart';
 import 'features/khatma/khatma_providers.dart';
@@ -26,6 +33,7 @@ import 'features/khatma/services/reminder_scheduler.dart';
 import 'features/mushaf/data/background_packs.dart';
 import 'features/mushaf/data/bundled_pack.dart';
 import 'features/mushaf/mushaf_providers.dart';
+import 'features/mushaf/presentation/navigation.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
@@ -43,12 +51,20 @@ Future<void> main() async {
       }
     });
   }
-  // Recitation keeps playing with the screen off, with lock-screen controls.
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'app.tibyan.recitation',
-    androidNotificationChannelName: 'التلاوة',
-    androidNotificationOngoing: true,
-  );
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.windows || TargetPlatform.linux:
+      // No system media session package for these: just_audio plays
+      // through libmpv (just_audio_media_kit).
+      JustAudioMediaKit.ensureInitialized(linux: true, windows: true);
+    default:
+      // Recitation keeps playing with the screen off, with lock-screen
+      // controls.
+      await JustAudioBackground.init(
+        androidNotificationChannelId: 'app.tibyan.recitation',
+        androidNotificationChannelName: 'التلاوة',
+        androidNotificationOngoing: true,
+      );
+  }
 
   final registry = await ThemeRegistry.load(rootBundle);
   final flags = await FeatureFlags.load(rootBundle);
@@ -67,7 +83,11 @@ Future<void> main() async {
       packRootProvider.overrideWithValue(packRoot),
       timingOverridesProvider.overrideWithValue(timing),
       reminderSchedulerProvider.overrideWithValue(LocalReminderScheduler()),
-      homeWidgetSyncProvider.overrideWithValue(PluginHomeWidgetSync()),
+      homeWidgetSyncProvider.overrideWithValue(
+        defaultTargetPlatform == TargetPlatform.macOS
+            ? MacHomeWidgetSync()
+            : PluginHomeWidgetSync(),
+      ),
     ],
   );
 
@@ -112,6 +132,7 @@ Future<void> main() async {
   // Which audio host is faster for this reader, measured in the background.
   unawaited(measureAudioHosts(container));
   unawaited(_refreshTimings(container, timing));
+  _startCarBrowsing(container);
   _startKhatma(container);
 }
 
@@ -137,13 +158,37 @@ Future<void> _refreshTimings(
 /// date, and opens the page a reminder or the widget points to.
 void _startKhatma(ProviderContainer container) {
   final service = container.read(khatmaServiceProvider);
-  Future<void> refresh() => service.refresh().catchError((_) {});
+  final widget = container.read(homeWidgetSyncProvider);
+  // Queued widget buttons first (the day's portion marked read), then the
+  // reminders and the widget's own entries are rewritten.
+  Future<void> refresh() async {
+    try {
+      for (final a in await widget.takePending()) {
+        if (a == WidgetAction.portionDone) await service.markTodayRead();
+      }
+      await service.refresh();
+    } catch (_) {}
+  }
+
   unawaited(refresh());
   AppLifecycleListener(onResume: refresh);
 
   Future<void> open(Uri? uri, {bool launch = false}) async {
-    if (uri == null || uri.host != 'khatma') return;
-    final route = await service.routeFor(uri);
+    if (uri == null) return;
+    final action = widgetActionOf(uri);
+    final verse = verseOfLink(uri);
+    if (uri.host != 'khatma' && action == null && verse == null) return;
+    final route =
+        action?.route ??
+        (verse != null
+            ? mushafLocation(
+                await container.read(
+                  versePageProvider((verse.surah, verse.ayah)).future,
+                ),
+                surah: verse.surah,
+                ayah: verse.ayah,
+              )
+            : await service.routeFor(uri));
     // Opened the app: after the splash screen has handed over to home.
     if (launch) await Future<void>.delayed(const Duration(milliseconds: 2200));
     container.read(appRouterProvider).go(route);
@@ -157,9 +202,61 @@ void _startKhatma(ProviderContainer container) {
         .then((p) => open(p == null ? null : Uri.tryParse(p), launch: true))
         .catchError((_) {}),
   );
-  final widget = container.read(homeWidgetSyncProvider);
   unawaited(
     widget.launchUri().then((u) => open(u, launch: true)).catchError((_) {}),
   );
   widget.taps.listen(open, onError: (_) {});
+
+  // Other `tibyan://` links (a verse link from a message or another app).
+  // The widgets' own links carry `homeWidget` and arrive above; on macOS
+  // every link comes through the app's channel (MacHomeWidgetSync).
+  if (defaultTargetPlatform != TargetPlatform.macOS) {
+    bool mine(Uri? u) =>
+        u != null && !u.queryParameters.containsKey('homeWidget');
+    final links = AppLinks();
+    unawaited(
+      links
+          .getInitialLink()
+          .then((u) => mine(u) ? open(u, launch: true) : null)
+          .catchError((_) {}),
+    );
+    links.uriLinkStream.listen((u) {
+      if (mine(u)) open(u);
+    }, onError: (_) {});
+  }
+}
+
+/// Android Auto and CarPlay: the reciters and surahs to choose from in the
+/// car, and «continue» from the reading position
+/// (lib/features/audio/car_browser.dart). Android Auto asks through the
+/// audio service; CarPlay through `app.tibyan/car` (car_channel.dart).
+void _startCarBrowsing(ProviderContainer container) {
+  final android = defaultTargetPlatform == TargetPlatform.android;
+  if (!android && defaultTargetPlatform != TargetPlatform.iOS) return;
+  final text = lookupAppLocalizations(
+    container.read(settingsProvider).locale ?? const Locale('ar'),
+  );
+  final browser = CarBrowser(
+    reciters: () => container.read(recitersProvider.future),
+    surahs: () => container.read(surahsProvider.future),
+    position: () async {
+      final p = await container.read(userDatabaseProvider).position();
+      return p == null ? null : (surah: p.surah, ayah: p.ayah);
+    },
+    start: ({int? reciter, required int surah, int? ayah}) async {
+      final c = container.read(recitationProvider.notifier);
+      if (reciter != null) await c.changeReciter(reciter);
+      await c.play(surah, from: ayah);
+    },
+    text: CarText(
+      continueReading: text.carContinue,
+      reciters: text.carReciters,
+      surah: (n, name) => '$n. ${text.surahWord(name)}',
+    ),
+  );
+  if (android) {
+    JustAudioBackground.browser = browser;
+  } else {
+    unawaited(CarChannel(browser).attach());
+  }
 }

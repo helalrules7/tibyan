@@ -33,3 +33,22 @@ Future<void> openVerse(
 Future<void> openPage(BuildContext context, WidgetRef ref, int page) async {
   context.go(mushafLocation(page));
 }
+
+/// A link to a verse (Hafs numbers) that opens the app on it:
+/// `tibyan://verse?s=2&a=255`.
+Uri verseLink(int surah, int ayah) => Uri(
+  scheme: 'tibyan',
+  host: 'verse',
+  queryParameters: {'s': '$surah', 'a': '$ayah'},
+);
+
+/// The verse a `tibyan://verse` link names, if it is one and is valid.
+({int surah, int ayah})? verseOfLink(Uri? uri) {
+  if (uri == null || uri.scheme != 'tibyan' || uri.host != 'verse') return null;
+  final s = int.tryParse(uri.queryParameters['s'] ?? '');
+  final a = int.tryParse(uri.queryParameters['a'] ?? '');
+  if (s == null || a == null || s < 1 || s > 114 || a < 1 || a > 286) {
+    return null;
+  }
+  return (surah: s, ayah: a);
+}

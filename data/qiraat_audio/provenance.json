@@ -1,0 +1,22 @@
+{
+  "format": 1,
+  "about": "Where each AQQD clip comes from, which decides its licence. The dataset paper releases AQQD under CC0 1.0, which can cover only the authors' own recordings. A clip's group comes from its reciter code (in 'reciters', e.g. \"R023\": \"authors_own\", filled only from the authors' own statement); a reciter not listed is 'unknown'. The app plays only the groups in its playableProvenance constant (lib/features/qiraat_audio/qiraat_audio_index.dart).",
+  "groups": {
+    "authors_own": {
+      "licence": "CC0-1.0",
+      "clear": true,
+      "about": "Recorded for the dataset by one reciter on a Taibah University mushaf (1,072 clips per the paper). CC0 per the paper."
+    },
+    "public_cut": {
+      "licence": null,
+      "clear": false,
+      "about": "Cut by the authors from recordings published elsewhere (reciters' sites, Midad, mp3quran, YouTube; 23,111 clips per the paper). The paper's CC0 does not clearly cover them: excluded until the source of each and its terms are known."
+    },
+    "unknown": {
+      "licence": null,
+      "clear": false,
+      "about": "Not yet assigned to a group: the file name does not say where a clip comes from. Excluded."
+    }
+  },
+  "reciters": {}
+}

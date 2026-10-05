@@ -181,9 +181,11 @@ def crossings(pts, y):
 # ------------------------------------------------------------------- text
 
 
-RIGHT_JOINING = set('آأؤإاةدذرزوٱ')
+# Yeh barree (ے), written for a final yeh in the Warsh and Qalun texts,
+# joins only the letter before it. Hafs has none.
+RIGHT_JOINING = set('آأؤإاةدذرزوٱے')
 NON_JOINING = {'ء'}
-LETTERS = {chr(c) for c in range(0x0621, 0x064B)} | {'ٱ', 'ـ'}
+LETTERS = {chr(c) for c in range(0x0621, 0x064B)} | {'ٱ', 'ـ', 'ے'}
 
 
 def predicted_pieces(word):
@@ -306,21 +308,36 @@ def align(segments, counts, expected=None):
     return groups
 
 
-def layouts(pages=range(1, 605)):
+def page_verse_segments(svg_zip, pages):
+    """{verse: [(page, line, pieces, contours)]} in page and line order."""
+    by_verse = {}
+    with zipfile.ZipFile(svg_zip) as z:
+        for page in pages:
+            for verse, li, pieces, cs in page_segments(z.read(f'svg/{page:03d}.svg').decode()):
+                by_verse.setdefault(verse, []).append((page, li, pieces, cs))
+    for segs in by_verse.values():
+        segs.sort(key=lambda s: (s[0], s[1]))
+    return by_verse
+
+
+def layouts(pages=range(1, 605), svg_zip=None, text=None, font_widths=None, by_verse=None):
     """Yields, per verse, how its contours split into its words:
     (verse, tokens, segs, groups, exact, owner). segs are the verse's line
     segments [(page, line, pieces, contours)]; groups[word index] is
     (segment, first piece, last piece); owner maps id(bbox) of every
-    contour to its word index (tokens include ۞)."""
-    text = load_text()
-    font_widths = json.loads(FONT_WIDTHS.read_text(encoding='utf-8'))
-    by_verse = {}
-    with zipfile.ZipFile(SVG_ZIP) as z:
-        for page in pages:
-            for verse, li, pieces, cs in page_segments(z.read(f'svg/{page:03d}.svg').decode()):
-                by_verse.setdefault(verse, []).append((page, li, pieces, cs))
+    contour to its word index (tokens include ۞).
+
+    Defaults are the new Hafs edition's: its SVG pages, the KFGQPC Hafs
+    text and word_font_widths.json. build_riwaya_word_boxes.py passes a
+    riwaya's pages ([by_verse], from page_verse_segments), text
+    ({verse: tokens}) and font widths ({token: width})."""
+    if text is None:
+        text = load_text()
+    if font_widths is None:
+        font_widths = json.loads(FONT_WIDTHS.read_text(encoding='utf-8'))
+    if by_verse is None:
+        by_verse = page_verse_segments(svg_zip or SVG_ZIP, pages)
     for verse, segs in by_verse.items():
-        segs.sort(key=lambda s: (s[0], s[1]))
         tokens = text[verse]
         segments = [pieces for _, _, pieces, _ in segs]
         counts = [predicted_pieces(w) for w in tokens]
@@ -352,11 +369,12 @@ def layouts(pages=range(1, 605)):
         yield verse, tokens, segs, groups, exact, owner
 
 
-def build(pages=range(1, 605)):
+def build(pages=range(1, 605), **kwargs):
     """Returns {(surah, ayah): (exact, [(word_no, page, x0, y0, x1, y1)])}.
-    Word numbers count words only (۞ is skipped), from 1."""
+    Word numbers count words only (۞ is skipped), from 1. [kwargs] go to
+    layouts()."""
     result = {}
-    for verse, tokens, segs, _, exact, owner in layouts(pages):
+    for verse, tokens, segs, _, exact, owner in layouts(pages, **kwargs):
         boxes = [None] * len(tokens)
         for page, _, _, cs in segs:
             for bbox, _ in cs:

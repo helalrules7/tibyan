@@ -57,6 +57,10 @@ class MushafRepository {
             ..orderBy([(t) => OrderingTerm.asc(t.number)]))
           .get();
 
+  /// A verse by its row id (1 … 6236, in mushaf order).
+  Future<AyahRow> ayahById(int id) =>
+      (_db.select(_db.ayah)..where((t) => t.id.equals(id))).getSingle();
+
   Future<AyahRow> ayah(int surah, int number) => (_db.select(
     _db.ayah,
   )..where((t) => t.surah.equals(surah) & t.number.equals(number))).getSingle();
@@ -241,6 +245,19 @@ class MushafRepository {
       _db.commentary,
     )..where((t) => t.surah.equals(surah) & t.ayah.equals(ayah))).get();
     return {for (final r in rows) r.sourceId: r};
+  }
+
+  /// The entries of [sourceIds] for every verse of [surah], keyed by
+  /// (source id, verse).
+  Future<Map<(int, int), CommentaryRow>> commentaryOfSurah(
+    int surah,
+    List<int> sourceIds,
+  ) async {
+    if (sourceIds.isEmpty) return const {};
+    final rows = await (_db.select(
+      _db.commentary,
+    )..where((t) => t.surah.equals(surah) & t.sourceId.isIn(sourceIds))).get();
+    return {for (final r in rows) (r.sourceId, r.ayah): r};
   }
 
   /// Every entry of the given texts, for searching by meaning.

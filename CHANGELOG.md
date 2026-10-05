@@ -6,6 +6,104 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (content ready, all hidden until reviewed and permitted)
+- Book sections from reviewed packs, all through one section widget: the tafsir books (al-Tabari, al-Qurtubi, Ibn Kathir, al-Baghawi, al-Saadi) as extra choices on the tafsir screen, «المناسبات» (al-Biqa'i), and al-Damghani's wujuh in word study. Text verbatim with its citation; the storage screen names each pack's kind.
+- «استمع للتفسير» (tafsir audio), the English translation heard after each verse during recitation, and the English tafsir (al-Mukhtasar) for the English interface, each behind a flag that is off, streamed from a small link index or an optional hash-checked pack, with its source line.
+
+### Added (asbab al-nuzul, off)
+- An «أسباب النزول» section in the verse services and the tafsir screen: the book's text as it is, with the verses it quotes coloured, and the source cited in the publisher's own wording. It shows only from an installed reviewed pack; none is published yet, and the feature is off.
+- Reviewed book packs are downloaded, hash-checked and deleted from the storage screen. `tools/import_dar_alathar.py` imports Dar al-Athar's file as review drafts.
+
+### Added (qiraat audio, off)
+- A verse-level index of the AQQD qiraat clips in `data/qiraat_audio/` (`tools/qiraat_audio.py` builds it from the OSF listing and checks contributions in CI), a guide for contributors who mark where the differing word falls in a clip (`docs/QIRAAT_AUDIO.md`, with a second reviewer), and an app data layer that streams the verse clip, or only the reviewed word range, from sources with a clear licence only. Behind the `qiraat_audio` flag, off.
+
+### Added (riwaya word boxes)
+- Riwaya editions (Warsh, Qalun, al-Duri, Shu'bah): word boxes derived from each riwaya's KFGQPC page geometry, text and font (`tools/build_riwaya_word_boxes.py`), carried in the v2 page packs. With a v2 pack, the divine names are coloured on riwaya pages, recitation and test modes cover verses word by word, and word study opens for a word that is exactly a Hafs word (same verse, word count and letters); other words say why there is none. The packs on the mirror are still v1.
+
+### Fixed
+- The riwaya sources lost from `tools/sources.json` in the riwayat merge are restored.
+
+### Added (tajweed review)
+- The tajweed rules the app colours with can now be reviewed by a qualified reader: `tools/import_tajweed_review.py` puts Juz' 'Amma and a fixed sample of 300 other verses (864 verses, 5,715 rules) in a review file, and the review tool shows each verse coloured by its rules with the list under it.
+
+### Added (recitation timing)
+- `timing_files.py fix-known`: two rules that fix 30 of the 76 known source timing errors without listening (not yet applied: they go in with a rebuilt content.db).
+- A `timing-measure` workflow, run by hand, measures missing verse and word timings by forced alignment on the files the app plays, riwaya recitations by their own count, and produces files for review; it never publishes.
+
+### Added (review drafts, not shown in the app)
+- The five tafsirs (al-Tabari, al-Qurtubi, Ibn Kathir, al-Baghawi, al-Saadi) and al-Biqa'i's Nazm al-Durar imported as review drafts from OpenITI's altafsir.com copies: one entry per verse group, each linked to its verses (`tools/import_altafsir.py`). The files are rebuilt locally and stay out of the repository until review starts.
+- al-Damghani's «إصلاح الوجوه والنظائر» imported as 2,744 drafts (481 words, 2,236 senses), rebuilt with `tools/import_damghani_wujuh.py`.
+- The review tool shows the entry kinds of al-wujuh wa-l-nazair (باب، كلمة، وجه) and lists the kinds present in each file.
+
+### Added (CarPlay, waiting for Apple)
+- CarPlay (iOS) is ready: choose a reciter and surah, or continue from where you stopped reading, with Now Playing. It switches on once Apple grants the CarPlay Audio entitlement (`tools/apple/carplay.rb enable`; the request steps are in docs/CARPLAY.md). Android Auto and CarPlay share one browsing tree (`CarBrowser`); CarPlay reaches it over the `app.tibyan/car` channel.
+
+### Added (staging content that waits for permission)
+- Tools that download pending sources into a git-ignored staging folder with their hashes, without shipping anything: `english_mokhtasar` and the `english_rwwad` audio index (QuranEnc), the Nuqayah tafsir audio index, the Quranpedia dumps and topics check, and the AQQD coverage measure. Reports in `docs/verification/2026-10-05_*`.
+- `docs/outreach/APPROVALS.md`: how each reply is recorded, and what it switches on or what replaces it if refused.
+
+### Added (widgets: iOS, macOS and an actions widget)
+- The khatma widget as a WidgetKit extension on iOS 17 and macOS 14 (desktop widgets), generated into the Xcode projects by `tools/apple/add_widget_targets.rb` from `apple/`. The macOS app is new (`macos/`): it carries a channel that writes the widgets' keys into the App Group and receives `tibyan://` links, since `home_widget` has no macOS support.
+- An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
+- `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
+
+### Fixed
+- The juz, hizb and surah in the frame's top cartouche overflowed it with a long surah name or large system text; they now shrink to fit.
+
+### Added (flow tests)
+- Tests that go through the whole app from the router: open the mushaf, select a verse with a screen reader's double tap and copy it (with its link and credit), and turn pages with the arrow keys while the reading position follows (test/flows/).
+
+### Added (recitation in the car)
+- Android Auto: the car shows «تابع من موضع القراءة» (the recitation from the last reading position) and the reciters, each with the 114 surahs to play. This needs a hook that just_audio_background does not offer, so the package is vendored in `packages/just_audio_background` with that addition only (TIBYAN.md there).
+
+### Added (verse links)
+- `tibyan://verse?s=2&a=255` opens the app on that verse's page with the verse selected (in a riwaya edition, the riwaya verse holding it), on Android, iOS and macOS. Copied and shared verse text carries the link to its first verse. Flutter's own deep linking is switched off, so every link goes through the same handler as the widgets'. Windows and Linux do not register the scheme yet.
+
+### Added (what's new)
+- After an update, the home screen opens a short «ما الجديد» once, listing what came in it; a first install never shows it. It can be opened again from the settings.
+
+### Added (search scope)
+- Search by words can be kept to one surah or one juz: a chip under the search box opens the choice, and its × goes back to the whole mushaf.
+
+### Added (verse by verse, for older eyes)
+- «آية آية»: a button under the page (the first, labelled one in elderly mode) turns the phone sideways and shows one verse a screen, as large as it fits (long verses at a readable minimum, scrolling). Large buttons go to the previous or next verse, or swipe; «استماع» recites from that verse and the screen follows the recitation; the screen stays on. Closing it (or Back) returns to the mushaf at the last verse shown, and the phone turns back. The text is the Hafs text in every edition.
+
+- «آية آية» can turn to the next verse by itself: a large button steps through off, 10, 20, 30 and 60 seconds a verse (kept for next time). A turn by hand starts the wait again, and while the recitation plays it leads instead.
+
+### Added (two facing pages)
+- On a wide screen held sideways (a tablet, a desktop window), the mushaf shows two facing pages like an open copy: the right page first, pages 1 and 2 together (2 and 3 in the Shamarly edition), the covers alone. Selection, sharing, following the recitation, going to a page and the page scrubber work across the spread; both pages count for the khatma once they have been on screen for twice a page's time. Off in a hifz test, and switchable in settings («صفحتان متقابلتان», on by default).
+
+### Changed (releases)
+- A release now also carries the Windows app (zip), the Linux bundle (tar.gz; the recitation needs libmpv on the system) and a macOS disk image, all unsigned; the native build workflow packages them the same way on every native change.
+
+### Changed (backup)
+- The backup file now carries your settings too (style, edition, reciter, speed, what shows under the verse…), and restoring it puts them back. Restored khatmas, notes and hifz progress are queued for sync like the app's own changes, so they reach your account once accounts are switched on.
+
+### Added (translation under the verse)
+- A continuous view («عرض متتالي», from the page's tools): a surah verse after verse in the KFGQPC text, opening at the page's first verse, with the reader's choice under each verse: the Arabic only, one or two translations (Saheeh International, Pickthall), or al-Tafsir al-Muyassar; smaller, quieter and justified. The choice is kept and changed from the top bar. A tap on a verse opens its tafsir and translations. The text is the Hafs text in every edition, and the view says so in a riwaya edition.
+- The pages stay as printed: selecting a verse shows the chosen texts for it in the verse services. On screens 900 points wide or more, the page can show the chosen texts for its verses beside it (off by default).
+
+### Fixed
+- Settings showed version 0.1.1 whatever the build; it now shows the app's own version and build number.
+
+### Added (storage and recitation speed)
+- Settings › «التخزين والتنزيلات»: every mushaf pack, each reciter's downloaded surahs, the search-by-meaning pack and the timing updates with their sizes, delete any of them (they download again when needed), and clean up the leftovers of downloads that stopped. The edition that ships with the app is shown but not deletable. Your own data is never listed or touched.
+- Recitation speed (×0.75 to ×2) in the player's options, kept for the next time. Verse highlighting follows the audio, so it stays right at any speed.
+
+### Added (backup and restore)
+- Settings › «النسخ الاحتياطي»: save one JSON file with your bookmarks and marks, reading position, khatmas, reading and listening reports, tadabbur notes and hifz progress (through the system share sheet), and restore it on this or another device. Restoring merges: nothing is deleted and the newer copy of a row wins; restoring the same file twice adds nothing. No account is needed. Settings (theme, edition, reciter) are not part of it.
+
+### Added (release pipeline)
+- `tools/release/prepare.py` cuts a release (pubspec version and build, changelog section, compare links); the release workflow checks the tag against both, builds a signed Android APK and AAB when the keystore secrets exist, uploads the bundle to Google Play's internal track when the service account exists, and attaches unsigned iOS and macOS builds. docs/RELEASE.md lists what needs the owner's accounts.
+
+### Added (selection over page breaks)
+- «تحديد عدة آيات»: turn the page while selecting and tap a verse to extend the selection to it (up to six pages); the services then work on the whole stretch: copy and share as text, marks and the fasil at its first verse. A picture of such a stretch turns the pages itself and joins the pieces in one image.
+
+### Added (copy and share verses)
+- «نسخ» (copy), «مشاركة نصًا» (share as text) and «مشاركة صورة» (share as image) in the verse services, for one verse or a selected stretch. The text is Tanzil's Uthmani text exactly as published (CC BY 3.0, no changes), with each verse's number in ornate brackets, a reference line per surah and Tanzil's credit; the basmala that Tanzil puts at the start of verse 1 is left out. The riwaya editions share the picture only: their text is encoded for the Complex's fonts and does not read right outside the app.
+- The picture is cut from the page as drawn (its edition, theme, ink and paper), with no frame and no caption. It is found by capturing the page with and without the selection, so it works in every edition without each page's drawing code reporting its boxes.
+- Known: Tanzil writes «مَا لِىَ» (separate) in an-Naml 20 and Ya-Sin 22 where the reviewers decided «مَالِيَ» (docs/review/DECISIONS.md 4 and 6); Tanzil's licence forbids changing its text, so the copied text keeps Tanzil's spelling.
+
 ### Added (recitation timings anyone can correct)
 - The timings of al-Sudais, al-Minshawi, al-Husary, Abdul Basit, al-Banna and Mustafa Ismail (verses and words), and of ten riwaya recitations (verses), are now text files in `data/timing/`, published under CC BY 4.0 with their sources' credit; content.db is built from them, with the same rows as before. Which reciters' timings may be published, and why, is in docs/TIMING.md.
 - A timing editor on the web (https://helalrules7.github.io/tibyan/, Arabic, works on a phone): listen with the waveform, the word being recited highlighted in the mushaf text, drag a word's start or end, tap to mark words while listening, nudge by 10 or 50 ms, loop a word or verse, slow down to half speed, undo, and see problems as you go. «اقترح التعديل» opens GitHub's editor with the new file, so the correction arrives as a pull request.

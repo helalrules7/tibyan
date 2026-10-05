@@ -34,7 +34,7 @@ CREATE TABLE source (
   id INTEGER PRIMARY KEY, key TEXT NOT NULL UNIQUE, kind TEXT NOT NULL,
   title TEXT NOT NULL, author TEXT NOT NULL, edition TEXT, publisher TEXT,
   tahqiq TEXT, licence TEXT NOT NULL, digitised_by TEXT, url TEXT NOT NULL,
-  sha256 TEXT NOT NULL
+  sha256 TEXT NOT NULL, citation TEXT
 );
 CREATE TABLE entry (
   id INTEGER PRIMARY KEY, source_id INTEGER NOT NULL REFERENCES source(id),
@@ -112,10 +112,14 @@ def _export(db, review_path, out, allow_empty):
     pack.executescript(PACK_SCHEMA)
     used_sources = sorted({r[1] for r in rows})
     for sid in used_sources:
-        pack.execute(
-            'INSERT INTO source VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            db.execute('SELECT id, key, kind, title, author, edition, publisher, tahqiq, licence, '
-                       'digitised_by, url, sha256 FROM source WHERE id = ?', (sid,)).fetchone())
+        row = db.execute('SELECT id, key, kind, title, author, edition, publisher, tahqiq, licence, '
+                         'digitised_by, url, sha256 FROM source WHERE id = ?', (sid,)).fetchone()
+        # The citation wording a publisher asked for, kept as given
+        # (tools/import_dar_alathar.py stores it in meta).
+        citation = db.execute('SELECT value FROM meta WHERE key = ?',
+                              (f'source_citation:{row[1]}',)).fetchone()
+        pack.execute('INSERT INTO source VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                     (*row, citation[0] if citation else None))
     ids = [r[0] for r in rows]
     hashes = []
     links = 0

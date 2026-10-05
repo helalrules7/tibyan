@@ -49,6 +49,10 @@ class FakeAudio implements RecitationAudio {
     _emit();
   }
 
+  double speed = 1.0;
+  @override
+  Future<void> setSpeed(double s) async => speed = s;
+
   @override
   Stream<Duration> get positions => _positions.stream;
   @override
@@ -637,6 +641,16 @@ void main() {
       final r = again.read(recitationProvider);
       expect(r.repeat, 5);
       expect(r.silence, const Duration(seconds: 10));
+    });
+
+    test('the speed is applied to the player and kept', () async {
+      final (c, audio) = await recitation(prefs: const {});
+      expect(c.read(settingsProvider).playbackSpeed, 1.0);
+      c.read(recitationProvider.notifier).setSpeed(1.5);
+      await Future<void>.delayed(Duration.zero);
+      expect(audio.speed, 1.5);
+      final sp = await SharedPreferences.getInstance();
+      expect(sp.getDouble('settings.playbackSpeed'), 1.5);
     });
 
     testWidgets('a verse listened to alone keeps the repeat set', (

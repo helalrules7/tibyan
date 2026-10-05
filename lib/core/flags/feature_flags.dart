@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 enum Feature {
   tajweed,
   qiraat,
+  qiraatAudio('qiraat_audio'),
   tawjih,
   munasabat,
   wujuhNazair('wujuh_nazair'),
@@ -15,6 +16,8 @@ enum Feature {
   topics,
   library,
   tafsirAudio('tafsir_audio'),
+  translationAudio('translation_audio'),
+  englishTafsir('english_tafsir'),
   oldMadinaEdition('old_madina_edition'),
   meaningSearch('meaning_search'),
   accountsSync('accounts_sync'),

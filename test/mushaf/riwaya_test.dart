@@ -22,6 +22,11 @@ import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 String _sample() =>
     File('test/fixtures/riwaya_warsh_sample.json').readAsStringSync();
 
+/// The same verses' word boxes from the Warsh pack's `words.json`, as
+/// built by tools/build_riwaya_word_boxes.py (geometry only).
+String _words() =>
+    File('test/fixtures/riwaya_warsh_words_sample.json').readAsStringSync();
+
 ReciterRow _reciter(int id, String riwaya) => ReciterRow(
   id: id,
   nameAr: 'قارئ $id',
@@ -82,6 +87,80 @@ void main() {
       expect(data.lines(3).cuts.length, 14);
       expect(data.pitch, closeTo(35.2, 0.5));
       expect(data.fontFile, endsWith('.ttf'));
+    });
+  });
+
+  group('word boxes of a riwaya pack', () {
+    final old = RiwayaData.parse(_sample());
+    final data = RiwayaData.parse(_sample(), _words());
+
+    test('a pack without words.json (v1) has none', () {
+      expect(old.hasWordBoxes, isFalse);
+      expect(old.wordBoxes(1), isEmpty);
+    });
+
+    test('one box per word of each verse, in page units', () {
+      expect(data.hasWordBoxes, isTrue);
+      final page1 = data.wordBoxes(1);
+      for (var a = 1; a <= 7; a++) {
+        final n = data.words(1, a).length;
+        expect(n, greaterThan(0));
+        for (var w = 1; w <= n; w++) {
+          final box = page1[(1, a, w)];
+          expect(box, isNotNull, reason: '1:$a word $w');
+          expect(box!.left, greaterThanOrEqualTo(-6));
+          expect(box.right, lessThanOrEqualTo(345));
+          expect(box.width, greaterThan(0));
+        }
+        expect(page1[(1, a, n + 1)], isNull);
+      }
+      // Words run right to left on a line.
+      expect(page1[(1, 1, 1)]!.left, greaterThan(page1[(1, 1, 2)]!.left));
+    });
+
+    test('a verse whose box count differs from its words is left out', () {
+      final d = jsonDecode(_words()) as Map<String, dynamic>;
+      final verses = d['verses'] as List<dynamic>;
+      final first = verses.first as List<dynamic>;
+      first[3] = (first[3] as int) + 1;
+      final boxes = RiwayaData.parseWordBoxes(jsonEncode(d), old);
+      expect(boxes[1]!.keys.where((k) => k.$1 == 1 && k.$2 == 1), isEmpty);
+      expect(boxes[1]!.keys.where((k) => k.$1 == 1 && k.$2 == 2), isNotEmpty);
+      // A format this version does not know: no boxes.
+      d['format'] = 2;
+      expect(RiwayaData.parseWordBoxes(jsonEncode(d), old), isEmpty);
+    });
+
+    test('words: split at spaces, without the number and ۞', () {
+      // Made-up letters, not verse text.
+      expect(RiwayaData.riwayaWords('سس  اس ﰀ'), ['سس', 'اس']);
+      expect(RiwayaData.riwayaWords('سس اسﰀ'), ['سس', 'اس']);
+      expect(RiwayaData.riwayaWords('سس اس ٢٨٦'), ['سس', 'اس']);
+      expect(RiwayaData.riwayaWords('۞ سس اس ﰀ'), ['سس', 'اس']);
+    });
+
+    test('a riwaya word is studied as a Hafs word only when certain', () {
+      // Hafs 1:2 in the KFGQPC Hafs text, verbatim.
+      const hafs = ['ٱلۡحَمۡدُ', 'لِلَّهِ', 'رَبِّ', 'ٱلۡعَٰلَمِينَ'];
+      // Warsh 1:1 is Hafs 1:2: same words, letters equal (ٱ is an alif).
+      expect(data.hafsWord(1, 1, 1, hafs), (1, 2, 1));
+      expect(data.hafsWord(1, 1, 4, hafs), (1, 2, 4));
+      // Another word count, or another Hafs verse's words: no match.
+      expect(data.hafsWord(1, 1, 1, hafs.sublist(1)), isNull);
+      expect(data.hafsWord(1, 1, 2, [...hafs.reversed]), isNull);
+      // Warsh 1:6 and 1:7 share Hafs 1:7: never matched word by word.
+      expect(data.hafsWord(1, 6, 1, hafs), isNull);
+      // Warsh 2:1 covers Hafs 2:1 and 2:2.
+      expect(data.hafsWord(2, 1, 1, hafs), isNull);
+    });
+
+    test('letters compared: marks dropped, hamza seats kept', () {
+      expect(
+        RiwayaData.wordLetters('يُومِنُونَ'),
+        isNot(RiwayaData.wordLetters('يُؤۡمِنُونَ')),
+      );
+      expect(RiwayaData.wordLetters('اِ۬لْحَمْدُ'), 'الحمد');
+      expect(RiwayaData.wordLetters('ٱلۡحَمۡدُ'), 'الحمد');
     });
   });
 
@@ -201,6 +280,25 @@ void main() {
         final frame = await container.read(frameInfoProvider(3).future);
         expect(frame?.juz, 1);
         expect(frame?.hizb, isNull);
+
+        // A v1 pack has no word boxes: no words, no divine names.
+        expect(await container.read(pageWordBoxesProvider(1).future), isEmpty);
+        expect(await container.read(divineNameBoxesProvider(1).future), []);
+
+        // A pack with words.json.xz (v2): words and divine names, in the
+        // riwaya's count.
+        final dir = container.read(pageInstallerProvider).dir;
+        File(p.join(dir.path, 'words.json.xz'))
+            .writeAsBytesSync(XZEncoder().encode(utf8.encode(_words())));
+        container.invalidate(riwayaDataProvider);
+        final withWords = await container.read(riwayaDataProvider.future);
+        expect(withWords?.hasWordBoxes, isTrue);
+        final boxes = await container.read(pageWordBoxesProvider(1).future);
+        expect(boxes[(1, 1, 1)], hasLength(1));
+        expect(boxes[(1, 7, 1)], isNotNull);
+        // Warsh 1:1: «لِلهِ» and «رَبِّ».
+        final names = await container.read(divineNameBoxesProvider(1).future);
+        expect(names, [boxes[(1, 1, 2)]!.single, boxes[(1, 1, 3)]!.single]);
       },
     );
   });

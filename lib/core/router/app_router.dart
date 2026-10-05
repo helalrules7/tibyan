@@ -24,7 +24,10 @@ import '../../features/settings/appearance_screen.dart';
 import '../../features/settings/player_settings_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
+import '../../features/reading/continuous_screen.dart';
+import '../../features/reading/one_verse_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../../features/settings/storage_screen.dart';
 import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
 
@@ -82,6 +85,10 @@ final appRouterProvider = Provider<GoRouter>(
                 builder: (context, state) => const AppearanceScreen(),
               ),
               GoRoute(
+                path: 'storage',
+                builder: (context, state) => const StorageScreen(),
+              ),
+              GoRoute(
                 path: 'player',
                 builder: (context, state) => const PlayerSettingsScreen(),
               ),
@@ -118,6 +125,21 @@ final appRouterProvider = Provider<GoRouter>(
         ],
       ),
       GoRoute(
+        path: '/verse',
+        builder: (context, state) => OneVerseScreen(
+          surah: _int(state, 's') ?? 1,
+          ayah: _int(state, 'a') ?? 1,
+        ),
+      ),
+      GoRoute(
+        path: '/read',
+        builder: (context, state) => ContinuousScreen(
+          key: ValueKey(state.uri.toString()),
+          surah: _int(state, 's') ?? 1,
+          ayah: _int(state, 'a') ?? 1,
+        ),
+      ),
+      GoRoute(
         path: '/mushaf',
         builder: (context, state) => MushafScreen(
           key: ValueKey(state.uri.toString()),
@@ -127,6 +149,7 @@ final appRouterProvider = Provider<GoRouter>(
           hifzUnit: state.uri.queryParameters['hifz'],
           hifzFrom: state.uri.queryParameters['from'],
           hifzTo: state.uri.queryParameters['to'],
+          listen: state.uri.queryParameters['listen'] == '1',
         ),
         routes: [
           GoRoute(

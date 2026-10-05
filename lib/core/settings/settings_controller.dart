@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/theme_registry.dart';
+import '../../features/home/whats_new.dart' show whatsNewId, whatsNewSeenKey;
 import 'app_settings.dart';
 
 /// Overridden in `main()` once assets and preferences are loaded.
@@ -33,6 +34,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kTafsirFont = 'settings.tafsirFont';
   static const _kTafsirScale = 'settings.tafsirFontScale';
   static const _kHiddenCommentaries = 'settings.hiddenCommentaries';
+  static const _kHiddenBookTafsirs = 'settings.hiddenBookTafsirs';
   static const _kKashida = 'settings.tafsirKashida';
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
@@ -40,6 +42,11 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kVersePause = 'settings.versePause';
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
+  static const _kPlaybackSpeed = 'settings.playbackSpeed';
+  static const _kUnderVerse = 'settings.underVerse';
+  static const _kSplitTranslation = 'settings.splitTranslation';
+  static const _kTwoPageSpread = 'settings.twoPageSpread';
+  static const _kOneVerseAuto = 'settings.oneVerseAutoSeconds';
   static const _kElderly = 'settings.elderlyMode';
   static const _kTajweed = 'settings.tajweedColors';
   static const _kTajweedHues = 'settings.tajweedHues';
@@ -85,6 +92,7 @@ class SettingsController extends Notifier<AppSettings> {
         for (final id in _prefs.getStringList(_kHiddenCommentaries) ?? [])
           ?int.tryParse(id),
       },
+      hiddenBookTafsirs: {...?_prefs.getStringList(_kHiddenBookTafsirs)},
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       riwayaReciters: {
@@ -97,6 +105,14 @@ class SettingsController extends Notifier<AppSettings> {
       versePause: _prefs.getInt(_kVersePause) ?? 500,
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
+      playbackSpeed: _prefs.getDouble(_kPlaybackSpeed) ?? 1.0,
+      underVerse: [
+        for (final id in _prefs.getStringList(_kUnderVerse) ?? const <String>[])
+          ?int.tryParse(id),
+      ],
+      splitTranslation: _prefs.getBool(_kSplitTranslation) ?? false,
+      twoPageSpread: _prefs.getBool(_kTwoPageSpread) ?? true,
+      oneVerseAutoSeconds: _prefs.getInt(_kOneVerseAuto) ?? 0,
       elderlyMode: _prefs.getBool(_kElderly) ?? false,
       tajweedColors: _prefs.getBool(_kTajweed) ?? false,
       tajweedHues: {
@@ -149,6 +165,8 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> completeOnboarding() async {
     state = state.copyWith(onboardingDone: true);
     await _prefs.setBool(_kOnboarding, true);
+    // A new reader meets everything at once: no «what's new» for them.
+    await _prefs.setString(whatsNewSeenKey, whatsNewId);
   }
 
   Future<void> setEdition(MushafEdition edition) async {
@@ -200,6 +218,14 @@ class SettingsController extends Notifier<AppSettings> {
     ]);
   }
 
+  /// Shows or hides a book tafsir (by its source key).
+  Future<void> setBookTafsirShown(String key, bool shown) async {
+    final hidden = {...state.hiddenBookTafsirs};
+    shown ? hidden.remove(key) : hidden.add(key);
+    state = state.copyWith(hiddenBookTafsirs: hidden);
+    await _prefs.setStringList(_kHiddenBookTafsirs, [...hidden]);
+  }
+
   Future<void> setTafsirKashida(bool value) async {
     state = state.copyWith(tafsirKashida: value);
     await _prefs.setBool(_kKashida, value);
@@ -236,6 +262,34 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setRepeat(int times) async {
     state = state.copyWith(repeat: times);
     await _prefs.setInt(_kRepeat, times);
+  }
+
+  /// What shows under each verse: up to two source ids (see
+  /// [AppSettings.underVerse]).
+  Future<void> setUnderVerse(List<int> sourceIds) async {
+    final ids = sourceIds.take(2).toList();
+    state = state.copyWith(underVerse: ids);
+    await _prefs.setStringList(_kUnderVerse, [for (final i in ids) '$i']);
+  }
+
+  Future<void> setOneVerseAutoSeconds(int seconds) async {
+    state = state.copyWith(oneVerseAutoSeconds: seconds);
+    await _prefs.setInt(_kOneVerseAuto, seconds);
+  }
+
+  Future<void> setTwoPageSpread(bool on) async {
+    state = state.copyWith(twoPageSpread: on);
+    await _prefs.setBool(_kTwoPageSpread, on);
+  }
+
+  Future<void> setSplitTranslation(bool on) async {
+    state = state.copyWith(splitTranslation: on);
+    await _prefs.setBool(_kSplitTranslation, on);
+  }
+
+  Future<void> setPlaybackSpeed(double speed) async {
+    state = state.copyWith(playbackSpeed: speed);
+    await _prefs.setDouble(_kPlaybackSpeed, speed);
   }
 
   Future<void> setRepeatSilence(int seconds) async {

@@ -41,9 +41,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sectionSearch => 'البحث';
 
   @override
-  String get comingSoon => 'قريبا';
-
-  @override
   String get settingsTitle => 'الإعدادات';
 
   @override
@@ -555,7 +552,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get multiSelect => 'تحديد عدة آيات';
 
   @override
-  String get multiSelectHint => 'اسحب المقبضين لتحديد الآيات';
+  String get multiSelectHint =>
+      'اسحب المقبضين، أو اقلب الصفحة واضغط آية لتمديد التحديد إليها';
 
   @override
   String get doneLabel => 'تم';
@@ -716,6 +714,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get audioCredit => 'التلاوات وتوقيت الآيات: mp3quran.net';
+
+  @override
+  String get tafsirAudioListen => 'استمع للتفسير';
+
+  @override
+  String get tafsirAudioListenSurah => 'استمع لتفسير السورة';
+
+  @override
+  String get translationAudioAfterVerse => 'الترجمة المسموعة بعد كل آية';
+
+  @override
+  String get translationAudioHint =>
+      'تُسمع ترجمة كل آية بعد تلاوتها، حين تتوالى الآيات بلا تكرار';
+
+  @override
+  String clipTranslationOf(String ayah) {
+    return 'ترجمة الآية $ayah';
+  }
+
+  @override
+  String englishTafsirOffer(String title) {
+    return 'تنزيل التفسير الإنجليزي: $title';
+  }
 
   @override
   String get touchReading => 'القراءة اللمسية';
@@ -1589,7 +1610,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get riwayaGaps =>
-      'في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة ولا تلوين للفظ الجلالة، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).';
+      'في مصاحف الروايات: لا تظليل للكلمة أثناء التلاوة (تلاواتها موقّتة بالآيات وحدها)، ولا يظهر الحزب وأرباعه في الإطار (الصفحة نفسها تحمل علاماتها المطبوعة).';
+
+  @override
+  String get riwayaNoWordBoxes =>
+      'صفحات هذه الرواية المنزّلة لا تحمل مربعات الكلمات، فلا تلوين فيها للفظ الجلالة ولا اختيار للكلمة. تحملها حزمة الصفحات الأحدث.';
+
+  @override
+  String get riwayaWordNoStudy =>
+      'لا دراسة لهذه الكلمة هنا: دراسة الكلمة مبنية على كلمات رواية حفص، وتُفتح لكلمة الرواية حين تكون هي كلمة حفص نفسها في الآية نفسها، بحروفها.';
 
   @override
   String riwayaTafsirNote(
@@ -1650,4 +1679,306 @@ class AppLocalizationsAr extends AppLocalizations {
   String reciterOfRiwaya(String riwaya) {
     return 'رواية $riwaya';
   }
+
+  @override
+  String get copyVerses => 'نسخ';
+
+  @override
+  String get shareVerseText => 'مشاركة نصًا';
+
+  @override
+  String get shareVerseImage => 'مشاركة صورة';
+
+  @override
+  String get sharePreparing => 'جارٍ تجهيز الصورة…';
+
+  @override
+  String get shareImageFailed => 'تعذر تجهيز الصورة';
+
+  @override
+  String get shareVerseCredit =>
+      'نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان';
+
+  @override
+  String get backupTitle => 'النسخ الاحتياطي';
+
+  @override
+  String get backupExport => 'حفظ نسخة احتياطية';
+
+  @override
+  String get backupExportHint =>
+      'ملف واحد فيه فواصلك وعلاماتك وموضع القراءة والختمة والتقارير وملاحظات التدبر وتقدم الحفظ، وإعداداتك. احتفظ به أو أرسله لنفسك.';
+
+  @override
+  String get backupImport => 'استعادة من نسخة';
+
+  @override
+  String get backupImportHint =>
+      'يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض، ويعيد الإعدادات كما كانت في النسخة.';
+
+  @override
+  String backupDone(String added, String updated) {
+    return 'تمت الاستعادة: $added جديد، $updated محدَّث';
+  }
+
+  @override
+  String get backupInvalid => 'هذا الملف ليس نسخة احتياطية من تبيان';
+
+  @override
+  String get backupFailed => 'تعذرت العملية';
+
+  @override
+  String get playbackSpeedLabel => 'سرعة التلاوة';
+
+  @override
+  String playbackSpeedValue(String value) {
+    return '×$value';
+  }
+
+  @override
+  String get storageTitle => 'التخزين والتنزيلات';
+
+  @override
+  String get storageOpen => 'التخزين والتنزيلات';
+
+  @override
+  String get storageOpenHint =>
+      'ما نُزِّل على الجهاز وأحجامه، وحذف ما لا تحتاجه';
+
+  @override
+  String get storageIntro =>
+      'كل ما نزّله التطبيق على جهازك. يمكنك حذف أي منها وتنزيله لاحقا. بياناتك (الفواصل، الختمة، الملاحظات) لا تظهر هنا ولا تُمس.';
+
+  @override
+  String storageTotal(String size) {
+    return 'المجموع: $size';
+  }
+
+  @override
+  String get storageBundled => 'مضمّن مع التطبيق';
+
+  @override
+  String storageSize(String mb) {
+    return '$mb ميجا';
+  }
+
+  @override
+  String storageAudioOf(String name) {
+    return 'تلاوات $name';
+  }
+
+  @override
+  String get storageSemantic => 'حزمة البحث بالمعنى';
+
+  @override
+  String get storageTiming => 'تحديثات توقيت التلاوة';
+
+  @override
+  String get storagePartial => 'تنزيلات غير مكتملة';
+
+  @override
+  String get storagePartialHint => 'بقايا تنزيلات توقفت؛ حذفها آمن';
+
+  @override
+  String get storageClean => 'تنظيف';
+
+  @override
+  String storageDeleteAsk(String name, String size) {
+    return 'حذف $name ($size)؟';
+  }
+
+  @override
+  String storageFreed(String size) {
+    return 'تم تحرير $size';
+  }
+
+  @override
+  String get storageEmpty => 'لا شيء منزَّل غير ما يأتي مع التطبيق';
+
+  @override
+  String get storageUnknown => 'ملفات أخرى';
+
+  @override
+  String get asbabTitle => 'أسباب النزول';
+
+  @override
+  String asbabCount(String count) {
+    return 'أسباب النزول ($count)';
+  }
+
+  @override
+  String bookCitationTahqiq(String name) {
+    return 'تحقيق $name';
+  }
+
+  @override
+  String bookCitationVolume(String volume) {
+    return 'ج $volume';
+  }
+
+  @override
+  String bookCitationPage(String page) {
+    return 'ص $page';
+  }
+
+  @override
+  String bookCitationPages(String from, String to) {
+    return 'ص $from–$to';
+  }
+
+  @override
+  String storageBook(String title) {
+    return 'كتاب «$title»';
+  }
+
+  @override
+  String get storageBooksAvailable => 'كتب يمكن تنزيلها';
+
+  @override
+  String get bookPackDownload => 'تنزيل';
+
+  @override
+  String get munasabatTitle => 'المناسبات';
+
+  @override
+  String munasabatCount(String count) {
+    return 'المناسبات ($count)';
+  }
+
+  @override
+  String get wujuhTitle => 'الوجوه والنظائر';
+
+  @override
+  String get bookKindTafsir => 'تفسير';
+
+  @override
+  String bookEntryVerses(String from, String to) {
+    return 'الآيات $from–$to';
+  }
+
+  @override
+  String get continuousView => 'عرض متتالي';
+
+  @override
+  String get underVerseTitle => 'ما يظهر تحت الآية';
+
+  @override
+  String get underArabicOnly => 'عربي فقط';
+
+  @override
+  String get underTranslation => 'عربي مع ترجمة';
+
+  @override
+  String get underTranslationHint => 'اختر ترجمة أو اثنتين';
+
+  @override
+  String get underMuyassar => 'عربي مع التفسير الميسر';
+
+  @override
+  String get splitTranslationLabel => 'بجانب الصفحة على الشاشات العريضة';
+
+  @override
+  String get splitTranslationHint =>
+      'الصفحة كما هي، وبجانبها ما اخترته لآياتها';
+
+  @override
+  String get nextSurah => 'السورة التالية';
+
+  @override
+  String get previousSurah => 'السورة السابقة';
+
+  @override
+  String get hafsTextNote => 'النص هنا برواية حفص';
+
+  @override
+  String get twoPageSpread => 'صفحتان متقابلتان';
+
+  @override
+  String get twoPageSpreadHint =>
+      'على الشاشات العريضة في الوضع الأفقي، كالمصحف المفتوح';
+
+  @override
+  String get oneVerse => 'آية آية';
+
+  @override
+  String get oneVerseHint => 'آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض';
+
+  @override
+  String get oneVerseAutoOff => 'الانتقال التلقائي متوقف. اضغط لتشغيله';
+
+  @override
+  String oneVerseAutoOn(String seconds) {
+    return 'ينتقل للآية التالية كل $seconds ثانية. اضغط للتغيير';
+  }
+
+  @override
+  String get oneVerseAutoShort => 'تلقائي';
+
+  @override
+  String secondsShort(String n) {
+    return '$n ث';
+  }
+
+  @override
+  String get searchScopeAll => 'كل المصحف';
+
+  @override
+  String get searchScopeJuz => 'في جزء';
+
+  @override
+  String get searchScopeSurah => 'في سورة';
+
+  @override
+  String get whatsNewTitle => 'ما الجديد';
+
+  @override
+  String get whatsNewDone => 'حسنا';
+
+  @override
+  String get newOneVerse => 'آية آية';
+
+  @override
+  String get newOneVerseBody =>
+      'زر تحت الصفحة يقلب الموبايل بالعرض ويعرض آية واحدة بخط كبير، مع انتقال تلقائي اختياري.';
+
+  @override
+  String get newUnderVerse => 'الترجمة تحت الآية';
+
+  @override
+  String get newUnderVerseBody =>
+      'العرض المتتالي من أدوات الصفحة: ترجمة أو اثنتان أو التفسير الميسر تحت كل آية.';
+
+  @override
+  String get newShare => 'النسخ والمشاركة';
+
+  @override
+  String get newShareBody =>
+      'انسخ الآية أو شاركها نصا أو صورة من صفحة المصحف، ولو امتدت على صفحتين.';
+
+  @override
+  String get newSpread => 'صفحتان متقابلتان';
+
+  @override
+  String get newSpreadBody =>
+      'على التابلت والشاشات العريضة بالعرض يظهر المصحف مفتوحا.';
+
+  @override
+  String get newWidgets => 'أدوات الشاشة';
+
+  @override
+  String get newWidgetsBody =>
+      'ورد الختمة واختصارات القراءة والاستماع على الشاشة الرئيسية، وزر استماع في الإعدادات السريعة.';
+
+  @override
+  String get newBackup => 'النسخة الاحتياطية';
+
+  @override
+  String get newBackupBody =>
+      'احفظ فواصلك وختمتك وملاحظاتك وإعداداتك في ملف واحد، واستعدها على أي جهاز.';
+
+  @override
+  String get carContinue => 'تابع من موضع القراءة';
+
+  @override
+  String get carReciters => 'القراء';
 }

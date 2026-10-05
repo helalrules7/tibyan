@@ -329,27 +329,32 @@ class IlluminatedFrame extends ConsumerWidget {
                           fontSize: 15,
                           color: t.ink,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            FrameTap(
-                              label: l.juzLabel(digits(info!.juz)),
-                              onTap: onJuzTap,
-                            ),
-                            FrameStar(color: t.marker),
-                            if (info!.hizb case final hizb?) ...[
+                        // A long surah name or large system text shrinks
+                        // to the cartouche instead of overflowing it.
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
                               FrameTap(
-                                label: l.hizbLabel(digits(hizb)),
-                                onTap: onHizbTap,
+                                label: l.juzLabel(digits(info!.juz)),
+                                onTap: onJuzTap,
                               ),
                               FrameStar(color: t.marker),
+                              if (info!.hizb case final hizb?) ...[
+                                FrameTap(
+                                  label: l.hizbLabel(digits(hizb)),
+                                  onTap: onHizbTap,
+                                ),
+                                FrameStar(color: t.marker),
+                              ],
+                              FrameTap(
+                                label: info!.surahName,
+                                bold: true,
+                                onTap: onSurahTap,
+                              ),
                             ],
-                            FrameTap(
-                              label: info!.surahName,
-                              bold: true,
-                              onTap: onSurahTap,
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -428,6 +433,14 @@ class NumberFormatter {
   NumberFormatter(Locale locale) : _arabic = locale.languageCode == 'ar';
 
   final bool _arabic;
+
+  /// A decimal number's text ("2.5") with Arabic-Indic digits in Arabic.
+  String decimal(String text) => _arabic
+      ? text.replaceAll('.', '٫').split('').map((c) {
+          final d = int.tryParse(c);
+          return d == null ? c : String.fromCharCode(0x0660 + d);
+        }).join()
+      : text;
 
   String call(int n) => _arabic
       ? n

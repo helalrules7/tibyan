@@ -41,9 +41,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionSearch => 'Search';
 
   @override
-  String get comingSoon => 'Coming soon';
-
-  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -556,7 +553,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get multiSelect => 'Select several verses';
 
   @override
-  String get multiSelectHint => 'Drag the handles to select verses';
+  String get multiSelectHint =>
+      'Drag the handles, or turn the page and tap a verse to extend the selection to it';
 
   @override
   String get doneLabel => 'Done';
@@ -719,6 +717,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get audioCredit => 'Recitations and verse timings: mp3quran.net';
+
+  @override
+  String get tafsirAudioListen => 'Listen to the tafsir';
+
+  @override
+  String get tafsirAudioListenSurah => 'Listen to the surah\'s tafsir';
+
+  @override
+  String get translationAudioAfterVerse => 'Translation audio after each verse';
+
+  @override
+  String get translationAudioHint =>
+      'Each verse\'s translation is heard after it is recited, when verses play on without repeating';
+
+  @override
+  String clipTranslationOf(String ayah) {
+    return 'Translation of verse $ayah';
+  }
+
+  @override
+  String englishTafsirOffer(String title) {
+    return 'Download the English tafsir: $title';
+  }
 
   @override
   String get touchReading => 'Touch reading';
@@ -1596,7 +1617,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get riwayaGaps =>
-      'In the riwaya editions: no word highlighting while listening, no colouring of the divine names, and no hizb or quarter in the frame (the page carries its own printed signs).';
+      'In the riwaya editions: no word highlighting while listening (their recitations are timed by verse only), and no hizb or quarter in the frame (the page carries its own printed signs).';
+
+  @override
+  String get riwayaNoWordBoxes =>
+      'This riwaya\'s downloaded pages carry no word boxes, so the divine names are not coloured and words cannot be picked. The newer page pack carries them.';
+
+  @override
+  String get riwayaWordNoStudy =>
+      'No word study for this word here: word study is built on the words of Hafs, and opens for a riwaya\'s word only when it is the same word, letter for letter, in the same verse of Hafs.';
 
   @override
   String riwayaTafsirNote(
@@ -1657,4 +1686,309 @@ class AppLocalizationsEn extends AppLocalizations {
   String reciterOfRiwaya(String riwaya) {
     return 'Riwaya of $riwaya';
   }
+
+  @override
+  String get copyVerses => 'Copy';
+
+  @override
+  String get shareVerseText => 'Share as text';
+
+  @override
+  String get shareVerseImage => 'Share as image';
+
+  @override
+  String get sharePreparing => 'Preparing the image…';
+
+  @override
+  String get shareImageFailed => 'Could not prepare the image';
+
+  @override
+  String get shareVerseCredit =>
+      'Quran text: Tanzil Project (tanzil.net) · Tibyan app';
+
+  @override
+  String get backupTitle => 'Backup';
+
+  @override
+  String get backupExport => 'Save a backup';
+
+  @override
+  String get backupExportHint =>
+      'One file with your bookmarks, marks, reading position, khatma, reports, tadabbur notes and hifz progress, and your settings. Keep it, or send it to yourself.';
+
+  @override
+  String get backupImport => 'Restore from a backup';
+
+  @override
+  String get backupImportHint =>
+      'Merges the backup with what is on this device: nothing is deleted, the newer copy wins where they differ, and the settings come back as they were in the backup.';
+
+  @override
+  String backupDone(String added, String updated) {
+    return 'Restored: $added new, $updated updated';
+  }
+
+  @override
+  String get backupInvalid => 'This file is not a Tibyan backup';
+
+  @override
+  String get backupFailed => 'That did not work';
+
+  @override
+  String get playbackSpeedLabel => 'Recitation speed';
+
+  @override
+  String playbackSpeedValue(String value) {
+    return '×$value';
+  }
+
+  @override
+  String get storageTitle => 'Storage and downloads';
+
+  @override
+  String get storageOpen => 'Storage and downloads';
+
+  @override
+  String get storageOpenHint =>
+      'What is downloaded on this device and how big it is; delete what you do not need';
+
+  @override
+  String get storageIntro =>
+      'Everything the app downloaded to this device. You can delete any of it and download it again later. Your own data (bookmarks, khatma, notes) is not listed here and is never touched.';
+
+  @override
+  String storageTotal(String size) {
+    return 'Total: $size';
+  }
+
+  @override
+  String get storageBundled => 'Comes with the app';
+
+  @override
+  String storageSize(String mb) {
+    return '$mb MB';
+  }
+
+  @override
+  String storageAudioOf(String name) {
+    return '$name\'s recitations';
+  }
+
+  @override
+  String get storageSemantic => 'Search-by-meaning pack';
+
+  @override
+  String get storageTiming => 'Recitation timing updates';
+
+  @override
+  String get storagePartial => 'Unfinished downloads';
+
+  @override
+  String get storagePartialHint =>
+      'What is left of downloads that stopped; safe to delete';
+
+  @override
+  String get storageClean => 'Clean up';
+
+  @override
+  String storageDeleteAsk(String name, String size) {
+    return 'Delete $name ($size)?';
+  }
+
+  @override
+  String storageFreed(String size) {
+    return 'Freed $size';
+  }
+
+  @override
+  String get storageEmpty =>
+      'Nothing is downloaded beyond what comes with the app';
+
+  @override
+  String get storageUnknown => 'Other files';
+
+  @override
+  String get asbabTitle => 'Occasions of revelation';
+
+  @override
+  String asbabCount(String count) {
+    return 'Occasions of revelation ($count)';
+  }
+
+  @override
+  String bookCitationTahqiq(String name) {
+    return 'ed. $name';
+  }
+
+  @override
+  String bookCitationVolume(String volume) {
+    return 'vol. $volume';
+  }
+
+  @override
+  String bookCitationPage(String page) {
+    return 'p. $page';
+  }
+
+  @override
+  String bookCitationPages(String from, String to) {
+    return 'pp. $from–$to';
+  }
+
+  @override
+  String storageBook(String title) {
+    return 'Book: $title';
+  }
+
+  @override
+  String get storageBooksAvailable => 'Books you can download';
+
+  @override
+  String get bookPackDownload => 'Download';
+
+  @override
+  String get munasabatTitle => 'Connections between verses';
+
+  @override
+  String munasabatCount(String count) {
+    return 'Connections between verses ($count)';
+  }
+
+  @override
+  String get wujuhTitle => 'Senses of the word in the Quran';
+
+  @override
+  String get bookKindTafsir => 'Tafsir';
+
+  @override
+  String bookEntryVerses(String from, String to) {
+    return 'Verses $from–$to';
+  }
+
+  @override
+  String get continuousView => 'Continuous view';
+
+  @override
+  String get underVerseTitle => 'Under each verse';
+
+  @override
+  String get underArabicOnly => 'Arabic only';
+
+  @override
+  String get underTranslation => 'Arabic with a translation';
+
+  @override
+  String get underTranslationHint => 'Choose one or two';
+
+  @override
+  String get underMuyassar => 'Arabic with al-Tafsir al-Muyassar';
+
+  @override
+  String get splitTranslationLabel => 'Beside the page on wide screens';
+
+  @override
+  String get splitTranslationHint =>
+      'The page as printed, with your choice for its verses beside it';
+
+  @override
+  String get nextSurah => 'Next surah';
+
+  @override
+  String get previousSurah => 'Previous surah';
+
+  @override
+  String get hafsTextNote => 'The text here is in the Hafs riwaya';
+
+  @override
+  String get twoPageSpread => 'Two facing pages';
+
+  @override
+  String get twoPageSpreadHint =>
+      'On wide screens held sideways, like an open mushaf';
+
+  @override
+  String get oneVerse => 'Verse by verse';
+
+  @override
+  String get oneVerseHint =>
+      'One verse a screen in large print, the phone sideways';
+
+  @override
+  String get oneVerseAutoOff => 'Auto-turn is off. Tap to turn it on';
+
+  @override
+  String oneVerseAutoOn(String seconds) {
+    return 'Turns to the next verse every $seconds seconds. Tap to change';
+  }
+
+  @override
+  String get oneVerseAutoShort => 'Auto';
+
+  @override
+  String secondsShort(String n) {
+    return '$n s';
+  }
+
+  @override
+  String get searchScopeAll => 'The whole mushaf';
+
+  @override
+  String get searchScopeJuz => 'In a juz';
+
+  @override
+  String get searchScopeSurah => 'In a surah';
+
+  @override
+  String get whatsNewTitle => 'What\'s new';
+
+  @override
+  String get whatsNewDone => 'OK';
+
+  @override
+  String get newOneVerse => 'Verse by verse';
+
+  @override
+  String get newOneVerseBody =>
+      'A button under the page turns the phone sideways and shows one verse in large print, with an optional auto-turn.';
+
+  @override
+  String get newUnderVerse => 'Translation under the verse';
+
+  @override
+  String get newUnderVerseBody =>
+      'The continuous view, from the page\'s tools: one or two translations, or al-Muyassar, under each verse.';
+
+  @override
+  String get newShare => 'Copy and share';
+
+  @override
+  String get newShareBody =>
+      'Copy a verse, or share it as text or as a picture of the mushaf page, even over a page break.';
+
+  @override
+  String get newSpread => 'Two facing pages';
+
+  @override
+  String get newSpreadBody =>
+      'On a tablet or a wide screen held sideways, the mushaf opens like a printed copy.';
+
+  @override
+  String get newWidgets => 'Widgets';
+
+  @override
+  String get newWidgetsBody =>
+      'Today\'s khatma portion and reading shortcuts on the home screen, and a Listen tile in Quick Settings.';
+
+  @override
+  String get newBackup => 'Backup';
+
+  @override
+  String get newBackupBody =>
+      'Save your bookmarks, khatma, notes and settings in one file, and restore them on any device.';
+
+  @override
+  String get carContinue => 'Continue where you stopped reading';
+
+  @override
+  String get carReciters => 'Reciters';
 }

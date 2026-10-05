@@ -3,4 +3,12 @@
     <string name="khatma_widget_label">الختمة</string>
     <string name="khatma_widget_description">ورد اليوم من الختمة</string>
     <string name="khatma_widget_open">افتح تبيان</string>
+    <string name="actions_widget_label">تبيان</string>
+    <string name="actions_widget_description">متابعة القراءة، الاستماع، البحث، وتسجيل ورد اليوم</string>
+    <string name="actions_continue">تابع</string>
+    <string name="actions_listen">استماع</string>
+    <string name="actions_search">بحث</string>
+    <string name="actions_read">قرأت الورد</string>
+    <string name="actions_done">تم</string>
+    <string name="tile_listen_label">استماع</string>
 </resources>

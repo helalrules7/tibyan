@@ -6,6 +6,7 @@ import 'package:tibyan/core/db/content_database.dart';
 import 'package:tibyan/features/search/search_engine.dart';
 
 void main() {
+  scopeTests();
   test('diacritics and common spelling differences are ignored', () {
     expect(normalize('ٱلرَّحۡمَٰنِ'), normalize('الرحمن'));
     expect(normalize('إِلَىٰ'), 'الي');
@@ -74,5 +75,19 @@ void main() {
     }
     // Too short to search.
     expect(search(verses, 'ا'), isEmpty);
+  });
+}
+
+void scopeTests() {
+  final verses = [
+    SearchVerse(2, 255, 'الله لا اله الا هو', juz: 3),
+    SearchVerse(3, 2, 'الله لا اله الا هو', juz: 3),
+    SearchVerse(20, 8, 'الله لا اله الا هو', juz: 16),
+  ];
+  test('a scope keeps the search to a surah or a juz', () {
+    expect(searchIn(verses, 'اله', const WholeMushaf()), hasLength(3));
+    expect(searchIn(verses, 'اله', const InSurah(3)).map((h) => h.surah), [3]);
+    expect(searchIn(verses, 'اله', const InJuz(3)).map((h) => h.surah), [2, 3]);
+    expect(searchIn(verses, 'اله', const InJuz(30)), isEmpty);
   });
 }

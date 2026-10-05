@@ -9,8 +9,8 @@ import 'illuminated_frame.dart';
 import 'mushaf_page.dart';
 
 /// Services for the selected verses: listening, tafsir and translation,
-/// the four one-tap marks and saving to a named fasil. Services whose
-/// data is not enabled yet (copy and share) are not shown.
+/// the four one-tap marks, copying and sharing (as text and as a picture of
+/// the page) and saving to a named fasil.
 class VerseServicesPanel extends StatelessWidget {
   const VerseServicesPanel({
     super.key,
@@ -25,9 +25,33 @@ class VerseServicesPanel extends StatelessWidget {
     required this.onWordStudy,
     required this.onWordMeanings,
     this.onReflect,
+    this.onCopy,
+    this.onShareText,
+    this.onShareImage,
+    this.preview,
     this.similarCount = 0,
     this.onSimilar,
+    this.asbabCount = 0,
+    this.onAsbab,
+    this.onTafsirAudio,
+    this.munasabatCount = 0,
+    this.onMunasabat,
   });
+
+  /// «استمع للتفسير»: shown only when a tafsir recording has the selected
+  /// verse (the feature is on and its index lists the verse).
+  final VoidCallback? onTafsirAudio;
+
+  /// Reviewed occasions of revelation of the selected verse («أسباب
+  /// النزول»); the button shows only when there are some (the feature is
+  /// on and a reviewed pack has entries for the verse).
+  final int asbabCount;
+  final VoidCallback? onAsbab;
+
+  /// Reviewed munasabat of the selected verse («المناسبات»), shown like
+  /// [asbabCount].
+  final int munasabatCount;
+  final VoidCallback? onMunasabat;
 
   /// Passages similar to the selected verse (mutashabihat); the button
   /// shows only when there are some.
@@ -53,6 +77,16 @@ class VerseServicesPanel extends StatelessWidget {
 
   /// Writes a note on the first selected verse (tadabbur journal).
   final VoidCallback? onReflect;
+
+  /// Copy and share the selected verses. A null callback hides its button
+  /// (the riwaya editions have no text that reads right outside the app).
+  final VoidCallback? onCopy;
+  final VoidCallback? onShareText;
+  final VoidCallback? onShareImage;
+
+  /// The reader's chosen texts for the first selected verse (a translation
+  /// or al-Muyassar), shown under the title; null for the Arabic only.
+  final Widget? preview;
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +173,12 @@ class VerseServicesPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (preview != null)
+                Container(
+                  constraints: const BoxConstraints(maxHeight: 140),
+                  margin: const EdgeInsets.only(top: 4),
+                  child: SingleChildScrollView(child: preview),
+                ),
               const SizedBox(height: 10),
               Row(
                 children: [
@@ -191,6 +231,39 @@ class VerseServicesPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (onTafsirAudio != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onTafsirAudio,
+                  icon: const Icon(Icons.headphones_outlined),
+                  label: Text(l.tafsirAudioListen),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
+              if (asbabCount > 0 && onAsbab != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onAsbab,
+                  icon: const Icon(Icons.history_edu_outlined),
+                  label: Text(l.asbabCount(digits(asbabCount))),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
+              if (munasabatCount > 0 && onMunasabat != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onMunasabat,
+                  icon: const Icon(Icons.link),
+                  label: Text(l.munasabatCount(digits(munasabatCount))),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
               if (similarCount > 0 && onSimilar != null) ...[
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
@@ -246,6 +319,39 @@ class VerseServicesPanel extends StatelessWidget {
                   ],
                 ],
               ),
+              if (onCopy != null ||
+                  onShareText != null ||
+                  onShareImage != null) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (onCopy != null)
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.copy_outlined,
+                          label: l.copyVerses,
+                          onTap: onCopy!,
+                        ),
+                      ),
+                    if (onShareText != null)
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.ios_share,
+                          label: l.shareVerseText,
+                          onTap: onShareText!,
+                        ),
+                      ),
+                    if (onShareImage != null)
+                      Expanded(
+                        child: _ShareButton(
+                          icon: Icons.image_outlined,
+                          label: l.shareVerseImage,
+                          onTap: onShareImage!,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 8),
               FilledButton.tonalIcon(
                 onPressed: onSaveToFasil,
@@ -261,6 +367,43 @@ class VerseServicesPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ShareButton extends StatelessWidget {
+  const _ShareButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 3),
+    child: OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size.fromHeight(56),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 20),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _MarkButton extends StatelessWidget {

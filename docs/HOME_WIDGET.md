@@ -25,21 +25,36 @@
 - مسجل في `AndroidManifest.xml`.
 - الضغط: `HomeWidgetLaunchIntent` إلى `MainActivity` مع الرابط، ويقرؤه `main.dart` (`_startKhatma`).
 
-## iOS (الكود جاهز، والهدف يحتاج Xcode)
+## iOS وmacOS (WidgetKit)
 
-ملف الأداة: `ios/TibyanWidget/TibyanWidget.swift` (WidgetKit، ‏`systemSmall` و`systemMedium`). لم يُضف إلى مشروع Xcode لأن إضافة هدف (target) لا يمكن التحقق منها دون Xcode. الخطوات:
+مصدر الأدوات في `apple/` ومشترك بين المنصتين:
 
-1. افتح `ios/Runner.xcworkspace` في Xcode.
-2. File ‹ New ‹ Target ‹ Widget Extension. الاسم: `TibyanWidget`. ألغِ «Include Configuration App Intent» و«Live Activity».
-3. احذف ملف Swift الذي أنشأه Xcode، وأضف `ios/TibyanWidget/TibyanWidget.swift` إلى الهدف الجديد فقط.
-4. اضبط Deployment Target للهدف على iOS 17 (لأجل `containerBackground`)، أو احذف ذلك السطر لدعم iOS 14.
-5. App Groups: في Signing & Capabilities أضف App Groups للهدفين **Runner** و**TibyanWidget** بالمعرف `group.app.tibyan.tibyan` (يطابق `PluginHomeWidgetSync.appGroup`). يحتاج هذا تفعيل المجموعة في حساب Apple Developer.
-6. Bundle ID للأداة: `app.tibyan.tibyan.TibyanWidget`.
-7. تأكد أن `Runner` ‹ Build Phases ‹ Embed Foundation Extensions يضم `TibyanWidget.appex`.
-8. ابن وجرّب على المحاكي: أضف الأداة من الشاشة الرئيسية، وابدأ ختمة في التطبيق، ثم اضغط الأداة.
+| المجلد | المحتوى |
+|---|---|
+| `apple/TibyanWidget/` | أداة الورد (`systemSmall` و`systemMedium`) |
+| `apple/TibyanActions/` | أداة الاختصارات، امتداد مستقل: متابع، استماع، بحث، «قرأت الورد» |
+| `apple/Shared/WidgetStore.swift` | الوصول إلى App Group وطابور الإجراءات |
+| `apple/Extension-Info.plist`، `Widget-*.xcconfig`، `Widget-*.entitlements` | إعدادات الامتدادين |
 
-ما أُضيف لـ iOS في هذا الفرع:
-- `CFBundleURLTypes` بالمخطط `tibyan` في `ios/Runner/Info.plist`، ليفتح رابط الأداة التطبيق.
-- الحزمة تتعرف على ضغطة الأداة من معامل `homeWidget` في الرابط.
+الأهداف (targets) لا تُكتب يدويا: `tools/apple/add_widget_targets.rb` يضيف الامتدادين إلى `ios/Runner.xcodeproj` و`macos/Runner.xcodeproj` (وجودهما مسجل في المستودع، والسكربت لا يكرر إضافتهما). يعمل بلا Xcode:
 
-قبل إعداد App Group، تفشل كتابة بيانات الأداة على iOS بصمت (`PluginHomeWidgetSync.write` يلتقط الخطأ)، والتطبيق يعمل كما هو.
+```
+gem install xcodeproj
+ruby tools/apple/add_widget_targets.rb ios
+ruby tools/apple/add_widget_targets.rb macos
+```
+
+الحد الأدنى: iOS 17 وmacOS 14 (لأجل `containerBackground` وأزرار `AppIntent` داخل الأداة). يتحقق `.github/workflows/native.yml` من البناء ومن وجود الامتدادين داخل التطبيق.
+
+### أداة الاختصارات (Action center)
+
+- متابع واستماع وبحث: روابط `tibyan://action/<name>?homeWidget` تفتح التطبيق (استماع يشغل التلاوة من أول صفحة القراءة).
+- «قرأت الورد»: لا يفتح التطبيق. `MarkPortionDoneIntent` يضيف `portion_done` إلى طابور `pending_actions` في App Group ويعرض الأداة «تم»؛ وعند أول تشغيل أو عودة للتطبيق يقرأ `takePending` الطابور ويسجل ورد اليوم مقروءا (`KhatmaService.markTodayRead`). على أندرويد الزر بث (`broadcast`) إلى `ActionsWidgetProvider` نفسه بنفس الطابور (`HomeWidgetPreferences`).
+- لا تلاوة بلا تشغيل التطبيق: تشغيل الصوت من الأداة يحتاج عملية التطبيق، فاستماع يفتحه.
+
+### ما لا يستطيع المستودع فعله وحده
+
+1. **App Group:** فعّله في حساب Apple Developer: iOS: `group.app.tibyan.tibyan`. macOS: `<TeamID>.group.app.tibyan.tibyan` (يأتي من `$(TeamIdentifierPrefix)`، ولا يُكتب في الكود). يلزمه التوقيع بفريق؛ قبله تفشل كتابة البيانات بصمت والتطبيق يعمل كما هو.
+2. Bundle IDs: `app.tibyan.tibyan.TibyanWidget` و`app.tibyan.tibyan.TibyanActions` لكل منصة.
+3. الأدوات المكتبية على macOS تُضاف من «تحرير الأدوات» في مركز الإشعارات.
+4. قناة macOS (`app.tibyan/widget` في `macos/Runner/AppDelegate.swift`) تكتب مفاتيح الأداة وتستقبل روابط `tibyan://`، لأن `home_widget` لا يدعم macOS.

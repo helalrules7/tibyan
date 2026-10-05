@@ -14,8 +14,13 @@ analyzer:
     - build/**
     - android/**
     - ios/**
+    - macos/**
+    - windows/**
+    - linux/**
     # Its own package, analyzed in its own CI step.
     - apps/**
+    # Vendored third-party code, kept as published.
+    - packages/**
 
 linter:
   # The lint rules applied to this project can be customized in the

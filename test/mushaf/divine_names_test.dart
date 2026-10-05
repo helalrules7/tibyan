@@ -27,6 +27,8 @@ void main() {
       'أَرۡبَابٗا',
       'ٱلۡأَرۡضِ',
       'لَهُمۡ',
+      // «My Lord» in the Warsh text, with yeh barree (Warsh 3:50).
+      '\u0631\u064e\u0628\u0651\u0650\u06d2',
     ]) {
       expect(isDivineName(w), isFalse, reason: w);
     }

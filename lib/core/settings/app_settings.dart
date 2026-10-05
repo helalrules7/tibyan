@@ -83,6 +83,7 @@ class AppSettings {
     this.tafsirFont = TafsirFont.naskh,
     this.tafsirFontScale = 1.0,
     this.hiddenCommentaries = const {},
+    this.hiddenBookTafsirs = const {},
     this.tafsirKashida = false,
     this.reciterId = 1,
     this.riwayaReciters = const {},
@@ -91,6 +92,11 @@ class AppSettings {
     this.versePause = 500,
     this.repeat = 1,
     this.repeatSilence = 0,
+    this.playbackSpeed = 1.0,
+    this.underVerse = const [],
+    this.splitTranslation = false,
+    this.twoPageSpread = true,
+    this.oneVerseAutoSeconds = 0,
     this.elderlyMode = false,
     this.tajweedColors = false,
     this.tajweedHues = const {},
@@ -127,6 +133,9 @@ class AppSettings {
   /// Source ids of tafsirs and translations the reader turned off.
   final Set<int> hiddenCommentaries;
 
+  /// Keys of the book tafsirs (reviewed packs) the reader turned off.
+  final Set<String> hiddenBookTafsirs;
+
   /// Trial: justify Arabic tafsir with tatweel instead of wider spaces.
   final bool tafsirKashida;
 
@@ -158,6 +167,23 @@ class AppSettings {
   /// Seconds of silence between repetitions, to repeat after the reciter.
   final int repeatSilence;
 
+  /// Recitation speed (1.0 as recorded).
+  final double playbackSpeed;
+
+  /// What is shown under each verse in the continuous view and beside the
+  /// page: the source ids of up to two translations, or of al-Muyassar;
+  /// empty for the Arabic only (docs/features/translation_under_ayah.md).
+  final List<int> underVerse;
+
+  /// Wide screens: the page with the texts of [underVerse] beside it.
+  final bool splitTranslation;
+
+  /// Wide screens held sideways: two pages side by side.
+  final bool twoPageSpread;
+
+  /// «آية آية»: seconds before the next verse turns by itself; 0 for off.
+  final int oneVerseAutoSeconds;
+
   /// «وضع كبار السن»: larger text and touch targets, stronger contrast, a
   /// home with only the main tasks, the page as large as it can be, and
   /// slower transitions.
@@ -185,6 +211,7 @@ class AppSettings {
     TafsirFont? tafsirFont,
     double? tafsirFontScale,
     Set<int>? hiddenCommentaries,
+    Set<String>? hiddenBookTafsirs,
     bool? tafsirKashida,
     int? reciterId,
     Map<Riwaya, int>? riwayaReciters,
@@ -193,6 +220,11 @@ class AppSettings {
     int? versePause,
     int? repeat,
     int? repeatSilence,
+    double? playbackSpeed,
+    List<int>? underVerse,
+    bool? splitTranslation,
+    bool? twoPageSpread,
+    int? oneVerseAutoSeconds,
     bool? elderlyMode,
     bool? tajweedColors,
     Map<String, String>? tajweedHues,
@@ -211,6 +243,7 @@ class AppSettings {
     tafsirFont: tafsirFont ?? this.tafsirFont,
     tafsirFontScale: tafsirFontScale ?? this.tafsirFontScale,
     hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
+    hiddenBookTafsirs: hiddenBookTafsirs ?? this.hiddenBookTafsirs,
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
     reciterId: reciterId ?? this.reciterId,
     riwayaReciters: riwayaReciters ?? this.riwayaReciters,
@@ -219,6 +252,11 @@ class AppSettings {
     versePause: versePause ?? this.versePause,
     repeat: repeat ?? this.repeat,
     repeatSilence: repeatSilence ?? this.repeatSilence,
+    playbackSpeed: playbackSpeed ?? this.playbackSpeed,
+    underVerse: underVerse ?? this.underVerse,
+    splitTranslation: splitTranslation ?? this.splitTranslation,
+    twoPageSpread: twoPageSpread ?? this.twoPageSpread,
+    oneVerseAutoSeconds: oneVerseAutoSeconds ?? this.oneVerseAutoSeconds,
     elderlyMode: elderlyMode ?? this.elderlyMode,
     tajweedColors: tajweedColors ?? this.tajweedColors,
     tajweedHues: tajweedHues ?? this.tajweedHues,
