@@ -1847,6 +1847,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookPackDownload => 'Download';
 
   @override
+  String get munasabatTitle => 'Connections between verses';
+
+  @override
+  String munasabatCount(String count) {
+    return 'Connections between verses ($count)';
+  }
+
+  @override
+  String get wujuhTitle => 'Senses of the word in the Quran';
+
+  @override
+  String get bookKindTafsir => 'Tafsir';
+
+  @override
+  String bookEntryVerses(String from, String to) {
+    return 'Verses $from–$to';
+  }
+
+  @override
   String get continuousView => 'Continuous view';
 
   @override

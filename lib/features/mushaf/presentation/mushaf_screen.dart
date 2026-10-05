@@ -19,6 +19,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../books/books_providers.dart';
 import '../../books/presentation/asbab_section.dart';
+import '../../books/presentation/book_section.dart';
 import '../../content_extras/verse_audio_index.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
@@ -1007,6 +1008,25 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                           },
                           null => null,
                         },
+                  munasabatCount: range.length == 1
+                      ? ref
+                            .watch(
+                              munasabatProvider((
+                                surah: hafsKeyOf(_riwaya, range.first).surah,
+                                ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                              )),
+                            )
+                            .length
+                      : 0,
+                  onMunasabat: () {
+                    final h = hafsKeyOf(_riwaya, range.first);
+                    showBookSheet(
+                      context,
+                      spec: BookSectionSpec.munasabat,
+                      surah: h.surah,
+                      ayah: h.ayah,
+                    );
+                  },
                   onReflect: () {
                     final h = hafsKeyOf(_riwaya, range.first);
                     showReflectionSheet(context, surah: h.surah, ayah: h.ayah);

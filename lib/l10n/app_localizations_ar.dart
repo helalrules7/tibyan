@@ -1838,6 +1838,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookPackDownload => 'تنزيل';
 
   @override
+  String get munasabatTitle => 'المناسبات';
+
+  @override
+  String munasabatCount(String count) {
+    return 'المناسبات ($count)';
+  }
+
+  @override
+  String get wujuhTitle => 'الوجوه والنظائر';
+
+  @override
+  String get bookKindTafsir => 'تفسير';
+
+  @override
+  String bookEntryVerses(String from, String to) {
+    return 'الآيات $from–$to';
+  }
+
+  @override
   String get continuousView => 'عرض متتالي';
 
   @override

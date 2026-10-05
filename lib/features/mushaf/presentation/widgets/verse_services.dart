@@ -34,6 +34,8 @@ class VerseServicesPanel extends StatelessWidget {
     this.asbabCount = 0,
     this.onAsbab,
     this.onTafsirAudio,
+    this.munasabatCount = 0,
+    this.onMunasabat,
   });
 
   /// «استمع للتفسير»: shown only when a tafsir recording has the selected
@@ -45,6 +47,11 @@ class VerseServicesPanel extends StatelessWidget {
   /// on and a reviewed pack has entries for the verse).
   final int asbabCount;
   final VoidCallback? onAsbab;
+
+  /// Reviewed munasabat of the selected verse («المناسبات»), shown like
+  /// [asbabCount].
+  final int munasabatCount;
+  final VoidCallback? onMunasabat;
 
   /// Passages similar to the selected verse (mutashabihat); the button
   /// shows only when there are some.
@@ -241,6 +248,17 @@ class VerseServicesPanel extends StatelessWidget {
                   onPressed: onAsbab,
                   icon: const Icon(Icons.history_edu_outlined),
                   label: Text(l.asbabCount(digits(asbabCount))),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                ),
+              ],
+              if (munasabatCount > 0 && onMunasabat != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onMunasabat,
+                  icon: const Icon(Icons.link),
+                  label: Text(l.munasabatCount(digits(munasabatCount))),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(44),
                   ),

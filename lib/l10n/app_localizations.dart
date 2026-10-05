@@ -3217,6 +3217,36 @@ abstract class AppLocalizations {
   /// **'تنزيل'**
   String get bookPackDownload;
 
+  /// No description provided for @munasabatTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المناسبات'**
+  String get munasabatTitle;
+
+  /// No description provided for @munasabatCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'المناسبات ({count})'**
+  String munasabatCount(String count);
+
+  /// No description provided for @wujuhTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوجوه والنظائر'**
+  String get wujuhTitle;
+
+  /// No description provided for @bookKindTafsir.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفسير'**
+  String get bookKindTafsir;
+
+  /// No description provided for @bookEntryVerses.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآيات {from}–{to}'**
+  String bookEntryVerses(String from, String to);
+
   /// No description provided for @continuousView.
   ///
   /// In ar, this message translates to:

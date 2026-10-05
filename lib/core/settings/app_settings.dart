@@ -83,6 +83,7 @@ class AppSettings {
     this.tafsirFont = TafsirFont.naskh,
     this.tafsirFontScale = 1.0,
     this.hiddenCommentaries = const {},
+    this.hiddenBookTafsirs = const {},
     this.tafsirKashida = false,
     this.reciterId = 1,
     this.riwayaReciters = const {},
@@ -131,6 +132,9 @@ class AppSettings {
 
   /// Source ids of tafsirs and translations the reader turned off.
   final Set<int> hiddenCommentaries;
+
+  /// Keys of the book tafsirs (reviewed packs) the reader turned off.
+  final Set<String> hiddenBookTafsirs;
 
   /// Trial: justify Arabic tafsir with tatweel instead of wider spaces.
   final bool tafsirKashida;
@@ -207,6 +211,7 @@ class AppSettings {
     TafsirFont? tafsirFont,
     double? tafsirFontScale,
     Set<int>? hiddenCommentaries,
+    Set<String>? hiddenBookTafsirs,
     bool? tafsirKashida,
     int? reciterId,
     Map<Riwaya, int>? riwayaReciters,
@@ -238,6 +243,7 @@ class AppSettings {
     tafsirFont: tafsirFont ?? this.tafsirFont,
     tafsirFontScale: tafsirFontScale ?? this.tafsirFontScale,
     hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
+    hiddenBookTafsirs: hiddenBookTafsirs ?? this.hiddenBookTafsirs,
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
     reciterId: reciterId ?? this.reciterId,
     riwayaReciters: riwayaReciters ?? this.riwayaReciters,

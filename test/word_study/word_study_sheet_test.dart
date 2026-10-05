@@ -5,14 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tibyan/core/db/content_database.dart';
+import 'package:tibyan/core/flags/feature_flags.dart';
+import 'package:tibyan/core/settings/settings_controller.dart';
 import 'package:tibyan/core/theme/app_theme.dart';
 import 'package:tibyan/core/theme/theme_registry.dart';
 import 'package:tibyan/core/theme/theme_tokens.dart';
+import 'package:tibyan/features/books/books_providers.dart';
+import 'package:tibyan/features/books/data/book_pack.dart';
 import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 import 'package:tibyan/features/word_study/data/word_study_repository.dart';
 import 'package:tibyan/features/word_study/word_study_sheet.dart';
 import 'package:tibyan/l10n/app_localizations.dart';
+
+import '../books/fake_pack.dart';
 
 /// The sheets, drawn from the real bundled database.
 void main() {
@@ -28,21 +35,36 @@ void main() {
   });
   tearDownAll(() => db.close());
 
-  Future<void> pump(WidgetTester tester, Widget child) async {
-    final registry = await tester.runAsync(
+  Future<void> pump(
+    WidgetTester tester,
+    Widget child, {
+    bool wujuh = false,
+    List<BookPack> packs = const [],
+  }) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await tester.runAsync(SharedPreferences.getInstance);
+    final registry = (await tester.runAsync(
       () => ThemeRegistry.load(rootBundle),
-    );
+    ))!;
     await tester.binding.setSurfaceSize(const Size(420, 2400));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [contentDatabaseProvider.overrideWithValue(db)],
+        overrides: [
+          contentDatabaseProvider.overrideWithValue(db),
+          themeRegistryProvider.overrideWithValue(registry),
+          sharedPreferencesProvider.overrideWithValue(prefs!),
+          featureFlagsProvider.overrideWithValue(
+            FeatureFlags({Feature.wujuhNazair.key: wujuh}),
+          ),
+          installedBookPacksProvider.overrideWithValue(packs),
+        ],
         child: MaterialApp(
           locale: const Locale('ar'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildTheme(
-            style: registry!.byId(registry.defaultStyleId),
+            style: registry.byId(registry.defaultStyleId),
             mode: ThemeModeId.light,
             uiFont: UiFont.plex,
           ),
@@ -135,5 +157,84 @@ void main() {
       expect(find.textContaining(e.body, findRichText: true), findsOneWidget);
     }
     expect(find.textContaining('نقاية'), findsOneWidget);
+  });
+
+  group('al-Damghani\'s senses of the word (wujuh)', () {
+    late BookPack pack;
+    setUp(() => pack = BookPack(fakeBooksPackDb()));
+    tearDown(() => pack.close());
+
+    testWidgets('the senses linked to this word, under their word header', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const WordStudySheet(surah: 1, ayah: 1, word: 3),
+        wujuh: true,
+        packs: [pack],
+      );
+      expect(find.text('الوجوه والنظائر'), findsOneWidget);
+      // The header once, verbatim, then each sense verbatim.
+      expect(find.text(fakeWordText, findRichText: true), findsOneWidget);
+      expect(find.text(fakeWajh1, findRichText: true), findsOneWidget);
+      expect(find.text(fakeWajh2, findRichText: true), findsOneWidget);
+      expect(
+        find.text('«كتاب وجوه تجريبي»، مؤلف تجريبي، تحقيق محقق تجريبي، ص ٧'),
+        findsNWidgets(2),
+      );
+      expect(find.textContaining('ص ٨'), findsOneWidget);
+    });
+
+    testWidgets('a sense tied to another word is not shown', (tester) async {
+      await pump(
+        tester,
+        const WordStudySheet(surah: 1, ayah: 1, word: 2),
+        wujuh: true,
+        packs: [pack],
+      );
+      expect(find.text(fakeWajh1, findRichText: true), findsNothing);
+      expect(find.text(fakeWajh2, findRichText: true), findsOneWidget);
+    });
+
+    testWidgets('a sense whose header is not reviewed shows without one', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const WordStudySheet(surah: 1, ayah: 2, word: 1),
+        wujuh: true,
+        packs: [pack],
+      );
+      expect(find.text(fakeWajhOrphan, findRichText: true), findsOneWidget);
+      // Its own heading (the book's), not another word's header text.
+      expect(
+        find.text('كلمة أخرى على وجهين', findRichText: true),
+        findsOneWidget,
+      );
+      expect(find.textContaining(fakeWordText), findsNothing);
+    });
+
+    testWidgets('nothing when the flag is off, without a pack, or for a '
+        'verse without senses', (tester) async {
+      await pump(
+        tester,
+        const WordStudySheet(surah: 1, ayah: 1, word: 3),
+        packs: [pack],
+      );
+      expect(find.text('الوجوه والنظائر'), findsNothing);
+      await pump(
+        tester,
+        const WordStudySheet(surah: 1, ayah: 1, word: 3),
+        wujuh: true,
+      );
+      expect(find.text('الوجوه والنظائر'), findsNothing);
+      await pump(
+        tester,
+        const WordStudySheet(surah: 1, ayah: 3, word: 1),
+        wujuh: true,
+        packs: [pack],
+      );
+      expect(find.text('الوجوه والنظائر'), findsNothing);
+    });
   });
 }

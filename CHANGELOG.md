@@ -6,6 +6,10 @@ All notable changes to Tibyan are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added (content ready, all hidden until reviewed and permitted)
+- Book sections from reviewed packs, all through one section widget: the tafsir books (al-Tabari, al-Qurtubi, Ibn Kathir, al-Baghawi, al-Saadi) as extra choices on the tafsir screen, «المناسبات» (al-Biqa'i), and al-Damghani's wujuh in word study. Text verbatim with its citation; the storage screen names each pack's kind.
+- «استمع للتفسير» (tafsir audio), the English translation heard after each verse during recitation, and the English tafsir (al-Mukhtasar) for the English interface, each behind a flag that is off, streamed from a small link index or an optional hash-checked pack, with its source line.
+
 ### Added (asbab al-nuzul, off)
 - An «أسباب النزول» section in the verse services and the tafsir screen: the book's text as it is, with the verses it quotes coloured, and the source cited in the publisher's own wording. It shows only from an installed reviewed pack; none is published yet, and the feature is off.
 - Reviewed book packs are downloaded, hash-checked and deleted from the storage screen. `tools/import_dar_alathar.py` imports Dar al-Athar's file as review drafts.

@@ -34,6 +34,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kTafsirFont = 'settings.tafsirFont';
   static const _kTafsirScale = 'settings.tafsirFontScale';
   static const _kHiddenCommentaries = 'settings.hiddenCommentaries';
+  static const _kHiddenBookTafsirs = 'settings.hiddenBookTafsirs';
   static const _kKashida = 'settings.tafsirKashida';
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
@@ -91,6 +92,7 @@ class SettingsController extends Notifier<AppSettings> {
         for (final id in _prefs.getStringList(_kHiddenCommentaries) ?? [])
           ?int.tryParse(id),
       },
+      hiddenBookTafsirs: {...?_prefs.getStringList(_kHiddenBookTafsirs)},
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       riwayaReciters: {
@@ -214,6 +216,14 @@ class SettingsController extends Notifier<AppSettings> {
     await _prefs.setStringList(_kHiddenCommentaries, [
       for (final id in hidden) '$id',
     ]);
+  }
+
+  /// Shows or hides a book tafsir (by its source key).
+  Future<void> setBookTafsirShown(String key, bool shown) async {
+    final hidden = {...state.hiddenBookTafsirs};
+    shown ? hidden.remove(key) : hidden.add(key);
+    state = state.copyWith(hiddenBookTafsirs: hidden);
+    await _prefs.setStringList(_kHiddenBookTafsirs, [...hidden]);
   }
 
   Future<void> setTafsirKashida(bool value) async {

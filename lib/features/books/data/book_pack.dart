@@ -8,6 +8,20 @@ import '../../mushaf/data/page_pack.dart';
 /// review database (tools/review_schema.sql).
 abstract final class BookKind {
   static const asbabNuzul = 'asbab_nuzul';
+  static const tafsir = 'tafsir';
+  static const munasabat = 'munasabat';
+  static const wujuhNazair = 'wujuh_nazair';
+}
+
+/// The kind of one entry of a book (`entry.kind`), as the import scripts
+/// split it.
+abstract final class EntryKind {
+  static const passage = 'passage';
+  static const surahIntro = 'surah_intro';
+
+  /// al-Damghani's word header («… على N أوجه») and one of its senses.
+  static const word = 'word';
+  static const wajh = 'wajh';
 }
 
 /// A reviewed book pack on Tibyan's mirror: a SQLite file built by
@@ -87,6 +101,37 @@ class BookSource {
   final String? citation;
 }
 
+/// Where an entry is linked in the mushaf (Hafs numbers): one verse or a
+/// range of verses of one surah, and optionally words (1-based, of the
+/// KFGQPC text) of the first and last verse.
+class BookLink {
+  const BookLink({
+    required this.surah,
+    required this.ayahFrom,
+    required this.ayahTo,
+    this.wordFrom,
+    this.wordTo,
+  });
+
+  final int surah;
+  final int ayahFrom;
+  final int ayahTo;
+  final int? wordFrom;
+  final int? wordTo;
+
+  /// The passage covers several verses.
+  bool get isRange => ayahTo != ayahFrom;
+
+  bool covers(int surah, int ayah) =>
+      surah == this.surah && ayahFrom <= ayah && ayah <= ayahTo;
+
+  /// Covers word [word] of [ayah]: a link without words covers every word
+  /// of its verses.
+  bool coversWord(int ayah, int word) =>
+      !(wordFrom != null && ayah == ayahFrom && word < wordFrom!) &&
+      !(wordTo != null && ayah == ayahTo && word > wordTo!);
+}
+
 /// One reviewed passage of a book. [text] is the book's text byte for
 /// byte; [section] is the book's own heading for it.
 class BookEntry {
@@ -95,20 +140,30 @@ class BookEntry {
     required this.source,
     required this.seq,
     required this.text,
+    this.kind = EntryKind.passage,
     this.section,
     this.volume,
     this.page,
     this.pageEnd,
+    this.link,
   });
 
   final int id;
   final BookSource source;
   final int seq;
   final String text;
+
+  /// [EntryKind].
+  final String kind;
   final String? section;
   final int? volume;
   final int? page;
   final int? pageEnd;
+
+  /// The link that put the entry on the verse it was asked for (the
+  /// first in the mushaf's order when several do); null for an entry
+  /// read by itself, such as a word header.
+  final BookLink? link;
 }
 
 /// An opened reviewed book pack (read-only).
@@ -170,38 +225,100 @@ class BookPack {
   final BookPackSpec? spec;
   final Map<int, BookSource> sources = {};
 
-  /// The reviewed entries linked to [surah]:[ayah], in the book's order.
-  /// A link covers the verse when its surah matches and
-  /// `ayah_from <= ayah <= ayah_to`. [kind] keeps one kind of book.
+  /// The reviewed entries linked to [surah]:[ayah], in the book's order,
+  /// each once even when several of its links cover the verse. A link
+  /// covers the verse when its surah matches and
+  /// `ayah_from <= ayah <= ayah_to`. [kind] keeps one kind of book,
+  /// [source] one book (its key), [entryKinds] some kinds of entries;
+  /// with [word], a link that names words must cover that word.
   /// An entry without a reviewer other than its editor is never returned
   /// (export_pack.py exports none; this guards a hand-made file).
-  List<BookEntry> entriesFor(int surah, int ayah, {String? kind}) {
+  List<BookEntry> entriesFor(
+    int surah,
+    int ayah, {
+    String? kind,
+    String? source,
+    Set<String>? entryKinds,
+    int? word,
+  }) {
     final rows = _db.select(
-      'SELECT DISTINCT e.id, e.source_id, e.seq, e.section, e.volume, '
-      'e.page, e.page_end, e.text FROM entry_link l '
+      'SELECT e.id, e.source_id, e.seq, e.kind, e.section, e.volume, '
+      'e.page, e.page_end, e.text, l.ayah_from, l.ayah_to, l.word_from, '
+      'l.word_to FROM entry_link l '
       'JOIN entry e ON e.id = l.entry_id '
       'JOIN source s ON s.id = e.source_id '
       'WHERE l.surah = ? AND l.ayah_from <= ? AND l.ayah_to >= ? '
-      "AND e.reviewer IS NOT NULL AND e.reviewer <> '' "
-      'AND e.reviewer <> e.editor '
+      '$_reviewed '
       '${kind == null ? '' : 'AND s.kind = ? '}'
-      'ORDER BY e.source_id, e.seq',
-      [surah, ayah, ayah, ?kind],
+      '${source == null ? '' : 'AND s.key = ? '}'
+      'ORDER BY e.source_id, e.seq, l.ayah_from, l.ayah_to',
+      [surah, ayah, ayah, ?kind, ?source],
     );
-    return [
-      for (final r in rows)
-        BookEntry(
-          id: r['id'] as int,
-          source: sources[r['source_id'] as int]!,
-          seq: r['seq'] as int,
-          section: _text(r['section']),
-          volume: r['volume'] as int?,
-          page: r['page'] as int?,
-          pageEnd: r['page_end'] as int?,
-          text: r['text'] as String,
-        ),
-    ];
+    final seen = <int>{};
+    final out = <BookEntry>[];
+    for (final r in rows) {
+      final id = r['id'] as int;
+      if (seen.contains(id)) continue;
+      if (entryKinds != null && !entryKinds.contains(r['kind'])) continue;
+      final link = BookLink(
+        surah: surah,
+        ayahFrom: r['ayah_from'] as int,
+        ayahTo: r['ayah_to'] as int,
+        wordFrom: r['word_from'] as int?,
+        wordTo: r['word_to'] as int?,
+      );
+      if (word != null && !link.coversWord(ayah, word)) continue;
+      seen.add(id);
+      out.add(_entry(r, link));
+    }
+    return out;
   }
+
+  /// The entry [entry] belongs under: the nearest entry of [kind] before
+  /// it in the same book, when it carries the same heading (al-Damghani
+  /// puts each sense under its word header). Null when that entry is not
+  /// in the pack (not reviewed) or the headings differ: never a guess.
+  BookEntry? parentOf(BookEntry entry, {required String kind}) {
+    if (entry.section == null) return null;
+    final rows = _db.select(
+      'SELECT e.id, e.source_id, e.seq, e.kind, e.section, e.volume, '
+      'e.page, e.page_end, e.text, e.editor, e.reviewer FROM entry e '
+      'WHERE e.source_id = ? AND e.seq < ? AND e.kind = ? '
+      'ORDER BY e.seq DESC LIMIT 1',
+      [entry.source.id, entry.seq, kind],
+    );
+    if (rows.isEmpty) return null;
+    final r = rows.first;
+    final reviewer = r['reviewer'] as String?;
+    if (reviewer == null || reviewer.isEmpty || reviewer == r['editor']) {
+      return null;
+    }
+    if (r['section'] != entry.section) return null;
+    return _entry(r, null);
+  }
+
+  /// The books of [kind] in this pack.
+  List<BookSource> sourcesOf(String kind) => [
+    for (final s in sources.values)
+      if (s.kind == kind) s,
+  ];
+
+  static const _reviewed =
+      "AND e.reviewer IS NOT NULL AND e.reviewer <> '' "
+      'AND e.reviewer <> e.editor';
+
+  BookEntry _entry(Row r, BookLink? link) => BookEntry(
+    id: r['id'] as int,
+    source: sources[r['source_id'] as int]!,
+    seq: r['seq'] as int,
+    kind: r['kind'] as String,
+    section: _text(r['section']),
+    volume: r['volume'] as int?,
+    page: r['page'] as int?,
+    pageEnd: r['page_end'] as int?,
+    text: r['text'] as String,
+    link: link,
+  );
 
   void close() => _db.close();
 
