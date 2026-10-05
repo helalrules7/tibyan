@@ -1,0 +1,37 @@
+name: Qiraat audio check
+
+# Validates the AQQD verse-level clip index and contributed word ranges
+# (data/qiraat_audio, docs/QIRAAT_AUDIO.md): schema, the verse exists, the
+# word exists in that verse's KFGQPC words, ranges inside the clip and not
+# overlapping, a reviewer who is a second person. Plain pull_request: the
+# proposed files are checked with no secrets and a read-only token.
+
+on:
+  pull_request:
+    paths:
+      - 'data/qiraat_audio/**'
+      - 'data/timing/verse_words.json'
+      - 'tools/qiraat_audio.py'
+      - 'tools/tests/test_qiraat_audio.py'
+  push:
+    branches: [main]
+    paths:
+      - 'data/qiraat_audio/**'
+      - 'tools/qiraat_audio.py'
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Validate the qiraat audio index
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Tool tests
+        run: python3 -m unittest discover -s tools/tests -p 'test_qiraat_audio.py'
+      - name: Check the index
+        run: python3 tools/qiraat_audio.py check

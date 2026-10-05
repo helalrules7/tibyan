@@ -18,7 +18,8 @@ Usage:
   python3 tools/measure_aqqd_coverage.py measure [--style-map map.json] [--listing names.txt]
 Inputs: tools/.cache/quranpedia/qiraat.json.gz (fetch_quranpedia_dumps.py),
 tools/.cache/staging/aqqd/listing.json (or a text file of names, one per line).
---style-map maps a style code ("S5") to its qira'a, from the paper's table.
+--style-map maps a style code ("S5") to its qira'a, from the paper's table:
+data/qiraat_audio/styles.json (unknown until filled by hand) or a plain map.
 """
 import gzip
 import json
@@ -130,7 +131,8 @@ def osf_walk(url, out):
                 osf_walk(item['relationships']['files']['links']['related']['href'], out)
             else:
                 out.append({'name': a['name'], 'path': a['materialized_path'], 'size': a['size'],
-                            'hashes': (a.get('extra') or {}).get('hashes')})
+                            'hashes': (a.get('extra') or {}).get('hashes'), 'id': item.get('id'),
+                            'download': (item.get('links') or {}).get('download')})
         url = page['links'].get('next')
     return out
 
@@ -149,11 +151,21 @@ def listing():
               '(e.g. `unzip -l`), which needs the archive itself.')
 
 
+def load_style_map(path):
+    """{"S5": name} from a plain map, or from data/qiraat_audio/styles.json
+    (whose entries are null until filled from the paper: shown as unknown)."""
+    doc = json.loads(Path(path).read_text(encoding='utf-8'))
+    if isinstance(doc.get('styles'), dict):
+        return {k: (v.get('name') or v.get('riwaya')) if isinstance(v, dict) else 'unknown'
+                for k, v in doc['styles'].items()}
+    return doc
+
+
 def measure(argv):
     style_map = {}
     names = None
     if '--style-map' in argv:
-        style_map = json.loads(Path(argv[argv.index('--style-map') + 1]).read_text(encoding='utf-8'))
+        style_map = load_style_map(Path(argv[argv.index('--style-map') + 1]))
     if '--listing' in argv:
         names = Path(argv[argv.index('--listing') + 1]).read_text(encoding='utf-8').split()
     else:

@@ -1,0 +1,14 @@
+{
+  "format": 1,
+  "about": "AQQD style code (the S in R023_S5_Surah_036_Aya40_C2.wav) -> the qira'a or riwaya it is recited in. Copy each entry by hand from the style table of the AQQD paper (PMC13285623) and cite where: {\"name\": \"...\", \"riwaya\": \"warsh\", \"source\": \"paper, Table N\"}. null means not known yet: never guess a mapping. Add codes beyond S8 if the listing has them.",
+  "styles": {
+    "S1": null,
+    "S2": null,
+    "S3": null,
+    "S4": null,
+    "S5": null,
+    "S6": null,
+    "S7": null,
+    "S8": null
+  }
+}

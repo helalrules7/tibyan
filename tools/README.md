@@ -36,6 +36,7 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `fetch_riwaya_timing.py` | Downloads mp3quran's verse timings of the riwaya recitations into `.cache/mp3quran_riwaya_timing.json` |
 | `riwaya_reciters.py` | The riwaya recitations, their timings and sources in `content.db` (called by `build_content_db.py`; also adds them to a built file) |
 | `export_pack.py` | Builds a data pack from a review database with reviewed entries only, after re-checking each one's hash and approval; writes the pack's index |
+| `qiraat_audio.py` | The AQQD qiraat clips indexed by verse and style in `data/qiraat_audio/` (MISSING_DATA ن2, docs/QIRAAT_AUDIO.md): `listing` (OSF file list), `build` (index files, keeping word ranges and durations), `durations` (from each WAV header by HTTP range, no audio kept), `check` (CI: schema, verse and word exist, ranges inside the clip, no overlaps, a second-person reviewer), `format` |
 | `staging.py` | Helpers for staged sources (downloaded and verified, never shipped while a permission is pending): `tools/.cache/staging/<source>/` with `SHA256SUMS` and `manifest.json` |
 | `fetch_quranenc_extra.py` | Stages QuranEnc `english_mokhtasar` (each surah's API response byte for byte) and the `english_rwwad` per-verse audio URL index with HEAD checks of a sample; the audio is not downloaded |
 | `build_nuqayah_audio_index.py` | `probe` finds where read.tafsir.one keeps its tafsir audio; `build` indexes al-Muyassar and al-Saadi verse by verse and HEAD-checks a sample; the audio is not downloaded |
