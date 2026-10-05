@@ -44,7 +44,7 @@
 | everyayah | https://everyayah.com/ | https://everyayah.com/data/timings_files/000_disclaimer.txt | **بلا ترخيص واضح:** صفحة الترخيص الكاملة 404، والمعلن فقط شرط وضع رابط لهم | `2026-09-28_everyayah_disclaimer_no-license.pdf` | |
 | quran_android (ayahinfo) | https://github.com/quran/quran_android | README المستودع | إحداثيات لكل كلمة، لكن ترخيص البيانات غير محدد، والصفحات ليست صفحات المجمع | — | |
 | تسجيل التفسير الميسر الصوتي | https://archive.org/details/002_20200606_202zzzzzzzzzzzzzzzzzzzzzzz | لا يوجد | إنتاج المجمع | — | |
-| بيانات AQQD للقراءات | https://pmc.ncbi.nlm.nih.gov/articles/PMC13285623/ | داخل الورقة | CC0 | — | |
+| بيانات AQQD للقراءات | https://pmc.ncbi.nlm.nih.gov/articles/PMC13285623/ (الملفات: https://osf.io/6sh5d، المسودة: https://www.researchsquare.com/article/rs-8804884/v1) | داخل الورقة (حقل الترخيص في OSF فارغ) | CC0 حسب الورقة. 24,183 مقطعا، 309 قراء، 70 سورة، مفهرسة بالآية في اسم الملف (`R023_S5_Surah_036_Aya40_C2.wav`). 23,111 منها من تسجيلات عامة لغيرهم (mp3quran، يوتيوب…): `docs/verification/2026-10-05_aqqd_coverage.md` | — | |
 
 ## 3ب. مصادر جديدة (2026-09-28)
 
