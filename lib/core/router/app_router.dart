@@ -25,6 +25,7 @@ import '../../features/settings/player_settings_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../../features/settings/storage_screen.dart';
 import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
 
@@ -80,6 +81,10 @@ final appRouterProvider = Provider<GoRouter>(
               GoRoute(
                 path: 'appearance',
                 builder: (context, state) => const AppearanceScreen(),
+              ),
+              GoRoute(
+                path: 'storage',
+                builder: (context, state) => const StorageScreen(),
               ),
               GoRoute(
                 path: 'player',

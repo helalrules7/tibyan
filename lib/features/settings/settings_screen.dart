@@ -179,6 +179,19 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.storage_outlined),
+              title: Text(l.storageOpen),
+              subtitle: Text(
+                l.storageOpenHint,
+                style: TextStyle(color: t.muted),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/settings/storage'),
+            ),
+          ),
+          const SizedBox(height: 16),
           _SectionTitle(l.backupTitle),
           Card(
             child: Column(

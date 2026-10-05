@@ -1713,4 +1713,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String playbackSpeedValue(String value) {
     return '×$value';
   }
+
+  @override
+  String get storageTitle => 'Storage and downloads';
+
+  @override
+  String get storageOpen => 'Storage and downloads';
+
+  @override
+  String get storageOpenHint =>
+      'What is downloaded on this device and how big it is; delete what you do not need';
+
+  @override
+  String get storageIntro =>
+      'Everything the app downloaded to this device. You can delete any of it and download it again later. Your own data (bookmarks, khatma, notes) is not listed here and is never touched.';
+
+  @override
+  String storageTotal(String size) {
+    return 'Total: $size';
+  }
+
+  @override
+  String get storageBundled => 'Comes with the app';
+
+  @override
+  String storageSize(String mb) {
+    return '$mb MB';
+  }
+
+  @override
+  String storageAudioOf(String name) {
+    return '$name\'s recitations';
+  }
+
+  @override
+  String get storageSemantic => 'Search-by-meaning pack';
+
+  @override
+  String get storageTiming => 'Recitation timing updates';
+
+  @override
+  String get storagePartial => 'Unfinished downloads';
+
+  @override
+  String get storagePartialHint =>
+      'What is left of downloads that stopped; safe to delete';
+
+  @override
+  String get storageClean => 'Clean up';
+
+  @override
+  String storageDeleteAsk(String name, String size) {
+    return 'Delete $name ($size)?';
+  }
+
+  @override
+  String storageFreed(String size) {
+    return 'Freed $size';
+  }
+
+  @override
+  String get storageEmpty =>
+      'Nothing is downloaded beyond what comes with the app';
+
+  @override
+  String get storageUnknown => 'Other files';
 }

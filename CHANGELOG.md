@@ -11,6 +11,10 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (storage and recitation speed)
+- Settings › «التخزين والتنزيلات»: every mushaf pack, each reciter's downloaded surahs, the search-by-meaning pack and the timing updates with their sizes, delete any of them (they download again when needed), and clean up the leftovers of downloads that stopped. The edition that ships with the app is shown but not deletable. Your own data is never listed or touched.
+- Recitation speed (×0.75 to ×2) in the player's options, kept for the next time. Verse highlighting follows the audio, so it stays right at any speed.
+
 ### Added (backup and restore)
 - Settings › «النسخ الاحتياطي»: save one JSON file with your bookmarks and marks, reading position, khatmas, reading and listening reports, tadabbur notes and hifz progress (through the system share sheet), and restore it on this or another device. Restoring merges: nothing is deleted and the newer copy of a row wins; restoring the same file twice adds nothing. No account is needed. Settings (theme, edition, reciter) are not part of it.
 

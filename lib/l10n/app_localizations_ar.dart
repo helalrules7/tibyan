@@ -1706,4 +1706,67 @@ class AppLocalizationsAr extends AppLocalizations {
   String playbackSpeedValue(String value) {
     return '×$value';
   }
+
+  @override
+  String get storageTitle => 'التخزين والتنزيلات';
+
+  @override
+  String get storageOpen => 'التخزين والتنزيلات';
+
+  @override
+  String get storageOpenHint =>
+      'ما نُزِّل على الجهاز وأحجامه، وحذف ما لا تحتاجه';
+
+  @override
+  String get storageIntro =>
+      'كل ما نزّله التطبيق على جهازك. يمكنك حذف أي منها وتنزيله لاحقا. بياناتك (الفواصل، الختمة، الملاحظات) لا تظهر هنا ولا تُمس.';
+
+  @override
+  String storageTotal(String size) {
+    return 'المجموع: $size';
+  }
+
+  @override
+  String get storageBundled => 'مضمّن مع التطبيق';
+
+  @override
+  String storageSize(String mb) {
+    return '$mb ميجا';
+  }
+
+  @override
+  String storageAudioOf(String name) {
+    return 'تلاوات $name';
+  }
+
+  @override
+  String get storageSemantic => 'حزمة البحث بالمعنى';
+
+  @override
+  String get storageTiming => 'تحديثات توقيت التلاوة';
+
+  @override
+  String get storagePartial => 'تنزيلات غير مكتملة';
+
+  @override
+  String get storagePartialHint => 'بقايا تنزيلات توقفت؛ حذفها آمن';
+
+  @override
+  String get storageClean => 'تنظيف';
+
+  @override
+  String storageDeleteAsk(String name, String size) {
+    return 'حذف $name ($size)؟';
+  }
+
+  @override
+  String storageFreed(String size) {
+    return 'تم تحرير $size';
+  }
+
+  @override
+  String get storageEmpty => 'لا شيء منزَّل غير ما يأتي مع التطبيق';
+
+  @override
+  String get storageUnknown => 'ملفات أخرى';
 }

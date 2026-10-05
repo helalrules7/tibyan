@@ -406,6 +406,14 @@ class NumberFormatter {
 
   final bool _arabic;
 
+  /// A decimal number's text ("2.5") with Arabic-Indic digits in Arabic.
+  String decimal(String text) => _arabic
+      ? text.replaceAll('.', '٫').split('').map((c) {
+          final d = int.tryParse(c);
+          return d == null ? c : String.fromCharCode(0x0660 + d);
+        }).join()
+      : text;
+
   String call(int n) => _arabic
       ? n
             .toString()

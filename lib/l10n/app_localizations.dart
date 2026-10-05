@@ -3018,6 +3018,108 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'×{value}'**
   String playbackSpeedValue(String value);
+
+  /// No description provided for @storageTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التخزين والتنزيلات'**
+  String get storageTitle;
+
+  /// No description provided for @storageOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'التخزين والتنزيلات'**
+  String get storageOpen;
+
+  /// No description provided for @storageOpenHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما نُزِّل على الجهاز وأحجامه، وحذف ما لا تحتاجه'**
+  String get storageOpenHint;
+
+  /// No description provided for @storageIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل ما نزّله التطبيق على جهازك. يمكنك حذف أي منها وتنزيله لاحقا. بياناتك (الفواصل، الختمة، الملاحظات) لا تظهر هنا ولا تُمس.'**
+  String get storageIntro;
+
+  /// No description provided for @storageTotal.
+  ///
+  /// In ar, this message translates to:
+  /// **'المجموع: {size}'**
+  String storageTotal(String size);
+
+  /// No description provided for @storageBundled.
+  ///
+  /// In ar, this message translates to:
+  /// **'مضمّن مع التطبيق'**
+  String get storageBundled;
+
+  /// No description provided for @storageSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'{mb} ميجا'**
+  String storageSize(String mb);
+
+  /// No description provided for @storageAudioOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلاوات {name}'**
+  String storageAudioOf(String name);
+
+  /// No description provided for @storageSemantic.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزمة البحث بالمعنى'**
+  String get storageSemantic;
+
+  /// No description provided for @storageTiming.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديثات توقيت التلاوة'**
+  String get storageTiming;
+
+  /// No description provided for @storagePartial.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيلات غير مكتملة'**
+  String get storagePartial;
+
+  /// No description provided for @storagePartialHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'بقايا تنزيلات توقفت؛ حذفها آمن'**
+  String get storagePartialHint;
+
+  /// No description provided for @storageClean.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنظيف'**
+  String get storageClean;
+
+  /// No description provided for @storageDeleteAsk.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف {name} ({size})؟'**
+  String storageDeleteAsk(String name, String size);
+
+  /// No description provided for @storageFreed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تحرير {size}'**
+  String storageFreed(String size);
+
+  /// No description provided for @storageEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا شيء منزَّل غير ما يأتي مع التطبيق'**
+  String get storageEmpty;
+
+  /// No description provided for @storageUnknown.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملفات أخرى'**
+  String get storageUnknown;
 }
 
 class _AppLocalizationsDelegate
