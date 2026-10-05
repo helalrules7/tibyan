@@ -776,5 +776,16 @@
   "storageFreed": "Freed {size}",
   "@storageFreed": {"placeholders": {"size": {"type": "String"}}},
   "storageEmpty": "Nothing is downloaded beyond what comes with the app",
-  "storageUnknown": "Other files"
+  "storageUnknown": "Other files",
+  "continuousView": "Continuous view",
+  "underVerseTitle": "Under each verse",
+  "underArabicOnly": "Arabic only",
+  "underTranslation": "Arabic with a translation",
+  "underTranslationHint": "Choose one or two",
+  "underMuyassar": "Arabic with al-Tafsir al-Muyassar",
+  "splitTranslationLabel": "Beside the page on wide screens",
+  "splitTranslationHint": "The page as printed, with your choice for its verses beside it",
+  "nextSurah": "Next surah",
+  "previousSurah": "Previous surah",
+  "hafsTextNote": "The text here is in the Hafs riwaya"
 }

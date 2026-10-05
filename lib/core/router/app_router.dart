@@ -24,6 +24,7 @@ import '../../features/settings/appearance_screen.dart';
 import '../../features/settings/player_settings_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
+import '../../features/reading/continuous_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/settings/storage_screen.dart';
 import '../settings/app_settings.dart';
@@ -121,6 +122,14 @@ final appRouterProvider = Provider<GoRouter>(
             builder: (context, state) => const JournalScreen(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/read',
+        builder: (context, state) => ContinuousScreen(
+          key: ValueKey(state.uri.toString()),
+          surah: _int(state, 's') ?? 1,
+          ayah: _int(state, 'a') ?? 1,
+        ),
       ),
       GoRoute(
         path: '/mushaf',

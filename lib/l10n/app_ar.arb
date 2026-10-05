@@ -1276,5 +1276,16 @@
   "storageFreed": "تم تحرير {size}",
   "@storageFreed": {"placeholders": {"size": {"type": "String"}}},
   "storageEmpty": "لا شيء منزَّل غير ما يأتي مع التطبيق",
-  "storageUnknown": "ملفات أخرى"
+  "storageUnknown": "ملفات أخرى",
+  "continuousView": "عرض متتالي",
+  "underVerseTitle": "ما يظهر تحت الآية",
+  "underArabicOnly": "عربي فقط",
+  "underTranslation": "عربي مع ترجمة",
+  "underTranslationHint": "اختر ترجمة أو اثنتين",
+  "underMuyassar": "عربي مع التفسير الميسر",
+  "splitTranslationLabel": "بجانب الصفحة على الشاشات العريضة",
+  "splitTranslationHint": "الصفحة كما هي، وبجانبها ما اخترته لآياتها",
+  "nextSurah": "السورة التالية",
+  "previousSurah": "السورة السابقة",
+  "hafsTextNote": "النص هنا برواية حفص"
 }

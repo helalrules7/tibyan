@@ -1769,4 +1769,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get storageUnknown => 'ملفات أخرى';
+
+  @override
+  String get continuousView => 'عرض متتالي';
+
+  @override
+  String get underVerseTitle => 'ما يظهر تحت الآية';
+
+  @override
+  String get underArabicOnly => 'عربي فقط';
+
+  @override
+  String get underTranslation => 'عربي مع ترجمة';
+
+  @override
+  String get underTranslationHint => 'اختر ترجمة أو اثنتين';
+
+  @override
+  String get underMuyassar => 'عربي مع التفسير الميسر';
+
+  @override
+  String get splitTranslationLabel => 'بجانب الصفحة على الشاشات العريضة';
+
+  @override
+  String get splitTranslationHint =>
+      'الصفحة كما هي، وبجانبها ما اخترته لآياتها';
+
+  @override
+  String get nextSurah => 'السورة التالية';
+
+  @override
+  String get previousSurah => 'السورة السابقة';
+
+  @override
+  String get hafsTextNote => 'النص هنا برواية حفص';
 }

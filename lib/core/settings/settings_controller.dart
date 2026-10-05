@@ -41,6 +41,8 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
   static const _kPlaybackSpeed = 'settings.playbackSpeed';
+  static const _kUnderVerse = 'settings.underVerse';
+  static const _kSplitTranslation = 'settings.splitTranslation';
   static const _kElderly = 'settings.elderlyMode';
   static const _kTajweed = 'settings.tajweedColors';
   static const _kTajweedHues = 'settings.tajweedHues';
@@ -99,6 +101,11 @@ class SettingsController extends Notifier<AppSettings> {
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
       playbackSpeed: _prefs.getDouble(_kPlaybackSpeed) ?? 1.0,
+      underVerse: [
+        for (final id in _prefs.getStringList(_kUnderVerse) ?? const <String>[])
+          ?int.tryParse(id),
+      ],
+      splitTranslation: _prefs.getBool(_kSplitTranslation) ?? false,
       elderlyMode: _prefs.getBool(_kElderly) ?? false,
       tajweedColors: _prefs.getBool(_kTajweed) ?? false,
       tajweedHues: {
@@ -238,6 +245,19 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setRepeat(int times) async {
     state = state.copyWith(repeat: times);
     await _prefs.setInt(_kRepeat, times);
+  }
+
+  /// What shows under each verse: up to two source ids (see
+  /// [AppSettings.underVerse]).
+  Future<void> setUnderVerse(List<int> sourceIds) async {
+    final ids = sourceIds.take(2).toList();
+    state = state.copyWith(underVerse: ids);
+    await _prefs.setStringList(_kUnderVerse, [for (final i in ids) '$i']);
+  }
+
+  Future<void> setSplitTranslation(bool on) async {
+    state = state.copyWith(splitTranslation: on);
+    await _prefs.setBool(_kSplitTranslation, on);
   }
 
   Future<void> setPlaybackSpeed(double speed) async {

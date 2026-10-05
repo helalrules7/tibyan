@@ -11,6 +11,13 @@ All notable changes to Tibyan are recorded here. The format follows
 - An actions widget, an extension of its own on iOS and macOS and a widget of its own on Android: continue reading, listen (the recitation starts from the opening page), search, and «قرأت الورد». The last one does not open the app: it queues the action and the app marks the day's portion read the next time it runs.
 - `.github/workflows/native.yml` builds Android, iOS and macOS with the extensions on every native change.
 
+### Added (translation under the verse)
+- A continuous view («عرض متتالي», from the page's tools): a surah verse after verse in the KFGQPC text, opening at the page's first verse, with the reader's choice under each verse: the Arabic only, one or two translations (Saheeh International, Pickthall), or al-Tafsir al-Muyassar; smaller, quieter and justified. The choice is kept and changed from the top bar. A tap on a verse opens its tafsir and translations. The text is the Hafs text in every edition, and the view says so in a riwaya edition.
+- The pages stay as printed: selecting a verse shows the chosen texts for it in the verse services. On screens 900 points wide or more, the page can show the chosen texts for its verses beside it (off by default).
+
+### Fixed
+- Settings showed version 0.1.1 whatever the build; it now shows the app's own version and build number.
+
 ### Added (storage and recitation speed)
 - Settings › «التخزين والتنزيلات»: every mushaf pack, each reciter's downloaded surahs, the search-by-meaning pack and the timing updates with their sizes, delete any of them (they download again when needed), and clean up the leftovers of downloads that stopped. The edition that ships with the app is shown but not deletable. Your own data is never listed or touched.
 - Recitation speed (×0.75 to ×2) in the player's options, kept for the next time. Verse highlighting follows the audio, so it stays right at any speed.

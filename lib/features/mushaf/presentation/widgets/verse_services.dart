@@ -28,6 +28,7 @@ class VerseServicesPanel extends StatelessWidget {
     this.onCopy,
     this.onShareText,
     this.onShareImage,
+    this.preview,
     this.similarCount = 0,
     this.onSimilar,
   });
@@ -62,6 +63,10 @@ class VerseServicesPanel extends StatelessWidget {
   final VoidCallback? onCopy;
   final VoidCallback? onShareText;
   final VoidCallback? onShareImage;
+
+  /// The reader's chosen texts for the first selected verse (a translation
+  /// or al-Muyassar), shown under the title; null for the Arabic only.
+  final Widget? preview;
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +153,12 @@ class VerseServicesPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              if (preview != null)
+                Container(
+                  constraints: const BoxConstraints(maxHeight: 140),
+                  margin: const EdgeInsets.only(top: 4),
+                  child: SingleChildScrollView(child: preview),
+                ),
               const SizedBox(height: 10),
               Row(
                 children: [

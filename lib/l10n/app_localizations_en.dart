@@ -1778,4 +1778,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storageUnknown => 'Other files';
+
+  @override
+  String get continuousView => 'Continuous view';
+
+  @override
+  String get underVerseTitle => 'Under each verse';
+
+  @override
+  String get underArabicOnly => 'Arabic only';
+
+  @override
+  String get underTranslation => 'Arabic with a translation';
+
+  @override
+  String get underTranslationHint => 'Choose one or two';
+
+  @override
+  String get underMuyassar => 'Arabic with al-Tafsir al-Muyassar';
+
+  @override
+  String get splitTranslationLabel => 'Beside the page on wide screens';
+
+  @override
+  String get splitTranslationHint =>
+      'The page as printed, with your choice for its verses beside it';
+
+  @override
+  String get nextSurah => 'Next surah';
+
+  @override
+  String get previousSurah => 'Previous surah';
+
+  @override
+  String get hafsTextNote => 'The text here is in the Hafs riwaya';
 }

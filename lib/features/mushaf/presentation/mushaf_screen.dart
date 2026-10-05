@@ -35,6 +35,7 @@ import '../data/tajweed.dart';
 import '../data/riwaya_data.dart';
 import '../data/verse_image.dart';
 import '../data/verse_share.dart';
+import '../../reading/under_verse.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'widgets/art_frame.dart';
@@ -599,54 +600,66 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             // The frame and the space above and below the page open the
             // menus too; a tap on the page itself or on a frame label is
             // taken by that (deeper) widget first.
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _onPageTap,
-              child: SafeArea(
-                // While listening, the page sits above the player bar so the
-                // catchword and the reading tools stay visible.
-                minimum: EdgeInsets.only(
-                  bottom: recitation.active && !_autoScroll
-                      ? MediaQuery.paddingOf(context).bottom + 80
-                      : 0,
-                ),
-                child: _autoScroll
-                    ? LayoutBuilder(
-                        builder: (context, box) {
-                          _pageExtent = box.maxHeight;
-                          _vertical ??= ScrollController(
-                            initialScrollOffset:
-                                (_page - _first) * box.maxHeight,
-                          );
-                          return ListView.builder(
-                            controller: _vertical,
-                            itemExtent: box.maxHeight,
-                            itemCount: pageCount + 1 - _first,
-                            itemBuilder: (context, i) => pageAt(i),
-                          );
-                        },
-                      )
-                    : _controller == null
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          semanticsLabel: l.loadingLabel,
-                        ),
-                      )
-                    // The mushaf opens from the right in every interface language.
-                    : Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: PageView.builder(
-                          controller: _controller,
-                          itemCount: pageCount + 1 - _first,
-                          // The pages either side are built and their images
-                          // decoded before they are turned to, so a page turn
-                          // does not stop on a spinner.
-                          allowImplicitScrolling: true,
-                          onPageChanged: _onPageChanged,
-                          itemBuilder: (context, i) => pageAt(i),
-                        ),
+            // Wide screens may show the chosen texts beside the page.
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _onPageTap,
+                    child: SafeArea(
+                      // While listening, the page sits above the player bar so the
+                      // catchword and the reading tools stay visible.
+                      minimum: EdgeInsets.only(
+                        bottom: recitation.active && !_autoScroll
+                            ? MediaQuery.paddingOf(context).bottom + 80
+                            : 0,
                       ),
-              ),
+                      child: _autoScroll
+                          ? LayoutBuilder(
+                              builder: (context, box) {
+                                _pageExtent = box.maxHeight;
+                                _vertical ??= ScrollController(
+                                  initialScrollOffset:
+                                      (_page - _first) * box.maxHeight,
+                                );
+                                return ListView.builder(
+                                  controller: _vertical,
+                                  itemExtent: box.maxHeight,
+                                  itemCount: pageCount + 1 - _first,
+                                  itemBuilder: (context, i) => pageAt(i),
+                                );
+                              },
+                            )
+                          : _controller == null
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                semanticsLabel: l.loadingLabel,
+                              ),
+                            )
+                          // The mushaf opens from the right in every interface language.
+                          : Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: PageView.builder(
+                                controller: _controller,
+                                itemCount: pageCount + 1 - _first,
+                                // The pages either side are built and their images
+                                // decoded before they are turned to, so a page turn
+                                // does not stop on a spinner.
+                                allowImplicitScrolling: true,
+                                onPageChanged: _onPageChanged,
+                                itemBuilder: (context, i) => pageAt(i),
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+                if (settings.splitTranslation &&
+                    settings.underVerse.isNotEmpty &&
+                    !_autoScroll &&
+                    MediaQuery.sizeOf(context).width >= 900)
+                  _SidePane(page: _page, riwaya: _riwaya),
+              ],
             ),
             if (_chrome) ...[
               // A light veil so the controls read as a layer over the page.
@@ -711,6 +724,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   onListen: _listenFromPage,
                   onGoTo: _goToPage,
                   onAutoScroll: _startAutoScroll,
+                  onContinuous: _openContinuous,
                   touchReading: _touchReading,
                   onTouchReading: _toggleTouchReading,
                   recite: _recite,
@@ -875,6 +889,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       ? null
                       : () => _shareVerseText(range),
                   onShareImage: () => _shareVerseImage(range),
+                  preview: settings.underVerse.isEmpty
+                      ? null
+                      : UnderVerseTexts(
+                          surah: hafsKeyOf(_riwaya, range.first).surah,
+                          ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                        ),
                 ),
               ),
           ],
@@ -1460,6 +1480,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     );
   }
 
+  /// The continuous view at the first verse of this page (Hafs numbers).
+  Future<void> _openContinuous() async {
+    final a = ref.read(pageAyahsProvider(_page)).value?.firstOrNull;
+    if (a == null) return;
+    final h = hafsKeyOf(_riwaya, (surah: a.surah, ayah: a.number));
+    _setChrome(false);
+    await context.push('/read?s=${h.surah}&a=${h.ayah}');
+  }
+
   Future<void> _goToPage() async {
     final page = await showGoToPage(
       context,
@@ -1659,6 +1688,7 @@ class _BottomControls extends StatelessWidget {
     required this.onListen,
     required this.onGoTo,
     required this.onAutoScroll,
+    required this.onContinuous,
     required this.touchReading,
     required this.onTouchReading,
     required this.recite,
@@ -1678,6 +1708,9 @@ class _BottomControls extends StatelessWidget {
   final VoidCallback onListen;
   final VoidCallback onGoTo;
   final VoidCallback onAutoScroll;
+
+  /// Opens the continuous view (with the texts under each verse).
+  final VoidCallback onContinuous;
 
   @override
   Widget build(BuildContext context) {
@@ -1736,6 +1769,11 @@ class _BottomControls extends StatelessWidget {
                       icon: const Icon(Icons.keyboard_double_arrow_down),
                       label: Text(l.autoScroll),
                     ),
+                    FilledButton.tonalIcon(
+                      onPressed: onContinuous,
+                      icon: const Icon(Icons.view_agenda_outlined),
+                      label: Text(l.continuousView),
+                    ),
                   ],
                 )
               else
@@ -1761,6 +1799,12 @@ class _BottomControls extends StatelessWidget {
                       label: Text(l.goToPage),
                     ),
                     const Spacer(),
+                    IconButton.filledTonal(
+                      tooltip: l.continuousView,
+                      onPressed: onContinuous,
+                      icon: const Icon(Icons.view_agenda_outlined),
+                    ),
+                    const SizedBox(width: 8),
                     IconButton.filledTonal(
                       tooltip: l.autoScroll,
                       onPressed: onAutoScroll,
@@ -2188,6 +2232,72 @@ class VerseBar extends StatelessWidget {
               icon: Icon(Icons.close, color: t.playerFg),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Beside the page on a wide screen: the reader's chosen texts (a
+/// translation or two, or al-Muyassar) for the verses on the page.
+class _SidePane extends ConsumerWidget {
+  const _SidePane({required this.page, required this.riwaya});
+
+  final int page;
+  final RiwayaData? riwaya;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.tokens.colors;
+    final l = AppLocalizations.of(context);
+    final ayahs = ref.watch(pageAyahsProvider(page)).value ?? const [];
+    final surahs = ref.watch(surahsProvider).value;
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    return Container(
+      width: 380,
+      decoration: BoxDecoration(
+        color: t.paper,
+        border: BorderDirectional(start: BorderSide(color: t.border)),
+      ),
+      child: SafeArea(
+        child: SelectionArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            children: [
+              for (final a in ayahs)
+                Builder(
+                  builder: (context) {
+                    // Texts are kept by Hafs verse.
+                    final h = hafsKeyOf(riwaya, (
+                      surah: a.surah,
+                      ayah: a.number,
+                    ));
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            l.verseLabel(
+                              surahs == null
+                                  ? ''
+                                  : surahName(context, surahs[a.surah - 1]),
+                              digits(a.number),
+                            ),
+                            style: TextStyle(
+                              color: t.goldText,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          UnderVerseTexts(surah: h.surah, ayah: h.ayah),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+            ],
+          ),
         ),
       ),
     );

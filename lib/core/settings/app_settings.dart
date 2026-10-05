@@ -92,6 +92,8 @@ class AppSettings {
     this.repeat = 1,
     this.repeatSilence = 0,
     this.playbackSpeed = 1.0,
+    this.underVerse = const [],
+    this.splitTranslation = false,
     this.elderlyMode = false,
     this.tajweedColors = false,
     this.tajweedHues = const {},
@@ -162,6 +164,14 @@ class AppSettings {
   /// Recitation speed (1.0 as recorded).
   final double playbackSpeed;
 
+  /// What is shown under each verse in the continuous view and beside the
+  /// page: the source ids of up to two translations, or of al-Muyassar;
+  /// empty for the Arabic only (docs/features/translation_under_ayah.md).
+  final List<int> underVerse;
+
+  /// Wide screens: the page with the texts of [underVerse] beside it.
+  final bool splitTranslation;
+
   /// «وضع كبار السن»: larger text and touch targets, stronger contrast, a
   /// home with only the main tasks, the page as large as it can be, and
   /// slower transitions.
@@ -198,6 +208,8 @@ class AppSettings {
     int? repeat,
     int? repeatSilence,
     double? playbackSpeed,
+    List<int>? underVerse,
+    bool? splitTranslation,
     bool? elderlyMode,
     bool? tajweedColors,
     Map<String, String>? tajweedHues,
@@ -225,6 +237,8 @@ class AppSettings {
     repeat: repeat ?? this.repeat,
     repeatSilence: repeatSilence ?? this.repeatSilence,
     playbackSpeed: playbackSpeed ?? this.playbackSpeed,
+    underVerse: underVerse ?? this.underVerse,
+    splitTranslation: splitTranslation ?? this.splitTranslation,
     elderlyMode: elderlyMode ?? this.elderlyMode,
     tajweedColors: tajweedColors ?? this.tajweedColors,
     tajweedHues: tajweedHues ?? this.tajweedHues,

@@ -3120,6 +3120,72 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ملفات أخرى'**
   String get storageUnknown;
+
+  /// No description provided for @continuousView.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض متتالي'**
+  String get continuousView;
+
+  /// No description provided for @underVerseTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما يظهر تحت الآية'**
+  String get underVerseTitle;
+
+  /// No description provided for @underArabicOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'عربي فقط'**
+  String get underArabicOnly;
+
+  /// No description provided for @underTranslation.
+  ///
+  /// In ar, this message translates to:
+  /// **'عربي مع ترجمة'**
+  String get underTranslation;
+
+  /// No description provided for @underTranslationHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر ترجمة أو اثنتين'**
+  String get underTranslationHint;
+
+  /// No description provided for @underMuyassar.
+  ///
+  /// In ar, this message translates to:
+  /// **'عربي مع التفسير الميسر'**
+  String get underMuyassar;
+
+  /// No description provided for @splitTranslationLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'بجانب الصفحة على الشاشات العريضة'**
+  String get splitTranslationLabel;
+
+  /// No description provided for @splitTranslationHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة كما هي، وبجانبها ما اخترته لآياتها'**
+  String get splitTranslationHint;
+
+  /// No description provided for @nextSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'السورة التالية'**
+  String get nextSurah;
+
+  /// No description provided for @previousSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'السورة السابقة'**
+  String get previousSurah;
+
+  /// No description provided for @hafsTextNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'النص هنا برواية حفص'**
+  String get hafsTextNote;
 }
 
 class _AppLocalizationsDelegate
