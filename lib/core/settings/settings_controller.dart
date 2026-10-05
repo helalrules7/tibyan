@@ -44,6 +44,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kUnderVerse = 'settings.underVerse';
   static const _kSplitTranslation = 'settings.splitTranslation';
   static const _kTwoPageSpread = 'settings.twoPageSpread';
+  static const _kOneVerseAuto = 'settings.oneVerseAutoSeconds';
   static const _kElderly = 'settings.elderlyMode';
   static const _kTajweed = 'settings.tajweedColors';
   static const _kTajweedHues = 'settings.tajweedHues';
@@ -108,6 +109,7 @@ class SettingsController extends Notifier<AppSettings> {
       ],
       splitTranslation: _prefs.getBool(_kSplitTranslation) ?? false,
       twoPageSpread: _prefs.getBool(_kTwoPageSpread) ?? true,
+      oneVerseAutoSeconds: _prefs.getInt(_kOneVerseAuto) ?? 0,
       elderlyMode: _prefs.getBool(_kElderly) ?? false,
       tajweedColors: _prefs.getBool(_kTajweed) ?? false,
       tajweedHues: {
@@ -255,6 +257,11 @@ class SettingsController extends Notifier<AppSettings> {
     final ids = sourceIds.take(2).toList();
     state = state.copyWith(underVerse: ids);
     await _prefs.setStringList(_kUnderVerse, [for (final i in ids) '$i']);
+  }
+
+  Future<void> setOneVerseAutoSeconds(int seconds) async {
+    state = state.copyWith(oneVerseAutoSeconds: seconds);
+    await _prefs.setInt(_kOneVerseAuto, seconds);
   }
 
   Future<void> setTwoPageSpread(bool on) async {

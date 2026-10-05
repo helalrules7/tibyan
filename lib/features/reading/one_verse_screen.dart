@@ -83,6 +83,12 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
   PageController? _controller;
   int _id = 1;
 
+  /// Turns to the next verse by itself (no recitation playing).
+  Timer? _auto;
+
+  /// The steps the auto-turn button goes through, in seconds (0: off).
+  static const autoSteps = [0, 10, 20, 30, 60];
+
   /// The reader's own choice, put back on leaving.
   late final bool _keepScreenOn = ref.read(settingsProvider).keepScreenOn;
 
@@ -100,6 +106,28 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
     _open();
   }
 
+  /// (Re)starts the auto-turn wait for the verse now shown.
+  void _restartAuto() {
+    _auto?.cancel();
+    final seconds = ref.read(settingsProvider).oneVerseAutoSeconds;
+    if (seconds <= 0) return;
+    _auto = Timer(Duration(seconds: seconds), () {
+      if (!mounted) return;
+      // The recitation leads while it plays.
+      if (ref.read(recitationProvider).playing) return _restartAuto();
+      if (_id < verseCount) _go(1);
+    });
+  }
+
+  void _cycleAuto() {
+    final now = ref.read(settingsProvider).oneVerseAutoSeconds;
+    final i = autoSteps.indexOf(now);
+    final next = autoSteps[(i + 1) % autoSteps.length];
+    unawaited(ref.read(settingsProvider.notifier).setOneVerseAutoSeconds(next));
+    // The setting is written; the timer follows the new value.
+    Future<void>.microtask(_restartAuto);
+  }
+
   Future<void> _open() async {
     final row = await ref
         .read(mushafRepositoryProvider)
@@ -109,6 +137,7 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
       _id = row.id;
       _controller = PageController(initialPage: row.id - 1);
     });
+    _restartAuto();
   }
 
   @override
@@ -118,6 +147,7 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
     if (!_keepScreenOn) {
       unawaited(WakelockPlus.disable().catchError((_) {}));
     }
+    _auto?.cancel();
     _controller?.dispose();
     super.dispose();
   }
@@ -202,10 +232,14 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
                     child: PageView.builder(
                       controller: c,
                       itemCount: verseCount,
-                      onPageChanged: (i) => setState(() => _id = i + 1),
+                      onPageChanged: (i) {
+                        setState(() => _id = i + 1);
+                        _restartAuto();
+                      },
                       itemBuilder: (context, i) => _VersePage(
                         id: i + 1,
                         onListen: _listen,
+                        onAuto: _cycleAuto,
                         onNext: () => _go(1),
                         onPrevious: () => _go(-1),
                         onLeave: _leave,
@@ -223,6 +257,7 @@ class _VersePage extends ConsumerWidget {
   const _VersePage({
     required this.id,
     required this.onListen,
+    required this.onAuto,
     required this.onNext,
     required this.onPrevious,
     required this.onLeave,
@@ -230,6 +265,9 @@ class _VersePage extends ConsumerWidget {
 
   final int id;
   final void Function(AyahRow row) onListen;
+
+  /// Steps the auto-turn through off, 10, 20, 30 and 60 seconds.
+  final VoidCallback onAuto;
   final VoidCallback onNext;
   final VoidCallback onPrevious;
   final VoidCallback onLeave;
@@ -246,6 +284,9 @@ class _VersePage extends ConsumerWidget {
     final r = ref.watch(recitationProvider);
     final playing =
         r.active && r.playing && r.surah == row.surah && r.ayah == row.number;
+    final auto = ref.watch(
+      settingsProvider.select((s) => s.oneVerseAutoSeconds),
+    );
     final name = surahs == null
         ? ''
         : surahName(context, surahs[row.surah - 1]);
@@ -299,6 +340,31 @@ class _VersePage extends ConsumerWidget {
                     ],
                   ),
                 ),
+                // Auto-turn: off, or the seconds each verse stays.
+                Semantics(
+                  button: true,
+                  label: auto == 0
+                      ? l.oneVerseAutoOff
+                      : l.oneVerseAutoOn(digits(auto)),
+                  excludeSemantics: true,
+                  child: SizedBox(
+                    height: 72,
+                    child: FilledButton.tonalIcon(
+                      onPressed: onAuto,
+                      icon: Icon(
+                        auto == 0 ? Icons.timer_off_outlined : Icons.timer,
+                        size: 32,
+                      ),
+                      label: Text(
+                        auto == 0
+                            ? l.oneVerseAutoShort
+                            : l.secondsShort(digits(auto)),
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 big(
                   playing ? Icons.pause : Icons.play_arrow,
                   playing ? l.pause : l.listen,

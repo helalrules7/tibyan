@@ -95,6 +95,7 @@ class AppSettings {
     this.underVerse = const [],
     this.splitTranslation = false,
     this.twoPageSpread = true,
+    this.oneVerseAutoSeconds = 0,
     this.elderlyMode = false,
     this.tajweedColors = false,
     this.tajweedHues = const {},
@@ -176,6 +177,9 @@ class AppSettings {
   /// Wide screens held sideways: two pages side by side.
   final bool twoPageSpread;
 
+  /// «آية آية»: seconds before the next verse turns by itself; 0 for off.
+  final int oneVerseAutoSeconds;
+
   /// «وضع كبار السن»: larger text and touch targets, stronger contrast, a
   /// home with only the main tasks, the page as large as it can be, and
   /// slower transitions.
@@ -215,6 +219,7 @@ class AppSettings {
     List<int>? underVerse,
     bool? splitTranslation,
     bool? twoPageSpread,
+    int? oneVerseAutoSeconds,
     bool? elderlyMode,
     bool? tajweedColors,
     Map<String, String>? tajweedHues,
@@ -245,6 +250,7 @@ class AppSettings {
     underVerse: underVerse ?? this.underVerse,
     splitTranslation: splitTranslation ?? this.splitTranslation,
     twoPageSpread: twoPageSpread ?? this.twoPageSpread,
+    oneVerseAutoSeconds: oneVerseAutoSeconds ?? this.oneVerseAutoSeconds,
     elderlyMode: elderlyMode ?? this.elderlyMode,
     tajweedColors: tajweedColors ?? this.tajweedColors,
     tajweedHues: tajweedHues ?? this.tajweedHues,

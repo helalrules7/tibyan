@@ -3204,6 +3204,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض'**
   String get oneVerseHint;
+
+  /// No description provided for @oneVerseAutoOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'الانتقال التلقائي متوقف. اضغط لتشغيله'**
+  String get oneVerseAutoOff;
+
+  /// No description provided for @oneVerseAutoOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'ينتقل للآية التالية كل {seconds} ثانية. اضغط للتغيير'**
+  String oneVerseAutoOn(String seconds);
+
+  /// No description provided for @oneVerseAutoShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلقائي'**
+  String get oneVerseAutoShort;
+
+  /// No description provided for @secondsShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} ث'**
+  String secondsShort(String n);
 }
 
 class _AppLocalizationsDelegate

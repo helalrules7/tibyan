@@ -41,10 +41,11 @@ void main() {
   });
   tearDownAll(() => db.close());
 
-  testWidgets('turns the phone sideways and steps verse by verse', (
-    tester,
-  ) async {
-    final orientations = <Object?>[];
+  Future<void> pumpScreen(
+    WidgetTester tester,
+    List<Object?> orientations, {
+    Map<String, Object> prefs = const {},
+  }) async {
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
       (call) async {
@@ -57,7 +58,7 @@ void main() {
     final registry = (await tester.runAsync(
       () => ThemeRegistry.load(rootBundle),
     ))!;
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues(prefs);
     final sp = await SharedPreferences.getInstance();
     final user = UserDatabase(NativeDatabase.memory());
     addTearDown(() => tester.runAsync(user.close));
@@ -87,6 +88,13 @@ void main() {
         ),
       ),
     );
+  }
+
+  testWidgets('turns the phone sideways and steps verse by verse', (
+    tester,
+  ) async {
+    final orientations = <Object?>[];
+    await pumpScreen(tester, orientations);
     Future<void> settle() async {
       for (var i = 0; i < 10; i++) {
         await tester.runAsync(
@@ -105,6 +113,31 @@ void main() {
 
     await tester.tap(find.byTooltip('الآية التالية'));
     await settle();
+    expect(find.text('سورة الفاتحة · ٣'), findsOneWidget);
+  });
+
+  testWidgets('auto-turn moves on by itself after the chosen seconds', (
+    tester,
+  ) async {
+    await pumpScreen(
+      tester,
+      [],
+      prefs: const {'settings.oneVerseAutoSeconds': 10},
+    );
+    for (var i = 0; i < 6; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.text('سورة الفاتحة · ٢'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 11));
+    for (var i = 0; i < 6; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
     expect(find.text('سورة الفاتحة · ٣'), findsOneWidget);
   });
 }

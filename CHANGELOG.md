@@ -14,6 +14,8 @@ All notable changes to Tibyan are recorded here. The format follows
 ### Added (verse by verse, for older eyes)
 - «آية آية»: a button under the page (the first, labelled one in elderly mode) turns the phone sideways and shows one verse a screen, as large as it fits (long verses at a readable minimum, scrolling). Large buttons go to the previous or next verse, or swipe; «استماع» recites from that verse and the screen follows the recitation; the screen stays on. Closing it (or Back) returns to the mushaf at the last verse shown, and the phone turns back. The text is the Hafs text in every edition.
 
+- «آية آية» can turn to the next verse by itself: a large button steps through off, 10, 20, 30 and 60 seconds a verse (kept for next time). A turn by hand starts the wait again, and while the recitation plays it leads instead.
+
 ### Added (two facing pages)
 - On a wide screen held sideways (a tablet, a desktop window), the mushaf shows two facing pages like an open copy: the right page first, pages 1 and 2 together (2 and 3 in the Shamarly edition), the covers alone. Selection, sharing, following the recitation, going to a page and the page scrubber work across the spread; both pages count for the khatma once they have been on screen for twice a page's time. Off in a hifz test, and switchable in settings («صفحتان متقابلتان», on by default).
 

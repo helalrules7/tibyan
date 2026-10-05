@@ -1813,4 +1813,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get oneVerseHint => 'آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض';
+
+  @override
+  String get oneVerseAutoOff => 'الانتقال التلقائي متوقف. اضغط لتشغيله';
+
+  @override
+  String oneVerseAutoOn(String seconds) {
+    return 'ينتقل للآية التالية كل $seconds ثانية. اضغط للتغيير';
+  }
+
+  @override
+  String get oneVerseAutoShort => 'تلقائي';
+
+  @override
+  String secondsShort(String n) {
+    return '$n ث';
+  }
 }

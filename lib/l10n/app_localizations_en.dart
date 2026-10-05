@@ -1823,4 +1823,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get oneVerseHint =>
       'One verse a screen in large print, the phone sideways';
+
+  @override
+  String get oneVerseAutoOff => 'Auto-turn is off. Tap to turn it on';
+
+  @override
+  String oneVerseAutoOn(String seconds) {
+    return 'Turns to the next verse every $seconds seconds. Tap to change';
+  }
+
+  @override
+  String get oneVerseAutoShort => 'Auto';
+
+  @override
+  String secondsShort(String n) {
+    return '$n s';
+  }
 }

@@ -1290,5 +1290,11 @@
   "twoPageSpread": "صفحتان متقابلتان",
   "twoPageSpreadHint": "على الشاشات العريضة في الوضع الأفقي، كالمصحف المفتوح",
   "oneVerse": "آية آية",
-  "oneVerseHint": "آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض"
+  "oneVerseHint": "آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض",
+  "oneVerseAutoOff": "الانتقال التلقائي متوقف. اضغط لتشغيله",
+  "oneVerseAutoOn": "ينتقل للآية التالية كل {seconds} ثانية. اضغط للتغيير",
+  "@oneVerseAutoOn": {"placeholders": {"seconds": {"type": "String"}}},
+  "oneVerseAutoShort": "تلقائي",
+  "secondsShort": "{n} ث",
+  "@secondsShort": {"placeholders": {"n": {"type": "String"}}}
 }
