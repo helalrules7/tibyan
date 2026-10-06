@@ -40,6 +40,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kFollow = 'settings.followRecitation';
   static const _kTouchReading = 'settings.touchReading';
   static const _kVersePause = 'settings.versePause';
+  static const _kTapJumpWord = 'settings.tapJumpFromWord';
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
   static const _kPlaybackSpeed = 'settings.playbackSpeed';
@@ -103,6 +104,7 @@ class SettingsController extends Notifier<AppSettings> {
       followRecitation: _prefs.getBool(_kFollow) ?? true,
       touchReading: _prefs.getBool(_kTouchReading) ?? true,
       versePause: _prefs.getInt(_kVersePause) ?? 500,
+      tapJumpFromWord: _prefs.getBool(_kTapJumpWord) ?? false,
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
       playbackSpeed: _prefs.getDouble(_kPlaybackSpeed) ?? 1.0,
@@ -257,6 +259,13 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setVersePause(int ms) async {
     state = state.copyWith(versePause: ms);
     await _prefs.setInt(_kVersePause, ms);
+  }
+
+  /// Where a tap on a verse while listening starts: the word tapped, or
+  /// the verse's start.
+  Future<void> setTapJumpFromWord(bool value) async {
+    state = state.copyWith(tapJumpFromWord: value);
+    await _prefs.setBool(_kTapJumpWord, value);
   }
 
   Future<void> setRepeat(int times) async {

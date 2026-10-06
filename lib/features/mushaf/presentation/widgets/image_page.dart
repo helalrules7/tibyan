@@ -783,7 +783,9 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                       final v = x.onVerseTap == null
                           ? null
                           : verseAt(d.localPosition);
-                      v != null ? x.onVerseTap!(v) : x.onTap();
+                      v != null
+                          ? x.onVerseTap!(v, layout.toImage(d.localPosition))
+                          : x.onTap();
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(d.localPosition);
@@ -854,6 +856,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                       (k, layout.toScreenRect(r)),
                   ]),
                   markAction: l.markThisVerse,
+                  listenAction: l.listenFromVerse,
                 ),
                 ...handles,
               ],

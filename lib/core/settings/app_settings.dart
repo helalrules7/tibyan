@@ -90,6 +90,7 @@ class AppSettings {
     this.followRecitation = true,
     this.touchReading = true,
     this.versePause = 500,
+    this.tapJumpFromWord = false,
     this.repeat = 1,
     this.repeatSilence = 0,
     this.playbackSpeed = 1.0,
@@ -160,6 +161,10 @@ class AppSettings {
   /// the recording as it is.
   final int versePause;
 
+  /// A tap on a verse while listening moves the reciter to the word tapped
+  /// (when it has a word timing) rather than to the verse's start.
+  final bool tapJumpFromWord;
+
   /// Times the player plays each verse, or the chosen stretch; 0 repeats
   /// until stopped.
   final int repeat;
@@ -218,6 +223,7 @@ class AppSettings {
     bool? followRecitation,
     bool? touchReading,
     int? versePause,
+    bool? tapJumpFromWord,
     int? repeat,
     int? repeatSilence,
     double? playbackSpeed,
@@ -250,6 +256,7 @@ class AppSettings {
     followRecitation: followRecitation ?? this.followRecitation,
     touchReading: touchReading ?? this.touchReading,
     versePause: versePause ?? this.versePause,
+    tapJumpFromWord: tapJumpFromWord ?? this.tapJumpFromWord,
     repeat: repeat ?? this.repeat,
     repeatSilence: repeatSilence ?? this.repeatSilence,
     playbackSpeed: playbackSpeed ?? this.playbackSpeed,

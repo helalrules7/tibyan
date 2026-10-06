@@ -427,6 +427,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       final testCovers = _testing && pg == _page
           ? _test.covers(_pageKeys(pg), testUnits)
           : null;
+      final jumps = _tapJumps(recitation);
       final interaction = PageInteraction(
         // The reader's selection, or else the verse being recited.
         selection: _selA != null
@@ -447,12 +448,16 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         },
         onMarkerTap: (v) => _toggleMark(v, pg),
         // Selecting several verses: a tap on a verse (on this page or a later
-        // or earlier one) extends the selection to it.
+        // or earlier one) extends the selection to it. While listening, it
+        // moves the recitation there.
         onVerseTap: _multi
-            ? (v) => _extendTo(v, pg)
+            ? (v, _) => _extendTo(v, pg)
+            : jumps
+            ? (v, point) => _listenFrom(v, pg, point)
             : _touchReading
-            ? (v) => setState(() => _touched = v)
+            ? (v, _) => setState(() => _touched = v)
             : null,
+        onListenFrom: jumps ? (v) => _listenFrom(v, pg, null) : null,
         touched: _touchReading ? _touched : null,
         touchColor: _touchReading
             ? (context.tokens.mode.isLight
@@ -1174,10 +1179,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   void _pickAt(int page, Offset point, VerseKey? verse) {
     final boxes = ref.read(pageWordBoxesProvider(page)).value ?? const {};
     final edition = ref.read(editionProvider);
-    // Page units in the SVG editions, image pixels in the others.
-    final slop = edition == MushafEdition.madina1441 || edition.isRiwaya
-        ? 2.0
-        : 6.0;
+    final slop = _wordSlop;
     final hit =
         wordUnder(boxes, point, verse: verse, slop: slop) ??
         wordUnder(boxes, point, slop: slop);
@@ -1221,6 +1223,64 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       return;
     }
     showWordStudy(context, surah: target.$1, ayah: target.$2, word: target.$3);
+  }
+
+  /// How near a word's box a touch counts as on it: page units in the SVG
+  /// editions, image pixels in the others.
+  double get _wordSlop {
+    final edition = ref.read(editionProvider);
+    return edition == MushafEdition.madina1441 || edition.isRiwaya ? 2.0 : 6.0;
+  }
+
+  /// Whether a tap on a verse moves the recitation there: while listening
+  /// (playing or paused) in plain reading. Selecting, recitation mode, a
+  /// hifz test, word picking and a tafsir played on its own keep their
+  /// own taps.
+  bool _tapJumps(RecitationState r) =>
+      r.active &&
+      !(r.clip?.standalone ?? false) &&
+      !_multi &&
+      _selA == null &&
+      !_recite &&
+      !_testing &&
+      !_pickWord;
+
+  /// While listening, a tap on [v] (at [point] on [page], edition units)
+  /// moves the recitation there: to the word tapped when the reader chose
+  /// so and the page has that word's box, else to the verse's start. Touch
+  /// reading shades the verse too. Verse and word numbers are those of
+  /// the page, which a riwaya's recitations share.
+  Future<void> _listenFrom(VerseKey v, int page, Offset? point) async {
+    if (_touchReading) setState(() => _touched = v);
+    int? word;
+    if (point != null && ref.read(settingsProvider).tapJumpFromWord) {
+      try {
+        final boxes = await ref.read(pageWordBoxesProvider(page).future);
+        word = wordUnder(boxes, point, verse: v, slop: _wordSlop)?.$3;
+      } on Object {
+        // No word boxes: from the verse's start.
+      }
+    }
+    final result = await ref
+        .read(recitationProvider.notifier)
+        .jumpTo(v.surah, v.ayah, word: word);
+    if (!mounted) return;
+    switch (result) {
+      case VerseJump.jumped:
+        HapticFeedback.lightImpact();
+      case VerseJump.noTiming:
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(milliseconds: 1800),
+              content: Text(AppLocalizations.of(context).tapJumpNoTiming),
+            ),
+          );
+      case VerseJump.ignored:
+        break;
+    }
   }
 
   /// Word boxes of [verses] on [page], by verse (edition units).

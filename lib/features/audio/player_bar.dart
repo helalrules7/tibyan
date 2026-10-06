@@ -504,6 +504,15 @@ class PlayerOptions extends ConsumerWidget {
           settings.versePause,
           ref.read(settingsProvider.notifier).setVersePause,
         ),
+        const SizedBox(height: 12),
+        Semantics(header: true, child: Text(l.tapJumpLabel, style: title)),
+        Text(l.tapJumpHint, style: hint),
+        const SizedBox(height: 6),
+        chips<bool>(
+          [(false, l.tapJumpVerseStart), (true, l.tapJumpFromWord)],
+          settings.tapJumpFromWord,
+          ref.read(settingsProvider.notifier).setTapJumpFromWord,
+        ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l.followRecitation),

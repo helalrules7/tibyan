@@ -484,6 +484,18 @@ class RecitationState {
   );
 }
 
+/// What a tap on a verse while listening did ([RecitationController.jumpTo]).
+enum VerseJump {
+  /// The recitation moved to the verse.
+  jumped,
+
+  /// The recitation has no timing for the verse: it plays on, unmoved.
+  noTiming,
+
+  /// Not listening, or a tafsir plays on its own: the tap is not a jump.
+  ignored,
+}
+
 /// The parts of the audio player the recitation uses; tests put a fake in
 /// its place.
 abstract class RecitationAudio {
@@ -661,6 +673,7 @@ class RecitationController extends Notifier<RecitationState> {
   /// defaults to the reader's setting. Unless [start] is false, playback
   /// begins once the file is ready. [nearSpeech] starts a moment before
   /// the verse's speech when the pauses are shortened (after a clip).
+  /// [word] starts at that word of [from] when it has a word timing.
   Future<void> play(
     int surah, {
     int? from,
@@ -670,6 +683,7 @@ class RecitationController extends Notifier<RecitationState> {
     Duration? silence,
     bool start = true,
     bool nearSpeech = false,
+    int? word,
   }) async {
     final load = ++_loads;
     _loading = true;
@@ -734,7 +748,9 @@ class RecitationController extends Notifier<RecitationState> {
     final stream = !local.existsSync();
     // The copy on the device, else the faster host, then the other.
     final uris = stream ? hosts.urls(reciter, surah) : [local.uri];
-    final at = nearSpeech ? _repeatStart(ayah) : _startOf(ayah);
+    final at =
+        _wordStart(ayah, word) ??
+        (nearSpeech ? _repeatStart(ayah) : _startOf(ayah));
     Object? error;
     for (final uri in uris) {
       try {
@@ -961,6 +977,17 @@ class RecitationController extends Notifier<RecitationState> {
       if (t.ayah == ayah) return Duration(milliseconds: t.startMs);
     }
     return Duration.zero;
+  }
+
+  /// Where [word] of [ayah] starts, when the recitation times it.
+  Duration? _wordStart(int? ayah, int? word) {
+    if (ayah == null || word == null) return null;
+    for (final w in _words) {
+      if (w.ayah == ayah && w.word == word) {
+        return Duration(milliseconds: w.startMs);
+      }
+    }
+    return null;
   }
 
   int? _endOf(int ayah) {
@@ -1216,6 +1243,70 @@ class RecitationController extends Notifier<RecitationState> {
       repeatDone: state.rangeTo == null ? 0 : null,
     );
     if (silent) unawaited(_p.play());
+  }
+
+  /// The reader tapped [ayah] of [surah] on the page while listening: the
+  /// recitation moves there at once and plays (a pause ends), from [word]
+  /// when given and timed, else from the verse's start. A stretch being
+  /// repeated is kept when the verse lies in it and dropped otherwise;
+  /// each verse still repeats as set. Another surah's verse loads that
+  /// surah's file. Nothing moves when the recitation has no timing for
+  /// the verse ([VerseJump.noTiming]), nor during a tafsir played on its
+  /// own ([VerseJump.ignored]).
+  Future<VerseJump> jumpTo(int surah, int ayah, {int? word}) async {
+    final s = state;
+    if (!s.active || (s.clip?.standalone ?? false)) return VerseJump.ignored;
+    final inRange =
+        s.rangeTo != null &&
+        s.surah == surah &&
+        ayah >= (s.rangeFrom ?? 1) &&
+        ayah <= s.rangeTo!;
+    // Out of the stretch: each verse repeats as the reader set it.
+    final repeat = s.rangeTo == null || inRange
+        ? s.repeat
+        : ref.read(settingsProvider).repeat;
+    if (s.surah != surah || s.clip != null || s.loading || _loading) {
+      // Another file (or the recitation's own, after a translation clip
+      // or while it loads): only when it times the verse.
+      final reciter = await ref.read(currentReciterProvider.future);
+      if (reciter == null) return VerseJump.ignored;
+      final timings = await ref
+          .read(mushafRepositoryProvider)
+          .timings(reciter.id, surah);
+      if (!timings.any((t) => t.ayah == ayah)) return VerseJump.noTiming;
+      if (!state.active) return VerseJump.ignored;
+      await play(
+        surah,
+        from: ayah,
+        to: inRange ? s.rangeTo : null,
+        rangeFrom: inRange ? s.rangeFrom : null,
+        repeat: repeat,
+        silence: s.silence,
+        nearSpeech: true,
+        word: word,
+      );
+      return VerseJump.jumped;
+    }
+    if (!s.timed || _endOf(ayah) == null) return VerseJump.noTiming;
+    final silent = _inSilence;
+    _waits++;
+    _inSilence = false;
+    _restartAt = null;
+    _resumeMs = null;
+    _jumpTo = null;
+    _verseDone = null;
+    await _p.seek(_wordStart(ayah, word) ?? _repeatStart(ayah));
+    state = state.copyWith(
+      ayah: () => ayah,
+      word: () => null,
+      rangeFrom: inRange ? null : () => null,
+      rangeTo: inRange ? null : () => null,
+      repeat: repeat,
+      // A stretch whose repetitions were done plays afresh.
+      repeatDone: inRange && !_rangeFinished ? null : 0,
+    );
+    if (silent || !state.playing) unawaited(_p.play());
+    return VerseJump.jumped;
   }
 
   /// Sets how many times each verse (or the chosen stretch) plays, and
