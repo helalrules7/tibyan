@@ -119,6 +119,45 @@ class MushafRepository {
             ]))
           .get();
 
+  /// Word boxes of verses [from] to [to] of [surah] on the new edition's
+  /// pages (1441H), in reading order.
+  Future<List<WordBoxRow>> wordBoxesOfVerses(int surah, int from, int to) =>
+      (_db.select(_db.wordBox)
+            ..where(
+              (t) => t.surah.equals(surah) & t.ayah.isBetweenValues(from, to),
+            )
+            ..orderBy([
+              (t) => OrderingTerm.asc(t.ayah),
+              (t) => OrderingTerm.asc(t.word),
+            ]))
+          .get();
+
+  /// The cuts between the lines of pages [from] to [to] of [edition], by
+  /// page (as [lineCuts]; pages 1 and 2 have none).
+  Future<Map<int, List<double>>> lineCutsOfPages(
+    String edition,
+    int from,
+    int to,
+  ) async {
+    final rows =
+        await (_db.select(_db.lineCut)
+              ..where(
+                (t) =>
+                    t.edition.equals(edition) &
+                    t.page.isBetweenValues(from, to),
+              )
+              ..orderBy([
+                (t) => OrderingTerm.asc(t.page),
+                (t) => OrderingTerm.asc(t.gap),
+              ]))
+            .get();
+    final out = <int, List<double>>{};
+    for (final r in rows) {
+      (out[r.page] ??= []).add(r.y);
+    }
+    return out;
+  }
+
   /// The 14 cuts between the lines of a page, top to bottom; empty for
   /// pages 1 and 2.
   Future<List<double>> lineCuts(String edition, int page) async {

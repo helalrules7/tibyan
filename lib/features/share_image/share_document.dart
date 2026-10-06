@@ -39,6 +39,7 @@ class SharePassage {
     required this.pageLabel,
     this.tajweed = const {},
     this.divineNames = false,
+    this.mushaf,
   });
 
   /// Verbatim from the source, in order.
@@ -66,6 +67,12 @@ class SharePassage {
   /// Colour the divine name.
   final bool divineNames;
 
+  /// The page and line of each word of the passage in its printed mushaf
+  /// (by surah, verse and word), when they are known: a passage on more
+  /// than one picture is then split as the mushaf is, page by page and
+  /// line by line ([paginateByMushaf]).
+  final Map<(int, int, int), MushafPlace>? mushaf;
+
   /// The basmala line opens a surah's first image, except before
   /// at-Tawba, which has none, and al-Fatiha, whose first verse is the
   /// basmala itself (shown as that verse, with its number).
@@ -81,8 +88,10 @@ class ShareDocument {
     this._words,
     this._widths,
     this.pages,
-    this._logo,
-  );
+    this._logo, {
+    required this.byMushaf,
+    double? linePitch,
+  }) : _linePitch = linePitch ?? fontSize * _pitch;
 
   static const width = 1536.0;
   static const height = 2048.0;
@@ -117,6 +126,11 @@ class ShareDocument {
   /// Line pitch, in font sizes.
   static const _pitch = 1.95;
 
+  /// The least line pitch of a passage laid out as its mushaf's pages, in
+  /// font sizes: a page of fifteen lines then still fits a picture at the
+  /// size its longest line allows.
+  static const _mushafPitch = 1.6;
+
   /// The least space between two words, in font sizes.
   static const _space = 0.26;
 
@@ -128,13 +142,20 @@ class ShareDocument {
   final List<SharePageLayout> pages;
   final ui.Image? _logo;
 
+  /// Laid out as the printed mushaf: each picture one page of it, each
+  /// line one of its lines ([paginateByMushaf]).
+  final bool byMushaf;
+
+  /// From one line's middle to the next one's.
+  final double _linePitch;
+
   int get pageCount => pages.length;
 
   /// The size of image [page]: a passage on one picture is only as tall as
   /// its header, basmala, text and footer need; a passage on several keeps
   /// the full 3:4 size on every one.
   Size sizeOf(int page) {
-    if (pages.length > 1) return size;
+    if (pages.length > 1 || byMushaf) return size;
     final layout = pages[page];
     final basmala = layout.firstOfSurah && passage.hasBasmala(layout.surah);
     final h =
@@ -148,19 +169,17 @@ class ShareDocument {
     return Size(width, h < height ? h.ceilToDouble() : height);
   }
 
-  double get _linePitch => fontSize * _pitch;
-
   /// Lays [passage] out. [logo] is the Tibyan mark for the footers.
+  ///
+  /// A passage that fits on one picture takes the largest size it fits at,
+  /// its lines flowed to the picture's width. A longer one is split as its
+  /// printed mushaf when the places of its words are known
+  /// ([SharePassage.mushaf]): one picture for each page, one line for each
+  /// line, all at one size, the largest at which the longest line fits the
+  /// text's width. Otherwise its lines are flowed at the smallest size.
   factory ShareDocument.build(SharePassage passage, {ui.Image? logo}) {
     final tokens = tokenize(passage.verses);
-    // The first word number of each token in its verse.
-    final firstWords = <int>[];
-    var word = 1;
-    for (var i = 0; i < tokens.length; i++) {
-      if (i > 0 && tokens[i].verse != tokens[i - 1].verse) word = 1;
-      firstWords.add(word);
-      word += wordsInToken(tokens[i].text, endsVerse: tokens[i].endsVerse);
-    }
+    final firstWords = tokenFirstWords(tokens);
 
     List<ui.Paragraph> paragraphs(double size) => [
       for (var i = 0; i < tokens.length; i++)
@@ -202,12 +221,111 @@ class ShareDocument {
         break;
       }
     }
-    if (chosen != base) {
-      words = paragraphs(chosen);
-      widths = [for (final p in words) _widthOf(p)];
+    if (chosen == base) {
+      final flowed = _paginate(passage, tokens, widths, base);
+      final places = passage.mushaf;
+      final mushaf = flowed.length > 1 && places != null
+          ? paginateByMushaf(
+              tokens: tokens,
+              verses: passage.verses,
+              placeOf: (s, a, w) => places[(s, a, w)],
+            )
+          : null;
+      if (mushaf == null) {
+        return ShareDocument._(
+          passage,
+          base,
+          tokens,
+          words,
+          widths,
+          flowed,
+          logo,
+          byMushaf: false,
+        );
+      }
+      for (final p in words) {
+        p.dispose();
+      }
+      return _byMushaf(passage, tokens, mushaf, paragraphs, logo);
     }
+    words = paragraphs(chosen);
+    widths = [for (final p in words) _widthOf(p)];
     final pages = _paginate(passage, tokens, widths, chosen);
-    return ShareDocument._(passage, chosen, tokens, words, widths, pages, logo);
+    return ShareDocument._(
+      passage,
+      chosen,
+      tokens,
+      words,
+      widths,
+      pages,
+      logo,
+      byMushaf: false,
+    );
+  }
+
+  /// [pages], the passage split as its mushaf, at the largest size (up to
+  /// the first of [fontSizes]) at which the longest line fits the text's
+  /// width and the fullest picture its height.
+  static ShareDocument _byMushaf(
+    SharePassage passage,
+    List<ShareToken> tokens,
+    List<SharePageLayout> pages,
+    List<ui.Paragraph> Function(double size) paragraphs,
+    ui.Image? logo,
+  ) {
+    double room(SharePageLayout p) =>
+        _textBottom -
+        _textTop(withBasmala: p.firstOfSurah && passage.hasBasmala(p.surah));
+    // The least room a line has on any picture.
+    var perLine = double.infinity;
+    for (final p in pages) {
+      perLine = math.min(perLine, room(p) / p.lines.length);
+    }
+    double widest(List<double> widths, double size) {
+      var most = 0.0;
+      for (final p in pages) {
+        for (final l in p.lines) {
+          var used = size * _space * (l.length - 1);
+          for (var i = l.from; i < l.to; i++) {
+            used += widths[i];
+          }
+          most = math.max(most, used);
+        }
+      }
+      return most;
+    }
+
+    const probe = 60.0;
+    var words = paragraphs(probe);
+    var size =
+        probe * textWidth / widest([for (final p in words) _widthOf(p)], probe);
+    size = math.min(size, perLine / _mushafPitch);
+    size = math.min(size, fontSizes.first);
+    var widths = <double>[];
+    // The measured widths scale only nearly with the size: shrink until the
+    // longest line fits.
+    for (var tries = 0; ; tries++) {
+      size = (size * 2).floorToDouble() / 2;
+      for (final p in words) {
+        p.dispose();
+      }
+      words = paragraphs(size);
+      widths = [for (final p in words) _widthOf(p)];
+      final most = widest(widths, size);
+      if (most <= textWidth || tries == 4) break;
+      size = math.min(size - 0.5, size * textWidth / most);
+    }
+    return ShareDocument._(
+      passage,
+      size,
+      tokens,
+      words,
+      widths,
+      pages,
+      logo,
+      byMushaf: true,
+      linePitch: math.min(size * _pitch, perLine),
+    );
   }
 
   static double _widthOf(ui.Paragraph p) {
@@ -217,14 +335,16 @@ class ShareDocument {
     return w;
   }
 
-  static int _capacity(double size, {required bool withBasmala}) {
-    final top =
-        _headerTop +
-        _headerHeight +
-        _gapAfterHeader +
-        (withBasmala ? _basmalaHeight : 0);
-    return ((_textBottom - top) / (size * _pitch)).floor();
-  }
+  /// Where the text's room starts: under the header, and the basmala.
+  static double _textTop({required bool withBasmala}) =>
+      _headerTop +
+      _headerHeight +
+      _gapAfterHeader +
+      (withBasmala ? _basmalaHeight : 0);
+
+  static int _capacity(double size, {required bool withBasmala}) =>
+      ((_textBottom - _textTop(withBasmala: withBasmala)) / (size * _pitch))
+          .floor();
 
   static List<SharePageLayout> _paginate(
     SharePassage passage,
@@ -300,6 +420,25 @@ class ShareDocument {
           ..addText(text);
     return b.build()..layout(ui.ParagraphConstraints(width: width));
   }
+
+  /// The width of the widest line of any picture, its words at their
+  /// natural spacing.
+  double get widestLine {
+    var most = 0.0;
+    for (final p in pages) {
+      for (final l in p.lines) {
+        var used = fontSize * _space * (l.length - 1);
+        for (var i = l.from; i < l.to; i++) {
+          used += _widths[i];
+        }
+        if (used > most) most = used;
+      }
+    }
+    return most;
+  }
+
+  /// From one line's middle to the next one's.
+  double get linePitch => _linePitch;
 
   /// The text drawn on image [page]: its tokens, joined as they stand in
   /// the verses.

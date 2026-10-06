@@ -122,6 +122,7 @@ Future<SharePassage> hafsPassage({
     verses.add(ShareVerse(surah: k.surah, ayah: k.ayah, text: r.displayText));
   }
   final basmala = (await repo.ayah(1, 1)).displayBody;
+  final mushaf = await hafsMushafPlaces(repo, range);
   return SharePassage(
     verses: verses,
     headers: _headers(range, surahs),
@@ -131,6 +132,90 @@ Future<SharePassage> hafsPassage({
     pageLabel: sharePageLabel,
     tajweed: tajweed,
     divineNames: options.divineNames,
+    mushaf: mushaf,
+  );
+}
+
+/// The line grid's pitch of the 1441 pages (page units), as the page view
+/// has it (mushaf_page.dart).
+const _pitch1441 = 35.75;
+
+/// The page and line of each word of [range] in the new Madina mushaf
+/// (1441H): from its word boxes and the cuts between its lines, the ones
+/// the page view draws the pages with. The verse on each side of each
+/// surah's part of the range is read too, for the words at its edges.
+Future<Map<(int, int, int), MushafPlace>> hafsMushafPlaces(
+  MushafRepository repo,
+  ShareRange range,
+) async {
+  final bySurah = <int, (int, int)>{};
+  for (final k in range) {
+    final (a, b) = bySurah[k.surah] ?? (k.ayah, k.ayah);
+    bySurah[k.surah] = (k.ayah < a ? k.ayah : a, k.ayah > b ? k.ayah : b);
+  }
+  final boxes = <MushafWordBox>[];
+  for (final MapEntry(key: s, value: (a, b)) in bySurah.entries) {
+    for (final r in await repo.wordBoxesOfVerses(s, a - 1, b + 1)) {
+      boxes.add((
+        surah: r.surah,
+        ayah: r.ayah,
+        word: r.word,
+        page: r.page,
+        left: r.x0 / 10,
+        top: r.y0 / 10,
+        right: r.x1 / 10,
+        bottom: r.y1 / 10,
+      ));
+    }
+  }
+  if (boxes.isEmpty) return const {};
+  final pages = boxes.map((b) => b.page);
+  final cuts = await repo.lineCutsOfPages(
+    'madina1441',
+    pages.reduce((a, b) => a < b ? a : b),
+    pages.reduce((a, b) => a > b ? a : b),
+  );
+  return mushafPlaces(
+    boxes,
+    cuts: (page) => cuts[page] ?? const [],
+    pitch: _pitch1441,
+  );
+}
+
+/// The page and line of each word of [range] in a riwaya's own mushaf,
+/// from the word boxes and line cuts of its page pack; null when the pack
+/// has no word boxes (packs v1).
+Map<(int, int, int), MushafPlace>? riwayaMushafPlaces(
+  RiwayaData data,
+  ShareRange range,
+) {
+  if (!data.hasWordBoxes || range.isEmpty) return null;
+  final first = data.verse(range.first.surah, range.first.ayah);
+  final last = data.verse(range.last.surah, range.last.ayah);
+  if (first == null || last == null) return null;
+  final keys = {for (final k in range) (k.surah, k.ayah)};
+  final boxes = <MushafWordBox>[];
+  // A verse may run over onto the page after the one it starts on.
+  for (var page = first.page; page <= last.page + 1; page++) {
+    for (final MapEntry(key: (s, a, w), value: r)
+        in data.wordBoxes(page).entries) {
+      if (!keys.contains((s, a))) continue;
+      boxes.add((
+        surah: s,
+        ayah: a,
+        word: w,
+        page: page,
+        left: r.left,
+        top: r.top,
+        right: r.right,
+        bottom: r.bottom,
+      ));
+    }
+  }
+  return mushafPlaces(
+    boxes,
+    cuts: (page) => data.lines(page).cuts,
+    pitch: data.pitch,
   );
 }
 
@@ -156,4 +241,5 @@ SharePassage riwayaPassage({
   reference: shareReference(range, surahs),
   pageLabel: sharePageLabel,
   divineNames: options.divineNames,
+  mushaf: riwayaMushafPlaces(data, range),
 );
