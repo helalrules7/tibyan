@@ -1714,6 +1714,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sharePreviousImage => 'Previous picture';
+
+  @override
+  String get shareNextImage => 'Next picture';
+
+  @override
   String get shareButton => 'Share';
 
   @override

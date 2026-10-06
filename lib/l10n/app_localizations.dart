@@ -3013,6 +3013,18 @@ abstract class AppLocalizations {
   /// **'{n} من {total}'**
   String shareImageOf(String n, String total);
 
+  /// No description provided for @sharePreviousImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصورة السابقة'**
+  String get sharePreviousImage;
+
+  /// No description provided for @shareNextImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصورة التالية'**
+  String get shareNextImage;
+
   /// No description provided for @shareButton.
   ///
   /// In ar, this message translates to:

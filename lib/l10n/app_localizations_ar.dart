@@ -1707,6 +1707,12 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get sharePreviousImage => 'الصورة السابقة';
+
+  @override
+  String get shareNextImage => 'الصورة التالية';
+
+  @override
   String get shareButton => 'مشاركة';
 
   @override

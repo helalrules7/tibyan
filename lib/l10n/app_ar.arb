@@ -1267,6 +1267,8 @@
   "shareImageTitle": "مشاركة كصورة",
   "shareImageOf": "{n} من {total}",
   "@shareImageOf": {"placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}},
+  "sharePreviousImage": "الصورة السابقة",
+  "shareNextImage": "الصورة التالية",
   "shareButton": "مشاركة",
   "saveToPhotos": "حفظ في الصور",
   "savedToPhotos": "حُفظت الصور",

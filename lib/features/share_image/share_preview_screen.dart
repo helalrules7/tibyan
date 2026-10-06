@@ -17,6 +17,7 @@ import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
 import 'photo_saver.dart';
+import 'share_carousel.dart';
 import 'share_document.dart';
 import 'share_source.dart';
 
@@ -30,8 +31,8 @@ Future<void> showSharePreview(BuildContext context, ShareRange range) =>
       ),
     );
 
-/// The pictures of a passage, one after the other, with the tajweed and
-/// divine-name switches, «Share» and «Save to Photos».
+/// The pictures of a passage in a carousel ([ShareCarousel]), with the
+/// tajweed and divine-name switches, «Share» and «Save to Photos».
 class SharePreviewScreen extends ConsumerStatefulWidget {
   const SharePreviewScreen({super.key, required this.range});
 
@@ -211,8 +212,8 @@ class _SharePreviewState extends ConsumerState<SharePreviewScreen> {
                   Expanded(
                     child: doc == null
                         ? const Center(child: CircularProgressIndicator())
-                        : PageView.builder(
-                            itemCount: doc.pageCount,
+                        : ShareCarousel(
+                            count: doc.pageCount,
                             onPageChanged: (i) => setState(() => _page = i),
                             itemBuilder: (context, i) => Padding(
                               padding: const EdgeInsets.all(16),

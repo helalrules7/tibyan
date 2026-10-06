@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tibyan/core/db/content_database.dart';
 import 'package:tibyan/features/mushaf/data/mushaf_repository.dart';
+import 'package:tibyan/features/mushaf/data/riwaya_data.dart';
 import 'package:tibyan/features/share_image/share_document.dart';
 import 'package:tibyan/features/share_image/share_layout.dart';
 import 'package:tibyan/features/share_image/share_source.dart';
@@ -327,6 +328,64 @@ void main() {
       final places = await hafsPassageMushaf(6, 97);
       expect(places[(6, 97, 6)]!.line, places[(6, 97, 5)]!.line);
       expect(places[(6, 97, 7)]!.line, places[(6, 97, 6)]!.line + 1);
+    });
+  });
+
+  group('riwaya', () {
+    final json = File('test/fixtures/riwaya_warsh_sample.json')
+        .readAsStringSync();
+    final words = File('test/fixtures/riwaya_warsh_words_sample.json')
+        .readAsStringSync();
+    final range = verses(11, 71, 88);
+
+    test('Warsh with its word boxes: its own pages and lines', () {
+      final data = RiwayaData.parse(json, words);
+      final p = riwayaPassage(
+        data: data,
+        fontFamily: 'UthmanicHafs',
+        range: range,
+        surahs: surahs,
+      );
+      expect(p.mushaf, isNotNull);
+      final tokens = tokenize(p.verses);
+      final pages = paginateByMushaf(
+        tokens: tokens,
+        verses: p.verses,
+        placeOf: (s, a, w) => p.mushaf![(s, a, w)],
+      )!;
+      // 11:71-80 are on Warsh page 230, 11:81-88 on page 231.
+      expect(pages, hasLength(2));
+      expect(p.verses[tokens[pages[0].to - 1].verse].ayah, 80);
+      expect(p.verses[tokens[pages[1].from].verse].ayah, 81);
+      // Each line: the words of one band between the page's cuts.
+      for (final (i, page) in [(0, 230), (1, 231)]) {
+        final cuts = data.lines(page).cuts;
+        final bands = <int>{
+          for (final r in data.wordBoxes(page).values)
+            cuts.where((c) => c < r.center.dy).length,
+        };
+        expect(pages[i].lines, hasLength(bands.length));
+      }
+      final doc = ShareDocument.build(p);
+      addTearDown(doc.dispose);
+      expect(doc.byMushaf, isTrue);
+      expectWholeText(doc, p);
+    });
+
+    test('a pack without word boxes keeps the flowed split', () {
+      final data = RiwayaData.parse(json);
+      final p = riwayaPassage(
+        data: data,
+        fontFamily: 'UthmanicHafs',
+        range: range,
+        surahs: surahs,
+      );
+      expect(p.mushaf, isNull);
+      final doc = ShareDocument.build(p);
+      addTearDown(doc.dispose);
+      expect(doc.byMushaf, isFalse);
+      expect(doc.pageCount, greaterThan(1));
+      expectWholeText(doc, p);
     });
   });
 }

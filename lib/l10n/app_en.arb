@@ -753,6 +753,8 @@
   "shareImageTitle": "Share as image",
   "shareImageOf": "{n} of {total}",
   "@shareImageOf": {"placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}},
+  "sharePreviousImage": "Previous picture",
+  "shareNextImage": "Next picture",
   "shareButton": "Share",
   "saveToPhotos": "Save to Photos",
   "savedToPhotos": "Saved to Photos",
