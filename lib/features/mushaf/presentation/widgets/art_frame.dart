@@ -26,6 +26,7 @@ class ArtPageFrame extends StatelessWidget {
     this.onJuzTap,
     this.onHizbTap,
     this.onSurahTap,
+    this.onSurahLongPress,
     this.onPageTap,
     this.tools,
     this.linePadding,
@@ -51,6 +52,9 @@ class ArtPageFrame extends StatelessWidget {
   final VoidCallback? onJuzTap;
   final VoidCallback? onHizbTap;
   final VoidCallback? onSurahTap;
+
+  /// A long press on the surah's name (shares the surah as pictures).
+  final VoidCallback? onSurahLongPress;
   final VoidCallback? onPageTap;
 
   final Widget? tools;
@@ -127,6 +131,7 @@ class ArtPageFrame extends StatelessWidget {
                           bold: true,
                           fontSize: 16,
                           onTap: onSurahTap,
+                          onLongPress: onSurahLongPress,
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -232,12 +237,14 @@ class _SmallTap extends StatelessWidget {
     required this.label,
     required this.fontSize,
     this.onTap,
+    this.onLongPress,
     this.bold = false,
   });
 
   final String label;
   final double fontSize;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final bool bold;
 
   @override
@@ -246,9 +253,11 @@ class _SmallTap extends StatelessWidget {
     label: label,
     excludeSemantics: true,
     onTap: onTap,
+    onLongPress: onLongPress,
     child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Text(

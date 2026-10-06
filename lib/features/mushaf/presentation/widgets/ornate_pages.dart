@@ -180,6 +180,7 @@ class OpeningPage extends ConsumerWidget {
     this.catchword,
     this.onPageTap,
     this.onSurahTap,
+    this.onSurahLongPress,
     this.tools,
   });
 
@@ -193,6 +194,9 @@ class OpeningPage extends ConsumerWidget {
 
   /// The surah's name was tapped (opens the index, as on other pages).
   final VoidCallback? onSurahTap;
+
+  /// A long press on the surah's name (shares the surah as pictures).
+  final VoidCallback? onSurahLongPress;
   final Widget? tools;
 
   @override
@@ -234,9 +238,11 @@ class OpeningPage extends ConsumerWidget {
           ? const SizedBox.shrink()
           : Semantics(
               button: onSurahTap != null,
+              onLongPress: onSurahLongPress,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: onSurahTap,
+                onLongPress: onSurahLongPress,
                 child: two(
                   l.surahWord(s.nameAr),
                   l.openingInfo(

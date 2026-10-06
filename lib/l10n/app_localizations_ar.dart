@@ -1981,7 +1981,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get newShareBody =>
-      'انسخ الآية أو شاركها نصا أو صورة من صفحة المصحف، ولو امتدت على صفحتين.';
+      'انسخ الآية أو شاركها نصا أو صورة بتصميم تبيان، ولو امتدت على صفحات. واضغط مطولا على اسم السورة أعلى الصفحة لمشاركة السورة كلها صورا.';
 
   @override
   String get newSpread => 'صفحتان متقابلتان';

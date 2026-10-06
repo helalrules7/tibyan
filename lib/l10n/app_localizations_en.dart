@@ -1991,7 +1991,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newShareBody =>
-      'Copy a verse, or share it as text or as a picture of the mushaf page, even over a page break.';
+      'Copy a verse, or share it as text or as a picture in Tibyan\'s design, even over a page break. Long-press the surah\'s name above the page to share the whole surah as pictures.';
 
   @override
   String get newSpread => 'Two facing pages';

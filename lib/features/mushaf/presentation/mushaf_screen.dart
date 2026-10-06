@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +38,8 @@ import '../../khatma/presentation/journal_screen.dart';
 import '../data/mushaf_repository.dart';
 import '../data/tajweed.dart';
 import '../data/riwaya_data.dart';
-import '../data/verse_image.dart';
 import '../data/verse_share.dart';
+import '../../share_image/share_preview_screen.dart';
 import '../../reading/under_verse.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
@@ -120,24 +118,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   int _pageA = 1;
   int _pageB = 1;
 
-  /// A picture of a selection over several pages turns the pages itself:
-  /// the selection must survive that.
-  bool _stacking = false;
-
   /// Most pages one selection may cover.
   static const _maxSelectionPages = 6;
 
   /// Two pages side by side, like an open mushaf (a wide screen held
   /// sideways); [_controller]'s index is then a spread, not a page.
   bool _spread = false;
-
-  /// Each page is drawn inside its own boundary, so a picture of the
-  /// selected verses can be cut from the page being read (one key per page:
-  /// a key moving between pages would clash while pages turn).
-  final Map<int, GlobalKey> _captureKeys = {};
-
-  /// True while the page is drawn without its selection, for that picture.
-  bool _capturing = false;
 
   /// Recitation mode: verses stay covered until revealed.
   bool _recite = false;
@@ -279,7 +265,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _page = page;
       // Turning the page while selecting keeps the selection, so it can be
       // extended onto the next page.
-      if (!_multi && !_stacking) _selA = _selB = null;
+      if (!_multi) _selA = _selB = null;
       _pickWord = false;
       // Recitation mode is for one page: turning the page ends it.
       _recite = false;
@@ -443,9 +429,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           : null;
       final interaction = PageInteraction(
         // The reader's selection, or else the verse being recited.
-        selection: _capturing
-            ? const {}
-            : _selA != null
+        selection: _selA != null
             ? _selectionOn(pg)
             : recitation.active && recitation.ayah != null
             ? {(surah: recitation.surah, ayah: recitation.ayah!)}
@@ -511,7 +495,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               : _revealed.add(v),
         ),
         ornateOpening: openingSurah != null,
-        showHandles: _multi && !_capturing,
+        showHandles: _multi,
         divineNames: settings.highlightDivineNames
             ? ref.watch(divineNameBoxesProvider(pg)).value ?? const []
             : const [],
@@ -599,10 +583,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           interaction: interaction,
         ),
       };
-      final pageWidget = RepaintBoundary(
-        key: _captureKeys.putIfAbsent(pg, GlobalKey.new),
-        child: pageBody,
-      );
+      final pageWidget = pageBody;
       final info = ref.watch(frameInfoProvider(pg)).value;
       void openIndex(String tab) {
         final a = ref.read(pageAyahsProvider(pg)).value?.firstOrNull;
@@ -624,6 +605,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             catchword: _recite || _testing ? null : info?.catchword,
             onPageTap: _goToPage,
             onSurahTap: () => openIndex('surahs'),
+            onSurahLongPress: () => _shareSurahImage(pg),
             tools: tools,
             child: pageWidget,
           ),
@@ -637,6 +619,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onJuzTap: () => openIndex('juz'),
           onHizbTap: () => openIndex('hizb'),
           onSurahTap: () => openIndex('surahs'),
+          onSurahLongPress: () => _shareSurahImage(pg),
           onPageTap: _goToPage,
           tools: tools,
           showCatchword: !_recite && !_testing,
@@ -1632,73 +1615,21 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     );
   }
 
-  /// A picture of the selected verses cut from the page as it is drawn
-  /// (its theme, ink and paper), without a frame or caption. A stretch over
-  /// a page break turns the pages and joins the pieces in one picture.
-  Future<void> _shareVerseImage(List<VerseKey> range) async {
-    final l = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    final paper = context.tokens.colors.paper;
-    final origin = _shareOrigin();
-    final from = _firstSelPage;
-    final to = _lastSelPage;
-    final startPage = _page;
-    messenger.showSnackBar(SnackBar(content: Text(l.sharePreparing)));
+  /// The selected verses drawn on Tibyan's picture template, from the
+  /// text (the selection marks never show), in the preview.
+  Future<void> _shareVerseImage(List<VerseKey> range) =>
+      showSharePreview(context, range);
 
-    final pieces = <ui.Image>[];
-    _stacking = true;
-    try {
-      for (var p = from; p <= to; p++) {
-        if (!_onScreen(p)) {
-          _controller?.jumpToPage(_indexOf(p));
-          // The page builds, and its verses load.
-          for (var i = 0; i < 20 && (!_onScreen(p) || !mounted); i++) {
-            await SchedulerBinding.instance.endOfFrame;
-          }
-          if (!mounted) return;
-          await ref.read(pageAyahsProvider(p).future);
-          await SchedulerBinding.instance.endOfFrame;
-          await SchedulerBinding.instance.endOfFrame;
-        }
-        final piece = await captureSelectionPicture(
-          key: _captureKeys.putIfAbsent(p, GlobalKey.new),
-          paper: paper,
-          clean: () async {
-            setState(() => _capturing = true);
-            await SchedulerBinding.instance.endOfFrame;
-          },
-          restore: () async {
-            if (mounted) setState(() => _capturing = false);
-          },
-        );
-        if (piece != null) pieces.add(piece);
-      }
-      if (_page != startPage && mounted) {
-        _controller?.jumpToPage(_indexOf(startPage));
-        await SchedulerBinding.instance.endOfFrame;
-      }
-    } finally {
-      _stacking = false;
-    }
-    File? file;
-    if (pieces.isNotEmpty) {
-      final one = pieces.length == 1
-          ? pieces.first
-          : await stackVertically(pieces, paper);
-      file = await savePng(one);
-      for (final p in pieces) {
-        p.dispose();
-      }
-      if (!identical(one, pieces.first)) one.dispose();
-    }
-    messenger.hideCurrentSnackBar();
-    if (file == null) {
-      messenger.showSnackBar(SnackBar(content: Text(l.shareImageFailed)));
-      return;
-    }
-    await SharePlus.instance.share(
-      ShareParams(files: [XFile(file.path)], sharePositionOrigin: origin),
-    );
+  /// A long press on the surah's name in the frame: the whole surah as
+  /// pictures.
+  Future<void> _shareSurahImage(int page) async {
+    final a = ref.read(pageAyahsProvider(page)).value?.firstOrNull;
+    if (a == null) return;
+    final count = await ref.read(surahAyahCountProvider(a.surah).future);
+    if (!mounted) return;
+    await showSharePreview(context, [
+      for (var i = 1; i <= count; i++) (surah: a.surah, ayah: i),
+    ]);
   }
 
   /// «آية آية» at the first verse of this page (Hafs numbers).

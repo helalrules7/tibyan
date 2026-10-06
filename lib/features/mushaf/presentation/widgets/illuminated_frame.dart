@@ -194,6 +194,7 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onJuzTap,
     this.onHizbTap,
     this.onSurahTap,
+    this.onSurahLongPress,
     this.onPageTap,
     this.tools,
     this.linePadding,
@@ -213,6 +214,9 @@ class IlluminatedFrame extends ConsumerWidget {
   final VoidCallback? onJuzTap;
   final VoidCallback? onHizbTap;
   final VoidCallback? onSurahTap;
+
+  /// A long press on the surah's name (shares the surah as pictures).
+  final VoidCallback? onSurahLongPress;
   final VoidCallback? onPageTap;
 
   /// Small reading tools shown just under the page number.
@@ -233,6 +237,7 @@ class IlluminatedFrame extends ConsumerWidget {
         onJuzTap: onJuzTap,
         onHizbTap: onHizbTap,
         onSurahTap: onSurahTap,
+        onSurahLongPress: onSurahLongPress,
         onPageTap: onPageTap,
         tools: tools,
         showCatchword: showCatchword,
@@ -247,6 +252,7 @@ class IlluminatedFrame extends ConsumerWidget {
         onJuzTap: onJuzTap,
         onHizbTap: onHizbTap,
         onSurahTap: onSurahTap,
+        onSurahLongPress: onSurahLongPress,
         onPageTap: onPageTap,
         tools: tools,
         linePadding: linePadding,
@@ -352,6 +358,7 @@ class IlluminatedFrame extends ConsumerWidget {
                                 label: info!.surahName,
                                 bold: true,
                                 onTap: onSurahTap,
+                                onLongPress: onSurahLongPress,
                               ),
                             ],
                           ),
@@ -471,6 +478,7 @@ class FrameTap extends StatelessWidget {
     super.key,
     required this.label,
     this.onTap,
+    this.onLongPress,
     this.bold = false,
     this.semanticLabel,
     this.fontSize,
@@ -478,6 +486,7 @@ class FrameTap extends StatelessWidget {
 
   final String label;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final bool bold;
   final String? semanticLabel;
   final double? fontSize;
@@ -489,8 +498,10 @@ class FrameTap extends StatelessWidget {
       label: semanticLabel ?? label,
       excludeSemantics: true,
       onTap: onTap,
+      onLongPress: onLongPress,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 32, minWidth: 32),
@@ -1197,6 +1208,7 @@ class PlainFrame extends StatelessWidget {
     this.onJuzTap,
     this.onHizbTap,
     this.onSurahTap,
+    this.onSurahLongPress,
     this.onPageTap,
     this.tools,
     this.showCatchword = true,
@@ -1207,6 +1219,9 @@ class PlainFrame extends StatelessWidget {
   final VoidCallback? onJuzTap;
   final VoidCallback? onHizbTap;
   final VoidCallback? onSurahTap;
+
+  /// A long press on the surah's name (shares the surah as pictures).
+  final VoidCallback? onSurahLongPress;
   final VoidCallback? onPageTap;
 
   /// Small reading tools shown under the page number.
@@ -1247,6 +1262,7 @@ class PlainFrame extends StatelessWidget {
                     label: info.surahName,
                     bold: true,
                     onTap: onSurahTap,
+                    onLongPress: onSurahLongPress,
                   ),
                   FrameStar(color: t.marker),
                   FrameTap(
