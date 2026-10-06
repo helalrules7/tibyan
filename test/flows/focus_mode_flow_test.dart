@@ -381,6 +381,30 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('a tap on a verse, or anywhere on the page, closes the '
+      'services', (tester) async {
+    final handle = tester.ensureSemantics();
+    await start(tester, prefs: const {});
+    final verse = find.bySemanticsLabel(RegExp('آل عمران.*٣'));
+    await settle(tester, verse);
+    await settle(tester);
+    for (final tapOn in ['verse', 'page']) {
+      await tester.longPressAt(tester.getRect(verse.first).center);
+      await settle(tester);
+      expect(find.text('خدمات الآيات'), findsOneWidget, reason: tapOn);
+      if (tapOn == 'verse') {
+        // Touch reading is on: before, this shaded the verse instead.
+        await tester.tapAt(tester.getRect(verse.first).center);
+      } else {
+        final page = tester.getRect(find.byType(MushafPage).first);
+        await tester.tapAt(page.topLeft + const Offset(2, 2));
+      }
+      await settle(tester);
+      expect(find.text('خدمات الآيات'), findsNothing, reason: tapOn);
+    }
+    handle.dispose();
+  });
+
   group('«القائمة»', () {
     const prefs = {'settings.focusMode': true, 'settings.focusTools': 'menu'};
 

@@ -6,12 +6,15 @@ import '../../core/db/content_database.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/mushaf_digits.dart';
 import '../../l10n/app_localizations.dart';
+import '../audio/recitation.dart';
 import '../books/books_providers.dart';
 import '../books/data/book_pack.dart';
 import '../books/presentation/asbab_section.dart';
 import '../content_extras/english_tafsir.dart';
 import '../content_extras/tafsir_audio_button.dart';
+import '../content_extras/verse_audio_index.dart';
 import '../books/presentation/book_section.dart';
 import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/mushaf_providers.dart';
@@ -67,6 +70,19 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
     super.dispose();
   }
 
+  /// Leaving the tafsir: a tafsir read aloud from here stops with it, so
+  /// no player is left over the mushaf.
+  void _stopTafsirAudio() {
+    final s = ref.read(recitationProvider);
+    final clip = s.clip;
+    if (s.active &&
+        clip != null &&
+        clip.standalone &&
+        clip.kind == VerseAudioKind.tafsir) {
+      ref.read(recitationProvider.notifier).stop();
+    }
+  }
+
   void _go(int delta, int count) {
     final next = _ayah - 1 + delta;
     if (next < 0 || next >= count) return;
@@ -86,71 +102,76 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
     final ayahs = ref.watch(surahAyahsProvider(widget.surah)).value;
     final count = surah?.ayahCount ?? 0;
 
-    return Scaffold(
-      backgroundColor: t.paper,
-      appBar: AppBar(
-        title: Text(
-          surah == null
-              ? l.tafsirTitle
-              : '${l.surahWord(surahName(context, surah))} · ${digits(_ayah)}',
-        ),
-        actions: [
-          IconButton(
-            tooltip: l.tafsirSettings,
-            icon: const Icon(Icons.text_fields),
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
-              showDragHandle: true,
-              builder: (_) => const _TafsirSettingsSheet(),
-            ),
-          ),
-        ],
-      ),
-      body: ayahs == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                if (widget.riwaya != null && widget.riwayaAyah != null)
-                  _RiwayaNote(
-                    riwaya: widget.riwaya!,
-                    surah: widget.surah,
-                    ayah: widget.riwayaAyah!,
-                  ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pages,
-                    itemCount: ayahs.length,
-                    onPageChanged: (i) => setState(() => _ayah = i + 1),
-                    itemBuilder: (context, i) => _VersePage(ayah: ayahs[i]),
-                  ),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _stopTafsirAudio();
+      },
+      child: Scaffold(
+        backgroundColor: t.paper,
+        appBar: AppBar(
+          title: surah == null
+              ? Text(l.tafsirTitle)
+              : MushafDigitsText(
+                  '${l.surahWord(surahName(context, surah))} | ${digits(_ayah)}',
                 ),
-              ],
-            ),
-      bottomNavigationBar: SafeArea(
-        child: Row(
-          children: [
+          actions: [
             IconButton(
-              tooltip: l.previousVerse,
-              onPressed: _ayah > 1 ? () => _go(-1, count) : null,
-              icon: const Icon(Icons.chevron_left),
-            ),
-            const Spacer(),
-            Semantics(
-              liveRegion: true,
-              label: l.verseCounter(digits(_ayah), digits(count)),
-              excludeSemantics: true,
-              child: Text(
-                '${digits(_ayah)} / ${digits(count)}',
-                style: TextStyle(color: t.muted),
+              tooltip: l.tafsirSettings,
+              icon: const Icon(Icons.text_fields),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                showDragHandle: true,
+                builder: (_) => const _TafsirSettingsSheet(),
               ),
             ),
-            const Spacer(),
-            IconButton(
-              tooltip: l.nextVerse,
-              onPressed: _ayah < count ? () => _go(1, count) : null,
-              icon: const Icon(Icons.chevron_right),
-            ),
           ],
+        ),
+        body: ayahs == null
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  if (widget.riwaya != null && widget.riwayaAyah != null)
+                    _RiwayaNote(
+                      riwaya: widget.riwaya!,
+                      surah: widget.surah,
+                      ayah: widget.riwayaAyah!,
+                    ),
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pages,
+                      itemCount: ayahs.length,
+                      onPageChanged: (i) => setState(() => _ayah = i + 1),
+                      itemBuilder: (context, i) => _VersePage(ayah: ayahs[i]),
+                    ),
+                  ),
+                ],
+              ),
+        bottomNavigationBar: SafeArea(
+          child: Row(
+            children: [
+              IconButton(
+                tooltip: l.previousVerse,
+                onPressed: _ayah > 1 ? () => _go(-1, count) : null,
+                icon: const Icon(Icons.chevron_left),
+              ),
+              const Spacer(),
+              Semantics(
+                liveRegion: true,
+                label: l.verseCounter(digits(_ayah), digits(count)),
+                excludeSemantics: true,
+                child: MushafDigitsText(
+                  '${digits(_ayah)} / ${digits(count)}',
+                  style: TextStyle(color: t.muted),
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                tooltip: l.nextVerse,
+                onPressed: _ayah < count ? () => _go(1, count) : null,
+                icon: const Icon(Icons.chevron_right),
+              ),
+            ],
+          ),
         ),
       ),
     );

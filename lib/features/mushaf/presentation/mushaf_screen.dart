@@ -700,6 +700,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         // moves the recitation there.
         onVerseTap: _multi
             ? (v, _) => _extendTo(v, pg)
+            // The verse services are open: a tap on any verse closes them,
+            // as a tap anywhere else on the page does.
+            : _selA != null
+            ? (_, _) => setState(() => _selA = _selB = null)
             : jumps
             ? (v, point) => _listenFrom(v, pg, point)
             : _touchReading
