@@ -168,7 +168,11 @@ class _SajdahCardViewState extends State<SajdahCardView>
     final digits = NumberFormatter(Localizations.localeOf(context));
     final width = math.min(size.width * 0.85, 420.0);
     final maxHeight = size.height * 0.4;
-    final icon = elderly ? 64.0 : 52.0;
+    // A short screen (a phone held sideways): a smaller pictogram and
+    // countdown leave room for the text.
+    final compact = maxHeight < 240;
+    final icon = compact ? (elderly ? 40.0 : 34.0) : (elderly ? 64.0 : 52.0);
+    final gap = compact ? 4.0 : 8.0;
     final text = sajdahSupplications;
 
     final countdown = AnimatedBuilder(
@@ -176,7 +180,7 @@ class _SajdahCardViewState extends State<SajdahCardView>
       builder: (context, _) {
         final left = (widget.seconds * (1 - _count.value)).ceil();
         return SizedBox.square(
-          dimension: elderly ? 48 : 40,
+          dimension: compact ? 34 : (elderly ? 48 : 40),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -208,10 +212,11 @@ class _SajdahCardViewState extends State<SajdahCardView>
       label: l.sajdahCardLabel,
       value: l.sajdahSecondsLeft(digits(widget.seconds)),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: width, maxHeight: maxHeight),
+        constraints: BoxConstraints.tightFor(width: width)
+            .copyWith(maxHeight: maxHeight),
         child: Material(
           // The paper, slightly see-through: the page shows faintly behind.
-          color: t.paper.withValues(alpha: 0.94),
+          color: t.paper.withValues(alpha: 0.97),
           elevation: 6,
           shadowColor: Colors.black38,
           shape: RoundedRectangleBorder(
@@ -226,7 +231,7 @@ class _SajdahCardViewState extends State<SajdahCardView>
             child: InkWell(
               onTap: widget.onTap,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+                padding: EdgeInsets.fromLTRB(20, gap + 6, 20, gap + 4),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -240,7 +245,7 @@ class _SajdahCardViewState extends State<SajdahCardView>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: gap),
                     Flexible(
                       child: SingleChildScrollView(
                         child: Text(
@@ -253,7 +258,6 @@ class _SajdahCardViewState extends State<SajdahCardView>
                               ? TextStyle(
                                   fontSize: elderly ? 18 : 15,
                                   color: t.muted,
-                                  fontStyle: FontStyle.italic,
                                 )
                               : TextStyle(
                                   fontFamily: 'UthmanTahaNaskh',
@@ -264,9 +268,9 @@ class _SajdahCardViewState extends State<SajdahCardView>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: gap + 2),
                     ExcludeSemantics(child: countdown),
-                    const SizedBox(height: 6),
+                    SizedBox(height: gap - 2),
                     ExcludeSemantics(
                       child: Text(
                         l.sajdahTapToContinue,
