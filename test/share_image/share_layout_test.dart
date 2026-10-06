@@ -33,7 +33,8 @@ List<SharePageLayout> _paginate(
     widths: [for (final _ in tokens) 10],
     width: width,
     space: 2,
-    capacity: ({required withBasmala}) => withBasmala ? first : rest,
+    capacity: ({required withBasmala, required surah}) =>
+        withBasmala ? first : rest,
     hasBasmala: basmala ?? (s) => s != 1 && s != 9,
   );
 }

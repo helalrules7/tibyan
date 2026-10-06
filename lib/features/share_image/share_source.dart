@@ -8,6 +8,7 @@ import '../mushaf/presentation/widgets/illuminated_frame.dart'
 import 'share_document.dart';
 import 'share_layout.dart';
 import 'share_text_runs.dart';
+import 'surah_statements.dart';
 
 /// A stretch of verses to share, in the numbers of the text it is drawn
 /// from (a riwaya's own count for a riwaya edition).
@@ -60,30 +61,67 @@ String shareReference(ShareRange range, List<SurahRow> surahs) {
       : _ar.verseRange(name(a.surah), _digits(a.ayah), _digits(b.ayah));
 }
 
-/// The header of surah [surah]: «سورة النساء», and under it its type, its
-/// place in the order of revelation and the surah revealed before it, as
-/// the page banners show them, from the Tanzil metadata of content.db:
-/// «مدنية · ترتيبها في النزول ٩٢ · نزلت بعد الممتحنة». The first surah
-/// revealed (al-'Alaq) has no «نزلت بعد». The type is the plain «مكية» or
-/// «مدنية»: no documented source of the verses excepted from it is held
-/// yet (docs/MISSING_DATA.md).
-ShareSurahHeader shareSurahHeader(int surah, List<SurahRow> surahs) {
+/// The header of surah [surah]: «سورة الأنعام», and under it the statement
+/// of its type as the 1924 Cairo mushaf prints it (with the verses excepted
+/// from it, [statements]), its place in the order of revelation and the
+/// surah revealed before it, from the Tanzil metadata of content.db, as the
+/// page banners show them: «مكية إلا الآيات ٢٠ و٢٣ … فمدنية · ترتيبها في
+/// النزول ٥٥ · نزلت بعد الحجر». The first surah revealed (al-'Alaq) has no
+/// «نزلت بعد».
+///
+/// [plainType]: the plain «مكية» or «مدنية» of Tanzil instead of the
+/// statement, for a text whose verses are numbered otherwise than the
+/// statement's (a riwaya with its own count of that surah).
+ShareSurahHeader shareSurahHeader(
+  int surah,
+  List<SurahRow> surahs, {
+  required SurahStatements statements,
+  bool plainType = false,
+}) {
   final s = surahs[surah - 1];
   final before = surahs
       .where((x) => x.revelationOrder == s.revelationOrder - 1)
       .firstOrNull;
+  final statement = statements[surah];
   return ShareSurahHeader(
     title: _ar.surahWord(s.nameAr),
     info: [
-      s.revelation == 'meccan' ? _ar.meccan : _ar.medinan,
+      if (statement != null && !(plainType && statement.numbered))
+        statement.statement
+      else
+        s.revelation == 'meccan' ? _ar.meccan : _ar.medinan,
       _ar.revealedOrder(_digits(s.revelationOrder)),
       if (before != null) _ar.revealedAfter(before.nameAr),
     ].join(' · '),
   );
 }
 
-Map<int, ShareSurahHeader> _headers(ShareRange range, List<SurahRow> surahs) =>
-    {for (final k in range) k.surah: shareSurahHeader(k.surah, surahs)};
+Map<int, ShareSurahHeader> _headers(
+  ShareRange range,
+  List<SurahRow> surahs,
+  SurahStatements statements, {
+  bool Function(int surah)? plainType,
+}) => {
+  for (final k in range)
+    k.surah: shareSurahHeader(
+      k.surah,
+      surahs,
+      statements: statements,
+      plainType: plainType?.call(k.surah) ?? false,
+    ),
+};
+
+/// Whether [data] numbers the verses of [surah] as Hafs does: as many
+/// verses, each the same Hafs verse. The statements of the 1342 print name
+/// verses by their Kufan (Hafs) numbers.
+bool riwayaNumbersAsHafs(RiwayaData data, int surah, int hafsCount) {
+  if (data.surahCounts[surah - 1] != hafsCount) return false;
+  for (var a = 1; a <= hafsCount; a++) {
+    final v = data.verse(surah, a);
+    if (v == null || v.hafsFrom != a || v.hafsTo != a) return false;
+  }
+  return true;
+}
 
 /// A Hafs passage (the 1441, 1405 and Shamarly editions): the KFGQPC Hafs
 /// text of content.db, verbatim, in the KFGQPC Hafs font.
@@ -91,6 +129,7 @@ Future<SharePassage> hafsPassage({
   required MushafRepository repo,
   required ShareRange range,
   required List<SurahRow> surahs,
+  required SurahStatements statements,
   ShareOptions options = const ShareOptions(),
 }) async {
   final verses = <ShareVerse>[];
@@ -136,7 +175,7 @@ Future<SharePassage> hafsPassage({
   final mushaf = await hafsMushafPlaces(repo, range);
   return SharePassage(
     verses: verses,
-    headers: _headers(range, surahs),
+    headers: _headers(range, surahs, statements),
     fontFamily: 'UthmanicHafs',
     basmala: basmala,
     reference: shareReference(range, surahs),
@@ -233,12 +272,15 @@ Map<(int, int, int), MushafPlace>? riwayaMushafPlaces(
 /// A riwaya passage: the riwaya's own KFGQPC text from its pack, verbatim,
 /// in the riwaya's KFGQPC font ([fontFamily], loaded from the pack). The
 /// riwaya's text has no basmala line of its own, so none is drawn, and no
-/// tajweed data exists for it.
+/// tajweed data exists for it. A surah's header has the 1342 statement of
+/// its type when the riwaya numbers its verses as Hafs does, and the plain
+/// type otherwise ([riwayaNumbersAsHafs]).
 SharePassage riwayaPassage({
   required RiwayaData data,
   required String fontFamily,
   required ShareRange range,
   required List<SurahRow> surahs,
+  required SurahStatements statements,
   ShareOptions options = const ShareOptions(),
 }) => SharePassage(
   verses: [
@@ -246,7 +288,12 @@ SharePassage riwayaPassage({
       if (data.verse(k.surah, k.ayah) case final v?)
         ShareVerse(surah: v.surah, ayah: v.ayah, text: v.text),
   ],
-  headers: _headers(range, surahs),
+  headers: _headers(
+    range,
+    surahs,
+    statements,
+    plainType: (s) => !riwayaNumbersAsHafs(data, s, surahs[s - 1].ayahCount),
+  ),
   fontFamily: fontFamily,
   basmala: null,
   reference: shareReference(range, surahs),

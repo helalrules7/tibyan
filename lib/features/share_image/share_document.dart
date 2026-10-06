@@ -88,7 +88,8 @@ class ShareDocument {
     this._words,
     this._widths,
     this.pages,
-    this._logo, {
+    this._logo,
+    this._heads, {
     required this.byMushaf,
     double? linePitch,
   }) : _linePitch = linePitch ?? fontSize * _pitch;
@@ -102,7 +103,10 @@ class ShareDocument {
   static const textWidth = width - 2 * margin;
 
   static const _headerTop = 72.0;
-  static const _headerHeight = 236.0;
+
+  /// The header's height, unless its info line needs more room
+  /// ([layoutHeader]).
+  static const headerHeight = 236.0;
   static const _basmalaHeight = 150.0;
   static const _footerTop = 1856.0;
   static const _gapAfterHeader = 44.0;
@@ -142,6 +146,16 @@ class ShareDocument {
   final List<SharePageLayout> pages;
   final ui.Image? _logo;
 
+  /// The header of each surah of the passage, laid out.
+  final Map<int, ShareHeaderLayout> _heads;
+
+  /// The height of surah [surah]'s header.
+  double headerHeightOf(int surah) =>
+      _heads[surah]?.rect.height ?? headerHeight;
+
+  /// Surah [surah]'s header as laid out on its pictures.
+  ShareHeaderLayout? headerOf(int surah) => _heads[surah];
+
   /// Laid out as the printed mushaf: each picture one page of it, each
   /// line one of its lines ([paginateByMushaf]).
   final bool byMushaf;
@@ -160,7 +174,7 @@ class ShareDocument {
     final basmala = layout.firstOfSurah && passage.hasBasmala(layout.surah);
     final h =
         _headerTop +
-        _headerHeight +
+        headerHeightOf(layout.surah) +
         _gapAfterHeader +
         (basmala ? _basmalaHeight : 0) +
         layout.lines.length * _linePitch +
@@ -178,6 +192,11 @@ class ShareDocument {
   /// line, all at one size, the largest at which the longest line fits the
   /// text's width. Otherwise its lines are flowed at the smallest size.
   factory ShareDocument.build(SharePassage passage, {ui.Image? logo}) {
+    final heads = {
+      for (final MapEntry(key: surah, value: h) in passage.headers.entries)
+        surah: layoutHeader(h, digits: passage.fontFamily),
+    };
+    double headOf(int surah) => heads[surah]?.rect.height ?? headerHeight;
     final tokens = tokenize(passage.verses);
     final firstWords = tokenFirstWords(tokens);
 
@@ -210,19 +229,28 @@ class ShareDocument {
     for (final s in fontSizes) {
       if (s == base) break;
       final k = s / base;
-      final pages = _paginate(passage, tokens, [
-        for (final w in widths) w * k,
-      ], s);
+      final pages = _paginate(
+        passage,
+        tokens,
+        [for (final w in widths) w * k],
+        s,
+        headOf,
+      );
       // A little room is kept, since the measured widths only scale
       // nearly with the size.
       if (pages.length == 1 &&
-          pages.first.lines.length < _capacity(s, withBasmala: true)) {
+          pages.first.lines.length <
+              _capacity(
+                s,
+                withBasmala: true,
+                headerHeight: headOf(pages.first.surah),
+              )) {
         chosen = s;
         break;
       }
     }
     if (chosen == base) {
-      final flowed = _paginate(passage, tokens, widths, base);
+      final flowed = _paginate(passage, tokens, widths, base, headOf);
       final places = passage.mushaf;
       final mushaf = flowed.length > 1 && places != null
           ? paginateByMushaf(
@@ -240,17 +268,18 @@ class ShareDocument {
           widths,
           flowed,
           logo,
+          heads,
           byMushaf: false,
         );
       }
       for (final p in words) {
         p.dispose();
       }
-      return _byMushaf(passage, tokens, mushaf, paragraphs, logo);
+      return _byMushaf(passage, tokens, mushaf, paragraphs, logo, heads);
     }
     words = paragraphs(chosen);
     widths = [for (final p in words) _widthOf(p)];
-    final pages = _paginate(passage, tokens, widths, chosen);
+    final pages = _paginate(passage, tokens, widths, chosen, headOf);
     return ShareDocument._(
       passage,
       chosen,
@@ -259,6 +288,7 @@ class ShareDocument {
       widths,
       pages,
       logo,
+      heads,
       byMushaf: false,
     );
   }
@@ -272,10 +302,14 @@ class ShareDocument {
     List<SharePageLayout> pages,
     List<ui.Paragraph> Function(double size) paragraphs,
     ui.Image? logo,
+    Map<int, ShareHeaderLayout> heads,
   ) {
     double room(SharePageLayout p) =>
         _textBottom -
-        _textTop(withBasmala: p.firstOfSurah && passage.hasBasmala(p.surah));
+        _textTop(
+          withBasmala: p.firstOfSurah && passage.hasBasmala(p.surah),
+          headerHeight: heads[p.surah]?.rect.height ?? headerHeight,
+        );
     // The least room a line has on any picture.
     var perLine = double.infinity;
     for (final p in pages) {
@@ -323,6 +357,7 @@ class ShareDocument {
       widths,
       pages,
       logo,
+      heads,
       byMushaf: true,
       linePitch: math.min(size * _pitch, perLine),
     );
@@ -335,15 +370,28 @@ class ShareDocument {
     return w;
   }
 
-  /// Where the text's room starts: under the header, and the basmala.
-  static double _textTop({required bool withBasmala}) =>
+  /// Where the text's room starts: under the header (of [headerHeight]),
+  /// and the basmala.
+  static double _textTop({
+    required bool withBasmala,
+    required double headerHeight,
+  }) =>
       _headerTop +
-      _headerHeight +
+      headerHeight +
       _gapAfterHeader +
       (withBasmala ? _basmalaHeight : 0);
 
-  static int _capacity(double size, {required bool withBasmala}) =>
-      ((_textBottom - _textTop(withBasmala: withBasmala)) / (size * _pitch))
+  static int _capacity(
+    double size, {
+    required bool withBasmala,
+    required double headerHeight,
+  }) =>
+      ((_textBottom -
+                  _textTop(
+                    withBasmala: withBasmala,
+                    headerHeight: headerHeight,
+                  )) /
+              (size * _pitch))
           .floor();
 
   static List<SharePageLayout> _paginate(
@@ -351,14 +399,18 @@ class ShareDocument {
     List<ShareToken> tokens,
     List<double> widths,
     double size,
+    double Function(int surah) headerHeightOf,
   ) => paginate(
     tokens: tokens,
     verses: passage.verses,
     widths: widths,
     width: textWidth,
     space: size * _space,
-    capacity: ({required withBasmala}) =>
-        _capacity(size, withBasmala: withBasmala),
+    capacity: ({required withBasmala, required surah}) => _capacity(
+      size,
+      withBasmala: withBasmala,
+      headerHeight: headerHeightOf(surah),
+    ),
     hasBasmala: passage.hasBasmala,
   );
 
@@ -401,7 +453,8 @@ class ShareDocument {
     double width = textWidth,
     ui.FontWeight weight = ui.FontWeight.w400,
     ui.TextAlign align = ui.TextAlign.center,
-    int maxLines = 1,
+    int? maxLines = 1,
+    double? lineHeight,
   }) {
     final b = ui.ParagraphBuilder(
       ui.ParagraphStyle(
@@ -417,6 +470,7 @@ class ShareDocument {
             : ui.StrutStyle(
                 fontFamily: family,
                 fontSize: size,
+                height: lineHeight,
                 forceStrutHeight: true,
               ),
       ),
@@ -480,10 +534,17 @@ class ShareDocument {
       Offset.zero & pictureSize,
       Paint()..color = ShareBrand.paper,
     );
-    final header = passage.headers[layout.surah];
-    _paintHeader(canvas, header);
+    final head = _heads[layout.surah];
+    if (head == null) {
+      paintCartouche(canvas, cartoucheRect(headerHeight));
+    } else {
+      paintCartouche(canvas, head.rect);
+      canvas
+        ..drawParagraph(head.title, head.titleOffset)
+        ..drawParagraph(head.info, head.infoOffset);
+    }
 
-    var top = _headerTop + _headerHeight + _gapAfterHeader;
+    var top = _headerTop + headerHeightOf(layout.surah) + _gapAfterHeader;
     if (layout.firstOfSurah && passage.hasBasmala(layout.surah)) {
       final b = _label(
         passage.basmala!,
@@ -526,54 +587,142 @@ class ShareDocument {
     _paintFooter(canvas, page, footerTop);
   }
 
-  void _paintHeader(Canvas canvas, ShareSurahHeader? header) {
-    const r = Rect.fromLTWH(96, _headerTop, width - 192, _headerHeight);
-    paintCartouche(canvas, r);
-    if (header == null) return;
+  /// The cartouche of a header of [height], across the picture.
+  static Rect cartoucheRect(double height) =>
+      Rect.fromLTWH(96, _headerTop, width - 192, height);
+
+  /// The width of the surah's info line, within the flat top and bottom of
+  /// the medallion (644 wide).
+  static const infoWidth = 640.0;
+
+  /// The info line's sizes: on one line, down to the least; then on two
+  /// lines; then on three at the least size, the cartouche taller.
+  static const infoSizes = [34.0, 32.0, 30.0, 28.0, 26.0, 24.0];
+  static const infoSizesWrapped = [26.0, 24.0];
+  static const infoLeastSize = 24.0;
+
+  /// The info line's line height, in font sizes. Changa's ascent and
+  /// descent shared out over it (1.0 and 0.5), each line's box holds its
+  /// ink: letters with their marks and the enlarged digits reach 0.98
+  /// above the baseline and 0.45 below (measured on all 114 headers).
+  static const infoLineHeight = 1.5;
+
+  /// How far the title's ink reaches below its baseline, in its font size:
+  /// at most 0.49 (measured on all 114 titles).
+  static const _titleDescent = 0.5;
+
+  /// [header] laid out: its title at its fixed size; its info line at the
+  /// largest size at which it fits the medallion on one line (down to the
+  /// last of [infoSizes]); else on two lines, at the largest of
+  /// [infoSizesWrapped] at which they fit; else at [infoLeastSize] on the
+  /// fewest lines it takes (two or three), the cartouche and the medallion
+  /// made taller for them. A wrapped line starts the order of revelation on
+  /// a line of its own when that takes no more lines. The info line never runs past the medallion and
+  /// is never cut. Its digits are in the passage's mushaf font [digits].
+  static ShareHeaderLayout layoutHeader(
+    ShareSurahHeader header, {
+    required String digits,
+  }) {
     final title = _label(
       header.title,
       family: 'UthmanTahaNaskh',
-      size: 70,
+      size: _titleSize,
       color: ShareBrand.ink,
       weight: ui.FontWeight.w700,
       width: 760,
     );
-    canvas.drawParagraph(
-      title,
-      Offset(r.center.dx - 380, r.top + 54 - title.height / 2 + 30),
-    );
-    final info = infoLine(header.info, digits: passage.fontFamily);
-    canvas.drawParagraph(
-      info,
-      Offset(r.center.dx - infoWidth / 2, r.bottom - 76 - info.height / 2),
-    );
-  }
+    Offset titleAt(Rect r) =>
+        Offset(r.center.dx - 380, r.top + 84 - title.height / 2);
+    Rect room(Rect r) =>
+        infoRoom(r, titleBaseline: titleAt(r).dy + title.alphabeticBaseline);
+    // On more than one line, the order of revelation starts a line of its
+    // own when that takes no more lines.
+    final broken = header.info.replaceFirst(' · ', '\n');
+    ui.Paragraph at(double size, int? lines, {bool breakFirst = false}) =>
+        _label(
+          breakFirst ? broken : header.info,
+          family: _uiFont,
+          size: size,
+          color: ShareBrand.brown,
+          digits: digits,
+          digitScale: _digitScale,
+          width: infoWidth,
+          maxLines: lines,
+          lineHeight: infoLineHeight,
+        );
 
-  /// The room of the surah's info line, inside the medallion's points.
-  static const infoWidth = 660.0;
-
-  /// The surah's info line, laid out: at the largest size it fits
-  /// [infoWidth] at, down to a least size; on two lines at that size if it
-  /// is still too long, never past the medallion. Its digits are in the
-  /// passage's mushaf font [digits].
-  static ui.Paragraph infoLine(String text, {required String digits}) {
-    ui.Paragraph at(double size, {int lines = 1}) => _label(
-      text,
-      family: _uiFont,
-      size: size,
-      color: ShareBrand.brown,
-      digits: digits,
-      digitScale: _digitScale,
-      width: infoWidth,
-      maxLines: lines,
-    );
-    for (var size = 34.0; size >= 26; size -= 2) {
-      final p = at(size);
-      if (p.maxIntrinsicWidth <= infoWidth) return p;
+    final base = room(cartoucheRect(headerHeight));
+    ui.Paragraph? info;
+    var size = infoLeastSize;
+    for (final s in infoSizes) {
+      final p = at(s, 1);
+      if (p.maxIntrinsicWidth <= infoWidth && p.height <= base.height) {
+        (info, size) = (p, s);
+        break;
+      }
       p.dispose();
     }
-    return at(26, lines: 2);
+    if (info == null) {
+      wrapped:
+      for (final s in infoSizesWrapped) {
+        for (final breakFirst in [true, false]) {
+          final p = at(s, 2, breakFirst: breakFirst);
+          if (!p.didExceedMaxLines && p.height <= base.height) {
+            (info, size) = (p, s);
+            break wrapped;
+          }
+          p.dispose();
+        }
+      }
+    }
+    var height = headerHeight;
+    if (info == null) {
+      // The fewest lines it takes: the cartouche grows by what they need
+      // beyond its room.
+      fewest:
+      for (var lines = 2; ; lines++) {
+        for (final breakFirst in [true, false]) {
+          final p = at(infoLeastSize, lines, breakFirst: breakFirst);
+          if (!p.didExceedMaxLines || (lines >= 12 && !breakFirst)) {
+            info = p;
+            break fewest;
+          }
+          p.dispose();
+        }
+      }
+      height += math.max(0.0, info.height - base.height).ceilToDouble();
+    }
+    final rect = cartoucheRect(height);
+    final r = room(rect);
+    return ShareHeaderLayout._(
+      rect: rect,
+      title: title,
+      titleOffset: titleAt(rect),
+      info: info,
+      infoOffset: Offset(
+        r.center.dx - infoWidth / 2,
+        r.top + (r.height - info.height) / 2,
+      ),
+      infoRoom: r,
+      infoSize: size,
+    );
   }
+
+  /// The room of a header's info line in cartouche [r]: as wide as
+  /// [infoWidth], centred, within the medallion's flat top and bottom; from
+  /// under the ink of the title (its baseline [titleBaseline]) to a little
+  /// above the medallion's inner line.
+  static Rect infoRoom(Rect r, {required double titleBaseline}) {
+    final m = Medallion.of(r);
+    return Rect.fromLTRB(
+      r.center.dx - infoWidth / 2,
+      titleBaseline + _titleSize * _titleDescent + 4,
+      r.center.dx + infoWidth / 2,
+      m.innerBottom - 3,
+    );
+  }
+
+  static const _titleSize = 70.0;
 
   /// The mushaf font's digits beside the labels' letters: the KFGQPC
   /// digits are drawn small (to sit inside a verse-end marker), so they
@@ -660,6 +809,48 @@ class ShareDocument {
     for (final p in _words) {
       p.dispose();
     }
+    for (final h in _heads.values) {
+      h.dispose();
+    }
+  }
+}
+
+/// A surah's header laid out ([ShareDocument.layoutHeader]).
+class ShareHeaderLayout {
+  ShareHeaderLayout._({
+    required this.rect,
+    required this.title,
+    required this.titleOffset,
+    required this.info,
+    required this.infoOffset,
+    required this.infoRoom,
+    required this.infoSize,
+  });
+
+  /// The cartouche: [ShareDocument.headerHeight] tall, or taller for an
+  /// info line that needs more room.
+  final Rect rect;
+
+  final ui.Paragraph title;
+  final Offset titleOffset;
+
+  /// The info line («مكية إلا … · ترتيبها في النزول … · نزلت بعد …»), laid
+  /// out [ShareDocument.infoWidth] wide, its lines centred.
+  final ui.Paragraph info;
+  final Offset infoOffset;
+
+  /// The room the info line has ([ShareDocument.infoRoom]).
+  final Rect infoRoom;
+  final double infoSize;
+
+  /// The info paragraph's box on the picture.
+  Rect get infoBox => infoOffset & Size(ShareDocument.infoWidth, info.height);
+
+  int get infoLineCount => info.computeLineMetrics().length;
+
+  void dispose() {
+    title.dispose();
+    info.dispose();
   }
 }
 
@@ -675,51 +866,54 @@ void _diamond(Canvas canvas, Offset c, double r, Color color) {
   );
 }
 
-/// The header cartouche, drawn with lines and arcs (Tibyan's own design): a
-/// double frame, a rosette panel at each end, and a pointed central
-/// medallion for the surah's name.
-void paintCartouche(Canvas canvas, Rect r) {
-  final gold = Paint()
-    ..color = ShareBrand.gold
-    ..style = ui.PaintingStyle.stroke
-    ..strokeWidth = 3;
-  final thin = Paint()
-    ..color = ShareBrand.gold
-    ..style = ui.PaintingStyle.stroke
-    ..strokeWidth = 1.6;
-  final pale = Paint()..color = ShareBrand.goldPale;
-  final paper = Paint()..color = ShareBrand.paper;
+/// The medallion of a cartouche: between the end panels, pointed at both
+/// ends.
+class Medallion {
+  const Medallion._(this.left, this.right, this.cy, this.half, this.lean);
 
-  final outer = ui.RRect.fromRectAndRadius(r, const ui.Radius.circular(14));
-  canvas
-    ..drawRRect(outer, pale)
-    ..drawRRect(outer, gold);
-  final inner = r.deflate(12);
-  canvas
-    ..drawRect(inner, paper)
-    ..drawRect(inner, thin)
-    ..drawRect(inner.deflate(7), thin);
-
-  // The end panels, square, with a rosette each.
-  final side = inner.height - 14;
-  final panels = [
-    Rect.fromLTWH(inner.left + 7, inner.top + 7, side, side),
-    Rect.fromLTWH(inner.right - 7 - side, inner.top + 7, side, side),
-  ];
-  for (final p in panels) {
-    canvas.drawRect(p, pale);
-    canvas.drawRect(p, thin);
-    _rosette(canvas, p.center, side * 0.40, gold, thin);
+  /// The medallion of cartouche [r]. The end panels keep their width when
+  /// the cartouche is taller than [ShareDocument.headerHeight], and the
+  /// points their slope, so the medallion's flat top and bottom keep their
+  /// length.
+  factory Medallion.of(Rect r) {
+    final inner = r.deflate(12);
+    final panel = math.min(inner.height - 14, _panelSide);
+    final left = inner.left + 7 + panel + 26;
+    final right = inner.right - 7 - panel - 26;
+    final half = (inner.height - 14) / 2 - 6;
+    return Medallion._(
+      left,
+      right,
+      inner.center.dy,
+      half,
+      math.min(half, _baseHalf) * 1.15,
+    );
   }
 
-  // Between the panels: the medallion, pointed at both ends.
-  final left = panels[0].right + 26;
-  final right = panels[1].left - 26;
-  final cy = inner.center.dy;
-  final half = (inner.height - 14) / 2 - 6;
-  ui.Path medallion(double inset) {
+  /// The side of the end panels, and the medallion's half height, in a
+  /// cartouche [ShareDocument.headerHeight] tall.
+  static const _panelSide = ShareDocument.headerHeight - 24 - 14;
+  static const _baseHalf = _panelSide / 2 - 6;
+
+  final double left;
+  final double right;
+  final double cy;
+  final double half;
+
+  /// How far in from each end the points reach the flat top and bottom.
+  final double lean;
+
+  /// The flat top and bottom, from left to right.
+  double get flatLeft => left + lean;
+  double get flatRight => right - lean;
+
+  /// The inner line, drawn 9 inside the outline.
+  double get innerTop => cy - half + 9;
+  double get innerBottom => cy + half - 9;
+
+  ui.Path path(double inset) {
     final l = left + inset, rt = right - inset, h = half - inset;
-    final lean = h * 1.15;
+    final lean = this.lean * h / half;
     return ui.Path()
       ..moveTo(l, cy)
       ..cubicTo(
@@ -751,14 +945,62 @@ void paintCartouche(Canvas canvas, Rect r) {
       ..cubicTo(l + lean * 0.55, cy + h, l + lean * 0.35, cy + h * 0.15, l, cy)
       ..close();
   }
+}
 
+/// The header cartouche, drawn with lines and arcs (Tibyan's own design): a
+/// double frame, a rosette panel at each end, and a pointed central
+/// medallion for the surah's name. A cartouche taller than
+/// [ShareDocument.headerHeight] keeps its panels' width and its points'
+/// slope ([Medallion.of]).
+void paintCartouche(Canvas canvas, Rect r) {
+  final gold = Paint()
+    ..color = ShareBrand.gold
+    ..style = ui.PaintingStyle.stroke
+    ..strokeWidth = 3;
+  final thin = Paint()
+    ..color = ShareBrand.gold
+    ..style = ui.PaintingStyle.stroke
+    ..strokeWidth = 1.6;
+  final pale = Paint()..color = ShareBrand.goldPale;
+  final paper = Paint()..color = ShareBrand.paper;
+
+  final outer = ui.RRect.fromRectAndRadius(r, const ui.Radius.circular(14));
   canvas
-    ..drawPath(medallion(0), paper)
-    ..drawPath(medallion(0), gold)
-    ..drawPath(medallion(9), thin);
+    ..drawRRect(outer, pale)
+    ..drawRRect(outer, gold);
+  final inner = r.deflate(12);
+  canvas
+    ..drawRect(inner, paper)
+    ..drawRect(inner, thin)
+    ..drawRect(inner.deflate(7), thin);
+
+  // The end panels, square in a cartouche of the usual height, with a
+  // rosette each.
+  final side = math.min(inner.height - 14, Medallion._panelSide);
+  final panels = [
+    Rect.fromLTWH(inner.left + 7, inner.top + 7, side, inner.height - 14),
+    Rect.fromLTWH(
+      inner.right - 7 - side,
+      inner.top + 7,
+      side,
+      inner.height - 14,
+    ),
+  ];
+  for (final p in panels) {
+    canvas.drawRect(p, pale);
+    canvas.drawRect(p, thin);
+    _rosette(canvas, p.center, side * 0.40, gold, thin);
+  }
+
+  // Between the panels: the medallion, pointed at both ends.
+  final m = Medallion.of(r);
+  canvas
+    ..drawPath(m.path(0), paper)
+    ..drawPath(m.path(0), gold)
+    ..drawPath(m.path(9), thin);
   // Small diamonds where the medallion points.
-  _diamond(canvas, Offset(left - 12, cy), 7, ShareBrand.gold);
-  _diamond(canvas, Offset(right + 12, cy), 7, ShareBrand.gold);
+  _diamond(canvas, Offset(m.left - 12, m.cy), 7, ShareBrand.gold);
+  _diamond(canvas, Offset(m.right + 12, m.cy), 7, ShareBrand.gold);
 }
 
 void _rosette(Canvas canvas, Offset c, double r, Paint stroke, Paint thin) {
