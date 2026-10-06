@@ -4,6 +4,9 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Recitation keeps playing with the screen off (audio_service). -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- «Save to Photos» of the shared verse pictures, on Android 9 and older
+         only (MediaStore needs no permission from Android 10 on). -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <!-- Page packs download in the background, with a notification
