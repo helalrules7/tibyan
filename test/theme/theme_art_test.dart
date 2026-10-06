@@ -194,7 +194,12 @@ void main() {
       expect(left.first.rect.width, closeTo(edgeV.width * k, 1e-9));
     });
 
-    test('the page starts at the deeper edge', () {
+    test('the page starts at each edge\'s own depth', () {
+      final dv = edgeV.width * k;
+      expect(layout.insets.top, closeTo(band, 1e-9));
+      expect(layout.insets.bottom, closeTo(band, 1e-9));
+      expect(layout.insets.left, closeTo(dv, 1e-9));
+      expect(layout.insets.right, closeTo(dv, 1e-9));
       expect(layout.inset, closeTo(band, 1e-9));
     });
 
@@ -229,6 +234,11 @@ void main() {
       final middle = l.placements[3];
       expect(middle.rect.height / middle.src!.height, greaterThan(k));
       expect(l.inset, closeTo(slot.top * k, 1e-9));
+      // The sides are thinner than the top: the page reaches each one.
+      expect(l.insets.left, closeTo(slot.left * k, 1e-9));
+      expect(l.insets.right, closeTo((view.width - slot.right) * k, 1e-9));
+      expect(l.insets.top, closeTo(slot.top * k, 1e-9));
+      expect(l.insets.bottom, closeTo((view.height - slot.bottom) * k, 1e-9));
       final union = l.placements
           .map((p) => p.rect)
           .reduce((a, b) => a.expandToInclude(b));

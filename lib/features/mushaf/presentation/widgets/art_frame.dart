@@ -36,8 +36,13 @@ class ArtPageFrame extends StatelessWidget {
   static const numberSpace = 40.0;
   static const toolsSpace = 26.0;
 
-  /// Room between the frame and the page's text.
+  /// Room between the frame and the page's text on the ornate pages.
   static const gap = 8.0;
+
+  /// Room between the frame's inner edge, on each side, and the page on
+  /// a text page: small, since the page keeps its own margin around its
+  /// ink, and the same on every side.
+  static const clearance = 4.0;
 
   /// Null while the art loads.
   final ThemeArtPictures? art;
@@ -61,17 +66,15 @@ class ArtPageFrame extends StatelessWidget {
 
     final framed = LayoutBuilder(
       builder: (context, box) {
-        final inset = art?.layout(box.biggest).inset ?? 20;
-        final pad = inset + gap;
+        final insets =
+            art?.layout(box.biggest).insets ?? const EdgeInsets.all(20);
+        final pad = insets + const EdgeInsets.all(clearance);
         final linePad =
-            linePadding?.call(
-              Size(box.maxWidth - 2 * pad, box.maxHeight - 2 * pad),
-            ) ??
-            EdgeInsets.zero;
+            linePadding?.call(pad.deflateSize(box.biggest)) ?? EdgeInsets.zero;
         final slot =
-            (box.maxHeight - 2 * pad - linePad.vertical) /
+            (box.maxHeight - pad.vertical - linePad.vertical) /
             IlluminatedFrame.lines;
-        final top = pad + linePad.top;
+        final top = pad.top + linePad.top;
         return Stack(
           clipBehavior: Clip.none,
           children: [
@@ -79,18 +82,18 @@ class ArtPageFrame extends StatelessWidget {
               child: RasterFrame(
                 cache:
                     'art|${t.paper.toARGB32()}|${identityHashCode(art)}'
-                    '|$gap',
+                    '|$clearance',
                 painter: ArtFramePainter(art: art, paper: t.paper),
               ),
             ),
             Positioned.fill(
-              child: Padding(padding: EdgeInsets.all(pad), child: child),
+              child: Padding(padding: pad, child: child),
             ),
             for (final b in info?.banners ?? const <SurahBanner>[])
               Positioned(
                 top: top + b.line * slot,
-                left: pad - 4,
-                right: pad - 4,
+                left: pad.left,
+                right: pad.right,
                 height: slot * b.slots,
                 child: ArtSurahBanner(banner: b, art: art),
               ),
