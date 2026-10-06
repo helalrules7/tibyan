@@ -99,13 +99,20 @@ class ShareDocument {
   static const _gapAfterHeader = 44.0;
   static const _textBottom = _footerTop - 36;
 
+  /// The footer's band, from its rule to the bottom edge.
+  static const _footerHeight = height - _footerTop;
+
+  /// Room between the text and the footer's rule on a picture trimmed to
+  /// its text.
+  static const _gapBeforeFooter = 96.0;
+
   /// The text's sizes, largest first: a passage that fits on one picture
   /// takes the largest size it fits at; a longer one the last.
   static const fontSizes = [92.0, 84.0, 76.0, 68.0, 62.0];
 
   /// The labels' font (the surah's line, the footer): one with the dash
   /// and the Arabic-Indic digits.
-  static const _uiFont = 'IBMPlexSansArabic';
+  static const _uiFont = 'Changa';
 
   /// Line pitch, in font sizes.
   static const _pitch = 1.95;
@@ -122,6 +129,25 @@ class ShareDocument {
   final ui.Image? _logo;
 
   int get pageCount => pages.length;
+
+  /// The size of image [page]: a passage on one picture is only as tall as
+  /// its header, basmala, text and footer need; a passage on several keeps
+  /// the full 3:4 size on every one.
+  Size sizeOf(int page) {
+    if (pages.length > 1) return size;
+    final layout = pages[page];
+    final basmala = layout.firstOfSurah && passage.hasBasmala(layout.surah);
+    final h =
+        _headerTop +
+        _headerHeight +
+        _gapAfterHeader +
+        (basmala ? _basmalaHeight : 0) +
+        layout.lines.length * _linePitch +
+        _gapBeforeFooter +
+        _footerHeight;
+    return Size(width, h < height ? h.ceilToDouble() : height);
+  }
+
   double get _linePitch => fontSize * _pitch;
 
   /// Lays [passage] out. [logo] is the Tibyan mark for the footers.
@@ -280,10 +306,16 @@ class ShareDocument {
   String textOf(int page) =>
       joinTokens(tokens.sublist(pages[page].from, pages[page].to));
 
-  /// Draws image [page] at 1536 x 2048.
+  /// Draws image [page] at [sizeOf] it.
   void paint(Canvas canvas, int page) {
     final layout = pages[page];
-    canvas.drawRect(Offset.zero & size, Paint()..color = ShareBrand.paper);
+    final pictureSize = sizeOf(page);
+    // The footer keeps its place from the bottom edge.
+    final footerTop = pictureSize.height - _footerHeight;
+    canvas.drawRect(
+      Offset.zero & pictureSize,
+      Paint()..color = ShareBrand.paper,
+    );
     final header = passage.headers[layout.surah];
     _paintHeader(canvas, header);
 
@@ -305,14 +337,21 @@ class ShareDocument {
     final pitch = _linePitch;
     final block = layout.lines.length * pitch;
     // The text sits in the middle of its room.
-    final room = _textBottom - top;
+    final room = footerTop - (_footerTop - _textBottom) - top;
     if (block < room) top += (room - block) / 2;
     final space = fontSize * _space;
     for (final line in layout.lines) {
-      final xs = placeLine(_widths, line, textWidth, space);
+      // Each line centred across, its words at their natural spacing.
+      final plain = ShareLine(line.from, line.to, justified: false);
+      final xs = placeLine(_widths, plain, textWidth, space);
+      var used = space * (line.length - 1);
+      for (var i = line.from; i < line.to; i++) {
+        used += _widths[i];
+      }
+      final inset = used < textWidth ? (textWidth - used) / 2 : 0.0;
       for (var i = line.from; i < line.to; i++) {
         final p = _words[i];
-        final right = width - margin - xs[i - line.from];
+        final right = width - margin - inset - xs[i - line.from];
         canvas.drawParagraph(
           p,
           Offset(right - _widths[i], top + (pitch - p.height) / 2),
@@ -320,7 +359,7 @@ class ShareDocument {
       }
       top += pitch;
     }
-    _paintFooter(canvas, page);
+    _paintFooter(canvas, page, footerTop);
   }
 
   void _paintHeader(Canvas canvas, ShareSurahHeader? header) {
@@ -348,25 +387,20 @@ class ShareDocument {
     );
     canvas.drawParagraph(
       info,
-      Offset(r.center.dx - 380, r.bottom - 58 - info.height / 2),
+      Offset(r.center.dx - 380, r.bottom - 76 - info.height / 2),
     );
   }
 
-  void _paintFooter(Canvas canvas, int page) {
-    const y = _footerTop;
+  void _paintFooter(Canvas canvas, int page, double y) {
     final rule = Paint()
       ..color = ShareBrand.gold
       ..strokeWidth = 2;
     canvas
-      ..drawLine(const Offset(margin, y), Offset(width / 2 - 26, y), rule)
-      ..drawLine(
-        Offset(width / 2 + 26, y),
-        const Offset(width - margin, y),
-        rule,
-      );
-    _diamond(canvas, const Offset(width / 2, y), 11, ShareBrand.gold);
+      ..drawLine(Offset(margin, y), Offset(width / 2 - 26, y), rule)
+      ..drawLine(Offset(width / 2 + 26, y), Offset(width - margin, y), rule);
+    _diamond(canvas, Offset(width / 2, y), 11, ShareBrand.gold);
 
-    const mid = y + 96;
+    final mid = y + 96;
     final ref = _label(
       passage.reference,
       family: _uiFont,
@@ -412,8 +446,9 @@ class ShareDocument {
     final recorder = ui.PictureRecorder();
     paint(Canvas(recorder), page);
     final picture = recorder.endRecording();
+    final s = sizeOf(page);
     return picture
-        .toImage(width.toInt(), height.toInt())
+        .toImage(s.width.toInt(), s.height.toInt())
         .whenComplete(picture.dispose);
   }
 

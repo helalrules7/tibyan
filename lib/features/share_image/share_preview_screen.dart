@@ -218,7 +218,9 @@ class _SharePreviewState extends ConsumerState<SharePreviewScreen> {
                               padding: const EdgeInsets.all(16),
                               child: Center(
                                 child: AspectRatio(
-                                  aspectRatio: 3 / 4,
+                                  aspectRatio:
+                                      doc.sizeOf(i).width /
+                                      doc.sizeOf(i).height,
                                   child: DecoratedBox(
                                     decoration: const BoxDecoration(
                                       boxShadow: [
@@ -230,7 +232,7 @@ class _SharePreviewState extends ConsumerState<SharePreviewScreen> {
                                     ),
                                     child: FittedBox(
                                       child: SizedBox.fromSize(
-                                        size: ShareDocument.size,
+                                        size: doc.sizeOf(i),
                                         child: CustomPaint(
                                           painter: _PagePainter(doc, i),
                                         ),
