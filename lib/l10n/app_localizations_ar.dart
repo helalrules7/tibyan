@@ -2123,4 +2123,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get playerStyleButtonHint =>
       'زر صغير: ضغطة للتشغيل والإيقاف، وضغطة مطولة للقائمة';
+
+  @override
+  String get focusExit => 'إنهاء التركيز';
+
+  @override
+  String get focusTools => 'الأدوات';
+
+  @override
+  String get focusShowTools => 'إظهار الأدوات';
+
+  @override
+  String get focusHideTools => 'إخفاء الأدوات';
+
+  @override
+  String get focusMenus => 'القوائم';
 }

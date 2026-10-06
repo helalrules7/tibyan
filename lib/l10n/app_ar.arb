@@ -1406,5 +1406,10 @@
   "playerStylePill": "وضع التركيز",
   "playerStylePillHint": "صغير وشفاف، فيه تشغيل وإعدادات وإغلاق",
   "playerStyleButton": "الزر الواحد",
-  "playerStyleButtonHint": "زر صغير: ضغطة للتشغيل والإيقاف، وضغطة مطولة للقائمة"
+  "playerStyleButtonHint": "زر صغير: ضغطة للتشغيل والإيقاف، وضغطة مطولة للقائمة",
+  "focusExit": "إنهاء التركيز",
+  "focusTools": "الأدوات",
+  "focusShowTools": "إظهار الأدوات",
+  "focusHideTools": "إخفاء الأدوات",
+  "focusMenus": "القوائم"
 }

@@ -59,6 +59,7 @@ import 'widgets/tajweed_legend.dart';
 import 'widgets/verse_services.dart';
 
 part 'mushaf_screen_controls.dart';
+part 'mushaf_screen_focus.dart';
 part 'mushaf_screen_hifz.dart';
 part 'mushaf_screen_panes.dart';
 
@@ -109,6 +110,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   /// Reading is immersive: no bars until the reader touches the page.
   bool _chrome = false;
+
+  /// Focus mode: the reading tools under the page are shown (the top
+  /// bar's tools button); a tap on the page hides them.
+  bool _focusTools = false;
+
+  /// Focus mode is on (see [AppSettings.focusMode]).
+  bool get _focus => ref.read(settingsProvider).focusMode;
   int? _scrubPage;
 
   /// The selection: two ends on the current page, in either order.
@@ -181,21 +189,43 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     _applySystemBars();
   }
 
+  /// The system's bars show with the menus; focus mode keeps them hidden
+  /// (immersive) all the time.
   void _applySystemBars() {
     SystemChrome.setEnabledSystemUIMode(
-      _chrome ? SystemUiMode.edgeToEdge : SystemUiMode.immersiveSticky,
+      _chrome && !_focus
+          ? SystemUiMode.edgeToEdge
+          : SystemUiMode.immersiveSticky,
     );
   }
 
   /// A tap on the page, its frame or the space around it: clears the
-  /// selection, or shows and hides the menus.
+  /// selection, or shows and hides the menus. In focus mode it only hides
+  /// what is shown (the tools, the menus); with nothing shown it does
+  /// nothing.
   void _onPageTap() {
     if (_multi) return;
     if (_selA != null) {
       setState(() => _selA = _selB = null);
+    } else if (_focus) {
+      if (_focusTools) setState(() => _focusTools = false);
+      _setChrome(false);
     } else {
       _setChrome(!_chrome);
     }
+  }
+
+  /// Focus mode's tools button: shows the reading tools under the page, or
+  /// hides them.
+  void _toggleFocusTools() {
+    _setChrome(false);
+    setState(() => _focusTools = !_focusTools);
+  }
+
+  /// Leaves focus mode (its bar's exit button), back to the normal page.
+  void _exitFocus() {
+    setState(() => _focusTools = false);
+    ref.read(settingsProvider.notifier).setFocusMode(false);
   }
 
   void _setChrome(bool on) {
@@ -381,6 +411,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final pageCount = edition.pageCount;
     // Page numbers differ between editions: reopen at the same verse.
     ref.listen(editionProvider, (_, _) => _open());
+    // Focus mode turned on or off (here, or in the settings): the system's
+    // bars follow, and its tools start hidden.
+    ref.listen(settingsProvider.select((s) => s.focusMode), (_, _) {
+      _focusTools = false;
+      _applySystemBars();
+    });
 
     // Bookmarks are kept in Hafs numbers; a riwaya page shows each on the
     // riwaya verse that holds it.
@@ -439,34 +475,33 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           );
 
     // Elderly mode: no small icon-only tools on the page; the same tools
-    // are labelled buttons in the bottom bar.
-    final tools = context.tokens.elderly
-        ? null
-        : _ReadingTools(
-            touchReading: _touchReading,
-            onTouchReading: _toggleTouchReading,
-            listening: recitation.active,
-            onListen: _listenFromPage,
-            recite: _recite || _testing,
-            onRecite: () => _testing
-                ? _closeTest()
-                : _recite
-                ? setState(() {
-                    _recite = false;
-                    _revealed.clear();
-                  })
-                : _startRecite(),
-            tajweed: editionHasTajweed(edition) ? settings.tajweedColors : null,
-            onTajweed: () => ref
-                .read(settingsProvider.notifier)
-                .setTajweedColors(!settings.tajweedColors),
-            onTajweedLegend: () => showTajweedLegend(context),
-          );
+    // are labelled buttons in the bottom bar (in focus mode, in its tools).
+    _ReadingTools readingTools({bool labelled = false}) => _ReadingTools(
+      labelled: labelled,
+      touchReading: _touchReading,
+      onTouchReading: _toggleTouchReading,
+      listening: recitation.active,
+      onListen: _listenFromPage,
+      recite: _recite || _testing,
+      onRecite: () => _testing
+          ? _closeTest()
+          : _recite
+          ? setState(() {
+              _recite = false;
+              _revealed.clear();
+            })
+          : _startRecite(),
+      tajweed: editionHasTajweed(edition) ? settings.tajweedColors : null,
+      onTajweed: () => ref
+          .read(settingsProvider.notifier)
+          .setTajweedColors(!settings.tajweedColors),
+      onTajweedLegend: () => showTajweedLegend(context),
+    );
+    final tools = context.tokens.elderly ? null : readingTools();
 
     Widget pageOf(int pg) {
-      if (pg == 0) return CoverPage(onTap: () => _setChrome(!_chrome));
-      if (edition == MushafEdition.shamarly && pg == 1) {
-        return CoverPage(onTap: () => _setChrome(!_chrome));
+      if (pg == 0 || (edition == MushafEdition.shamarly && pg == 1)) {
+        return CoverPage(onTap: _onPageTap);
       }
       // The first two pages of the text (al-Fatiha, the opening of
       // al-Baqarah) sit in the ornate opening frame.
@@ -707,6 +742,28 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
     final scrubbing = _scrubPage ?? _page;
     final range = _range();
+    final shownPages = _pagesAt(_barHold ?? _indexOf(_page));
+    final playerStyle = settings.effectivePlayerStyle;
+    final focusBar = !focus
+        ? null
+        : _FocusTopBar(
+            key: const ValueKey('focus-bar'),
+            infos: [
+              for (final pg in shownPages)
+                isCover(pg) ? null : ref.watch(frameInfoProvider(pg)).value,
+            ],
+            actions: [
+              (Icons.fullscreen_exit, l.focusExit, _exitFocus),
+              if (settings.focusTools == FocusTools.button) ...[
+                (
+                  Icons.handyman_outlined,
+                  _focusTools ? l.focusHideTools : l.focusShowTools,
+                  _toggleFocusTools,
+                ),
+                (Icons.menu, l.showMenus, () => _setChrome(true)),
+              ],
+            ],
+          );
     return _keyboard(
       Scaffold(
         backgroundColor: t.bg,
@@ -723,123 +780,150 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     behavior: HitTestBehavior.opaque,
                     onTap: _onPageTap,
                     child: SafeArea(
+                      // Focus mode's bar stands in the room above the page.
+                      top: !focus,
                       // While listening, the page sits above the player bar so the
-                      // catchword and the reading tools stay visible.
+                      // catchword and the reading tools stay visible. The
+                      // floating players stay over the page instead.
                       minimum: EdgeInsets.only(
-                        bottom: recitation.active && !_autoScroll
+                        bottom:
+                            recitation.active &&
+                                !_autoScroll &&
+                                playerStyle == PlayerStyle.normal
                             ? MediaQuery.paddingOf(context).bottom + 80
                             : 0,
                       ),
-                      child: _autoScroll
-                          ? LayoutBuilder(
-                              builder: (context, box) {
-                                _pageExtent = box.maxHeight;
-                                _vertical ??= ScrollController(
-                                  initialScrollOffset:
-                                      (_page - _first) * box.maxHeight,
-                                );
-                                return ListView.builder(
-                                  controller: _vertical,
-                                  itemExtent: box.maxHeight,
-                                  itemCount: pageCount + 1 - _first,
-                                  itemBuilder: (context, i) => pageAt(i),
-                                );
-                              },
-                            )
-                          : _controller == null
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                semanticsLabel: l.loadingLabel,
-                              ),
-                            )
-                          // The pages turn under one reading bar, which
-                          // stays put.
-                          : Column(
-                              children: [
-                                Expanded(
-                                  child: NotificationListener<ScrollNotification>(
-                                    onNotification: _onPagerScroll,
-                                    child:
-                                        // The mushaf opens from the right in every interface language.
-                                        Directionality(
-                                          textDirection: TextDirection.rtl,
-                                          child: LayoutBuilder(
-                                            builder: (context, box) {
-                                              // A wide screen held sideways shows two
-                                              // pages; not in a hifz test, which is one
-                                              // page at a time.
-                                              final spread =
-                                                  settings.twoPageSpread &&
-                                                  !_testing &&
-                                                  box.maxWidth >
-                                                      box.maxHeight &&
-                                                  box.maxWidth >= 800;
-                                              if (spread != _spread) {
-                                                WidgetsBinding.instance
-                                                    .addPostFrameCallback(
-                                                      (_) => _setSpread(spread),
-                                                    );
-                                              }
-                                              // A mouse and a trackpad drag the pages
-                                              // like a finger; the wheel turns them.
-                                              return Listener(
-                                                onPointerSignal: _onWheel,
-                                                child: ScrollConfiguration(
-                                                  behavior:
-                                                      ScrollConfiguration.of(
-                                                        context,
-                                                      ).copyWith(
-                                                        dragDevices:
-                                                            PointerDeviceKind
-                                                                .values
-                                                                .toSet(),
-                                                      ),
-                                                  child: PageView.builder(
-                                                    // A new controller (spreads turned on or off, another
-                                                    // edition) starts a new pager: the old one would keep its
-                                                    // place, now another page.
-                                                    key: ObjectKey(_controller),
-                                                    controller: _controller,
-                                                    itemCount: _spreads.count,
-                                                    // The pages either side are built and their images
-                                                    // decoded before they are turned to, so a page turn
-                                                    // does not stop on a spinner.
-                                                    allowImplicitScrolling:
-                                                        true,
-                                                    onPageChanged:
-                                                        _onPageChanged,
-                                                    itemBuilder: (context, i) {
-                                                      final pages = _pagesAt(i);
-                                                      if (pages.length == 1) {
-                                                        return pageOf(
-                                                          pages.single,
-                                                        );
-                                                      }
-                                                      // Right page first: the mushaf opens
-                                                      // from the right.
-                                                      return Row(
-                                                        textDirection:
-                                                            TextDirection.rtl,
-                                                        children: [
-                                                          for (final pg
-                                                              in pages)
-                                                            Expanded(
-                                                              child: pageOf(pg),
+                      child: Column(
+                        children: [
+                          ?focusBar,
+                          Expanded(
+                            child: _autoScroll
+                                ? LayoutBuilder(
+                                    builder: (context, box) {
+                                      _pageExtent = box.maxHeight;
+                                      _vertical ??= ScrollController(
+                                        initialScrollOffset:
+                                            (_page - _first) * box.maxHeight,
+                                      );
+                                      return ListView.builder(
+                                        controller: _vertical,
+                                        itemExtent: box.maxHeight,
+                                        itemCount: pageCount + 1 - _first,
+                                        itemBuilder: (context, i) => pageAt(i),
+                                      );
+                                    },
+                                  )
+                                : _controller == null
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                      semanticsLabel: l.loadingLabel,
+                                    ),
+                                  )
+                                // The pages turn under one reading bar, which
+                                // stays put.
+                                : Column(
+                                    children: [
+                                      Expanded(
+                                        child: NotificationListener<ScrollNotification>(
+                                          onNotification: _onPagerScroll,
+                                          child:
+                                              // The mushaf opens from the right in every interface language.
+                                              Directionality(
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                child: LayoutBuilder(
+                                                  builder: (context, box) {
+                                                    // A wide screen held sideways shows two
+                                                    // pages; not in a hifz test, which is one
+                                                    // page at a time.
+                                                    final spread =
+                                                        settings
+                                                            .twoPageSpread &&
+                                                        !_testing &&
+                                                        box.maxWidth >
+                                                            box.maxHeight &&
+                                                        box.maxWidth >= 800;
+                                                    if (spread != _spread) {
+                                                      WidgetsBinding.instance
+                                                          .addPostFrameCallback(
+                                                            (_) => _setSpread(
+                                                              spread,
                                                             ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  ),
+                                                          );
+                                                    }
+                                                    // A mouse and a trackpad drag the pages
+                                                    // like a finger; the wheel turns them.
+                                                    return Listener(
+                                                      onPointerSignal: _onWheel,
+                                                      child: ScrollConfiguration(
+                                                        behavior:
+                                                            ScrollConfiguration.of(
+                                                              context,
+                                                            ).copyWith(
+                                                              dragDevices:
+                                                                  PointerDeviceKind
+                                                                      .values
+                                                                      .toSet(),
+                                                            ),
+                                                        child: PageView.builder(
+                                                          // A new controller (spreads turned on or off, another
+                                                          // edition) starts a new pager: the old one would keep its
+                                                          // place, now another page.
+                                                          key: ObjectKey(
+                                                            _controller,
+                                                          ),
+                                                          controller:
+                                                              _controller,
+                                                          itemCount:
+                                                              _spreads.count,
+                                                          // The pages either side are built and their images
+                                                          // decoded before they are turned to, so a page turn
+                                                          // does not stop on a spinner.
+                                                          allowImplicitScrolling:
+                                                              true,
+                                                          onPageChanged:
+                                                              _onPageChanged,
+                                                          itemBuilder: (context, i) {
+                                                            final pages =
+                                                                _pagesAt(i);
+                                                            if (pages.length ==
+                                                                1) {
+                                                              return pageOf(
+                                                                pages.single,
+                                                              );
+                                                            }
+                                                            // Right page first: the mushaf opens
+                                                            // from the right.
+                                                            return Row(
+                                                              textDirection:
+                                                                  TextDirection
+                                                                      .rtl,
+                                                              children: [
+                                                                for (final pg
+                                                                    in pages)
+                                                                  Expanded(
+                                                                    child:
+                                                                        pageOf(
+                                                                          pg,
+                                                                        ),
+                                                                  ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
-                                              );
-                                            },
-                                          ),
+                                              ),
                                         ),
+                                      ),
+                                      if (!_autoScroll && !focus) readingBar(),
+                                    ],
                                   ),
-                                ),
-                                if (!_autoScroll && !focus) readingBar(),
-                              ],
-                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -935,6 +1019,24 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       ),
               ),
             ),
+            // Focus mode: the reading tools under the page, while shown.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Reveal(
+                visible: focus && _focusTools && !_chrome && !_autoScroll,
+                child: !focus || !_focusTools
+                    ? null
+                    : _FocusToolsPanel(
+                        key: const ValueKey('focus-tools'),
+                        bar: readingBar(),
+                        labelledTools: context.tokens.elderly
+                            ? readingTools(labelled: true)
+                            : null,
+                      ),
+              ),
+            ),
             Positioned(
               left: 16,
               right: 16,
@@ -962,7 +1064,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               bottom: 12,
               child: Reveal(
                 visible:
-                    recitation.active && range == null && !_multi && !_chrome,
+                    recitation.active &&
+                    range == null &&
+                    !_multi &&
+                    !_chrome &&
+                    !(focus && _focusTools),
                 from: const Offset(0, 0.4),
                 child: const SafeArea(top: false, child: PlayerBar()),
               ),

@@ -3732,6 +3732,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'زر صغير: ضغطة للتشغيل والإيقاف، وضغطة مطولة للقائمة'**
   String get playerStyleButtonHint;
+
+  /// No description provided for @focusExit.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنهاء التركيز'**
+  String get focusExit;
+
+  /// No description provided for @focusTools.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأدوات'**
+  String get focusTools;
+
+  /// No description provided for @focusShowTools.
+  ///
+  /// In ar, this message translates to:
+  /// **'إظهار الأدوات'**
+  String get focusShowTools;
+
+  /// No description provided for @focusHideTools.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء الأدوات'**
+  String get focusHideTools;
+
+  /// No description provided for @focusMenus.
+  ///
+  /// In ar, this message translates to:
+  /// **'القوائم'**
+  String get focusMenus;
 }
 
 class _AppLocalizationsDelegate

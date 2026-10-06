@@ -2137,4 +2137,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get playerStyleButtonHint =>
       'A small button: tap to play or pause, long press for the menu';
+
+  @override
+  String get focusExit => 'Exit focus';
+
+  @override
+  String get focusTools => 'Tools';
+
+  @override
+  String get focusShowTools => 'Show the tools';
+
+  @override
+  String get focusHideTools => 'Hide the tools';
+
+  @override
+  String get focusMenus => 'Menus';
 }

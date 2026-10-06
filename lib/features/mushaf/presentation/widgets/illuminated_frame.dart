@@ -113,6 +113,7 @@ class FrameInfo {
     required this.juz,
     required this.hizb,
     required this.surahName,
+    this.quarter,
     this.catchword,
     this.catchwordImage = false,
     this.banners = const [],
@@ -140,6 +141,9 @@ class FrameInfo {
   /// riwaya editions); the frame then shows the juz alone.
   final int? hizb;
   final String surahName;
+
+  /// The hizb quarter (1..240) the page opens in; null where [hizb] is.
+  final int? quarter;
 
   /// First word of the next page, shown under the frame.
   final String? catchword;

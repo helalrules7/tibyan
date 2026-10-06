@@ -882,5 +882,10 @@
   "playerStylePill": "Focus",
   "playerStylePillHint": "Small and see-through, with play, settings and close",
   "playerStyleButton": "Single button",
-  "playerStyleButtonHint": "A small button: tap to play or pause, long press for the menu"
+  "playerStyleButtonHint": "A small button: tap to play or pause, long press for the menu",
+  "focusExit": "Exit focus",
+  "focusTools": "Tools",
+  "focusShowTools": "Show the tools",
+  "focusHideTools": "Hide the tools",
+  "focusMenus": "Menus"
 }
