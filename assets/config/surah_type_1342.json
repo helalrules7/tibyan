@@ -1,0 +1,1746 @@
+{
+ "status": "draft-transcription",
+ "source": {
+  "title": "مصحف الملك فؤاد، الطبعة الأولى",
+  "edition": "جمع ورتب في المطبعة الأميرية ببولاق وطبع في مصلحة المساحة بالجيزة سنة ١٣٤٢هـ (1924)",
+  "scan": "https://archive.org/download/mushafElMe4679669676497saha_201703/mushafElMesaha.pdf",
+  "scan_sha256": "227a5c0a7036fd8006967b7651eb1cb0c46a14d22777d113cc1f7ebd0af59175",
+  "mirror": "https://tibyan.ahmedhelal.dev/mirror/sources/mushaf-1342-cairo/",
+  "headers": "https://tibyan.ahmedhelal.dev/mirror/sources/mushaf-1342-cairo/headers/",
+  "stated_source": "وأُخذ بيان مكيه ومدنيه من الكتب المذكورة، و\"كتاب أبي القاسم عمر بن محمد بن عبد الكافي\"، و\"كتب القراءات والتفسير\" على خلاف في بعضها (التعريف، ص و، صفحة PDF 834)",
+  "rights": "public domain: Egyptian government publication of 1924 (50-year term for legal persons, expired); published before 1931 (US)"
+ },
+ "transcribed": "2026-10-06",
+ "method": "by hand from 600 dpi crops, two independent passes (tools/surah_type_1342/pass1.txt, pass2.txt), every disagreement resolved on the crop (tools/surah_type_1342/build.py)",
+ "review": {
+  "approved": false,
+  "reviewer": null
+ },
+ "spelling": "as printed: «فى», «آيتى», «ابراهيم», «الا» or «إلا» as each header has it; digits as Arabic-Indic",
+ "surahs": [
+  {
+   "surah": 1,
+   "page": 2,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "سبع",
+   "verse_count": 7,
+   "after_printed": "المدثر",
+   "remark": null,
+   "header_text": "مكية وآياتها سبع نزلت بعد المدثر"
+  },
+  {
+   "surah": 2,
+   "page": 3,
+   "type": "medinan",
+   "statement": "مدنية إلا آية ٢٨١ فنزلت بمنى فى حجة الوداع",
+   "exceptions": [
+    {
+     "verses": [
+      281
+     ],
+     "type": null,
+     "note": "فنزلت بمنى فى حجة الوداع"
+    }
+   ],
+   "verse_count_printed": "مائتان وست وثمانون",
+   "verse_count": 286,
+   "after_printed": null,
+   "remark": "وهى أول سورة نزلت بالمدينة",
+   "header_text": "مدنية إلا آية ٢٨١ فنزلت بمنى فى حجة الوداع وآياتها مائتان وست وثمانون وهى أول سورة نزلت بالمدينة",
+   "uncertain": "the header is in the ornamental opening frames, in a different hand: the hamza of «إلا» and the dots of «فى» are hard to see"
+  },
+  {
+   "surah": 3,
+   "page": 62,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٢٠٠",
+   "verse_count": 200,
+   "after_printed": "الأنفال",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٢٠٠ نزلت بعد الأنفال"
+  },
+  {
+   "surah": 4,
+   "page": 97,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١٧٦",
+   "verse_count": 176,
+   "after_printed": "الممتحنة",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١٧٦ نزلت بعد الممتحنة"
+  },
+  {
+   "surah": 5,
+   "page": 134,
+   "type": "medinan",
+   "statement": "مدنية إلا آية ٣ فنزلت بعرفات فى حجة الوداع",
+   "exceptions": [
+    {
+     "verses": [
+      3
+     ],
+     "type": null,
+     "note": "فنزلت بعرفات فى حجة الوداع"
+    }
+   ],
+   "verse_count_printed": "١٢٠",
+   "verse_count": 120,
+   "after_printed": "الفتح",
+   "remark": null,
+   "header_text": "مدنية إلا آية ٣ فنزلت بعرفات فى حجة الوداع وآياتها ١٢٠ نزلت بعد الفتح"
+  },
+  {
+   "surah": 6,
+   "page": 162,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٢٠ و٢٣ و٩١ و٩٣ و١١٤ و١٤١ و١٥١ و١٥٢ و١٥٣ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      20,
+      23,
+      91,
+      93,
+      114,
+      141,
+      151,
+      152,
+      153
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١٦٥",
+   "verse_count": 165,
+   "after_printed": "الحجر",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٢٠ و٢٣ و٩١ و٩٣ و١١٤ و١٤١ و١٥١ و١٥٢ و١٥٣ فمدنية وآياتها ١٦٥ نزلت بعد الحجر"
+  },
+  {
+   "surah": 7,
+   "page": 192,
+   "type": "meccan",
+   "statement": "مكية إلا من آية ١٦٣ إلى غاية آية ١٧٠ فمدنية",
+   "exceptions": [
+    {
+     "from": 163,
+     "to": 170,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٢٠٦",
+   "verse_count": 206,
+   "after_printed": "ص",
+   "remark": null,
+   "header_text": "مكية إلا من آية ١٦٣ إلى غاية آية ١٧٠ فمدنية وآياتها ٢٠٦ نزلت بعد ص"
+  },
+  {
+   "surah": 8,
+   "page": 226,
+   "type": "medinan",
+   "statement": "مدنية إلا من آية ٣٠ إلى غاية آية ٣٦ فمكية",
+   "exceptions": [
+    {
+     "from": 30,
+     "to": 36,
+     "type": "meccan"
+    }
+   ],
+   "verse_count_printed": "٧٥",
+   "verse_count": 75,
+   "after_printed": "البقرة",
+   "remark": null,
+   "header_text": "مدنية إلا من آية ٣٠ إلى غاية آية ٣٦ فمكية وآياتها ٧٥ نزلت بعد البقرة"
+  },
+  {
+   "surah": 9,
+   "page": 239,
+   "type": "medinan",
+   "statement": "مدنية إلا الآيتين الأخيرتين فمكيتان",
+   "exceptions": [
+    {
+     "last": 2,
+     "type": "meccan"
+    }
+   ],
+   "verse_count_printed": "١٢٩",
+   "verse_count": 129,
+   "after_printed": "المائدة",
+   "remark": null,
+   "header_text": "مدنية إلا الآيتين الأخيرتين فمكيتان وآياتها ١٢٩ نزلت بعد المائدة"
+  },
+  {
+   "surah": 10,
+   "page": 265,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٤٠ و٩٤ و٩٥ و٩٦ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      40,
+      94,
+      95,
+      96
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١٠٩",
+   "verse_count": 109,
+   "after_printed": "الإسراء",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٤٠ و٩٤ و٩٥ و٩٦ فمدنية وآياتها ١٠٩ نزلت بعد الإسراء"
+  },
+  {
+   "surah": 11,
+   "page": 283,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ١٢ و١٧ و١١٤ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      12,
+      17,
+      114
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١٢٣",
+   "verse_count": 123,
+   "after_printed": "سورة يونس",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ١٢ و١٧ و١١٤ فمدنية وآياتها ١٢٣ نزلت بعد سورة يونس"
+  },
+  {
+   "surah": 12,
+   "page": 302,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ١ و٢ و٣ و٧ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      1,
+      2,
+      3,
+      7
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١١١",
+   "verse_count": 111,
+   "after_printed": "سورة هود",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ١ و٢ و٣ و٧ فمدنية وآياتها ١١١ نزلت بعد سورة هود"
+  },
+  {
+   "surah": 13,
+   "page": 320,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٤٣",
+   "verse_count": 43,
+   "after_printed": "سورة محمد",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٤٣ نزلت بعد سورة محمد"
+  },
+  {
+   "surah": 14,
+   "page": 329,
+   "type": "meccan",
+   "statement": "مكية إلا آيتى ٢٨ و٢٩ فمدنيتان",
+   "exceptions": [
+    {
+     "verses": [
+      28,
+      29
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٥٢",
+   "verse_count": 52,
+   "after_printed": "سورة نوح",
+   "remark": null,
+   "header_text": "مكية إلا آيتى ٢٨ و٢٩ فمدنيتان وآياتها ٥٢ نزلت بعد سورة نوح"
+  },
+  {
+   "surah": 15,
+   "page": 337,
+   "type": "meccan",
+   "statement": "مكية الا آية ٨٧ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      87
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٩٩",
+   "verse_count": 99,
+   "after_printed": "سورة يوسف",
+   "remark": null,
+   "header_text": "مكية الا آية ٨٧ فمدنية وآياتها ٩٩ نزلت بعد سورة يوسف"
+  },
+  {
+   "surah": 16,
+   "page": 345,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات الثلاث الأخيرة فمدنية",
+   "exceptions": [
+    {
+     "last": 3,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١٢٨",
+   "verse_count": 128,
+   "after_printed": "الكهف",
+   "remark": null,
+   "header_text": "مكية إلا الآيات الثلاث الأخيرة فمدنية وآياتها ١٢٨ نزلت بعد الكهف"
+  },
+  {
+   "surah": 17,
+   "page": 364,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٢٦ و٣٢ و٣٣ و٥٧ ومن آية ٧٣ الى غاية آية ٨٠ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      26,
+      32,
+      33,
+      57
+     ],
+     "type": "medinan"
+    },
+    {
+     "from": 73,
+     "to": 80,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١١١",
+   "verse_count": 111,
+   "after_printed": "القصص",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٢٦ و٣٢ و٣٣ و٥٧ ومن آية ٧٣ الى غاية آية ٨٠ فمدنية وآياتها ١١١ نزلت بعد القصص"
+  },
+  {
+   "surah": 18,
+   "page": 380,
+   "type": "meccan",
+   "statement": "مكية إلا آية ٢٨ ومن آية ٨٣ إلى غاية آية ١٠١ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      28
+     ],
+     "type": "medinan"
+    },
+    {
+     "from": 83,
+     "to": 101,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١١٠",
+   "verse_count": 110,
+   "after_printed": "الغاشية",
+   "remark": null,
+   "header_text": "مكية إلا آية ٢٨ ومن آية ٨٣ إلى غاية آية ١٠١ فمدنية وآياتها ١١٠ نزلت بعد الغاشية"
+  },
+  {
+   "surah": 19,
+   "page": 396,
+   "type": "meccan",
+   "statement": "مكية إلا آيتى ٥٨ و٧١ فمدنيتان",
+   "exceptions": [
+    {
+     "verses": [
+      58,
+      71
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٩٨",
+   "verse_count": 98,
+   "after_printed": "فاطر",
+   "remark": null,
+   "header_text": "مكية إلا آيتى ٥٨ و٧١ فمدنيتان وآياتها ٩٨ نزلت بعد فاطر"
+  },
+  {
+   "surah": 20,
+   "page": 406,
+   "type": "meccan",
+   "statement": "مكية إلا آيتى ١٣٠ و١٣١ فمدنيتان",
+   "exceptions": [
+    {
+     "verses": [
+      130,
+      131
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "١٣٥",
+   "verse_count": 135,
+   "after_printed": "مريم",
+   "remark": null,
+   "header_text": "مكية إلا آيتى ١٣٠ و١٣١ فمدنيتان وآياتها ١٣٥ نزلت بعد مريم"
+  },
+  {
+   "surah": 21,
+   "page": 420,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١١٢",
+   "verse_count": 112,
+   "after_printed": "سورة ابراهيم",
+   "remark": null,
+   "header_text": "مكية وآياتها ١١٢ نزلت بعد سورة ابراهيم"
+  },
+  {
+   "surah": 22,
+   "page": 432,
+   "type": "medinan",
+   "statement": "مدنية إلا الآيات ٥٢ و٥٣ و٥٤ و٥٥ فبين مكة والمدينة",
+   "exceptions": [
+    {
+     "verses": [
+      52,
+      53,
+      54,
+      55
+     ],
+     "type": null,
+     "note": "فبين مكة والمدينة"
+    }
+   ],
+   "verse_count_printed": "٧٨",
+   "verse_count": 78,
+   "after_printed": "النور",
+   "remark": null,
+   "header_text": "مدنية إلا الآيات ٥٢ و٥٣ و٥٤ و٥٥ فبين مكة والمدينة وآياتها ٧٨ نزلت بعد النور"
+  },
+  {
+   "surah": 23,
+   "page": 445,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١١٨",
+   "verse_count": 118,
+   "after_printed": "الأنبياء",
+   "remark": null,
+   "header_text": "مكية وآياتها ١١٨ نزلت بعد الأنبياء"
+  },
+  {
+   "surah": 24,
+   "page": 456,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٦٤",
+   "verse_count": 64,
+   "after_printed": "الحشر",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٦٤ نزلت بعد الحشر"
+  },
+  {
+   "surah": 25,
+   "page": 470,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٦٨ و٦٩ و٧٠ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      68,
+      69,
+      70
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٧٧",
+   "verse_count": 77,
+   "after_printed": "يس",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٦٨ و٦٩ و٧٠ فمدنية وآياتها ٧٧ نزلت بعد يس"
+  },
+  {
+   "surah": 26,
+   "page": 479,
+   "type": "meccan",
+   "statement": "مكية إلا آية ١٩٧ ومن ٢٢٤ إلى آخر السورة فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      197
+     ],
+     "type": "medinan"
+    },
+    {
+     "from": 224,
+     "to": null,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٢٢٧",
+   "verse_count": 227,
+   "after_printed": "الواقعة",
+   "remark": null,
+   "header_text": "مكية إلا آية ١٩٧ ومن ٢٢٤ إلى آخر السورة فمدنية وآياتها ٢٢٧ نزلت بعد الواقعة"
+  },
+  {
+   "surah": 27,
+   "page": 494,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٩٣",
+   "verse_count": 93,
+   "after_printed": "سورة الشعراء",
+   "remark": null,
+   "header_text": "مكية وآياتها ٩٣ نزلت بعد سورة الشعراء"
+  },
+  {
+   "surah": 28,
+   "page": 506,
+   "type": "meccan",
+   "statement": "مكية إلا من آية ٥٢ إلى غاية آية ٥٥ فمدنية وآية ٨٥ فبالجحفة أثناء الهجرة",
+   "exceptions": [
+    {
+     "from": 52,
+     "to": 55,
+     "type": "medinan"
+    },
+    {
+     "verses": [
+      85
+     ],
+     "type": null,
+     "note": "فبالجحفة أثناء الهجرة"
+    }
+   ],
+   "verse_count_printed": "٨٨",
+   "verse_count": 88,
+   "after_printed": "النمل",
+   "remark": null,
+   "header_text": "مكية إلا من آية ٥٢ إلى غاية آية ٥٥ فمدنية وآية ٨٥ فبالجحفة أثناء الهجرة وآياتها ٨٨ نزلت بعد النمل"
+  },
+  {
+   "surah": 29,
+   "page": 520,
+   "type": "meccan",
+   "statement": "مكية إلا من آية ١ إلى غاية آية ١١ فمدنية",
+   "exceptions": [
+    {
+     "from": 1,
+     "to": 11,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٦٩",
+   "verse_count": 69,
+   "after_printed": "الروم",
+   "remark": null,
+   "header_text": "مكية إلا من آية ١ إلى غاية آية ١١ فمدنية وآياتها ٦٩ نزلت بعد الروم"
+  },
+  {
+   "surah": 30,
+   "page": 530,
+   "type": "meccan",
+   "statement": "مكية إلا آية ١٧ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      17
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٦٠",
+   "verse_count": 60,
+   "after_printed": "الانشقاق",
+   "remark": null,
+   "header_text": "مكية إلا آية ١٧ فمدنية وآياتها ٦٠ نزلت بعد الانشقاق",
+   "uncertain": "the stroke over the alif of «الانشقاق» («نزلت بعد») may be a hamza or a fatha; transcribed without it, as both passes read it"
+  },
+  {
+   "surah": 31,
+   "page": 539,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٢٧ و٢٨ و٢٩ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      27,
+      28,
+      29
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٣٤",
+   "verse_count": 34,
+   "after_printed": "الصافات",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٢٧ و٢٨ و٢٩ فمدنية وآياتها ٣٤ نزلت بعد الصافات"
+  },
+  {
+   "surah": 32,
+   "page": 544,
+   "type": "meccan",
+   "statement": "مكية إلا من آية ١٦ إلى غاية آية ٢٠ فمدنية",
+   "exceptions": [
+    {
+     "from": 16,
+     "to": 20,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٣٠",
+   "verse_count": 30,
+   "after_printed": "المؤمنون",
+   "remark": null,
+   "header_text": "مكية إلا من آية ١٦ إلى غاية آية ٢٠ فمدنية وآياتها ٣٠ نزلت بعد المؤمنون"
+  },
+  {
+   "surah": 33,
+   "page": 548,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٧٣",
+   "verse_count": 73,
+   "after_printed": "آل عمران",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٧٣ نزلت بعد آل عمران"
+  },
+  {
+   "surah": 34,
+   "page": 562,
+   "type": "meccan",
+   "statement": "مكية إلا آية ٦ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      6
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٥٤",
+   "verse_count": 54,
+   "after_printed": "لقمان",
+   "remark": null,
+   "header_text": "مكية إلا آية ٦ فمدنية وآياتها ٥٤ نزلت بعد لقمان"
+  },
+  {
+   "surah": 35,
+   "page": 571,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤٥",
+   "verse_count": 45,
+   "after_printed": "الفرقان",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤٥ نزلت بعد الفرقان"
+  },
+  {
+   "surah": 36,
+   "page": 579,
+   "type": "meccan",
+   "statement": "مكية الا آية ٤٥ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      45
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٨٣",
+   "verse_count": 83,
+   "after_printed": "الجن",
+   "remark": null,
+   "header_text": "مكية الا آية ٤٥ فمدنية وآياتها ٨٣ نزلت بعد الجن"
+  },
+  {
+   "surah": 37,
+   "page": 587,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١٨٢",
+   "verse_count": 182,
+   "after_printed": "الأنعام",
+   "remark": null,
+   "header_text": "مكية وآياتها ١٨٢ نزلت بعد الأنعام"
+  },
+  {
+   "surah": 38,
+   "page": 597,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٨٨",
+   "verse_count": 88,
+   "after_printed": "القمر",
+   "remark": null,
+   "header_text": "مكية وآياتها ٨٨ نزلت بعد القمر"
+  },
+  {
+   "surah": 39,
+   "page": 605,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٥٢ و٥٣ و٥٤ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      52,
+      53,
+      54
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٧٥",
+   "verse_count": 75,
+   "after_printed": "سبإ",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٥٢ و٥٣ و٥٤ فمدنية وآياتها ٧٥ نزلت بعد سبإ"
+  },
+  {
+   "surah": 40,
+   "page": 617,
+   "type": "meccan",
+   "statement": "مكية إلا آيتى ٥٦ و٥٧ فمدنيتان",
+   "exceptions": [
+    {
+     "verses": [
+      56,
+      57
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٨٥",
+   "verse_count": 85,
+   "after_printed": "الزمر",
+   "remark": null,
+   "header_text": "مكية إلا آيتى ٥٦ و٥٧ فمدنيتان وآياتها ٨٥ نزلت بعد الزمر"
+  },
+  {
+   "surah": 41,
+   "page": 629,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥٤",
+   "verse_count": 54,
+   "after_printed": "غافر",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥٤ نزلت بعد غافر"
+  },
+  {
+   "surah": 42,
+   "page": 638,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٢٣ و٢٤ و٢٥ و٢٧ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      23,
+      24,
+      25,
+      27
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٥٣",
+   "verse_count": 53,
+   "after_printed": "فصلت",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٢٣ و٢٤ و٢٥ و٢٧ فمدنية وآياتها ٥٣ نزلت بعد فصلت"
+  },
+  {
+   "surah": 43,
+   "page": 647,
+   "type": "meccan",
+   "statement": "مكية إلا آية ٥٤ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      54
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٨٩",
+   "verse_count": 89,
+   "after_printed": "الشورى",
+   "remark": null,
+   "header_text": "مكية إلا آية ٥٤ فمدنية وآياتها ٨٩ نزلت بعد الشورى"
+  },
+  {
+   "surah": 44,
+   "page": 656,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥٩",
+   "verse_count": 59,
+   "after_printed": "الزخرف",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥٩ نزلت بعد الزخرف"
+  },
+  {
+   "surah": 45,
+   "page": 660,
+   "type": "meccan",
+   "statement": "مكية إلا آية ١٤ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      14
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٣٧",
+   "verse_count": 37,
+   "after_printed": "الدخان",
+   "remark": null,
+   "header_text": "مكية إلا آية ١٤ فمدنية وآياتها ٣٧ نزلت بعد الدخان"
+  },
+  {
+   "surah": 46,
+   "page": 665,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ١٠ و١٥ و٣٥ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      10,
+      15,
+      35
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٣٥",
+   "verse_count": 35,
+   "after_printed": "الجاثية",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ١٠ و١٥ و٣٥ فمدنية وآياتها ٣٥ نزلت بعد الجاثية"
+  },
+  {
+   "surah": 47,
+   "page": 672,
+   "type": "medinan",
+   "statement": "مدنية إلا آية ١٣ فنزلت فى الطريق أثناء الهجرة",
+   "exceptions": [
+    {
+     "verses": [
+      13
+     ],
+     "type": null,
+     "note": "فنزلت فى الطريق أثناء الهجرة"
+    }
+   ],
+   "verse_count_printed": "٣٨",
+   "verse_count": 38,
+   "after_printed": "الحديد",
+   "remark": null,
+   "header_text": "مدنية إلا آية ١٣ فنزلت فى الطريق أثناء الهجرة وآياتها ٣٨ نزلت بعد الحديد"
+  },
+  {
+   "surah": 48,
+   "page": 678,
+   "type": "medinan",
+   "statement": "مدنية نزلت فى الطريق عند الانصراف من الحديبية",
+   "exceptions": [],
+   "verse_count_printed": "٢٩",
+   "verse_count": 29,
+   "after_printed": "الجمعة",
+   "remark": null,
+   "header_text": "مدنية نزلت فى الطريق عند الانصراف من الحديبية وآياتها ٢٩ نزلت بعد الجمعة",
+   "note": "نزلت فى الطريق عند الانصراف من الحديبية"
+  },
+  {
+   "surah": 49,
+   "page": 684,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١٨",
+   "verse_count": 18,
+   "after_printed": "المجادلة",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١٨ نزلت بعد المجادلة"
+  },
+  {
+   "surah": 50,
+   "page": 688,
+   "type": "meccan",
+   "statement": "مكية الا آية ٣٨ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      38
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٤٥",
+   "verse_count": 45,
+   "after_printed": "المرسلات",
+   "remark": null,
+   "header_text": "مكية الا آية ٣٨ فمدنية وآياتها ٤٥ نزلت بعد المرسلات"
+  },
+  {
+   "surah": 51,
+   "page": 692,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٦٠",
+   "verse_count": 60,
+   "after_printed": "الأحقاف",
+   "remark": null,
+   "header_text": "مكية وآياتها ٦٠ نزلت بعد الأحقاف"
+  },
+  {
+   "surah": 52,
+   "page": 696,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤٩",
+   "verse_count": 49,
+   "after_printed": "السجدة",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤٩ نزلت بعد السجدة"
+  },
+  {
+   "surah": 53,
+   "page": 700,
+   "type": "meccan",
+   "statement": "مكية إلا آية ٣٢ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      32
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٦٢",
+   "verse_count": 62,
+   "after_printed": "الإخلاص",
+   "remark": null,
+   "header_text": "مكية إلا آية ٣٢ فمدنية وآياتها ٦٢ نزلت بعد الإخلاص"
+  },
+  {
+   "surah": 54,
+   "page": 704,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ٤٤ و٤٥ و٤٦ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      44,
+      45,
+      46
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٥٥",
+   "verse_count": 55,
+   "after_printed": "الطارق",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ٤٤ و٤٥ و٤٦ فمدنية وآياتها ٥٥ نزلت بعد الطارق"
+  },
+  {
+   "surah": 55,
+   "page": 708,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٧٨",
+   "verse_count": 78,
+   "after_printed": "الرعد",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٧٨ نزلت بعد الرعد"
+  },
+  {
+   "surah": 56,
+   "page": 713,
+   "type": "meccan",
+   "statement": "مكية إلا آيتى ٨١ و٨٢ فمدنيتان",
+   "exceptions": [
+    {
+     "verses": [
+      81,
+      82
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٩٦",
+   "verse_count": 96,
+   "after_printed": "طه",
+   "remark": null,
+   "header_text": "مكية إلا آيتى ٨١ و٨٢ فمدنيتان وآياتها ٩٦ نزلت بعد طه"
+  },
+  {
+   "surah": 57,
+   "page": 718,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٢٩",
+   "verse_count": 29,
+   "after_printed": "الزلزلة",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٢٩ نزلت بعد الزلزلة"
+  },
+  {
+   "surah": 58,
+   "page": 724,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٢٢",
+   "verse_count": 22,
+   "after_printed": "المنافقون",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٢٢ نزلت بعد المنافقون"
+  },
+  {
+   "surah": 59,
+   "page": 729,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٢٤",
+   "verse_count": 24,
+   "after_printed": "البينة",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٢٤ نزلت بعد البينة"
+  },
+  {
+   "surah": 60,
+   "page": 734,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١٣",
+   "verse_count": 13,
+   "after_printed": "الأحزاب",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١٣ نزلت بعد الأحزاب"
+  },
+  {
+   "surah": 61,
+   "page": 738,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١٤",
+   "verse_count": 14,
+   "after_printed": "التغابن",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١٤ نزلت بعد التغابن"
+  },
+  {
+   "surah": 62,
+   "page": 740,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١١",
+   "verse_count": 11,
+   "after_printed": "الصف",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١١ نزلت بعد الصف"
+  },
+  {
+   "surah": 63,
+   "page": 742,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١١",
+   "verse_count": 11,
+   "after_printed": "الحج",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١١ نزلت بعد الحج"
+  },
+  {
+   "surah": 64,
+   "page": 745,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١٨",
+   "verse_count": 18,
+   "after_printed": "التحريم",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١٨ نزلت بعد التحريم"
+  },
+  {
+   "surah": 65,
+   "page": 748,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١٢",
+   "verse_count": 12,
+   "after_printed": "الإنسان",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١٢ نزلت بعد الإنسان"
+  },
+  {
+   "surah": 66,
+   "page": 751,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "١٢",
+   "verse_count": 12,
+   "after_printed": "الحجرات",
+   "remark": null,
+   "header_text": "مدنية وآياتها ١٢ نزلت بعد الحجرات"
+  },
+  {
+   "surah": 67,
+   "page": 754,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٣٠",
+   "verse_count": 30,
+   "after_printed": "الطور",
+   "remark": null,
+   "header_text": "مكية وآياتها ٣٠ نزلت بعد الطور"
+  },
+  {
+   "surah": 68,
+   "page": 757,
+   "type": "meccan",
+   "statement": "مكية إلا من آية ١٧ إلى غاية آية ٣٣ ومن آية ٤٨ إلى غاية آية ٥٠ فمدنية",
+   "exceptions": [
+    {
+     "from": 17,
+     "to": 33,
+     "type": "medinan"
+    },
+    {
+     "from": 48,
+     "to": 50,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٥٢",
+   "verse_count": 52,
+   "after_printed": "العلق",
+   "remark": null,
+   "header_text": "مكية إلا من آية ١٧ إلى غاية آية ٣٣ ومن آية ٤٨ إلى غاية آية ٥٠ فمدنية وآياتها ٥٢ نزلت بعد العلق"
+  },
+  {
+   "surah": 69,
+   "page": 761,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥٢",
+   "verse_count": 52,
+   "after_printed": "الملك",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥٢ نزلت بعد الملك"
+  },
+  {
+   "surah": 70,
+   "page": 764,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤٤",
+   "verse_count": 44,
+   "after_printed": "الحاقة",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤٤ نزلت بعد الحاقة"
+  },
+  {
+   "surah": 71,
+   "page": 767,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢٨",
+   "verse_count": 28,
+   "after_printed": "النحل",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢٨ نزلت بعد النحل"
+  },
+  {
+   "surah": 72,
+   "page": 770,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢٨",
+   "verse_count": 28,
+   "after_printed": "الأعراف",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢٨ نزلت بعد الأعراف"
+  },
+  {
+   "surah": 73,
+   "page": 773,
+   "type": "meccan",
+   "statement": "مكية إلا الآيات ١٠ و١١ و٢٠ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      10,
+      11,
+      20
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٢٠",
+   "verse_count": 20,
+   "after_printed": "القلم",
+   "remark": null,
+   "header_text": "مكية إلا الآيات ١٠ و١١ و٢٠ فمدنية وآياتها ٢٠ نزلت بعد القلم"
+  },
+  {
+   "surah": 74,
+   "page": 775,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥٦",
+   "verse_count": 56,
+   "after_printed": "المزمل",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥٦ نزلت بعد المزمل"
+  },
+  {
+   "surah": 75,
+   "page": 778,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤٠",
+   "verse_count": 40,
+   "after_printed": "القارعة",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤٠ نزلت بعد القارعة"
+  },
+  {
+   "surah": 76,
+   "page": 781,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٣١",
+   "verse_count": 31,
+   "after_printed": "الرحمن",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٣١ نزلت بعد الرحمن"
+  },
+  {
+   "surah": 77,
+   "page": 784,
+   "type": "meccan",
+   "statement": "مكية إلا آية ٤٨ فمدنية",
+   "exceptions": [
+    {
+     "verses": [
+      48
+     ],
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٥٠",
+   "verse_count": 50,
+   "after_printed": "الهمزة",
+   "remark": null,
+   "header_text": "مكية إلا آية ٤٨ فمدنية وآياتها ٥٠ نزلت بعد الهمزة"
+  },
+  {
+   "surah": 78,
+   "page": 786,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤٠",
+   "verse_count": 40,
+   "after_printed": "المعارج",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤٠ نزلت بعد المعارج"
+  },
+  {
+   "surah": 79,
+   "page": 789,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤٦",
+   "verse_count": 46,
+   "after_printed": "النبإ",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤٦ نزلت بعد النبإ"
+  },
+  {
+   "surah": 80,
+   "page": 791,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤٢",
+   "verse_count": 42,
+   "after_printed": "النجم",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤٢ نزلت بعد النجم"
+  },
+  {
+   "surah": 81,
+   "page": 793,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢٩",
+   "verse_count": 29,
+   "after_printed": "المسد",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢٩ نزلت بعد المسد"
+  },
+  {
+   "surah": 82,
+   "page": 795,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١٩",
+   "verse_count": 19,
+   "after_printed": "النازعات",
+   "remark": null,
+   "header_text": "مكية وآياتها ١٩ نزلت بعد النازعات"
+  },
+  {
+   "surah": 83,
+   "page": 796,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٣٦",
+   "verse_count": 36,
+   "after_printed": "العنكبوت",
+   "remark": "وهى آخر سورة نزلت بمكة",
+   "header_text": "مكية وآياتها ٣٦ نزلت بعد العنكبوت وهى آخر سورة نزلت بمكة"
+  },
+  {
+   "surah": 84,
+   "page": 799,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢٥",
+   "verse_count": 25,
+   "after_printed": "الأنفطار",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢٥ نزلت بعد الأنفطار"
+  },
+  {
+   "surah": 85,
+   "page": 800,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢٢",
+   "verse_count": 22,
+   "after_printed": "الشمس",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢٢ نزلت بعد الشمس"
+  },
+  {
+   "surah": 86,
+   "page": 802,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١٧",
+   "verse_count": 17,
+   "after_printed": "البلد",
+   "remark": null,
+   "header_text": "مكية وآياتها ١٧ نزلت بعد البلد"
+  },
+  {
+   "surah": 87,
+   "page": 803,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١٩",
+   "verse_count": 19,
+   "after_printed": "التكوير",
+   "remark": null,
+   "header_text": "مكية وآياتها ١٩ نزلت بعد التكوير"
+  },
+  {
+   "surah": 88,
+   "page": 804,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢٦",
+   "verse_count": 26,
+   "after_printed": "الذاريات",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢٦ نزلت بعد الذاريات"
+  },
+  {
+   "surah": 89,
+   "page": 806,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٣٠",
+   "verse_count": 30,
+   "after_printed": "الليل",
+   "remark": null,
+   "header_text": "مكية وآياتها ٣٠ نزلت بعد الليل"
+  },
+  {
+   "surah": 90,
+   "page": 808,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢٠",
+   "verse_count": 20,
+   "after_printed": "ق",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢٠ نزلت بعد ق"
+  },
+  {
+   "surah": 91,
+   "page": 809,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١٥",
+   "verse_count": 15,
+   "after_printed": "القدر",
+   "remark": null,
+   "header_text": "مكية وآياتها ١٥ نزلت بعد القدر"
+  },
+  {
+   "surah": 92,
+   "page": 810,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٢١",
+   "verse_count": 21,
+   "after_printed": "الأعلى",
+   "remark": null,
+   "header_text": "مكية وآياتها ٢١ نزلت بعد الأعلى"
+  },
+  {
+   "surah": 93,
+   "page": 811,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١١",
+   "verse_count": 11,
+   "after_printed": "الفجر",
+   "remark": null,
+   "header_text": "مكية وآياتها ١١ نزلت بعد الفجر"
+  },
+  {
+   "surah": 94,
+   "page": 812,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٨",
+   "verse_count": 8,
+   "after_printed": "الضحى",
+   "remark": null,
+   "header_text": "مكية وآياتها ٨ نزلت بعد الضحى"
+  },
+  {
+   "surah": 95,
+   "page": 813,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٨",
+   "verse_count": 8,
+   "after_printed": "البروج",
+   "remark": null,
+   "header_text": "مكية وآياتها ٨ نزلت بعد البروج"
+  },
+  {
+   "surah": 96,
+   "page": 814,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١٩",
+   "verse_count": 19,
+   "after_printed": null,
+   "remark": "وهى أول ما نزل من القرءان",
+   "header_text": "مكية وآياتها ١٩ وهى أول ما نزل من القرءان"
+  },
+  {
+   "surah": 97,
+   "page": 815,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥",
+   "verse_count": 5,
+   "after_printed": "عبس",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥ نزلت بعد عبس"
+  },
+  {
+   "surah": 98,
+   "page": 816,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٨",
+   "verse_count": 8,
+   "after_printed": "الطلاق",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٨ نزلت بعد الطلاق"
+  },
+  {
+   "surah": 99,
+   "page": 817,
+   "type": "medinan",
+   "statement": "مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٨",
+   "verse_count": 8,
+   "after_printed": "النساء",
+   "remark": null,
+   "header_text": "مدنية وآياتها ٨ نزلت بعد النساء"
+  },
+  {
+   "surah": 100,
+   "page": 818,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١١",
+   "verse_count": 11,
+   "after_printed": "العصر",
+   "remark": null,
+   "header_text": "مكية وآياتها ١١ نزلت بعد العصر"
+  },
+  {
+   "surah": 101,
+   "page": 819,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "١١",
+   "verse_count": 11,
+   "after_printed": "قريش",
+   "remark": null,
+   "header_text": "مكية وآياتها ١١ نزلت بعد قريش"
+  },
+  {
+   "surah": 102,
+   "page": 820,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٨",
+   "verse_count": 8,
+   "after_printed": "الكوثر",
+   "remark": null,
+   "header_text": "مكية وآياتها ٨ نزلت بعد الكوثر"
+  },
+  {
+   "surah": 103,
+   "page": 820,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٣",
+   "verse_count": 3,
+   "after_printed": "الشرح",
+   "remark": null,
+   "header_text": "مكية وآياتها ٣ نزلت بعد الشرح"
+  },
+  {
+   "surah": 104,
+   "page": 821,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٩",
+   "verse_count": 9,
+   "after_printed": "القيامة",
+   "remark": null,
+   "header_text": "مكية وآياتها ٩ نزلت بعد القيامة"
+  },
+  {
+   "surah": 105,
+   "page": 822,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥",
+   "verse_count": 5,
+   "after_printed": "الكافرون",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥ نزلت بعد الكافرون"
+  },
+  {
+   "surah": 106,
+   "page": 822,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤",
+   "verse_count": 4,
+   "after_printed": "التين",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤ نزلت بعد التين"
+  },
+  {
+   "surah": 107,
+   "page": 823,
+   "type": "mixed",
+   "statement": "مكية ثلاث الآيات الأول مدنية البقية",
+   "exceptions": [
+    {
+     "first": 3,
+     "type": "meccan"
+    },
+    {
+     "rest": true,
+     "type": "medinan"
+    }
+   ],
+   "verse_count_printed": "٧",
+   "verse_count": 7,
+   "after_printed": "التكاثر",
+   "remark": null,
+   "header_text": "مكية ثلاث الآيات الأول مدنية البقية وآياتها ٧ نزلت بعد التكاثر"
+  },
+  {
+   "surah": 108,
+   "page": 824,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٣",
+   "verse_count": 3,
+   "after_printed": "العاديات",
+   "remark": null,
+   "header_text": "مكية وآياتها ٣ نزلت بعد العاديات"
+  },
+  {
+   "surah": 109,
+   "page": 824,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٦",
+   "verse_count": 6,
+   "after_printed": "الماعون",
+   "remark": null,
+   "header_text": "مكية وآياتها ٦ نزلت بعد الماعون"
+  },
+  {
+   "surah": 110,
+   "page": 825,
+   "type": "medinan",
+   "statement": "نزلت بمنى فى حجة الوداع فتعد مدنية",
+   "exceptions": [],
+   "verse_count_printed": "٣",
+   "verse_count": 3,
+   "after_printed": "التوبة",
+   "remark": "وهى آخر ما نزل من السور",
+   "header_text": "نزلت بمنى فى حجة الوداع فتعد مدنية وهى آخر ما نزل من السور وآياتها ٣ نزلت بعد التوبة",
+   "note": "نزلت بمنى فى حجة الوداع"
+  },
+  {
+   "surah": 111,
+   "page": 825,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥",
+   "verse_count": 5,
+   "after_printed": "الفاتحة",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥ نزلت بعد الفاتحة"
+  },
+  {
+   "surah": 112,
+   "page": 826,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٤",
+   "verse_count": 4,
+   "after_printed": "الناس",
+   "remark": null,
+   "header_text": "مكية وآياتها ٤ نزلت بعد الناس"
+  },
+  {
+   "surah": 113,
+   "page": 826,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٥",
+   "verse_count": 5,
+   "after_printed": "الفيل",
+   "remark": null,
+   "header_text": "مكية وآياتها ٥ نزلت بعد الفيل"
+  },
+  {
+   "surah": 114,
+   "page": 827,
+   "type": "meccan",
+   "statement": "مكية",
+   "exceptions": [],
+   "verse_count_printed": "٦",
+   "verse_count": 6,
+   "after_printed": "الفلق",
+   "remark": null,
+   "header_text": "مكية وآياتها ٦ نزلت بعد الفلق"
+  }
+ ]
+}
