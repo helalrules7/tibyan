@@ -179,7 +179,6 @@ void main() {
                     info: variant == '_art'
                         ? null
                         : ref.watch(frameInfoProvider(pg)).value,
-                    showCatchword: false,
                     linePadding: edition == MushafEdition.shamarly
                         ? shamarlyLinePadding
                         : null,

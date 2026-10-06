@@ -8,7 +8,6 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/duotone.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'art_frame.dart';
-import 'catchword_view.dart';
 import 'opening_art.dart';
 import 'raster_frame.dart';
 
@@ -198,8 +197,9 @@ class QuarterMark {
 }
 
 /// The illuminated page frame: an ornamental band, a cartouche with the
-/// juz, hizb and surah on the top band, the page number centred on the
-/// bottom band, and the next page's first word under the frame.
+/// juz, hizb and surah on the top band, and the page number centred on the
+/// bottom band. The strip under it (the quarter, the reading tools and the
+/// next page's first word) is the screen's reading bar, outside the pages.
 class IlluminatedFrame extends ConsumerWidget {
   const IlluminatedFrame({
     super.key,
@@ -211,9 +211,7 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onSurahLongPress,
     this.onBannerLongPress,
     this.onPageTap,
-    this.tools,
     this.linePadding,
-    this.showCatchword = true,
   });
 
   /// A long press on a surah's banner inside the page, with its number
@@ -226,7 +224,6 @@ class IlluminatedFrame extends ConsumerWidget {
 
   static const band = 30.0;
   static const lines = 15;
-  static const catchwordSpace = 26.0;
 
   final FrameInfo? info;
   final Widget child;
@@ -237,12 +234,6 @@ class IlluminatedFrame extends ConsumerWidget {
   /// A long press on the surah's name (shares the surah as pictures).
   final VoidCallback? onSurahLongPress;
   final VoidCallback? onPageTap;
-
-  /// Small reading tools shown just under the page number.
-  final Widget? tools;
-
-  /// The next page's first word under the frame (off in recitation mode).
-  final bool showCatchword;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -258,8 +249,6 @@ class IlluminatedFrame extends ConsumerWidget {
         onSurahTap: onSurahTap,
         onSurahLongPress: onSurahLongPress,
         onPageTap: onPageTap,
-        tools: tools,
-        showCatchword: showCatchword,
         child: child,
       );
     }
@@ -274,9 +263,7 @@ class IlluminatedFrame extends ConsumerWidget {
         onSurahLongPress: onSurahLongPress,
         onBannerLongPress: onBannerLongPress,
         onPageTap: onPageTap,
-        tools: tools,
         linePadding: linePadding,
-        showCatchword: showCatchword,
         child: child,
       );
     }
@@ -318,142 +305,95 @@ class IlluminatedFrame extends ConsumerWidget {
     final digits = NumberFormatter(Localizations.localeOf(context));
     final cartoucheFill = t.paper;
 
-    return Column(
+    return Stack(
       children: [
-        Expanded(
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: RasterFrame(
-                  cache:
-                      'zakhrafa|${t.paper.toARGB32()}|${t.marker.toARGB32()}'
-                      '|${identityHashCode(images)}',
-                  painter: _FramePainter(
-                    images: images,
-                    rule: t.marker,
-                    paper: t.paper,
+        Positioned.fill(
+          child: RasterFrame(
+            cache:
+                'zakhrafa|${t.paper.toARGB32()}|${t.marker.toARGB32()}'
+                '|${identityHashCode(images)}',
+            painter: _FramePainter(
+              images: images,
+              rule: t.marker,
+              paper: t.paper,
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Padding(padding: const EdgeInsets.all(band + 6), child: child),
+        ),
+        Positioned.fill(child: overlays),
+        if (info != null) ...[
+          Positioned(
+            top: band / 2 - 16,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: _Cartouche(
+                width: 234,
+                height: 32,
+                fill: cartoucheFill,
+                rosette: images?.rosette,
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(
+                    fontFamily: 'UthmanTahaNaskh',
+                    fontSize: 15,
+                    color: t.ink,
                   ),
-                ),
-              ),
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.all(band + 6),
-                  child: child,
-                ),
-              ),
-              Positioned.fill(child: overlays),
-              if (info != null) ...[
-                Positioned(
-                  top: band / 2 - 16,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: _Cartouche(
-                      width: 234,
-                      height: 32,
-                      fill: cartoucheFill,
-                      rosette: images?.rosette,
-                      child: DefaultTextStyle.merge(
-                        style: TextStyle(
-                          fontFamily: 'UthmanTahaNaskh',
-                          fontSize: 15,
-                          color: t.ink,
+                  // A long surah name or large system text shrinks
+                  // to the cartouche instead of overflowing it.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FrameTap(
+                          label: l.juzLabel(digits(info!.juz)),
+                          onTap: onJuzTap,
                         ),
-                        // A long surah name or large system text shrinks
-                        // to the cartouche instead of overflowing it.
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              FrameTap(
-                                label: l.juzLabel(digits(info!.juz)),
-                                onTap: onJuzTap,
-                              ),
-                              FrameStar(color: t.marker),
-                              if (info!.hizb case final hizb?) ...[
-                                FrameTap(
-                                  label: l.hizbLabel(digits(hizb)),
-                                  onTap: onHizbTap,
-                                ),
-                                FrameStar(color: t.marker),
-                              ],
-                              FrameTap(
-                                label: info!.surahName,
-                                bold: true,
-                                onTap: onSurahTap,
-                                onLongPress: onSurahLongPress,
-                              ),
-                            ],
+                        FrameStar(color: t.marker),
+                        if (info!.hizb case final hizb?) ...[
+                          FrameTap(
+                            label: l.hizbLabel(digits(hizb)),
+                            onTap: onHizbTap,
                           ),
+                          FrameStar(color: t.marker),
+                        ],
+                        FrameTap(
+                          label: info!.surahName,
+                          bold: true,
+                          onTap: onSurahTap,
+                          onLongPress: onSurahLongPress,
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                ),
-                Positioned(
-                  // Centred on the bottom band (the catchword row is outside this stack).
-                  bottom: band / 2 - 15,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: _Cartouche(
-                      width: 74,
-                      height: 30,
-                      fill: cartoucheFill,
-                      rosette: images?.margin,
-                      child: FrameTap(
-                        label: digits(info!.page),
-                        bold: true,
-                        semanticLabel: l.pageOf('${info!.page}'),
-                        onTap: onPageTap,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-        SizedBox(
-          height: catchwordSpace,
-          child: Stack(
-            children: [
-              if (tools != null) Center(child: tools),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    // Start side (right in Arabic): the quarter that begins on
-                    // this page, so the reader notices it.
-                    if (info != null && info!.quarters.isNotEmpty)
-                      QuarterLabel(
-                        text: quarterName(
-                          l,
-                          digits,
-                          info!.quarters.last.quarter,
-                        ),
-                        color: t.muted,
-                      ),
-                    const Spacer(),
-                    if (showCatchword && (info?.hasCatchword ?? false))
-                      CatchwordView(
-                        page: info!.page,
-                        text: info!.catchword,
-                        style: TextStyle(
-                          fontFamily: 'UthmanicHafs',
-                          fontSize: 15,
-                          height: 1.4,
-                          color: t.muted,
-                        ),
-                      ),
-                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            // Centred on the bottom band.
+            bottom: band / 2 - 15,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: _Cartouche(
+                width: 74,
+                height: 30,
+                fill: cartoucheFill,
+                rosette: images?.margin,
+                child: FrameTap(
+                  label: digits(info!.page),
+                  bold: true,
+                  semanticLabel: l.pageOf('${info!.page}'),
+                  onTap: onPageTap,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -976,21 +916,13 @@ class OrnateFrame extends ConsumerWidget {
     required this.child,
     this.page,
     this.onPageTap,
-    this.catchword,
-    this.catchwordSpace = true,
-    this.tools,
   });
-
-  /// Small reading tools shown just under the page number.
-  final Widget? tools;
 
   final Widget top;
   final Widget bottom;
   final Widget child;
   final int? page;
   final VoidCallback? onPageTap;
-  final String? catchword;
-  final bool catchwordSpace;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1001,9 +933,6 @@ class OrnateFrame extends ConsumerWidget {
         bottom: bottom,
         page: page,
         onPageTap: onPageTap,
-        catchword: catchword,
-        catchwordSpace: catchwordSpace,
-        tools: tools,
         child: child,
       );
     }
@@ -1110,49 +1039,7 @@ class OrnateFrame extends ConsumerWidget {
               );
             },
           );
-    if (!catchwordSpace) return body;
-    return Column(
-      children: [
-        Expanded(child: body),
-        SizedBox(
-          height: IlluminatedFrame.catchwordSpace,
-          child: Stack(
-            children: [
-              if (tools != null) Center(child: tools),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: catchword == null
-                      ? null
-                      : page == null
-                      ? Text(
-                          catchword!,
-                          semanticsLabel: l.catchwordLabel(catchword!),
-                          style: TextStyle(
-                            fontFamily: 'UthmanicHafs',
-                            fontSize: 15,
-                            height: 1.4,
-                            color: t.muted,
-                          ),
-                        )
-                      : CatchwordView(
-                          page: page!,
-                          text: catchword,
-                          style: TextStyle(
-                            fontFamily: 'UthmanicHafs',
-                            fontSize: 15,
-                            height: 1.4,
-                            color: t.muted,
-                          ),
-                        ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+    return body;
   }
 }
 
@@ -1222,8 +1109,7 @@ class QuarterLabel extends StatelessWidget {
 
 /// The plain theme's frame: nothing around the page. A box above it holds
 /// the surah, the juz and the hizb; a circle under it holds the page
-/// number, with the hizb on the right of that row and the next page's
-/// first word on its left, and the reading tools below it.
+/// number. The strip under it is the screen's reading bar.
 class PlainFrame extends StatelessWidget {
   const PlainFrame({
     super.key,
@@ -1234,8 +1120,6 @@ class PlainFrame extends StatelessWidget {
     this.onSurahTap,
     this.onSurahLongPress,
     this.onPageTap,
-    this.tools,
-    this.showCatchword = true,
   });
 
   final FrameInfo? info;
@@ -1247,10 +1131,6 @@ class PlainFrame extends StatelessWidget {
   /// A long press on the surah's name (shares the surah as pictures).
   final VoidCallback? onSurahLongPress;
   final VoidCallback? onPageTap;
-
-  /// Small reading tools shown under the page number.
-  final Widget? tools;
-  final bool showCatchword;
 
   /// Room the row of the page number takes.
   static const row = 44.0;
@@ -1312,42 +1192,16 @@ class PlainFrame extends StatelessWidget {
         ),
         SizedBox(
           height: row,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                if (info?.hizb case final hizb?)
-                  DefaultTextStyle.merge(
-                    style: label.copyWith(color: t.muted),
-                    child: FrameTap(
-                      label: l.hizbLabel(digits(hizb)),
-                      onTap: onHizbTap,
-                    ),
-                  ),
-                const Spacer(),
-                if (info != null)
-                  _PageNumber(
+          child: info == null
+              ? null
+              : Center(
+                  child: _PageNumber(
                     label: digits(info.page),
                     semanticLabel: l.pageOf('${info.page}'),
                     onTap: onPageTap,
                   ),
-                const Spacer(),
-                if (showCatchword && (info?.hasCatchword ?? false))
-                  CatchwordView(
-                    page: info!.page,
-                    text: info.catchword,
-                    style: TextStyle(
-                      fontFamily: 'UthmanicHafs',
-                      fontSize: 15,
-                      height: 1.4,
-                      color: t.muted,
-                    ),
-                  ),
-              ],
-            ),
-          ),
+                ),
         ),
-        ?tools,
       ],
     );
   }

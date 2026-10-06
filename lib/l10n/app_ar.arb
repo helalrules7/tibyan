@@ -1377,5 +1377,12 @@
   "newBackup": "النسخة الاحتياطية",
   "newBackupBody": "احفظ فواصلك وختمتك وملاحظاتك وإعداداتك في ملف واحد، واستعدها على أي جهاز.",
   "carContinue": "تابع من موضع القراءة",
-  "carReciters": "القراء"
+  "carReciters": "القراء",
+  "pagesMapCurrent": "الصفحة الحالية",
+  "pagesMapRead": "مقروءة في الختمة",
+  "pagesMapMarked": "فيها فاصل",
+  "pagesRange": "ص {first}–{last}",
+  "@pagesRange": {"placeholders": {"first": {"type": "String"}, "last": {"type": "String"}}},
+  "pagesMapJuzRead": "قُرئ {read} من {total}",
+  "@pagesMapJuzRead": {"placeholders": {"read": {"type": "String"}, "total": {"type": "String"}}}
 }

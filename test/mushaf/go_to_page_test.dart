@@ -95,4 +95,75 @@ void main() {
     await tester.pumpAndSettle();
     expect(result, 522);
   });
+
+  testWidgets('Arabic interface: Arabic-Indic digits shown, both typed', (
+    tester,
+  ) async {
+    rootBundle.clear();
+    final registry = await ThemeRegistry.load(rootBundle);
+    int? result = -1;
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('ar'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildTheme(
+            style: registry.byId('zakhrafa'),
+            mode: ThemeModeId.light,
+            uiFont: UiFont.plex,
+          ),
+          home: Builder(
+            builder: (context) => TextButton(
+              onPressed: () async =>
+                  result = await showGoToPage(context, current: 14),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    final field = tester.widget<TextField>(find.byType(TextField));
+    // The page number keyboard, digits only.
+    expect(field.keyboardType, TextInputType.number);
+    // The current page in the interface's digits.
+    expect(field.controller!.text, '١٤');
+
+    // Western digits typed are written as the interface writes them.
+    await tester.enterText(find.byType(TextField), '255');
+    await tester.pump();
+    expect(field.controller!.text, '٢٥٥');
+    // Letters and signs are refused; a fourth digit too.
+    await tester.enterText(find.byType(TextField), '2a5-5١');
+    await tester.pump();
+    expect(field.controller!.text, '٢٥٥');
+
+    // Arabic-Indic digits as typed.
+    await tester.enterText(find.byType(TextField), '٣٠٠');
+    await tester.pump();
+    expect(field.controller!.text, '٣٠٠');
+    await tester.tap(find.widgetWithText(FilledButton, 'انتقال'));
+    await tester.pumpAndSettle();
+    expect(result, 300);
+  });
+
+  test('digits of either set read as numbers', () {
+    expect(latinDigits('١٢٣'), '123');
+    expect(latinDigits('۴۵'), '45');
+    expect(latinDigits('7٨'), '78');
+    final ar = AppDigitsFormatter(arabic: true);
+    final en = AppDigitsFormatter(arabic: false);
+    const typed = TextEditingValue(
+      text: '6٠4',
+      selection: TextSelection.collapsed(offset: 3),
+    );
+    expect(ar.formatEditUpdate(TextEditingValue.empty, typed).text, '٦٠٤');
+    expect(en.formatEditUpdate(TextEditingValue.empty, typed).text, '604');
+    expect(
+      ar.formatEditUpdate(TextEditingValue.empty, typed).selection,
+      typed.selection,
+    );
+  });
 }

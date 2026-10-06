@@ -2033,4 +2033,23 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get carReciters => 'القراء';
+
+  @override
+  String get pagesMapCurrent => 'الصفحة الحالية';
+
+  @override
+  String get pagesMapRead => 'مقروءة في الختمة';
+
+  @override
+  String get pagesMapMarked => 'فيها فاصل';
+
+  @override
+  String pagesRange(String first, String last) {
+    return 'ص $first–$last';
+  }
+
+  @override
+  String pagesMapJuzRead(String read, String total) {
+    return 'قُرئ $read من $total';
+  }
 }

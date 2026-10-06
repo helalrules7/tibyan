@@ -15,21 +15,11 @@ abstract final class OpeningArtLayout {
   static const top = Rect.fromLTRB(455, 225, 745, 380);
   static const bottom = Rect.fromLTRB(454, 1077, 745, 1231);
 
-  /// The drawing's side ornaments, from its edge to the panel: this much is
-  /// cropped off each side so the page inside gets 46% bigger.
-  ///
-  /// The page's text is what it is — the printed artwork of al-Fatiha and the
-  /// opening of al-Baqarah, which must not be re-laid-out — so the only way
-  /// to enlarge it is to give it more of the screen. Fitting the drawing's
-  /// whole width to the screen gives the panel 43% of it; dropping these two
-  /// strips gives it 63%, and the two cream cartouches stay where they are.
-  /// The strips are ornament on both sides, so what is lost is repeats of a
-  /// pattern that already repeats down every page.
-  static const sideCut = 190.0;
-
-  /// What is left of the drawing's width once [sideCut] is taken off both
-  /// sides, and therefore the width the drawing is scaled to fit.
-  static const visibleWidth = 1200 - 2 * sideCut;
+  /// The width the drawing is scaled to fit: all of it. Its side ornaments
+  /// used to be cropped off to give the page inside more of the screen, but
+  /// the frame then ran off both edges of a phone; the whole frame is shown
+  /// now, scaled down to the room it has.
+  static const visibleWidth = 1200.0;
 
   /// One period of the side borders, between the two cartouche rows: the
   /// rows 493 and 750 match across the whole width (the same in every
@@ -42,8 +32,9 @@ abstract final class OpeningArtLayout {
   static const maxStretch = 0.08;
 }
 
-/// The opening frame fitted to [room]: [OpeningArtLayout.visibleWidth] of the
-/// drawing across, and made taller by repeating the side borders'
+/// The opening frame fitted inside [room], never cropped: the whole drawing
+/// as wide as the room (or, in a room too short for that, as tall, centred
+/// across it), and made taller by repeating the side borders'
 /// [OpeningArtLayout.bandTop] ([repeats] extra copies, each [stretch] times
 /// its height), so the art is never distorted beyond a slight stretch of that
 /// band.
@@ -203,7 +194,7 @@ class OpeningArtBody extends StatelessWidget {
               child: _SlicedArt(asset: asset, geometry: g),
             ),
             Positioned.fromRect(
-              rect: panel.deflate(panel.width * 0.03),
+              rect: panel.deflate(panel.width * 0.02),
               child: child,
             ),
             for (final c in [

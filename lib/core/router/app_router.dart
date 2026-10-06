@@ -30,6 +30,7 @@ import '../../features/settings/settings_screen.dart';
 import '../../features/settings/storage_screen.dart';
 import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
+import 'keyboard_dismiss.dart';
 
 int? _int(GoRouterState s, String key) =>
     int.tryParse(s.uri.queryParameters[key] ?? '');
@@ -37,6 +38,8 @@ int? _int(GoRouterState s, String key) =>
 final appRouterProvider = Provider<GoRouter>(
   (ref) => GoRouter(
     initialLocation: '/splash',
+    // A screen left or returned to never keeps the keyboard up.
+    observers: [KeyboardDismissObserver()],
     // First launch: language, then style and colours, then the edition.
     redirect: (context, state) {
       final done = ref.read(settingsProvider).onboardingDone;

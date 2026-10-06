@@ -92,7 +92,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(4),
                   child: OrnateFrame(
-                    catchwordSpace: false,
                     top: Text(
                       l.coverSubtitle,
                       style: const TextStyle(fontSize: 16),

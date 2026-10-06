@@ -9,12 +9,12 @@ void main() {
       Size(352, 520), // small phone
       Size(812, 1050), // tablet, portrait
     ]) {
-      test('$room: covers the width, taller, the art undistorted', () {
+      test('$room: inside the room, taller, the art undistorted', () {
         final g = OpeningArtGeometry.fit(room);
-        // The room's width is covered — what the drawing loses at its sides
-        // runs off both edges — and the frame is never taller than the room.
-        expect(g.frame.width, greaterThanOrEqualTo(room.width - 0.01));
-        expect(g.frame.left, lessThanOrEqualTo(0.01));
+        // The whole frame is inside the room — nothing runs off an edge —
+        // and as wide as it.
+        expect(g.frame.width, closeTo(room.width, 0.01));
+        expect(g.frame.left, closeTo(0, 0.01));
         expect(g.frame.height, lessThanOrEqualTo(room.height + 0.01));
         expect(g.frame.top, greaterThanOrEqualTo(-0.01));
         // The band copies are stretched by 8% at most.
@@ -50,26 +50,39 @@ void main() {
       expect(room.height - g.frame.height, lessThan(257 * g.scale));
     });
 
-    test('the sides are cropped, and the page inside gets more of them', () {
-      const room = Size(360, 742); // a phone, near enough
-      final g = OpeningArtGeometry.fit(room);
-      // The drawing fills the width between its two cropped sides, and the
-      // rest of it runs off both edges.
-      expect(
-        room.width / g.scale,
-        closeTo(OpeningArtLayout.visibleWidth, 0.01),
-      );
-      expect(-g.frame.left, closeTo(OpeningArtLayout.sideCut * g.scale, 0.01));
-      // The page keeps the drawing's panel, and it is about half again as
-      // wide as fitting the whole drawing gave it.
-      final panel = g.place(OpeningArtLayout.panel);
-      final whole = OpeningArtLayout.panel.width * (room.width / 1200);
-      expect(panel.width, greaterThan(whole * 1.4));
-      // Both cartouches stay on the screen.
-      for (final r in [OpeningArtLayout.top, OpeningArtLayout.bottom]) {
-        final cartouche = g.place(r);
-        expect(cartouche.left, greaterThanOrEqualTo(-0.01));
-        expect(cartouche.right, lessThanOrEqualTo(room.width + 0.01));
+    test('nothing is cropped: the whole drawing, its panel in proportion', () {
+      for (final room in const [
+        Size(385, 760), // iPhone 6.1"
+        Size(422, 840), // iPhone 6.7"
+        Size(367, 575), // iPhone SE
+        Size(404, 823), // Android
+        Size(712, 808), // laptop, one page of a spread
+        Size(1432, 808), // laptop, a single page
+      ]) {
+        final g = OpeningArtGeometry.fit(room);
+        expect(g.frame.left, greaterThanOrEqualTo(-0.01), reason: '$room');
+        expect(g.frame.right, lessThanOrEqualTo(room.width + 0.01));
+        expect(g.frame.top, greaterThanOrEqualTo(-0.01));
+        expect(g.frame.bottom, lessThanOrEqualTo(room.height + 0.01));
+        // All of the drawing's width is drawn, at one scale.
+        expect(g.frame.width / g.scale, closeTo(1200, 0.01));
+        final panel = g.place(OpeningArtLayout.panel);
+        expect(
+          panel.width,
+          closeTo(OpeningArtLayout.panel.width * g.scale, 1e-6),
+        );
+        // The cartouches and the panel are on screen.
+        for (final r in [
+          OpeningArtLayout.top,
+          OpeningArtLayout.bottom,
+          OpeningArtLayout.panel,
+        ]) {
+          final placed = g.place(r);
+          expect(placed.left, greaterThanOrEqualTo(-0.01));
+          expect(placed.right, lessThanOrEqualTo(room.width + 0.01));
+          expect(placed.top, greaterThanOrEqualTo(-0.01));
+          expect(placed.bottom, lessThanOrEqualTo(room.height + 0.01));
+        }
       }
     });
 
