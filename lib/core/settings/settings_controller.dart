@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show Offset;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,6 +52,12 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kElderly = 'settings.elderlyMode';
   static const _kTajweed = 'settings.tajweedColors';
   static const _kTajweedHues = 'settings.tajweedHues';
+  static const _kFocus = 'settings.focusMode';
+  static const _kFocusTools = 'settings.focusTools';
+  static const _kPageFill = 'settings.pageFill';
+  static const _kPlayerStyle = 'settings.playerStyle';
+  static const _kPlayerX = 'settings.playerX';
+  static const _kPlayerY = 'settings.playerY';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -121,6 +128,23 @@ class SettingsController extends Notifier<AppSettings> {
         for (final e in _prefs.getStringList(_kTajweedHues) ?? const <String>[])
           if (e.indexOf('=') case final i when i > 0)
             e.substring(0, i): e.substring(i + 1),
+      },
+      focusMode: _prefs.getBool(_kFocus) ?? false,
+      focusTools:
+          _enumByName(FocusTools.values, _prefs.getString(_kFocusTools)) ??
+          FocusTools.button,
+      pageFill:
+          _enumByName(PageFill.values, _prefs.getString(_kPageFill)) ??
+          PageFill.lines,
+      playerStyle:
+          _enumByName(PlayerStyle.values, _prefs.getString(_kPlayerStyle)) ??
+          PlayerStyle.auto,
+      playerPosition: switch ((
+        _prefs.getDouble(_kPlayerX),
+        _prefs.getDouble(_kPlayerY),
+      )) {
+        (final double x, final double y) => Offset(x, y),
+        _ => null,
       },
     );
   }
@@ -332,6 +356,35 @@ class SettingsController extends Notifier<AppSettings> {
     await _prefs.setStringList(_kTajweedHues, [
       for (final e in hues.entries) '${e.key}=${e.value}',
     ]);
+  }
+
+  Future<void> setFocusMode(bool value) async {
+    state = state.copyWith(focusMode: value);
+    await _prefs.setBool(_kFocus, value);
+  }
+
+  Future<void> setFocusTools(FocusTools value) async {
+    state = state.copyWith(focusTools: value);
+    await _prefs.setString(_kFocusTools, value.name);
+  }
+
+  Future<void> setPageFill(PageFill value) async {
+    state = state.copyWith(pageFill: value);
+    await _prefs.setString(_kPageFill, value.name);
+  }
+
+  Future<void> setPlayerStyle(PlayerStyle value) async {
+    state = state.copyWith(playerStyle: value);
+    await _prefs.setString(_kPlayerStyle, value.name);
+  }
+
+  /// Keeps where the floating player was left (fractions of the screen,
+  /// each clamped to 0..1).
+  Future<void> setPlayerPosition(Offset at) async {
+    final kept = Offset(at.dx.clamp(0.0, 1.0), at.dy.clamp(0.0, 1.0));
+    state = state.copyWith(playerPosition: () => kept);
+    await _prefs.setDouble(_kPlayerX, kept.dx);
+    await _prefs.setDouble(_kPlayerY, kept.dy);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

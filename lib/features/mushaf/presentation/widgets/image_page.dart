@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/settings/app_settings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/tajweed.dart';
@@ -99,10 +100,16 @@ class StripLayout {
     this.g, {
     bool withoutHeader = false,
     bool stretch = false,
+    this.fill,
   }) {
     final shared = withoutHeader ? (g.inkWithoutHeader ?? g.ink) : g.ink;
+    // Focus mode's full stretch scales a text page on both axes to the
+    // room: never in strips.
+    final full = fill == PageFill.full && !g.whole;
     strips =
-        !g.whole && size.width / shared.width < size.height / shared.height;
+        !full &&
+        !g.whole &&
+        size.width / shared.width < size.height / shared.height;
     // Fitted to the height, a page is cropped to its own ink with a margin
     // (never past the shared crop, which never cuts a mark).
     final own = g.ownInk;
@@ -111,12 +118,20 @@ class StripLayout {
         : shared;
     final byWidth = size.width / ink.width;
     final byHeight = size.height / ink.height;
-    scale = strips || byWidth < byHeight ? byWidth : byHeight;
+    scale = full
+        ? byHeight
+        : strips || byWidth < byHeight
+        ? byWidth
+        : byHeight;
     // A text page fitted to the height (a page of a two-page spread, a
     // wide window) is stretched across toward the frame, a little.
     // Only where the page itself is drawn by this layout ([stretch]): the
-    // new edition draws its own and uses this one for touches.
-    scaleX = stretch && !strips && !g.whole
+    // new edition draws its own and uses this one for touches. In focus
+    // mode [fill] decides instead, for every edition alike.
+    final widen = fill == null ? stretch : fill == PageFill.stretch;
+    scaleX = full
+        ? byWidth
+        : widen && !strips && !g.whole
         ? math.min(byWidth, scale * (1 + maxStretch))
         : scale;
     offset = Offset(
@@ -124,6 +139,9 @@ class StripLayout {
       (size.height - ink.height * scale) / 2,
     );
   }
+
+  /// Focus mode's choice of how the page fills the room; null outside it.
+  final PageFill? fill;
 
   /// How much wider than tall a page fitted to the height may be drawn,
   /// to fill the width: enough for a spread's pages, not enough to change
@@ -546,6 +564,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               data.geometry,
               withoutHeader: x.ornateOpening,
               stretch: true,
+              fill: x.fill,
             );
             // By the line first: the screen between two lines, and between
             // two words, belongs to the nearest.
@@ -789,7 +808,9 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(d.localPosition);
-                      if (v != null) x.onVerseLongPress(v);
+                      v != null
+                          ? x.onVerseLongPress(v)
+                          : x.onPageLongPress?.call();
                     },
                     child: Semantics(
                       label: l.pageOf('${widget.page}'),
@@ -1045,6 +1066,9 @@ class _ImagePagePainter extends CustomPainter {
       old.alphaInk != alphaInk ||
       old.layout.size != layout.size ||
       old.layout.ink != layout.ink ||
+      old.layout.scale != layout.scale ||
+      old.layout.scaleX != layout.scaleX ||
+      old.layout.strips != layout.strips ||
       old.ink != ink ||
       old.highlight != highlight ||
       old.word != word ||

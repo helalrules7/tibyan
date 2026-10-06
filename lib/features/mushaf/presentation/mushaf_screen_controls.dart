@@ -17,7 +17,11 @@ class _ReadingTools extends StatelessWidget {
     required this.tajweed,
     required this.onTajweed,
     required this.onTajweedLegend,
+    this.labelled = false,
   });
+
+  /// Elderly mode in focus mode: each tool a button with its name.
+  final bool labelled;
 
   /// Tajweed colouring: a tap turns it on or off; a long press shows the
   /// colour key. null: the edition has no tajweed data, so no button.
@@ -36,6 +40,43 @@ class _ReadingTools extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
+    if (labelled) {
+      Widget named(IconData icon, String label, bool on, VoidCallback onTap) =>
+          Semantics(
+            toggled: on,
+            child: FilledButton.tonalIcon(
+              onPressed: onTap,
+              icon: Icon(icon),
+              label: Text(label),
+              // In the interface's font, as the rest of the bar.
+              style: FilledButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+          );
+      return Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          named(
+            touchReading ? Icons.touch_app : Icons.touch_app_outlined,
+            l.touchReading,
+            touchReading,
+            onTouchReading,
+          ),
+          named(
+            Icons.headphones_outlined,
+            l.listenFromPage,
+            listening,
+            onListen,
+          ),
+          named(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
+          if (tajweed case final on?)
+            named(Icons.palette_outlined, l.tajweedColors, on, onTajweed),
+        ],
+      );
+    }
     // [glyph] is an icon, or a letter drawn in its place.
     Widget button(
       Object glyph,

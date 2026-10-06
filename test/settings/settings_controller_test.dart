@@ -127,4 +127,47 @@ void main() {
       ThemeModeId.black,
     );
   });
+
+  test(
+    'focus mode and the player style: defaults, saved and restored',
+    () async {
+      final c = await containerWith({});
+      final s = c.read(settingsProvider);
+      expect(s.focusMode, isFalse);
+      expect(s.focusTools, FocusTools.button);
+      expect(s.pageFill, PageFill.lines);
+      expect(s.playerStyle, PlayerStyle.auto);
+      expect(s.playerPosition, isNull);
+      // Automatic: the normal bar, and the pill in focus mode.
+      expect(s.effectivePlayerStyle, PlayerStyle.normal);
+      expect(
+        s.copyWith(focusMode: true).effectivePlayerStyle,
+        PlayerStyle.pill,
+      );
+      expect(
+        s
+            .copyWith(focusMode: true, playerStyle: PlayerStyle.normal)
+            .effectivePlayerStyle,
+        PlayerStyle.normal,
+      );
+
+      final ctrl = c.read(settingsProvider.notifier);
+      await ctrl.setFocusMode(true);
+      await ctrl.setFocusTools(FocusTools.menu);
+      await ctrl.setPageFill(PageFill.full);
+      await ctrl.setPlayerStyle(PlayerStyle.button);
+      await ctrl.setPlayerPosition(const Offset(0.25, 1.4));
+      final sp = await SharedPreferences.getInstance();
+      final restored = await containerWith({
+        for (final k in sp.getKeys()) k: sp.get(k)!,
+      });
+      final r = restored.read(settingsProvider);
+      expect(r.focusMode, isTrue);
+      expect(r.focusTools, FocusTools.menu);
+      expect(r.pageFill, PageFill.full);
+      expect(r.playerStyle, PlayerStyle.button);
+      // Kept inside the screen.
+      expect(r.playerPosition, const Offset(0.25, 1));
+    },
+  );
 }

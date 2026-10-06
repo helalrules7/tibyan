@@ -43,7 +43,16 @@ class PageInteraction {
     this.verseText,
     this.tajweedColor,
     this.tajweed = '',
+    this.fill,
+    this.onPageLongPress,
   });
+
+  /// A long press on the page off any verse; null: it does nothing.
+  final VoidCallback? onPageLongPress;
+
+  /// Focus mode: how the page fills the room it is given; null outside
+  /// focus mode, where each edition keeps its own layout.
+  final PageFill? fill;
 
   /// Screen readers: a verse's name («سورة البقرة، الآية ٥») and its text
   /// as stored (read after the name). Without [verseLabel] the page has no

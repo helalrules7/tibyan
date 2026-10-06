@@ -161,14 +161,25 @@ class _PageLayout {
     required Rect openingBody,
     this.cuts = const [],
     bool withoutHeader = false,
+    PageFill? fill,
   }) : clip = opening && withoutHeader ? openingBody : null {
     final area = clip ?? (opening ? openingInk : viewBox);
     final byWidth = size.width / area.width;
     final byHeight = size.height / area.height;
-    scale = byWidth < byHeight ? byWidth : byHeight;
-    strips = !opening && byWidth < byHeight;
+    // Focus mode: a full stretch scales the page on both axes to the room;
+    // a slight one widens a page fitted to the height by up to
+    // [StripLayout.maxStretch]. The touch layout ([StripLayout]) does the
+    // same with the same [fill], so touches land where the page is drawn.
+    final full = fill == PageFill.full && !opening;
+    scale = full || byWidth >= byHeight ? byHeight : byWidth;
+    strips = !full && !opening && byWidth < byHeight;
+    scaleX = full
+        ? byWidth
+        : fill == PageFill.stretch && !strips && !opening
+        ? math.min(byWidth, scale * (1 + StripLayout.maxStretch))
+        : scale;
     offset = Offset(
-      (size.width - area.width * scale) / 2 - area.left * scale,
+      (size.width - area.width * scaleX) / 2 - area.left * scaleX,
       (size.height - area.height * scale) / 2 - area.top * scale,
     );
   }
@@ -196,6 +207,10 @@ class _PageLayout {
   final List<Path> clips;
 
   late final double scale;
+
+  /// Page units to screen across: [scale], or wider when focus mode
+  /// stretches a page that is not drawn in strips.
+  late final double scaleX;
   late final bool strips;
   late final Offset offset;
 
@@ -240,7 +255,9 @@ class _PageLayout {
 
   /// Page units to screen pixels.
   Offset toScreen(Offset p, {int? line}) {
-    if (!strips) return p * scale + offset;
+    if (!strips) {
+      return Offset(p.dx * scaleX + offset.dx, p.dy * scale + offset.dy);
+    }
     final j = line ?? _lineOf(p.dy);
     return Offset(
       p.dx * scale + offset.dx,
@@ -260,7 +277,7 @@ class _PageLayout {
     if (!strips) {
       canvas.save();
       canvas.translate(offset.dx, offset.dy);
-      canvas.scale(scale);
+      canvas.scale(scaleX, scale);
       draw(canvas);
       canvas.restore();
       return;
@@ -293,7 +310,7 @@ class _PageLayout {
     if (!strips) {
       canvas.save();
       canvas.translate(offset.dx, offset.dy);
-      canvas.scale(scale);
+      canvas.scale(scaleX, scale);
       if (clip != null) canvas.clipRect(clip!);
       draw(canvas, false, -1);
       canvas.restore();
@@ -626,6 +643,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               box.biggest,
               lineGeometry,
               withoutHeader: x.ornateOpening,
+              fill: x.fill,
             );
             VerseKey? verseAt(Offset local) {
               // Pages 1 and 2 have no line grid; their outlines tile the
@@ -657,6 +675,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               openingInk: geometry.openingInk,
               openingBody: geometry.openingBody,
               withoutHeader: x.ornateOpening,
+              fill: x.fill,
             );
             final selected = [
               for (final v in verses)
@@ -804,7 +823,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
               '${widget.page}|${box.biggest.width}x${box.biggest.height}'
               '|$dpr|$ink|${x.divineColor}|${x.divineNames.length}'
               '|$_markersHidden|$_loadId|${emphasisLines.join(',')}'
-              '|$tajweedSig',
+              '|$tajweedSig|${x.fill}',
               layout,
               dpr,
               emphasis: x.emphasisLines,
@@ -855,7 +874,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(d.localPosition);
-                      if (v != null) x.onVerseLongPress(v);
+                      v != null
+                          ? x.onVerseLongPress(v)
+                          : x.onPageLongPress?.call();
                     },
                     child: Semantics(
                       label: l.pageOf('${widget.page}'),
