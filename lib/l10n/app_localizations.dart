@@ -3570,6 +3570,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'القراء'**
   String get carReciters;
+
+  /// No description provided for @pagesMapCurrent.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة الحالية'**
+  String get pagesMapCurrent;
+
+  /// No description provided for @pagesMapRead.
+  ///
+  /// In ar, this message translates to:
+  /// **'مقروءة في الختمة'**
+  String get pagesMapRead;
+
+  /// No description provided for @pagesMapMarked.
+  ///
+  /// In ar, this message translates to:
+  /// **'فيها فاصل'**
+  String get pagesMapMarked;
+
+  /// No description provided for @pagesRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'ص {first}–{last}'**
+  String pagesRange(String first, String last);
+
+  /// No description provided for @pagesMapJuzRead.
+  ///
+  /// In ar, this message translates to:
+  /// **'قُرئ {read} من {total}'**
+  String pagesMapJuzRead(String read, String total);
 }
 
 class _AppLocalizationsDelegate

@@ -855,5 +855,10 @@
   "newBackup": "Backup",
   "newBackupBody": "Save your bookmarks, khatma, notes and settings in one file, and restore them on any device.",
   "carContinue": "Continue where you stopped reading",
-  "carReciters": "Reciters"
+  "carReciters": "Reciters",
+  "pagesMapCurrent": "Current page",
+  "pagesMapRead": "Read in the khatma",
+  "pagesMapMarked": "Has a bookmark",
+  "pagesRange": "p. {first}–{last}",
+  "pagesMapJuzRead": "{read} of {total} read"
 }

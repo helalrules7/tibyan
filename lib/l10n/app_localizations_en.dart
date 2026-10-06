@@ -2044,4 +2044,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get carReciters => 'Reciters';
+
+  @override
+  String get pagesMapCurrent => 'Current page';
+
+  @override
+  String get pagesMapRead => 'Read in the khatma';
+
+  @override
+  String get pagesMapMarked => 'Has a bookmark';
+
+  @override
+  String pagesRange(String first, String last) {
+    return 'p. $first–$last';
+  }
+
+  @override
+  String pagesMapJuzRead(String read, String total) {
+    return '$read of $total read';
+  }
 }
