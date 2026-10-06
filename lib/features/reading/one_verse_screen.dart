@@ -17,6 +17,8 @@ import '../mushaf/presentation/mushaf_screen.dart' show surahName;
 import '../mushaf/presentation/navigation.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
+import '../sajdah/sajdah_card.dart';
+import '../sajdah/sajdah_positions.dart';
 
 /// Every verse, by its row id (1 = al-Fatiha 1 … 6236 = an-Nas 6).
 final verseByIdProvider = FutureProvider.family<AyahRow, int>(
@@ -86,6 +88,10 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
   /// Turns to the next verse by itself (no recitation playing).
   Timer? _auto;
 
+  /// The verse the screen is turning to because the recitation got there
+  /// (not the reader): its sajdah card is the recitation's own.
+  int? _following;
+
   /// The steps the auto-turn button goes through, in seconds (0: off).
   static const autoSteps = [0, 10, 20, 30, 60];
 
@@ -111,6 +117,8 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
     _auto?.cancel();
     final seconds = ref.read(settingsProvider).oneVerseAutoSeconds;
     if (seconds <= 0) return;
+    // The sajdah card holds the auto-turn; it starts again once it closes.
+    if (ref.read(sajdahCardProvider) != null) return;
     _auto = Timer(Duration(seconds: seconds), () {
       if (!mounted) return;
       // The recitation leads while it plays.
@@ -150,6 +158,23 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
     _auto?.cancel();
     _controller?.dispose();
     super.dispose();
+  }
+
+  /// The reader (a swipe, the arrows, the auto-turn) came to verse [id]:
+  /// after a verse of prostration, with the timer on, the sajdah card
+  /// shows. Not when the recitation leads (its own card shows at the
+  /// verse's end).
+  Future<void> _sajdahAfterMove(int id, {required bool followed}) async {
+    if (followed || !ref.read(settingsProvider).sajdahTimer) return;
+    if (ref.read(recitationProvider).playing) return;
+    final positions = await ref.read(hafsSajdahPositionsProvider.future);
+    final row = await ref.read(verseByIdProvider(id).future);
+    if (!mounted || id != _id || ref.read(recitationProvider).playing) return;
+    final sajdah = positions.before(row.surah, row.number);
+    if (sajdah == null || ref.read(sajdahCardProvider)?.verse == sajdah) {
+      return;
+    }
+    ref.read(sajdahCardProvider.notifier).show(sajdah, SajdahFrom.reading);
   }
 
   void _go(int by) {
@@ -193,6 +218,7 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
       unawaited(() async {
         final row = await ref.read(mushafRepositoryProvider).ayah(now.surah, a);
         if (mounted && row.id != _id) {
+          _following = row.id;
           _controller?.animateToPage(
             row.id - 1,
             duration: const Duration(milliseconds: 450),
@@ -200,6 +226,16 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
           );
         }
       }());
+    });
+
+    // While the sajdah card is up, the auto-turn waits; it starts again
+    // when the card closes.
+    ref.listen(sajdahCardProvider, (before, now) {
+      if (now != null) {
+        _auto?.cancel();
+      } else if (before != null) {
+        _restartAuto();
+      }
     });
 
     final c = _controller;
@@ -210,44 +246,64 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
       },
       child: Scaffold(
         backgroundColor: t.paper,
-        body: c == null
-            ? Center(
-                child: CircularProgressIndicator(
-                  semanticsLabel: l.loadingLabel,
-                ),
-              )
-            : CallbackShortcuts(
-                bindings: {
-                  const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
-                      _go(1),
-                  const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
-                      _go(-1),
-                  const SingleActivator(LogicalKeyboardKey.escape): _leave,
-                },
-                child: Focus(
-                  autofocus: true,
-                  child: Directionality(
-                    // Verses run from right to left: the next is on the left.
-                    textDirection: TextDirection.rtl,
-                    child: PageView.builder(
-                      controller: c,
-                      itemCount: verseCount,
-                      onPageChanged: (i) {
-                        setState(() => _id = i + 1);
-                        _restartAuto();
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: c == null
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        semanticsLabel: l.loadingLabel,
+                      ),
+                    )
+                  : CallbackShortcuts(
+                      bindings: {
+                        const SingleActivator(
+                          LogicalKeyboardKey.arrowLeft,
+                        ): () =>
+                            _go(1),
+                        const SingleActivator(
+                          LogicalKeyboardKey.arrowRight,
+                        ): () =>
+                            _go(-1),
+                        const SingleActivator(LogicalKeyboardKey.escape):
+                            _leave,
                       },
-                      itemBuilder: (context, i) => _VersePage(
-                        id: i + 1,
-                        onListen: _listen,
-                        onAuto: _cycleAuto,
-                        onNext: () => _go(1),
-                        onPrevious: () => _go(-1),
-                        onLeave: _leave,
+                      child: Focus(
+                        autofocus: true,
+                        child: Directionality(
+                          // Verses run from right to left: the next is on the left.
+                          textDirection: TextDirection.rtl,
+                          child: PageView.builder(
+                            controller: c,
+                            itemCount: verseCount,
+                            onPageChanged: (i) {
+                              // Pages passed on the way to the recited verse
+                              // are the recitation's too.
+                              final followed = _following != null;
+                              if (_following == i + 1) _following = null;
+                              setState(() => _id = i + 1);
+                              _restartAuto();
+                              unawaited(
+                                _sajdahAfterMove(i + 1, followed: followed),
+                              );
+                            },
+                            itemBuilder: (context, i) => _VersePage(
+                              id: i + 1,
+                              onListen: _listen,
+                              onAuto: _cycleAuto,
+                              onNext: () => _go(1),
+                              onPrevious: () => _go(-1),
+                              onLeave: _leave,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
+            ),
+            // The sajdah card, over the verse.
+            const SajdahCardLayer(),
+          ],
+        ),
       ),
     );
   }

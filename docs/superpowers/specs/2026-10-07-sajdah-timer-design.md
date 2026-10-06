@@ -38,6 +38,18 @@ Both are saved like the other settings.
   sajdah verse.
 - It uses the same countdown. There is no audio.
 
+**«آية آية» (one verse a screen):**
+
+- The card shows as soon as the reader moves to the verse that follows a
+  sajdah verse: a swipe, the big arrow buttons, or the auto-turn.
+- While the card is up, the auto-turn countdown waits; it starts again
+  only once the card closes (its countdown ends, or a tap).
+- While the recitation plays there, the listening rule applies: the pause
+  at the sajdah verse's end, the card, then the recitation goes on. The
+  screen following the recitation to the next verse does not show the
+  card a second time.
+- The same card, over the verse.
+
 **Editions:** the card works in every edition, in line with edition parity.
 
 ## The card
