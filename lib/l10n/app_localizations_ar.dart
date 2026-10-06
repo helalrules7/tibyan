@@ -685,6 +685,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get followRecitation => 'تقليب الصفحات مع التلاوة';
 
   @override
+  String get tapJumpLabel => 'عند لمس آية أثناء الاستماع';
+
+  @override
+  String get tapJumpHint => 'لمسة على آية في الصفحة تنقل الشيخ إليها';
+
+  @override
+  String get tapJumpVerseStart => 'من أول الآية';
+
+  @override
+  String get tapJumpFromWord => 'من الكلمة الملموسة';
+
+  @override
+  String get tapJumpNoTiming => 'هذه التلاوة لا تدعم الانتقال إلى آية';
+
+  @override
+  String get listenFromVerse => 'استمع من هذه الآية';
+
+  @override
   String get audioDownloads => 'تحميل التلاوات';
 
   @override

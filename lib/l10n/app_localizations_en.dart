@@ -688,6 +688,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get followRecitation => 'Turn pages with the recitation';
 
   @override
+  String get tapJumpLabel => 'Tapping a verse while listening';
+
+  @override
+  String get tapJumpHint =>
+      'A tap on a verse on the page moves the reciter there';
+
+  @override
+  String get tapJumpVerseStart => 'From the verse\'s start';
+
+  @override
+  String get tapJumpFromWord => 'From the word tapped';
+
+  @override
+  String get tapJumpNoTiming => 'This recitation can\'t jump to a verse';
+
+  @override
+  String get listenFromVerse => 'Listen from this verse';
+
+  @override
   String get audioDownloads => 'Download recitations';
 
   @override

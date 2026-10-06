@@ -1262,6 +1262,42 @@ abstract class AppLocalizations {
   /// **'تقليب الصفحات مع التلاوة'**
   String get followRecitation;
 
+  /// No description provided for @tapJumpLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'عند لمس آية أثناء الاستماع'**
+  String get tapJumpLabel;
+
+  /// No description provided for @tapJumpHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لمسة على آية في الصفحة تنقل الشيخ إليها'**
+  String get tapJumpHint;
+
+  /// No description provided for @tapJumpVerseStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'من أول الآية'**
+  String get tapJumpVerseStart;
+
+  /// No description provided for @tapJumpFromWord.
+  ///
+  /// In ar, this message translates to:
+  /// **'من الكلمة الملموسة'**
+  String get tapJumpFromWord;
+
+  /// No description provided for @tapJumpNoTiming.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه التلاوة لا تدعم الانتقال إلى آية'**
+  String get tapJumpNoTiming;
+
+  /// No description provided for @listenFromVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمع من هذه الآية'**
+  String get listenFromVerse;
+
   /// No description provided for @audioDownloads.
   ///
   /// In ar, this message translates to:
