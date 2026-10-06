@@ -123,6 +123,18 @@ void main() {
           ),
         );
 
+        await draw('fatiha', 'سورة الفاتحة كاملة', await hafs(surah(1)));
+        await draw(
+          'alaq_1_5',
+          'العلق ١–٥ (أول ما نزل: بلا «نزلت بعد»)',
+          await hafs(verses(96, 1, 5)),
+        );
+        await draw(
+          'mujadila_1',
+          'المجادلة ١ (أطول سطر تحت اسم السورة)',
+          await hafs(verses(58, 1, 1)),
+        );
+
         final warshZip = File('tools/.cache/riwayat/UthmanicWarsh_v2-1.zip');
         if (warshZip.existsSync()) {
           final z = ZipDecoder().decodeBytes(warshZip.readAsBytesSync());
