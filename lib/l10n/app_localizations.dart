@@ -3768,6 +3768,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أدوات الصفحة'**
   String get focusPageTools;
+
+  /// No description provided for @playerFull.
+  ///
+  /// In ar, this message translates to:
+  /// **'المشغل كاملًا'**
+  String get playerFull;
 }
 
 class _AppLocalizationsDelegate

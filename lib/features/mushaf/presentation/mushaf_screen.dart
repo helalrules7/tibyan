@@ -21,6 +21,7 @@ import '../../books/books_providers.dart';
 import '../../books/presentation/asbab_section.dart';
 import '../../books/presentation/book_section.dart';
 import '../../content_extras/verse_audio_index.dart';
+import '../../audio/floating_player.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
 import '../../hifz/data/hifz_repository.dart';
@@ -1210,6 +1211,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               bottom: 12,
               child: Reveal(
                 visible:
+                    playerStyle == PlayerStyle.normal &&
                     recitation.active &&
                     range == null &&
                     !_multi &&
@@ -1217,6 +1219,22 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     !(focus && _focusTools),
                 from: const Offset(0, 0.4),
                 child: const SafeArea(top: false, child: PlayerBar()),
+              ),
+            ),
+            // «شكل المشغل»: the pill or the single button, over the page
+            // wherever the reader left it.
+            Positioned.fill(
+              child: Reveal(
+                visible:
+                    playerStyle != PlayerStyle.normal &&
+                    recitation.active &&
+                    range == null &&
+                    !_multi &&
+                    !_chrome,
+                from: Offset.zero,
+                child: playerStyle == PlayerStyle.normal
+                    ? null
+                    : FloatingPlayer(style: playerStyle),
               ),
             ),
             // The chosen edition is still downloading: say so, and that the

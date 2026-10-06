@@ -888,5 +888,6 @@
   "focusShowTools": "Show the tools",
   "focusHideTools": "Hide the tools",
   "focusMenus": "Menus",
-  "focusPageTools": "Page tools"
+  "focusPageTools": "Page tools",
+  "playerFull": "Full player"
 }

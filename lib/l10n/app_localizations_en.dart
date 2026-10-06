@@ -2155,4 +2155,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get focusPageTools => 'Page tools';
+
+  @override
+  String get playerFull => 'Full player';
 }

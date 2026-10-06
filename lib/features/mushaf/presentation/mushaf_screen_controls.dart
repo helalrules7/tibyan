@@ -48,6 +48,10 @@ class _ReadingTools extends StatelessWidget {
               onPressed: onTap,
               icon: Icon(icon),
               label: Text(label),
+              // In the interface's font, as the rest of the bar.
+              style: FilledButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
           );
       return Wrap(

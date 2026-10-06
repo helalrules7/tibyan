@@ -116,21 +116,37 @@ class _FocusTopBar extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       info,
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 8,
-                          runSpacing: 6,
-                          children: [
-                            for (final (icon, label, onTap) in actions)
-                              FilledButton.tonalIcon(
-                                onPressed: onTap,
-                                icon: Icon(icon),
-                                label: Text(label),
+                      // Each button with its name under it, in one row.
+                      Row(
+                        children: [
+                          for (final (icon, label, onTap) in actions)
+                            Expanded(
+                              child: InkWell(
+                                onTap: onTap,
+                                borderRadius: BorderRadius.circular(12),
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    minHeight: elderlyTarget,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(icon, color: t.ink, size: 28),
+                                      Text(
+                                        label,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge
+                                            ?.copyWith(color: t.ink),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
                     ],
                   )

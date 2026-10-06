@@ -2141,4 +2141,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get focusPageTools => 'أدوات الصفحة';
+
+  @override
+  String get playerFull => 'المشغل كاملًا';
 }
