@@ -15,6 +15,7 @@ import '../../../core/db/user_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/reveal.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../books/books_providers.dart';
 import '../../books/presentation/asbab_section.dart';
@@ -828,9 +829,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   _SidePane(page: _page, riwaya: _riwaya),
               ],
             ),
-            if (_chrome) ...[
-              // A light veil so the controls read as a layer over the page.
-              Positioned.fill(
+            // The menus come and go with a short fade and slide (at once
+            // when less motion is asked for).
+            // A light veil so the controls read as a layer over the page.
+            Positioned.fill(
+              child: Reveal(
+                visible: _chrome,
+                from: Offset.zero,
                 child: Semantics(
                   button: true,
                   label: l.hideMenus,
@@ -844,10 +849,14 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   ),
                 ),
               ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Reveal(
+                visible: _chrome,
+                from: const Offset(0, -0.25),
                 child: _TopControls(
                   items: [
                     (
@@ -874,37 +883,43 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   ],
                 ),
               ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: _BottomControls(
-                  page: scrubbing,
-                  pageCount: pageCount,
-                  label: _scrubLabel(context, scrubbing, surahs),
-                  onChanged: (p) => setState(() => _scrubPage = p),
-                  onChangeEnd: (p) {
-                    setState(() => _scrubPage = null);
-                    _controller?.jumpToPage(_indexOf(p));
-                  },
-                  onRecite: _startRecite,
-                  onListen: _listenFromPage,
-                  onGoTo: _goToPage,
-                  onAutoScroll: _startAutoScroll,
-                  onContinuous: _openContinuous,
-                  onOneVerse: _openOneVerse,
-                  touchReading: _touchReading,
-                  onTouchReading: _toggleTouchReading,
-                  recite: _recite,
-                  listening: recitation.active,
-                ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Reveal(
+                visible: _chrome,
+                child: !_chrome
+                    ? null
+                    : _BottomControls(
+                        page: scrubbing,
+                        pageCount: pageCount,
+                        label: _scrubLabel(context, scrubbing, surahs),
+                        onChanged: (p) => setState(() => _scrubPage = p),
+                        onChangeEnd: (p) {
+                          setState(() => _scrubPage = null);
+                          _controller?.jumpToPage(_indexOf(p));
+                        },
+                        onRecite: _startRecite,
+                        onListen: _listenFromPage,
+                        onGoTo: _goToPage,
+                        onAutoScroll: _startAutoScroll,
+                        onContinuous: _openContinuous,
+                        onOneVerse: _openOneVerse,
+                        touchReading: _touchReading,
+                        onTouchReading: _toggleTouchReading,
+                        recite: _recite,
+                        listening: recitation.active,
+                      ),
               ),
-            ],
-            if (_autoScroll)
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 16,
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: Reveal(
+                visible: _autoScroll,
                 child: SafeArea(
                   top: false,
                   child: _AutoScrollBar(
@@ -919,27 +934,38 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   ),
                 ),
               ),
-            if (recitation.active && range == null && !_multi && !_chrome)
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 12,
+            ),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: Reveal(
+                visible:
+                    recitation.active && range == null && !_multi && !_chrome,
+                from: const Offset(0, 0.4),
                 child: const SafeArea(top: false, child: PlayerBar()),
               ),
+            ),
             // The chosen edition is still downloading: say so, and that the
             // new Madina edition is read meanwhile.
-            if (ref.watch(chosenEditionProvider) != edition && !_chrome)
-              const Positioned(
-                top: 0,
-                left: 24,
-                right: 24,
-                child: SafeArea(child: DownloadingBanner()),
+            Positioned(
+              top: 0,
+              left: 24,
+              right: 24,
+              child: Reveal(
+                visible:
+                    ref.watch(chosenEditionProvider) != edition && !_chrome,
+                from: const Offset(0, -0.25),
+                child: const SafeArea(child: DownloadingBanner()),
               ),
-            if (_multi)
-              Positioned(
-                top: 0,
-                left: 16,
-                right: 16,
+            ),
+            Positioned(
+              top: 0,
+              left: 16,
+              right: 16,
+              child: Reveal(
+                visible: _multi,
+                from: const Offset(0, -0.25),
                 child: SafeArea(
                   child: _MultiSelectBar(
                     count: range?.length ?? 1,
@@ -947,181 +973,225 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   ),
                 ),
               ),
-            if (_testing && !_chrome)
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 12,
-                child: SafeArea(top: false, child: _testBar(context, surahs)),
+            ),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: Reveal(
+                visible: _testing && !_chrome,
+                from: const Offset(0, 0.4),
+                child: !_testing
+                    ? null
+                    : SafeArea(top: false, child: _testBar(context, surahs)),
               ),
-            if (_pickWord)
-              Positioned(
-                top: 0,
-                left: 16,
-                right: 16,
+            ),
+            Positioned(
+              top: 0,
+              left: 16,
+              right: 16,
+              child: Reveal(
+                visible: _pickWord,
+                from: const Offset(0, -0.25),
                 child: SafeArea(
                   child: _WordPickBar(
                     onCancel: () => setState(() => _pickWord = false),
                   ),
                 ),
               ),
-            if (range != null && !_multi)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: VerseServicesPanel(
-                  verses: range,
-                  surahs: surahs,
-                  onMark: (kind) =>
-                      _setMark(kind, range.first, _rangeFirstPage(range)),
-                  onSaveToFasil: () => showSaveToFasil(
-                    context,
-                    ref,
-                    verse: hafsKeyOf(_riwaya, range.first),
-                    page: _rangeFirstPage(range),
-                  ),
-                  onClose: () => setState(() => _selA = _selB = null),
-                  onMultiSelect: () {
-                    _setChrome(false);
-                    setState(() => _multi = true);
-                  },
-                  onListen: () {
-                    final one = range.length == 1;
-                    setState(() => _selA = _selB = null);
-                    ref
-                        .read(recitationProvider.notifier)
-                        .play(
-                          range.first.surah,
-                          from: range.first.ayah,
-                          // Several verses: that stretch, repeated as set.
-                          to: one ? null : range.last.ayah,
-                        );
-                  },
-                  // Tafsir and translation are keyed by Hafs numbers; from a
-                  // riwaya the screen also names the verse as read there.
-                  onTafsir: () {
-                    final v = range.first;
-                    final h = hafsKeyOf(_riwaya, v);
-                    final r = ref.read(editionProvider).riwaya;
-                    context.push(
-                      '/mushaf/tafsir?s=${h.surah}&a=${h.ayah}'
-                      '${r == Riwaya.hafs ? '' : '&r=${r.name}&ra=${v.ayah}'}',
-                    );
-                  },
-                  // Word study reads the Hafs text's words: on a riwaya's
-                  // pages it needs the pack's word boxes, and opens only
-                  // for a word that is exactly a Hafs word (_pickAt).
-                  onWordStudy:
-                      edition.isRiwaya && !(_riwaya?.hasWordBoxes ?? false)
-                      ? null
-                      : () {
-                          _setChrome(false);
-                          setState(() {
-                            _selA = _selB = null;
-                            _pickWord = true;
-                          });
-                        },
-                  // Meanings and reflections are kept by Hafs verse: a riwaya
-                  // verse opens those of the Hafs verses it covers.
-                  onWordMeanings: () => showVerseMeanings(
-                    context,
-                    verses: [
-                      for (final v in range)
-                        ...?_riwaya?.toHafs(v.surah, v.ayah),
-                      if (_riwaya == null)
-                        for (final v in range) (surah: v.surah, ayah: v.ayah),
-                    ],
-                  ),
-                  similarCount: range.length == 1
-                      ? ref
-                                .watch(
-                                  similarCountProvider((
-                                    hafsKeyOf(_riwaya, range.first).surah,
-                                    hafsKeyOf(_riwaya, range.first).ayah,
-                                  )),
-                                )
-                                .value ??
-                            0
-                      : 0,
-                  onSimilar: () {
-                    final h = hafsKeyOf(_riwaya, range.first);
-                    showSimilarSheet(context, surah: h.surah, ayah: h.ayah);
-                  },
-                  // Occasions of revelation are kept by Hafs verse.
-                  asbabCount: range.length == 1
-                      ? ref
-                            .watch(
-                              asbabProvider((
-                                surah: hafsKeyOf(_riwaya, range.first).surah,
-                                ayah: hafsKeyOf(_riwaya, range.first).ayah,
-                              )),
-                            )
-                            .length
-                      : 0,
-                  onAsbab: () {
-                    final h = hafsKeyOf(_riwaya, range.first);
-                    showAsbabSheet(context, surah: h.surah, ayah: h.ayah);
-                  },
-                  // A tafsir read aloud, by Hafs verse (flag tafsir_audio).
-                  onTafsirAudio: range.length != 1
-                      ? null
-                      : switch (ref
-                            .watch(
-                              tafsirAudioForVerseProvider((
-                                surah: hafsKeyOf(_riwaya, range.first).surah,
-                                ayah: hafsKeyOf(_riwaya, range.first).ayah,
-                              )),
-                            )
-                            .value
-                            ?.firstOrNull) {
-                          (final index, _) => () {
-                            final h = hafsKeyOf(_riwaya, range.first);
-                            setState(() => _selA = _selB = null);
-                            ref
-                                .read(recitationProvider.notifier)
-                                .playTafsir(index, h.surah, h.ayah);
-                          },
-                          null => null,
-                        },
-                  munasabatCount: range.length == 1
-                      ? ref
-                            .watch(
-                              munasabatProvider((
-                                surah: hafsKeyOf(_riwaya, range.first).surah,
-                                ayah: hafsKeyOf(_riwaya, range.first).ayah,
-                              )),
-                            )
-                            .length
-                      : 0,
-                  onMunasabat: () {
-                    final h = hafsKeyOf(_riwaya, range.first);
-                    showBookSheet(
-                      context,
-                      spec: BookSectionSpec.munasabat,
-                      surah: h.surah,
-                      ayah: h.ayah,
-                    );
-                  },
-                  onReflect: () {
-                    final h = hafsKeyOf(_riwaya, range.first);
-                    showReflectionSheet(context, surah: h.surah, ayah: h.ayah);
-                  },
-                  // The text is Tanzil's, which is the Hafs text: a riwaya
-                  // edition shares only the picture of its page.
-                  onCopy: edition.isRiwaya ? null : () => _copyVerses(range),
-                  onShareText: edition.isRiwaya
-                      ? null
-                      : () => _shareVerseText(range),
-                  onShareImage: () => _shareVerseImage(range),
-                  preview: settings.underVerse.isEmpty
-                      ? null
-                      : UnderVerseTexts(
-                          surah: hafsKeyOf(_riwaya, range.first).surah,
-                          ayah: hafsKeyOf(_riwaya, range.first).ayah,
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Reveal(
+                visible: range != null && !_multi,
+                from: const Offset(0, 0.15),
+                child: range == null || _multi
+                    ? null
+                    : VerseServicesPanel(
+                        verses: range,
+                        surahs: surahs,
+                        onMark: (kind) =>
+                            _setMark(kind, range.first, _rangeFirstPage(range)),
+                        onSaveToFasil: () => showSaveToFasil(
+                          context,
+                          ref,
+                          verse: hafsKeyOf(_riwaya, range.first),
+                          page: _rangeFirstPage(range),
                         ),
-                ),
+                        onClose: () => setState(() => _selA = _selB = null),
+                        onMultiSelect: () {
+                          _setChrome(false);
+                          setState(() => _multi = true);
+                        },
+                        onListen: () {
+                          final one = range.length == 1;
+                          setState(() => _selA = _selB = null);
+                          ref
+                              .read(recitationProvider.notifier)
+                              .play(
+                                range.first.surah,
+                                from: range.first.ayah,
+                                // Several verses: that stretch, repeated as set.
+                                to: one ? null : range.last.ayah,
+                              );
+                        },
+                        // Tafsir and translation are keyed by Hafs numbers; from a
+                        // riwaya the screen also names the verse as read there.
+                        onTafsir: () {
+                          final v = range.first;
+                          final h = hafsKeyOf(_riwaya, v);
+                          final r = ref.read(editionProvider).riwaya;
+                          context.push(
+                            '/mushaf/tafsir?s=${h.surah}&a=${h.ayah}'
+                            '${r == Riwaya.hafs ? '' : '&r=${r.name}&ra=${v.ayah}'}',
+                          );
+                        },
+                        // Word study reads the Hafs text's words: on a riwaya's
+                        // pages it needs the pack's word boxes, and opens only
+                        // for a word that is exactly a Hafs word (_pickAt).
+                        onWordStudy:
+                            edition.isRiwaya &&
+                                !(_riwaya?.hasWordBoxes ?? false)
+                            ? null
+                            : () {
+                                _setChrome(false);
+                                setState(() {
+                                  _selA = _selB = null;
+                                  _pickWord = true;
+                                });
+                              },
+                        // Meanings and reflections are kept by Hafs verse: a riwaya
+                        // verse opens those of the Hafs verses it covers.
+                        onWordMeanings: () => showVerseMeanings(
+                          context,
+                          verses: [
+                            for (final v in range)
+                              ...?_riwaya?.toHafs(v.surah, v.ayah),
+                            if (_riwaya == null)
+                              for (final v in range)
+                                (surah: v.surah, ayah: v.ayah),
+                          ],
+                        ),
+                        similarCount: range.length == 1
+                            ? ref
+                                      .watch(
+                                        similarCountProvider((
+                                          hafsKeyOf(_riwaya, range.first).surah,
+                                          hafsKeyOf(_riwaya, range.first).ayah,
+                                        )),
+                                      )
+                                      .value ??
+                                  0
+                            : 0,
+                        onSimilar: () {
+                          final h = hafsKeyOf(_riwaya, range.first);
+                          showSimilarSheet(
+                            context,
+                            surah: h.surah,
+                            ayah: h.ayah,
+                          );
+                        },
+                        // Occasions of revelation are kept by Hafs verse.
+                        asbabCount: range.length == 1
+                            ? ref
+                                  .watch(
+                                    asbabProvider((
+                                      surah: hafsKeyOf(
+                                        _riwaya,
+                                        range.first,
+                                      ).surah,
+                                      ayah: hafsKeyOf(
+                                        _riwaya,
+                                        range.first,
+                                      ).ayah,
+                                    )),
+                                  )
+                                  .length
+                            : 0,
+                        onAsbab: () {
+                          final h = hafsKeyOf(_riwaya, range.first);
+                          showAsbabSheet(context, surah: h.surah, ayah: h.ayah);
+                        },
+                        // A tafsir read aloud, by Hafs verse (flag tafsir_audio).
+                        onTafsirAudio: range.length != 1
+                            ? null
+                            : switch (ref
+                                  .watch(
+                                    tafsirAudioForVerseProvider((
+                                      surah: hafsKeyOf(
+                                        _riwaya,
+                                        range.first,
+                                      ).surah,
+                                      ayah: hafsKeyOf(
+                                        _riwaya,
+                                        range.first,
+                                      ).ayah,
+                                    )),
+                                  )
+                                  .value
+                                  ?.firstOrNull) {
+                                (final index, _) => () {
+                                  final h = hafsKeyOf(_riwaya, range.first);
+                                  setState(() => _selA = _selB = null);
+                                  ref
+                                      .read(recitationProvider.notifier)
+                                      .playTafsir(index, h.surah, h.ayah);
+                                },
+                                null => null,
+                              },
+                        munasabatCount: range.length == 1
+                            ? ref
+                                  .watch(
+                                    munasabatProvider((
+                                      surah: hafsKeyOf(
+                                        _riwaya,
+                                        range.first,
+                                      ).surah,
+                                      ayah: hafsKeyOf(
+                                        _riwaya,
+                                        range.first,
+                                      ).ayah,
+                                    )),
+                                  )
+                                  .length
+                            : 0,
+                        onMunasabat: () {
+                          final h = hafsKeyOf(_riwaya, range.first);
+                          showBookSheet(
+                            context,
+                            spec: BookSectionSpec.munasabat,
+                            surah: h.surah,
+                            ayah: h.ayah,
+                          );
+                        },
+                        onReflect: () {
+                          final h = hafsKeyOf(_riwaya, range.first);
+                          showReflectionSheet(
+                            context,
+                            surah: h.surah,
+                            ayah: h.ayah,
+                          );
+                        },
+                        // The text is Tanzil's, which is the Hafs text: a riwaya
+                        // edition shares only the picture of its page.
+                        onCopy: edition.isRiwaya
+                            ? null
+                            : () => _copyVerses(range),
+                        onShareText: edition.isRiwaya
+                            ? null
+                            : () => _shareVerseText(range),
+                        onShareImage: () => _shareVerseImage(range),
+                        preview: settings.underVerse.isEmpty
+                            ? null
+                            : UnderVerseTexts(
+                                surah: hafsKeyOf(_riwaya, range.first).surah,
+                                ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                              ),
+                      ),
               ),
+            ),
           ],
         ),
       ),
