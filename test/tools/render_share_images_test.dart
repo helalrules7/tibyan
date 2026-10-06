@@ -145,8 +145,8 @@ void main() {
                 RiwayaVerse(
                   surah: int.parse('${r['sura_no']}'),
                   ayah: int.parse('${r['aya_no']}'),
-                  page: int.parse('${r['page']}'),
-                  juz: int.parse('${r['jozz']}'),
+                  page: 1,
+                  juz: 1,
                   hafsFrom: 0,
                   hafsTo: 0,
                   text: r['aya_text'] as String,
