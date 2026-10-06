@@ -145,6 +145,37 @@ class MushafRepository {
     return row?.read<String>('data') ?? '';
   }
 
+  /// The Hafs tajweed letters of verses [from]..[to] of [surah]
+  /// (`tajweed_letter`): (verse, word, letter, marks only, rule key).
+  Future<List<(int, int, int, bool, String)>> tajweedLetters(
+    int surah,
+    int from,
+    int to,
+  ) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT ayah, word, letter, part, rule FROM tajweed_letter '
+          "WHERE riwaya = 'hafs' AND surah = ? AND ayah BETWEEN ? AND ? "
+          'ORDER BY ayah, word, letter',
+          variables: [
+            Variable.withInt(surah),
+            Variable.withInt(from),
+            Variable.withInt(to),
+          ],
+        )
+        .get();
+    return [
+      for (final r in rows)
+        (
+          r.read<int>('ayah'),
+          r.read<int>('word'),
+          r.read<int>('letter'),
+          r.read<String>('part') == 'marks',
+          r.read<String>('rule'),
+        ),
+    ];
+  }
+
   Future<List<LineOverflowRow>> lineOverflow(int page) =>
       (_db.select(_db.lineOverflow)..where((t) => t.page.equals(page))).get();
 
