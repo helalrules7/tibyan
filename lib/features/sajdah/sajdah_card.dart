@@ -89,6 +89,19 @@ class SajdahCardController extends Notifier<SajdahCard?> {
   }
 }
 
+/// A hifz test is under way: no sajdah card, while listening or reading.
+/// The reading screen sets it for the length of the test.
+final sajdahMutedProvider = NotifierProvider<SajdahMuted, bool>(
+  SajdahMuted.new,
+);
+
+class SajdahMuted extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool muted) => state = muted;
+}
+
 /// The card over a reading screen: fades in when a sajdah card is shown,
 /// centred, and fades out when it closes. Put it last in the screen's
 /// Stack; only the card itself takes touches.
