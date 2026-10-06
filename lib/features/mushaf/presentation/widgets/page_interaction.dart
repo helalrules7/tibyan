@@ -35,6 +35,7 @@ class PageInteraction {
     this.emphasisLines = const {},
     this.activeWord,
     this.onVerseTap,
+    this.onListenFrom,
     this.touched,
     this.touchColor,
     this.onPick,
@@ -63,8 +64,15 @@ class PageInteraction {
   /// px in the others) and the verse under it, if any.
   final void Function(Offset point, VerseKey? verse)? onPick;
 
-  /// Touch reading: a tap on a verse shades it (replacing the last one).
-  final ValueChanged<VerseKey>? onVerseTap;
+  /// A tap on a verse (not its marker), with the point in edition units
+  /// as for [onPick]: touch reading shades it, multi-verse selection
+  /// extends to it, listening moves the recitation there. While null, a
+  /// tap on a verse is a tap on the page ([onTap]).
+  final void Function(VerseKey verse, Offset point)? onVerseTap;
+
+  /// While listening: screen readers' action that moves the recitation to
+  /// a verse.
+  final ValueChanged<VerseKey>? onListenFrom;
   final VerseKey? touched;
   final Color? touchColor;
 
@@ -127,13 +135,17 @@ class PageInteraction {
 /// it covers ([areas], screen coordinates, in reading order). A double tap
 /// selects the verse (or, in recitation mode, shows or covers it; while
 /// picking a word, studies the verse), a long press does what it does on
-/// the page, and a custom action sets or removes the reading mark. The
-/// nodes take no touches: the page under them still answers every gesture.
+/// the page, and a custom action sets or removes the reading mark; while
+/// listening another ([listenAction]) moves the recitation to the verse.
+/// The nodes take no touches: the page under them still answers every
+/// gesture.
 List<Widget> verseSemanticNodes(
   PageInteraction x,
   List<(VerseKey, Rect)> areas, {
   required String markAction,
+  String? listenAction,
 }) {
+  final listen = x.onListenFrom;
   final label = x.verseLabel;
   if (label == null) return const [];
   return [
@@ -154,6 +166,8 @@ List<Widget> verseSemanticNodes(
           onLongPress: () => x.onVerseLongPress(v),
           customSemanticsActions: {
             CustomSemanticsAction(label: markAction): () => x.onMarkerTap(v),
+            if (listen != null && listenAction != null)
+              CustomSemanticsAction(label: listenAction): () => listen(v),
           },
           child: const SizedBox.expand(),
         ),

@@ -851,7 +851,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                       final m = markerAt(point);
                       if (m != null) return x.onMarkerTap(m);
                       final v = x.onVerseTap == null ? null : verseAt(local);
-                      v != null ? x.onVerseTap!(v) : x.onTap();
+                      v != null ? x.onVerseTap!(v, point) : x.onTap();
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(d.localPosition);
@@ -1152,6 +1152,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                         ),
                   ]),
                   markAction: l.markThisVerse,
+                  listenAction: l.listenFromVerse,
                 ),
                 ...handles,
               ],
