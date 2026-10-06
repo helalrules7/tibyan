@@ -99,7 +99,7 @@ void main() {
     }
   }
 
-  testWidgets('select a verse on the page and copy it, with its link', (
+  testWidgets('select a verse on the page and copy it: verse and reference', (
     tester,
   ) async {
     final handle = tester.ensureSemantics();
@@ -134,8 +134,10 @@ void main() {
     await settle(tester);
 
     expect(copied, isNotNull);
-    expect(copied, contains('tibyan://verse?s=113&a=1'));
-    expect(copied, contains('tanzil.net'));
+    // The verse and its reference only: no link, no source line.
+    expect(copied, contains('[سورة الفلق ١]'));
+    expect(copied, isNot(contains('tibyan://')));
+    expect(copied, isNot(contains('tanzil.net')));
     handle.dispose();
   });
 
