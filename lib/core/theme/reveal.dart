@@ -80,8 +80,10 @@ class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
         return FadeTransition(
           opacity: _curve,
           child: SlideTransition(
-            position: Tween(begin: widget.from, end: Offset.zero)
-                .animate(_curve),
+            position: Tween(
+              begin: widget.from,
+              end: Offset.zero,
+            ).animate(_curve),
             child: IgnorePointer(
               ignoring: !shown,
               child: ExcludeSemantics(excluding: !shown, child: child),
