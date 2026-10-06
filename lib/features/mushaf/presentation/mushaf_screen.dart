@@ -358,6 +358,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) => old?.dispose());
   }
 
+  /// Room kept around a page in focus mode, so its ink does not touch the
+  /// screen's edges.
+  static const _focusPagePadding = EdgeInsets.symmetric(
+    horizontal: 6,
+    vertical: 4,
+  );
+
   /// In the Zakhrafa style the mushaf opens with a cover as page 0.
   /// The Madina editions open with the app's cover as page 0. The
   /// Shamarly edition has its own cover as page 1, shown in the same frame,
@@ -385,6 +392,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     };
 
     final settings = ref.watch(settingsProvider);
+    // Focus mode: the page alone, with no frame and nothing under it.
+    final focus = settings.focusMode;
     // The current page's verses: recitation mode hides them, and after an
     // edition change they arrive later, so the page must rebuild then.
     ref.watch(pageAyahsProvider(_page));
@@ -589,6 +598,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         tajweed: settings.tajweedColors
             ? ref.watch(tajweedPageProvider(pg)).value ?? ''
             : '',
+        fill: focus ? settings.pageFill : null,
       );
       final pageBody = switch (edition) {
         MushafEdition.madina1405 => OldMushafPage(
@@ -617,6 +627,13 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           '${info == null ? '' : '&j=${info.juz}'}'
           '${info?.hizb == null ? '' : '&h=${info!.hizb}'}',
         );
+      }
+
+      // Focus mode: no frame at all. The opening pages keep their text
+      // only (the top bar names the surah), as wide as the screen and
+      // centred; the cover stays as it is.
+      if (focus) {
+        return Padding(padding: _focusPagePadding, child: pageWidget);
       }
 
       if (openingSurah != null) {
@@ -820,7 +837,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                                         ),
                                   ),
                                 ),
-                                if (!_autoScroll) readingBar(),
+                                if (!_autoScroll && !focus) readingBar(),
                               ],
                             ),
                     ),
