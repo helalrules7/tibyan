@@ -1262,6 +1262,54 @@ abstract class AppLocalizations {
   /// **'تقليب الصفحات مع التلاوة'**
   String get followRecitation;
 
+  /// No description provided for @sajdahTimer.
+  ///
+  /// In ar, this message translates to:
+  /// **'مؤقت سجدات التلاوة'**
+  String get sajdahTimer;
+
+  /// No description provided for @sajdahTimerHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'عند آية السجدة يتوقف الشيخ وتظهر بطاقة بأدعية السجود وعدّ تنازلي، ثم تُستكمل التلاوة'**
+  String get sajdahTimerHint;
+
+  /// No description provided for @sajdahTimerLength.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدة المؤقت'**
+  String get sajdahTimerLength;
+
+  /// No description provided for @sajdahCardLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجدة تلاوة'**
+  String get sajdahCardLabel;
+
+  /// No description provided for @sajdahTapToContinue.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط للاستكمال'**
+  String get sajdahTapToContinue;
+
+  /// No description provided for @sajdahContinue.
+  ///
+  /// In ar, this message translates to:
+  /// **'استكمال'**
+  String get sajdahContinue;
+
+  /// No description provided for @sajdahSecondsLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} ثانية متبقية'**
+  String sajdahSecondsLeft(String n);
+
+  /// No description provided for @sajdahTextPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص الأدعية في انتظار مراجعة المصدر'**
+  String get sajdahTextPending;
+
   /// No description provided for @tapJumpLabel.
   ///
   /// In ar, this message translates to:

@@ -688,6 +688,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get followRecitation => 'Turn pages with the recitation';
 
   @override
+  String get sajdahTimer => 'Sajdah timer';
+
+  @override
+  String get sajdahTimerHint =>
+      'At a verse of prostration the reciter pauses and a card with the supplications of prostration counts down, then the recitation goes on';
+
+  @override
+  String get sajdahTimerLength => 'Timer length';
+
+  @override
+  String get sajdahCardLabel => 'Prostration of recitation';
+
+  @override
+  String get sajdahTapToContinue => 'Tap to continue';
+
+  @override
+  String get sajdahContinue => 'Continue';
+
+  @override
+  String sajdahSecondsLeft(String n) {
+    return '$n seconds left';
+  }
+
+  @override
+  String get sajdahTextPending => 'The supplications await the source review';
+
+  @override
   String get tapJumpLabel => 'Tapping a verse while listening';
 
   @override

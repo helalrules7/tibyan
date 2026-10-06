@@ -74,6 +74,10 @@ enum PageFill { lines, stretch, full }
 /// floating pill everywhere; [button]: one small round button everywhere.
 enum PlayerStyle { auto, normal, pill, button }
 
+/// «مؤقت سجدات التلاوة»: the lengths offered for the pause at a verse of
+/// prostration, in seconds.
+const sajdahTimerLengths = <int>[10, 15, 20, 30, 45, 60];
+
 /// Colours offered for tinting verse-end markers (ARGB); null = none.
 const markerTints = <int>[
   0xFF1FA79B,
@@ -125,6 +129,8 @@ class AppSettings {
     this.pageFill = PageFill.lines,
     this.playerStyle = PlayerStyle.auto,
     this.playerPosition,
+    this.sajdahTimer = false,
+    this.sajdahSeconds = 20,
   });
 
   final String styleId;
@@ -249,6 +255,14 @@ class AppSettings {
   /// kept on screen whatever its size; null for the default place.
   final Offset? playerPosition;
 
+  /// «مؤقت سجدات التلاوة»: at a verse of prostration the recitation pauses
+  /// and a card with the sajdah's supplications counts down (off by
+  /// default).
+  final bool sajdahTimer;
+
+  /// The card's countdown, one of [sajdahTimerLengths] (20 by default).
+  final int sajdahSeconds;
+
   /// The player style in effect: [PlayerStyle.auto] is the normal bar, or
   /// the pill while focus mode is on.
   PlayerStyle get effectivePlayerStyle => playerStyle != PlayerStyle.auto
@@ -297,6 +311,8 @@ class AppSettings {
     PageFill? pageFill,
     PlayerStyle? playerStyle,
     Offset? Function()? playerPosition,
+    bool? sajdahTimer,
+    int? sajdahSeconds,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -339,6 +355,8 @@ class AppSettings {
     playerPosition: playerPosition == null
         ? this.playerPosition
         : playerPosition(),
+    sajdahTimer: sajdahTimer ?? this.sajdahTimer,
+    sajdahSeconds: sajdahSeconds ?? this.sajdahSeconds,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

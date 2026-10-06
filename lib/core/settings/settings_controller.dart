@@ -60,6 +60,8 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kPlayerStyle = 'settings.playerStyle';
   static const _kPlayerX = 'settings.playerX';
   static const _kPlayerY = 'settings.playerY';
+  static const _kSajdahTimer = 'settings.sajdahTimer';
+  static const _kSajdahSeconds = 'settings.sajdahSeconds';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -150,8 +152,14 @@ class SettingsController extends Notifier<AppSettings> {
         (final double x, final double y) => Offset(x, y),
         _ => null,
       },
+      sajdahTimer: _prefs.getBool(_kSajdahTimer) ?? false,
+      sajdahSeconds: _sajdahLength(_prefs.getInt(_kSajdahSeconds)),
     );
   }
+
+  /// A kept length, or the default (20) when it is not one offered.
+  static int _sajdahLength(int? seconds) =>
+      sajdahTimerLengths.contains(seconds) ? seconds! : 20;
 
   /// Until the reader picks a marker shape, a heritage theme draws its own
   /// marker and Zakhrafa its 16-point rosette.
@@ -400,6 +408,18 @@ class SettingsController extends Notifier<AppSettings> {
     state = state.copyWith(playerPosition: () => kept);
     await _prefs.setDouble(_kPlayerX, kept.dx);
     await _prefs.setDouble(_kPlayerY, kept.dy);
+  }
+
+  Future<void> setSajdahTimer(bool on) async {
+    state = state.copyWith(sajdahTimer: on);
+    await _prefs.setBool(_kSajdahTimer, on);
+  }
+
+  /// Sets the sajdah card's countdown; a length not offered is ignored.
+  Future<void> setSajdahSeconds(int seconds) async {
+    if (!sajdahTimerLengths.contains(seconds)) return;
+    state = state.copyWith(sajdahSeconds: seconds);
+    await _prefs.setInt(_kSajdahSeconds, seconds);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

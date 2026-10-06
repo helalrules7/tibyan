@@ -685,6 +685,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get followRecitation => 'تقليب الصفحات مع التلاوة';
 
   @override
+  String get sajdahTimer => 'مؤقت سجدات التلاوة';
+
+  @override
+  String get sajdahTimerHint =>
+      'عند آية السجدة يتوقف الشيخ وتظهر بطاقة بأدعية السجود وعدّ تنازلي، ثم تُستكمل التلاوة';
+
+  @override
+  String get sajdahTimerLength => 'مدة المؤقت';
+
+  @override
+  String get sajdahCardLabel => 'سجدة تلاوة';
+
+  @override
+  String get sajdahTapToContinue => 'اضغط للاستكمال';
+
+  @override
+  String get sajdahContinue => 'استكمال';
+
+  @override
+  String sajdahSecondsLeft(String n) {
+    return '$n ثانية متبقية';
+  }
+
+  @override
+  String get sajdahTextPending => 'نص الأدعية في انتظار مراجعة المصدر';
+
+  @override
   String get tapJumpLabel => 'عند لمس آية أثناء الاستماع';
 
   @override

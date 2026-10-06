@@ -519,6 +519,27 @@ class PlayerOptions extends ConsumerWidget {
           value: settings.followRecitation,
           onChanged: ref.read(settingsProvider.notifier).setFollowRecitation,
         ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l.sajdahTimer),
+          subtitle: Text(l.sajdahTimerHint),
+          value: settings.sajdahTimer,
+          onChanged: ref.read(settingsProvider.notifier).setSajdahTimer,
+        ),
+        // The length shows only while the timer is on.
+        if (settings.sajdahTimer) ...[
+          Semantics(
+            header: true,
+            child: Text(l.sajdahTimerLength, style: title),
+          ),
+          const SizedBox(height: 6),
+          chips<int>(
+            [for (final n in sajdahTimerLengths) (n, l.seconds(digits(n)))],
+            settings.sajdahSeconds,
+            ref.read(settingsProvider.notifier).setSajdahSeconds,
+          ),
+          const SizedBox(height: 12),
+        ],
         // Offered only while its flag is on and its index is available, and
         // for Hafs, whose verse numbers the translation follows.
         if (riwaya == Riwaya.hafs)
