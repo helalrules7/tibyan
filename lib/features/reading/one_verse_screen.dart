@@ -375,9 +375,10 @@ class _VersePage extends ConsumerWidget {
             Expanded(
               child: Row(
                 children: [
-                  // Right: back to the verse before (reading order).
+                  // Right: back to the verse before (reading order). The
+                  // chevrons mirror in Arabic: chevron_left points right.
                   big(
-                    Icons.chevron_right,
+                    Icons.chevron_left,
                     l.previousVerse,
                     id > 1 ? onPrevious : null,
                   ),
@@ -419,7 +420,7 @@ class _VersePage extends ConsumerWidget {
                     ),
                   ),
                   big(
-                    Icons.chevron_left,
+                    Icons.chevron_right,
                     l.nextVerse,
                     id < verseCount ? onNext : null,
                   ),

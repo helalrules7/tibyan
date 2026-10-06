@@ -108,8 +108,9 @@ class _ShareCarouselState extends State<ShareCarousel> {
       return IconButton(
         key: ValueKey(forward ? 'share-next' : 'share-previous'),
         tooltip: forward ? l.shareNextImage : l.sharePreviousImage,
-        // Forward is to the left, as in the mushaf.
-        icon: Icon(forward ? Icons.chevron_left : Icons.chevron_right),
+        // Forward is to the left, as in the mushaf. The chevrons mirror in
+        // this right-to-left row: chevron_right is drawn pointing left.
+        icon: Icon(forward ? Icons.chevron_right : Icons.chevron_left),
         iconSize: 32,
         onPressed: enabled ? () => _turn(forward ? 1 : -1) : null,
       );
