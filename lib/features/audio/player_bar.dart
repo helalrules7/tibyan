@@ -519,6 +519,20 @@ class PlayerOptions extends ConsumerWidget {
           value: settings.followRecitation,
           onChanged: ref.read(settingsProvider.notifier).setFollowRecitation,
         ),
+        // Offered only while its flag is on and its index is available, and
+        // for Hafs, whose verse numbers the translation follows.
+        if (riwaya == Riwaya.hafs)
+          if (ref.watch(translationAudioIndexProvider).value case final idx?)
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l.translationAudioAfterVerse),
+              subtitle: Text(
+                '${l.translationAudioHint}\n'
+                '${contentCredit(idx.source, Localizations.localeOf(context).languageCode)}',
+              ),
+              value: ref.watch(translationAudioChoiceProvider),
+              onChanged: c.setTranslationAfterVerses,
+            ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l.sajdahTimer),
@@ -540,20 +554,6 @@ class PlayerOptions extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
         ],
-        // Offered only while its flag is on and its index is available, and
-        // for Hafs, whose verse numbers the translation follows.
-        if (riwaya == Riwaya.hafs)
-          if (ref.watch(translationAudioIndexProvider).value case final idx?)
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l.translationAudioAfterVerse),
-              subtitle: Text(
-                '${l.translationAudioHint}\n'
-                '${contentCredit(idx.source, Localizations.localeOf(context).languageCode)}',
-              ),
-              value: ref.watch(translationAudioChoiceProvider),
-              onChanged: c.setTranslationAfterVerses,
-            ),
         OutlinedButton.icon(
           onPressed: () {
             if (inSheet) Navigator.pop(context);
