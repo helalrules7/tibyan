@@ -3,15 +3,16 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
-import 'package:tibyan/features/share_image/surah_statements.dart';
 
-/// The transcription of the surah headers of the 1924 Cairo mushaf
-/// (assets/config/surah_type_1342.json): its fields, and its numbers
-/// against the app's own data.
+/// The draft transcription of the surah headers of the 1924 Cairo mushaf
+/// (assets/config/surah_type_1342.json, built by
+/// tools/surah_type_1342/build.py): its fields, and its numbers against the
+/// app's own data. Kept for the scholarly review; not shown in the app.
+const _asset = 'assets/config/surah_type_1342.json';
+
 void main() {
-  final raw = jsonDecode(
-    File(SurahStatements.asset).readAsStringSync(),
-  ) as Map<String, dynamic>;
+  final raw =
+      jsonDecode(File(_asset).readAsStringSync()) as Map<String, dynamic>;
   final entries = (raw['surahs'] as List).cast<Map<String, dynamic>>();
   const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
   int arabic(String s) => int.parse(
@@ -69,17 +70,12 @@ void main() {
         }
       }
     }
-    final s = SurahStatements.parse(
-      File(SurahStatements.asset).readAsStringSync(),
-    );
-    expect(s.length, 114);
-    expect(s.status, 'draft-transcription');
   });
 
   test('the verse counts are the KFGQPC Hafs counts of content.db; the '
       'excepted verses exist', () {
     final db = sqlite3.open('assets/db/content.db', mode: OpenMode.readOnly);
-    addTearDown(db.dispose);
+    addTearDown(db.close);
     final counts = {
       for (final r in db.select(
         'select surah, count(*) as n from ayah group by surah',
@@ -104,7 +100,7 @@ void main() {
   test('the type agrees with Tanzil\'s for every surah but al-Ma\'un, '
       'printed in two parts', () {
     final db = sqlite3.open('assets/db/content.db', mode: OpenMode.readOnly);
-    addTearDown(db.dispose);
+    addTearDown(db.close);
     final tanzil = {
       for (final r in db.select('select id, revelation from surah'))
         r['id'] as int: r['revelation'] as String,

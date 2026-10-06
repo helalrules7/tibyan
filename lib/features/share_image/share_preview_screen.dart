@@ -20,7 +20,6 @@ import 'photo_saver.dart';
 import 'share_carousel.dart';
 import 'share_document.dart';
 import 'share_source.dart';
-import 'surah_statements.dart';
 
 /// Opens the preview of [range] (numbered as in the edition being read)
 /// shared as pictures.
@@ -83,7 +82,6 @@ class _SharePreviewState extends ConsumerState<SharePreviewScreen> {
     _logo ??= await _loadLogo();
     final edition = ref.read(editionProvider);
     final surahs = await ref.read(surahsProvider.future);
-    final statements = await SurahStatements.load();
     SharePassage? passage;
     if (edition.isRiwaya) {
       // The riwaya's own text and font, from its pack; never Hafs's.
@@ -95,7 +93,6 @@ class _SharePreviewState extends ConsumerState<SharePreviewScreen> {
           fontFamily: riwayaFontFamily(r),
           range: widget.range,
           surahs: surahs,
-          statements: statements,
           options: _options,
         );
       }
@@ -104,7 +101,6 @@ class _SharePreviewState extends ConsumerState<SharePreviewScreen> {
         repo: ref.read(mushafRepositoryProvider),
         range: widget.range,
         surahs: surahs,
-        statements: statements,
         options: _options,
       );
     }

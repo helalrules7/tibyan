@@ -11,7 +11,6 @@ import 'package:tibyan/features/mushaf/data/mushaf_repository.dart';
 import 'package:tibyan/features/mushaf/data/riwaya_data.dart';
 import 'package:tibyan/features/share_image/share_document.dart';
 import 'package:tibyan/features/share_image/share_source.dart';
-import 'package:tibyan/features/share_image/surah_statements.dart';
 
 /// Not a test: draws sample pictures of the «share as image» feature into
 /// `$SHARE_IMAGES_OUT/<name>_<n>.png` (default build/share_images), with
@@ -22,9 +21,6 @@ void main() {
   final run = Platform.environment['RENDER_SHARE_IMAGES'] == '1';
   final outPath =
       Platform.environment['SHARE_IMAGES_OUT'] ?? 'build/share_images';
-  // SHARE_IMAGES_ONLY=types: only the surah headers with the 1342
-  // statement of their type (the longest ones, and a few more).
-  final onlyTypes = Platform.environment['SHARE_IMAGES_ONLY'] == 'types';
 
   testWidgets(
     'render share images',
@@ -53,9 +49,6 @@ void main() {
           await loader.load();
         }
         final surahs = await repo.surahs();
-        final statements = SurahStatements.parse(
-          File(SurahStatements.asset).readAsStringSync(),
-        );
         final logoBytes = File('assets/ornaments/share_logo.png')
             .readAsBytesSync();
         final codec = await ui.instantiateImageCodec(logoBytes);
@@ -96,59 +89,8 @@ void main() {
         Future<SharePassage> hafs(
           ShareRange r, {
           ShareOptions options = const ShareOptions(divineNames: true),
-        }) => hafsPassage(
-          repo: repo,
-          range: r,
-          surahs: surahs,
-          statements: statements,
-          options: options,
-        );
-
-        if (onlyTypes) {
-          // The ten longest statements, then al-Fatiha, al-An'am, al-A'raf,
-          // Yunus, Hud and at-Tawba: each surah's first verses.
-          final longest = [for (var s = 1; s <= 114; s++) s]
-            ..sort(
-              (a, b) => statements[b]!.statement.length.compareTo(
-                statements[a]!.statement.length,
-              ),
-            );
-          final shown = <int>{...longest.take(10), 1, 6, 7, 10, 11, 9};
-          for (final s in shown) {
-            final n = surahs[s - 1].ayahCount;
-            await draw(
-              'type_${s.toString().padLeft(3, '0')}',
-              'سورة ${surahs[s - 1].nameAr}: «${statements[s]!.statement}»',
-              await hafs(verses(s, 1, n < 3 ? n : 3)),
-            );
-          }
-          // A riwaya numbering the surah otherwise: the plain type.
-          final warshZip = File('tools/.cache/riwayat/UthmanicWarsh_v2-1.zip');
-          if (warshZip.existsSync()) {
-            final z = ZipDecoder().decodeBytes(warshZip.readAsBytesSync());
-            final font = z.files.firstWhere((f) => f.name.endsWith('.ttf'));
-            await (FontLoader('KFGQPC_warsh')
-                  ..addFont(Future.value(ByteData.sublistView(font.content))))
-                .load();
-            final data = RiwayaData.parse(
-              File('test/fixtures/riwaya_warsh_sample.json').readAsStringSync(),
-            );
-            await draw(
-              'type_warsh_hud',
-              'ورش: هود ٧١–٧٣ (عد ورش لهود غير عد حفص: النوع وحده)',
-              riwayaPassage(
-                data: data,
-                fontFamily: 'KFGQPC_warsh',
-                range: verses(11, 71, 73),
-                surahs: surahs,
-                statements: statements,
-                options: const ShareOptions(divineNames: true),
-              ),
-            );
-          }
-          logo.dispose();
-          return;
-        }
+        }) =>
+            hafsPassage(repo: repo, range: r, surahs: surahs, options: options);
 
         await draw(
           'nisa',
@@ -215,7 +157,6 @@ void main() {
               fontFamily: 'KFGQPC_warsh',
               range: verses(11, 71, 88),
               surahs: surahs,
-              statements: statements,
               options: const ShareOptions(divineNames: true),
             ),
           );
@@ -226,7 +167,7 @@ void main() {
       File('${out.path}/index.html').writeAsStringSync('''
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${onlyTypes ? 'تبيان: نوع السورة في الصورة' : 'تبيان: مشاركة الآيات صورة'}</title>
+<title>تبيان: مشاركة الآيات صورة</title>
 <style>
 body{font-family:system-ui,sans-serif;background:#efe6d6;color:#1e1915;margin:16px}
 h1{font-size:22px}h2{font-size:17px;margin:28px 0 8px}
@@ -234,7 +175,7 @@ h1{font-size:22px}h2{font-size:17px;margin:28px 0 8px}
 .m{margin:0 0 8px;color:#7a4a26}
 .row img{height:420px;box-shadow:0 1px 6px #0003;border-radius:4px}
 </style></head><body>
-<h1>${onlyTypes ? 'رأس السورة في صورة المشاركة: بيان نوعها كما طُبع في مصحف ١٣٤٢هـ (مسودة نقل تنتظر المراجعة)' : 'مشاركة الآيات صورة: صورة لكل صفحة من مصحف المدينة (١٤٤١) بسطورها'}</h1>
+<h1>مشاركة الآيات صورة: صورة لكل صفحة من مصحف المدينة (١٤٤١) بسطورها</h1>
 $html
 </body></html>
 ''');

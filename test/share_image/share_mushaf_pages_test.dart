@@ -10,11 +10,6 @@ import 'package:tibyan/features/share_image/share_document.dart';
 import 'package:tibyan/features/share_image/share_layout.dart';
 import 'package:tibyan/features/share_image/share_source.dart';
 import 'package:tibyan/features/share_image/share_text_runs.dart';
-import 'package:tibyan/features/share_image/surah_statements.dart';
-
-final statements = SurahStatements.parse(
-  File(SurahStatements.asset).readAsStringSync(),
-);
 
 /// A passage on several pictures is split as the new Madina mushaf (1441H):
 /// one picture a page, one line a line of the page, its words exactly.
@@ -93,12 +88,7 @@ void main() {
   }
 
   test('an-Nisa\' is thirty pictures, pages 77 to 106, line by line', () async {
-    final p = await hafsPassage(
-      repo: repo,
-      range: surah(4),
-      surahs: surahs,
-      statements: statements,
-    );
+    final p = await hafsPassage(repo: repo, range: surah(4), surahs: surahs);
     final pictures = pictureLines(p);
     expect(pictures, hasLength(30));
     final lines = await mushafLines(4, 1, 176);
@@ -135,12 +125,7 @@ void main() {
   }
 
   test('an-Nisa\' on pictures: one size, every line fits', () async {
-    final p = await hafsPassage(
-      repo: repo,
-      range: surah(4),
-      surahs: surahs,
-      statements: statements,
-    );
+    final p = await hafsPassage(repo: repo, range: surah(4), surahs: surahs);
     final doc = build(p);
     addTearDown(doc.dispose);
     expect(doc.byMushaf, isTrue);
@@ -159,12 +144,7 @@ void main() {
   test(
     'al-Kahf: pages 293 to 304, its first page from its own lines',
     () async {
-      final p = await hafsPassage(
-        repo: repo,
-        range: surah(18),
-        surahs: surahs,
-        statements: statements,
-      );
+      final p = await hafsPassage(repo: repo, range: surah(18), surahs: surahs);
       final pictures = pictureLines(p);
       expect(pictures, hasLength(12));
       final lines = await mushafLines(18, 1, 110);
@@ -189,7 +169,6 @@ void main() {
       repo: repo,
       range: verses(2, 282, 286),
       surahs: surahs,
-      statements: statements,
     );
     final pictures = pictureLines(p);
     expect(pictures, hasLength(2));
@@ -213,7 +192,6 @@ void main() {
       repo: repo,
       range: verses(4, 11, 12),
       surahs: surahs,
-      statements: statements,
     );
     final pictures = pictureLines(p);
     expect(pictures.map((x) => x.length), [8, 11]);
@@ -278,7 +256,6 @@ void main() {
         repo: repo,
         range: verses(2, 255, 255),
         surahs: surahs,
-        statements: statements,
       );
       final doc = build(p);
       addTearDown(doc.dispose);
@@ -293,7 +270,6 @@ void main() {
         repo: repo,
         range: verses(2, 5, 6),
         surahs: surahs,
-        statements: statements,
       );
       final doc = build(p);
       addTearDown(doc.dispose);
@@ -369,7 +345,6 @@ void main() {
         fontFamily: 'UthmanicHafs',
         range: range,
         surahs: surahs,
-        statements: statements,
       );
       expect(p.mushaf, isNotNull);
       final tokens = tokenize(p.verses);
@@ -404,7 +379,6 @@ void main() {
         fontFamily: 'UthmanicHafs',
         range: range,
         surahs: surahs,
-        statements: statements,
       );
       expect(p.mushaf, isNull);
       final doc = ShareDocument.build(p);

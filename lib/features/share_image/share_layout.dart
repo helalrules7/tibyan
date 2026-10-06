@@ -150,13 +150,9 @@ class SharePageLayout {
   int get to => lines.last.to;
 }
 
-/// How many lines an image of surah [surah] holds (its header may be
-/// taller than another surah's), with the basmala line when it opens its
-/// surah's part, or without.
-typedef ShareCapacity = int Function({
-  required bool withBasmala,
-  required int surah,
-});
+/// How many lines an image holds: [first] when it opens its surah's part
+/// with the basmala line, [rest] otherwise.
+typedef ShareCapacity = int Function({required bool withBasmala});
 
 /// The passage split into images. Each surah of the passage starts a new
 /// image (its own header). An image ends at a verse end when one fits;
@@ -185,7 +181,7 @@ List<SharePageLayout> paginate({
     var first = true;
     while (start < end) {
       final withBasmala = first && hasBasmala(surah);
-      final cap = capacity(withBasmala: withBasmala, surah: surah);
+      final cap = capacity(withBasmala: withBasmala);
       assert(cap > 0);
       final lines = breakLines(widths, width, space, from: start, to: end);
       int stop;
