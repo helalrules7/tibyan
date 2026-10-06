@@ -120,6 +120,7 @@ class AppSettings {
     this.tajweedHues = const {},
     this.focusMode = false,
     this.focusTools = FocusTools.button,
+    this.focusToolsShown = false,
     this.pageFill = PageFill.lines,
     this.playerStyle = PlayerStyle.auto,
     this.playerPosition,
@@ -229,6 +230,10 @@ class AppSettings {
   /// How focus mode's tools are reached.
   final FocusTools focusTools;
 
+  /// Focus mode's reading tools were left shown under the page (by the top
+  /// bar's tools button); kept until the reader hides them.
+  final bool focusToolsShown;
+
   /// How the page fills the screen in focus mode.
   final PageFill pageFill;
 
@@ -283,6 +288,7 @@ class AppSettings {
     Map<String, String>? tajweedHues,
     bool? focusMode,
     FocusTools? focusTools,
+    bool? focusToolsShown,
     PageFill? pageFill,
     PlayerStyle? playerStyle,
     Offset? Function()? playerPosition,
@@ -321,6 +327,7 @@ class AppSettings {
     tajweedHues: tajweedHues ?? this.tajweedHues,
     focusMode: focusMode ?? this.focusMode,
     focusTools: focusTools ?? this.focusTools,
+    focusToolsShown: focusToolsShown ?? this.focusToolsShown,
     pageFill: pageFill ?? this.pageFill,
     playerStyle: playerStyle ?? this.playerStyle,
     playerPosition: playerPosition == null

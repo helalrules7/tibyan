@@ -54,6 +54,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kTajweedHues = 'settings.tajweedHues';
   static const _kFocus = 'settings.focusMode';
   static const _kFocusTools = 'settings.focusTools';
+  static const _kFocusToolsShown = 'settings.focusToolsShown';
   static const _kPageFill = 'settings.pageFill';
   static const _kPlayerStyle = 'settings.playerStyle';
   static const _kPlayerX = 'settings.playerX';
@@ -133,6 +134,7 @@ class SettingsController extends Notifier<AppSettings> {
       focusTools:
           _enumByName(FocusTools.values, _prefs.getString(_kFocusTools)) ??
           FocusTools.button,
+      focusToolsShown: _prefs.getBool(_kFocusToolsShown) ?? false,
       pageFill:
           _enumByName(PageFill.values, _prefs.getString(_kPageFill)) ??
           PageFill.lines,
@@ -366,6 +368,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setFocusTools(FocusTools value) async {
     state = state.copyWith(focusTools: value);
     await _prefs.setString(_kFocusTools, value.name);
+  }
+
+  Future<void> setFocusToolsShown(bool value) async {
+    state = state.copyWith(focusToolsShown: value);
+    await _prefs.setBool(_kFocusToolsShown, value);
   }
 
   Future<void> setPageFill(PageFill value) async {

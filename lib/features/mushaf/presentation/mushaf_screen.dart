@@ -113,8 +113,17 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   bool _chrome = false;
 
   /// Focus mode: the reading tools under the page are shown (the top
-  /// bar's tools button); a tap on the page hides them.
-  bool _focusTools = false;
+  /// bar's tools button); a tap on the page hides them. The reader's
+  /// choice is kept ([AppSettings.focusToolsShown]); «القائمة» has no such
+  /// tools.
+  bool get _focusTools {
+    // The build watches the settings, so this follows them.
+    final s = ref.read(settingsProvider);
+    return s.focusToolsShown && s.focusTools == FocusTools.button;
+  }
+
+  void _setFocusTools(bool shown) =>
+      ref.read(settingsProvider.notifier).setFocusToolsShown(shown);
 
   /// The verse the «القائمة» window was opened on, shaded while it is open.
   VerseKey? _menuVerse;
@@ -212,7 +221,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (_selA != null) {
       setState(() => _selA = _selB = null);
     } else if (_focus) {
-      if (_focusTools) setState(() => _focusTools = false);
+      if (_focusTools) _setFocusTools(false);
       _setChrome(false);
     } else {
       _setChrome(!_chrome);
@@ -223,7 +232,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// hides them.
   void _toggleFocusTools() {
     _setChrome(false);
-    setState(() => _focusTools = !_focusTools);
+    _setFocusTools(!_focusTools);
   }
 
   /// The small reading tools (touch reading, listening, recitation mode,
@@ -282,7 +291,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     HapticFeedback.selectionClick();
     _setChrome(false);
     setState(() {
-      _focusTools = false;
       _selA = _selB = null;
       _menuVerse = verse;
       // The services read the verse's page from here (copy, marks).
@@ -381,7 +389,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   /// Leaves focus mode (its bar's exit button), back to the normal page.
   void _exitFocus() {
-    setState(() => _focusTools = false);
     ref.read(settingsProvider.notifier).setFocusMode(false);
   }
 
@@ -569,9 +576,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     // Page numbers differ between editions: reopen at the same verse.
     ref.listen(editionProvider, (_, _) => _open());
     // Focus mode turned on or off (here, or in the settings): the system's
-    // bars follow, and its tools start hidden.
+    // bars follow.
     ref.listen(settingsProvider.select((s) => s.focusMode), (_, _) {
-      _focusTools = false;
       _applySystemBars();
     });
 

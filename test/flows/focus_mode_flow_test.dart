@@ -331,6 +331,41 @@ void main() {
     expect(bar, findsOneWidget);
   });
 
+  testWidgets('the tools left shown are kept: saved, and shown on the next '
+      'opening, in focus mode turned off and on again', (tester) async {
+    final container = await start(tester, size: const Size(600, 1000));
+    await settle(tester, find.byType(MushafPage));
+    await settle(tester);
+    await tester.tap(button('إظهار الأدوات'));
+    await settle(tester);
+    expect(container.read(settingsProvider).focusToolsShown, isTrue);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool('settings.focusToolsShown'), isTrue);
+    // Out of focus mode and back: still shown.
+    await container.read(settingsProvider.notifier).setFocusMode(false);
+    await settle(tester);
+    await container.read(settingsProvider.notifier).setFocusMode(true);
+    await settle(tester);
+    expect(find.byKey(const ValueKey('focus-tools')), findsOneWidget);
+    // A tap on the page hides them, and that is kept too.
+    final page = tester.getRect(find.byType(MushafPage).first);
+    await tester.tapAt(page.topLeft + const Offset(2, 2));
+    await settle(tester);
+    expect(prefs.getBool('settings.focusToolsShown'), isFalse);
+  });
+
+  testWidgets('the app opens with the tools as they were left', (tester) async {
+    await start(
+      tester,
+      size: const Size(600, 1000),
+      prefs: {'settings.focusMode': true, 'settings.focusToolsShown': true},
+    );
+    await settle(tester, find.byType(MushafPage));
+    await settle(tester);
+    expect(find.byKey(const ValueKey('focus-tools')), findsOneWidget);
+    expect(find.byType(ReadingBar), findsOneWidget);
+  });
+
   testWidgets('a long press on a verse still opens its services', (
     tester,
   ) async {
