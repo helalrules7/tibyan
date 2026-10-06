@@ -49,7 +49,10 @@ Both are saved like the other settings.
   fades in and out in about 250 ms, and appears at once when the system
   asks for less motion.
 - **Contents, from top to bottom:**
-  - the sajdah sign ۩, drawn in the mushaf's font;
+  - a prostration pictogram (a person in sujood: knees, hands and forehead
+    on the ground), Tibyan's own single-colour SVG
+    (`assets/ornaments/sajdah.svg`), tinted with the theme's control
+    colour so it reads in every theme and mode;
   - the supplications, copied verbatim from Hisn al-Muslim (see
     *Sources*);
   - a circular countdown;
