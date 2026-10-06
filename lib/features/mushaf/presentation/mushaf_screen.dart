@@ -778,6 +778,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                                                                 .toSet(),
                                                       ),
                                                   child: PageView.builder(
+                                                    // A new controller (spreads turned on or off, another
+                                                    // edition) starts a new pager: the old one would keep its
+                                                    // place, now another page.
+                                                    key: ObjectKey(_controller),
                                                     controller: _controller,
                                                     itemCount: _spreads.count,
                                                     // The pages either side are built and their images
