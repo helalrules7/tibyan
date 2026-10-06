@@ -60,19 +60,30 @@ String shareReference(ShareRange range, List<SurahRow> surahs) {
       : _ar.verseRange(name(a.surah), _digits(a.ayah), _digits(b.ayah));
 }
 
+/// The header of surah [surah]: «سورة النساء», and under it its type, its
+/// place in the order of revelation and the surah revealed before it, as
+/// the page banners show them, from the Tanzil metadata of content.db:
+/// «مدنية · ترتيبها في النزول ٩٢ · نزلت بعد الممتحنة». The first surah
+/// revealed (al-'Alaq) has no «نزلت بعد». The type is the plain «مكية» or
+/// «مدنية»: no documented source of the verses excepted from it is held
+/// yet (docs/MISSING_DATA.md).
+ShareSurahHeader shareSurahHeader(int surah, List<SurahRow> surahs) {
+  final s = surahs[surah - 1];
+  final before = surahs
+      .where((x) => x.revelationOrder == s.revelationOrder - 1)
+      .firstOrNull;
+  return ShareSurahHeader(
+    title: _ar.surahWord(s.nameAr),
+    info: [
+      s.revelation == 'meccan' ? _ar.meccan : _ar.medinan,
+      _ar.revealedOrder(_digits(s.revelationOrder)),
+      if (before != null) _ar.revealedAfter(before.nameAr),
+    ].join(' · '),
+  );
+}
+
 Map<int, ShareSurahHeader> _headers(ShareRange range, List<SurahRow> surahs) =>
-    {
-      for (final k in range)
-        k.surah: () {
-          final s = surahs[k.surah - 1];
-          return ShareSurahHeader(
-            title: _ar.surahWord(s.nameAr),
-            info:
-                '${s.revelation == 'meccan' ? _ar.meccan : _ar.medinan}'
-                ' · ${_ar.revealedOrder(_digits(s.revelationOrder))}',
-          );
-        }(),
-    };
+    {for (final k in range) k.surah: shareSurahHeader(k.surah, surahs)};
 
 /// A Hafs passage (the 1441, 1405 and Shamarly editions): the KFGQPC Hafs
 /// text of content.db, verbatim, in the KFGQPC Hafs font.
