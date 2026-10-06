@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
@@ -41,6 +43,7 @@ PageGeometry oldEditionGeometry({
   required bool opening,
   List<double> cuts = const [],
   Map<int, List<Rect>> overflow = const {},
+  Rect? ownInk,
 }) {
   final ink = opening ? _openingInk : _ink;
   final hasCuts = cuts.length == _lineCount - 1;
@@ -63,6 +66,7 @@ PageGeometry oldEditionGeometry({
             : (hasCuts ? cuts[j] : _gridTop + (j + 1) * _pitch),
     ],
     overflow: overflow,
+    ownInk: opening ? null : ownInk,
     inkAbove: _inkAbove,
     inkBelow: _inkBelow,
     boxHalfHeight: _pitch * 0.42,
@@ -87,7 +91,32 @@ class OldMushafPage extends StatelessWidget {
       ImageMushafPage(page: page, interaction: interaction, load: _loadOldPage);
 }
 
+/// Each page's own ink (tools/measure_old_page_ink.py), read once.
+Future<Map<int, Rect>>? _ownInk;
+
+Future<Map<int, Rect>> _readOwnInk() async {
+  try {
+    final json = jsonDecode(
+      await rootBundle.loadString('assets/config/old_page_ink.json'),
+    ) as Map<String, dynamic>;
+    return {
+      for (final e in json.entries)
+        if (e.value case [num l, num t, num r, num b])
+          int.parse(e.key): Rect.fromLTRB(
+            l.toDouble(),
+            t.toDouble(),
+            r.toDouble(),
+            b.toDouble(),
+          ),
+    };
+  } catch (_) {
+    // Without it every page keeps the shared crop.
+    return const {};
+  }
+}
+
 Future<ImagePageData> _loadOldPage(WidgetRef ref, int page) async {
+  final ownInk = (_ownInk ??= _readOwnInk());
   final dir = ref.read(pageInstallerProvider).dir;
   final file = File(
     p.join(dir.path, 'p${page.toString().padLeft(3, '0')}.png'),
@@ -142,6 +171,7 @@ Future<ImagePageData> _loadOldPage(WidgetRef ref, int page) async {
       opening: page <= 2,
       cuts: cuts,
       overflow: overflow,
+      ownInk: (await ownInk)[page],
     ),
     pieces: [
       for (final g in glyphs)

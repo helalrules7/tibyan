@@ -27,7 +27,13 @@ class PageGeometry {
     this.inkBelow = 0,
     this.whole = false,
     this.inkWithoutHeader,
+    this.ownInk,
   });
+
+  /// This page's own ink (image px), when known: a page fitted to the
+  /// height is cropped to it rather than to [ink], which covers every page
+  /// of the edition, and so is drawn larger.
+  final Rect? ownInk;
 
   /// The part of the image drawn; cropping to it never cuts a mark.
   final Rect ink;
@@ -93,11 +99,19 @@ class StripLayout {
     this.g, {
     bool withoutHeader = false,
     bool stretch = false,
-  }) : ink = withoutHeader ? (g.inkWithoutHeader ?? g.ink) : g.ink {
+  }) {
+    final shared = withoutHeader ? (g.inkWithoutHeader ?? g.ink) : g.ink;
+    strips =
+        !g.whole && size.width / shared.width < size.height / shared.height;
+    // Fitted to the height, a page is cropped to its own ink with a margin
+    // (never past the shared crop, which never cuts a mark).
+    final own = g.ownInk;
+    ink = stretch && !strips && !g.whole && own != null
+        ? own.inflate(ownInkMargin).intersect(shared)
+        : shared;
     final byWidth = size.width / ink.width;
     final byHeight = size.height / ink.height;
-    scale = byWidth < byHeight ? byWidth : byHeight;
-    strips = !g.whole && byWidth < byHeight;
+    scale = strips || byWidth < byHeight ? byWidth : byHeight;
     // A text page fitted to the height (a page of a two-page spread, a
     // wide window) is stretched across toward the frame, a little.
     // Only where the page itself is drawn by this layout ([stretch]): the
@@ -116,9 +130,13 @@ class StripLayout {
   /// the calligraphy's look.
   static const maxStretch = 0.12;
 
+  /// Room kept around a page's own ink (image px): its marks stay clear of
+  /// the frame.
+  static const ownInkMargin = 8.0;
+
   final Size size;
   final PageGeometry g;
-  final Rect ink;
+  late final Rect ink;
 
   /// Image px to screen: [scale] down (and across in strips), [scaleX]
   /// across when the page is fitted to the height.
