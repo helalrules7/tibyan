@@ -20,7 +20,7 @@ abstract final class ShareBrand {
 }
 
 /// A surah's header: its title («سورة البقرة») and the line under it
-/// («مدنية · ترتيبها في النزول ٨٧»).
+/// («مدنية · ترتيبها في النزول ٨٧ · نزلت بعد المطففين»).
 class ShareSurahHeader {
   const ShareSurahHeader({required this.title, required this.info});
 
@@ -119,8 +119,8 @@ class ShareDocument {
   /// takes the largest size it fits at; a longer one the last.
   static const fontSizes = [92.0, 84.0, 76.0, 68.0, 62.0];
 
-  /// The labels' font (the surah's line, the footer): one with the dash
-  /// and the Arabic-Indic digits.
+  /// The labels' font (the surah's line, the footer), for their words:
+  /// their digits are in the passage's mushaf font ([labelRuns]).
   static const _uiFont = 'Changa';
 
   /// Line pitch, in font sizes.
@@ -388,36 +388,61 @@ class ShareDocument {
     return b.build();
   }
 
+  /// A label in [family]; its digits, when [digits] is given, in that font
+  /// (the mushaf's), at [digitScale] times the size, on the same baseline
+  /// and within the lines' height of [family].
   static ui.Paragraph _label(
     String text, {
     required String family,
     required double size,
     required Color color,
+    String? digits,
+    double digitScale = 1,
     double width = textWidth,
     ui.FontWeight weight = ui.FontWeight.w400,
     ui.TextAlign align = ui.TextAlign.center,
+    int maxLines = 1,
   }) {
-    final b =
-        ui.ParagraphBuilder(
-            ui.ParagraphStyle(
-              textDirection: ui.TextDirection.rtl,
-              textAlign: align,
-              fontFamily: family,
-              fontSize: size,
-              fontWeight: weight,
-              maxLines: 1,
-              ellipsis: '…',
-            ),
-          )
-          ..pushStyle(
-            ui.TextStyle(
-              color: color,
-              fontFamily: family,
-              fontSize: size,
-              fontWeight: weight,
-            ),
-          )
-          ..addText(text);
+    final b = ui.ParagraphBuilder(
+      ui.ParagraphStyle(
+        textDirection: ui.TextDirection.rtl,
+        textAlign: align,
+        fontFamily: family,
+        fontSize: size,
+        fontWeight: weight,
+        maxLines: maxLines,
+        ellipsis: '…',
+        strutStyle: digits == null
+            ? null
+            : ui.StrutStyle(
+                fontFamily: family,
+                fontSize: size,
+                forceStrutHeight: true,
+              ),
+      ),
+    );
+    final runs = digits == null
+        ? [(text, family)]
+        : labelRuns(text, words: family, digits: digits);
+    for (final (run, font) in runs) {
+      final isDigits = font != family;
+      b
+        ..pushStyle(
+          ui.TextStyle(
+            color: color,
+            fontFamily: font,
+            fontSize: isDigits ? size * digitScale : size,
+            fontWeight: isDigits ? ui.FontWeight.w400 : weight,
+            // The KFGQPC fonts join a run of digits into a verse-end
+            // marker (their «rlig»): here they are plain numbers.
+            fontFeatures: isDigits
+                ? const [ui.FontFeature.disable('rlig')]
+                : null,
+          ),
+        )
+        ..addText(run)
+        ..pop();
+    }
     return b.build()..layout(ui.ParagraphConstraints(width: width));
   }
 
@@ -517,18 +542,43 @@ class ShareDocument {
       title,
       Offset(r.center.dx - 380, r.top + 54 - title.height / 2 + 30),
     );
-    final info = _label(
-      header.info,
-      family: _uiFont,
-      size: 34,
-      color: ShareBrand.brown,
-      width: 760,
-    );
+    final info = infoLine(header.info, digits: passage.fontFamily);
     canvas.drawParagraph(
       info,
-      Offset(r.center.dx - 380, r.bottom - 76 - info.height / 2),
+      Offset(r.center.dx - infoWidth / 2, r.bottom - 76 - info.height / 2),
     );
   }
+
+  /// The room of the surah's info line, inside the medallion's points.
+  static const infoWidth = 660.0;
+
+  /// The surah's info line, laid out: at the largest size it fits
+  /// [infoWidth] at, down to a least size; on two lines at that size if it
+  /// is still too long, never past the medallion. Its digits are in the
+  /// passage's mushaf font [digits].
+  static ui.Paragraph infoLine(String text, {required String digits}) {
+    ui.Paragraph at(double size, {int lines = 1}) => _label(
+      text,
+      family: _uiFont,
+      size: size,
+      color: ShareBrand.brown,
+      digits: digits,
+      digitScale: _digitScale,
+      width: infoWidth,
+      maxLines: lines,
+    );
+    for (var size = 34.0; size >= 26; size -= 2) {
+      final p = at(size);
+      if (p.maxIntrinsicWidth <= infoWidth) return p;
+      p.dispose();
+    }
+    return at(26, lines: 2);
+  }
+
+  /// The mushaf font's digits beside the labels' letters: the KFGQPC
+  /// digits are drawn small (to sit inside a verse-end marker), so they
+  /// are enlarged to stand about as tall as the letters.
+  static const _digitScale = 2.3;
 
   void _paintFooter(Canvas canvas, int page, double y) {
     final rule = Paint()
@@ -545,6 +595,8 @@ class ShareDocument {
       family: _uiFont,
       size: 44,
       color: ShareBrand.brown,
+      digits: passage.fontFamily,
+      digitScale: _digitScale,
       width: 620,
       align: ui.TextAlign.right,
     );
@@ -558,6 +610,8 @@ class ShareDocument {
         family: _uiFont,
         size: 38,
         color: ShareBrand.brown,
+        digits: passage.fontFamily,
+        digitScale: _digitScale,
         width: 300,
       );
       canvas.drawParagraph(n, Offset(width / 2 - 150, mid - n.height / 2));

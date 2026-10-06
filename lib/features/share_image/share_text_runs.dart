@@ -133,3 +133,25 @@ List<(String, Color?)> tokenRuns(
   }
   return runs;
 }
+
+final _digitRun = RegExp('[٠-٩0-9]+');
+
+/// A label of the pictures ([text]) as runs in order, each with its font:
+/// the digits in [digits] (the mushaf's font, as its verse-end markers
+/// are), everything else in [words] (the labels' font). The runs' texts
+/// joined give back [text] exactly.
+List<(String, String)> labelRuns(
+  String text, {
+  required String words,
+  required String digits,
+}) {
+  final runs = <(String, String)>[];
+  var at = 0;
+  for (final m in _digitRun.allMatches(text)) {
+    if (m.start > at) runs.add((text.substring(at, m.start), words));
+    runs.add((m[0]!, digits));
+    at = m.end;
+  }
+  if (at < text.length) runs.add((text.substring(at), words));
+  return runs;
+}
