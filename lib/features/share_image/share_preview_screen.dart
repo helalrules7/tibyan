@@ -171,7 +171,8 @@ class _SharePreviewState extends ConsumerState<SharePreviewScreen> {
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _busy = true);
     try {
-      final folder = await PhotoSaver.save(await _files(doc));
+      final (:saved, :folder) = await PhotoSaver.save(await _files(doc));
+      if (!saved) return;
       messenger.showSnackBar(
         SnackBar(
           content: Text(

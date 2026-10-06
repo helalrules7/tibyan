@@ -27,10 +27,12 @@ import UserNotifications
 }
 
 /// Saves PNG files to the Photos library («Save to Photos» of the shared
-/// verse pictures), asking only for add-only access
-/// (NSPhotoLibraryAddUsageDescription).
+/// verse pictures), in a «Tibyan» album when the reader allows full
+/// access (NSPhotoLibraryUsageDescription); with add-only access
+/// (NSPhotoLibraryAddUsageDescription) they go to the library itself.
 enum PhotoSaverChannel {
   private static var channel: FlutterMethodChannel?
+  private static let album = "Tibyan"
 
   static func attach(_ messenger: FlutterBinaryMessenger) {
     let c = FlutterMethodChannel(name: "app.tibyan/photos", binaryMessenger: messenger)
@@ -48,19 +50,48 @@ enum PhotoSaverChannel {
   }
 
   private static func save(_ paths: [String], _ result: @escaping FlutterResult) {
-    PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
-      guard status == .authorized || status == .limited else {
-        DispatchQueue.main.async { result(false) }
+    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+      if status == .authorized {
+        saveInAlbum(paths, result)
         return
       }
-      PHPhotoLibrary.shared().performChanges({
-        for path in paths {
-          PHAssetCreationRequest.forAsset().addResource(
-            with: .photo, fileURL: URL(fileURLWithPath: path), options: nil)
+      PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+        guard status == .authorized || status == .limited else {
+          DispatchQueue.main.async { result(false) }
+          return
         }
-      }) { ok, _ in
-        DispatchQueue.main.async { result(ok) }
+        PHPhotoLibrary.shared().performChanges({
+          for path in paths {
+            PHAssetCreationRequest.forAsset().addResource(
+              with: .photo, fileURL: URL(fileURLWithPath: path), options: nil)
+          }
+        }) { ok, _ in
+          DispatchQueue.main.async { result(ok) }
+        }
       }
+    }
+  }
+
+  /// The pictures, added to the «Tibyan» album (made the first time).
+  private static func saveInAlbum(_ paths: [String], _ result: @escaping FlutterResult) {
+    let options = PHFetchOptions()
+    options.predicate = NSPredicate(format: "title = %@", album)
+    let existing = PHAssetCollection.fetchAssetCollections(
+      with: .album, subtype: .any, options: options
+    ).firstObject
+    PHPhotoLibrary.shared().performChanges({
+      let albumRequest =
+        existing.flatMap { PHAssetCollectionChangeRequest(for: $0) }
+        ?? PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: album)
+      var added: [PHObjectPlaceholder] = []
+      for path in paths {
+        let request = PHAssetCreationRequest.forAsset()
+        request.addResource(with: .photo, fileURL: URL(fileURLWithPath: path), options: nil)
+        if let placeholder = request.placeholderForCreatedAsset { added.append(placeholder) }
+      }
+      albumRequest.addAssets(added as NSArray)
+    }) { ok, _ in
+      DispatchQueue.main.async { result(ok) }
     }
   }
 }

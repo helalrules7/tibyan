@@ -8,6 +8,8 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>تبيان يحفظ صور الآيات التي تشاركها في الصور. Tibyan saves the verse pictures you share to Photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>تبيان يجمع صور الآيات التي تحفظها في ألبوم «Tibyan». Tibyan keeps the verse pictures you save together in a «Tibyan» album.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Tibyan</string>
 	<key>CFBundleExecutable</key>
