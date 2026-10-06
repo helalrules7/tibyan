@@ -201,6 +201,9 @@ class SettingsScreen extends ConsumerWidget {
           _SectionTitle(l.focusModeTitle),
           const _FocusModeCard(),
           const SizedBox(height: 16),
+          _SectionTitle(l.playerStyleLabel),
+          const _PlayerStyleCard(),
+          const SizedBox(height: 16),
           Card(
             child: ListTile(
               leading: const Icon(Icons.storage_outlined),
@@ -404,6 +407,45 @@ class _FocusModeCard extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// «شكل المشغل»: how the player over the mushaf looks, with focus mode on
+/// or off.
+class _PlayerStyleCard extends ConsumerWidget {
+  const _PlayerStyleCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final muted = TextStyle(color: context.tokens.colors.muted);
+    return Card(
+      child: RadioGroup<PlayerStyle>(
+        groupValue: ref.watch(settingsProvider.select((s) => s.playerStyle)),
+        onChanged: (v) => v == null
+            ? null
+            : ref.read(settingsProvider.notifier).setPlayerStyle(v),
+        child: Column(
+          children: [
+            for (final (v, name, hint) in [
+              (PlayerStyle.auto, l.playerStyleAuto, l.playerStyleAutoHint),
+              (PlayerStyle.normal, l.playerStyleNormal, null),
+              (PlayerStyle.pill, l.playerStylePill, l.playerStylePillHint),
+              (
+                PlayerStyle.button,
+                l.playerStyleButton,
+                l.playerStyleButtonHint,
+              ),
+            ])
+              RadioListTile(
+                value: v,
+                title: Text(name),
+                subtitle: hint == null ? null : Text(hint, style: muted),
+              ),
+          ],
+        ),
       ),
     );
   }

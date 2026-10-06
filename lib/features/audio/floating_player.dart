@@ -75,12 +75,19 @@ class _FloatingPlayerState extends ConsumerState<FloatingPlayer> {
     return LayoutBuilder(
       builder: (context, box) {
         final size = box.biggest;
+        // The centre drawn for [want] (fractions), kept inside the screen.
+        Offset kept(Offset want) {
+          final at = FloatingPlayer.place(want, size, padding, own);
+          return Offset(
+            (at.dx + own.width / 2) / size.width,
+            (at.dy + own.height / 2) / size.height,
+          );
+        }
+
         final at = FloatingPlayer.place(_dragging ?? saved, size, padding, own);
-        // The centre actually used, as fractions: where a drag starts.
-        Offset centre() => Offset(
-          (at.dx + own.width / 2) / size.width,
-          (at.dy + own.height / 2) / size.height,
-        );
+        // Read at the time of the gesture, not of the last frame: a drag's
+        // events can come faster than frames.
+        Offset centre() => kept(_dragging ?? saved);
         return Stack(
           children: [
             Positioned(
@@ -96,10 +103,12 @@ class _FloatingPlayerState extends ConsumerState<FloatingPlayer> {
                 child: GestureDetector(
                   onPanStart: (_) => setState(() => _dragging = centre()),
                   onPanUpdate: (d) => setState(() {
-                    final c = _dragging ?? centre();
-                    _dragging = Offset(
-                      c.dx + d.delta.dx / size.width,
-                      c.dy + d.delta.dy / size.height,
+                    final c = centre();
+                    _dragging = kept(
+                      Offset(
+                        c.dx + d.delta.dx / size.width,
+                        c.dy + d.delta.dy / size.height,
+                      ),
                     );
                   }),
                   onPanEnd: (_) {
@@ -259,10 +268,12 @@ class _PlayerButton extends ConsumerWidget {
           ])
             PopupMenuItem(
               value: v,
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(icon),
-                title: Text(name),
+              child: Row(
+                children: [
+                  Icon(icon),
+                  const SizedBox(width: 12),
+                  Flexible(child: Text(name)),
+                ],
               ),
             ),
         ],
