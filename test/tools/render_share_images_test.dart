@@ -15,8 +15,8 @@ import 'package:tibyan/features/share_image/share_source.dart';
 /// Not a test: draws sample pictures of the «share as image» feature into
 /// `$SHARE_IMAGES_OUT/<name>_<n>.png` (default build/share_images), with
 /// an index.html. Runs only with RENDER_SHARE_IMAGES=1. The Warsh sample
-/// needs tools/.cache/riwayat/UthmanicWarsh_v2-1.zip (the KFGQPC Warsh
-/// text and font a Warsh pack carries).
+/// (pages 230-231 of the Warsh pack fixture, with its word boxes) needs
+/// the KFGQPC Warsh font from tools/.cache/riwayat/UthmanicWarsh_v2-1.zip.
 void main() {
   final run = Platform.environment['RENDER_SHARE_IMAGES'] == '1';
   final outPath =
@@ -59,10 +59,23 @@ void main() {
         ];
         ShareRange surah(int s) => verses(s, 1, surahs[s - 1].ayahCount);
 
-        Future<void> draw(String name, String title, SharePassage p) async {
+        Future<void> draw(
+          String name,
+          String title,
+          SharePassage p, {
+          List<int>? only,
+        }) async {
           final doc = ShareDocument.build(p, logo: logo);
-          html.writeln('<h2>$title (${doc.pageCount})</h2><div class="row">');
-          for (var i = 0; i < doc.pageCount; i++) {
+          final shown = only == null
+              ? [for (var i = 0; i < doc.pageCount; i++) i]
+              : [for (final i in only) i < 0 ? doc.pageCount + i : i];
+          html.writeln(
+            '<h2>$title (${doc.pageCount}'
+            '${only == null ? '' : '، المعروض: ${shown.map((i) => i + 1).join('، ')}'})'
+            '</h2><p class="m">${doc.byMushaf ? 'مقسمة على صفحات المصحف وسطوره' : 'سطور منسابة'}'
+            ' · حجم الخط ${doc.fontSize}</p><div class="row">',
+          );
+          for (final i in shown) {
             final file = '${name}_${i + 1}.png';
             File('${out.path}/$file').writeAsBytesSync(await doc.png(i));
             html.writeln(
@@ -80,39 +93,33 @@ void main() {
             hafsPassage(repo: repo, range: r, surahs: surahs, options: options);
 
         await draw(
-          'kursi',
-          'آية الكرسي، البقرة ٢٥٥',
-          await hafs(verses(2, 255, 255)),
-        );
-        await draw('baqarah_1_5', 'البقرة ١–٥', await hafs(verses(2, 1, 5)));
-        await draw('ikhlas', 'سورة الإخلاص كاملة', await hafs(surah(112)));
-        await draw('fatiha', 'سورة الفاتحة', await hafs(surah(1)));
-        await draw('tawbah_1_3', 'التوبة ١–٣', await hafs(verses(9, 1, 3)));
-        await draw(
-          'anfal_65',
-          'الأنفال ٦٥ (مثل التصميم المطلوب)',
-          await hafs(verses(8, 65, 65)),
-        );
-        await draw(
-          'baqarah_282_286',
-          'مقطع طويل ينقسم: البقرة ٢٨٢–٢٨٦',
-          await hafs(verses(2, 282, 286)),
+          'nisa',
+          'سورة النساء كاملة: صفحات ٧٧–١٠٦',
+          await hafs(surah(4)),
+          only: [0, 1, 2, -1],
         );
         await draw('kahf', 'سورة الكهف كاملة', await hafs(surah(18)));
+        await draw(
+          'baqarah_282_286',
+          'البقرة ٢٨٢–٢٨٦',
+          await hafs(verses(2, 282, 286)),
+        );
+        await draw(
+          'nisa_11_12',
+          'تحديد على صفحتين: النساء ١١–١٢',
+          await hafs(verses(4, 11, 12)),
+        );
+        await draw(
+          'kursi',
+          'آية الكرسي، البقرة ٢٥٥ (صورة واحدة كما كانت)',
+          await hafs(verses(2, 255, 255)),
+        );
         await draw(
           'kursi_tajweed',
           'آية الكرسي بألوان التجويد',
           await hafs(
             verses(2, 255, 255),
             options: const ShareOptions(tajweed: true, divineNames: true),
-          ),
-        );
-        await draw(
-          'mulk_1_5_tajweed',
-          'الملك ١–٥ بألوان التجويد بلا تمييز لفظ الجلالة',
-          await hafs(
-            verses(67, 1, 5),
-            options: const ShareOptions(tajweed: true),
           ),
         );
 
@@ -123,45 +130,20 @@ void main() {
           await (FontLoader(
             'KFGQPC_warsh',
           )..addFont(Future.value(ByteData.sublistView(font.content)))).load();
-          final rows = jsonDecode(
-            utf8.decode(
-              z.files.firstWhere((f) => f.name.endsWith('.json')).content,
-            ),
-          ) as List<dynamic>;
-          final data = RiwayaData(
-            id: 'warsh',
-            nameAr: 'ورش',
-            nameEn: 'Warsh',
-            pageCount: 0,
-            firstLine: 0,
-            pitch: 0,
-            openingInk: const [],
-            openingBody: const [],
-            fontFile: '',
-            surahCounts: const [],
-            surahStartPages: const [],
-            verses: [
-              for (final r in rows.cast<Map<String, dynamic>>())
-                RiwayaVerse(
-                  surah: int.parse('${r['sura_no']}'),
-                  ayah: int.parse('${r['aya_no']}'),
-                  page: 1,
-                  juz: 1,
-                  hafsFrom: 0,
-                  hafsTo: 0,
-                  text: r['aya_text'] as String,
-                ),
-            ],
-            polygonsByPage: const {},
-            linesByPage: const {},
+          // The Warsh pages 230-231 of the test fixture: the pack's own
+          // verses, word boxes and line cuts.
+          final data = RiwayaData.parse(
+            File('test/fixtures/riwaya_warsh_sample.json').readAsStringSync(),
+            File('test/fixtures/riwaya_warsh_words_sample.json')
+                .readAsStringSync(),
           );
           await draw(
-            'warsh_fatiha',
-            'ورش: الفاتحة بنص ورش وخطه (بلا سطر بسملة)',
+            'warsh_hud_71_88',
+            'ورش: هود ٧١–٨٨ على صفحتي ورش ٢٣٠–٢٣١ وسطورهما',
             riwayaPassage(
               data: data,
               fontFamily: 'KFGQPC_warsh',
-              range: surah(1).sublist(0, 7),
+              range: verses(11, 71, 88),
               surahs: surahs,
               options: const ShareOptions(divineNames: true),
             ),
@@ -178,9 +160,10 @@ void main() {
 body{font-family:system-ui,sans-serif;background:#efe6d6;color:#1e1915;margin:16px}
 h1{font-size:22px}h2{font-size:17px;margin:28px 0 8px}
 .row{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+.m{margin:0 0 8px;color:#7a4a26}
 .row img{height:420px;box-shadow:0 1px 6px #0003;border-radius:4px}
 </style></head><body>
-<h1>مشاركة الآيات صورة: عينات (1536×2048)</h1>
+<h1>مشاركة الآيات صورة: صورة لكل صفحة من مصحف المدينة (١٤٤١) بسطورها</h1>
 $html
 </body></html>
 ''');
