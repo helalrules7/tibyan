@@ -1696,8 +1696,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareImageFailed => 'تعذر تجهيز الصورة';
 
   @override
-  String get shareVerseCredit =>
-      'نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان';
+  String get shareVerseCredit => 'نص القرآن: tanzil.net';
 
   @override
   String get backupTitle => 'النسخ الاحتياطي';

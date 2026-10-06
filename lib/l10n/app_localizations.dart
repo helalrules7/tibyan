@@ -2998,7 +2998,7 @@ abstract class AppLocalizations {
   /// No description provided for @shareVerseCredit.
   ///
   /// In ar, this message translates to:
-  /// **'نص القرآن الكريم: مشروع تنزيل (tanzil.net) · تطبيق تبيان'**
+  /// **'نص القرآن: tanzil.net'**
   String get shareVerseCredit;
 
   /// No description provided for @backupTitle.

@@ -58,15 +58,16 @@ void main() {
     expect(out, contains('[S2 1]'));
   });
 
-  test('a link to the first verse comes before the credit', () {
+  test('the shared text: verses, reference, one credit line, no link', () {
     final out = composeVerseText(
-      verses: [_ayah(2, 255, 'x')],
-      surahLabel: (s) => 'S$s',
+      verses: [_ayah(4, 123, 'لَّيْسَ')],
+      surahLabel: (s) => 'سورة النساء',
       digits: (n) => '$n',
-      range: (s, a, b) => '$s $a-$b',
-      credit: 'credit',
-      link: 'tibyan://verse?s=2&a=255',
+      range: (s, a, b) => '$s $a–$b',
+      credit: 'نص القرآن: tanzil.net',
     );
-    expect(out, endsWith('[S2 255]\ntibyan://verse?s=2&a=255\n\ncredit'));
+    expect(out, 'لَّيْسَ ﴿123﴾\n[سورة النساء 123]\n\nنص القرآن: tanzil.net');
+    expect(out, isNot(contains('tibyan://')));
+    expect('نص القرآن'.allMatches(out).length, 1);
   });
 }

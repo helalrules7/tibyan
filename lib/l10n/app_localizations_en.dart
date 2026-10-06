@@ -1703,8 +1703,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareImageFailed => 'Could not prepare the image';
 
   @override
-  String get shareVerseCredit =>
-      'Quran text: Tanzil Project (tanzil.net) · Tibyan app';
+  String get shareVerseCredit => 'Quran text: tanzil.net';
 
   @override
   String get backupTitle => 'Backup';

@@ -45,7 +45,6 @@ import '../data/verse_share.dart';
 import '../../reading/under_verse.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
-import 'navigation.dart';
 import 'page_spreads.dart';
 import 'widgets/art_frame.dart';
 import 'widgets/fasil_sheet.dart';
@@ -1611,7 +1610,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       digits: NumberFormatter(Localizations.localeOf(context)).call,
       range: (s, a, b) => l.verseRange(s, a, b),
       credit: l.shareVerseCredit,
-      link: verseLink(range.first.surah, range.first.ayah).toString(),
     );
   }
 

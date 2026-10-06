@@ -4,7 +4,8 @@ import '../../../core/db/content_database.dart';
 ///
 /// It is Tanzil's Uthmani text, verbatim (its licence forbids changing
 /// it), the verse numbers in ornate brackets, a reference line per surah
-/// and Tanzil's credit. Where a verse opens with the basmala in the file
+/// and Tanzil's credit as one short line (its licence asks for the source
+/// with a link to tanzil.net), written once, as given. Where a verse opens with the basmala in the file
 /// (every surah but al-Fatiha and at-Tawba), the basmala is left out: it is
 /// not part of the verse.
 String composeVerseText({
@@ -13,7 +14,6 @@ String composeVerseText({
   required String Function(int n) digits,
   required String Function(String surah, String from, String to) range,
   required String credit,
-  String? link,
 }) {
   final out = StringBuffer();
   var i = 0;
@@ -38,8 +38,6 @@ String composeVerseText({
     );
     i = j;
   }
-  // The link opens the first verse in Tibyan.
-  if (link != null) out.write('\n$link');
   out
     ..write('\n\n')
     ..write(credit);
