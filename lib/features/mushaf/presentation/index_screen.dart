@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/content_database.dart';
+import '../../../core/router/keyboard_dismiss.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
@@ -91,6 +92,8 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
         appBar: AppBar(
           title: Text(l.indexTitle),
           bottom: TabBar(
+            // The surahs' search field is left behind: its keyboard goes.
+            onTap: (_) => dismissKeyboard(),
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             tabs: [
@@ -104,45 +107,47 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
         ),
         body: surahs == null
             ? Center(child: Text(l.loadingLabel))
-            : TabBarView(
-                children: [
-                  _surahTab(context, surahs),
-                  _StartsTab(
-                    surahs: surahs,
-                    // A riwaya edition: its own juz starts (KFGQPC).
-                    starts: riwaya != null
-                        ? [for (final v in riwaya.juzStarts()) riwaya.row(v)]
-                        : ref
-                              .watch(juzStartsProvider)
-                              .value
-                              ?.map((j) => j.ayah)
-                              .toList(),
-                    current: widget.juz,
-                    title: (n) => l.juzLabel('$n'),
-                  ),
-                  // The riwayat's hizb divisions are not in their sources.
-                  if (riwaya != null)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Text(
-                          riwaya.hasWordBoxes
-                              ? l.riwayaGaps
-                              : '${l.riwayaGaps}\n\n${l.riwayaNoWordBoxes}',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    )
-                  else
+            : DismissKeyboardOnSwipe(
+                child: TabBarView(
+                  children: [
+                    _surahTab(context, surahs),
                     _StartsTab(
                       surahs: surahs,
-                      starts: ref.watch(hizbStartsProvider).value,
-                      current: widget.hizb,
-                      title: (n) => l.hizbLabel('$n'),
+                      // A riwaya edition: its own juz starts (KFGQPC).
+                      starts: riwaya != null
+                          ? [for (final v in riwaya.juzStarts()) riwaya.row(v)]
+                          : ref
+                                .watch(juzStartsProvider)
+                                .value
+                                ?.map((j) => j.ayah)
+                                .toList(),
+                      current: widget.juz,
+                      title: (n) => l.juzLabel('$n'),
                     ),
-                  _PagesTab(current: widget.page),
-                  _MarksTab(surahs: surahs),
-                ],
+                    // The riwayat's hizb divisions are not in their sources.
+                    if (riwaya != null)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Text(
+                            riwaya.hasWordBoxes
+                                ? l.riwayaGaps
+                                : '${l.riwayaGaps}\n\n${l.riwayaNoWordBoxes}',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    else
+                      _StartsTab(
+                        surahs: surahs,
+                        starts: ref.watch(hizbStartsProvider).value,
+                        current: widget.hizb,
+                        title: (n) => l.hizbLabel('$n'),
+                      ),
+                    _PagesTab(current: widget.page),
+                    _MarksTab(surahs: surahs),
+                  ],
+                ),
               ),
       ),
     );

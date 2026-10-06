@@ -29,7 +29,9 @@ class _GoToPageDialog extends StatefulWidget {
 }
 
 class _GoToPageDialogState extends State<_GoToPageDialog> {
-  late final _field = TextEditingController(text: '${widget.current}');
+  /// Digits as the interface writes them: Arabic-Indic in Arabic.
+  late final _digits = NumberFormatter(Localizations.localeOf(context));
+  late final _field = TextEditingController(text: _digits(widget.current));
 
   @override
   void dispose() {
@@ -38,17 +40,13 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
   }
 
   int? get _value {
-    final latin = _field.text.trim().replaceAllMapped(
-      RegExp('[٠-٩]'),
-      (m) => '${m[0]!.codeUnitAt(0) - 0x0660}',
-    );
-    final n = int.tryParse(latin);
+    final n = int.tryParse(latinDigits(_field.text.trim()));
     return n != null && n >= 1 && n <= widget.max ? n : null;
   }
 
   void _step(int by) {
     final n = ((_value ?? widget.current) + by).clamp(1, widget.max);
-    setState(() => _field.text = '$n');
+    setState(() => _field.text = _digits(n));
   }
 
   @override
@@ -75,9 +73,18 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
               controller: _field,
               autofocus: true,
               textAlign: TextAlign.center,
+              // Digits only, typed in either set, shown in the
+              // interface's own.
               keyboardType: TextInputType.number,
+              autocorrect: false,
+              enableSuggestions: false,
+              textInputAction: TextInputAction.go,
               inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('[0-9٠-٩]')),
+                FilteringTextInputFormatter.allow(RegExp('[0-9٠-٩۰-۹]')),
+                LengthLimitingTextInputFormatter('${widget.max}'.length),
+                AppDigitsFormatter(
+                  arabic: Localizations.localeOf(context).languageCode == 'ar',
+                ),
               ],
               style: TextStyle(
                 fontSize: 26,
@@ -118,5 +125,37 @@ class _GoToPageDialogState extends State<_GoToPageDialog> {
         ),
       ],
     );
+  }
+}
+
+/// [text] with Arabic-Indic (and Persian) digits as Western ones.
+String latinDigits(String text) =>
+    text.replaceAllMapped(RegExp('[٠-٩۰-۹]'), (m) {
+      final c = m[0]!.codeUnitAt(0);
+      return '${c - (c >= 0x06F0 ? 0x06F0 : 0x0660)}';
+    });
+
+/// Writes the digits typed, in either set, as the interface writes them:
+/// Arabic-Indic when [arabic], Western otherwise.
+class AppDigitsFormatter extends TextInputFormatter {
+  AppDigitsFormatter({required this.arabic});
+
+  final bool arabic;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final latin = latinDigits(newValue.text);
+    final text = arabic
+        ? latin.replaceAllMapped(
+            RegExp('[0-9]'),
+            (m) => String.fromCharCode(0x0660 + int.parse(m[0]!)),
+          )
+        : latin;
+    if (text == newValue.text) return newValue;
+    // One character for one: the selection stays where it was.
+    return newValue.copyWith(text: text);
   }
 }
