@@ -860,7 +860,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String continueReadingAt(String surah, String ayah, String page) {
-    return '$surah · الآية $ayah · صفحة $page';
+    return '$surah | الآية $ayah · صفحة $page';
   }
 
   @override
@@ -1167,7 +1167,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String journalVerseRef(String surah, String ayah) {
-    return 'سورة $surah · آية $ayah';
+    return 'سورة $surah | آية $ayah';
   }
 
   @override

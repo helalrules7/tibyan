@@ -1565,7 +1565,7 @@ abstract class AppLocalizations {
   /// No description provided for @continueReadingAt.
   ///
   /// In ar, this message translates to:
-  /// **'{surah} · الآية {ayah} · صفحة {page}'**
+  /// **'{surah} | الآية {ayah} · صفحة {page}'**
   String continueReadingAt(String surah, String ayah, String page);
 
   /// No description provided for @openLabel.
@@ -2093,7 +2093,7 @@ abstract class AppLocalizations {
   /// No description provided for @journalVerseRef.
   ///
   /// In ar, this message translates to:
-  /// **'سورة {surah} · آية {ayah}'**
+  /// **'سورة {surah} | آية {ayah}'**
   String journalVerseRef(String surah, String ayah);
 
   /// No description provided for @journalSaved.

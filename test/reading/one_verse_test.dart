@@ -109,11 +109,11 @@ void main() {
       'DeviceOrientation.landscapeLeft',
       'DeviceOrientation.landscapeRight',
     ]);
-    expect(find.text('سورة الفاتحة · ٢'), findsOneWidget);
+    expect(find.text('سورة الفاتحة | ٢'), findsOneWidget);
 
     await tester.tap(find.byTooltip('الآية التالية'));
     await settle();
-    expect(find.text('سورة الفاتحة · ٣'), findsOneWidget);
+    expect(find.text('سورة الفاتحة | ٣'), findsOneWidget);
   });
 
   testWidgets('auto-turn moves on by itself after the chosen seconds', (
@@ -130,7 +130,7 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 100));
     }
-    expect(find.text('سورة الفاتحة · ٢'), findsOneWidget);
+    expect(find.text('سورة الفاتحة | ٢'), findsOneWidget);
     await tester.pump(const Duration(seconds: 11));
     for (var i = 0; i < 6; i++) {
       await tester.runAsync(
@@ -138,6 +138,6 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 100));
     }
-    expect(find.text('سورة الفاتحة · ٣'), findsOneWidget);
+    expect(find.text('سورة الفاتحة | ٣'), findsOneWidget);
   });
 }

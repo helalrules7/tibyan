@@ -636,7 +636,7 @@
   "searchHistory": "عمليات البحث السابقة",
   "searchClearHistory": "مسح",
   "continueReading": "متابعة القراءة",
-  "continueReadingAt": "{surah} · الآية {ayah} · صفحة {page}",
+  "continueReadingAt": "{surah} | الآية {ayah} · صفحة {page}",
   "@continueReadingAt": {
     "placeholders": {
       "surah": {
@@ -877,7 +877,7 @@
   "journalHint": "اكتب ملاحظتك على الآية",
   "journalEdit": "تعديل",
   "journalOpenVerse": "افتح الآية",
-  "journalVerseRef": "سورة {surah} · آية {ayah}",
+  "journalVerseRef": "سورة {surah} | آية {ayah}",
   "@journalVerseRef": {
     "placeholders": {
       "surah": {

@@ -324,7 +324,7 @@ class _VersePage extends ConsumerWidget {
                   child: Column(
                     children: [
                       Text(
-                        '${l.surahWord(name)} · ${digits(row.number)}',
+                        '${l.surahWord(name)} | ${digits(row.number)}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 24,

@@ -488,7 +488,7 @@
   "searchHistory": "Recent searches",
   "searchClearHistory": "Clear",
   "continueReading": "Continue reading",
-  "continueReadingAt": "{surah} · verse {ayah} · page {page}",
+  "continueReadingAt": "{surah} | verse {ayah} · page {page}",
   "@continueReadingAt": {
     "placeholders": {
       "surah": {
@@ -599,7 +599,7 @@
   "journalHint": "Write your note on the verse",
   "journalEdit": "Edit",
   "journalOpenVerse": "Open the verse",
-  "journalVerseRef": "{surah} · verse {ayah}",
+  "journalVerseRef": "{surah} | verse {ayah}",
   "journalSaved": "Note saved",
   "journalEarlier": "Your notes on this verse",
   "elderlyMode": "Elderly mode",

@@ -45,13 +45,13 @@ class PlayerBar extends ConsumerWidget {
     // its source's credit line under it while it plays.
     final where = clip != null
         ? clip.kind == VerseAudioKind.translation
-              ? '${l.surahWord(surah)} · ${l.clipTranslationOf(digits(clip.ayah))}'
+              ? '${l.surahWord(surah)} | ${l.clipTranslationOf(digits(clip.ayah))}'
               : clip.wholeSurah
               ? '${clip.title(lang)} · ${l.surahWord(surah)}'
-              : '${clip.title(lang)} · ${l.surahWord(surah)} · ${digits(clip.ayah)}'
+              : '${clip.title(lang)} · ${l.surahWord(surah)} | ${digits(clip.ayah)}'
         : s.ayah == null
         ? l.surahWord(surah)
-        : '${l.surahWord(surah)} · ${digits(s.ayah!)}';
+        : '${l.surahWord(surah)} | ${digits(s.ayah!)}';
     final repeating = s.timed && s.repeat != 1;
     // Verses go right to left in Arabic: "previous" points right there.
     final rtl = Directionality.of(context) == TextDirection.rtl;

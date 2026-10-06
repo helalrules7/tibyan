@@ -291,7 +291,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             ? l.surahWord(
                                 surahName(context, surahs[ref0.surah - 1]),
                               )
-                            : '${l.surahWord(surahName(context, surahs[ref0.surah - 1]))} · ${digits(ref0.ayah!)}',
+                            : '${l.surahWord(surahName(context, surahs[ref0.surah - 1]))} | ${digits(ref0.ayah!)}',
                       ),
                       subtitle: Text(l.searchGoTo),
                       onTap: () {
@@ -369,7 +369,7 @@ class _Result extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                '${l.surahWord(name)} · ${digits(hit.ayah)}',
+                '${l.surahWord(name)} | ${digits(hit.ayah)}',
                 semanticsLabel: l.verseLabel(name, digits(hit.ayah)),
                 style: TextStyle(
                   fontWeight: FontWeight.w700,

@@ -33,7 +33,7 @@ class VerseBar extends StatelessWidget {
               child: Semantics(
                 liveRegion: true,
                 child: Text(
-                  '${l.surahWord(name)} · ${l.verseSelected('${verse.ayah}')}',
+                  '${l.surahWord(name)} | ${l.verseSelected('${verse.ayah}')}',
                   style: TextStyle(
                     color: t.playerFg,
                     fontWeight: FontWeight.w600,
