@@ -363,6 +363,30 @@ class MarkerLook {
   /// frame, or their own colours when null.
   final (Color, Color)? artTint;
 
+  /// Paper over the printed marker at [c] (radius [r]: half its box's
+  /// shorter side). The printed marker reaches its box's sides (the 1405
+  /// marker's side ornaments, the Shamarly ring), so where its box is
+  /// wider than tall (a page stretched across) a circle leaves their ends
+  /// showing beside the new marker: the box's own oval, kept inside the
+  /// box so the words around keep their ink, covers them.
+  void _cover(Canvas canvas, Offset c, double r, Rect? printed) {
+    final paint = Paint()..color = paper;
+    canvas.drawCircle(c, r * 1.12, paint);
+    if (printed == null) return;
+    canvas
+      ..save()
+      ..clipRect(printed.inflate(printed.shortestSide * 0.04))
+      ..drawOval(
+        Rect.fromCenter(
+          center: printed.center,
+          width: printed.width * 1.12,
+          height: printed.height * 1.12,
+        ),
+        paint,
+      )
+      ..restore();
+  }
+
   /// Under the page ink: a tint that shows inside the printed marker.
   void paintUnder(Canvas canvas, Offset c, double r) {
     if (tint == null || image != null || art != null) return;
@@ -375,20 +399,22 @@ class MarkerLook {
 
   /// Over the page ink: a rosette with the verse number, covering the
   /// printed marker.
-  /// [marked] fills the centre with a mark's colour.
+  /// [marked] fills the centre with a mark's colour. [printed] is the
+  /// printed marker's box on screen, where the page image has one.
   void paintOver(
     Canvas canvas,
     Offset c,
     double r,
     int number, {
     Color? marked,
+    Rect? printed,
   }) {
     final art = this.art;
     if (art != null) {
       // The printed marker goes under the paper (the new edition leaves it
       // out; the page images have it), then the theme's marker with the
       // number in its number box.
-      canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
+      _cover(canvas, c, r, printed);
       paintArtMarker(
         canvas,
         art,
@@ -401,7 +427,7 @@ class MarkerLook {
     }
     final img = image;
     if (img == null) return;
-    canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
+    _cover(canvas, c, r, printed);
     final size = r * 2.7;
     canvas.drawImageRect(
       img,

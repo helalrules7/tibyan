@@ -995,7 +995,14 @@ class _ImagePagePainter extends CustomPainter {
       canvas.drawImageRect(image, r, layout.toScreenRect(r), tint);
     }
     for (final (r, n, marked) in markers) {
-      look?.paintOver(canvas, r.center, r.shortestSide / 2, n, marked: marked);
+      look?.paintOver(
+        canvas,
+        r.center,
+        r.shortestSide / 2,
+        n,
+        marked: marked,
+        printed: r,
+      );
     }
     if (hidden.isNotEmpty) {
       final cover = Paint()..color = paper;
@@ -1023,6 +1030,7 @@ class _ImagePagePainter extends CustomPainter {
           r.shortestSide / 2,
           n,
           marked: marked,
+          printed: r,
         );
       }
     }
