@@ -52,6 +52,7 @@ import 'widgets/mushaf_page.dart';
 import 'widgets/ornate_pages.dart';
 import 'widgets/old_mushaf_page.dart';
 import 'widgets/page_interaction.dart';
+import 'widgets/reading_bar.dart';
 import 'widgets/shamarly_page.dart';
 import 'widgets/tajweed_legend.dart';
 import 'widgets/verse_services.dart';
@@ -100,6 +101,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     with SingleTickerProviderStateMixin {
   PageController? _controller;
   int _page = 1;
+
+  /// The pager's index the reading bar shows while a page is being turned:
+  /// the bar follows [_page] only once the pager settles.
+  int? _barHold;
 
   /// Reading is immersive: no bars until the reader touches the page.
   bool _chrome = false;
@@ -222,6 +227,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     setState(() {
       _page = start;
       if (_selA != null) _pageA = _pageB = start;
+      _barHold = null;
       _controller = PageController(initialPage: _indexOf(start));
     });
     _trackPage();
@@ -255,6 +261,18 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     _vertical?.dispose();
     _controller?.dispose();
     super.dispose();
+  }
+
+  /// A turn starts: the reading bar keeps the page it shows until the
+  /// pager comes to rest, then takes the page settled on.
+  bool _onPagerScroll(ScrollNotification n) {
+    if (n.depth != 0) return false;
+    if (n is ScrollStartNotification) {
+      _barHold ??= _indexOf(_page);
+    } else if (n is ScrollEndNotification && _barHold != null) {
+      setState(() => _barHold = null);
+    }
+    return false;
   }
 
   /// The pager turned to [index] (a page, or a spread).
@@ -333,6 +351,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final old = _controller;
     setState(() {
       _spread = on;
+      _barHold = null;
       _controller = PageController(initialPage: _indexOf(page));
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => old?.dispose());
@@ -407,6 +426,31 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             paper: t.paper,
             ink: t.ink,
             artTint: t.artTint,
+          );
+
+    // Elderly mode: no small icon-only tools on the page; the same tools
+    // are labelled buttons in the bottom bar.
+    final tools = context.tokens.elderly
+        ? null
+        : _ReadingTools(
+            touchReading: _touchReading,
+            onTouchReading: _toggleTouchReading,
+            listening: recitation.active,
+            onListen: _listenFromPage,
+            recite: _recite || _testing,
+            onRecite: () => _testing
+                ? _closeTest()
+                : _recite
+                ? setState(() {
+                    _recite = false;
+                    _revealed.clear();
+                  })
+                : _startRecite(),
+            tajweed: editionHasTajweed(edition) ? settings.tajweedColors : null,
+            onTajweed: () => ref
+                .read(settingsProvider.notifier)
+                .setTajweedColors(!settings.tajweedColors),
+            onTajweedLegend: () => showTajweedLegend(context),
           );
 
     Widget pageOf(int pg) {
@@ -545,32 +589,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             ? ref.watch(tajweedPageProvider(pg)).value ?? ''
             : '',
       );
-      // Elderly mode: no small icon-only tools on the page; the same tools
-      // are labelled buttons in the bottom bar.
-      final tools = context.tokens.elderly
-          ? null
-          : _ReadingTools(
-              touchReading: _touchReading,
-              onTouchReading: _toggleTouchReading,
-              listening: recitation.active,
-              onListen: _listenFromPage,
-              recite: _recite || _testing,
-              onRecite: () => _testing
-                  ? _closeTest()
-                  : _recite
-                  ? setState(() {
-                      _recite = false;
-                      _revealed.clear();
-                    })
-                  : _startRecite(),
-              tajweed: editionHasTajweed(edition)
-                  ? settings.tajweedColors
-                  : null,
-              onTajweed: () => ref
-                  .read(settingsProvider.notifier)
-                  .setTajweedColors(!settings.tajweedColors),
-              onTajweedLegend: () => showTajweedLegend(context),
-            );
       final pageBody = switch (edition) {
         MushafEdition.madina1405 => OldMushafPage(
           page: pg,
@@ -606,12 +624,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           child: OpeningPage(
             page: pg,
             surah: openingSurah,
-            // Recitation mode: the next page's first word would give it away.
-            catchword: _recite || _testing ? null : info?.catchword,
             onPageTap: _goToPage,
             onSurahTap: () => openIndex('surahs'),
             onSurahLongPress: () => _shareSurahImage(pg),
-            tools: tools,
             child: pageWidget,
           ),
         );
@@ -627,8 +642,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onSurahLongPress: () => _shareSurahImage(pg),
           onBannerLongPress: _shareSurah,
           onPageTap: _goToPage,
-          tools: tools,
-          showCatchword: !_recite && !_testing,
           linePadding: edition == MushafEdition.shamarly
               ? shamarlyLinePadding
               : null,
@@ -638,6 +651,41 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     }
 
     Widget pageAt(int i) => pageOf(i + _first);
+
+    bool isCover(int pg) =>
+        pg == 0 || (edition == MushafEdition.shamarly && pg == 1);
+
+    /// The strip under the pages, for the page (or spread) the pager has
+    /// settled on: it does not change while a page is being turned.
+    Widget readingBar() {
+      final pages = _pagesAt(_barHold ?? _indexOf(_page));
+      final cover = pages.every(isCover);
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        // Laid out as the mushaf is: the quarter on the right, the next
+        // page's first word on the left.
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: ReadingBar.of(
+            [
+              for (final pg in pages)
+                isCover(pg) ? null : ref.watch(frameInfoProvider(pg)).value,
+            ],
+            key: const ValueKey('reading-bar'),
+            page: pages.last,
+            // Recitation mode: the next page's first word would give it away.
+            showCatchword: !_recite && !_testing,
+            coverCatchword: cover
+                ? (ref.watch(basmalaProvider).value ?? '')
+                      .split(' ')
+                      .take(2)
+                      .join(' ')
+                : null,
+            tools: cover ? null : tools,
+          ),
+        ),
+      );
+    }
 
     final scrubbing = _scrubPage ?? _page;
     final range = _range();
@@ -686,64 +734,89 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                                 semanticsLabel: l.loadingLabel,
                               ),
                             )
-                          // The mushaf opens from the right in every interface language.
-                          : Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: LayoutBuilder(
-                                builder: (context, box) {
-                                  // A wide screen held sideways shows two
-                                  // pages; not in a hifz test, which is one
-                                  // page at a time.
-                                  final spread =
-                                      settings.twoPageSpread &&
-                                      !_testing &&
-                                      box.maxWidth > box.maxHeight &&
-                                      box.maxWidth >= 800;
-                                  if (spread != _spread) {
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback(
-                                          (_) => _setSpread(spread),
-                                        );
-                                  }
-                                  // A mouse and a trackpad drag the pages
-                                  // like a finger; the wheel turns them.
-                                  return Listener(
-                                    onPointerSignal: _onWheel,
-                                    child: ScrollConfiguration(
-                                      behavior: ScrollConfiguration.of(context)
-                                          .copyWith(
-                                            dragDevices: PointerDeviceKind
-                                                .values
-                                                .toSet(),
+                          // The pages turn under one reading bar, which
+                          // stays put.
+                          : Column(
+                              children: [
+                                Expanded(
+                                  child: NotificationListener<ScrollNotification>(
+                                    onNotification: _onPagerScroll,
+                                    child:
+                                        // The mushaf opens from the right in every interface language.
+                                        Directionality(
+                                          textDirection: TextDirection.rtl,
+                                          child: LayoutBuilder(
+                                            builder: (context, box) {
+                                              // A wide screen held sideways shows two
+                                              // pages; not in a hifz test, which is one
+                                              // page at a time.
+                                              final spread =
+                                                  settings.twoPageSpread &&
+                                                  !_testing &&
+                                                  box.maxWidth >
+                                                      box.maxHeight &&
+                                                  box.maxWidth >= 800;
+                                              if (spread != _spread) {
+                                                WidgetsBinding.instance
+                                                    .addPostFrameCallback(
+                                                      (_) => _setSpread(spread),
+                                                    );
+                                              }
+                                              // A mouse and a trackpad drag the pages
+                                              // like a finger; the wheel turns them.
+                                              return Listener(
+                                                onPointerSignal: _onWheel,
+                                                child: ScrollConfiguration(
+                                                  behavior:
+                                                      ScrollConfiguration.of(
+                                                        context,
+                                                      ).copyWith(
+                                                        dragDevices:
+                                                            PointerDeviceKind
+                                                                .values
+                                                                .toSet(),
+                                                      ),
+                                                  child: PageView.builder(
+                                                    controller: _controller,
+                                                    itemCount: _spreads.count,
+                                                    // The pages either side are built and their images
+                                                    // decoded before they are turned to, so a page turn
+                                                    // does not stop on a spinner.
+                                                    allowImplicitScrolling:
+                                                        true,
+                                                    onPageChanged:
+                                                        _onPageChanged,
+                                                    itemBuilder: (context, i) {
+                                                      final pages = _pagesAt(i);
+                                                      if (pages.length == 1) {
+                                                        return pageOf(
+                                                          pages.single,
+                                                        );
+                                                      }
+                                                      // Right page first: the mushaf opens
+                                                      // from the right.
+                                                      return Row(
+                                                        textDirection:
+                                                            TextDirection.rtl,
+                                                        children: [
+                                                          for (final pg
+                                                              in pages)
+                                                            Expanded(
+                                                              child: pageOf(pg),
+                                                            ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                           ),
-                                      child: PageView.builder(
-                                        controller: _controller,
-                                        itemCount: _spreads.count,
-                                        // The pages either side are built and their images
-                                        // decoded before they are turned to, so a page turn
-                                        // does not stop on a spinner.
-                                        allowImplicitScrolling: true,
-                                        onPageChanged: _onPageChanged,
-                                        itemBuilder: (context, i) {
-                                          final pages = _pagesAt(i);
-                                          if (pages.length == 1) {
-                                            return pageOf(pages.single);
-                                          }
-                                          // Right page first: the mushaf opens
-                                          // from the right.
-                                          return Row(
-                                            textDirection: TextDirection.rtl,
-                                            children: [
-                                              for (final pg in pages)
-                                                Expanded(child: pageOf(pg)),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
+                                        ),
+                                  ),
+                                ),
+                                if (!_autoScroll) readingBar(),
+                              ],
                             ),
                     ),
                   ),
@@ -1603,6 +1676,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final page = _page;
     setState(() {
       _autoScroll = false;
+      _barHold = null;
       _controller?.dispose();
       _controller = PageController(initialPage: _indexOf(page));
     });
