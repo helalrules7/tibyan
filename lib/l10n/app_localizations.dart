@@ -3600,6 +3600,138 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'قُرئ {read} من {total}'**
   String pagesMapJuzRead(String read, String total);
+
+  /// No description provided for @focusModeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع التركيز'**
+  String get focusModeTitle;
+
+  /// No description provided for @focusModeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة وحدها بلا إطار ولا شيء تحتها، وشريط رفيع في الأعلى'**
+  String get focusModeHint;
+
+  /// No description provided for @focusToolsLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إظهار الأدوات'**
+  String get focusToolsLabel;
+
+  /// No description provided for @focusToolsButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'الزرار البسيط'**
+  String get focusToolsButton;
+
+  /// No description provided for @focusToolsButtonHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثلاثة أزرار صغيرة في الشريط العلوي'**
+  String get focusToolsButtonHint;
+
+  /// No description provided for @focusToolsMenu.
+  ///
+  /// In ar, this message translates to:
+  /// **'القائمة'**
+  String get focusToolsMenu;
+
+  /// No description provided for @focusToolsMenuHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضغطة مطولة على الصفحة تفتح نافذة فيها كل الأدوات'**
+  String get focusToolsMenuHint;
+
+  /// No description provided for @pageFillLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملء الشاشة'**
+  String get pageFillLabel;
+
+  /// No description provided for @pageFillLines.
+  ///
+  /// In ar, this message translates to:
+  /// **'توزيع السطور'**
+  String get pageFillLines;
+
+  /// No description provided for @pageFillLinesHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل سطر بعرض الشاشة، والسطور موزعة على طولها'**
+  String get pageFillLinesHint;
+
+  /// No description provided for @pageFillStretch.
+  ///
+  /// In ar, this message translates to:
+  /// **'توزيع + مط خفيف'**
+  String get pageFillStretch;
+
+  /// No description provided for @pageFillStretchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ومط أفقي حتى ١٢٪ حيث تملأ الصفحة الطول'**
+  String get pageFillStretchHint;
+
+  /// No description provided for @pageFillFull.
+  ///
+  /// In ar, this message translates to:
+  /// **'مط كامل'**
+  String get pageFillFull;
+
+  /// No description provided for @pageFillFullHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تملأ الصفحة الشاشة طولا وعرضا، ويتغير بذلك شكل الحروف'**
+  String get pageFillFullHint;
+
+  /// No description provided for @playerStyleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكل المشغل'**
+  String get playerStyleLabel;
+
+  /// No description provided for @playerStyleAuto.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلقائي'**
+  String get playerStyleAuto;
+
+  /// No description provided for @playerStyleAutoHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'العادي في القراءة، وشكل وضع التركيز مع وضع التركيز'**
+  String get playerStyleAutoHint;
+
+  /// No description provided for @playerStyleNormal.
+  ///
+  /// In ar, this message translates to:
+  /// **'العادي'**
+  String get playerStyleNormal;
+
+  /// No description provided for @playerStylePill.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع التركيز'**
+  String get playerStylePill;
+
+  /// No description provided for @playerStylePillHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'صغير وشفاف، فيه تشغيل وإعدادات وإغلاق'**
+  String get playerStylePillHint;
+
+  /// No description provided for @playerStyleButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'الزر الواحد'**
+  String get playerStyleButton;
+
+  /// No description provided for @playerStyleButtonHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'زر صغير: ضغطة للتشغيل والإيقاف، وضغطة مطولة للقائمة'**
+  String get playerStyleButtonHint;
 }
 
 class _AppLocalizationsDelegate

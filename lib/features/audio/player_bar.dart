@@ -339,6 +339,42 @@ class PlayerOptions extends ConsumerWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       children: [
+        // «شكل المشغل»: kept in the settings, for the mushaf with focus
+        // mode on or off.
+        if (!inSheet) ...[
+          Semantics(
+            header: true,
+            child: Text(l.playerStyleLabel, style: title),
+          ),
+          RadioGroup<PlayerStyle>(
+            groupValue: settings.playerStyle,
+            onChanged: (v) => v == null
+                ? null
+                : ref.read(settingsProvider.notifier).setPlayerStyle(v),
+            child: Column(
+              children: [
+                for (final (v, name, desc) in [
+                  (PlayerStyle.auto, l.playerStyleAuto, l.playerStyleAutoHint),
+                  (PlayerStyle.normal, l.playerStyleNormal, null),
+                  (PlayerStyle.pill, l.playerStylePill, l.playerStylePillHint),
+                  (
+                    PlayerStyle.button,
+                    l.playerStyleButton,
+                    l.playerStyleButtonHint,
+                  ),
+                ])
+                  RadioListTile<PlayerStyle>(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    value: v,
+                    title: Text(name),
+                    subtitle: desc == null ? null : Text(desc, style: hint),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         // A riwaya edition lists that riwaya's recitations only.
         Semantics(
           header: true,

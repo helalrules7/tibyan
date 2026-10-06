@@ -2063,4 +2063,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String pagesMapJuzRead(String read, String total) {
     return '$read of $total read';
   }
+
+  @override
+  String get focusModeTitle => 'Focus mode';
+
+  @override
+  String get focusModeHint =>
+      'The page alone, with no frame and nothing under it, and a thin bar at the top';
+
+  @override
+  String get focusToolsLabel => 'Showing the tools';
+
+  @override
+  String get focusToolsButton => 'Simple buttons';
+
+  @override
+  String get focusToolsButtonHint => 'Three small buttons in the top bar';
+
+  @override
+  String get focusToolsMenu => 'Menu';
+
+  @override
+  String get focusToolsMenuHint =>
+      'A long press on the page opens a window with every tool';
+
+  @override
+  String get pageFillLabel => 'Filling the screen';
+
+  @override
+  String get pageFillLines => 'Spread the lines';
+
+  @override
+  String get pageFillLinesHint =>
+      'Each line as wide as the screen, the lines spread over its height';
+
+  @override
+  String get pageFillStretch => 'Spread + slight stretch';
+
+  @override
+  String get pageFillStretchHint =>
+      'Plus up to 12% wider where the page fills the height';
+
+  @override
+  String get pageFillFull => 'Full stretch';
+
+  @override
+  String get pageFillFullHint =>
+      'The page fills the screen both ways, which changes the letters\' shape';
+
+  @override
+  String get playerStyleLabel => 'Player style';
+
+  @override
+  String get playerStyleAuto => 'Automatic';
+
+  @override
+  String get playerStyleAutoHint =>
+      'The normal player when reading, the focus player in focus mode';
+
+  @override
+  String get playerStyleNormal => 'Normal';
+
+  @override
+  String get playerStylePill => 'Focus';
+
+  @override
+  String get playerStylePillHint =>
+      'Small and see-through, with play, settings and close';
+
+  @override
+  String get playerStyleButton => 'Single button';
+
+  @override
+  String get playerStyleButtonHint =>
+      'A small button: tap to play or pause, long press for the menu';
 }

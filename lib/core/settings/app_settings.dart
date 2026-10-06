@@ -57,6 +57,23 @@ enum MarkerStyle { theme, traditional, rosette7, rosette9, rosette16 }
 /// Font of tafsir and translation texts.
 enum TafsirFont { naskh, interface }
 
+/// Focus mode: how the reading tools are reached. [button]: the top bar's
+/// three buttons; [menu]: a long press on the page opens a dialog with
+/// every tool, and the top bar keeps only the exit.
+enum FocusTools { button, menu }
+
+/// Focus mode: how the page fills the screen. [lines]: each line fills
+/// the width and the lines are spread over the height (the strip layouts);
+/// [stretch]: the same, plus up to 12% across where the page is fitted to
+/// the height (the image pages' `StripLayout.maxStretch`); [full]: the page is scaled on both
+/// axes to the room, which changes the letters' shape.
+enum PageFill { lines, stretch, full }
+
+/// «شكل المشغل»: the player over the mushaf. [auto]: the normal bar, and
+/// the pill in focus mode; [normal]: the bar everywhere; [pill]: the small
+/// floating pill everywhere; [button]: one small round button everywhere.
+enum PlayerStyle { auto, normal, pill, button }
+
 /// Colours offered for tinting verse-end markers (ARGB); null = none.
 const markerTints = <int>[
   0xFF1FA79B,
@@ -101,6 +118,11 @@ class AppSettings {
     this.elderlyMode = false,
     this.tajweedColors = false,
     this.tajweedHues = const {},
+    this.focusMode = false,
+    this.focusTools = FocusTools.button,
+    this.pageFill = PageFill.lines,
+    this.playerStyle = PlayerStyle.auto,
+    this.playerPosition,
   });
 
   final String styleId;
@@ -201,6 +223,31 @@ class AppSettings {
   /// (TajweedHue), or '' for no colour. Rules not listed use their default.
   final Map<String, String> tajweedHues;
 
+  /// «وضع التركيز»: the reading screen with nothing around the page.
+  final bool focusMode;
+
+  /// How focus mode's tools are reached.
+  final FocusTools focusTools;
+
+  /// How the page fills the screen in focus mode.
+  final PageFill pageFill;
+
+  /// How the player over the mushaf looks.
+  final PlayerStyle playerStyle;
+
+  /// Where the floating player (the pill or the single button) was left:
+  /// its centre as a fraction of the screen's width and height, so it is
+  /// kept on screen whatever its size; null for the default place.
+  final Offset? playerPosition;
+
+  /// The player style in effect: [PlayerStyle.auto] is the normal bar, or
+  /// the pill while focus mode is on.
+  PlayerStyle get effectivePlayerStyle => playerStyle != PlayerStyle.auto
+      ? playerStyle
+      : focusMode
+      ? PlayerStyle.pill
+      : PlayerStyle.normal;
+
   AppSettings copyWith({
     String? styleId,
     ModeSetting? mode,
@@ -234,6 +281,11 @@ class AppSettings {
     bool? elderlyMode,
     bool? tajweedColors,
     Map<String, String>? tajweedHues,
+    bool? focusMode,
+    FocusTools? focusTools,
+    PageFill? pageFill,
+    PlayerStyle? playerStyle,
+    Offset? Function()? playerPosition,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -267,6 +319,13 @@ class AppSettings {
     elderlyMode: elderlyMode ?? this.elderlyMode,
     tajweedColors: tajweedColors ?? this.tajweedColors,
     tajweedHues: tajweedHues ?? this.tajweedHues,
+    focusMode: focusMode ?? this.focusMode,
+    focusTools: focusTools ?? this.focusTools,
+    pageFill: pageFill ?? this.pageFill,
+    playerStyle: playerStyle ?? this.playerStyle,
+    playerPosition: playerPosition == null
+        ? this.playerPosition
+        : playerPosition(),
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

@@ -198,6 +198,9 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
+          _SectionTitle(l.focusModeTitle),
+          const _FocusModeCard(),
+          const SizedBox(height: 16),
           Card(
             child: ListTile(
               leading: const Icon(Icons.storage_outlined),
@@ -326,6 +329,83 @@ Future<void> _import(BuildContext context, WidgetRef ref) async {
     messenger.showSnackBar(SnackBar(content: Text(l.backupInvalid)));
   } catch (_) {
     messenger.showSnackBar(SnackBar(content: Text(l.backupFailed)));
+  }
+}
+
+/// «وضع التركيز»: the switch, how the tools are reached, and how the page
+/// fills the screen.
+class _FocusModeCard extends ConsumerWidget {
+  const _FocusModeCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
+    final muted = TextStyle(color: context.tokens.colors.muted);
+    Widget label(String text) => Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
+      ),
+    );
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: const Icon(Icons.fullscreen),
+            title: Text(l.focusModeTitle),
+            subtitle: Text(l.focusModeHint, style: muted),
+            value: settings.focusMode,
+            onChanged: controller.setFocusMode,
+          ),
+          const Divider(height: 1),
+          label(l.focusToolsLabel),
+          RadioGroup<FocusTools>(
+            groupValue: settings.focusTools,
+            onChanged: (v) => v == null ? null : controller.setFocusTools(v),
+            child: Column(
+              children: [
+                for (final (v, name, hint) in [
+                  (
+                    FocusTools.button,
+                    l.focusToolsButton,
+                    l.focusToolsButtonHint,
+                  ),
+                  (FocusTools.menu, l.focusToolsMenu, l.focusToolsMenuHint),
+                ])
+                  RadioListTile(
+                    value: v,
+                    title: Text(name),
+                    subtitle: Text(hint, style: muted),
+                  ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          label(l.pageFillLabel),
+          RadioGroup<PageFill>(
+            groupValue: settings.pageFill,
+            onChanged: (v) => v == null ? null : controller.setPageFill(v),
+            child: Column(
+              children: [
+                for (final (v, name, hint) in [
+                  (PageFill.lines, l.pageFillLines, l.pageFillLinesHint),
+                  (PageFill.stretch, l.pageFillStretch, l.pageFillStretchHint),
+                  (PageFill.full, l.pageFillFull, l.pageFillFullHint),
+                ])
+                  RadioListTile(
+                    value: v,
+                    title: Text(name),
+                    subtitle: Text(hint, style: muted),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

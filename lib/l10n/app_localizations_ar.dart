@@ -2052,4 +2052,75 @@ class AppLocalizationsAr extends AppLocalizations {
   String pagesMapJuzRead(String read, String total) {
     return 'قُرئ $read من $total';
   }
+
+  @override
+  String get focusModeTitle => 'وضع التركيز';
+
+  @override
+  String get focusModeHint =>
+      'الصفحة وحدها بلا إطار ولا شيء تحتها، وشريط رفيع في الأعلى';
+
+  @override
+  String get focusToolsLabel => 'إظهار الأدوات';
+
+  @override
+  String get focusToolsButton => 'الزرار البسيط';
+
+  @override
+  String get focusToolsButtonHint => 'ثلاثة أزرار صغيرة في الشريط العلوي';
+
+  @override
+  String get focusToolsMenu => 'القائمة';
+
+  @override
+  String get focusToolsMenuHint =>
+      'ضغطة مطولة على الصفحة تفتح نافذة فيها كل الأدوات';
+
+  @override
+  String get pageFillLabel => 'ملء الشاشة';
+
+  @override
+  String get pageFillLines => 'توزيع السطور';
+
+  @override
+  String get pageFillLinesHint => 'كل سطر بعرض الشاشة، والسطور موزعة على طولها';
+
+  @override
+  String get pageFillStretch => 'توزيع + مط خفيف';
+
+  @override
+  String get pageFillStretchHint => 'ومط أفقي حتى ١٢٪ حيث تملأ الصفحة الطول';
+
+  @override
+  String get pageFillFull => 'مط كامل';
+
+  @override
+  String get pageFillFullHint =>
+      'تملأ الصفحة الشاشة طولا وعرضا، ويتغير بذلك شكل الحروف';
+
+  @override
+  String get playerStyleLabel => 'شكل المشغل';
+
+  @override
+  String get playerStyleAuto => 'تلقائي';
+
+  @override
+  String get playerStyleAutoHint =>
+      'العادي في القراءة، وشكل وضع التركيز مع وضع التركيز';
+
+  @override
+  String get playerStyleNormal => 'العادي';
+
+  @override
+  String get playerStylePill => 'وضع التركيز';
+
+  @override
+  String get playerStylePillHint => 'صغير وشفاف، فيه تشغيل وإعدادات وإغلاق';
+
+  @override
+  String get playerStyleButton => 'الزر الواحد';
+
+  @override
+  String get playerStyleButtonHint =>
+      'زر صغير: ضغطة للتشغيل والإيقاف، وضغطة مطولة للقائمة';
 }
