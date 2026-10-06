@@ -20,6 +20,7 @@ import 'package:tibyan/features/audio/player_bar.dart';
 import 'package:tibyan/features/audio/recitation.dart';
 import 'package:tibyan/features/home/whats_new.dart';
 import 'package:tibyan/features/mushaf/mushaf_providers.dart';
+import 'package:tibyan/features/mushaf/presentation/index_screen.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/illuminated_frame.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/mushaf_page.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/ornate_pages.dart';
@@ -364,6 +365,34 @@ void main() {
     await settle(tester);
     expect(find.byKey(const ValueKey('focus-tools')), findsOneWidget);
     expect(find.byType(ReadingBar), findsOneWidget);
+  });
+
+  testWidgets('the bar\'s surah and hizb open the index; its page number, '
+      'going to a page', (tester) async {
+    await start(tester);
+    await settle(tester, find.byType(MushafPage));
+    await settle(tester);
+    Finder inBar(Finder f) => find.descendant(of: bar, matching: f);
+    await tester.tap(inBar(find.text('٥٠')));
+    await settle(tester);
+    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('انتقال إلى صفحة'),
+      ),
+      findsOneWidget,
+    );
+    Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+    await settle(tester);
+    for (final label in ['آل عمران', '¾ الحزب ٥']) {
+      await tester.tap(inBar(find.text(label)));
+      await settle(tester, find.byType(IndexScreen));
+      expect(find.byType(IndexScreen), findsOneWidget, reason: label);
+      Navigator.of(tester.element(find.byType(IndexScreen))).pop();
+      await settle(tester);
+      expect(find.byType(IndexScreen), findsNothing);
+    }
   });
 
   testWidgets('a long press on a verse still opens its services', (

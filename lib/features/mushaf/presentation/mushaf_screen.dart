@@ -911,6 +911,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         ? null
         : _FocusTopBar(
             key: const ValueKey('focus-bar'),
+            onIndex: () => context.push('/mushaf/index'),
+            onGoTo: _goToPage,
             infos: [
               for (final pg in shownPages)
                 isCover(pg) ? null : ref.watch(frameInfoProvider(pg)).value,
@@ -1087,35 +1089,20 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                                       if (!_autoScroll && !focus) readingBar(),
                                       // Focus mode's tools, while shown, take
                                       // their own room under the page: the
-                                      // page's lines close up above them.
-                                      if (!_autoScroll && focus)
-                                        AnimatedSize(
-                                          duration:
-                                              MediaQuery.disableAnimationsOf(
-                                                context,
-                                              )
-                                              ? Duration.zero
-                                              : const Duration(
-                                                  milliseconds: 200,
-                                                ),
-                                          curve: Curves.easeOut,
-                                          alignment: Alignment.bottomCenter,
-                                          child: _focusTools && !_chrome
-                                              ? _FocusToolsPanel(
-                                                  key: const ValueKey(
-                                                    'focus-tools',
-                                                  ),
-                                                  bar: readingBar(),
-                                                  labelledTools:
-                                                      context.tokens.elderly
-                                                      ? readingTools(
-                                                          labelled: true,
-                                                        )
-                                                      : null,
-                                                )
-                                              : const SizedBox(
-                                                  width: double.infinity,
-                                                ),
+                                      // page's lines close up above them. At
+                                      // once, not animated: the page is drawn
+                                      // into an image of its exact size
+                                      // (MushafPage's bake), so every frame of
+                                      // a size animation drew it all again.
+                                      // The menus lie over it rather than
+                                      // resizing the page again.
+                                      if (!_autoScroll && focus && _focusTools)
+                                        _FocusToolsPanel(
+                                          key: const ValueKey('focus-tools'),
+                                          bar: readingBar(),
+                                          labelledTools: context.tokens.elderly
+                                              ? readingTools(labelled: true)
+                                              : null,
                                         ),
                                     ],
                                   ),

@@ -12,7 +12,13 @@ typedef _FocusAction = (IconData icon, String label, VoidCallback onTap);
 /// focus mode's buttons. A spread names both its pages. In elderly mode it
 /// is larger, and its buttons, with their names, take a row of their own.
 class _FocusTopBar extends StatelessWidget {
-  const _FocusTopBar({super.key, required this.infos, required this.actions});
+  const _FocusTopBar({
+    super.key,
+    required this.infos,
+    required this.actions,
+    required this.onIndex,
+    required this.onGoTo,
+  });
 
   /// Height of the bar's row (elderly mode's is larger).
   static const height = 32.0;
@@ -24,6 +30,12 @@ class _FocusTopBar extends StatelessWidget {
 
   /// The buttons at the far left, in order from the right.
   final List<_FocusAction> actions;
+
+  /// A tap on the surah, the juz or the hizb: the index.
+  final VoidCallback onIndex;
+
+  /// A tap on the page number: go to another page.
+  final VoidCallback onGoTo;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +71,22 @@ class _FocusTopBar extends StatelessWidget {
           );
     Widget shrink(Widget child, AlignmentDirectional at) =>
         FittedBox(fit: BoxFit.scaleDown, alignment: at, child: child);
+    // The surah, the juz and the hizb open the index; the page number,
+    // going to a page.
+    Widget tappable(Widget child, VoidCallback onTap, String label) =>
+        Semantics(
+          button: true,
+          label: label,
+          onTap: onTap,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: child,
+            ),
+          ),
+        );
     final info = SizedBox(
       height: elderly ? elderlyHeight : height,
       child: DefaultTextStyle.merge(
@@ -70,24 +98,36 @@ class _FocusTopBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
-              child: shrink(
-                Text(
-                  surahs.join(' · '),
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+              child: tappable(
+                shrink(
+                  Text(
+                    surahs.join(' · '),
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  AlignmentDirectional.centerStart,
                 ),
-                AlignmentDirectional.centerStart,
+                onIndex,
+                l.indexTitle,
               ),
             ),
-            Text(
-              [for (final i in known) digits(i.page)].join(' – '),
-              semanticsLabel: known.isEmpty
-                  ? null
-                  : l.pageOf(digits(known.first.page)),
-              style: const TextStyle(fontWeight: FontWeight.w700),
+            tappable(
+              Text(
+                [for (final i in known) digits(i.page)].join(' – '),
+                semanticsLabel: known.isEmpty
+                    ? null
+                    : l.pageOf(digits(known.first.page)),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              onGoTo,
+              l.goToPage,
             ),
             ?switch (where) {
               final w? => Flexible(
-                child: shrink(w, AlignmentDirectional.center),
+                child: tappable(
+                  shrink(w, AlignmentDirectional.center),
+                  onIndex,
+                  l.indexTitle,
+                ),
               ),
               null => null,
             },
