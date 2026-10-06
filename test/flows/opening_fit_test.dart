@@ -19,8 +19,9 @@ import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/opening_art.dart';
 
 /// The opening pages (the cover, al-Fatiha, the start of al-Baqarah) fit
-/// the screen whole at phone, small phone, Android and laptop sizes: their
-/// frame is never cropped and nothing overflows.
+/// the screen at phone, small phone, Android and laptop sizes: their frame's
+/// ornament is cropped, never the page inside or its cartouches, and nothing
+/// overflows.
 void main() {
   late ContentDatabase db;
   late Directory root;
@@ -114,7 +115,7 @@ void main() {
 
   for (final style in ['zakhrafa', 'seljuk']) {
     for (final MapEntry(key: name, value: size) in sizes.entries) {
-      testWidgets('$style, $name: the opening pages fit whole', (tester) async {
+      testWidgets('$style, $name: the opening pages fit', (tester) async {
         final (container, _) = await start(tester, size: size, style: style);
         // The app opens on the home screen, which is not under test here:
         // its tiles' labels may not fit the test font on a small phone.
@@ -141,13 +142,19 @@ void main() {
             final g = OpeningArtGeometry.fit(
               Size(box.width, box.height - number),
             );
-            final frame = g.frame.shift(box.topLeft);
-            // The whole drawing, inside its room and on the screen.
-            expect(g.frame.width / g.scale, closeTo(1200, 0.01));
-            expect(frame.left, greaterThanOrEqualTo(box.left - 0.01));
-            expect(frame.right, lessThanOrEqualTo(box.right + 0.01));
-            expect(frame.top, greaterThanOrEqualTo(box.top - 0.01));
-            expect(frame.bottom, lessThanOrEqualTo(box.bottom + 0.01));
+            // The page and its cartouches inside the room and on screen;
+            // only the frame's ornament may be cropped.
+            for (final r in [
+              OpeningArtLayout.top,
+              OpeningArtLayout.panel,
+              OpeningArtLayout.bottom,
+            ]) {
+              final placed = g.place(r).shift(box.topLeft);
+              expect(placed.left, greaterThanOrEqualTo(box.left - 0.01));
+              expect(placed.right, lessThanOrEqualTo(box.right + 0.01));
+              expect(placed.top, greaterThanOrEqualTo(box.top - 0.01));
+              expect(placed.bottom, lessThanOrEqualTo(box.bottom + 0.01));
+            }
             // The page inside stays a readable size.
             final panel = g.place(OpeningArtLayout.panel);
             expect(panel.width, greaterThan(150), reason: '$page $size');

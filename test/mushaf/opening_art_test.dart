@@ -6,15 +6,15 @@ void main() {
   group('the opening frame made taller', () {
     for (final room in const [
       Size(382, 700), // phone
-      Size(352, 520), // small phone
-      Size(812, 1050), // tablet, portrait
+      Size(352, 700), // narrow phone
+      Size(600, 1200), // a tall, narrow window
     ]) {
       test('$room: inside the room, taller, the art undistorted', () {
         final g = OpeningArtGeometry.fit(room);
-        // The whole frame is inside the room — nothing runs off an edge —
-        // and as wide as it.
-        expect(g.frame.width, closeTo(room.width, 0.01));
-        expect(g.frame.left, closeTo(0, 0.01));
+        // The drawing less its side ornaments is as wide as the room: the
+        // ornaments run off both edges, equally.
+        expect(g.scale, closeTo(room.width / 820, 1e-9));
+        expect(g.frame.left, closeTo(-190 * g.scale, 0.01));
         expect(g.frame.height, lessThanOrEqualTo(room.height + 0.01));
         expect(g.frame.top, greaterThanOrEqualTo(-0.01));
         // The band copies are stretched by 8% at most.
@@ -42,15 +42,16 @@ void main() {
     }
 
     test('a phone gets more of its height than the plain picture gave', () {
-      const room = Size(382, 700);
-      final plain = 1457 * room.width / 1200;
+      const room = Size(382, 820);
+      final plain = 1457 * room.width / 820;
       final g = OpeningArtGeometry.fit(room);
       expect(g.frame.height, greaterThan(plain + 100));
       // What is left over is less than one band.
       expect(room.height - g.frame.height, lessThan(257 * g.scale));
     });
 
-    test('nothing is cropped: the whole drawing, its panel in proportion', () {
+    test('the frame is cropped, never the text: the panel and cartouches '
+        'on screen, at the cropped width\'s scale', () {
       for (final room in const [
         Size(385, 760), // iPhone 6.1"
         Size(422, 840), // iPhone 6.7"
@@ -60,12 +61,22 @@ void main() {
         Size(1432, 808), // laptop, a single page
       ]) {
         final g = OpeningArtGeometry.fit(room);
-        expect(g.frame.left, greaterThanOrEqualTo(-0.01), reason: '$room');
-        expect(g.frame.right, lessThanOrEqualTo(room.width + 0.01));
-        expect(g.frame.top, greaterThanOrEqualTo(-0.01));
-        expect(g.frame.bottom, lessThanOrEqualTo(room.height + 0.01));
-        // All of the drawing's width is drawn, at one scale.
-        expect(g.frame.width / g.scale, closeTo(1200, 0.01));
+        // The text is as big as the room's width allows with the side
+        // ornaments cropped; a room too short for the cartouches is the only
+        // thing that makes it smaller.
+        final byWidth = room.width / 820;
+        final byHeight = room.height / (1256 - 201);
+        expect(
+          g.scale,
+          closeTo(byWidth < byHeight ? byWidth : byHeight, 1e-9),
+          reason: '$room',
+        );
+        // Never smaller than the whole drawing fitted inside the room.
+        final whole = [
+          room.width / 1200,
+          room.height / 1457,
+        ].reduce((a, b) => a < b ? a : b);
+        expect(g.scale, greaterThan(whole), reason: '$room');
         final panel = g.place(OpeningArtLayout.panel);
         expect(
           panel.width,
@@ -78,9 +89,9 @@ void main() {
           OpeningArtLayout.panel,
         ]) {
           final placed = g.place(r);
-          expect(placed.left, greaterThanOrEqualTo(-0.01));
+          expect(placed.left, greaterThanOrEqualTo(-0.01), reason: '$room');
           expect(placed.right, lessThanOrEqualTo(room.width + 0.01));
-          expect(placed.top, greaterThanOrEqualTo(-0.01));
+          expect(placed.top, greaterThanOrEqualTo(-0.01), reason: '$room');
           expect(placed.bottom, lessThanOrEqualTo(room.height + 0.01));
         }
       }
@@ -113,12 +124,15 @@ void main() {
       },
     );
 
-    test('a wide room fits the height, unchanged', () {
+    test('a wide room crops the top and bottom borders, unstretched', () {
       final g = OpeningArtGeometry.fit(const Size(1000, 600));
       expect(g.repeats, 0);
       expect(g.stretch, 1);
-      expect(g.frame.height, closeTo(600, 0.01));
-      expect(g.frame.width, closeTo(600 * 1200 / 1457, 0.01));
+      expect(g.scale, closeTo(600 / (1256 - 201), 1e-9));
+      // Centred: as much cropped above as below.
+      expect(g.frame.top, closeTo(600 - g.frame.bottom, 0.01));
+      expect(g.place(OpeningArtLayout.top).top, greaterThanOrEqualTo(0));
+      expect(g.place(OpeningArtLayout.bottom).bottom, lessThanOrEqualTo(600));
     });
   });
 }

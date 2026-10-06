@@ -15,11 +15,27 @@ abstract final class OpeningArtLayout {
   static const top = Rect.fromLTRB(455, 225, 745, 380);
   static const bottom = Rect.fromLTRB(454, 1077, 745, 1231);
 
-  /// The width the drawing is scaled to fit: all of it. Its side ornaments
-  /// used to be cropped off to give the page inside more of the screen, but
-  /// the frame then ran off both edges of a phone; the whole frame is shown
-  /// now, scaled down to the room it has.
-  static const visibleWidth = 1200.0;
+  /// The drawing's side ornaments, from its edge to the panel: this much is
+  /// cropped off each side so the page inside gets 46% bigger.
+  ///
+  /// The page's text is what it is — the printed artwork of al-Fatiha and the
+  /// opening of al-Baqarah, which must not be re-laid-out — so the only way
+  /// to enlarge it is to give it more of the screen: the frame is cropped,
+  /// the text never made smaller. The strips are ornament on both sides, so
+  /// what is lost is repeats of a pattern that already repeats down every
+  /// page.
+  static const sideCut = 190.0;
+
+  /// What is left of the drawing's width once [sideCut] is taken off both
+  /// sides, and therefore the width the drawing is scaled to fit.
+  static const visibleWidth = 1200 - 2 * sideCut;
+
+  /// What must stay on screen in a room too short for the drawing's height:
+  /// the two cartouches and a little ornament beyond them. The rest of the
+  /// top and bottom borders is cropped, equally, rather than the text made
+  /// smaller.
+  static const keepTop = 201.0;
+  static const keepBottom = 1256.0;
 
   /// One period of the side borders, between the two cartouche rows: the
   /// rows 493 and 750 match across the whole width (the same in every
@@ -32,9 +48,11 @@ abstract final class OpeningArtLayout {
   static const maxStretch = 0.08;
 }
 
-/// The opening frame fitted inside [room], never cropped: the whole drawing
-/// as wide as the room (or, in a room too short for that, as tall, centred
-/// across it), and made taller by repeating the side borders'
+/// The opening frame fitted to [room]: [OpeningArtLayout.visibleWidth] of the
+/// drawing across, its side ornaments cropped (and, in a room too short for
+/// the rest, its top and bottom borders down to [OpeningArtLayout.keepTop] and
+/// [OpeningArtLayout.keepBottom]), and made taller by repeating the side
+/// borders'
 /// [OpeningArtLayout.bandTop] ([repeats] extra copies, each [stretch] times
 /// its height), so the art is never distorted beyond a slight stretch of that
 /// band.
@@ -46,8 +64,10 @@ class OpeningArtGeometry {
     var repeats = 0;
     var stretch = 1.0;
     if (art.height * k >= room.height) {
-      // Too tall already: fit the height, unchanged.
-      k = room.height / art.height;
+      // Too tall already: crop the top and bottom borders, and only if even
+      // the cartouches would not fit, scale down to fit them.
+      const keep = OpeningArtLayout.keepBottom - OpeningArtLayout.keepTop;
+      if (keep * k > room.height) k = room.height / keep;
     } else {
       final extra = room.height / k - art.height;
       // The band region (the band and its copies) takes up `extra`: of
@@ -183,48 +203,55 @@ class OpeningArtBody extends StatelessWidget {
         final g = OpeningArtGeometry.fit(room);
         final frame = g.frame;
         final panel = g.place(OpeningArtLayout.panel);
-        return Stack(
-          children: [
-            // The page's paper shows through the panel.
-            Positioned.fromRect(
-              rect: panel,
-              child: ColoredBox(color: tokens.colors.paper),
-            ),
-            Positioned.fill(
-              child: _SlicedArt(asset: asset, geometry: g),
-            ),
-            Positioned.fromRect(
-              rect: panel.deflate(panel.width * 0.02),
-              child: child,
-            ),
-            for (final c in [
-              (OpeningArtLayout.top, top),
-              (OpeningArtLayout.bottom, bottom),
-            ])
+        // The cropped ornament stays inside the page's room.
+        return ClipRect(
+          child: Stack(
+            children: [
+              // The page's paper shows through the panel.
               Positioned.fromRect(
-                // The cartouche's ends are notched: keep the text inside.
-                rect: () {
-                  final r = g.place(c.$1);
-                  return Rect.fromLTRB(
-                    r.left + r.width * 0.16,
-                    r.top + r.height * 0.14,
-                    r.right - r.width * 0.16,
-                    r.bottom - r.height * 0.14,
-                  );
-                }(),
-                child: _OnCream(
-                  child: FittedBox(fit: BoxFit.scaleDown, child: c.$2),
+                rect: panel,
+                child: ColoredBox(color: tokens.colors.paper),
+              ),
+              Positioned.fill(
+                child: _SlicedArt(asset: asset, geometry: g),
+              ),
+              Positioned.fromRect(
+                rect: panel.deflate(panel.width * 0.02),
+                child: child,
+              ),
+              for (final c in [
+                (OpeningArtLayout.top, top),
+                (OpeningArtLayout.bottom, bottom),
+              ])
+                Positioned.fromRect(
+                  // The cartouche's ends are notched: keep the text inside.
+                  rect: () {
+                    final r = g.place(c.$1);
+                    return Rect.fromLTRB(
+                      r.left + r.width * 0.16,
+                      r.top + r.height * 0.14,
+                      r.right - r.width * 0.16,
+                      r.bottom - r.height * 0.14,
+                    );
+                  }(),
+                  child: _OnCream(
+                    child: FittedBox(fit: BoxFit.scaleDown, child: c.$2),
+                  ),
                 ),
-              ),
-            if (pageNumber != null)
-              Positioned(
-                left: 0,
-                right: 0,
-                top: frame.bottom + 2,
-                height: numberSpace - 2,
-                child: Center(child: pageNumber),
-              ),
-          ],
+              if (pageNumber != null)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top:
+                      (frame.bottom < room.height
+                          ? frame.bottom
+                          : room.height) +
+                      2,
+                  height: numberSpace - 2,
+                  child: Center(child: pageNumber),
+                ),
+            ],
+          ),
         );
       },
     );
