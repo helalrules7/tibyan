@@ -157,6 +157,8 @@ void main() {
       await ctrl.setPageFill(PageFill.full);
       await ctrl.setPlayerStyle(PlayerStyle.button);
       await ctrl.setPlayerPosition(const Offset(0.25, 1.4));
+      await ctrl.setFocusToolsShown(true);
+      await ctrl.setAutoScrollSpeed(12);
       final sp = await SharedPreferences.getInstance();
       final restored = await containerWith({
         for (final k in sp.getKeys()) k: sp.get(k)!,
@@ -168,6 +170,9 @@ void main() {
       expect(r.playerStyle, PlayerStyle.button);
       // Kept inside the screen.
       expect(r.playerPosition, const Offset(0.25, 1));
+      expect(r.focusToolsShown, isTrue);
+      // Kept within 1–10.
+      expect(r.autoScrollSpeed, 10);
     },
   );
 }

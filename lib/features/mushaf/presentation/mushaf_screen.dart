@@ -174,7 +174,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Auto-scroll: pages stacked vertically, moving at [_speed].
   bool _autoScroll = false;
   bool _paused = false;
-  int _speed = 3;
+
+  /// The reader's speed, kept between openings
+  /// ([AppSettings.autoScrollSpeed]).
+  int get _speed => ref.read(settingsProvider).autoScrollSpeed;
   ScrollController? _vertical;
   Ticker? _ticker;
   Duration _lastTick = Duration.zero;
@@ -1222,10 +1225,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                     paused: _paused,
                     speed: _speed,
                     onPause: () => setState(() => _paused = !_paused),
-                    onSlower: () =>
-                        setState(() => _speed = (_speed - 1).clamp(1, 10)),
-                    onFaster: () =>
-                        setState(() => _speed = (_speed + 1).clamp(1, 10)),
+                    onSlower: () => ref
+                        .read(settingsProvider.notifier)
+                        .setAutoScrollSpeed(_speed - 1),
+                    onFaster: () => ref
+                        .read(settingsProvider.notifier)
+                        .setAutoScrollSpeed(_speed + 1),
                     onClose: _stopAutoScroll,
                   ),
                 ),

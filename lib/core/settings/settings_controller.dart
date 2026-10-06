@@ -55,6 +55,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kFocus = 'settings.focusMode';
   static const _kFocusTools = 'settings.focusTools';
   static const _kFocusToolsShown = 'settings.focusToolsShown';
+  static const _kAutoScrollSpeed = 'settings.autoScrollSpeed';
   static const _kPageFill = 'settings.pageFill';
   static const _kPlayerStyle = 'settings.playerStyle';
   static const _kPlayerX = 'settings.playerX';
@@ -135,6 +136,7 @@ class SettingsController extends Notifier<AppSettings> {
           _enumByName(FocusTools.values, _prefs.getString(_kFocusTools)) ??
           FocusTools.button,
       focusToolsShown: _prefs.getBool(_kFocusToolsShown) ?? false,
+      autoScrollSpeed: (_prefs.getInt(_kAutoScrollSpeed) ?? 3).clamp(1, 10),
       pageFill:
           _enumByName(PageFill.values, _prefs.getString(_kPageFill)) ??
           PageFill.lines,
@@ -373,6 +375,12 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setFocusToolsShown(bool value) async {
     state = state.copyWith(focusToolsShown: value);
     await _prefs.setBool(_kFocusToolsShown, value);
+  }
+
+  Future<void> setAutoScrollSpeed(int value) async {
+    final speed = value.clamp(1, 10);
+    state = state.copyWith(autoScrollSpeed: speed);
+    await _prefs.setInt(_kAutoScrollSpeed, speed);
   }
 
   Future<void> setPageFill(PageFill value) async {

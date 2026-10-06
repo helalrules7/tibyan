@@ -121,6 +121,7 @@ class AppSettings {
     this.focusMode = false,
     this.focusTools = FocusTools.button,
     this.focusToolsShown = false,
+    this.autoScrollSpeed = 3,
     this.pageFill = PageFill.lines,
     this.playerStyle = PlayerStyle.auto,
     this.playerPosition,
@@ -234,6 +235,9 @@ class AppSettings {
   /// bar's tools button); kept until the reader hides them.
   final bool focusToolsShown;
 
+  /// Auto-scroll's speed, 1 (slowest) to 10, as the reader last left it.
+  final int autoScrollSpeed;
+
   /// How the page fills the screen in focus mode.
   final PageFill pageFill;
 
@@ -289,6 +293,7 @@ class AppSettings {
     bool? focusMode,
     FocusTools? focusTools,
     bool? focusToolsShown,
+    int? autoScrollSpeed,
     PageFill? pageFill,
     PlayerStyle? playerStyle,
     Offset? Function()? playerPosition,
@@ -328,6 +333,7 @@ class AppSettings {
     focusMode: focusMode ?? this.focusMode,
     focusTools: focusTools ?? this.focusTools,
     focusToolsShown: focusToolsShown ?? this.focusToolsShown,
+    autoScrollSpeed: autoScrollSpeed ?? this.autoScrollSpeed,
     pageFill: pageFill ?? this.pageFill,
     playerStyle: playerStyle ?? this.playerStyle,
     playerPosition: playerPosition == null
