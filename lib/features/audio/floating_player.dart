@@ -170,12 +170,15 @@ class _PlayerPill extends ConsumerWidget {
               children: [
                 Icon(icon, size: elderly ? 28 : size, color: t.playerFg),
                 if (elderly)
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      style: TextStyle(fontSize: 13, color: t.playerFg),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 13, color: t.playerFg),
+                      ),
                     ),
                   ),
               ],

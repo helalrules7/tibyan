@@ -313,12 +313,21 @@ class _FocusMenu extends StatelessWidget {
                             children: [
                               Icon(icon, color: t.muted, size: 24),
                               const SizedBox(height: 3),
-                              Text(
-                                label,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 12, color: t.muted),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 2,
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    label,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: t.muted,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
