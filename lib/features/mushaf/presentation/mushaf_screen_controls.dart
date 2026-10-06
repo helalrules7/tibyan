@@ -17,6 +17,8 @@ class _ReadingTools extends StatelessWidget {
     required this.tajweed,
     required this.onTajweed,
     required this.onTajweedLegend,
+    required this.focus,
+    required this.onFocus,
     this.labelled = false,
   });
 
@@ -28,6 +30,10 @@ class _ReadingTools extends StatelessWidget {
   final bool? tajweed;
   final VoidCallback onTajweed;
   final VoidCallback onTajweedLegend;
+
+  /// Focus mode is on: the button leaves it, or (off) enters it.
+  final bool focus;
+  final VoidCallback onFocus;
 
   final bool touchReading;
   final bool recite;
@@ -74,6 +80,12 @@ class _ReadingTools extends StatelessWidget {
           named(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
           if (tajweed case final on?)
             named(Icons.palette_outlined, l.tajweedColors, on, onTajweed),
+          named(
+            focus ? Icons.fullscreen_exit : Icons.fullscreen,
+            focus ? l.focusExit : l.focusModeTitle,
+            focus,
+            onFocus,
+          ),
         ],
       );
     }
@@ -161,6 +173,12 @@ class _ReadingTools extends StatelessWidget {
             onLongPress: onTajweedLegend,
           ),
         ],
+        button(
+          focus ? Icons.fullscreen_exit : Icons.fullscreen,
+          focus ? l.focusExit : l.focusModeTitle,
+          focus,
+          onFocus,
+        ),
       ],
     );
   }

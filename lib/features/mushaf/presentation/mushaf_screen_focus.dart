@@ -63,9 +63,11 @@ class _FocusTopBar extends StatelessWidget {
       height: elderly ? elderlyHeight : height,
       child: DefaultTextStyle.merge(
         style: text,
-        // The page number sits halfway between the surah and the juz; a
-        // text too long for its room shrinks rather than overflowing.
+        // The surah, the page number, the juz and the buttons spread over
+        // the whole width with equal room between them; a text too long for
+        // its room shrinks rather than overflowing.
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
               child: shrink(
@@ -76,28 +78,22 @@ class _FocusTopBar extends StatelessWidget {
                 AlignmentDirectional.centerStart,
               ),
             ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  [for (final i in known) digits(i.page)].join(' – '),
-                  semanticsLabel: known.isEmpty
-                      ? null
-                      : l.pageOf(digits(known.first.page)),
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ),
+            Text(
+              [for (final i in known) digits(i.page)].join(' – '),
+              semanticsLabel: known.isEmpty
+                  ? null
+                  : l.pageOf(digits(known.first.page)),
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             ?switch (where) {
               final w? => Flexible(
-                child: shrink(w, AlignmentDirectional.centerEnd),
+                child: shrink(w, AlignmentDirectional.center),
               ),
               null => null,
             },
-            if (!elderly) ...[
-              const SizedBox(width: 6),
+            if (!elderly)
               for (final (icon, label, onTap) in actions)
                 _SmallFocusButton(icon: icon, label: label, onTap: onTap),
-            ],
           ],
         ),
       ),

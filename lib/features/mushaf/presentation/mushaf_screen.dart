@@ -265,6 +265,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             .setTajweedColors(!settings.tajweedColors),
       ),
       onTajweedLegend: act(() => showTajweedLegend(context)),
+      focus: settings.focusMode,
+      onFocus: act(
+        () => settings.focusMode
+            ? _exitFocus()
+            : ref.read(settingsProvider.notifier).setFocusMode(true),
+      ),
     );
   }
 
@@ -1066,6 +1072,38 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                                         ),
                                       ),
                                       if (!_autoScroll && !focus) readingBar(),
+                                      // Focus mode's tools, while shown, take
+                                      // their own room under the page: the
+                                      // page's lines close up above them.
+                                      if (!_autoScroll && focus)
+                                        AnimatedSize(
+                                          duration:
+                                              MediaQuery.disableAnimationsOf(
+                                                context,
+                                              )
+                                              ? Duration.zero
+                                              : const Duration(
+                                                  milliseconds: 200,
+                                                ),
+                                          curve: Curves.easeOut,
+                                          alignment: Alignment.bottomCenter,
+                                          child: _focusTools && !_chrome
+                                              ? _FocusToolsPanel(
+                                                  key: const ValueKey(
+                                                    'focus-tools',
+                                                  ),
+                                                  bar: readingBar(),
+                                                  labelledTools:
+                                                      context.tokens.elderly
+                                                      ? readingTools(
+                                                          labelled: true,
+                                                        )
+                                                      : null,
+                                                )
+                                              : const SizedBox(
+                                                  width: double.infinity,
+                                                ),
+                                        ),
                                     ],
                                   ),
                           ),
@@ -1163,24 +1201,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                         onTouchReading: _toggleTouchReading,
                         recite: _recite,
                         listening: recitation.active,
-                      ),
-              ),
-            ),
-            // Focus mode: the reading tools under the page, while shown.
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Reveal(
-                visible: focus && _focusTools && !_chrome && !_autoScroll,
-                child: !focus || !_focusTools
-                    ? null
-                    : _FocusToolsPanel(
-                        key: const ValueKey('focus-tools'),
-                        bar: readingBar(),
-                        labelledTools: context.tokens.elderly
-                            ? readingTools(labelled: true)
-                            : null,
                       ),
               ),
             ),

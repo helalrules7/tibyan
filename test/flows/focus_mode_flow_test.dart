@@ -274,20 +274,35 @@ void main() {
     expect(find.byIcon(Icons.list_alt), findsNothing);
     expect(find.byType(ReadingBar), findsNothing);
 
-    // The tools: today's reading bar, under the page; a tap hides it.
+    // The tools: today's reading bar, in its own room under the page (the
+    // page closes up above it), with the focus-mode button; a tap hides it.
     await tester.tap(button('إظهار الأدوات'));
     await settle(tester);
     expect(find.byType(ReadingBar), findsOneWidget);
+    for (final label in ['القراءة اللمسية', 'إنهاء التركيز']) {
+      expect(
+        find.descendant(
+          of: find.byType(ReadingBar),
+          matching: find.bySemanticsLabel(label),
+        ),
+        findsOneWidget,
+        reason: label,
+      );
+    }
+    final closedUp = tester.getRect(find.byType(MushafPage).first);
+    expect(closedUp.top, closeTo(page.top, 0.5));
+    expect(closedUp.bottom, lessThan(page.bottom - 20));
     expect(
-      find.descendant(
-        of: find.byType(ReadingBar),
-        matching: find.bySemanticsLabel('القراءة اللمسية'),
-      ),
-      findsOneWidget,
+      closedUp.bottom,
+      lessThanOrEqualTo(tester.getRect(find.byType(ReadingBar)).top + 0.5),
     );
     await tester.tapAt(page.topLeft + const Offset(2, 2));
     await settle(tester);
     expect(find.byType(ReadingBar), findsNothing);
+    expect(
+      tester.getRect(find.byType(MushafPage).first).bottom,
+      closeTo(page.bottom, 0.5),
+    );
 
     // The menus: as a tap on the frame opens them today.
     await tester.tap(button('إظهار القوائم'));
@@ -303,6 +318,17 @@ void main() {
     expect(container.read(settingsProvider).focusMode, isFalse);
     expect(bar, findsNothing);
     expect(find.byType(ReadingBar), findsOneWidget);
+
+    // The reading bar's own button enters focus mode again.
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ReadingBar),
+        matching: find.bySemanticsLabel('وضع التركيز'),
+      ),
+    );
+    await settle(tester);
+    expect(container.read(settingsProvider).focusMode, isTrue);
+    expect(bar, findsOneWidget);
   });
 
   testWidgets('a long press on a verse still opens its services', (
