@@ -93,6 +93,20 @@ Future<ui.Image> _duotone(ui.Image image, (Color, Color) tint) async {
   }
 }
 
+/// A surah banner inside the page: a long press calls [onLongPress] with
+/// the surah's number.
+Widget surahBannerGestures(
+  Widget banner,
+  int surah,
+  void Function(int surah)? onLongPress,
+) => onLongPress == null
+    ? banner
+    : GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onLongPress: () => onLongPress(surah),
+        child: banner,
+      );
+
 /// What the frame shows around one page.
 class FrameInfo {
   const FrameInfo({
@@ -195,11 +209,16 @@ class IlluminatedFrame extends ConsumerWidget {
     this.onHizbTap,
     this.onSurahTap,
     this.onSurahLongPress,
+    this.onBannerLongPress,
     this.onPageTap,
     this.tools,
     this.linePadding,
     this.showCatchword = true,
   });
+
+  /// A long press on a surah's banner inside the page, with its number
+  /// (shares that surah as pictures).
+  final void Function(int surah)? onBannerLongPress;
 
   /// Room the page keeps above its first line and below its last, for a
   /// page of the given size; the banners and margin marks follow it.
@@ -253,6 +272,7 @@ class IlluminatedFrame extends ConsumerWidget {
         onHizbTap: onHizbTap,
         onSurahTap: onSurahTap,
         onSurahLongPress: onSurahLongPress,
+        onBannerLongPress: onBannerLongPress,
         onPageTap: onPageTap,
         tools: tools,
         linePadding: linePadding,
@@ -282,7 +302,11 @@ class IlluminatedFrame extends ConsumerWidget {
                 left: inset - 4,
                 right: inset - 4,
                 height: slot * b.slots,
-                child: SurahBannerView(banner: b, images: images),
+                child: surahBannerGestures(
+                  SurahBannerView(banner: b, images: images),
+                  b.number,
+                  onBannerLongPress,
+                ),
               ),
           ],
         );

@@ -620,6 +620,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onHizbTap: () => openIndex('hizb'),
           onSurahTap: () => openIndex('surahs'),
           onSurahLongPress: () => _shareSurahImage(pg),
+          onBannerLongPress: _shareSurah,
           onPageTap: _goToPage,
           tools: tools,
           showCatchword: !_recite && !_testing,
@@ -1625,10 +1626,15 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   Future<void> _shareSurahImage(int page) async {
     final a = ref.read(pageAyahsProvider(page)).value?.firstOrNull;
     if (a == null) return;
-    final count = await ref.read(surahAyahCountProvider(a.surah).future);
+    await _shareSurah(a.surah);
+  }
+
+  /// A whole surah as pictures (a long press on its banner in the page).
+  Future<void> _shareSurah(int surah) async {
+    final count = await ref.read(surahAyahCountProvider(surah).future);
     if (!mounted) return;
     await showSharePreview(context, [
-      for (var i = 1; i <= count; i++) (surah: a.surah, ayah: i),
+      for (var i = 1; i <= count; i++) (surah: surah, ayah: i),
     ]);
   }
 

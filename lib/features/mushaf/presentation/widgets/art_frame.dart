@@ -27,6 +27,7 @@ class ArtPageFrame extends StatelessWidget {
     this.onHizbTap,
     this.onSurahTap,
     this.onSurahLongPress,
+    this.onBannerLongPress,
     this.onPageTap,
     this.tools,
     this.linePadding,
@@ -55,6 +56,9 @@ class ArtPageFrame extends StatelessWidget {
 
   /// A long press on the surah's name (shares the surah as pictures).
   final VoidCallback? onSurahLongPress;
+
+  /// A long press on a surah's banner inside the page, with its number.
+  final void Function(int surah)? onBannerLongPress;
   final VoidCallback? onPageTap;
 
   final Widget? tools;
@@ -99,7 +103,11 @@ class ArtPageFrame extends StatelessWidget {
                 left: pad.left,
                 right: pad.right,
                 height: slot * b.slots,
-                child: ArtSurahBanner(banner: b, art: art),
+                child: surahBannerGestures(
+                  ArtSurahBanner(banner: b, art: art),
+                  b.number,
+                  onBannerLongPress,
+                ),
               ),
           ],
         );
