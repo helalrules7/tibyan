@@ -2152,4 +2152,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get focusMenus => 'Menus';
+
+  @override
+  String get focusPageTools => 'Page tools';
 }

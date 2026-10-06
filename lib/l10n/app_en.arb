@@ -887,5 +887,6 @@
   "focusTools": "Tools",
   "focusShowTools": "Show the tools",
   "focusHideTools": "Hide the tools",
-  "focusMenus": "Menus"
+  "focusMenus": "Menus",
+  "focusPageTools": "Page tools"
 }

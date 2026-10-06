@@ -3762,6 +3762,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'القوائم'**
   String get focusMenus;
+
+  /// No description provided for @focusPageTools.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدوات الصفحة'**
+  String get focusPageTools;
 }
 
 class _AppLocalizationsDelegate

@@ -2138,4 +2138,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get focusMenus => 'القوائم';
+
+  @override
+  String get focusPageTools => 'أدوات الصفحة';
 }

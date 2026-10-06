@@ -1411,5 +1411,6 @@
   "focusTools": "الأدوات",
   "focusShowTools": "إظهار الأدوات",
   "focusHideTools": "إخفاء الأدوات",
-  "focusMenus": "القوائم"
+  "focusMenus": "القوائم",
+  "focusPageTools": "أدوات الصفحة"
 }

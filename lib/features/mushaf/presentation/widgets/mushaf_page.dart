@@ -874,7 +874,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(d.localPosition);
-                      if (v != null) x.onVerseLongPress(v);
+                      v != null
+                          ? x.onVerseLongPress(v)
+                          : x.onPageLongPress?.call();
                     },
                     child: Semantics(
                       label: l.pageOf('${widget.page}'),

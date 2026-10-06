@@ -36,7 +36,12 @@ class VerseServicesPanel extends StatelessWidget {
     this.onTafsirAudio,
     this.munasabatCount = 0,
     this.onMunasabat,
+    this.embedded = false,
   });
+
+  /// Inside focus mode's window: no sheet of its own (no handle, no close
+  /// button), the window around it is the surface.
+  final bool embedded;
 
   /// «استمع للتفسير»: shown only when a tafsir recording has the selected
   /// verse (the feature is on and its index lists the verse).
@@ -113,6 +118,244 @@ class VerseServicesPanel extends StatelessWidget {
       (MarkKind.tadabbur, l.markTadabbur),
     ];
 
+    final body = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (!embedded) ...[
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: t.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      l.servicesTitle,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Semantics(
+                    liveRegion: true,
+                    child: Text(
+                      title,
+                      style: TextStyle(fontSize: 12, color: t.muted),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (!embedded)
+              IconButton(
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                onPressed: onClose,
+                icon: const Icon(Icons.close),
+              ),
+          ],
+        ),
+        if (preview != null)
+          Container(
+            constraints: const BoxConstraints(maxHeight: 140),
+            margin: const EdgeInsets.only(top: 4),
+            child: SingleChildScrollView(child: preview),
+          ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: onListen,
+                icon: const Icon(Icons.play_arrow),
+                label: Text(l.listen),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: onTafsir,
+                icon: const Icon(Icons.menu_book_outlined),
+                label: Text(l.tafsirTitle),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onWordStudy,
+                icon: const Icon(Icons.touch_app_outlined),
+                label: Text(l.wordStudy),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onWordMeanings,
+                icon: const Icon(Icons.notes),
+                label: Text(l.wordMeanings),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (onTafsirAudio != null) ...[
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: onTafsirAudio,
+            icon: const Icon(Icons.headphones_outlined),
+            label: Text(l.tafsirAudioListen),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(44),
+            ),
+          ),
+        ],
+        if (asbabCount > 0 && onAsbab != null) ...[
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: onAsbab,
+            icon: const Icon(Icons.history_edu_outlined),
+            label: Text(l.asbabCount(digits(asbabCount))),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(44),
+            ),
+          ),
+        ],
+        if (munasabatCount > 0 && onMunasabat != null) ...[
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: onMunasabat,
+            icon: const Icon(Icons.link),
+            label: Text(l.munasabatCount(digits(munasabatCount))),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(44),
+            ),
+          ),
+        ],
+        if (similarCount > 0 && onSimilar != null) ...[
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: onSimilar,
+            icon: const Icon(Icons.compare_arrows),
+            label: Text(l.similarCount(digits(similarCount))),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(44),
+            ),
+          ),
+        ],
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            for (final (kind, label) in marks)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: _MarkButton(
+                    color: Color(kind.color),
+                    label: label,
+                    onTap: () => onMark(kind),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onMultiSelect,
+                icon: const Icon(Icons.format_line_spacing),
+                label: Text(l.multiSelect),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
+              ),
+            ),
+            if (onReflect != null) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onReflect,
+                  icon: const Icon(Icons.edit_note_outlined),
+                  label: Text(l.journalAdd),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        if (onCopy != null || onShareText != null || onShareImage != null) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              if (onCopy != null)
+                Expanded(
+                  child: _ShareButton(
+                    icon: Icons.copy_outlined,
+                    label: l.copyVerses,
+                    onTap: onCopy!,
+                  ),
+                ),
+              if (onShareText != null)
+                Expanded(
+                  child: _ShareButton(
+                    icon: Icons.ios_share,
+                    label: l.shareVerseText,
+                    onTap: onShareText!,
+                  ),
+                ),
+              if (onShareImage != null)
+                Expanded(
+                  child: _ShareButton(
+                    icon: Icons.image_outlined,
+                    label: l.shareVerseImage,
+                    onTap: onShareImage!,
+                  ),
+                ),
+            ],
+          ),
+        ],
+        const SizedBox(height: 8),
+        FilledButton.tonalIcon(
+          onPressed: onSaveToFasil,
+          icon: const Icon(Icons.bookmark_add_outlined),
+          label: Text(l.fasilSaveHere),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+        ),
+      ],
+    );
+    if (embedded) return body;
     return Material(
       color: t.paper,
       elevation: 12,
@@ -124,245 +367,7 @@ class VerseServicesPanel extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: t.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Semantics(
-                          header: true,
-                          child: Text(
-                            l.servicesTitle,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        Semantics(
-                          liveRegion: true,
-                          child: Text(
-                            title,
-                            style: TextStyle(fontSize: 12, color: t.muted),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: MaterialLocalizations.of(context)
-                        .closeButtonTooltip,
-                    onPressed: onClose,
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ),
-              if (preview != null)
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 140),
-                  margin: const EdgeInsets.only(top: 4),
-                  child: SingleChildScrollView(child: preview),
-                ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: onListen,
-                      icon: const Icon(Icons.play_arrow),
-                      label: Text(l.listen),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(48),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: onTafsir,
-                      icon: const Icon(Icons.menu_book_outlined),
-                      label: Text(l.tafsirTitle),
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(48),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onWordStudy,
-                      icon: const Icon(Icons.touch_app_outlined),
-                      label: Text(l.wordStudy),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(48),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onWordMeanings,
-                      icon: const Icon(Icons.notes),
-                      label: Text(l.wordMeanings),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(48),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (onTafsirAudio != null) ...[
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: onTafsirAudio,
-                  icon: const Icon(Icons.headphones_outlined),
-                  label: Text(l.tafsirAudioListen),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(44),
-                  ),
-                ),
-              ],
-              if (asbabCount > 0 && onAsbab != null) ...[
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: onAsbab,
-                  icon: const Icon(Icons.history_edu_outlined),
-                  label: Text(l.asbabCount(digits(asbabCount))),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(44),
-                  ),
-                ),
-              ],
-              if (munasabatCount > 0 && onMunasabat != null) ...[
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: onMunasabat,
-                  icon: const Icon(Icons.link),
-                  label: Text(l.munasabatCount(digits(munasabatCount))),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(44),
-                  ),
-                ),
-              ],
-              if (similarCount > 0 && onSimilar != null) ...[
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: onSimilar,
-                  icon: const Icon(Icons.compare_arrows),
-                  label: Text(l.similarCount(digits(similarCount))),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(44),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  for (final (kind, label) in marks)
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 3),
-                        child: _MarkButton(
-                          color: Color(kind.color),
-                          label: label,
-                          onTap: () => onMark(kind),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onMultiSelect,
-                      icon: const Icon(Icons.format_line_spacing),
-                      label: Text(l.multiSelect),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(48),
-                      ),
-                    ),
-                  ),
-                  if (onReflect != null) ...[
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onReflect,
-                        icon: const Icon(Icons.edit_note_outlined),
-                        label: Text(l.journalAdd),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(48),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              if (onCopy != null ||
-                  onShareText != null ||
-                  onShareImage != null) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    if (onCopy != null)
-                      Expanded(
-                        child: _ShareButton(
-                          icon: Icons.copy_outlined,
-                          label: l.copyVerses,
-                          onTap: onCopy!,
-                        ),
-                      ),
-                    if (onShareText != null)
-                      Expanded(
-                        child: _ShareButton(
-                          icon: Icons.ios_share,
-                          label: l.shareVerseText,
-                          onTap: onShareText!,
-                        ),
-                      ),
-                    if (onShareImage != null)
-                      Expanded(
-                        child: _ShareButton(
-                          icon: Icons.image_outlined,
-                          label: l.shareVerseImage,
-                          onTap: onShareImage!,
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 8),
-              FilledButton.tonalIcon(
-                onPressed: onSaveToFasil,
-                icon: const Icon(Icons.bookmark_add_outlined),
-                label: Text(l.fasilSaveHere),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(48),
-                ),
-              ),
-            ],
-          ),
+          child: body,
         ),
       ),
     );

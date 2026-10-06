@@ -199,7 +199,7 @@ class _FocusToolsPanel extends StatelessWidget {
     final t = context.tokens.colors;
     return Material(
       color: t.paper,
-      elevation: 4,
+      shape: Border(top: BorderSide(color: t.border)),
       child: SafeArea(
         top: false,
         child: Padding(
@@ -230,4 +230,165 @@ String _quarterShort(AppLocalizations l, NumberFormatter digits, int quarter) {
     2 => '½ $hizb',
     _ => '¾ $hizb',
   };
+}
+
+/// «القائمة»: focus mode's window with every tool, centred on the screen.
+/// The header holds today's top bar and the exit from focus mode; the body
+/// the services of the verse pressed (when the press was on one) and the
+/// page's tools; the footer the reading strip, the page number and the
+/// reading tools.
+class _FocusMenu extends StatelessWidget {
+  const _FocusMenu({
+    required this.header,
+    required this.verse,
+    required this.pageTools,
+    required this.bar,
+    required this.tools,
+    required this.page,
+    required this.onPage,
+  });
+
+  final List<_FocusAction> header;
+
+  /// The verse's services; null when the press was off any verse.
+  final Widget? verse;
+  final List<_FocusAction> pageTools;
+
+  /// The page's reading strip (its quarter and next page's first word).
+  final Widget? bar;
+  final Widget tools;
+  final int page;
+
+  /// The page number was tapped: go to another page.
+  final VoidCallback onPage;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens.colors;
+    final l = AppLocalizations.of(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final size = MediaQuery.sizeOf(context);
+    return Dialog(
+      key: const ValueKey('focus-menu'),
+      backgroundColor: t.paper,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 520,
+          maxHeight: size.height * 0.9,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 6, 4, 4),
+              child: Row(
+                children: [
+                  for (final (icon, label, onTap) in header)
+                    Expanded(
+                      child: InkWell(
+                        onTap: onTap,
+                        borderRadius: BorderRadius.circular(12),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 56),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(icon, color: t.muted, size: 24),
+                              const SizedBox(height: 3),
+                              Text(
+                                label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 12, color: t.muted),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (verse != null) ...[
+                      verse!,
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+                    ],
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        l.focusPageTools,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final (icon, label, onTap) in pageTools)
+                          OutlinedButton.icon(
+                            onPressed: onTap,
+                            icon: Icon(icon, size: 20),
+                            label: Text(label),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ?bar,
+                  const SizedBox(height: 6),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      Semantics(
+                        button: true,
+                        label: l.pageOf(digits(page)),
+                        excludeSemantics: true,
+                        onTap: onPage,
+                        child: ActionChip(
+                          avatar: const Icon(Icons.menu_book_outlined),
+                          label: Text(
+                            digits(page),
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          onPressed: onPage,
+                        ),
+                      ),
+                      tools,
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
