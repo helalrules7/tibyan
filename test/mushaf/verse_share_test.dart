@@ -28,21 +28,17 @@ String _compose(List<AyahRow> v) => composeVerseText(
   surahLabel: (s) => 'S$s',
   digits: (n) => '$n',
   range: (s, a, b) => '$s $a-$b',
-  credit: 'credit',
 );
 
 void main() {
-  test('one verse: text, number in brackets, reference, credit', () {
-    expect(
-      _compose([_ayah(2, 255, 'اللَّهُ')]),
-      'اللَّهُ ﴿255﴾\n[S2 255]\n\ncredit',
-    );
+  test('one verse: text, number in brackets, reference', () {
+    expect(_compose([_ayah(2, 255, 'اللَّهُ')]), 'اللَّهُ ﴿255﴾\n[S2 255]');
   });
 
   test('a range of verses joins them under one reference', () {
     expect(
       _compose([_ayah(2, 1, 'a'), _ayah(2, 2, 'b')]),
-      'a ﴿1﴾ b ﴿2﴾\n[S2 1-2]\n\ncredit',
+      'a ﴿1﴾ b ﴿2﴾\n[S2 1-2]',
     );
   });
 
@@ -58,16 +54,15 @@ void main() {
     expect(out, contains('[S2 1]'));
   });
 
-  test('the shared text: verses, reference, one credit line, no link', () {
+  test('the shared text: verses and reference only, no credit, no link', () {
     final out = composeVerseText(
       verses: [_ayah(4, 123, 'لَّيْسَ')],
       surahLabel: (s) => 'سورة النساء',
       digits: (n) => '$n',
       range: (s, a, b) => '$s $a–$b',
-      credit: 'نص القرآن: tanzil.net',
     );
-    expect(out, 'لَّيْسَ ﴿123﴾\n[سورة النساء 123]\n\nنص القرآن: tanzil.net');
+    expect(out, 'لَّيْسَ ﴿123﴾\n[سورة النساء 123]');
     expect(out, isNot(contains('tibyan://')));
-    expect('نص القرآن'.allMatches(out).length, 1);
+    expect(out, isNot(contains('tanzil')));
   });
 }

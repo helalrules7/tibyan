@@ -1703,7 +1703,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareImageFailed => 'Could not prepare the image';
 
   @override
-  String get shareVerseCredit => 'Quran text: tanzil.net';
+  String get shareSurahImage => 'Share the surah as images';
+
+  @override
+  String get shareImageTitle => 'Share as image';
+
+  @override
+  String shareImageOf(String n, String total) {
+    return '$n of $total';
+  }
+
+  @override
+  String get shareButton => 'Share';
+
+  @override
+  String get saveToPhotos => 'Save to Photos';
+
+  @override
+  String get savedToPhotos => 'Saved to Photos';
+
+  @override
+  String savedToFolder(String folder) {
+    return 'Saved in $folder';
+  }
+
+  @override
+  String get saveToPhotosFailed => 'Could not save to Photos';
+
+  @override
+  String get shareImageRiwayaUnavailable =>
+      'This riwaya\'s text and font are not on this device yet, so its verses cannot be shared as images. Download its pages first.';
 
   @override
   String get backupTitle => 'Backup';

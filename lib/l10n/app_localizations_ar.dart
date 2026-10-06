@@ -1687,7 +1687,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareVerseText => 'مشاركة نصًا';
 
   @override
-  String get shareVerseImage => 'مشاركة صورة';
+  String get shareVerseImage => 'مشاركة كصورة';
 
   @override
   String get sharePreparing => 'جارٍ تجهيز الصورة…';
@@ -1696,7 +1696,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareImageFailed => 'تعذر تجهيز الصورة';
 
   @override
-  String get shareVerseCredit => 'نص القرآن: tanzil.net';
+  String get shareSurahImage => 'مشاركة السورة كصورة';
+
+  @override
+  String get shareImageTitle => 'مشاركة كصورة';
+
+  @override
+  String shareImageOf(String n, String total) {
+    return '$n من $total';
+  }
+
+  @override
+  String get shareButton => 'مشاركة';
+
+  @override
+  String get saveToPhotos => 'حفظ في الصور';
+
+  @override
+  String get savedToPhotos => 'حُفظت الصور';
+
+  @override
+  String savedToFolder(String folder) {
+    return 'حُفظت الصور في $folder';
+  }
+
+  @override
+  String get saveToPhotosFailed => 'تعذر الحفظ في الصور';
+
+  @override
+  String get shareImageRiwayaUnavailable =>
+      'نص هذه الرواية وخطها غير متاحين على هذا الجهاز بعد، فلا تُشارك آياتها صورةً. نزّل صفحات الرواية أولا.';
 
   @override
   String get backupTitle => 'النسخ الاحتياطي';

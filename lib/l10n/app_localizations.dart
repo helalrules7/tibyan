@@ -2980,7 +2980,7 @@ abstract class AppLocalizations {
   /// No description provided for @shareVerseImage.
   ///
   /// In ar, this message translates to:
-  /// **'مشاركة صورة'**
+  /// **'مشاركة كصورة'**
   String get shareVerseImage;
 
   /// No description provided for @sharePreparing.
@@ -2995,11 +2995,59 @@ abstract class AppLocalizations {
   /// **'تعذر تجهيز الصورة'**
   String get shareImageFailed;
 
-  /// No description provided for @shareVerseCredit.
+  /// No description provided for @shareSurahImage.
   ///
   /// In ar, this message translates to:
-  /// **'نص القرآن: tanzil.net'**
-  String get shareVerseCredit;
+  /// **'مشاركة السورة كصورة'**
+  String get shareSurahImage;
+
+  /// No description provided for @shareImageTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة كصورة'**
+  String get shareImageTitle;
+
+  /// No description provided for @shareImageOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} من {total}'**
+  String shareImageOf(String n, String total);
+
+  /// No description provided for @shareButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة'**
+  String get shareButton;
+
+  /// No description provided for @saveToPhotos.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ في الصور'**
+  String get saveToPhotos;
+
+  /// No description provided for @savedToPhotos.
+  ///
+  /// In ar, this message translates to:
+  /// **'حُفظت الصور'**
+  String get savedToPhotos;
+
+  /// No description provided for @savedToFolder.
+  ///
+  /// In ar, this message translates to:
+  /// **'حُفظت الصور في {folder}'**
+  String savedToFolder(String folder);
+
+  /// No description provided for @saveToPhotosFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر الحفظ في الصور'**
+  String get saveToPhotosFailed;
+
+  /// No description provided for @shareImageRiwayaUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص هذه الرواية وخطها غير متاحين على هذا الجهاز بعد، فلا تُشارك آياتها صورةً. نزّل صفحات الرواية أولا.'**
+  String get shareImageRiwayaUnavailable;
 
   /// No description provided for @backupTitle.
   ///

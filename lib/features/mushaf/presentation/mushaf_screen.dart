@@ -1609,7 +1609,6 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           l.surahWord(surahs == null ? '' : surahName(context, surahs[s - 1])),
       digits: NumberFormatter(Localizations.localeOf(context)).call,
       range: (s, a, b) => l.verseRange(s, a, b),
-      credit: l.shareVerseCredit,
     );
   }
 
