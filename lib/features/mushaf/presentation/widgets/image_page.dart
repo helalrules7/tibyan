@@ -88,22 +88,42 @@ EdgeInsets stripPadding(
 /// screen without stretching the calligraphy. Opening pages and screens
 /// wider than the page are scaled as a whole instead.
 class StripLayout {
-  StripLayout(this.size, this.g, {bool withoutHeader = false})
-    : ink = withoutHeader ? (g.inkWithoutHeader ?? g.ink) : g.ink {
+  StripLayout(
+    this.size,
+    this.g, {
+    bool withoutHeader = false,
+    bool stretch = false,
+  }) : ink = withoutHeader ? (g.inkWithoutHeader ?? g.ink) : g.ink {
     final byWidth = size.width / ink.width;
     final byHeight = size.height / ink.height;
     scale = byWidth < byHeight ? byWidth : byHeight;
     strips = !g.whole && byWidth < byHeight;
+    // A text page fitted to the height (a page of a two-page spread, a
+    // wide window) is stretched across toward the frame, a little.
+    // Only where the page itself is drawn by this layout ([stretch]): the
+    // new edition draws its own and uses this one for touches.
+    scaleX = stretch && !strips && !g.whole
+        ? math.min(byWidth, scale * (1 + maxStretch))
+        : scale;
     offset = Offset(
-      (size.width - ink.width * scale) / 2,
+      (size.width - ink.width * scaleX) / 2,
       (size.height - ink.height * scale) / 2,
     );
   }
 
+  /// How much wider than tall a page fitted to the height may be drawn,
+  /// to fill the width: enough for a spread's pages, not enough to change
+  /// the calligraphy's look.
+  static const maxStretch = 0.12;
+
   final Size size;
   final PageGeometry g;
   final Rect ink;
+
+  /// Image px to screen: [scale] down (and across in strips), [scaleX]
+  /// across when the page is fitted to the height.
   late final double scale;
+  late final double scaleX;
   late final bool strips;
   late final Offset offset;
 
@@ -175,7 +195,12 @@ class StripLayout {
   }
 
   Offset toScreen(Offset p, {int? line}) {
-    if (!strips) return (p - ink.topLeft) * scale + offset;
+    if (!strips) {
+      return Offset(
+        (p.dx - ink.left) * scaleX + offset.dx,
+        (p.dy - ink.top) * scale + offset.dy,
+      );
+    }
     final j = line ?? lineOfImageY(p.dy);
     return Offset(
       (p.dx - ink.left) * scale,
@@ -206,7 +231,12 @@ class StripLayout {
   /// In strips, a touch in the gap around a line is taken to the nearest
   /// edge of that line's band: the screen there has no image of its own.
   Offset toImage(Offset p) {
-    if (!strips) return (p - offset) / scale + ink.topLeft;
+    if (!strips) {
+      return Offset(
+        (p.dx - offset.dx) / scaleX + ink.left,
+        (p.dy - offset.dy) / scale + ink.top,
+      );
+    }
     final j = lineAt(p.dy);
     return Offset(
       p.dx / scale + ink.left,
@@ -343,7 +373,7 @@ class StripLayout {
         Rect.fromLTWH(
           offset.dx,
           offset.dy,
-          ink.width * scale,
+          ink.width * scaleX,
           ink.height * scale,
         ),
         paint,
@@ -497,6 +527,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               box.biggest,
               data.geometry,
               withoutHeader: x.ornateOpening,
+              stretch: true,
             );
             // By the line first: the screen between two lines, and between
             // two words, belongs to the nearest.

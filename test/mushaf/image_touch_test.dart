@@ -189,7 +189,7 @@ void main() {
       ];
       final lines = [for (final b in boxes) b.line];
       for (final size in _sizes) {
-        final layout = StripLayout(size, g);
+        final layout = StripLayout(size, g, stretch: true);
         failures.addAll([
           for (final f in _checkPage(
             layout,
@@ -240,7 +240,12 @@ void main() {
             ),
         ];
         for (final size in _sizes) {
-          final layout = StripLayout(size, g, withoutHeader: page <= 2);
+          final layout = StripLayout(
+            size,
+            g,
+            withoutHeader: page <= 2,
+            stretch: true,
+          );
           failures.addAll([
             for (final f in _checkPage(
               layout,
