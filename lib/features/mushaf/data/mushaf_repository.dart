@@ -61,6 +61,14 @@ class MushafRepository {
   Future<AyahRow> ayahById(int id) =>
       (_db.select(_db.ayah)..where((t) => t.id.equals(id))).getSingle();
 
+  /// The verses of prostration (the `sajda` column, from Tanzil's
+  /// metadata), in mushaf order.
+  Future<List<AyahRow>> sajdaVerses() =>
+      (_db.select(_db.ayah)
+            ..where((t) => t.sajda.isNotNull())
+            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+          .get();
+
   Future<AyahRow> ayah(int surah, int number) => (_db.select(
     _db.ayah,
   )..where((t) => t.surah.equals(surah) & t.number.equals(number))).getSingle();
