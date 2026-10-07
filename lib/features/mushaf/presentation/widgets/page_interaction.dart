@@ -14,6 +14,25 @@ import '../../data/tajweed.dart';
 import 'mushaf_page.dart';
 import 'theme_art.dart';
 
+/// The colour a page is drawn on. Recitation covers are painted in it, so
+/// a covered line is the page's own background and nothing more. The
+/// framed layouts lay the page on the theme's paper (the default); where
+/// no frame is drawn (the plain frame of plain themes and elderly mode,
+/// focus mode) the page lies on the screen's background, and the layout
+/// says so here.
+class PageGround extends InheritedWidget {
+  const PageGround({super.key, required this.color, required super.child});
+
+  final Color color;
+
+  static Color of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<PageGround>()?.color ??
+      context.tokens.colors.paper;
+
+  @override
+  bool updateShouldNotify(PageGround oldWidget) => oldWidget.color != color;
+}
+
 /// What the reader can do on a page; shared by both editions.
 class PageInteraction {
   const PageInteraction({

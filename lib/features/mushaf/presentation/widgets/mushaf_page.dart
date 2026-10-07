@@ -579,6 +579,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
+    final ground = PageGround.of(context);
     final x = widget.interaction;
     final l = AppLocalizations.of(context);
     return FutureBuilder(
@@ -1002,7 +1003,7 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                           // no mark of theirs is left.
                           final hidden = x.hidden;
                           if (hidden != null) {
-                            final cover = Paint()..color = tokens.colors.paper;
+                            final cover = Paint()..color = ground;
                             final markersOn = <int, List<double>>{};
                             for (final v in verses) {
                               final m = v.marker;

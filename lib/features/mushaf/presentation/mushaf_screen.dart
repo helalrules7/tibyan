@@ -841,7 +841,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       // only (the top bar names the surah), as wide as the screen and
       // centred; the cover stays as it is.
       if (focus) {
-        return Padding(padding: _focusPagePadding, child: pageWidget);
+        return Padding(
+          padding: _focusPagePadding,
+          // No frame and no paper: the page lies on the screen's background.
+          child: PageGround(color: context.tokens.colors.bg, child: pageWidget),
+        );
       }
 
       if (openingSurah != null) {

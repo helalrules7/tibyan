@@ -854,7 +854,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                                   for (final e in markers.entries)
                                     (e.value, layout.toScreenRect(e.value)),
                                 ],
-                          paper: tokens.colors.paper,
+                          paper: PageGround.of(context),
                           line: tokens.colors.border,
                           divineNames: x.divineNames,
                           divineColor: x.divineColor,
