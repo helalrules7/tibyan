@@ -974,5 +974,14 @@
         "type": "String"
       }
     }
+  },
+  "tasmeeWordDoubtful": "Unsure",
+  "tasmeeSessionDoubtful": "{count} unsure words, not counted in the accuracy",
+  "@tasmeeSessionDoubtful": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   }
 }

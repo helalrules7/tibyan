@@ -4110,6 +4110,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الدقة: {accuracy}%'**
   String tasmeeSessionAccuracy(String accuracy);
+
+  /// No description provided for @tasmeeWordDoubtful.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشكوك فيها'**
+  String get tasmeeWordDoubtful;
+
+  /// No description provided for @tasmeeSessionDoubtful.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} كلمة مشكوك فيها، لم تُحسب في الدقة'**
+  String tasmeeSessionDoubtful(String count);
 }
 
 class _AppLocalizationsDelegate

@@ -1,0 +1,27 @@
+{
+ "name": "stop to correct: a doubtful basmala in al-Fatiha does not stop the session",
+ "range": {
+  "verses": [
+   1,
+   1,
+   1,
+   7
+  ]
+ },
+ "options": {
+  "onError": "stopToCorrect"
+ },
+ "steps": [
+  {
+   "say": "الحمد لله رب العالمين الرحمن الرحيم مالك يوم الدين إياك نعبد وإياك نستعين"
+  }
+ ],
+ "statuses": {
+  "1:1:1-4": "doubtful",
+  "1:2:1-4": "correct",
+  "1:3:1-2": "correct",
+  "1:4:1-3": "correct",
+  "1:5:1-4": "correct",
+  "*": "hidden"
+ }
+}

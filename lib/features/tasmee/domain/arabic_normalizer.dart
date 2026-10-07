@@ -43,7 +43,11 @@ const uthmaniSpellingRules = <SpellingRule>[
   SpellingRule('ل$_daggerكن', 'لكن', 'وَلَٰكِنَّ → ولكن'),
   SpellingRule('ل$_daggerه', 'له', 'إِلَٰهَ → إله'),
   SpellingRule('رحم$_daggerن', 'رحمن', 'ٱلرَّحۡمَٰنِ → الرحمن'),
-  SpellingRule('أول$_dagger', 'أول', 'أُوْلَٰٓئِكَ → أولئك'),
+  SpellingRule(
+    'أول$_dagger(?=ئ)',
+    'أول',
+    'أُوْلَٰٓئِكَ → أولئك (not أَوۡلَٰدَ)',
+  ),
   // One lam where the common spelling writes two.
   SpellingRule('ٱل(?=يل)', 'ٱلل', 'ٱلَّيۡلَ → الليل'),
   SpellingRule('ٱل$_dagger(?=ت|ئ)', 'ٱللا', 'ٱلَّٰتِي → اللاتي'),
@@ -75,6 +79,16 @@ final _hamzaFatha = RegExp(
 );
 final _hamzaOnTatweel = RegExp('\u0640\u0654');
 
+/// After a yeh the hamza with a fatha sits on a yeh in the common
+/// spelling (خَطِيٓـَٔتُهُۥ → خطيئته).
+final _hamzaFathaAfterYeh = RegExp(
+  '(?<=\u064A[\u064B-\u0653]*)\u0640(?:\u0654\u064E|\u064E\u0654)',
+);
+
+/// A sad with a small high seen is read as a seen in Hafs (وَيَبۡصُۜطُ →
+/// ويبسط، بَصۜۡطَةٗ → بسطة).
+final _sadReadAsSeen = RegExp('\u0635(?=[\u064B-\u0653]*\u06DC)');
+
 final _whitespace = RegExp('[\\s\u00A0\u200C\u200D\u200E\u200F]+');
 final _nonLetter = RegExp('[^\u0621-\u064A]');
 final _alifRun = RegExp('\u0627+');
@@ -95,6 +109,8 @@ String normalizeArabicWord(
   List<SpellingRule> rules = uthmaniSpellingRules,
 }) {
   var w = word
+      .replaceAll(_sadReadAsSeen, 'س')
+      .replaceAll(_hamzaFathaAfterYeh, 'ئ')
       .replaceAll(_hamzaFatha, 'أ')
       .replaceAll(_hamzaOnTatweel, 'ئ')
       .replaceAll(_marks, '');

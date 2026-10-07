@@ -2346,4 +2346,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String tasmeeSessionAccuracy(String accuracy) {
     return 'Accuracy: $accuracy%';
   }
+
+  @override
+  String get tasmeeWordDoubtful => 'Unsure';
+
+  @override
+  String tasmeeSessionDoubtful(String count) {
+    return '$count unsure words, not counted in the accuracy';
+  }
 }

@@ -130,6 +130,59 @@ void main() {
       expect(scores.containsKey('1:6'), isFalse);
     });
 
+    test('doubtful words count neither as correct nor as errors', () async {
+      final words = await repo.expectedWords(
+        const VerseRange(fromSurah: 2, fromAyah: 255, toSurah: 2, toAyah: 255),
+      );
+      final engine = TasmeeEngine(words);
+      // القيون: one letter off a long word (medium lets it through).
+      engine.addWords(['الله لا إله إلا هو الحي القيون لا تأخذه']);
+      engine.finish();
+      expect(engine.statusOf(6), WordStatus.doubtful);
+      expect(WordStatus.doubtful.isSettled, isTrue);
+      expect(WordStatus.doubtful.isError, isFalse);
+      final score = engine.scoreOf(words.first.verseId);
+      expect(score.doubtful, 1);
+      expect(score.correct, 8);
+      expect(score.judged, words.length - 1);
+      expect(score.accuracy, closeTo(8 / (words.length - 1), 1e-9));
+    });
+
+    test('strict never leaves a word doubtful', () async {
+      final words = await repo.expectedWords(
+        const VerseRange(fromSurah: 2, fromAyah: 255, toSurah: 2, toAyah: 255),
+      );
+      final engine = TasmeeEngine(
+        words,
+        options: const TasmeeEngineOptions(strictness: MatchStrictness.strict),
+      );
+      engine.addWords(['الله لا إله إلا هو الحي القيون لا تأخذه']);
+      engine.finish();
+      expect(engine.statuses, isNot(contains(WordStatus.doubtful)));
+      expect(engine.statusOf(6), WordStatus.wrong);
+    });
+
+    test('a verse whose every word is doubtful has no accuracy', () async {
+      final words = await repo.expectedWords(const SurahRange(1));
+      final engine = TasmeeEngine(words);
+      engine.addWords(['الحمد لله رب العالمين الرحمن الرحيم']);
+      engine.finish();
+      final basmala = engine.scoreOf(words.first.verseId);
+      expect(basmala.doubtful, 4);
+      expect(basmala.accuracy, isNull);
+    });
+
+    test('the al-Fatiha rule can be turned off', () async {
+      final words = await repo.expectedWords(const SurahRange(1));
+      final engine = TasmeeEngine(
+        words,
+        options: const TasmeeEngineOptions(forgiveFatihaOpening: false),
+      );
+      engine.addWords(['الحمد لله رب العالمين الرحمن الرحيم']);
+      engine.finish();
+      expect(engine.statuses.take(4), everyElement(WordStatus.skipped));
+    });
+
     test('a long range read cleanly, word by word, quickly', () async {
       final words = await repo.expectedWords(const SurahRange(2));
       final heard = _plainWords(words);

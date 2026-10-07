@@ -1521,5 +1521,14 @@
         "type": "String"
       }
     }
+  },
+  "tasmeeWordDoubtful": "مشكوك فيها",
+  "tasmeeSessionDoubtful": "{count} كلمة مشكوك فيها، لم تُحسب في الدقة",
+  "@tasmeeSessionDoubtful": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   }
 }

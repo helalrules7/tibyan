@@ -251,6 +251,7 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
         WordStatus.wrong => l.tasmeeWordWrong,
         WordStatus.skipped => l.tasmeeWordSkipped,
         WordStatus.correctedAfterError => l.tasmeeWordCorrected,
+        WordStatus.doubtful => l.tasmeeWordDoubtful,
       };
 
   Color _statusColor(BuildContext context, WordStatus status) {
@@ -260,15 +261,21 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
       WordStatus.wrong => const Color(0xFFC62828),
       WordStatus.skipped => const Color(0xFFB26A00),
       WordStatus.correctedAfterError => colors.goldText,
+      // Calm: not an error, not confirmed either.
+      WordStatus.doubtful => colors.muted,
     };
   }
 
-  int get _correctCount => _engine.words
-      .where((w) => _engine.statusOf(w.index) == WordStatus.correct)
-      .length;
+  int _count(WordStatus status) =>
+      _engine.words.where((w) => _engine.statusOf(w.index) == status).length;
 
-  double get _accuracy =>
-      _engine.words.isEmpty ? 0 : _correctCount / _engine.words.length;
+  int get _doubtfulCount => _count(WordStatus.doubtful);
+
+  /// Correct words over the words judged: doubtful words count apart.
+  double get _accuracy {
+    final judged = _engine.words.length - _doubtfulCount;
+    return judged <= 0 ? 0 : _count(WordStatus.correct) / judged;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -366,6 +373,13 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
                                     (_accuracy * 100).toStringAsFixed(0),
                                   ),
                                 ),
+                                if (_doubtfulCount > 0)
+                                  Text(
+                                    l.tasmeeSessionDoubtful(
+                                      digits(_doubtfulCount),
+                                    ),
+                                    style: TextStyle(color: t.muted),
+                                  ),
                               ],
                             ),
                           ),
@@ -550,6 +564,11 @@ class _WordTile extends StatelessWidget {
           textDirection: TextDirection.rtl,
           style: TextStyle(
             color: color,
+            decoration: status == WordStatus.doubtful
+                ? TextDecoration.underline
+                : null,
+            decorationStyle: TextDecorationStyle.dotted,
+            decorationColor: color,
             fontSize: 24,
             height: 1.7,
             fontFamily: 'KFGQPC Hafs Uthmanic Script',

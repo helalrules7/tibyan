@@ -1,5 +1,5 @@
 {
- "name": "medium: one letter off in a long word is read correctly",
+ "name": "medium: one letter off in a long word is no error, but doubtful",
  "range": {
   "verses": [
    2,
@@ -14,7 +14,9 @@
   }
  ],
  "statuses": {
-  "2:255:1-9": "correct",
+  "2:255:1-6": "correct",
+  "2:255:7": "doubtful",
+  "2:255:8-9": "correct",
   "2:255:10-50": "hidden"
  }
 }

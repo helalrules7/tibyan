@@ -19,7 +19,13 @@ enum WordStatus {
   skipped,
 
   /// Read wrongly or passed over, then read correctly.
-  correctedAfterError;
+  correctedAfterError,
+
+  /// Neither confirmed nor an error: the word matched only through the
+  /// tolerance of the medium or lenient setting (not letter for letter),
+  /// or it is the opening basmala of al-Fatiha that the recogniser did not
+  /// write (see [TasmeeEngine]). Counted apart: not correct, not an error.
+  doubtful;
 
   bool get isSettled => this != hidden;
   bool get isError => this == wrong || this == skipped;
@@ -45,6 +51,7 @@ class TasmeeEngineOptions {
     this.lookBack = 20,
     this.maxPending = 6,
     this.ignorePreamble = true,
+    this.forgiveFatihaOpening = true,
   });
 
   final MatchStrictness strictness;
@@ -70,6 +77,10 @@ class TasmeeEngineOptions {
   /// The isti'adha and the basmala heard at the start of the session or of
   /// a surah are not extra words.
   final bool ignorePreamble;
+
+  /// A session that opens on al-Fatiha 1:1: basmala words the recogniser
+  /// did not write before the reading is heard are doubtful, not skipped.
+  final bool forgiveFatihaOpening;
 }
 
 /// The words of one verse in the session, and how they were read.
@@ -83,6 +94,7 @@ class VerseScore {
     required this.wrong,
     required this.skipped,
     required this.corrected,
+    this.doubtful = 0,
   });
 
   final int verseId;
@@ -100,13 +112,21 @@ class VerseScore {
   /// correct, reported apart.
   final int corrected;
 
-  /// Correct words over the verse's words, 0..1.
-  double get accuracy => words == 0 ? 0 : correct / words;
+  /// Words the engine is not sure of ([WordStatus.doubtful]): neither
+  /// correct nor an error, reported apart.
+  final int doubtful;
+
+  /// Words judged: all but the doubtful ones.
+  int get judged => words - doubtful;
+
+  /// Correct words over the words judged, 0..1; null when every word of
+  /// the verse is doubtful (nothing to judge).
+  double? get accuracy => judged <= 0 ? null : correct / judged;
 
   @override
   String toString() =>
       'VerseScore($surah:$ayah $correct/$words, wrong $wrong, '
-      'skipped $skipped, corrected $corrected)';
+      'skipped $skipped, corrected $corrected, doubtful $doubtful)';
 }
 
 sealed class TasmeeEvent {
@@ -289,14 +309,21 @@ class TasmeeEngine {
 
   // ---------------------------------------------------------------------
 
+  /// Nothing has been settled yet: the reading proper has not started.
+  bool get _atSessionStart => _cursor == 0 && !_anySettled;
+  bool _anySettled = false;
+
   void _take(_Heard h, List<TasmeeEvent> events) {
     if (_waitingAt != null) return _whileWaiting(h, events);
-    if (options.ignorePreamble && _preambleOpen && _buffer.isEmpty) {
+    // At the very start a word the recogniser garbled does not end the
+    // preamble: it stays open until a word matches the words ahead.
+    final start = _atSessionStart;
+    if (options.ignorePreamble && _preambleOpen && (_buffer.isEmpty || start)) {
       if (_isPreamble(h.key)) {
         events.add(IgnoredWord(h.raw, IgnoredReason.preamble));
         return;
       }
-      _preambleOpen = false;
+      if (!start || _matchesAhead(h.key)) _preambleOpen = false;
     }
     _buffer.add(h);
     _settle(events, force: false);
@@ -307,10 +334,17 @@ class TasmeeEngine {
   /// the middle of one of them (a range opening with «ٱللَّهُ» after a
   /// basmala).
   bool _isPreamble(String key) {
+    // Inside a phrase already begun, and for the first word of a phrase
+    // before the reading starts, the isti'adha and basmala are matched
+    // leniently: they are never judged, so a recogniser's slip in them
+    // must not turn them into errors.
+    final loose = math.min(_threshold, MatchStrictness.lenient.threshold);
+    final start = _atSessionStart;
     bool same(String a, String b) => wordSimilarity(a, b) >= _threshold;
+    bool goesOn(String a, String b) => wordSimilarity(a, b) >= loose;
     final phrase = _phrase;
     if (phrase != null && _phraseAt < phrase.length) {
-      if (same(key, phrase[_phraseAt])) {
+      if (goesOn(key, phrase[_phraseAt])) {
         _phraseAt++;
         if (_phraseAt == phrase.length) _phrase = null;
         return true;
@@ -318,8 +352,11 @@ class TasmeeEngine {
       _phrase = null;
     }
     if (_cursor < words.length && _matches(key, _cursor)) return false;
+    // Before the reading starts, a word of the range just ahead is the
+    // reading (al-Fatiha whose basmala the recogniser did not write).
+    if (start && _matchesAhead(key)) return false;
     for (final p in _preambles) {
-      if (same(key, p.first)) {
+      if (start ? goesOn(key, p.first) : same(key, p.first)) {
         _phrase = p;
         _phraseAt = 1;
         return true;
@@ -370,6 +407,12 @@ class TasmeeEngine {
       latest ??= i;
     }
     return latest;
+  }
+
+  /// The heard words [ops] k consumes, from the queue.
+  List<_Heard> _heardOf(List<_Op> ops, int k) {
+    final from = _tokensBefore(ops, k);
+    return _buffer.sublist(from, from + ops[k].tokens);
   }
 
   int _tokensBefore(List<_Op> ops, int k) {
@@ -496,6 +539,14 @@ class TasmeeEngine {
         break;
       }
       if (!op.isError) {
+        // A match only through the setting's tolerance (doubtful) may be
+        // a word read again that the queue has not shown yet: it waits for
+        // a word matched after it.
+        if (op.kind != _OpKind.repeat &&
+            _matchSimilarity(op, _heardOf(ops, k), wordAt) < 1 &&
+            (k == ops.length - 1 || !ops[k + 1].isMatch)) {
+          break;
+        }
         wordAt += op.words;
         k++;
         continue;
@@ -555,8 +606,11 @@ class TasmeeEngine {
       final c = _cursor;
       switch (op.kind) {
         case _OpKind.match || _OpKind.merge || _OpKind.split:
+          final status = _matchSimilarity(op, heard, c) >= 1
+              ? WordStatus.correct
+              : WordStatus.doubtful;
           for (var x = 0; x < op.words; x++) {
-            _set(c + x, WordStatus.correct, events);
+            _set(c + x, status, events);
             touched.add(c + x);
           }
           _moveTo(c + op.words);
@@ -570,6 +624,14 @@ class TasmeeEngine {
           }
           _moveTo(c + 1);
         case _OpKind.skip:
+          if (_isFatihaOpeningGap(c, op.words)) {
+            for (var x = 0; x < op.words; x++) {
+              _set(c + x, WordStatus.doubtful, events);
+              touched.add(c + x);
+            }
+            _moveTo(c + op.words);
+            break;
+          }
           final stop = options.onError == ErrorBehavior.stopToCorrect;
           for (var x = 0; x < (stop ? 1 : op.words); x++) {
             _set(c + x, WordStatus.skipped, events);
@@ -606,12 +668,46 @@ class TasmeeEngine {
     _completeVerses(touched, events);
   }
 
+  /// How close the heard word(s) of a match, merge or split are to the
+  /// expected word(s): 1 when letter for letter.
+  double _matchSimilarity(_Op op, List<_Heard> heard, int at) =>
+      switch (op.kind) {
+        _OpKind.match => _similarity(heard.single.key, at),
+        _OpKind.merge => _similarity(
+          joinKeys([for (final h in heard) h.key]),
+          at,
+        ),
+        _ => wordSimilarity(
+          heard.single.key,
+          joinKeys([words[at].matching, words[at + 1].matching]),
+        ),
+      };
+
+  /// The opening of al-Fatiha: a skip of [length] words from [at] at the
+  /// very start of a session that opens on 1:1, lying wholly in 1:1. The
+  /// recogniser often drops the basmala at the head of a long stretch; the
+  /// words after the skip (verse 2 on) have already confirmed it, so the
+  /// basmala was most likely read and not written. A skip reaching into
+  /// 1:2 is a real skip.
+  bool _isFatihaOpeningGap(int at, int length) {
+    if (!options.forgiveFatihaOpening || at != 0 || !_atSessionStart) {
+      return false;
+    }
+    final first = words.first;
+    if (first.surah != 1 || first.ayah != 1 || first.word != 1) return false;
+    final last = at + length - 1;
+    return last < words.length &&
+        words[last].surah == 1 &&
+        words[last].ayah == 1;
+  }
+
   void _set(
     int index,
     WordStatus status,
     List<TasmeeEvent> events, {
     String? heard,
   }) {
+    if (status != WordStatus.hidden) _anySettled = true;
     _status[index] = status;
     events.add(WordSettled(index, status, heard: heard));
   }
@@ -645,6 +741,7 @@ class TasmeeEngine {
       wrong: count(WordStatus.wrong),
       skipped: count(WordStatus.skipped),
       corrected: count(WordStatus.correctedAfterError),
+      doubtful: count(WordStatus.doubtful),
     );
   }
 }
@@ -679,6 +776,9 @@ class _Op {
 
   bool get isError =>
       kind == _OpKind.sub || kind == _OpKind.insert || kind == _OpKind.skip;
+
+  bool get isMatch =>
+      kind == _OpKind.match || kind == _OpKind.merge || kind == _OpKind.split;
 
   @override
   String toString() => '${kind.name}($tokens/$words)';
