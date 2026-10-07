@@ -712,9 +712,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get sajdahTextPending => 'The supplications await the source review';
-
-  @override
   String get tapJumpLabel => 'Tapping a verse while listening';
 
   @override

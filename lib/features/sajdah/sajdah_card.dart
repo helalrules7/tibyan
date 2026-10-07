@@ -247,25 +247,41 @@ class _SajdahCardViewState extends State<SajdahCardView>
                     ),
                     SizedBox(height: gap),
                     Flexible(
-                      child: SingleChildScrollView(
-                        child: Text(
-                          text ?? l.sajdahTextPending,
-                          textAlign: TextAlign.center,
-                          textDirection: text == null
-                              ? null
-                              : TextDirection.rtl,
-                          style: text == null
-                              ? TextStyle(
-                                  fontSize: elderly ? 18 : 15,
-                                  color: t.muted,
-                                )
-                              : TextStyle(
-                                  fontFamily: 'UthmanTahaNaskh',
-                                  fontSize: elderly ? 24 : 20,
-                                  height: 1.8,
-                                  color: t.ink,
-                                ),
-                        ),
+                      // All of the supplications in sight: the text is made
+                      // smaller (down to a floor) until it fits the card,
+                      // and only past that does it scroll.
+                      child: LayoutBuilder(
+                        builder: (context, box) {
+                          final scaler = MediaQuery.textScalerOf(context);
+                          TextStyle at(double size) => TextStyle(
+                            fontFamily: 'UthmanTahaNaskh',
+                            fontSize: size,
+                            height: 1.8,
+                            color: t.ink,
+                          );
+                          var size = elderly ? 24.0 : 20.0;
+                          final floor = elderly ? 17.0 : 14.0;
+                          while (size > floor) {
+                            final painter = TextPainter(
+                              text: TextSpan(text: text, style: at(size)),
+                              textAlign: TextAlign.center,
+                              textDirection: TextDirection.rtl,
+                              textScaler: scaler,
+                            )..layout(maxWidth: box.maxWidth);
+                            final fits = painter.height <= box.maxHeight;
+                            painter.dispose();
+                            if (fits) break;
+                            size -= 1;
+                          }
+                          return SingleChildScrollView(
+                            child: Text(
+                              text,
+                              textAlign: TextAlign.center,
+                              textDirection: TextDirection.rtl,
+                              style: at(size),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     SizedBox(height: gap + 2),

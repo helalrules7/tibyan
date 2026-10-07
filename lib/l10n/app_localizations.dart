@@ -1304,12 +1304,6 @@ abstract class AppLocalizations {
   /// **'{n} ثانية متبقية'**
   String sajdahSecondsLeft(String n);
 
-  /// No description provided for @sajdahTextPending.
-  ///
-  /// In ar, this message translates to:
-  /// **'نص الأدعية في انتظار مراجعة المصدر'**
-  String get sajdahTextPending;
-
   /// No description provided for @tapJumpLabel.
   ///
   /// In ar, this message translates to:

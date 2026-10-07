@@ -529,7 +529,6 @@
   "sajdahContinue": "استكمال",
   "sajdahSecondsLeft": "{n} ثانية متبقية",
   "@sajdahSecondsLeft": {"placeholders": {"n": {"type": "String"}}},
-  "sajdahTextPending": "نص الأدعية في انتظار مراجعة المصدر",
   "tapJumpLabel": "عند لمس آية أثناء الاستماع",
   "tapJumpHint": "لمسة على آية في الصفحة تنقل الشيخ إليها",
   "tapJumpVerseStart": "من أول الآية",

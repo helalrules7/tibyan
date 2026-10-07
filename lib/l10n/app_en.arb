@@ -395,7 +395,6 @@
   "sajdahContinue": "Continue",
   "sajdahSecondsLeft": "{n} seconds left",
   "@sajdahSecondsLeft": {"placeholders": {"n": {"type": "String"}}},
-  "sajdahTextPending": "The supplications await the source review",
   "tapJumpLabel": "Tapping a verse while listening",
   "tapJumpHint": "A tap on a verse on the page moves the reciter there",
   "tapJumpVerseStart": "From the verse's start",

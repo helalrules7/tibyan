@@ -709,9 +709,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get sajdahTextPending => 'نص الأدعية في انتظار مراجعة المصدر';
-
-  @override
   String get tapJumpLabel => 'عند لمس آية أثناء الاستماع';
 
   @override
