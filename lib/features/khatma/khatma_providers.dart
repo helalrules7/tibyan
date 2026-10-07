@@ -11,17 +11,58 @@ import '../../core/settings/settings_controller.dart';
 import '../../core/sync/sync.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/data/mushaf_repository.dart';
+import '../mushaf/data/page_pack.dart';
+import '../mushaf/data/riwaya_data.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
 import 'data/activity_repository.dart';
 import 'data/khatma_repository.dart';
+import 'data/quran_index_loader.dart';
 import 'domain/day.dart';
+import 'domain/quran_index.dart';
 import 'domain/khatma_plan.dart';
 import 'domain/reading_tracker.dart';
 import 'domain/reminder_plan.dart';
 import 'services/home_widget_sync.dart';
 import 'services/reminder_scheduler.dart';
+
+/// The verses' numbers, pages and weights, built once from content.db.
+final quranIndexProvider = FutureProvider<QuranIndex>(
+  (ref) => loadQuranIndex(ref.watch(contentDatabaseProvider)),
+);
+
+/// A riwaya edition's pack data: the edition being read's, or another's
+/// read from its pack when it is on the device; null for Hafs editions and
+/// for a pack not downloaded.
+final editionRiwayaDataProvider =
+    FutureProvider.family<RiwayaData?, MushafEdition>((ref, edition) async {
+      if (!edition.isRiwaya) return null;
+      if (ref.watch(editionProvider) == edition) {
+        return ref.watch(riwayaDataProvider.future);
+      }
+      try {
+        final installer = PagePackInstaller(
+          root: ref.watch(packsDirProvider),
+          spec: PagePackSpec.of(edition),
+        );
+        if (!installer.isInstalled) return null;
+        return await RiwayaData.load(installer.dir);
+      } catch (_) {
+        return null;
+      }
+    });
+
+/// The pages of [edition] in Hafs verse numbers (a riwaya's from its pack;
+/// null when the pack is not on the device).
+final editionPagesProvider =
+    FutureProvider.family<EditionPageMap?, MushafEdition>((ref, edition) async {
+      final index = await ref.watch(quranIndexProvider.future);
+      final hafs = index.hafsPages(edition.name);
+      if (hafs != null) return hafs;
+      final data = await ref.watch(editionRiwayaDataProvider(edition).future);
+      return data == null ? null : riwayaPages(edition.name, data, index);
+    });
 
 final khatmaRepositoryProvider = Provider<KhatmaRepository>(
   (ref) => KhatmaRepository(ref.watch(userDatabaseProvider)),
@@ -204,16 +245,19 @@ class KhatmaService {
     );
   }
 
-  /// Pages of [to] holding the verses of [page] of [from].
+  /// Pages of [to] holding the verses of [page] of [from] (a riwaya's
+  /// pages through its pack; none when the pack is not on the device).
   Future<Set<int>> pagesIn(
     int page,
     MushafEdition from,
     MushafEdition to,
   ) async {
     if (from == to) return {page};
-    return {
-      for (final a in await _mushaf.ayahsOnPage(page, from)) a.pageIn(to),
-    };
+    final a = await _ref.read(editionPagesProvider(from).future);
+    final b = await _ref.read(editionPagesProvider(to).future);
+    final verses = a?.ayahsOn(page);
+    if (b == null || verses == null) return const {};
+    return b.pagesOf(verses.from, verses.to);
   }
 
   /// A page stayed on screen long enough: it counts for the khatma.
@@ -362,6 +406,7 @@ class KhatmaService {
       final first = (await _mushaf.ayahsOnPage(
         range.from,
         s!.edition,
+        await _ref.read(editionRiwayaDataProvider(s.edition).future),
       )).firstOrNull;
       final surah = first == null ? null : surahs[first.surah - 1];
       days[day] = (

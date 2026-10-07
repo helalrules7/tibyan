@@ -241,6 +241,30 @@ class RiwayaData {
     for (final v in versesOnPage(page)) row(v),
   ];
 
+  /// Every riwaya verse with a part on [page]: those that start on it and
+  /// one running over from the page before (from its outlines).
+  Set<RiwayaKey> versesTouching(int page) => {
+    for (final v in versesOnPage(page)) v.key,
+    for (final p in polygons(page))
+      if (_index.containsKey((surah: p.surah, ayah: p.number)))
+        (surah: p.surah, ayah: p.number),
+  };
+
+  /// Whether Hafs verse [ayah] of [surah] is on [page]: a riwaya verse on
+  /// the page covers it, or holds its start (a Hafs verse the riwaya does
+  /// not count goes with the verse after it).
+  bool hafsOnPage(int surah, int ayah, int page) {
+    final on = versesTouching(page);
+    if (on.contains(fromHafs(surah, ayah))) return true;
+    for (final k in on) {
+      final v = verse(k.surah, k.ayah)!;
+      if (v.surah == surah && v.hafsFrom > 0) {
+        if (ayah >= v.hafsFrom && ayah <= v.hafsTo) return true;
+      }
+    }
+    return false;
+  }
+
   /// First verse of each juz, by the riwaya's own juz numbers.
   List<RiwayaVerse> juzStarts() {
     final out = <RiwayaVerse>[];
