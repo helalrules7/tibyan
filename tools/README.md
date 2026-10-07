@@ -45,6 +45,7 @@ Scripts that download, verify and prepare data. They handle structure only (down
 | `fetch_quranpedia_dumps.py` | Downloads Quranpedia dump files (e.g. `qiraat.json.gz`, `topics.json.gz`) into `.cache/quranpedia/` and compares them with the hashes recorded on 2026-09-28 |
 | `measure_aqqd_coverage.py` | `listing` reads the AQQD file list from OSF (no audio); `measure` counts, per qira'a style, the Quranpedia qiraat verses and words that have AQQD clips (verse level: an upper bound for words) |
 | `inspect_quranpedia_topics.py` | Depth, counts, verse and surah coverage, source fields and the first levels' titles of Quranpedia's `topics.json` |
+| `patch_changa_marks.py` | Makes the Changa 3.003 release keep a shadda and its haraka (or a hamza mark and its haraka) as two marks: drops GSUB lookup 5 from `ccmp`, which joined them into a spacing glyph that tore words apart. Checks the input's SHA-256; the output is byte-stable (docs/DATA_SOURCES.md, «خط Changa») |
 
 Tests: `python3 -m unittest discover -s tools/tests`. The review workflow is in `docs/review/README.md`.
 
