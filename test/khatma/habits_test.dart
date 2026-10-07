@@ -12,19 +12,38 @@ import 'package:tibyan/features/khatma/domain/reminder_plan.dart';
 void main() {
   final today = Day(2026, 10, 10);
 
-  group('streaks', () {
-    test('count back from today, or from yesterday while today is open', () {
-      final days = {today, today.add(-1), today.add(-2), today.add(-4)};
-      expect(currentStreak(days, today), 3);
-      expect(currentStreak(days.difference({today}), today), 2);
-      expect(currentStreak({today.add(-3)}, today), 0);
-      expect(currentStreak({}, today), 0);
+  group('regularity without streaks (decision 1)', () {
+    test('read X of the last Y days, Y from the first reading (11..30)', () {
+      // Read on 24 of the last 27 days: the window starts at the first.
+      final days = {
+        for (var i = 0; i < 27; i++)
+          if (i != 3 && i != 9 && i != 15) today.add(-i),
+      };
+      expect(readDaysOfLast(days, today), (read: 24, days: 27));
+      // A gap does not reset anything: there is no run to break.
+      expect(readDaysOfLast(days.difference({today, today.add(-1)}), today), (
+        read: 22,
+        days: 27,
+      ));
+      // A new reader: at least 11 days, so the line keeps one form.
+      expect(readDaysOfLast({today, today.add(-2)}, today), (
+        read: 2,
+        days: 11,
+      ));
+      // Older reading is outside the 30 days.
+      expect(readDaysOfLast({today, today.add(-40), today.add(-29)}, today), (
+        read: 2,
+        days: 30,
+      ));
+      expect(readDaysOfLast({today.add(-31)}, today), isNull);
+      expect(readDaysOfLast({}, today), isNull);
     });
 
     test('a missed day is never a failure: the note invites back', () {
       expect(streakNote({}, today), StreakNote.none);
       expect(streakNote({today}, today), StreakNote.readToday);
-      expect(streakNote({today.add(-1)}, today), StreakNote.continueToday);
+      // Read yesterday, not yet today: nothing about a run to keep.
+      expect(streakNote({today.add(-1)}, today), StreakNote.none);
       expect(streakNote({today.add(-5)}, today), StreakNote.welcomeBack);
     });
   });

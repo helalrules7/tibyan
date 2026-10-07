@@ -58,29 +58,39 @@ ReadingReport buildReport({
   return ReadingReport(days: days);
 }
 
-/// Days in a row with reading or listening, ending today, or yesterday when
-/// today has had nothing yet (the day is not over, so nothing is lost).
-int currentStreak(Set<Day> active, Day today) {
-  var d = active.contains(today) ? today : today.add(-1);
-  var n = 0;
-  while (active.contains(d)) {
-    n++;
-    d = d.add(-1);
-  }
-  return n;
+/// «قرأت 24 من آخر 27 يوما» (decision 1: no days-in-a-row count): the
+/// days with reading or listening in a window ending [today].
+///
+/// The window runs back to the first day with activity, at least
+/// [minWindow] and at most [maxWindow] days (11..30 keeps the Arabic
+/// counted noun in one form). Null with no activity in it.
+({int read, int days})? readDaysOfLast(
+  Set<Day> active,
+  Day today, {
+  int minWindow = 11,
+  int maxWindow = 30,
+}) {
+  final first = today.add(-(maxWindow - 1));
+  final inWindow = [
+    for (final d in active)
+      if (d.difference(first) >= 0 && today.difference(d) >= 0) d,
+  ];
+  if (inWindow.isEmpty) return null;
+  final earliest = inWindow.reduce((a, b) => a.difference(b) <= 0 ? a : b);
+  final days = (today.difference(earliest) + 1).clamp(minWindow, maxWindow);
+  return (read: inWindow.length, days: days);
 }
 
-/// The gentle note shown with the streak (plan D9: a missed day is never
-/// shown as a failure, and the notes can be turned off).
+/// The gentle note shown above the week (plan D9 and decision 1: a missed
+/// day is never shown as a failure, nothing counts days in a row, and the
+/// notes can be turned off).
 enum StreakNote {
-  /// Nothing to say: no activity recorded yet.
+  /// Nothing to say: no activity recorded yet, or not yet today after
+  /// reading yesterday.
   none,
 
-  /// Read today, and on [currentStreak] days in a row.
+  /// Read today.
   readToday,
-
-  /// Not yet today; the run so far is waiting for today's page.
-  continueToday,
 
   /// Some days since the last reading: an invitation, without counting.
   welcomeBack,
@@ -89,6 +99,6 @@ enum StreakNote {
 StreakNote streakNote(Set<Day> active, Day today) {
   if (active.isEmpty) return StreakNote.none;
   if (active.contains(today)) return StreakNote.readToday;
-  if (active.contains(today.add(-1))) return StreakNote.continueToday;
+  if (active.contains(today.add(-1))) return StreakNote.none;
   return StreakNote.welcomeBack;
 }
