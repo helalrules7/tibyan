@@ -12,7 +12,9 @@ import '../sync/outbox_writer.dart';
 /// account and goes through the system's share sheet; restoring it merges.
 ///
 /// Rows are copied by SQL column name, so the file does not depend on the
-/// Dart classes. The sync outbox is not part of it: a restored row of a
+/// Dart classes. The khatmas' caches (khatma_coverage, daily_stat) are not
+/// part of it: they are rebuilt from the attributions after a restore. The
+/// sync outbox is not part of it either: a restored row of a
 /// synced table is queued in it again, so it reaches the account once sync
 /// is switched on.
 ///
@@ -36,7 +38,9 @@ class Backup {
     'reading_positions',
     'khatma',
     'khatma_log',
+    'khatma_pause',
     'reading_session',
+    'session_attribution',
     'listening_session',
     'reflection',
     'srs_item',

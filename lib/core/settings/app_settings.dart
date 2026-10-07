@@ -78,6 +78,17 @@ enum PlayerStyle { auto, normal, pill, button }
 /// prostration, in seconds.
 const sajdahTimerLengths = <int>[10, 15, 20, 30, 45, 60];
 
+/// «سرعة القراءة» of the khatmas: how long a whole page must stay on
+/// screen to count as read.
+enum ReadingSpeed {
+  slow(30),
+  medium(20),
+  fast(12);
+
+  const ReadingSpeed(this.secondsPerPage);
+  final int secondsPerPage;
+}
+
 /// Colours offered for tinting verse-end markers (ARGB); null = none.
 const markerTints = <int>[
   0xFF1FA79B,
@@ -131,6 +142,10 @@ class AppSettings {
     this.playerPosition,
     this.sajdahTimer = false,
     this.sajdahSeconds = 20,
+    this.dayStartHour = 3,
+    this.readingSpeed = ReadingSpeed.medium,
+    this.countListening = true,
+    this.showWirdIndicator = true,
   });
 
   final String styleId;
@@ -263,6 +278,19 @@ class AppSettings {
   /// The card's countdown, one of [sajdahTimerLengths] (20 by default).
   final int sajdahSeconds;
 
+  /// Khatmas: the hour the day starts (0–23, 3 by default): reading at
+  /// 1:30 at night counts for the day before.
+  final int dayStartHour;
+
+  /// Khatmas: how long a page must stay on screen to count as read.
+  final ReadingSpeed readingSpeed;
+
+  /// Khatmas: verses heard to their end count as read (on by default).
+  final bool countListening;
+
+  /// Khatmas: today's portion shown in the reader («ورد اليوم · 18 / 20»).
+  final bool showWirdIndicator;
+
   /// The player style in effect: [PlayerStyle.auto] is the normal bar, or
   /// the pill while focus mode is on.
   PlayerStyle get effectivePlayerStyle => playerStyle != PlayerStyle.auto
@@ -313,6 +341,10 @@ class AppSettings {
     Offset? Function()? playerPosition,
     bool? sajdahTimer,
     int? sajdahSeconds,
+    int? dayStartHour,
+    ReadingSpeed? readingSpeed,
+    bool? countListening,
+    bool? showWirdIndicator,
   }) => AppSettings(
     styleId: styleId ?? this.styleId,
     mode: mode ?? this.mode,
@@ -357,6 +389,10 @@ class AppSettings {
         : playerPosition(),
     sajdahTimer: sajdahTimer ?? this.sajdahTimer,
     sajdahSeconds: sajdahSeconds ?? this.sajdahSeconds,
+    dayStartHour: dayStartHour ?? this.dayStartHour,
+    readingSpeed: readingSpeed ?? this.readingSpeed,
+    countListening: countListening ?? this.countListening,
+    showWirdIndicator: showWirdIndicator ?? this.showWirdIndicator,
   );
 
   /// Resolves the colour mode. A dark device maps to Night (never pure

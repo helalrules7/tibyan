@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../mushaf_providers.dart';
 import 'mushaf_screen.dart';
 import 'navigation.dart';
+import '../../khatma/domain/khatmah.dart' show EntryPoint;
 
 /// The last reading position and the reader's named bookmarks (fawasil).
 class FawasilScreen extends ConsumerWidget {
@@ -51,6 +52,7 @@ class FawasilScreen extends ConsumerWidget {
                         ref,
                         surah: last.surah,
                         ayah: last.ayah,
+                        entry: EntryPoint.lastRead,
                       ),
               ),
             ),
@@ -81,8 +83,13 @@ class FawasilScreen extends ConsumerWidget {
                     pageOf(s.surah, s.ayah, s.page),
                   ),
                 ),
-                onTap: () =>
-                    openVerse(context, ref, surah: s.surah, ayah: s.ayah),
+                onTap: () => openVerse(
+                  context,
+                  ref,
+                  surah: s.surah,
+                  ayah: s.ayah,
+                  entry: EntryPoint.bookmark,
+                ),
                 trailing: IconButton(
                   tooltip: l.delete,
                   icon: const Icon(Icons.delete_outline),

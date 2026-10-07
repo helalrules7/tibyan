@@ -16,6 +16,7 @@ import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'data/word_study_repository.dart';
 import 'word_study_providers.dart';
 import '../mushaf/presentation/navigation.dart';
+import '../khatma/domain/khatmah.dart' show EntryPoint;
 
 /// Opens «دراسة الكلمة» for a word of a verse; [word] null lets the reader
 /// choose one of the verse's words first.
@@ -408,7 +409,14 @@ class _Occurrence extends ConsumerWidget {
             versePageProvider((a.surah, a.number)).future,
           );
           navigator.pop();
-          router.go(mushafLocation(page, surah: a.surah, ayah: a.number));
+          router.go(
+            mushafLocation(
+              page,
+              surah: a.surah,
+              ayah: a.number,
+              entry: EntryPoint.search,
+            ),
+          );
         },
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),

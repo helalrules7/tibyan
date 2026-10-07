@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../khatma/domain/khatmah.dart' show EntryPoint;
 import '../mushaf_providers.dart';
 
 var _visit = 0;
@@ -9,9 +10,18 @@ var _visit = 0;
 /// The page view's location for [page] (and a verse to select). Each call
 /// gives a new location: going to the one already open would otherwise
 /// do nothing, though the reader may have turned the page since.
-String mushafLocation(int page, {int? surah, int? ayah}) =>
+///
+/// [entry] says where the reading was opened from (the khatma's reading
+/// tracker counts only what comes after the page a search landed on).
+String mushafLocation(
+  int page, {
+  int? surah,
+  int? ayah,
+  EntryPoint entry = EntryPoint.other,
+}) =>
     '/mushaf?page=$page'
     '${surah == null || ayah == null ? '' : '&s=$surah&a=$ayah'}'
+    '${entry == EntryPoint.other ? '' : '&entry=${entry.name}'}'
     '&v=${++_visit}';
 
 /// Opens a verse in the page view. Navigation only turns the page; it
@@ -21,12 +31,13 @@ Future<void> openVerse(
   WidgetRef ref, {
   required int surah,
   required int ayah,
+  EntryPoint entry = EntryPoint.other,
 }) async {
   // [surah]:[ayah] is in Hafs numbers; a riwaya edition opens the page of
   // the riwaya verse that holds it.
   final page = await ref.read(versePageProvider((surah, ayah)).future);
   if (!context.mounted) return;
-  context.go(mushafLocation(page));
+  context.go(mushafLocation(page, entry: entry));
 }
 
 /// Opens a page of the edition being read.

@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../core/db/content_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../audio/timing_updates.dart';
+import 'riwaya_data.dart';
 import 'tajweed_index.dart';
 
 /// First verse of a juz, for the juz index.
@@ -32,10 +33,33 @@ class MushafRepository {
 
   /// Verses on a page of the given edition, in order. In the Shamarly
   /// edition this includes a verse that started on the page before.
+  ///
+  /// A riwaya edition's pages are in its pack: with [riwaya] (that
+  /// edition's data), the Hafs verses its page holds; without it, none.
   Future<List<AyahRow>> ayahsOnPage(
     int page, [
     MushafEdition edition = MushafEdition.madina1441,
-  ]) =>
+    RiwayaData? riwaya,
+  ]) async {
+    if (edition.isRiwaya) {
+      if (riwaya == null) return const [];
+      final on = riwaya.versesTouching(page);
+      if (on.isEmpty) return const [];
+      final surahs = {for (final k in on) k.surah};
+      final rows =
+          await (_db.select(_db.ayah)
+                ..where((t) => t.surah.isIn(surahs))
+                ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+              .get();
+      return [
+        for (final r in rows)
+          if (riwaya.hafsOnPage(r.surah, r.number, page)) r,
+      ];
+    }
+    return _hafsAyahsOnPage(page, edition);
+  }
+
+  Future<List<AyahRow>> _hafsAyahsOnPage(int page, MushafEdition edition) =>
       (_db.select(_db.ayah)
             ..where(
               (t) => switch (edition) {

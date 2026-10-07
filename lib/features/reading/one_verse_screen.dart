@@ -6,11 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../core/db/content_database.dart';
+import '../../core/router/cover_observer.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../audio/recitation.dart';
+import '../khatma/domain/khatmah.dart' show EntryPoint;
+import '../khatma/domain/reading_tracker.dart';
+import '../khatma/khatma_providers.dart';
 import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart' show surahName;
@@ -72,10 +76,18 @@ double fitFontSize(
 /// and while the recitation plays the screen follows it. Leaving goes back
 /// to the mushaf at the last verse shown. The text is the Hafs text.
 class OneVerseScreen extends ConsumerStatefulWidget {
-  const OneVerseScreen({super.key, required this.surah, required this.ayah});
+  const OneVerseScreen({
+    super.key,
+    required this.surah,
+    required this.ayah,
+    this.entry = EntryPoint.other,
+  });
 
   final int surah;
   final int ayah;
+
+  /// Where the reading was opened from (see [MushafScreen.entry]).
+  final EntryPoint entry;
 
   @override
   ConsumerState<OneVerseScreen> createState() => _OneVerseScreenState();
@@ -98,6 +110,12 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
   /// The reader's own choice, put back on leaving.
   late final bool _keepScreenOn = ref.read(settingsProvider).keepScreenOn;
 
+  /// Counts each verse read (after its share of a page's time) for the
+  /// khatma, and the time spent reading.
+  late final ReadingTracker _tracker;
+  late final AppLifecycleListener _lifecycle;
+  Route<dynamic>? _route;
+
   @override
   void initState() {
     super.initState();
@@ -109,7 +127,70 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     unawaited(WakelockPlus.enable().catchError((_) {}));
     _keepScreenOn; // read now: ref is not usable in dispose
+    // The tracker's callbacks also run from dispose, when ref is no longer
+    // usable: they read through the container.
+    final c = ProviderScope.containerOf(context, listen: false);
+    final service = ref.read(khatmaServiceProvider);
+    String edition() => c.read(editionProvider).name;
+    _tracker = ReadingTracker(
+      mode: 'verse',
+      onPageRead: (_) {},
+      onVersesRead: (r) => unawaited(
+        service
+            .versesRead(r, entry: widget.entry, edition: edition())
+            .catchError((_) {}),
+      ),
+      onSessionEnd: (s) => unawaited(
+        service.sessionEnded(s, entry: widget.entry).catchError((_) {}),
+      ),
+      verseWeight: (id) =>
+          c.read(quranIndexProvider).value?.weight(id) ?? 1 / 15,
+      minDwell: Duration(
+        seconds: ref.read(settingsProvider).readingSpeed.secondsPerPage,
+      ),
+    );
+    ref.read(quranIndexProvider.future).ignore();
+    _lifecycle = AppLifecycleListener(
+      onHide: _tracker.end,
+      onShow: () => _tracker.showVerse(_id, edition: edition()),
+    );
     _open();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null && route != _route) {
+      if (_route != null) coverObserver.unsubscribe(_route!);
+      _route = route;
+      coverObserver.subscribe(route, _tracker.freeze);
+    }
+  }
+
+  /// Verse [id] is on screen: the tracker waits on it, and it is the last
+  /// place read (as the page view keeps it).
+  Future<void> _shown(int id) async {
+    final edition = ref.read(editionProvider);
+    _tracker.showVerse(id, edition: edition.name);
+    try {
+      final row = await ref.read(verseByIdProvider(id).future);
+      final page = await ref.read(
+        versePageProvider((row.surah, row.number)).future,
+      );
+      if (!mounted || id != _id) return;
+      await ref
+          .read(userDatabaseProvider)
+          .savePosition(
+            edition: edition.name,
+            view: 'verse',
+            surah: row.surah,
+            ayah: row.number,
+            page: page,
+          );
+    } catch (_) {
+      // The position stays where it was.
+    }
   }
 
   /// (Re)starts the auto-turn wait for the verse now shown.
@@ -145,6 +226,8 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
       _id = row.id;
       _controller = PageController(initialPage: row.id - 1);
     });
+    if (widget.entry.countsOnlyAfterLanding) _tracker.onlyAfterVerse = row.id;
+    unawaited(_shown(row.id));
     _restartAuto();
   }
 
@@ -156,6 +239,9 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
       unawaited(WakelockPlus.disable().catchError((_) {}));
     }
     _auto?.cancel();
+    _lifecycle.dispose();
+    if (_route != null) coverObserver.unsubscribe(_route!);
+    _tracker.end();
     _controller?.dispose();
     super.dispose();
   }
@@ -239,70 +325,78 @@ class _OneVerseScreenState extends ConsumerState<OneVerseScreen> {
     });
 
     final c = _controller;
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) unawaited(_leave());
-      },
-      child: Scaffold(
-        backgroundColor: t.paper,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: c == null
-                  ? Center(
-                      child: CircularProgressIndicator(
-                        semanticsLabel: l.loadingLabel,
-                      ),
-                    )
-                  : CallbackShortcuts(
-                      bindings: {
-                        const SingleActivator(
-                          LogicalKeyboardKey.arrowLeft,
-                        ): () =>
-                            _go(1),
-                        const SingleActivator(
-                          LogicalKeyboardKey.arrowRight,
-                        ): () =>
-                            _go(-1),
-                        const SingleActivator(LogicalKeyboardKey.escape):
-                            _leave,
-                      },
-                      child: Focus(
-                        autofocus: true,
-                        child: Directionality(
-                          // Verses run from right to left: the next is on the left.
-                          textDirection: TextDirection.rtl,
-                          child: PageView.builder(
-                            controller: c,
-                            itemCount: verseCount,
-                            onPageChanged: (i) {
-                              // Pages passed on the way to the recited verse
-                              // are the recitation's too.
-                              final followed = _following != null;
-                              if (_following == i + 1) _following = null;
-                              setState(() => _id = i + 1);
-                              _restartAuto();
-                              unawaited(
-                                _sajdahAfterMove(i + 1, followed: followed),
-                              );
-                            },
-                            itemBuilder: (context, i) => _VersePage(
-                              id: i + 1,
-                              onListen: _listen,
-                              onAuto: _cycleAuto,
-                              onNext: () => _go(1),
-                              onPrevious: () => _go(-1),
-                              onLeave: _leave,
+    _tracker.minDwell = Duration(
+      seconds: ref.watch(settingsProvider).readingSpeed.secondsPerPage,
+    );
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _tracker.touch(),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) unawaited(_leave());
+        },
+        child: Scaffold(
+          backgroundColor: t.paper,
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: c == null
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          semanticsLabel: l.loadingLabel,
+                        ),
+                      )
+                    : CallbackShortcuts(
+                        bindings: {
+                          const SingleActivator(
+                            LogicalKeyboardKey.arrowLeft,
+                          ): () =>
+                              _go(1),
+                          const SingleActivator(
+                            LogicalKeyboardKey.arrowRight,
+                          ): () =>
+                              _go(-1),
+                          const SingleActivator(LogicalKeyboardKey.escape):
+                              _leave,
+                        },
+                        child: Focus(
+                          autofocus: true,
+                          child: Directionality(
+                            // Verses run from right to left: the next is on the left.
+                            textDirection: TextDirection.rtl,
+                            child: PageView.builder(
+                              controller: c,
+                              itemCount: verseCount,
+                              onPageChanged: (i) {
+                                // Pages passed on the way to the recited verse
+                                // are the recitation's too.
+                                final followed = _following != null;
+                                if (_following == i + 1) _following = null;
+                                setState(() => _id = i + 1);
+                                unawaited(_shown(i + 1));
+                                _restartAuto();
+                                unawaited(
+                                  _sajdahAfterMove(i + 1, followed: followed),
+                                );
+                              },
+                              itemBuilder: (context, i) => _VersePage(
+                                id: i + 1,
+                                onListen: _listen,
+                                onAuto: _cycleAuto,
+                                onNext: () => _go(1),
+                                onPrevious: () => _go(-1),
+                                onLeave: _leave,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-            ),
-            // The sajdah card, over the verse.
-            const SajdahCardLayer(),
-          ],
+              ),
+              // The sajdah card, over the verse.
+              const SajdahCardLayer(),
+            ],
+          ),
         ),
       ),
     );

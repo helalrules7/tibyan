@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/assistant/assistant_screen.dart';
 import '../../features/assistant/tajweed_marks_screen.dart';
 import '../../features/hifz/presentation/hifz_map_screen.dart';
+import '../../features/khatma/domain/khatmah.dart' show EntryPoint, enumNamed;
 import '../../features/hifz/presentation/hifz_screen.dart';
 import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
@@ -33,6 +34,7 @@ import '../../features/settings/settings_screen.dart';
 import '../../features/settings/storage_screen.dart';
 import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
+import 'cover_observer.dart';
 import 'keyboard_dismiss.dart';
 
 int? _int(GoRouterState s, String key) =>
@@ -42,7 +44,7 @@ final appRouterProvider = Provider<GoRouter>(
   (ref) => GoRouter(
     initialLocation: '/splash',
     // A screen left or returned to never keeps the keyboard up.
-    observers: [KeyboardDismissObserver()],
+    observers: [KeyboardDismissObserver(), coverObserver],
     // First launch: language, then style and colours, then the edition.
     redirect: (context, state) {
       final done = ref.read(settingsProvider).onboardingDone;
@@ -159,6 +161,12 @@ final appRouterProvider = Provider<GoRouter>(
         builder: (context, state) => OneVerseScreen(
           surah: _int(state, 's') ?? 1,
           ayah: _int(state, 'a') ?? 1,
+          entry:
+              enumNamed(
+                EntryPoint.values,
+                state.uri.queryParameters['entry'],
+              ) ??
+              EntryPoint.other,
         ),
       ),
       GoRoute(
@@ -167,6 +175,12 @@ final appRouterProvider = Provider<GoRouter>(
           key: ValueKey(state.uri.toString()),
           surah: _int(state, 's') ?? 1,
           ayah: _int(state, 'a') ?? 1,
+          entry:
+              enumNamed(
+                EntryPoint.values,
+                state.uri.queryParameters['entry'],
+              ) ??
+              EntryPoint.other,
         ),
       ),
       GoRoute(
@@ -180,6 +194,14 @@ final appRouterProvider = Provider<GoRouter>(
           hifzFrom: state.uri.queryParameters['from'],
           hifzTo: state.uri.queryParameters['to'],
           listen: state.uri.queryParameters['listen'] == '1',
+          // `entry=`: where the reading was opened from (the reading
+          // tracker counts only past the landing page for some).
+          entry:
+              enumNamed(
+                EntryPoint.values,
+                state.uri.queryParameters['entry'],
+              ) ??
+              EntryPoint.other,
         ),
         routes: [
           GoRoute(
