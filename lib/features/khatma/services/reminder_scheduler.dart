@@ -51,8 +51,7 @@ class NoReminders implements ReminderScheduler {
   set onTap(void Function(String payload)? handler) {}
 }
 
-/// flutter_local_notifications: one notification per day, scheduled ahead
-/// for [reminderDaysAhead] days (iOS keeps at most 64 pending), inexact so
+/// flutter_local_notifications: rolling per-plan reminders are inexact so
 /// no exact-alarm permission is needed on Android.
 class LocalReminderScheduler implements ReminderScheduler {
   final _plugin = FlutterLocalNotificationsPlugin();
@@ -147,8 +146,16 @@ class LocalReminderScheduler implements ReminderScheduler {
   }) async {
     if (!_supported) return;
     await _init();
-    for (var i = 0; i < reminderDaysAhead; i++) {
-      await _plugin.cancel(id: reminderIdBase + i);
+    final pending = await _plugin.pendingNotificationRequests();
+    for (final request in pending) {
+      final id = request.id;
+      final legacyReminder =
+          id >= reminderIdBase && id < reminderIdBase + reminderDaysAhead;
+      final khatmaReminder =
+          id >= khatmaReminderIdBase && id < khatmaReminderIdLimit;
+      if (legacyReminder || khatmaReminder) {
+        await _plugin.cancel(id: id);
+      }
     }
     final details = NotificationDetails(
       android: AndroidNotificationDetails(
