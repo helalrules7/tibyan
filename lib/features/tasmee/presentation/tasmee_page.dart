@@ -3,9 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/settings/app_settings.dart' show PageFill;
 import '../../../core/theme/app_theme.dart';
 import '../../mushaf/mushaf_providers.dart';
-import '../../mushaf/presentation/widgets/illuminated_frame.dart';
 import '../../mushaf/presentation/widgets/mushaf_page.dart';
 import '../../mushaf/presentation/widgets/page_interaction.dart';
 import '../domain/alignment_engine.dart';
@@ -57,7 +57,6 @@ class TasmeePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final boxes = ref.watch(pageWordBoxesProvider(page)).value;
-    final info = ref.watch(frameInfoProvider(page)).value;
     final t = context.tokens.colors;
     final c = context.tasmeeColors;
     final s = state;
@@ -145,20 +144,29 @@ class TasmeePage extends ConsumerWidget {
       hiddenWords: hiddenWords,
       revealedWords: revealedWords,
       wordTints: tints,
+      fill: PageFill.lines,
       wordOverlay: marks.isEmpty
           ? null
           : (canvas, toScreen) =>
                 _paintMarks(canvas, marks, toScreen, c, t.goldText, t.paper),
     );
+    // Frameless, as in focus mode: the lines fill the width at the
+    // glyphs' own proportions, on the theme's paper.
     return Semantics(
       container: true,
       label: _pageLabel(context, s),
-      child: IlluminatedFrame(
-        info: info,
-        child: MushafPage(
-          key: ValueKey('tasmee/$page'),
-          page: page,
-          interaction: interaction,
+      child: ColoredBox(
+        color: t.paper,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          child: PageGround(
+            color: t.paper,
+            child: MushafPage(
+              key: ValueKey('tasmee/$page'),
+              page: page,
+              interaction: interaction,
+            ),
+          ),
         ),
       ),
     );

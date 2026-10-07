@@ -490,17 +490,19 @@ void main() {
     expect(container.read(tasmeeSettingsProvider).last, isNull);
   });
 
-  testWidgets('elderly theme: the page lies on the background', (tester) async {
-    final (container, _, _) = await pumpSession(
-      tester,
-      elderly: true,
-      size: const Size(480, 900),
-    );
-    final t = tasmeeTheme(
-      container,
-      elderly: true,
-    ).extension<TibyanTokens>()!.colors;
-    expect(t.bg, isNot(t.paper));
-    expect(PageGround.of(tester.element(find.byType(MushafPage))), t.bg);
-  });
+  testWidgets(
+    'elderly theme: frameless page on the paper, covers the same colour',
+    (tester) async {
+      final (container, _, _) = await pumpSession(
+        tester,
+        elderly: true,
+        size: const Size(480, 900),
+      );
+      final t = tasmeeTheme(
+        container,
+        elderly: true,
+      ).extension<TibyanTokens>()!.colors;
+      expect(PageGround.of(tester.element(find.byType(MushafPage))), t.paper);
+    },
+  );
 }

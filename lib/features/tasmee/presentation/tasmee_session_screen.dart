@@ -319,10 +319,7 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
     );
     final edition = ref.watch(editionProvider);
     final Widget pageView = edition == MushafEdition.madina1441
-        ? Padding(
-            padding: const EdgeInsets.fromLTRB(4, 10, 4, 4),
-            child: TasmeePage(page: page, words: words, state: pageState),
-          )
+        ? TasmeePage(page: page, words: words, state: pageState)
         : _WordsView(words: widget.request.words, state: pageState);
     ref.watch(surahsProvider);
     final (title, line) = _title(context);
@@ -344,15 +341,14 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
                   Expanded(
                     child: Row(
                       children: [
-                        const Spacer(),
-                        SizedBox(
-                          width: 560,
+                        const SizedBox(width: 24),
+                        Expanded(
                           child: KeyedSubtree(
                             key: const ValueKey('tasmee-page'),
                             child: pageView,
                           ),
                         ),
-                        const SizedBox(width: 28),
+                        const SizedBox(width: 24),
                         SizedBox(
                           width: 340,
                           child: Padding(
@@ -360,7 +356,7 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
                             child: _SidePanel(session: s, actions: actions),
                           ),
                         ),
-                        const Spacer(),
+                        const SizedBox(width: 24),
                       ],
                     ),
                   ),
