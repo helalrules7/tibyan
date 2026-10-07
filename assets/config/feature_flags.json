@@ -16,5 +16,6 @@
   "old_madina_edition": true,
   "meaning_search": true,
   "accounts_sync": true,
-  "group_khatma": true
+  "group_khatma": true,
+  "tasmee_hint": true
 }

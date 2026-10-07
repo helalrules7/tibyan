@@ -302,6 +302,19 @@ class TasmeeEngine {
     return events;
   }
 
+  /// Stop to correct: the reader gives up on the word the engine waits on.
+  /// It stays wrong, and the recitation goes on from the word after it.
+  List<TasmeeEvent> skipWaiting() {
+    final events = <TasmeeEvent>[];
+    final at = _waitingAt;
+    if (at == null) return events;
+    _waitingAt = null;
+    _lastWhileWaiting = null;
+    _moveTo(at + 1);
+    _completeVerses([at], events);
+    return events;
+  }
+
   /// The score of each verse with a word settled, in order.
   List<VerseScore> get verseScores => [
     for (final e in _verseIndices.entries)

@@ -38,6 +38,9 @@ class TasmeeAudioCapture {
   AudioLevelCallback? _onLevel;
   SpeechEndedCallback? _onSpeechEnded;
   AudioErrorCallback? _onError;
+
+  /// Every captured frame, speech or not (the panel's spectrum).
+  PcmCallback? _onFrame;
   bool _disposed = false;
   bool _running = false;
   DateTime _lastLevelNotification = DateTime.fromMillisecondsSinceEpoch(0);
@@ -49,6 +52,7 @@ class TasmeeAudioCapture {
     required AudioLevelCallback onLevel,
     required SpeechEndedCallback onSpeechEnded,
     required AudioErrorCallback onError,
+    PcmCallback? onFrame,
   }) async {
     if (_disposed) throw StateError('Audio capture has been disposed');
     if (_running) return;
@@ -63,6 +67,7 @@ class TasmeeAudioCapture {
     _onLevel = onLevel;
     _onSpeechEnded = onSpeechEnded;
     _onError = onError;
+    _onFrame = onFrame;
     _detector.reset();
     _pendingBytes.clear();
     _pendingSamples.clear();
@@ -112,6 +117,7 @@ class TasmeeAudioCapture {
       _onLevel = null;
       _onSpeechEnded = null;
       _onError = null;
+      _onFrame = null;
     }
   }
 
@@ -129,6 +135,7 @@ class TasmeeAudioCapture {
     while (_pendingSamples.length >= frameSize) {
       final frame = Int16List.fromList(_pendingSamples.sublist(0, frameSize));
       _pendingSamples.removeRange(0, frameSize);
+      _onFrame?.call(frame);
       final result = _detector.addFrame(frame);
       final now = DateTime.now();
       if (now.difference(_lastLevelNotification).inMilliseconds >= 80) {

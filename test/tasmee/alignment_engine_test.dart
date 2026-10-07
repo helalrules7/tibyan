@@ -245,6 +245,30 @@ void main() {
     });
   });
 
+  group('stop to correct', () {
+    test('skipping the word waited on leaves it wrong and goes on', () async {
+      final words = await repo.expectedWords(
+        const VerseRange(fromSurah: 2, fromAyah: 2, toSurah: 2, toAyah: 2),
+      );
+      final engine = TasmeeEngine(
+        words,
+        options: const TasmeeEngineOptions(
+          onError: ErrorBehavior.stopToCorrect,
+        ),
+      );
+      engine.addWords(['ذلك الكتاب لا شك فيه']);
+      expect(engine.waitingAt, 3);
+      final events = engine.skipWaiting();
+      expect(events, isEmpty, reason: 'the verse is not complete yet');
+      expect(engine.waitingAt, isNull);
+      expect(engine.statusOf(3), WordStatus.wrong);
+      expect(engine.cursor, 4);
+      engine.addWords(['فيه هدى للمتقين']);
+      expect(engine.statusOf(4), WordStatus.correct);
+      expect(engine.skipWaiting(), isEmpty, reason: 'nothing to skip');
+    });
+  });
+
   group('TranscriptStabilizer', () {
     test('a word settles once two hypotheses agree on it', () {
       final s = TranscriptStabilizer();
