@@ -91,7 +91,8 @@ typedef TranscriberLoader = SegmentTranscriber Function(
 /// this reports [FinalTranscript]s only: each time the reader pauses
 /// ([endOfSpeech], from the capture's voice activity detection) the audio
 /// since the last pause is transcribed; a stretch longer than the
-/// [SpeechSegmentBuffer] limit is cut there. The model runs in its own
+/// [SpeechSegmentBuffer] limit (8 s) is cut at its quietest moment near
+/// there. The model runs in its own
 /// isolate, so the screen never waits on it.
 class SherpaOfflineRecognizer implements RecitationRecognizer {
   SherpaOfflineRecognizer(

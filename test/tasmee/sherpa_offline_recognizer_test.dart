@@ -137,15 +137,22 @@ void main() {
       await recognizer.dispose();
     });
 
-    test('a stretch longer than the segment limit is cut there', () async {
+    test('a stretch with no pause is cut near the segment limit', () async {
       final recognizer = SherpaOfflineRecognizer(ctc, loader: _fakeLoader);
       final texts = <String>[];
       final sub = recognizer.events.listen((e) => texts.add(e.text));
       await recognizer.start();
       recognizer.acceptAudio(_speech(30));
       recognizer.endOfSpeech();
-      await _until(() => texts.length >= 2);
-      expect(texts, ['ctc ${25 * 16000}', 'ctc ${5 * 16000}']);
+      await _until(() => texts.length >= 3);
+      final lengths = [for (final t in texts) int.parse(t.split(' ').last)];
+      expect(lengths, hasLength(3));
+      // Flat audio has no dip: cut at the hard maximum (11 s), never longer.
+      for (final n in lengths.take(2)) {
+        expect(n, inInclusiveRange(10 * 16000, 11 * 16000));
+      }
+      // Nothing lost; each cut repeats 0.2 s in the next segment.
+      expect(lengths.reduce((a, b) => a + b), 30 * 16000 + 2 * 3200);
       await sub.cancel();
       await recognizer.dispose();
     });
