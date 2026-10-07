@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -200,6 +201,11 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           _SectionTitle(l.focusModeTitle),
           const _FocusModeCard(),
+          const SizedBox(height: 16),
+          // Here as well as in the player's settings: it also works with
+          // touch reading and «آية آية», with no recitation playing.
+          _SectionTitle(l.sajdahTimer),
+          const _SajdahTimerCard(),
           const SizedBox(height: 16),
           _SectionTitle(l.playerStyleLabel),
           const _PlayerStyleCard(),
@@ -406,6 +412,71 @@ class _FocusModeCard extends ConsumerWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// «مؤقت سجدات التلاوة»: on or off, and the card's countdown.
+class _SajdahTimerCard extends ConsumerWidget {
+  const _SajdahTimerCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: ExcludeSemantics(
+              child: SvgPicture.asset(
+                'assets/ornaments/sajdah.svg',
+                height: 24,
+                colorFilter: ColorFilter.mode(t.muted, BlendMode.srcIn),
+              ),
+            ),
+            title: Text(l.sajdahTimer),
+            subtitle: Text(l.sajdahTimerHint, style: TextStyle(color: t.muted)),
+            value: settings.sajdahTimer,
+            onChanged: controller.setSajdahTimer,
+          ),
+          // The length shows only while the timer is on.
+          if (settings.sajdahTimer) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      l.sajdahTimerLength,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final n in sajdahTimerLengths)
+                        ChoiceChip(
+                          label: Text(l.seconds(digits(n))),
+                          selected: settings.sajdahSeconds == n,
+                          onSelected: (_) => controller.setSajdahSeconds(n),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
