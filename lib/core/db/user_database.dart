@@ -69,6 +69,10 @@ class ReadingPositions extends Table {
     Outbox,
     SrsItems,
     Memorizations,
+    KhatmaPauses,
+    SessionAttributions,
+    KhatmaCoverages,
+    DailyStats,
   ],
 )
 class UserDatabase extends _$UserDatabase {
@@ -77,7 +81,7 @@ class UserDatabase extends _$UserDatabase {
   UserDatabase.open() : super(driftDatabase(name: 'user'));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -97,8 +101,73 @@ class UserDatabase extends _$UserDatabase {
         await m.createTable(srsItems);
         await m.createTable(memorizations);
       }
+      if (from < 5) await _toKhatmahV5(m);
     },
   );
+
+  /// Khatmah v1.1: khatmas over verse ranges with sessions and their
+  /// attributions as the record. Old columns stay; the old log is carried
+  /// over to sessions later, once the verse index is at hand
+  /// (KhatmahStore.migrateLegacy), and is kept read-only.
+  Future<void> _toKhatmahV5(Migrator m) async {
+    // A v4 database made by an earlier step of this same upgrade (from < 3)
+    // already has the new columns.
+    final have = {
+      for (final r in await customSelect('PRAGMA table_info("khatma")').get())
+        r.read<String>('name'),
+    };
+    for (final c in [
+      khatmas.kind,
+      khatmas.rangeStart,
+      khatmas.rangeEnd,
+      khatmas.startAt,
+      khatmas.pacingMode,
+      khatmas.scheduleMode,
+      khatmas.dailyWeight,
+      khatmas.restWeekdays,
+      khatmas.countingMode,
+      khatmas.isPrimary,
+      khatmas.status,
+      khatmas.autoRestart,
+      khatmas.presetId,
+      khatmas.aheadChoice,
+      khatmas.reminderKinds,
+      khatmas.recovery,
+    ]) {
+      if (!have.contains(c.name)) await m.addColumn(khatmas, c);
+    }
+    final session = {
+      for (final r in await customSelect(
+        'PRAGMA table_info("reading_session")',
+      ).get())
+        r.read<String>('name'),
+    };
+    for (final c in [
+      readingSessions.source,
+      readingSessions.entryPoint,
+      readingSessions.activeSeconds,
+      readingSessions.ranges,
+    ]) {
+      if (!session.contains(c.name)) await m.addColumn(readingSessions, c);
+    }
+    await m.createTable(khatmaPauses);
+    await m.createTable(sessionAttributions);
+    await m.createTable(khatmaCoverages);
+    await m.createTable(dailyStats);
+    // What the old rows said by their dates: the status, how the plan was
+    // made, and the khatma being read as the primary one.
+    await customStatement(
+      "UPDATE khatma SET status = CASE "
+      "WHEN deleted_at IS NOT NULL THEN 'cancelled' "
+      "WHEN completed_at IS NOT NULL THEN 'completed' ELSE 'active' END, "
+      "pacing_mode = CASE WHEN daily_portion IS NULL THEN 'endDate' "
+      "ELSE 'dailyAmount' END",
+    );
+    await customStatement(
+      'UPDATE khatma SET is_primary = 1 WHERE id = (SELECT id FROM khatma '
+      "WHERE status = 'active' ORDER BY created_at DESC, id DESC LIMIT 1)",
+    );
+  }
 
   Future<void> _createHabitTables(Migrator m) async {
     await m.createTable(khatmas);

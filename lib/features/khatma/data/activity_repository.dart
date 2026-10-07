@@ -56,10 +56,14 @@ class ActivityRepository {
     );
   });
 
+  /// Reading in the app (not pages marked read by hand, nor verses heard:
+  /// those are khatma sessions, and listening has its own record).
   Stream<List<ReadingSessionRow>> watchReadingSince(DateTime since) =>
       (_db.select(_db.readingSessions)..where(
             (t) =>
-                t.startedAt.isBiggerOrEqualValue(since) & t.deletedAt.isNull(),
+                t.startedAt.isBiggerOrEqualValue(since) &
+                t.deletedAt.isNull() &
+                t.source.equals('reader'),
           ))
           .watch();
 

@@ -23,3 +23,33 @@
 
 **مفتوح:**
 - وحدة الحفظ بالصفحات في الروايات (`HifzRepository.unit`) ما زالت بلا صفحات؛ لم ألمسها (خارج الختمة). الإصلاح نفسه متاح لها عبر `riwayaPages`.
+
+---
+
+## المرحلة 2: البيانات (user.db v5، IntervalSet، الترحيل، rebuildAll، النسخ الاحتياطي)
+
+**ما تم:**
+- `domain/interval_set.dart`: مجموعة نطاقات آيات مرتبة ومدموجة دائما (اتحاد، تقاطع، طرح، `firstGap`، `containsRange`، `weigh`، صيغة JSON `[[from,to],…]`). 15 اختبارا منها مقارنة عشوائية بمجموعات أرقام عادية (400 حالة).
+- `domain/khatmah.dart` (نقي): الأنواع (`KhatmahKind`، `PacingMode`، `ScheduleMode`، `WirdUnit`، `CountingMode`، `KhatmahStatus`، `AheadChoice`، `SessionSource`، `EntryPoint`، `DecidedBy`)، و`Khatmah` (الخطة)، و`Credit` (الاحتساب)، و`PausePeriod`، و`KhatmahOrder` (الترتيب الدائري و`frontier`)، و`Ledger` (التغطية ووزن كل يوم من الاحتسابات، بإعادة التشغيل بترتيب بداية الجلسات).
+- user.db v5 (`habit_tables.dart` و`user_database.dart`):
+  - `khatma`: الأعمدة الجديدة كلها كما في القسم 3.1، ولم يُحذف عمود.
+  - `reading_session`: `source` و`entry_point` و`active_seconds` و`ranges`؛ و`mode` صار نوع العرض.
+  - جداول جديدة: `khatma_pause` و`session_attribution` (مع أعمدة المزامنة، وفي `syncedTables` و`applyRemote`)، والـcache: `khatma_coverage` و`daily_stat`.
+  - الترحيل في `onUpgrade` يضيف الأعمدة (ويتحقق من وجودها أولا)، ويملأ `status` من `completedAt`/`deletedAt`، و`pacing_mode` من `daily_portion`، ويجعل الختمة المفتوحة الأحدث `is_primary`.
+- `data/khatmah_store.dart`: قراءة وكتابة الختمات والإيقافات والجلسات والاحتسابات (كل كتابة إلى الـoutbox)، و`rebuild`/`rebuildAll`، و`migrateLegacy`.
+- **ترحيل السجل القديم (`migrateLegacy`)** يحتاج QuranIndex، فلا يجري داخل `onUpgrade` (قاعدة المستخدم لا ترى content.db هناك). يعمل عند التشغيل لكل ختمة بلا `range_start`، في transaction لكل ختمة، ومرة واحدة:
+  - الآية تُحتسب في يوم قراءة الصفحة التي **تنتهي** عليها، في طبعة الختمة (الشمرلي بالبداية والنهاية).
+  - جلسة `manual`/`other` لكل يوم، ومعها احتساب `auto`. `khatma_log` يبقى كما هو.
+  - `daily_weight` من `daily_portion` (صفحة/جزء/حزب ← وزن) أو من الأيام المتبقية.
+  - ختمة رواية حزمتها غير موجودة تنتظر التشغيل التالي.
+- النسخ الاحتياطي: `khatma_pause` و`session_attribution` في النسخة؛ الـcache لا يدخلها ويُعاد بناؤه.
+- التقارير (`watchReadingSince`) تعدّ جلسات `reader` فقط، حتى لا تتكرر صفحات الجلسات المرحّلة واليدوية والصوتية.
+- اختبارات: `migration_v5_test.dart` على قاعدة v4 حقيقية مبنية من مخطط v4 نفسه (`test/fixtures/user_db_v4.sql`، مأخوذ من الكود قبل التعديل): السيناريو 17 (نفس الصفحات ونفس النسبة ونفس أول صفحة غير مقروءة)، وختمة شمرلي تحفظ صفحاتها، وعدم التكرار، والانتظار، والسيناريو 13 (حذف الـcache ثم `rebuildAll`). و`khatmah_backup_test.dart`.
+
+**تغيّر عن الخطة:**
+- قاعدة «الصفحة المقروءة»: الصفحة مقروءة إذا غُطيت كل آية **تنتهي** عليها (وإن لم تنته عليها آية: كل آية فيها). بهذه القاعدة تبقى صفحات الشمرلي المقروءة نفسها بعد الترحيل، وتُحسب الصفحة بنفس المعنى في أي طبعة.
+- أعمدة زائدة على القسم 3.1: `recovery` (اختيار التعويض، JSON)، و`session_attribution.day` و`at` (اليوم المنطقي للجلسة وبدايتها، حتى لا تتغير الإحصائيات القديمة إن تغير `dayStartHour`)، وقيمة `declined` في `decidedBy` (رفض «ask» حتى لا يُسأل مرة أخرى).
+- `test/hifz/user_database_hifz_test.dart` كان يتوقع رقم المخطط 4؛ صار 5 (تغيير مقصود في الخطة).
+
+**مفتوح:**
+- الربط بالتطبيق (تشغيل `migrateLegacy` و`rebuildAll` عند البدء، وتحويل `KhatmaService` للمحرك) في المرحلة 4، مع المحرك نفسه. حتى ذلك الـcommit يكتب التطبيق في `khatma_log` كما كان.

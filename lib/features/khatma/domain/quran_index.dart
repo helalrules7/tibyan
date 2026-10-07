@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'interval_set.dart';
+
 /// One verse as content.db holds it, only what the khatma needs: its
 /// numbers, its pages in the three Hafs editions, its juz and hizb quarter,
 /// and the letters of its text (see [lettersOf]).
@@ -251,6 +253,7 @@ class EditionPageMap {
     final from = <int, int>{};
     final to = <int, int>{};
     final ends = <int, int>{};
+    final endFrom = <int, int>{};
     for (var i = 0; i < _start.length; i++) {
       final id = i + 1;
       for (var p = _start[i]; p <= _end[i]; p++) {
@@ -258,9 +261,12 @@ class EditionPageMap {
         to[p] = id;
       }
       ends[_end[i]] = id;
+      endFrom[_end[i]] ??= id;
     }
     _from = from;
     _to = to;
+    _endFrom = endFrom;
+    _endTo = ends;
     _pagesWithText = (from.keys.toList()..sort());
     pageEnds = List.unmodifiable(ends.values.toSet().toList()..sort());
   }
@@ -274,6 +280,8 @@ class EditionPageMap {
   final Int32List _end;
   late final Map<int, int> _from;
   late final Map<int, int> _to;
+  late final Map<int, int> _endFrom;
+  late final Map<int, int> _endTo;
   late final List<int> _pagesWithText;
 
   /// The verse that ends each page, in order: where a day's portion may
@@ -316,5 +324,30 @@ class EditionPageMap {
   double weightOfPage(int page, QuranIndex index) {
     final r = ayahsOn(page);
     return r == null ? 0 : index.weightOf(r.from, r.to);
+  }
+
+  /// The verses whose end is on [page]: what reading the page completes
+  /// (a verse running on to the next page is read with that page). Null
+  /// for a page that ends no verse (one long verse runs through it).
+  ({int from, int to})? ayahsEndingOn(int page) {
+    final f = _endFrom[page];
+    return f == null ? null : (from: f, to: _endTo[page]!);
+  }
+
+  /// The verses reading [pages] completes ([ayahsEndingOn] each).
+  IntervalSet versesReadOn(Iterable<int> pages) =>
+      IntervalSet([for (final p in pages) ?ayahsEndingOn(p)]);
+
+  /// The pages read in [covered]: every verse ending on the page is
+  /// covered (a page ending none: every verse on it). So a page counts the
+  /// same whichever edition it was read in.
+  Set<int> readPages(IntervalSet covered) {
+    final out = <int>{};
+    if (covered.isEmpty) return out;
+    for (final p in _pagesWithText) {
+      final r = ayahsEndingOn(p) ?? ayahsOn(p)!;
+      if (covered.containsRange(r.from, r.to)) out.add(p);
+    }
+    return out;
   }
 }
