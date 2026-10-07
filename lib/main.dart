@@ -173,11 +173,17 @@ void _startKhatma(ProviderContainer container) {
   unawaited(refresh());
   AppLifecycleListener(onResume: refresh);
 
-  Future<void> open(Uri? uri, {bool launch = false}) async {
+  Future<void> open(Uri? uri) async {
     if (uri == null) return;
     final action = widgetActionOf(uri);
     final verse = verseOfLink(uri);
-    if (uri.host != 'khatma' && action == null && verse == null) return;
+    final khatmaLink = const {
+      'khatma',
+      'khatmah',
+      'khatmat',
+      'reader',
+    }.contains(uri.host);
+    if (!khatmaLink && action == null && verse == null) return;
     final route =
         action?.route ??
         (verse != null
@@ -189,8 +195,10 @@ void _startKhatma(ProviderContainer container) {
                 ayah: verse.ayah,
               )
             : await service.routeFor(uri));
-    // Opened the app: after the splash screen has handed over to home.
-    if (launch) await Future<void>.delayed(const Duration(milliseconds: 2200));
+    // After the splash screen (or the first-run setup) has handed over,
+    // so its own navigation does not replace the link's. A link of a
+    // running app goes at once: the signal is already given.
+    await container.read(appRouterReadyProvider).future;
     container.read(appRouterProvider).go(route);
   }
 
@@ -199,12 +207,10 @@ void _startKhatma(ProviderContainer container) {
   unawaited(
     reminders
         .launchPayload()
-        .then((p) => open(p == null ? null : Uri.tryParse(p), launch: true))
+        .then((p) => open(p == null ? null : Uri.tryParse(p)))
         .catchError((_) {}),
   );
-  unawaited(
-    widget.launchUri().then((u) => open(u, launch: true)).catchError((_) {}),
-  );
+  unawaited(widget.launchUri().then(open).catchError((_) {}));
   widget.taps.listen(open, onError: (_) {});
 
   // Other `tibyan://` links (a verse link from a message or another app).
@@ -217,7 +223,7 @@ void _startKhatma(ProviderContainer container) {
     unawaited(
       links
           .getInitialLink()
-          .then((u) => mine(u) ? open(u, launch: true) : null)
+          .then((u) => mine(u) ? open(u) : null)
           .catchError((_) {}),
     );
     links.uriLinkStream.listen((u) {

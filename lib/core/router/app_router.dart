@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -36,6 +38,14 @@ import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
 import 'cover_observer.dart';
 import 'keyboard_dismiss.dart';
+
+final appRouterReadyProvider = Provider<Completer<void>>(
+  (ref) => Completer<void>(),
+);
+
+void markAppRouterReady(Completer<void> ready) {
+  if (!ready.isCompleted) ready.complete();
+}
 
 int? _int(GoRouterState s, String key) =>
     int.tryParse(s.uri.queryParameters[key] ?? '');
@@ -116,7 +126,8 @@ final appRouterProvider = Provider<GoRouter>(
       ),
       GoRoute(
         path: '/khatma',
-        builder: (context, state) => const KhatmaScreen(),
+        builder: (context, state) =>
+            KhatmaScreen(selectedPlanId: state.uri.queryParameters['plan']),
         routes: [
           GoRoute(
             path: 'new',

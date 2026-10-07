@@ -540,6 +540,170 @@
   },
   "themeArtCredit": "Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers.",
   "khatmaTitle": "Khatma",
+  "khatmaPrimaryLabel": "Primary khatma",
+  "khatmaOtherPlans": "Other khatmas",
+  "khatmaSetPrimary": "Set as primary",
+  "khatmaPause": "Pause",
+  "khatmaResume": "Resume",
+  "khatmaPaused": "Paused",
+  "khatmaStepPlan": "Plan",
+  "khatmaStepSchedule": "Schedule",
+  "khatmaStepReview": "Review",
+  "khatmaLoadFailed": "Couldn't load khatma setup data: {error}",
+  "@khatmaLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaCreateFailed": "Couldn't create the khatma: {error}",
+  "@khatmaCreateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaKindLabel": "Plan type",
+  "khatmaSettings": "Khatma settings",
+  "khatmaTabPlan": "Plan",
+  "khatmaTabStats": "Statistics",
+  "khatmaStatsPageEquivalents": "Page equivalents",
+  "khatmaStatsSessions": "Reading sessions",
+  "khatmaStatsMinutes": "Reading minutes",
+  "khatmaStatsNoActivity": "No khatma reading recorded in this period.",
+  "khatmaStatsWeek": "Week",
+  "khatmaStatsMonth": "Month",
+  "khatmaStatsYear": "Year",
+  "khatmaStatsPreviousPeriod": "Previous period",
+  "khatmaStatsNextPeriod": "Next period",
+  "khatmaReminderForPlan": "Khatma: {plan}",
+  "@khatmaReminderForPlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderMissedTitle": "Still time for {plan}",
+  "@khatmaReminderMissedTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderMissedBody": "Today's portion: pages {from} to {to}.",
+  "@khatmaReminderMissedBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderRecoveryTitle": "A catch-up plan for {plan}",
+  "@khatmaReminderRecoveryTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderRecoveryBody": "Today's portion is pages {from} to {to}. Open the plan to review gentle catch-up options.",
+  "@khatmaReminderRecoveryBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTargetTitle": "One day until {plan} is due",
+  "@khatmaReminderTargetTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTargetBody": "Review your progress and plan before the target date.",
+  "khatmaReminderCompletedTitle": "Khatma completed: {plan}",
+  "@khatmaReminderCompletedTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderCompletedBody": "You completed the khatma. May Allah accept it from you.",
+  "khatmaReminderPlanLimit": "Reminders can be enabled for up to 20 open khatmas.",
+  "khatmaSaveSettings": "Save settings",
+  "khatmaSaveFailed": "Couldn't save khatma settings: {error}",
+  "@khatmaSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaAutoRestart": "Start this plan again when it finishes",
+  "khatmaReplan": "Adjust the plan",
+  "khatmaCatchUpToday": "Finish the missed portion today",
+  "khatmaCatchUpGradually": "Catch up gradually",
+  "khatmaCompletionBody": "You completed this khatma. May Allah accept it from you.",
+  "khatmaReusePlan": "Use this plan again",
+  "khatmaKindFull": "Full Quran",
+  "khatmaKindPartial": "Selected range",
+  "khatmaKindDaily": "Daily wird",
+  "khatmaKindCustom": "Custom range",
+  "khatmaPresetLabel": "Template",
+  "khatmaPresetCustom": "Custom plan",
+  "khatmaPresetMonth": "One month",
+  "khatmaPresetRamadan30": "Ramadan: {days} days",
+  "@khatmaPresetRamadan30": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaPresetRamadanTwice": "Two khatmas in Ramadan",
+  "khatmaPresetBeforeLastTen": "Before the last ten nights",
+  "khatmaPresetWeekly": "One week",
+  "khatmaPresetDailyJuz": "A juz a day",
+  "khatmaFromSurah": "From surah",
+  "khatmaToSurah": "To surah",
+  "khatmaFromAyah": "From verse",
+  "khatmaToAyah": "To verse",
+  "khatmaRangeError": "Choose a start verse before the end verse.",
+  "khatmaScheduleMode": "Schedule",
+  "khatmaScheduleAdaptive": "Adaptive",
+  "khatmaScheduleFixed": "Fixed",
+  "khatmaRestDays": "Rest days (optional)",
+  "khatmaAtLeastOneReadingDay": "Keep at least one reading day each week.",
+  "khatmaCountingMode": "How reading counts",
+  "khatmaCountAuto": "Count automatically",
+  "khatmaCountAsk": "Ask each time",
+  "khatmaCountManual": "Only when I mark it",
+  "khatmaMakePrimary": "Make this the primary khatma",
+  "khatmaUnitRub": "Quarter hizb",
+  "khatmaReviewRange": "Range: {from}–{to}",
+  "@khatmaReviewRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "khatmaNew": "New khatma",
   "khatmaEmptyTitle": "No khatma yet",
   "khatmaEmptyBody": "Plan a full reading of the mushaf: choose an end date or a daily amount. Pages you read in the mushaf are counted automatically.",
@@ -571,7 +735,7 @@
   "khatmaDaysLeft": "Days left: {count}",
   "khatmaEnds": "Ends on {date}",
   "khatmaBehindTitle": "Pages from earlier days: {count}",
-  "khatmaBehindBody": "They are added to today's portion. You can spread them over the days left, or move the end date.",
+  "khatmaBehindBody": "They join today's portion. Choose whether to finish them today, catch up gradually, spread the remaining amount, or move the end date.",
   "khatmaSpread": "Spread over the days left",
   "khatmaExtend": "Move the end date",
   "khatmaComplete": "Khatma complete",
@@ -595,11 +759,11 @@
   "reportsListeningMinutes": "Listening minutes",
   "reportsEmpty": "Your reading and listening appear here automatically.",
   "reportsDayRead": "A day with reading or listening",
-  "streakReadToday": "You read today. Days in a row: {count}",
-  "streakContinue": "Days in a row until yesterday: {count}. A page today continues it.",
+  "streakReadToday": "You read today.",
   "streakWelcome": "Welcome back. Pick up where you left off.",
-  "streakNotesToggle": "Streak notes",
-  "streakNotesHint": "Shows days in a row only; missed days are never shown.",
+  "readDaysOfLast": "You read on {read} of the last {days} days",
+  "streakNotesToggle": "Gentle notes",
+  "streakNotesHint": "Calm notes on your reading; they never count days in a row or show missed days.",
   "journalTitle": "Tadabbur journal",
   "journalSearch": "Search your notes",
   "journalEmpty": "No notes yet. Long-press a verse in the mushaf and choose “Reflection note”.",
@@ -909,5 +1073,12 @@
   "assistantTitle": "Assistant",
   "assistantIntro": "Helpers for your reading, one card for each.",
   "tajweedMarksTitle": "Tajweed marks",
-  "moreLabel": "More"
+  "moreLabel": "More",
+  "wirdIndicator": "Today's portion: {read} of {total}",
+  "khatmaContinueMine": "Continue my khatma",
+  "askCreditLine": "Your last reading is part of “{plan}”. Count it?",
+  "askCreditCount": "Count it",
+  "askCreditNo": "No",
+  "khatmaPendingTitle": "Readings waiting to be counted",
+  "khatmaPendingOn": "Reading on {date}"
 }

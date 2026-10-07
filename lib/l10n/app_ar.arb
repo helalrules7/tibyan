@@ -708,6 +708,170 @@
   },
   "themeArtCredit": "الزخارف: مشروع quran-assets من Quran.ws، تطوير Abdullah Ibeid (github.com/quran-ws/quran-assets). المنقول منها من المصاحف برخصة المشاع الإبداعي غير التجارية CC BY-NC-SA 4.0، وتصميمه لمجمع الملك فهد وناشرين آخرين.",
   "khatmaTitle": "الختمة",
+  "khatmaPrimaryLabel": "الختمة الأساسية",
+  "khatmaOtherPlans": "ختمات أخرى",
+  "khatmaSetPrimary": "تعيين كأساسية",
+  "khatmaPause": "إيقاف مؤقت",
+  "khatmaResume": "استئناف",
+  "khatmaPaused": "متوقفة مؤقتا",
+  "khatmaStepPlan": "الخطة",
+  "khatmaStepSchedule": "الجدول",
+  "khatmaStepReview": "المراجعة",
+  "khatmaLoadFailed": "تعذر تحميل بيانات إعداد الختمة: {error}",
+  "@khatmaLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaCreateFailed": "تعذر إنشاء الختمة: {error}",
+  "@khatmaCreateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaKindLabel": "نوع الخطة",
+  "khatmaSettings": "إعدادات الختمة",
+  "khatmaTabPlan": "الخطة",
+  "khatmaTabStats": "الإحصاءات",
+  "khatmaStatsPageEquivalents": "مكافئ الصفحات",
+  "khatmaStatsSessions": "جلسات القراءة",
+  "khatmaStatsMinutes": "دقائق القراءة",
+  "khatmaStatsNoActivity": "لا توجد قراءة مسجلة لهذه الختمة في هذه الفترة.",
+  "khatmaStatsWeek": "الأسبوع",
+  "khatmaStatsMonth": "الشهر",
+  "khatmaStatsYear": "السنة",
+  "khatmaStatsPreviousPeriod": "الفترة السابقة",
+  "khatmaStatsNextPeriod": "الفترة التالية",
+  "khatmaReminderForPlan": "الختمة: {plan}",
+  "@khatmaReminderForPlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderMissedTitle": "ما زال هناك وقت لورد {plan}",
+  "@khatmaReminderMissedTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderMissedBody": "ورد اليوم: من صفحة {from} إلى صفحة {to}",
+  "@khatmaReminderMissedBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderRecoveryTitle": "خطة تعويض لطيفة لختمة {plan}",
+  "@khatmaReminderRecoveryTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderRecoveryBody": "ورد اليوم من صفحة {from} إلى صفحة {to}. افتح الخطة للاطلاع على خيارات التعويض.",
+  "@khatmaReminderRecoveryBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTargetTitle": "بقي يوم على موعد ختمة {plan}",
+  "@khatmaReminderTargetTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTargetBody": "راجع تقدمك وخطتك قبل الموعد.",
+  "khatmaReminderCompletedTitle": "أتممت ختمة {plan}",
+  "@khatmaReminderCompletedTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderCompletedBody": "أتممت الختمة. تقبّل الله منك.",
+  "khatmaReminderPlanLimit": "يمكن تفعيل التذكيرات لعشرين ختمة مفتوحة كحد أقصى.",
+  "khatmaSaveSettings": "حفظ الإعدادات",
+  "khatmaSaveFailed": "تعذر حفظ إعدادات الختمة: {error}",
+  "@khatmaSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaAutoRestart": "بدء الخطة من جديد عند إكمالها",
+  "khatmaReplan": "تعديل الخطة",
+  "khatmaCatchUpToday": "إنجاز الورد الفائت اليوم",
+  "khatmaCatchUpGradually": "تعويض الورد تدريجيا",
+  "khatmaCompletionBody": "أتممت هذه الختمة. تقبّل الله منك.",
+  "khatmaReusePlan": "استخدام هذه الخطة مرة أخرى",
+  "khatmaKindFull": "القرآن كاملا",
+  "khatmaKindPartial": "نطاق محدد",
+  "khatmaKindDaily": "ورد يومي",
+  "khatmaKindCustom": "نطاق مخصص",
+  "khatmaPresetLabel": "قالب جاهز",
+  "khatmaPresetCustom": "خطة مخصصة",
+  "khatmaPresetMonth": "ختمة في شهر",
+  "khatmaPresetRamadan30": "رمضان: {days} يوما",
+  "@khatmaPresetRamadan30": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaPresetRamadanTwice": "ختمتان في رمضان",
+  "khatmaPresetBeforeLastTen": "قبل العشر الأواخر",
+  "khatmaPresetWeekly": "ختمة في أسبوع",
+  "khatmaPresetDailyJuz": "جزء يوميا",
+  "khatmaFromSurah": "من سورة",
+  "khatmaToSurah": "إلى سورة",
+  "khatmaFromAyah": "من آية",
+  "khatmaToAyah": "إلى آية",
+  "khatmaRangeError": "اختر آية بداية تسبق آية النهاية.",
+  "khatmaScheduleMode": "طريقة توزيع الورد",
+  "khatmaScheduleAdaptive": "متغير حسب التقدم",
+  "khatmaScheduleFixed": "جدول ثابت",
+  "khatmaRestDays": "أيام راحة (اختياري)",
+  "khatmaAtLeastOneReadingDay": "اترك يوما واحدا على الأقل للقراءة كل أسبوع.",
+  "khatmaCountingMode": "طريقة احتساب القراءة",
+  "khatmaCountAuto": "احتساب تلقائي",
+  "khatmaCountAsk": "السؤال في كل مرة",
+  "khatmaCountManual": "عند تحديدها كمقروءة فقط",
+  "khatmaMakePrimary": "جعلها الختمة الأساسية",
+  "khatmaUnitRub": "ربع حزب",
+  "khatmaReviewRange": "النطاق: {from}–{to}",
+  "@khatmaReviewRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "khatmaNew": "ختمة جديدة",
   "khatmaEmptyTitle": "لا ختمة الآن",
   "khatmaEmptyBody": "ضع خطة لختم المصحف: حدد موعد الختم أو مقدار الورد اليومي. والصفحات التي تقرؤها في المصحف تُحسب تلقائيا.",
@@ -811,7 +975,7 @@
       }
     }
   },
-  "khatmaBehindBody": "أُضيفت إلى ورد اليوم. يمكنك توزيعها على الأيام الباقية، أو تأخير موعد الختم.",
+  "khatmaBehindBody": "ينضم ما فات إلى ورد اليوم. اختر إنجازه اليوم، أو تعويضه تدريجيا، أو توزيع الباقي، أو مد موعد الختم.",
   "khatmaSpread": "وزّعها على الأيام الباقية",
   "khatmaExtend": "أخّر موعد الختم",
   "khatmaComplete": "اكتملت الختمة",
@@ -859,25 +1023,21 @@
   "reportsListeningMinutes": "دقائق الاستماع",
   "reportsEmpty": "تظهر هنا قراءتك واستماعك تلقائيا.",
   "reportsDayRead": "يوم فيه قراءة أو استماع",
-  "streakReadToday": "قرأت اليوم. الأيام المتتالية: {count}",
-  "@streakReadToday": {
-    "placeholders": {
-      "count": {
-        "type": "String"
-      }
-    }
-  },
-  "streakContinue": "الأيام المتتالية حتى أمس: {count}. صفحة اليوم تصلها.",
-  "@streakContinue": {
-    "placeholders": {
-      "count": {
-        "type": "String"
-      }
-    }
-  },
+  "streakReadToday": "قرأت اليوم.",
   "streakWelcome": "مرحبا بعودتك. تابع من حيث وقفت.",
+  "readDaysOfLast": "قرأت {read} من آخر {days} يوما",
+  "@readDaysOfLast": {
+    "placeholders": {
+      "read": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
   "streakNotesToggle": "رسائل الاستمرار",
-  "streakNotesHint": "تعرض الأيام المتتالية فقط، ولا تعرض الأيام الفائتة.",
+  "streakNotesHint": "ملاحظات هادئة عن قراءتك، لا تعدّ الأيام المتتالية ولا تعرض الأيام الفائتة.",
   "journalTitle": "دفتر التدبر",
   "journalSearch": "ابحث في ملاحظاتك",
   "journalEmpty": "لا ملاحظات بعد. اضغط مطولا على آية في المصحف واختر «ملاحظة تدبر».",
@@ -1456,5 +1616,36 @@
   "assistantTitle": "المساعد",
   "assistantIntro": "أدوات تعينك على القراءة، لكل أداة بطاقة.",
   "tajweedMarksTitle": "علامات التجويد",
-  "moreLabel": "المزيد"
+  "moreLabel": "المزيد",
+  "wirdIndicator": "ورد اليوم: {read} من {total}",
+  "@wirdIndicator": {
+    "placeholders": {
+      "read": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaContinueMine": "متابعة ختمتي",
+  "askCreditLine": "قراءتك الأخيرة تدخل في «{plan}». أتُحتسب لها؟",
+  "@askCreditLine": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "askCreditCount": "احتسب",
+  "askCreditNo": "لا",
+  "khatmaPendingTitle": "قراءات تنتظر الاحتساب",
+  "khatmaPendingOn": "قراءة {date}",
+  "@khatmaPendingOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

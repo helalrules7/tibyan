@@ -18,7 +18,11 @@ class _FocusTopBar extends StatelessWidget {
     required this.actions,
     required this.onIndex,
     required this.onGoTo,
+    this.wird,
   });
+
+  /// «ورد اليوم · 18 / 20» (it takes no room when there is none).
+  final Widget? wird;
 
   /// Height of the bar's row (elderly mode's is larger).
   static const height = 32.0;
@@ -131,6 +135,8 @@ class _FocusTopBar extends StatelessWidget {
               ),
               null => null,
             },
+            if (wird case final w?)
+              Flexible(child: shrink(w, AlignmentDirectional.center)),
             if (!elderly)
               for (final (icon, label, onTap) in actions)
                 _SmallFocusButton(icon: icon, label: label, onTap: onTap),

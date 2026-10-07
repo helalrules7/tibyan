@@ -963,6 +963,249 @@ class AppLocalizationsEn extends AppLocalizations {
   String get khatmaTitle => 'Khatma';
 
   @override
+  String get khatmaPrimaryLabel => 'Primary khatma';
+
+  @override
+  String get khatmaOtherPlans => 'Other khatmas';
+
+  @override
+  String get khatmaSetPrimary => 'Set as primary';
+
+  @override
+  String get khatmaPause => 'Pause';
+
+  @override
+  String get khatmaResume => 'Resume';
+
+  @override
+  String get khatmaPaused => 'Paused';
+
+  @override
+  String get khatmaStepPlan => 'Plan';
+
+  @override
+  String get khatmaStepSchedule => 'Schedule';
+
+  @override
+  String get khatmaStepReview => 'Review';
+
+  @override
+  String khatmaLoadFailed(String error) {
+    return 'Couldn\'t load khatma setup data: $error';
+  }
+
+  @override
+  String khatmaCreateFailed(String error) {
+    return 'Couldn\'t create the khatma: $error';
+  }
+
+  @override
+  String get khatmaKindLabel => 'Plan type';
+
+  @override
+  String get khatmaSettings => 'Khatma settings';
+
+  @override
+  String get khatmaTabPlan => 'Plan';
+
+  @override
+  String get khatmaTabStats => 'Statistics';
+
+  @override
+  String get khatmaStatsPageEquivalents => 'Page equivalents';
+
+  @override
+  String get khatmaStatsSessions => 'Reading sessions';
+
+  @override
+  String get khatmaStatsMinutes => 'Reading minutes';
+
+  @override
+  String get khatmaStatsNoActivity =>
+      'No khatma reading recorded in this period.';
+
+  @override
+  String get khatmaStatsWeek => 'Week';
+
+  @override
+  String get khatmaStatsMonth => 'Month';
+
+  @override
+  String get khatmaStatsYear => 'Year';
+
+  @override
+  String get khatmaStatsPreviousPeriod => 'Previous period';
+
+  @override
+  String get khatmaStatsNextPeriod => 'Next period';
+
+  @override
+  String khatmaReminderForPlan(String plan) {
+    return 'Khatma: $plan';
+  }
+
+  @override
+  String khatmaReminderMissedTitle(String plan) {
+    return 'Still time for $plan';
+  }
+
+  @override
+  String khatmaReminderMissedBody(String from, String to) {
+    return 'Today\'s portion: pages $from to $to.';
+  }
+
+  @override
+  String khatmaReminderRecoveryTitle(String plan) {
+    return 'A catch-up plan for $plan';
+  }
+
+  @override
+  String khatmaReminderRecoveryBody(String from, String to) {
+    return 'Today\'s portion is pages $from to $to. Open the plan to review gentle catch-up options.';
+  }
+
+  @override
+  String khatmaReminderTargetTitle(String plan) {
+    return 'One day until $plan is due';
+  }
+
+  @override
+  String get khatmaReminderTargetBody =>
+      'Review your progress and plan before the target date.';
+
+  @override
+  String khatmaReminderCompletedTitle(String plan) {
+    return 'Khatma completed: $plan';
+  }
+
+  @override
+  String get khatmaReminderCompletedBody =>
+      'You completed the khatma. May Allah accept it from you.';
+
+  @override
+  String get khatmaReminderPlanLimit =>
+      'Reminders can be enabled for up to 20 open khatmas.';
+
+  @override
+  String get khatmaSaveSettings => 'Save settings';
+
+  @override
+  String khatmaSaveFailed(String error) {
+    return 'Couldn\'t save khatma settings: $error';
+  }
+
+  @override
+  String get khatmaAutoRestart => 'Start this plan again when it finishes';
+
+  @override
+  String get khatmaReplan => 'Adjust the plan';
+
+  @override
+  String get khatmaCatchUpToday => 'Finish the missed portion today';
+
+  @override
+  String get khatmaCatchUpGradually => 'Catch up gradually';
+
+  @override
+  String get khatmaCompletionBody =>
+      'You completed this khatma. May Allah accept it from you.';
+
+  @override
+  String get khatmaReusePlan => 'Use this plan again';
+
+  @override
+  String get khatmaKindFull => 'Full Quran';
+
+  @override
+  String get khatmaKindPartial => 'Selected range';
+
+  @override
+  String get khatmaKindDaily => 'Daily wird';
+
+  @override
+  String get khatmaKindCustom => 'Custom range';
+
+  @override
+  String get khatmaPresetLabel => 'Template';
+
+  @override
+  String get khatmaPresetCustom => 'Custom plan';
+
+  @override
+  String get khatmaPresetMonth => 'One month';
+
+  @override
+  String khatmaPresetRamadan30(String days) {
+    return 'Ramadan: $days days';
+  }
+
+  @override
+  String get khatmaPresetRamadanTwice => 'Two khatmas in Ramadan';
+
+  @override
+  String get khatmaPresetBeforeLastTen => 'Before the last ten nights';
+
+  @override
+  String get khatmaPresetWeekly => 'One week';
+
+  @override
+  String get khatmaPresetDailyJuz => 'A juz a day';
+
+  @override
+  String get khatmaFromSurah => 'From surah';
+
+  @override
+  String get khatmaToSurah => 'To surah';
+
+  @override
+  String get khatmaFromAyah => 'From verse';
+
+  @override
+  String get khatmaToAyah => 'To verse';
+
+  @override
+  String get khatmaRangeError => 'Choose a start verse before the end verse.';
+
+  @override
+  String get khatmaScheduleMode => 'Schedule';
+
+  @override
+  String get khatmaScheduleAdaptive => 'Adaptive';
+
+  @override
+  String get khatmaScheduleFixed => 'Fixed';
+
+  @override
+  String get khatmaRestDays => 'Rest days (optional)';
+
+  @override
+  String get khatmaAtLeastOneReadingDay =>
+      'Keep at least one reading day each week.';
+
+  @override
+  String get khatmaCountingMode => 'How reading counts';
+
+  @override
+  String get khatmaCountAuto => 'Count automatically';
+
+  @override
+  String get khatmaCountAsk => 'Ask each time';
+
+  @override
+  String get khatmaCountManual => 'Only when I mark it';
+
+  @override
+  String get khatmaMakePrimary => 'Make this the primary khatma';
+
+  @override
+  String get khatmaUnitRub => 'Quarter hizb';
+
+  @override
+  String khatmaReviewRange(String from, String to) {
+    return 'Range: $from–$to';
+  }
+
+  @override
   String get khatmaNew => 'New khatma';
 
   @override
@@ -1077,7 +1320,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get khatmaBehindBody =>
-      'They are added to today\'s portion. You can spread them over the days left, or move the end date.';
+      'They join today\'s portion. Choose whether to finish them today, catch up gradually, spread the remaining amount, or move the end date.';
 
   @override
   String get khatmaSpread => 'Spread over the days left';
@@ -1156,24 +1399,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsDayRead => 'A day with reading or listening';
 
   @override
-  String streakReadToday(String count) {
-    return 'You read today. Days in a row: $count';
-  }
-
-  @override
-  String streakContinue(String count) {
-    return 'Days in a row until yesterday: $count. A page today continues it.';
-  }
+  String get streakReadToday => 'You read today.';
 
   @override
   String get streakWelcome => 'Welcome back. Pick up where you left off.';
 
   @override
-  String get streakNotesToggle => 'Streak notes';
+  String readDaysOfLast(String read, String days) {
+    return 'You read on $read of the last $days days';
+  }
+
+  @override
+  String get streakNotesToggle => 'Gentle notes';
 
   @override
   String get streakNotesHint =>
-      'Shows days in a row only; missed days are never shown.';
+      'Calm notes on your reading; they never count days in a row or show missed days.';
 
   @override
   String get journalTitle => 'Tadabbur journal';
@@ -2226,4 +2467,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moreLabel => 'More';
+
+  @override
+  String wirdIndicator(String read, String total) {
+    return 'Today\'s portion: $read of $total';
+  }
+
+  @override
+  String get khatmaContinueMine => 'Continue my khatma';
+
+  @override
+  String askCreditLine(String plan) {
+    return 'Your last reading is part of “$plan”. Count it?';
+  }
+
+  @override
+  String get askCreditCount => 'Count it';
+
+  @override
+  String get askCreditNo => 'No';
+
+  @override
+  String get khatmaPendingTitle => 'Readings waiting to be counted';
+
+  @override
+  String khatmaPendingOn(String date) {
+    return 'Reading on $date';
+  }
 }

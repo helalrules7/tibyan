@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/router/app_router.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
@@ -28,7 +29,9 @@ class OnboardingEditionScreen extends ConsumerWidget {
 
     Future<void> finish(String to) async {
       await ctrl.completeOnboarding();
-      if (context.mounted) context.go(to);
+      if (!context.mounted) return;
+      context.go(to);
+      markAppRouterReady(ref.read(appRouterReadyProvider));
     }
 
     return Scaffold(
