@@ -898,10 +898,15 @@
   "focusMenus": "Menus",
   "focusPageTools": "Page tools",
   "playerFull": "Full player",
-  "aboutTajweedTitle": "Tajweed rules: colours and places",
-  "aboutTajweedHint": "Each rule in the colour the mushaf pages give it, and every place it falls in the mushaf. Tap a rule to see its places, and a place to open its page.",
+  "tajweedMarksSubtitle": "Tajweed rules: colours and places",
+  "tajweedMarksHint": "Each rule in the colour the mushaf pages give it, and every place it falls in the mushaf. Tap a rule to see its places, and a place to open its page.",
   "tajweedRuleCount": "Verses: {verses} · Coloured letters: {letters}",
   "tajweedPlaceAt": "{surah} {ayah} · page {page}",
   "tajweedIndexColorNote": "Colours as the pages draw them now: your choice, or the default. Change them in Mushaf look.",
-  "tajweedIndexLoadError": "The places of this rule could not be read."
+  "tajweedIndexLoadError": "The places of this rule could not be read.",
+  "tajweedMarksInkNote": "Where a rule falls on a mark alone (like the small meem), the mark stays in the text colour here: the font cannot colour a mark without part of its letter. The mushaf page shows it in colour.",
+  "assistantTitle": "Assistant",
+  "assistantIntro": "Helpers for your reading, one card for each.",
+  "tajweedMarksTitle": "Tajweed marks",
+  "moreLabel": "More"
 }

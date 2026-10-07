@@ -17,6 +17,7 @@ import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/reveal.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../assistant/assistant_screen.dart';
 import '../../books/books_providers.dart';
 import '../../books/presentation/asbab_section.dart';
 import '../../books/presentation/book_section.dart';
@@ -326,6 +327,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                   Icons.list_alt,
                   l.indexTitle,
                   then(() => screen.push('/mushaf/index')),
+                ),
+                (
+                  assistantIcon,
+                  l.assistantTitle,
+                  then(() => screen.push(assistantLocation)),
                 ),
                 (Icons.home_outlined, l.homeTitle, then(() => screen.go('/'))),
                 (
@@ -1168,6 +1174,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       Icons.bookmarks_outlined,
                       l.fawasilTitle,
                       () => context.push('/mushaf/fawasil'),
+                    ),
+                    (
+                      assistantIcon,
+                      l.assistantTitle,
+                      () => context.push(assistantLocation),
                     ),
                     (Icons.home_outlined, l.homeTitle, () => context.go('/')),
                     (

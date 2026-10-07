@@ -6,7 +6,6 @@ import '../../audio/recitation.dart';
 import '../../../l10n/app_localizations.dart';
 import '../mushaf_providers.dart';
 import 'source_names.dart';
-import 'tajweed_index_screen.dart';
 
 /// Where the text and pages come from, their licences, and open review notes.
 class AboutMushafScreen extends ConsumerWidget {
@@ -43,7 +42,6 @@ class AboutMushafScreen extends ConsumerWidget {
                 ),
               ),
             ),
-          const TajweedIndexCard(),
           for (final s in sources ?? const [])
             Card(
               child: Builder(

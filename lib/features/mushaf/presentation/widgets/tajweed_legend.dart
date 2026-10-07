@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/settings/settings_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../assistant/tajweed_marks_screen.dart' show tajweedMarksLocation;
 import '../../data/tajweed.dart';
 import '../../mushaf_providers.dart';
 
@@ -123,12 +125,31 @@ class _Legend extends ConsumerWidget {
       controller: scroll,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       children: [
-        Semantics(
-          header: true,
-          child: Text(
-            l.tajweedLegend,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Text(
+                  l.tajweedLegend,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ),
+            // «المزيد»: the tajweed marks in the Assistant (the rules'
+            // places). The sheet closes first.
+            TextButton.icon(
+              key: const ValueKey('tajweed-legend-more'),
+              onPressed: () {
+                final router = GoRouter.of(context);
+                Navigator.of(context).pop();
+                router.push(tajweedMarksLocation);
+              },
+              icon: const Icon(Icons.chevron_right),
+              iconAlignment: IconAlignment.end,
+              label: Text(l.moreLabel),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         for (final rule in tajweedLegendOrder)
