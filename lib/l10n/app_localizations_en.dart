@@ -2182,4 +2182,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playerFull => 'Full player';
+
+  @override
+  String get aboutTajweedTitle => 'Tajweed rules: colours and places';
+
+  @override
+  String get aboutTajweedHint =>
+      'Each rule in the colour the mushaf pages give it, and every place it falls in the mushaf. Tap a rule to see its places, and a place to open its page.';
+
+  @override
+  String tajweedRuleCount(String verses, String letters) {
+    return 'Verses: $verses · Coloured letters: $letters';
+  }
+
+  @override
+  String tajweedPlaceAt(String surah, String ayah, String page) {
+    return '$surah $ayah · page $page';
+  }
+
+  @override
+  String get tajweedIndexColorNote =>
+      'Colours as the pages draw them now: your choice, or the default. Change them in Mushaf look.';
+
+  @override
+  String get tajweedIndexLoadError =>
+      'The places of this rule could not be read.';
 }

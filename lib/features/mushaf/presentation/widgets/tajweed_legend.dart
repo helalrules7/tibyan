@@ -68,9 +68,10 @@ const tajweedLegendOrder = [
   TajweedRule.silent,
 ];
 
-/// A round colour sample on the page's paper.
-class _Swatch extends StatelessWidget {
-  const _Swatch(this.color);
+/// A round colour sample on the page's paper; a crossed circle for a rule
+/// left without colour.
+class TajweedSwatch extends StatelessWidget {
+  const TajweedSwatch(this.color, {super.key});
 
   static const size = 26.0;
 
@@ -134,7 +135,7 @@ class _Legend extends ConsumerWidget {
           if (tajweedHueOf(rule, hues) case final hue)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: _Swatch(hue?.on(darkPaper: dark)),
+              leading: TajweedSwatch(hue?.on(darkPaper: dark)),
               title: Text(
                 tajweedRuleName(l, rule),
                 style: TextStyle(color: hue?.on(darkPaper: dark) ?? t.muted),
@@ -211,7 +212,7 @@ class TajweedSettings extends ConsumerWidget {
                 ListTile(
                   dense: true,
                   title: Text(tajweedRuleName(l, rule)),
-                  trailing: _Swatch(hue?.on(darkPaper: dark)),
+                  trailing: TajweedSwatch(hue?.on(darkPaper: dark)),
                   onTap: () => _pick(context, ref, rule),
                 ),
             Align(
@@ -278,7 +279,7 @@ class TajweedSettings extends ConsumerWidget {
                       width: selected ? 2.5 : 1,
                     ),
                   ),
-                  child: Center(child: _Swatch(hue?.on(darkPaper: dark))),
+                  child: Center(child: TajweedSwatch(hue?.on(darkPaper: dark))),
                 ),
               ),
             );

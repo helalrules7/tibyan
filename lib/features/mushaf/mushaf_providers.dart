@@ -18,6 +18,7 @@ import 'data/divine_names.dart';
 import 'data/mushaf_repository.dart';
 import 'data/page_pack.dart';
 import 'data/riwaya_data.dart';
+import 'data/tajweed_index.dart';
 import 'presentation/widgets/illuminated_frame.dart';
 import 'presentation/widgets/mushaf_page.dart' show VerseKey, outlineRects;
 
@@ -896,4 +897,15 @@ final tajweedPageProvider = FutureProvider.family<String, int>(
   (ref, page) => ref
       .watch(mushafRepositoryProvider)
       .tajweedPage(ref.watch(editionProvider), page),
+);
+
+/// How far each Hafs tajweed rule reaches (verses and letters), by rule
+/// key: the counts of the tajweed index in «About this mushaf».
+final tajweedRuleCountsProvider = FutureProvider<Map<String, TajweedRuleCount>>(
+  (ref) => ref.watch(mushafRepositoryProvider).tajweedRuleCounts(),
+);
+
+/// The verses a Hafs tajweed rule (by key) falls in, in mushaf order.
+final tajweedPlacesProvider = FutureProvider.family<List<TajweedPlace>, String>(
+  (ref, rule) => ref.watch(mushafRepositoryProvider).tajweedPlaces(rule),
 );

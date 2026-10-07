@@ -16,7 +16,9 @@ import '../../features/mushaf/presentation/download_all_screen.dart';
 import '../../features/mushaf/presentation/download_screen.dart';
 import '../../features/mushaf/presentation/fawasil_screen.dart';
 import '../../features/mushaf/presentation/index_screen.dart';
+import '../../features/mushaf/data/tajweed.dart';
 import '../../features/mushaf/presentation/mushaf_screen.dart';
+import '../../features/mushaf/presentation/tajweed_index_screen.dart';
 import '../../features/onboarding/onboarding_edition_screen.dart';
 import '../../features/onboarding/onboarding_language_screen.dart';
 import '../../features/onboarding/onboarding_style_screen.dart';
@@ -192,6 +194,18 @@ final appRouterProvider = Provider<GoRouter>(
           GoRoute(
             path: 'about',
             builder: (context, state) => const AboutMushafScreen(),
+            routes: [
+              GoRoute(
+                path: 'tajweed',
+                builder: (context, state) => TajweedRuleScreen(
+                  rule:
+                      TajweedRule.byKey(
+                        state.uri.queryParameters['rule'] ?? '',
+                      ) ??
+                      TajweedRule.madd6,
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../core/db/content_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../audio/timing_updates.dart';
+import 'tajweed_index.dart';
 
 /// First verse of a juz, for the juz index.
 class JuzStart {
@@ -219,6 +220,55 @@ class MushafRepository {
           r.read<int>('letter'),
           r.read<String>('part') == 'marks',
           r.read<String>('rule'),
+        ),
+    ];
+  }
+
+  /// For each tajweed rule key of the Hafs data (`tajweed_letter`): the
+  /// verses it falls in and the letters it colours.
+  Future<Map<String, TajweedRuleCount>> tajweedRuleCounts() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT rule, COUNT(*) AS letters, '
+          'COUNT(DISTINCT surah * 1000 + ayah) AS verses FROM tajweed_letter '
+          "WHERE riwaya = 'hafs' GROUP BY rule",
+        )
+        .get();
+    return {
+      for (final r in rows)
+        r.read<String>('rule'): (
+          verses: r.read<int>('verses'),
+          letters: r.read<int>('letters'),
+        ),
+    };
+  }
+
+  /// The verses the Hafs tajweed rule [ruleKey] falls in, in mushaf order,
+  /// each with its letters of the rule, its text and its pages.
+  Future<List<TajweedPlace>> tajweedPlaces(String ruleKey) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT t.surah AS surah, t.ayah AS ayah, a.display_text AS text, '
+          'a.page AS p1441, a.page_1405 AS p1405, a.page_shamarly AS psh, '
+          "group_concat(t.word || ':' || t.letter || ':' || t.part, ' ') "
+          'AS letters '
+          'FROM tajweed_letter t '
+          'JOIN ayah a ON a.surah = t.surah AND a.number = t.ayah '
+          "WHERE t.riwaya = 'hafs' AND t.rule = ? "
+          'GROUP BY t.surah, t.ayah ORDER BY a.id',
+          variables: [Variable.withString(ruleKey)],
+        )
+        .get();
+    return [
+      for (final r in rows)
+        TajweedPlace(
+          surah: r.read<int>('surah'),
+          ayah: r.read<int>('ayah'),
+          text: r.read<String>('text'),
+          letters: TajweedPlace.parseLetters(r.read<String>('letters')),
+          page1441: r.read<int>('p1441'),
+          page1405: r.read<int>('p1405'),
+          pageShamarly: r.read<int>('psh'),
         ),
     ];
   }
