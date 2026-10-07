@@ -22,7 +22,7 @@ class AssistantScreen extends StatelessWidget {
     final t = context.tokens.colors;
     final helpers = [
       (
-        Icons.format_color_text,
+        Icons.palette_outlined,
         l.tajweedMarksTitle,
         l.tajweedMarksSubtitle,
         tajweedMarksLocation,
