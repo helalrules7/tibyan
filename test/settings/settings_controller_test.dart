@@ -8,6 +8,7 @@ import 'package:tibyan/core/settings/settings_controller.dart';
 import 'package:tibyan/core/theme/app_theme.dart';
 import 'package:tibyan/core/theme/theme_registry.dart';
 import 'package:tibyan/core/theme/theme_tokens.dart';
+import 'package:tibyan/features/audio/verse_queue.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +57,136 @@ void main() {
     expect(s.uiFont, UiFont.kfgqpcAn);
     expect(s.locale, const Locale('en'));
   });
+
+  test('foreign tafsir defaults follow the interface language', () async {
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'en',
+        languageCode: 'ar',
+      ),
+      isFalse,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'en',
+        languageCode: 'en',
+      ),
+      isTrue,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'ar',
+        languageCode: 'en',
+      ),
+      isFalse,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'tafsir',
+        contentLanguageCode: 'ar',
+        languageCode: 'en',
+      ),
+      isTrue,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: '',
+        languageCode: 'en',
+      ),
+      isFalse,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'ur',
+        languageCode: 'en',
+      ),
+      isFalse,
+    );
+    final c = await containerWith({});
+    final controller = c.read(settingsProvider.notifier);
+    await controller.setCommentaryShown(42, true);
+    expect(
+      c.read(settingsProvider).isCommentaryShown(42, defaultShown: false),
+      isTrue,
+    );
+    final sp = await SharedPreferences.getInstance();
+    final restored = await containerWith({
+      for (final k in sp.getKeys()) k: sp.get(k)!,
+    });
+    expect(
+      restored
+          .read(settingsProvider)
+          .isCommentaryShown(42, defaultShown: false),
+      isTrue,
+    );
+    await controller.setCommentaryShown(42, false);
+    expect(
+      c.read(settingsProvider).isCommentaryShown(42, defaultShown: true),
+      isFalse,
+    );
+  });
+
+  test(
+    'English tafsir visibility override is saved across locale changes',
+    () async {
+      final c = await containerWith({});
+      final controller = c.read(settingsProvider.notifier);
+      expect(c.read(settingsProvider).isEnglishTafsirShown('ar'), isFalse);
+      expect(c.read(settingsProvider).isEnglishTafsirShown('en'), isTrue);
+
+      await controller.setEnglishTafsirShown(true);
+      await controller.setUnderVerse([7]);
+      await controller.setLanguage(LanguageSetting.en);
+      expect(c.read(settingsProvider).isEnglishTafsirShown('ar'), isTrue);
+      expect(c.read(settingsProvider).underVerse, [7]);
+
+      final sp = await SharedPreferences.getInstance();
+      final restored = await containerWith({
+        for (final k in sp.getKeys()) k: sp.get(k)!,
+      });
+      expect(
+        restored.read(settingsProvider).isEnglishTafsirShown('ar'),
+        isTrue,
+      );
+      expect(restored.read(settingsProvider).underVerse, [7]);
+    },
+  );
+
+  test(
+    'translation audio default follows language until explicitly chosen',
+    () async {
+      expect(
+        defaultTranslationAudioEnabled(
+          LanguageSetting.system,
+          systemLanguageCode: 'en',
+        ),
+        isTrue,
+      );
+      expect(
+        defaultTranslationAudioEnabled(
+          LanguageSetting.system,
+          systemLanguageCode: 'ar',
+        ),
+        isFalse,
+      );
+      final c = await containerWith({});
+      final controller = c.read(settingsProvider.notifier);
+      expect(c.read(translationAudioChoiceProvider), isFalse);
+
+      await controller.setLanguage(LanguageSetting.en);
+      expect(c.read(translationAudioChoiceProvider), isTrue);
+
+      c.read(translationAudioChoiceProvider.notifier).set(false);
+      await controller.setLanguage(LanguageSetting.ar);
+      await controller.setLanguage(LanguageSetting.en);
+      expect(c.read(translationAudioChoiceProvider), isFalse);
+    },
+  );
 
   test(
     'a new theme brings its own marker shape over an earlier choice',

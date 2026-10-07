@@ -597,6 +597,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tafsirShown => 'Texts shown';
 
   @override
+  String get englishTafsirVisibilityLabel => 'English tafsir';
+
+  @override
   String get tafsirNoneShown =>
       'All texts are hidden. Choose one in the tafsir settings.';
 

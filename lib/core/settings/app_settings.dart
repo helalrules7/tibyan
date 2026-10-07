@@ -89,6 +89,28 @@ enum ReadingSpeed {
   final int secondsPerPage;
 }
 
+bool commentaryDefaultShown({
+  required String kind,
+  required String contentLanguageCode,
+  required String languageCode,
+}) {
+  if (contentLanguageCode.isEmpty) return false;
+  if (kind == 'tafsir' && contentLanguageCode == 'ar') return true;
+  return languageCode == contentLanguageCode;
+}
+
+bool defaultTranslationAudioEnabled(
+  LanguageSetting language, {
+  required String systemLanguageCode,
+}) {
+  final code = switch (language) {
+    LanguageSetting.system => systemLanguageCode,
+    LanguageSetting.ar => 'ar',
+    LanguageSetting.en => 'en',
+  };
+  return code == 'en';
+}
+
 /// Colours offered for tinting verse-end markers (ARGB); null = none.
 const markerTints = <int>[
   0xFF1FA79B,
@@ -115,7 +137,9 @@ class AppSettings {
     this.tafsirFont = TafsirFont.naskh,
     this.tafsirFontScale = 1.0,
     this.hiddenCommentaries = const {},
+    this.shownCommentaries = const {},
     this.hiddenBookTafsirs = const {},
+    this.englishTafsirVisibilityOverride,
     this.tafsirKashida = false,
     this.reciterId = 1,
     this.riwayaReciters = const {},
@@ -179,8 +203,25 @@ class AppSettings {
   /// Source ids of tafsirs and translations the reader turned off.
   final Set<int> hiddenCommentaries;
 
+  /// Source ids the reader explicitly turned on, even when they do not
+  /// match the interface language.
+  final Set<int> shownCommentaries;
+
   /// Keys of the book tafsirs (reviewed packs) the reader turned off.
   final Set<String> hiddenBookTafsirs;
+
+  /// Explicit English-tafsir visibility choice; null follows the interface
+  /// language (English shown, Arabic hidden).
+  final bool? englishTafsirVisibilityOverride;
+
+  bool isCommentaryShown(int sourceId, {required bool defaultShown}) {
+    if (hiddenCommentaries.contains(sourceId)) return false;
+    if (shownCommentaries.contains(sourceId)) return true;
+    return defaultShown;
+  }
+
+  bool isEnglishTafsirShown(String languageCode) =>
+      englishTafsirVisibilityOverride ?? languageCode != 'ar';
 
   /// Trial: justify Arabic tafsir with tatweel instead of wider spaces.
   final bool tafsirKashida;
@@ -314,7 +355,9 @@ class AppSettings {
     TafsirFont? tafsirFont,
     double? tafsirFontScale,
     Set<int>? hiddenCommentaries,
+    Set<int>? shownCommentaries,
     Set<String>? hiddenBookTafsirs,
+    bool? englishTafsirVisibilityOverride,
     bool? tafsirKashida,
     int? reciterId,
     Map<Riwaya, int>? riwayaReciters,
@@ -360,7 +403,10 @@ class AppSettings {
     tafsirFont: tafsirFont ?? this.tafsirFont,
     tafsirFontScale: tafsirFontScale ?? this.tafsirFontScale,
     hiddenCommentaries: hiddenCommentaries ?? this.hiddenCommentaries,
+    shownCommentaries: shownCommentaries ?? this.shownCommentaries,
     hiddenBookTafsirs: hiddenBookTafsirs ?? this.hiddenBookTafsirs,
+    englishTafsirVisibilityOverride:
+        englishTafsirVisibilityOverride ?? this.englishTafsirVisibilityOverride,
     tafsirKashida: tafsirKashida ?? this.tafsirKashida,
     reciterId: reciterId ?? this.reciterId,
     riwayaReciters: riwayaReciters ?? this.riwayaReciters,

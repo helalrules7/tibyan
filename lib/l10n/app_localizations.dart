@@ -1106,6 +1106,12 @@ abstract class AppLocalizations {
   /// **'النصوص المعروضة'**
   String get tafsirShown;
 
+  /// No description provided for @englishTafsirVisibilityLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'التفسير الإنجليزي'**
+  String get englishTafsirVisibilityLabel;
+
   /// No description provided for @tafsirNoneShown.
   ///
   /// In ar, this message translates to:

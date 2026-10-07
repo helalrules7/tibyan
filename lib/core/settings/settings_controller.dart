@@ -35,7 +35,9 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kTafsirFont = 'settings.tafsirFont';
   static const _kTafsirScale = 'settings.tafsirFontScale';
   static const _kHiddenCommentaries = 'settings.hiddenCommentaries';
+  static const _kShownCommentaries = 'settings.shownCommentaries';
   static const _kHiddenBookTafsirs = 'settings.hiddenBookTafsirs';
+  static const _kEnglishTafsirVisibility = 'settings.englishTafsirVisibility';
   static const _kKashida = 'settings.tafsirKashida';
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
@@ -108,7 +110,14 @@ class SettingsController extends Notifier<AppSettings> {
         for (final id in _prefs.getStringList(_kHiddenCommentaries) ?? [])
           ?int.tryParse(id),
       },
+      shownCommentaries: {
+        for (final id in _prefs.getStringList(_kShownCommentaries) ?? [])
+          ?int.tryParse(id),
+      },
       hiddenBookTafsirs: {...?_prefs.getStringList(_kHiddenBookTafsirs)},
+      englishTafsirVisibilityOverride: _prefs.getBool(
+        _kEnglishTafsirVisibility,
+      ),
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       riwayaReciters: {
@@ -259,11 +268,29 @@ class SettingsController extends Notifier<AppSettings> {
 
   Future<void> setCommentaryShown(int sourceId, bool shown) async {
     final hidden = {...state.hiddenCommentaries};
-    shown ? hidden.remove(sourceId) : hidden.add(sourceId);
-    state = state.copyWith(hiddenCommentaries: hidden);
+    final explicitlyShown = {...state.shownCommentaries};
+    if (shown) {
+      hidden.remove(sourceId);
+      explicitlyShown.add(sourceId);
+    } else {
+      hidden.add(sourceId);
+      explicitlyShown.remove(sourceId);
+    }
+    state = state.copyWith(
+      hiddenCommentaries: hidden,
+      shownCommentaries: explicitlyShown,
+    );
     await _prefs.setStringList(_kHiddenCommentaries, [
       for (final id in hidden) '$id',
     ]);
+    await _prefs.setStringList(_kShownCommentaries, [
+      for (final id in explicitlyShown) '$id',
+    ]);
+  }
+
+  Future<void> setEnglishTafsirShown(bool shown) async {
+    state = state.copyWith(englishTafsirVisibilityOverride: shown);
+    await _prefs.setBool(_kEnglishTafsirVisibility, shown);
   }
 
   /// Shows or hides a book tafsir (by its source key).

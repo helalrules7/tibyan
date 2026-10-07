@@ -14,11 +14,20 @@ import 'package:tibyan/core/theme/theme_registry.dart';
 import 'package:tibyan/core/theme/theme_tokens.dart';
 import 'package:tibyan/features/books/books_providers.dart';
 import 'package:tibyan/features/books/data/book_pack.dart';
+import 'package:tibyan/features/content_extras/english_tafsir.dart';
 import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 import 'package:tibyan/features/tafsir/tafsir_screen.dart';
 import 'package:tibyan/l10n/app_localizations.dart';
 
 import '../books/fake_pack.dart';
+
+const _englishTafsirSpec = TafsirTextPackSpec(
+  id: 'test-english-tafsir',
+  url: 'https://example.test/english-tafsir.pack.db',
+  sha256: 'test',
+  bytes: 1,
+  title: 'English tafsir',
+);
 
 /// Book tafsirs from reviewed packs beside the bundled ones, on the real
 /// bundled database.
@@ -52,6 +61,8 @@ void main() {
     WidgetTester tester, {
     List<BookPack>? packs,
     Map<String, bool> flags = const {},
+    List<TafsirTextPackSpec> englishTafsirSpecs = const [],
+    String locale = 'ar',
     int ayah = 1,
   }) async {
     SharedPreferences.setMockInitialValues({});
@@ -59,6 +70,8 @@ void main() {
     final registry = (await tester.runAsync(
       () => ThemeRegistry.load(rootBundle),
     ))!;
+    final packRoot = Directory.systemTemp.createTempSync('tafsir_settings');
+    addTearDown(() => packRoot.deleteSync(recursive: true));
     await tester.binding.setSurfaceSize(const Size(420, 4000));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await tester.pumpWidget(
@@ -69,9 +82,11 @@ void main() {
           sharedPreferencesProvider.overrideWithValue(prefs!),
           featureFlagsProvider.overrideWithValue(FeatureFlags(flags)),
           installedBookPacksProvider.overrideWithValue(packs ?? [pack]),
+          englishTafsirSpecsProvider.overrideWithValue(englishTafsirSpecs),
+          packRootProvider.overrideWithValue(packRoot),
         ],
         child: MaterialApp(
-          locale: const Locale('ar'),
+          locale: Locale(locale),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: buildTheme(
@@ -111,6 +126,41 @@ void main() {
   testWidgets('none without a reviewed pack', (tester) async {
     await pump(tester, packs: []);
     expect(find.text('تفسير تجريبي أول'), findsNothing);
+  });
+
+  testWidgets(
+    'English translations follow interface language, Arabic tafsir stays',
+    (tester) async {
+      await pump(tester);
+      expect(find.text('التفسير الميسر'), findsOneWidget);
+      expect(find.text('الترجمة الإنجليزية: صحيح إنترناشونال'), findsNothing);
+
+      await pump(tester, locale: 'en');
+      expect(find.text('Al-Tafsir al-Muyassar'), findsOneWidget);
+      expect(find.text('Saheeh International'), findsOneWidget);
+      expect(find.text('Pickthall'), findsOneWidget);
+    },
+  );
+
+  testWidgets('English tafsir can be explicitly enabled from Arabic settings', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      flags: {'english_tafsir': true},
+      englishTafsirSpecs: [_englishTafsirSpec],
+    );
+
+    await tester.tap(find.byIcon(Icons.text_fields));
+    await tester.pumpAndSettle();
+    final switchTile = find.widgetWithText(SwitchListTile, 'التفسير الإنجليزي');
+    expect(switchTile, findsOneWidget);
+    expect(tester.widget<SwitchListTile>(switchTile).value, isFalse);
+
+    await tester.ensureVisible(switchTile);
+    await tester.tap(switchTile);
+    await tester.pumpAndSettle();
+    expect(tester.widget<SwitchListTile>(switchTile).value, isTrue);
   });
 
   testWidgets('munasabat under the tafsirs only when the flag is on', (

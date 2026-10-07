@@ -596,6 +596,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tafsirShown => 'النصوص المعروضة';
 
   @override
+  String get englishTafsirVisibilityLabel => 'التفسير الإنجليزي';
+
+  @override
   String get tafsirNoneShown => 'كل النصوص مخفية. اختر نصا من إعدادات التفسير.';
 
   @override

@@ -259,8 +259,9 @@ void main() {
     String locale = 'ar',
     List<TafsirTextPackSpec> specs = const [],
     Directory? root,
+    Map<String, Object> initialPrefs = const {},
   }) async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues(initialPrefs);
     final prefs = await tester.runAsync(SharedPreferences.getInstance);
     final audio = FakeAudio();
     await tester.binding.setSurfaceSize(const Size(420, 1600));
@@ -484,6 +485,36 @@ void main() {
         flags: {Feature.englishTafsir: true},
         specs: [spec],
         root: installed(),
+      );
+      expect(find.textContaining('Placeholder'), findsNothing);
+    });
+
+    testWidgets('an explicit choice shows it in the Arabic interface', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        section,
+        flags: {Feature.englishTafsir: true},
+        specs: [spec],
+        root: installed(),
+        initialPrefs: {'settings.englishTafsirVisibility': true},
+      );
+      expect(find.text('Placeholder English tafsir'), findsOneWidget);
+      expect(find.text('Placeholder text for 2:2.'), findsOneWidget);
+    });
+
+    testWidgets('an explicit choice can hide it in the English interface', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        section,
+        locale: 'en',
+        flags: {Feature.englishTafsir: true},
+        specs: [spec],
+        root: installed(),
+        initialPrefs: {'settings.englishTafsirVisibility': false},
       );
       expect(find.textContaining('Placeholder'), findsNothing);
     });

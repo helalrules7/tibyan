@@ -211,7 +211,9 @@ class EnglishTafsirSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (Localizations.localeOf(context).languageCode == 'ar') {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final settings = ref.watch(settingsProvider);
+    if (!settings.isEnglishTafsirShown(languageCode)) {
       return const SizedBox.shrink();
     }
     if (!ref.watch(featureFlagsProvider).isOn(Feature.englishTafsir)) {
@@ -223,7 +225,7 @@ class EnglishTafsirSection extends ConsumerWidget {
     if (entry == null) return const SizedBox.shrink();
     final l = AppLocalizations.of(context);
     final t = context.tokens.colors;
-    final scale = ref.watch(settingsProvider.select((s) => s.tafsirFontScale));
+    final scale = settings.tafsirFontScale;
     final dir = pack.rtl ? TextDirection.rtl : TextDirection.ltr;
     final credit = contentCredit(pack.source, 'en', version: pack.version);
     return Container(

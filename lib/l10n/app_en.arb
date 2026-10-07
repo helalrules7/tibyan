@@ -326,6 +326,7 @@
   "tafsirFontInterface": "Interface font",
   "tafsirTextSize": "Text size",
   "tafsirShown": "Texts shown",
+  "englishTafsirVisibilityLabel": "English tafsir",
   "tafsirNoneShown": "All texts are hidden. Choose one in the tafsir settings.",
   "tafsirFootnotes": "Footnotes",
   "previousVerse": "Previous verse",

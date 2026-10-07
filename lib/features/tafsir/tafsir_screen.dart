@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/content_database.dart';
+import '../../core/flags/feature_flags.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
@@ -261,6 +262,7 @@ class _VersePage extends ConsumerWidget {
     final t = context.tokens.colors;
     final settings = ref.watch(settingsProvider);
     final editions = ref.watch(commentaryEditionsProvider).value;
+    final languageCode = Localizations.localeOf(context).languageCode;
     final entries = ref
         .watch(verseCommentaryProvider((surah: ayah.surah, ayah: ayah.number)))
         .value;
@@ -273,7 +275,14 @@ class _VersePage extends ConsumerWidget {
     }
     final shown = [
       for (final e in editions)
-        if (!settings.hiddenCommentaries.contains(e.sourceId) &&
+        if (settings.isCommentaryShown(
+              e.sourceId,
+              defaultShown: commentaryDefaultShown(
+                kind: e.kind,
+                contentLanguageCode: e.language,
+                languageCode: languageCode,
+              ),
+            ) &&
             entries[e.sourceId] != null)
           e,
     ];
@@ -544,7 +553,10 @@ class _TafsirSettingsSheet extends ConsumerWidget {
     final controller = ref.read(settingsProvider.notifier);
     final editions = ref.watch(commentaryEditionsProvider).value ?? const [];
     final books = ref.watch(installedBookSourcesProvider(BookKind.tafsir));
-    final arabicUi = Localizations.localeOf(context).languageCode == 'ar';
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final arabicUi = languageCode == 'ar';
+    final flags = ref.watch(featureFlagsProvider);
+    final englishTafsirSpecs = ref.watch(englishTafsirSpecsProvider);
 
     return SafeArea(
       child: ListView(
@@ -601,8 +613,23 @@ class _TafsirSettingsSheet extends ConsumerWidget {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(arabicUi ? e.nameAr : e.nameEn),
-              value: !settings.hiddenCommentaries.contains(e.sourceId),
+              value: settings.isCommentaryShown(
+                e.sourceId,
+                defaultShown: commentaryDefaultShown(
+                  kind: e.kind,
+                  contentLanguageCode: e.language,
+                  languageCode: languageCode,
+                ),
+              ),
               onChanged: (v) => controller.setCommentaryShown(e.sourceId, v),
+            ),
+          if (englishTafsirSpecs.isNotEmpty &&
+              flags.isOn(Feature.englishTafsir))
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l.englishTafsirVisibilityLabel),
+              value: settings.isEnglishTafsirShown(languageCode),
+              onChanged: controller.setEnglishTafsirShown,
             ),
           for (final b in books)
             SwitchListTile(

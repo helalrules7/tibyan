@@ -460,6 +460,7 @@
   "tafsirFontInterface": "خط الواجهة",
   "tafsirTextSize": "حجم النص",
   "tafsirShown": "النصوص المعروضة",
+  "englishTafsirVisibilityLabel": "التفسير الإنجليزي",
   "tafsirNoneShown": "كل النصوص مخفية. اختر نصا من إعدادات التفسير.",
   "tafsirFootnotes": "الحواشي",
   "previousVerse": "الآية السابقة",

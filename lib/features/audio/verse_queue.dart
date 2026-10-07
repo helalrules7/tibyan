@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../content_extras/verse_audio_index.dart';
 
@@ -79,7 +81,14 @@ class TranslationAudioChoice extends Notifier<bool> {
   static const key = 'settings.translationAudio';
 
   @override
-  bool build() => ref.read(sharedPreferencesProvider).getBool(key) ?? false;
+  bool build() {
+    final language = ref.watch(settingsProvider.select((s) => s.language));
+    return ref.read(sharedPreferencesProvider).getBool(key) ??
+        defaultTranslationAudioEnabled(
+          language,
+          systemLanguageCode: PlatformDispatcher.instance.locale.languageCode,
+        );
+  }
 
   void set(bool value) {
     state = value;
