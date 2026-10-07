@@ -1,0 +1,25 @@
+{
+ "name": "strict: one letter off is wrong",
+ "range": {
+  "verses": [
+   2,
+   255,
+   2,
+   255
+  ]
+ },
+ "options": {
+  "strictness": "strict"
+ },
+ "steps": [
+  {
+   "say": "الله لا إله إلا هو الحي القيون لا تأخذه"
+  }
+ ],
+ "statuses": {
+  "2:255:1-6": "correct",
+  "2:255:7": "wrong",
+  "2:255:8-9": "correct",
+  "2:255:10-50": "hidden"
+ }
+}

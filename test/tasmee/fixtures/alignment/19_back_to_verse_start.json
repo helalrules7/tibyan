@@ -1,0 +1,29 @@
+{
+ "name": "going back to the start of the verse is repetition, not error",
+ "range": {
+  "verses": [
+   2,
+   5,
+   2,
+   5
+  ]
+ },
+ "steps": [
+  {
+   "say": "أولئك على هدى من ربهم"
+  },
+  {
+   "say": "أولئك على هدى من ربهم وأولئك هم المفلحون"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": [],
+ "ignored": {
+  "repetition": 5
+ },
+ "accuracy": {
+  "2:5": 1
+ }
+}

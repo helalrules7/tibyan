@@ -1,0 +1,20 @@
+{
+ "name": "يا أيها heard as two words is the one word of the mushaf",
+ "range": {
+  "verses": [
+   2,
+   21,
+   2,
+   21
+  ]
+ },
+ "steps": [
+  {
+   "say": "يا أيها الناس اعبدوا ربكم الذي خلقكم والذين من قبلكم لعلكم تتقون"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": []
+}

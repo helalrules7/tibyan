@@ -1,0 +1,20 @@
+{
+ "name": "words the recogniser divides differently (يا أيها، ألف لام ميم)",
+ "range": {
+  "verses": [
+   2,
+   1,
+   2,
+   2
+  ]
+ },
+ "steps": [
+  {
+   "say": "ألف لام ميم ذلك الكتاب لا ريب فيه هدى للمتقين"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": []
+}

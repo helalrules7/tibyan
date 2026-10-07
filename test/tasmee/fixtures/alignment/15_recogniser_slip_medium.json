@@ -1,0 +1,20 @@
+{
+ "name": "medium: one letter off in a long word is read correctly",
+ "range": {
+  "verses": [
+   2,
+   255,
+   2,
+   255
+  ]
+ },
+ "steps": [
+  {
+   "say": "الله لا إله إلا هو الحي القيون لا تأخذه"
+  }
+ ],
+ "statuses": {
+  "2:255:1-9": "correct",
+  "2:255:10-50": "hidden"
+ }
+}

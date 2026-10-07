@@ -1,0 +1,23 @@
+{
+ "name": "a basmala before a range that opens with «ٱللَّهُ» is not taken for the range",
+ "range": {
+  "verses": [
+   3,
+   2,
+   3,
+   2
+  ]
+ },
+ "steps": [
+  {
+   "say": "أعوذ بالله من الشيطان الرجيم بسم الله الرحمن الرحيم الله لا إله إلا هو الحي القيوم"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": [],
+ "ignored": {
+  "preamble": 9
+ }
+}

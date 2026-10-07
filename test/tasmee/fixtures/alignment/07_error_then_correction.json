@@ -1,0 +1,37 @@
+{
+ "name": "a word read wrongly then read again correctly",
+ "range": {
+  "surah": 1
+ },
+ "options": {
+  "strictness": "strict"
+ },
+ "steps": [
+  {
+   "say": "بسم الله الرحمن الرحيم الحمد لله رب العالمون العالمين الرحمن الرحيم"
+  },
+  {
+   "say": "مالك يوم الدين"
+  },
+  {
+   "finish": true
+  }
+ ],
+ "statuses": {
+  "1:1:1-4": "correct",
+  "1:2:1-3": "correct",
+  "1:2:4": "correctedAfterError",
+  "1:3:1-2": "correct",
+  "1:4:1-3": "correct",
+  "1:5:1-4": "hidden",
+  "1:6:1-3": "hidden",
+  "1:7:1-9": "hidden"
+ },
+ "extras": [],
+ "accuracy": {
+  "1:2": 0.75
+ },
+ "corrected": {
+  "1:2": 1
+ }
+}

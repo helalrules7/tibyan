@@ -1,0 +1,38 @@
+{
+ "name": "verse by verse: the words of a verse not read are skipped when it ends",
+ "range": {
+  "verses": [
+   1,
+   2,
+   1,
+   3
+  ]
+ },
+ "steps": [
+  {
+   "say": "الحمد لله"
+  },
+  {
+   "finishVerse": "1:2"
+  },
+  {
+   "say": "الرحمن الرحيم"
+  },
+  {
+   "finishVerse": "1:3"
+  }
+ ],
+ "statuses": {
+  "1:2:1-2": "correct",
+  "1:2:3-4": "skipped",
+  "1:3:1-2": "correct"
+ },
+ "accuracy": {
+  "1:2": 0.5,
+  "1:3": 1
+ },
+ "completed": [
+  "1:2",
+  "1:3"
+ ]
+}
