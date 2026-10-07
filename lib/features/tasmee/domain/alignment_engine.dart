@@ -66,8 +66,11 @@ class TasmeeEngineOptions {
   final int maxJump;
   final int farConfirm;
 
-  /// How far back a word read again is recognised as a repetition (or, for
-  /// a word marked wrong or skipped, as its correction).
+  /// How far back a restart may begin: the reader goes back up to this
+  /// many words and reads again, in order, the words just before the one
+  /// expected (or, for a word marked wrong or skipped, corrects it). A word
+  /// that only matches some earlier word, out of that order, is not a
+  /// repetition.
   final int lookBack;
 
   /// Heard words held while their reading is unsure; past this many the
@@ -198,7 +201,7 @@ final class VerseCompleted extends TasmeeEvent {
 /// Pure Dart: no UI and no recogniser. Each heard word joins a short queue
 /// of unsure words, which is aligned with the expected words from the
 /// cursor (an edit distance alignment that also knows skips of several
-/// words, repetitions of words already read, and words the recogniser
+/// words, restarts that read again the words just before, and words the recogniser
 /// splits or joins differently from the mushaf). A word read as expected
 /// is settled at once; an error is settled when the words after it confirm
 /// it, so a word is never marked wrong on the strength of one unsure word.
@@ -447,15 +450,15 @@ class TasmeeEngine {
     final sims = <int, double>{};
     double sim(int i, int j) =>
         sims[i * width + j] ??= _similarity(_buffer[i].key, c + j);
-    // For each heard word, the earlier words it matches (a repetition).
-    final lowest = math.max(0, c - options.lookBack);
-    final repeats = [
-      for (final h in _buffer)
-        [
-          for (var k = lowest; k < c + m; k++)
-            if (_matches(h.key, k)) k,
-        ],
-    ];
+    final matched = <int, bool>{};
+    bool heardIs(int i, int k) =>
+        matched[i * (words.length + 1) + k] ??= _matches(_buffer[i].key, k);
+    bool readsFrom(int i, int start, int length) {
+      for (var x = 0; x < length; x++) {
+        if (!heardIs(i + x, start + x)) return false;
+      }
+      return true;
+    }
 
     void relax(int i, int j, double value, int source, _Op op) {
       final at = i * width + j;
@@ -495,10 +498,29 @@ class TasmeeEngine {
             }
           }
         }
-        final target = repeats[i].lastWhere((k) => k < c + j, orElse: () => -1);
-        target >= 0
-            ? relax(i + 1, j, d + 0.3, here, _Op.repeat(target))
-            : relax(i + 1, j, d + 1.05, here, _Op.insert);
+        relax(i + 1, j, d + 1.05, here, _Op.insert);
+        // A restart (at a waqf): the reader goes back and reads again, in
+        // order, the words just before the one expected, up to it. At the
+        // end of the queue it may still be under way (only its first words
+        // heard yet); it is then never settled until the rest is heard.
+        final at = c + j;
+        final earliest = math.max(0, at - options.lookBack);
+        for (var length = 1; i + length <= n; length++) {
+          final whole = at - length;
+          if (whole < earliest) break;
+          final open = i + length == n;
+          for (var start = open ? earliest : whole; start <= whole; start++) {
+            if (readsFrom(i, start, length)) {
+              relax(
+                i + length,
+                j,
+                d + 0.3 * length,
+                here,
+                _Op.repeat(start, length),
+              );
+            }
+          }
+        }
         for (var l = 1; l <= options.maxJump && j + l <= m; l++) {
           relax(i, j + l, d + _skipCost(l), here, _Op.skip(l));
         }
@@ -530,13 +552,22 @@ class TasmeeEngine {
     final errorWords = <int>{};
     while (k < ops.length) {
       final op = ops[k];
-      // A word read again that is also a word further on waits for a word
-      // read correctly after it to tell which it was (a skipped line may
-      // land on it).
-      if (op.kind == _OpKind.repeat &&
-          (k == ops.length - 1 || ops[k + 1].isError) &&
-          _matchesAhead(_buffer[_tokensBefore(ops, k)].key)) {
-        break;
+      if (op.kind == _OpKind.repeat) {
+        final last = k == ops.length - 1;
+        // A restart still under way waits for the rest of it.
+        if (op.target + op.tokens < wordAt) break;
+        // A word read again that is also a word further on waits for a
+        // word read correctly after it to tell which it was (a skipped line
+        // may land on it).
+        if ((last || ops[k + 1].isError) &&
+            _matchesAhead(_buffer[_tokensBefore(ops, k)].key)) {
+          break;
+        }
+        // So does a correction: the word after it tells a word read wrongly
+        // and then rightly from two words read in each other's place.
+        final corrects = [for (var x = 0; x < op.tokens; x++) op.target + x]
+            .any((t) => _status[t].isError || errorWords.contains(t));
+        if (corrects && (last || !ops[k + 1].isMatch)) break;
       }
       if (!op.isError) {
         // A match only through the setting's tolerance (doubtful) may be
@@ -568,7 +599,9 @@ class TasmeeEngine {
         if (next.isError) break;
         if (next.kind == _OpKind.repeat) {
           // Reading the erring word again confirms it was an error.
-          if (errorWords.contains(next.target)) got += 1;
+          for (var x = 0; x < next.tokens; x++) {
+            if (errorWords.contains(next.target + x)) got += 1;
+          }
         } else {
           got += weight(next, at);
         }
@@ -647,20 +680,16 @@ class TasmeeEngine {
           _extras.add(extra);
           events.add(extra);
         case _OpKind.repeat:
-          // The target was chosen against the queue; look again now that
-          // the words before it are settled.
-          final target =
-              _repeatTarget(
-                heard.single.key,
-                from: c - options.lookBack,
-                to: c,
-              ) ??
-              op.target;
-          if (target < c && _status[target].isError) {
-            _set(target, WordStatus.correctedAfterError, events);
-            touched.add(target);
-          } else {
-            events.add(IgnoredWord(heard.single.raw, IgnoredReason.repetition));
+          // A restart: each word read again is ignored, or corrects the
+          // word it reads if that one was marked wrong or skipped.
+          for (var x = 0; x < op.tokens; x++) {
+            final target = op.target + x;
+            if (target < c && _status[target].isError) {
+              _set(target, WordStatus.correctedAfterError, events);
+              touched.add(target);
+            } else {
+              events.add(IgnoredWord(heard[x].raw, IgnoredReason.repetition));
+            }
           }
       }
       if (_waitingAt != null) break;
@@ -764,14 +793,17 @@ class _Op {
   static const insert = _Op._(_OpKind.insert, 1, 0);
   static const split = _Op._(_OpKind.split, 1, 2);
   factory _Op.merge(int tokens) => _Op._(_OpKind.merge, tokens, 1);
-  factory _Op.repeat(int target) => _Op._(_OpKind.repeat, 1, 0, target);
+
+  /// [length] words read again, from the expected word [start] on.
+  factory _Op.repeat(int start, int length) =>
+      _Op._(_OpKind.repeat, length, 0, start);
   factory _Op.skip(int length) => _Op._(_OpKind.skip, 0, length);
 
   final _OpKind kind;
   final int tokens;
   final int words;
 
-  /// The earlier word a repetition reads again.
+  /// The first earlier word a restart reads again.
   final int target;
 
   bool get isError =>

@@ -1,0 +1,27 @@
+{
+ "name": "two words read in each other's place are both wrong, not a repetition and a correction",
+ "range": {
+  "surah": 1
+ },
+ "steps": [
+  {
+   "say": "بسم الله الرحمن الرحيم الحمد لله رب العالمين الرحيم الرحمن مالك يوم الدين إياك نعبد وإياك نستعين اهدنا الصراط المستقيم صراط الذين أنعمت عليهم غير المغضوب عليهم ولا الضالين"
+  },
+  {
+   "finish": true
+  }
+ ],
+ "statuses": {
+  "1:3:1-2": "wrong",
+  "*": "correct"
+ },
+ "extras": [],
+ "heard": {
+  "1:3:1": "الرحيم",
+  "1:3:2": "الرحمن"
+ },
+ "ignored": {},
+ "accuracy": {
+  "1:3": 0
+ }
+}
