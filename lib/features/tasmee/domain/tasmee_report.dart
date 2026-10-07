@@ -39,7 +39,9 @@ class VerseReport {
   /// Words settled or shown (the rest were not reached).
   final int reached;
 
-  int get judged => words - doubtful;
+  /// Words reached and judged: all but the unsure ones and those never
+  /// reached (a session ended in the middle of a verse).
+  int get judged => reached - doubtful;
 
   /// Correct words over the words judged, 0..1; null with nothing judged.
   double? get accuracy => judged <= 0 ? null : correct / judged;
@@ -123,9 +125,9 @@ class TasmeeReport {
   int get doubtful => _sum((v) => v.doubtful);
   int get hinted => _sum((v) => v.hinted);
 
-  /// Correct words over every word judged in the verses reached.
+  /// Correct words over every word judged (reached, not unsure).
   double? get accuracy {
-    final judged = words - doubtful;
+    final judged = _sum((v) => v.judged);
     return judged <= 0 ? null : correct / judged;
   }
 

@@ -30,6 +30,7 @@ import '../../features/reading/continuous_screen.dart';
 import '../../features/reading/one_verse_screen.dart';
 import '../../features/tasmee/domain/tasmee_session_request.dart';
 import '../../features/tasmee/presentation/tasmee_session_screen.dart';
+import '../../features/tasmee/presentation/tasmee_settings_screen.dart';
 import '../../features/tasmee/presentation/tasmee_setup_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/settings/storage_screen.dart';
@@ -114,6 +115,10 @@ final appRouterProvider = Provider<GoRouter>(
               GoRoute(
                 path: 'player',
                 builder: (context, state) => const PlayerSettingsScreen(),
+              ),
+              GoRoute(
+                path: 'tasmee',
+                builder: (context, state) => const TasmeeSettingsScreen(),
               ),
             ],
           ),

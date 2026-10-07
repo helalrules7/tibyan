@@ -3871,12 +3871,6 @@ abstract class AppLocalizations {
   /// **'اختر نطاق التسميع'**
   String get tasmeeSelectRange;
 
-  /// No description provided for @tasmeeRangeType.
-  ///
-  /// In ar, this message translates to:
-  /// **'نوع النطاق'**
-  String get tasmeeRangeType;
-
   /// No description provided for @tasmeeSurah.
   ///
   /// In ar, this message translates to:
@@ -3894,54 +3888,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الحزب'**
   String get tasmeeHizb;
-
-  /// No description provided for @tasmeeQuarter.
-  ///
-  /// In ar, this message translates to:
-  /// **'ربع الحزب'**
-  String get tasmeeQuarter;
-
-  /// No description provided for @tasmeeHalfHizb.
-  ///
-  /// In ar, this message translates to:
-  /// **'نصف الحزب'**
-  String get tasmeeHalfHizb;
-
-  /// No description provided for @tasmeeThreeQuartersHizb.
-  ///
-  /// In ar, this message translates to:
-  /// **'ثلاثة أرباع الحزب'**
-  String get tasmeeThreeQuartersHizb;
-
-  /// No description provided for @tasmeePages.
-  ///
-  /// In ar, this message translates to:
-  /// **'الصفحات'**
-  String get tasmeePages;
-
-  /// No description provided for @tasmeeVerses.
-  ///
-  /// In ar, this message translates to:
-  /// **'الآيات'**
-  String get tasmeeVerses;
-
-  /// No description provided for @tasmeeFrom.
-  ///
-  /// In ar, this message translates to:
-  /// **'من'**
-  String get tasmeeFrom;
-
-  /// No description provided for @tasmeeTo.
-  ///
-  /// In ar, this message translates to:
-  /// **'إلى'**
-  String get tasmeeTo;
-
-  /// No description provided for @tasmeeHalf.
-  ///
-  /// In ar, this message translates to:
-  /// **'النصف'**
-  String get tasmeeHalf;
 
   /// No description provided for @tasmeeFirstHalf.
   ///
@@ -3979,24 +3925,6 @@ abstract class AppLocalizations {
   /// **'آية بآية'**
   String get tasmeeVerseByVerse;
 
-  /// No description provided for @tasmeeWordsCount.
-  ///
-  /// In ar, this message translates to:
-  /// **'{count} كلمة'**
-  String tasmeeWordsCount(String count);
-
-  /// No description provided for @tasmeeContinue.
-  ///
-  /// In ar, this message translates to:
-  /// **'متابعة'**
-  String get tasmeeContinue;
-
-  /// No description provided for @tasmeeEmptyRange.
-  ///
-  /// In ar, this message translates to:
-  /// **'النطاق المختار لا يحتوي كلمات.'**
-  String get tasmeeEmptyRange;
-
   /// No description provided for @tasmeeInvalidRange.
   ///
   /// In ar, this message translates to:
@@ -4008,48 +3936,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تنزيل نموذج التسميع'**
   String get tasmeeDownloadModel;
-
-  /// No description provided for @tasmeeModelDownloading.
-  ///
-  /// In ar, this message translates to:
-  /// **'جارٍ تنزيل النموذج'**
-  String get tasmeeModelDownloading;
-
-  /// No description provided for @tasmeeModelReady.
-  ///
-  /// In ar, this message translates to:
-  /// **'النموذج جاهز'**
-  String get tasmeeModelReady;
-
-  /// No description provided for @tasmeeModelConsent.
-  ///
-  /// In ar, this message translates to:
-  /// **'سيُنزل نموذج حجمه نحو {size}. سيستخدم اتصال الإنترنت، وقد تُحسب بيانات الهاتف. الصوت نفسه لا يُرسل.'**
-  String tasmeeModelConsent(String size);
-
-  /// Credit for the CC BY 4.0 speech model, shown in the tasmee intro and on the model download screen.
-  ///
-  /// In ar, this message translates to:
-  /// **'يعمل التسميع بنموذج NVIDIA العربي للتعرف على الكلام (FastConformer، ‏nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0) برخصة CC BY 4.0 ‏(creativecommons.org/licenses/by/4.0). حوّل تبيان فرعه CTC إلى صيغة ONNX وضغطه (int8)، دون تأييد من NVIDIA. يُنزَّل منفصلا عن التطبيق ويعمل على جهازك.'**
-  String get tasmeeModelAttribution;
-
-  /// No description provided for @tasmeeDownload.
-  ///
-  /// In ar, this message translates to:
-  /// **'تنزيل'**
-  String get tasmeeDownload;
-
-  /// No description provided for @tasmeeStartListening.
-  ///
-  /// In ar, this message translates to:
-  /// **'ابدأ التسميع'**
-  String get tasmeeStartListening;
-
-  /// No description provided for @tasmeeStopListening.
-  ///
-  /// In ar, this message translates to:
-  /// **'إنهاء التسميع'**
-  String get tasmeeStopListening;
 
   /// No description provided for @tasmeeListening.
   ///
@@ -4069,24 +3955,6 @@ abstract class AppLocalizations {
   /// **'جارٍ تجهيز النموذج'**
   String get tasmeeModelLoad;
 
-  /// No description provided for @tasmeeMicDenied.
-  ///
-  /// In ar, this message translates to:
-  /// **'لم تُمنح صلاحية الميكروفون. فعّلها من إعدادات الجهاز.'**
-  String get tasmeeMicDenied;
-
-  /// No description provided for @tasmeeSessionFailed.
-  ///
-  /// In ar, this message translates to:
-  /// **'تعذر بدء التسميع: {error}'**
-  String tasmeeSessionFailed(String error);
-
-  /// No description provided for @tasmeeWordCorrect.
-  ///
-  /// In ar, this message translates to:
-  /// **'صحيحة'**
-  String get tasmeeWordCorrect;
-
   /// No description provided for @tasmeeWordWrong.
   ///
   /// In ar, this message translates to:
@@ -4099,35 +3967,809 @@ abstract class AppLocalizations {
   /// **'متجاوزة'**
   String get tasmeeWordSkipped;
 
-  /// No description provided for @tasmeeWordCorrected.
-  ///
-  /// In ar, this message translates to:
-  /// **'صُححت بعد خطأ'**
-  String get tasmeeWordCorrected;
-
   /// No description provided for @tasmeeSessionComplete.
   ///
   /// In ar, this message translates to:
   /// **'انتهى التسميع'**
   String get tasmeeSessionComplete;
 
-  /// No description provided for @tasmeeSessionAccuracy.
-  ///
-  /// In ar, this message translates to:
-  /// **'الدقة: {accuracy}%'**
-  String tasmeeSessionAccuracy(String accuracy);
-
-  /// No description provided for @tasmeeWordDoubtful.
-  ///
-  /// In ar, this message translates to:
-  /// **'مشكوك فيها'**
-  String get tasmeeWordDoubtful;
-
   /// No description provided for @tasmeeSessionDoubtful.
   ///
   /// In ar, this message translates to:
   /// **'{count} كلمة مشكوك فيها، لم تُحسب في الدقة'**
   String tasmeeSessionDoubtful(String count);
+
+  /// No description provided for @tasmeeAccuracy.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدقة'**
+  String get tasmeeAccuracy;
+
+  /// No description provided for @tasmeeAccuracyShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدقة'**
+  String get tasmeeAccuracyShort;
+
+  /// No description provided for @tasmeeAcrossSurahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'{fromSurah} {fromAyah} – {toSurah} {toAyah} · {mode}'**
+  String tasmeeAcrossSurahs(
+    String fromSurah,
+    String fromAyah,
+    String toSurah,
+    String toAyah,
+    String mode,
+  );
+
+  /// No description provided for @tasmeeAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية'**
+  String get tasmeeAyah;
+
+  /// No description provided for @tasmeeCancelDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء التنزيل'**
+  String get tasmeeCancelDownload;
+
+  /// No description provided for @tasmeeClearHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح سجل التسميع'**
+  String get tasmeeClearHistory;
+
+  /// No description provided for @tasmeeClearHistoryBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُمسح ما يحفظه التطبيق عن جلساتك السابقة (آخر تسميع). لا يوجد صوت محفوظ أصلا.'**
+  String get tasmeeClearHistoryBody;
+
+  /// No description provided for @tasmeeClearHistoryHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر تسميع ونتيجته'**
+  String get tasmeeClearHistoryHint;
+
+  /// No description provided for @tasmeeClose.
+  ///
+  /// In ar, this message translates to:
+  /// **'إغلاق'**
+  String get tasmeeClose;
+
+  /// No description provided for @tasmeeConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد'**
+  String get tasmeeConfirm;
+
+  /// No description provided for @tasmeeContinueLast.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكمل'**
+  String get tasmeeContinueLast;
+
+  /// No description provided for @tasmeeContinuousHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ متصلا؛ تظهر كل كلمة في موضعها لحظة قراءتها'**
+  String get tasmeeContinuousHint;
+
+  /// No description provided for @tasmeeDefaultsNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'القيم الافتراضية من الإعدادات › التسميع'**
+  String get tasmeeDefaultsNote;
+
+  /// No description provided for @tasmeeDeleteModel.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف النموذج'**
+  String get tasmeeDeleteModel;
+
+  /// No description provided for @tasmeeDeleteModelBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُحذف نموذج التسميع من الجهاز. تحتاج إلى تنزيله ثانية قبل التسميع القادم.'**
+  String get tasmeeDeleteModelBody;
+
+  /// No description provided for @tasmeeDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم'**
+  String get tasmeeDone;
+
+  /// No description provided for @tasmeeDownloadShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'نزّل النموذج'**
+  String get tasmeeDownloadShort;
+
+  /// No description provided for @tasmeeDownloadSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'نزّل ({size} م.ب)'**
+  String tasmeeDownloadSize(String size);
+
+  /// No description provided for @tasmeeDurationWords.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدة {minutes} د {seconds} ث · {words} كلمة'**
+  String tasmeeDurationWords(String minutes, String seconds, String words);
+
+  /// No description provided for @tasmeeElapsed.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدة'**
+  String get tasmeeElapsed;
+
+  /// No description provided for @tasmeeEnd.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنهاء'**
+  String get tasmeeEnd;
+
+  /// No description provided for @tasmeeFeedback.
+  ///
+  /// In ar, this message translates to:
+  /// **'أثناء التسميع'**
+  String get tasmeeFeedback;
+
+  /// No description provided for @tasmeeFinishing.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنهي التسميع…'**
+  String get tasmeeFinishing;
+
+  /// No description provided for @tasmeeFromPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'من صفحة'**
+  String get tasmeeFromPage;
+
+  /// No description provided for @tasmeeFromSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'من سورة'**
+  String get tasmeeFromSurah;
+
+  /// No description provided for @tasmeeHelp.
+  ///
+  /// In ar, this message translates to:
+  /// **'المساعدة'**
+  String get tasmeeHelp;
+
+  /// No description provided for @tasmeeHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلميح'**
+  String get tasmeeHint;
+
+  /// No description provided for @tasmeeHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'السجل'**
+  String get tasmeeHistory;
+
+  /// No description provided for @tasmeeKindHalfHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'نصف حزب'**
+  String get tasmeeKindHalfHizb;
+
+  /// No description provided for @tasmeeKindHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزب'**
+  String get tasmeeKindHizb;
+
+  /// No description provided for @tasmeeKindJuz.
+  ///
+  /// In ar, this message translates to:
+  /// **'جزء'**
+  String get tasmeeKindJuz;
+
+  /// No description provided for @tasmeeKindPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحات'**
+  String get tasmeeKindPages;
+
+  /// No description provided for @tasmeeKindQuarter.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربع حزب'**
+  String get tasmeeKindQuarter;
+
+  /// No description provided for @tasmeeKindSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة'**
+  String get tasmeeKindSurah;
+
+  /// No description provided for @tasmeeKindThreeQuarters.
+  ///
+  /// In ar, this message translates to:
+  /// **'٣ أرباع حزب'**
+  String get tasmeeKindThreeQuarters;
+
+  /// No description provided for @tasmeeKindVerses.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيات'**
+  String get tasmeeKindVerses;
+
+  /// No description provided for @tasmeeLastSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر تسميع: {range} · {accuracy}'**
+  String tasmeeLastSession(String range, String accuracy);
+
+  /// No description provided for @tasmeeLenient.
+  ///
+  /// In ar, this message translates to:
+  /// **'متسامح'**
+  String get tasmeeLenient;
+
+  /// No description provided for @tasmeeLenientHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يقبل فرقا أكبر في نطق الكلمة'**
+  String get tasmeeLenientHint;
+
+  /// No description provided for @tasmeeLess.
+  ///
+  /// In ar, this message translates to:
+  /// **'أقل'**
+  String get tasmeeLess;
+
+  /// No description provided for @tasmeeListeningVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {ayah}: أستمع إليك'**
+  String tasmeeListeningVerse(String ayah);
+
+  /// No description provided for @tasmeeMarkAndGoOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'تابع وعلّمه'**
+  String get tasmeeMarkAndGoOn;
+
+  /// No description provided for @tasmeeMedium.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسط'**
+  String get tasmeeMedium;
+
+  /// No description provided for @tasmeeMediumHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتجاوز عن حرف واحد في الكلمة الطويلة'**
+  String get tasmeeMediumHint;
+
+  /// No description provided for @tasmeeMicOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'الميكروفون غير مسموح'**
+  String get tasmeeMicOff;
+
+  /// No description provided for @tasmeeMicPrivacy.
+  ///
+  /// In ar, this message translates to:
+  /// **'التسميع يسمع قراءتك على جهازك فقط. لا يُرسل الصوت ولا يُحفظ.'**
+  String get tasmeeMicPrivacy;
+
+  /// No description provided for @tasmeeMistakes.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} أخطاء'**
+  String tasmeeMistakes(String count);
+
+  /// No description provided for @tasmeeModelChecking.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ معرفة الحجم…'**
+  String get tasmeeModelChecking;
+
+  /// No description provided for @tasmeeModelDetails.
+  ///
+  /// In ar, this message translates to:
+  /// **'المصدر والرخصة في «عن المصحف» › المصادر'**
+  String get tasmeeModelDetails;
+
+  /// No description provided for @tasmeeModelFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر الاتصال. تحقق من الإنترنت وحاول ثانية.'**
+  String get tasmeeModelFailed;
+
+  /// No description provided for @tasmeeModelInstalled.
+  ///
+  /// In ar, this message translates to:
+  /// **'النموذج منزّل (الإصدار {version})'**
+  String tasmeeModelInstalled(String version);
+
+  /// No description provided for @tasmeeModelMissing.
+  ///
+  /// In ar, this message translates to:
+  /// **'نموذج التسميع غير منزّل'**
+  String get tasmeeModelMissing;
+
+  /// No description provided for @tasmeeModelOffline.
+  ///
+  /// In ar, this message translates to:
+  /// **'يعمل بعدها بلا إنترنت'**
+  String get tasmeeModelOffline;
+
+  /// No description provided for @tasmeeModelProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'{done} من {total} م.ب'**
+  String tasmeeModelProgress(String done, String total);
+
+  /// No description provided for @tasmeeModelRemove.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحذفه متى شئت من الإعدادات › التسميع'**
+  String get tasmeeModelRemove;
+
+  /// No description provided for @tasmeeModelSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'{size} م.ب · مرة واحدة'**
+  String tasmeeModelSize(String size);
+
+  /// No description provided for @tasmeeModelSizeUnknown.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرة واحدة'**
+  String get tasmeeModelSizeUnknown;
+
+  /// No description provided for @tasmeeModelSpace.
+  ///
+  /// In ar, this message translates to:
+  /// **'المساحة المستخدمة: {size} م.ب'**
+  String tasmeeModelSpace(String size);
+
+  /// No description provided for @tasmeeModelTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'نموذج التسميع'**
+  String get tasmeeModelTitle;
+
+  /// No description provided for @tasmeeModelVoiceStays.
+  ///
+  /// In ar, this message translates to:
+  /// **'صوتك يبقى على جهازك، لا يُرسل ولا يُحفظ'**
+  String get tasmeeModelVoiceStays;
+
+  /// No description provided for @tasmeeModelWifiNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُفضَّل التنزيل عبر Wi‑Fi؛ قد تُحسب بيانات الهاتف'**
+  String get tasmeeModelWifiNote;
+
+  /// No description provided for @tasmeeMore.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكثر'**
+  String get tasmeeMore;
+
+  /// No description provided for @tasmeeNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسميع جديد'**
+  String get tasmeeNew;
+
+  /// No description provided for @tasmeeNoAudioKept.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُحفظ آخر تسميع لتكمل منه. لا يُحفظ أي صوت.'**
+  String get tasmeeNoAudioKept;
+
+  /// No description provided for @tasmeeNoMistakes.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا أخطاء'**
+  String get tasmeeNoMistakes;
+
+  /// No description provided for @tasmeeNotNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليس الآن'**
+  String get tasmeeNotNow;
+
+  /// No description provided for @tasmeeNothingToReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'أحسنت، لا آيات تحتاج مراجعة.'**
+  String get tasmeeNothingToReview;
+
+  /// No description provided for @tasmeeNoticeDeviceBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'صوتك لا يُرسل إلى أي خادم ولا يُحفظ.'**
+  String get tasmeeNoticeDeviceBody;
+
+  /// No description provided for @tasmeeNoticeDeviceTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يعمل على جهازك'**
+  String get tasmeeNoticeDeviceTitle;
+
+  /// No description provided for @tasmeeNoticeMishearBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكلمة التي يشك فيها تُعلَّم بنقاط خفيفة ولا تُحسب عليك.'**
+  String get tasmeeNoticeMishearBody;
+
+  /// No description provided for @tasmeeNoticeMishearTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قد يخطئ في السماع'**
+  String get tasmeeNoticeMishearTitle;
+
+  /// No description provided for @tasmeeNoticeOk.
+  ///
+  /// In ar, this message translates to:
+  /// **'فهمت'**
+  String get tasmeeNoticeOk;
+
+  /// No description provided for @tasmeeNoticeStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'فهمت، ابدأ'**
+  String get tasmeeNoticeStart;
+
+  /// No description provided for @tasmeeNoticeTajweedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ولا المخارج ولا المدود ولا الوقف والابتداء.'**
+  String get tasmeeNoticeTajweedBody;
+
+  /// No description provided for @tasmeeNoticeTajweedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يقيّم التجويد ولا أحكام الأداء'**
+  String get tasmeeNoticeTajweedTitle;
+
+  /// No description provided for @tasmeeNoticeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التسميع يختبر حفظك، لا تجويدك'**
+  String get tasmeeNoticeTitle;
+
+  /// No description provided for @tasmeeNoticeWordsBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل قرأت ما في المصحف كلمة كلمة؟'**
+  String get tasmeeNoticeWordsBody;
+
+  /// No description provided for @tasmeeNoticeWordsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتحقق من الكلمات وترتيبها'**
+  String get tasmeeNoticeWordsTitle;
+
+  /// No description provided for @tasmeeOnError.
+  ///
+  /// In ar, this message translates to:
+  /// **'عند الخطأ'**
+  String get tasmeeOnError;
+
+  /// No description provided for @tasmeeOneMistake.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ واحد'**
+  String get tasmeeOneMistake;
+
+  /// No description provided for @tasmeeOneTo.
+  ///
+  /// In ar, this message translates to:
+  /// **'من ١ إلى {max}'**
+  String tasmeeOneTo(String max);
+
+  /// No description provided for @tasmeeOpenDeviceSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح إعدادات الجهاز'**
+  String get tasmeeOpenDeviceSettings;
+
+  /// No description provided for @tasmeeOtherEdition.
+  ///
+  /// In ar, this message translates to:
+  /// **'التسميع يتبع صفحات مصحف المدينة الجديد (١٤٤١)؛ في طبعتك تظهر الكلمات هنا متتابعة.'**
+  String get tasmeeOtherEdition;
+
+  /// No description provided for @tasmeePause.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف مؤقت'**
+  String get tasmeePause;
+
+  /// No description provided for @tasmeePaused.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوقف مؤقتا'**
+  String get tasmeePaused;
+
+  /// No description provided for @tasmeeProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما سُمّع من النطاق'**
+  String get tasmeeProgress;
+
+  /// No description provided for @tasmeeQuarterOfHizb.
+  ///
+  /// In ar, this message translates to:
+  /// **'الربع'**
+  String get tasmeeQuarterOfHizb;
+
+  /// No description provided for @tasmeeRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'النطاق'**
+  String get tasmeeRange;
+
+  /// No description provided for @tasmeeRangeSummary.
+  ///
+  /// In ar, this message translates to:
+  /// **'من {from} إلى {to} · {verses} آية · {words} كلمة · ص {pages}'**
+  String tasmeeRangeSummary(
+    String from,
+    String to,
+    String verses,
+    String words,
+    String pages,
+  );
+
+  /// No description provided for @tasmeeReReadWord.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعد قراءة الكلمة المعلّمة بالأحمر'**
+  String get tasmeeReReadWord;
+
+  /// No description provided for @tasmeeReciteAgain.
+  ///
+  /// In ar, this message translates to:
+  /// **'سمّع هذه الآيات ثانية'**
+  String get tasmeeReciteAgain;
+
+  /// No description provided for @tasmeeReciteVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'سمّع الآية'**
+  String get tasmeeReciteVerse;
+
+  /// No description provided for @tasmeeRedownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة تنزيل النموذج'**
+  String get tasmeeRedownload;
+
+  /// No description provided for @tasmeeRedownloadBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُحذف النموذج الحالي ثم يُنزّل من جديد.'**
+  String get tasmeeRedownloadBody;
+
+  /// No description provided for @tasmeeRepeat.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعد'**
+  String get tasmeeRepeat;
+
+  /// No description provided for @tasmeeResume.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة'**
+  String get tasmeeResume;
+
+  /// No description provided for @tasmeeRetry.
+  ///
+  /// In ar, this message translates to:
+  /// **'حاول ثانية'**
+  String get tasmeeRetry;
+
+  /// No description provided for @tasmeeReviewRow.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {ayah}، الدقة {accuracy}'**
+  String tasmeeReviewRow(String ayah, String accuracy);
+
+  /// No description provided for @tasmeeRingSemantics.
+  ///
+  /// In ar, this message translates to:
+  /// **'{title}، {note}: {value}'**
+  String tasmeeRingSemantics(String title, String note, String value);
+
+  /// No description provided for @tasmeeSeconds.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} ث'**
+  String tasmeeSeconds(String count);
+
+  /// No description provided for @tasmeeSessionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسميع · {surah}'**
+  String tasmeeSessionTitle(String surah);
+
+  /// No description provided for @tasmeeSettingsNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الطريقة، السلوك عند الخطأ، النموذج'**
+  String get tasmeeSettingsNote;
+
+  /// No description provided for @tasmeeSkipWord.
+  ///
+  /// In ar, this message translates to:
+  /// **'تجاوزها'**
+  String get tasmeeSkipWord;
+
+  /// No description provided for @tasmeeStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ'**
+  String get tasmeeStart;
+
+  /// No description provided for @tasmeeStartReciting.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ التسميع'**
+  String get tasmeeStartReciting;
+
+  /// No description provided for @tasmeeStopToCorrect.
+  ///
+  /// In ar, this message translates to:
+  /// **'توقّف للتصحيح'**
+  String get tasmeeStopToCorrect;
+
+  /// No description provided for @tasmeeStopToCorrectHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يتقدم حتى تقرأ الكلمة الصحيحة'**
+  String get tasmeeStopToCorrectHint;
+
+  /// No description provided for @tasmeeStrict.
+  ///
+  /// In ar, this message translates to:
+  /// **'صارم'**
+  String get tasmeeStrict;
+
+  /// No description provided for @tasmeeStrictHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكلمة كما هي حرفا حرفا'**
+  String get tasmeeStrictHint;
+
+  /// No description provided for @tasmeeStrictness.
+  ///
+  /// In ar, this message translates to:
+  /// **'حساسية المطابقة'**
+  String get tasmeeStrictness;
+
+  /// No description provided for @tasmeeSummary.
+  ///
+  /// In ar, this message translates to:
+  /// **'الملخص'**
+  String get tasmeeSummary;
+
+  /// No description provided for @tasmeeTestByTouch.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختبر حفظك باللمس بدلا من ذلك'**
+  String get tasmeeTestByTouch;
+
+  /// No description provided for @tasmeeThisVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'دقة الآية'**
+  String get tasmeeThisVerse;
+
+  /// No description provided for @tasmeeToPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلى صفحة'**
+  String get tasmeeToPage;
+
+  /// No description provided for @tasmeeToReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيات تحتاج مراجعة'**
+  String get tasmeeToReview;
+
+  /// No description provided for @tasmeeToSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلى سورة'**
+  String get tasmeeToSurah;
+
+  /// No description provided for @tasmeeToastDuration.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدة ظهور نتيجة الآية'**
+  String get tasmeeToastDuration;
+
+  /// No description provided for @tasmeeVerseByVerseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط، اقرأ آية، ثم تظهر كاملة بنتيجتها'**
+  String get tasmeeVerseByVerseHint;
+
+  /// No description provided for @tasmeeVerseDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت الآية'**
+  String get tasmeeVerseDone;
+
+  /// No description provided for @tasmeeVerseNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {ayah}'**
+  String tasmeeVerseNumber(String ayah);
+
+  /// No description provided for @tasmeeVerseOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {n} من {count}: اضغط وسمّعها'**
+  String tasmeeVerseOf(String n, String count);
+
+  /// No description provided for @tasmeeVerseResult.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {ayah} · {accuracy} · {detail}'**
+  String tasmeeVerseResult(String ayah, String accuracy, String detail);
+
+  /// No description provided for @tasmeeVersesHeading.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآيات'**
+  String get tasmeeVersesHeading;
+
+  /// No description provided for @tasmeeVersesLine.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآيات {from}–{to} · {mode}'**
+  String tasmeeVersesLine(String from, String to, String mode);
+
+  /// No description provided for @tasmeeVibration.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاهتزاز عند الخطأ'**
+  String get tasmeeVibration;
+
+  /// No description provided for @tasmeeVibrationHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اهتزاز خفيف حين تُعلَّم كلمة خطأ أو متجاوزة'**
+  String get tasmeeVibrationHint;
+
+  /// No description provided for @tasmeeWholeSession.
+  ///
+  /// In ar, this message translates to:
+  /// **'للتسميع كله'**
+  String get tasmeeWholeSession;
+
+  /// No description provided for @tasmeeWordCorrectedShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'صُحّحت'**
+  String get tasmeeWordCorrectedShort;
+
+  /// No description provided for @tasmeeWordHinted.
+  ///
+  /// In ar, this message translates to:
+  /// **'بتلميح'**
+  String get tasmeeWordHinted;
+
+  /// No description provided for @tasmeeAllowMicHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح إعدادات الجهاز، ثم اسمح لتبيان باستخدام الميكروفون.'**
+  String get tasmeeAllowMicHint;
 }
 
 class _AppLocalizationsDelegate
