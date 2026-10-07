@@ -359,10 +359,18 @@ class _BottomControls extends StatelessWidget {
                       icon: const Icon(Icons.headphones_outlined),
                     ),
                     const Spacer(),
-                    FilledButton.tonalIcon(
-                      onPressed: onGoTo,
-                      icon: const Icon(Icons.menu_book_outlined, size: 18),
-                      label: Text(l.goToPage),
+                    // On a narrow phone the labelled button gives way (it
+                    // shrinks) so the five tools beside it stay on screen.
+                    Flexible(
+                      flex: 8,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: FilledButton.tonalIcon(
+                          onPressed: onGoTo,
+                          icon: const Icon(Icons.menu_book_outlined, size: 18),
+                          label: Text(l.goToPage),
+                        ),
+                      ),
                     ),
                     const Spacer(),
                     IconButton.filledTonal(
