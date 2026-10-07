@@ -1730,6 +1730,432 @@ abstract class AppLocalizations {
   /// **'الختمة'**
   String get khatmaTitle;
 
+  /// No description provided for @khatmaPrimaryLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الختمة الأساسية'**
+  String get khatmaPrimaryLabel;
+
+  /// No description provided for @khatmaOtherPlans.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمات أخرى'**
+  String get khatmaOtherPlans;
+
+  /// No description provided for @khatmaSetPrimary.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعيين كأساسية'**
+  String get khatmaSetPrimary;
+
+  /// No description provided for @khatmaPause.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف مؤقت'**
+  String get khatmaPause;
+
+  /// No description provided for @khatmaResume.
+  ///
+  /// In ar, this message translates to:
+  /// **'استئناف'**
+  String get khatmaResume;
+
+  /// No description provided for @khatmaPaused.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوقفة مؤقتا'**
+  String get khatmaPaused;
+
+  /// No description provided for @khatmaStepPlan.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخطة'**
+  String get khatmaStepPlan;
+
+  /// No description provided for @khatmaStepSchedule.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجدول'**
+  String get khatmaStepSchedule;
+
+  /// No description provided for @khatmaStepReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'المراجعة'**
+  String get khatmaStepReview;
+
+  /// No description provided for @khatmaLoadFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تحميل بيانات إعداد الختمة: {error}'**
+  String khatmaLoadFailed(String error);
+
+  /// No description provided for @khatmaCreateFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر إنشاء الختمة: {error}'**
+  String khatmaCreateFailed(String error);
+
+  /// No description provided for @khatmaKindLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع الخطة'**
+  String get khatmaKindLabel;
+
+  /// No description provided for @khatmaSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الختمة'**
+  String get khatmaSettings;
+
+  /// No description provided for @khatmaTabPlan.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخطة'**
+  String get khatmaTabPlan;
+
+  /// No description provided for @khatmaTabStats.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإحصاءات'**
+  String get khatmaTabStats;
+
+  /// No description provided for @khatmaStatsPageEquivalents.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكافئ الصفحات'**
+  String get khatmaStatsPageEquivalents;
+
+  /// No description provided for @khatmaStatsSessions.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلسات القراءة'**
+  String get khatmaStatsSessions;
+
+  /// No description provided for @khatmaStatsMinutes.
+  ///
+  /// In ar, this message translates to:
+  /// **'دقائق القراءة'**
+  String get khatmaStatsMinutes;
+
+  /// No description provided for @khatmaStatsNoActivity.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد قراءة مسجلة لهذه الختمة في هذه الفترة.'**
+  String get khatmaStatsNoActivity;
+
+  /// No description provided for @khatmaStatsWeek.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأسبوع'**
+  String get khatmaStatsWeek;
+
+  /// No description provided for @khatmaStatsMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشهر'**
+  String get khatmaStatsMonth;
+
+  /// No description provided for @khatmaStatsYear.
+  ///
+  /// In ar, this message translates to:
+  /// **'السنة'**
+  String get khatmaStatsYear;
+
+  /// No description provided for @khatmaStatsPreviousPeriod.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفترة السابقة'**
+  String get khatmaStatsPreviousPeriod;
+
+  /// No description provided for @khatmaStatsNextPeriod.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفترة التالية'**
+  String get khatmaStatsNextPeriod;
+
+  /// No description provided for @khatmaReminderForPlan.
+  ///
+  /// In ar, this message translates to:
+  /// **'الختمة: {plan}'**
+  String khatmaReminderForPlan(String plan);
+
+  /// No description provided for @khatmaReminderMissedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما زال هناك وقت لورد {plan}'**
+  String khatmaReminderMissedTitle(String plan);
+
+  /// No description provided for @khatmaReminderMissedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد اليوم: من صفحة {from} إلى صفحة {to}'**
+  String khatmaReminderMissedBody(String from, String to);
+
+  /// No description provided for @khatmaReminderRecoveryTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطة تعويض لطيفة لختمة {plan}'**
+  String khatmaReminderRecoveryTitle(String plan);
+
+  /// No description provided for @khatmaReminderRecoveryBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد اليوم من صفحة {from} إلى صفحة {to}. افتح الخطة للاطلاع على خيارات التعويض.'**
+  String khatmaReminderRecoveryBody(String from, String to);
+
+  /// No description provided for @khatmaReminderTargetTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بقي يوم على موعد ختمة {plan}'**
+  String khatmaReminderTargetTitle(String plan);
+
+  /// No description provided for @khatmaReminderTargetBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'راجع تقدمك وخطتك قبل الموعد.'**
+  String get khatmaReminderTargetBody;
+
+  /// No description provided for @khatmaReminderCompletedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أتممت ختمة {plan}'**
+  String khatmaReminderCompletedTitle(String plan);
+
+  /// No description provided for @khatmaReminderCompletedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أتممت الختمة. تقبّل الله منك.'**
+  String get khatmaReminderCompletedBody;
+
+  /// No description provided for @khatmaReminderPlanLimit.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكن تفعيل التذكيرات لعشرين ختمة مفتوحة كحد أقصى.'**
+  String get khatmaReminderPlanLimit;
+
+  /// No description provided for @khatmaSaveSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ الإعدادات'**
+  String get khatmaSaveSettings;
+
+  /// No description provided for @khatmaSaveFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر حفظ إعدادات الختمة: {error}'**
+  String khatmaSaveFailed(String error);
+
+  /// No description provided for @khatmaAutoRestart.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدء الخطة من جديد عند إكمالها'**
+  String get khatmaAutoRestart;
+
+  /// No description provided for @khatmaReplan.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل الخطة'**
+  String get khatmaReplan;
+
+  /// No description provided for @khatmaCatchUpToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجاز الورد الفائت اليوم'**
+  String get khatmaCatchUpToday;
+
+  /// No description provided for @khatmaCatchUpGradually.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعويض الورد تدريجيا'**
+  String get khatmaCatchUpGradually;
+
+  /// No description provided for @khatmaCompletionBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أتممت هذه الختمة. تقبّل الله منك.'**
+  String get khatmaCompletionBody;
+
+  /// No description provided for @khatmaReusePlan.
+  ///
+  /// In ar, this message translates to:
+  /// **'استخدام هذه الخطة مرة أخرى'**
+  String get khatmaReusePlan;
+
+  /// No description provided for @khatmaKindFull.
+  ///
+  /// In ar, this message translates to:
+  /// **'القرآن كاملا'**
+  String get khatmaKindFull;
+
+  /// No description provided for @khatmaKindPartial.
+  ///
+  /// In ar, this message translates to:
+  /// **'نطاق محدد'**
+  String get khatmaKindPartial;
+
+  /// No description provided for @khatmaKindDaily.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد يومي'**
+  String get khatmaKindDaily;
+
+  /// No description provided for @khatmaKindCustom.
+  ///
+  /// In ar, this message translates to:
+  /// **'نطاق مخصص'**
+  String get khatmaKindCustom;
+
+  /// No description provided for @khatmaPresetLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'قالب جاهز'**
+  String get khatmaPresetLabel;
+
+  /// No description provided for @khatmaPresetCustom.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطة مخصصة'**
+  String get khatmaPresetCustom;
+
+  /// No description provided for @khatmaPresetMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة في شهر'**
+  String get khatmaPresetMonth;
+
+  /// No description provided for @khatmaPresetRamadan30.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمضان: {days} يوما'**
+  String khatmaPresetRamadan30(String days);
+
+  /// No description provided for @khatmaPresetRamadanTwice.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمتان في رمضان'**
+  String get khatmaPresetRamadanTwice;
+
+  /// No description provided for @khatmaPresetBeforeLastTen.
+  ///
+  /// In ar, this message translates to:
+  /// **'قبل العشر الأواخر'**
+  String get khatmaPresetBeforeLastTen;
+
+  /// No description provided for @khatmaPresetWeekly.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة في أسبوع'**
+  String get khatmaPresetWeekly;
+
+  /// No description provided for @khatmaPresetDailyJuz.
+  ///
+  /// In ar, this message translates to:
+  /// **'جزء يوميا'**
+  String get khatmaPresetDailyJuz;
+
+  /// No description provided for @khatmaFromSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'من سورة'**
+  String get khatmaFromSurah;
+
+  /// No description provided for @khatmaToSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلى سورة'**
+  String get khatmaToSurah;
+
+  /// No description provided for @khatmaFromAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'من آية'**
+  String get khatmaFromAyah;
+
+  /// No description provided for @khatmaToAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلى آية'**
+  String get khatmaToAyah;
+
+  /// No description provided for @khatmaRangeError.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر آية بداية تسبق آية النهاية.'**
+  String get khatmaRangeError;
+
+  /// No description provided for @khatmaScheduleMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'طريقة توزيع الورد'**
+  String get khatmaScheduleMode;
+
+  /// No description provided for @khatmaScheduleAdaptive.
+  ///
+  /// In ar, this message translates to:
+  /// **'متغير حسب التقدم'**
+  String get khatmaScheduleAdaptive;
+
+  /// No description provided for @khatmaScheduleFixed.
+  ///
+  /// In ar, this message translates to:
+  /// **'جدول ثابت'**
+  String get khatmaScheduleFixed;
+
+  /// No description provided for @khatmaRestDays.
+  ///
+  /// In ar, this message translates to:
+  /// **'أيام راحة (اختياري)'**
+  String get khatmaRestDays;
+
+  /// No description provided for @khatmaAtLeastOneReadingDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'اترك يوما واحدا على الأقل للقراءة كل أسبوع.'**
+  String get khatmaAtLeastOneReadingDay;
+
+  /// No description provided for @khatmaCountingMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'طريقة احتساب القراءة'**
+  String get khatmaCountingMode;
+
+  /// No description provided for @khatmaCountAuto.
+  ///
+  /// In ar, this message translates to:
+  /// **'احتساب تلقائي'**
+  String get khatmaCountAuto;
+
+  /// No description provided for @khatmaCountAsk.
+  ///
+  /// In ar, this message translates to:
+  /// **'السؤال في كل مرة'**
+  String get khatmaCountAsk;
+
+  /// No description provided for @khatmaCountManual.
+  ///
+  /// In ar, this message translates to:
+  /// **'عند تحديدها كمقروءة فقط'**
+  String get khatmaCountManual;
+
+  /// No description provided for @khatmaMakePrimary.
+  ///
+  /// In ar, this message translates to:
+  /// **'جعلها الختمة الأساسية'**
+  String get khatmaMakePrimary;
+
+  /// No description provided for @khatmaUnitRub.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربع حزب'**
+  String get khatmaUnitRub;
+
+  /// No description provided for @khatmaReviewRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'النطاق: {from}–{to}'**
+  String khatmaReviewRange(String from, String to);
+
   /// No description provided for @khatmaNew.
   ///
   /// In ar, this message translates to:
@@ -1919,7 +2345,7 @@ abstract class AppLocalizations {
   /// No description provided for @khatmaBehindBody.
   ///
   /// In ar, this message translates to:
-  /// **'أُضيفت إلى ورد اليوم. يمكنك توزيعها على الأيام الباقية، أو تأخير موعد الختم.'**
+  /// **'ينضم ما فات إلى ورد اليوم. اختر إنجازه اليوم، أو تعويضه تدريجيا، أو توزيع الباقي، أو مد موعد الختم.'**
   String get khatmaBehindBody;
 
   /// No description provided for @khatmaSpread.
@@ -2063,20 +2489,20 @@ abstract class AppLocalizations {
   /// No description provided for @streakReadToday.
   ///
   /// In ar, this message translates to:
-  /// **'قرأت اليوم. الأيام المتتالية: {count}'**
-  String streakReadToday(String count);
-
-  /// No description provided for @streakContinue.
-  ///
-  /// In ar, this message translates to:
-  /// **'الأيام المتتالية حتى أمس: {count}. صفحة اليوم تصلها.'**
-  String streakContinue(String count);
+  /// **'قرأت اليوم.'**
+  String get streakReadToday;
 
   /// No description provided for @streakWelcome.
   ///
   /// In ar, this message translates to:
   /// **'مرحبا بعودتك. تابع من حيث وقفت.'**
   String get streakWelcome;
+
+  /// No description provided for @readDaysOfLast.
+  ///
+  /// In ar, this message translates to:
+  /// **'قرأت {read} من آخر {days} يوما'**
+  String readDaysOfLast(String read, String days);
 
   /// No description provided for @streakNotesToggle.
   ///
@@ -2087,7 +2513,7 @@ abstract class AppLocalizations {
   /// No description provided for @streakNotesHint.
   ///
   /// In ar, this message translates to:
-  /// **'تعرض الأيام المتتالية فقط، ولا تعرض الأيام الفائتة.'**
+  /// **'ملاحظات هادئة عن قراءتك، لا تعدّ الأيام المتتالية ولا تعرض الأيام الفائتة.'**
   String get streakNotesHint;
 
   /// No description provided for @journalTitle.
@@ -3888,6 +4314,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'المزيد'**
   String get moreLabel;
+
+  /// No description provided for @wirdIndicator.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد اليوم: {read} من {total}'**
+  String wirdIndicator(String read, String total);
+
+  /// No description provided for @khatmaContinueMine.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة ختمتي'**
+  String get khatmaContinueMine;
+
+  /// No description provided for @askCreditLine.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءتك الأخيرة تدخل في «{plan}». أتُحتسب لها؟'**
+  String askCreditLine(String plan);
+
+  /// No description provided for @askCreditCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'احتسب'**
+  String get askCreditCount;
+
+  /// No description provided for @askCreditNo.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا'**
+  String get askCreditNo;
+
+  /// No description provided for @khatmaPendingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءات تنتظر الاحتساب'**
+  String get khatmaPendingTitle;
+
+  /// No description provided for @khatmaPendingOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة {date}'**
+  String khatmaPendingOn(String date);
 }
 
 class _AppLocalizationsDelegate

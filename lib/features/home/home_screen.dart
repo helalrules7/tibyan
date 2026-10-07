@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../assistant/assistant_screen.dart';
 import '../hifz/hifz_providers.dart';
+import '../khatma/domain/khatmah.dart' show EntryPoint;
 import '../khatma/khatma_providers.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
@@ -102,7 +105,7 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                     trailing: FilledButton(
-                      onPressed: () => context.go('/mushaf'),
+                      onPressed: () => context.go('/mushaf?entry=home'),
                       child: Text(l.openLabel),
                     ),
                   ),
@@ -147,6 +150,7 @@ class HomeScreen extends ConsumerWidget {
                                           'edition': khatma.edition.name,
                                         },
                                       ),
+                                      entry: EntryPoint.home,
                                     ),
                               ),
                               child: Text(l.khatmaReadNow),
@@ -170,7 +174,7 @@ class HomeScreen extends ConsumerWidget {
                       icon: Icons.menu_book_outlined,
                       label: l.sectionMushaf,
                       note: l.mushafOpen,
-                      onTap: () => context.go('/mushaf'),
+                      onTap: () => context.go('/mushaf?entry=home'),
                     ),
                     _SectionTile(
                       icon: Icons.search_outlined,
@@ -364,6 +368,8 @@ class _ElderlyHome extends ConsumerWidget {
     final digits = NumberFormatter(Localizations.localeOf(context));
     final position = ref.watch(readingPositionProvider).value;
     final surahs = ref.watch(surahsProvider).value;
+    final khatma = ref.watch(khatmaStatusProvider).value;
+    final portion = khatma?.todayPortion;
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -405,8 +411,37 @@ class _ElderlyHome extends ConsumerWidget {
                       digits(position.page),
                     ),
               primary: true,
-              onTap: () => context.go('/mushaf'),
+              onTap: () => context.go('/mushaf?entry=home'),
             ),
+            // The khatma's portion for today (plan 6: elderly mode's home
+            // has its own card): a tap opens the portion.
+            if (khatma != null && !khatma.complete) ...[
+              const SizedBox(height: 16),
+              _BigAction(
+                icon: Icons.auto_stories_outlined,
+                label: l.homeTodayTitle,
+                detail: portion != null
+                    ? '${l.khatmaToday}: ${l.khatmaPagesRange(digits(portion.range.from), digits(portion.range.to))}'
+                    : l.khatmaTodayDone,
+                onTap: () async {
+                  if (portion == null) {
+                    unawaited(context.push('/khatma'));
+                    return;
+                  }
+                  final route = await ref
+                      .read(khatmaServiceProvider)
+                      .routeFor(
+                        Uri(
+                          scheme: 'tibyan',
+                          host: 'khatmah',
+                          path: '/${khatma.khatmah.uuid}/continue',
+                        ),
+                        entry: EntryPoint.home,
+                      );
+                  if (context.mounted) context.go(route);
+                },
+              ),
+            ],
             const SizedBox(height: 16),
             _BigAction(
               icon: Icons.headphones_outlined,

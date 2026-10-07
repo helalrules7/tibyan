@@ -956,6 +956,246 @@ class AppLocalizationsAr extends AppLocalizations {
   String get khatmaTitle => 'الختمة';
 
   @override
+  String get khatmaPrimaryLabel => 'الختمة الأساسية';
+
+  @override
+  String get khatmaOtherPlans => 'ختمات أخرى';
+
+  @override
+  String get khatmaSetPrimary => 'تعيين كأساسية';
+
+  @override
+  String get khatmaPause => 'إيقاف مؤقت';
+
+  @override
+  String get khatmaResume => 'استئناف';
+
+  @override
+  String get khatmaPaused => 'متوقفة مؤقتا';
+
+  @override
+  String get khatmaStepPlan => 'الخطة';
+
+  @override
+  String get khatmaStepSchedule => 'الجدول';
+
+  @override
+  String get khatmaStepReview => 'المراجعة';
+
+  @override
+  String khatmaLoadFailed(String error) {
+    return 'تعذر تحميل بيانات إعداد الختمة: $error';
+  }
+
+  @override
+  String khatmaCreateFailed(String error) {
+    return 'تعذر إنشاء الختمة: $error';
+  }
+
+  @override
+  String get khatmaKindLabel => 'نوع الخطة';
+
+  @override
+  String get khatmaSettings => 'إعدادات الختمة';
+
+  @override
+  String get khatmaTabPlan => 'الخطة';
+
+  @override
+  String get khatmaTabStats => 'الإحصاءات';
+
+  @override
+  String get khatmaStatsPageEquivalents => 'مكافئ الصفحات';
+
+  @override
+  String get khatmaStatsSessions => 'جلسات القراءة';
+
+  @override
+  String get khatmaStatsMinutes => 'دقائق القراءة';
+
+  @override
+  String get khatmaStatsNoActivity =>
+      'لا توجد قراءة مسجلة لهذه الختمة في هذه الفترة.';
+
+  @override
+  String get khatmaStatsWeek => 'الأسبوع';
+
+  @override
+  String get khatmaStatsMonth => 'الشهر';
+
+  @override
+  String get khatmaStatsYear => 'السنة';
+
+  @override
+  String get khatmaStatsPreviousPeriod => 'الفترة السابقة';
+
+  @override
+  String get khatmaStatsNextPeriod => 'الفترة التالية';
+
+  @override
+  String khatmaReminderForPlan(String plan) {
+    return 'الختمة: $plan';
+  }
+
+  @override
+  String khatmaReminderMissedTitle(String plan) {
+    return 'ما زال هناك وقت لورد $plan';
+  }
+
+  @override
+  String khatmaReminderMissedBody(String from, String to) {
+    return 'ورد اليوم: من صفحة $from إلى صفحة $to';
+  }
+
+  @override
+  String khatmaReminderRecoveryTitle(String plan) {
+    return 'خطة تعويض لطيفة لختمة $plan';
+  }
+
+  @override
+  String khatmaReminderRecoveryBody(String from, String to) {
+    return 'ورد اليوم من صفحة $from إلى صفحة $to. افتح الخطة للاطلاع على خيارات التعويض.';
+  }
+
+  @override
+  String khatmaReminderTargetTitle(String plan) {
+    return 'بقي يوم على موعد ختمة $plan';
+  }
+
+  @override
+  String get khatmaReminderTargetBody => 'راجع تقدمك وخطتك قبل الموعد.';
+
+  @override
+  String khatmaReminderCompletedTitle(String plan) {
+    return 'أتممت ختمة $plan';
+  }
+
+  @override
+  String get khatmaReminderCompletedBody => 'أتممت الختمة. تقبّل الله منك.';
+
+  @override
+  String get khatmaReminderPlanLimit =>
+      'يمكن تفعيل التذكيرات لعشرين ختمة مفتوحة كحد أقصى.';
+
+  @override
+  String get khatmaSaveSettings => 'حفظ الإعدادات';
+
+  @override
+  String khatmaSaveFailed(String error) {
+    return 'تعذر حفظ إعدادات الختمة: $error';
+  }
+
+  @override
+  String get khatmaAutoRestart => 'بدء الخطة من جديد عند إكمالها';
+
+  @override
+  String get khatmaReplan => 'تعديل الخطة';
+
+  @override
+  String get khatmaCatchUpToday => 'إنجاز الورد الفائت اليوم';
+
+  @override
+  String get khatmaCatchUpGradually => 'تعويض الورد تدريجيا';
+
+  @override
+  String get khatmaCompletionBody => 'أتممت هذه الختمة. تقبّل الله منك.';
+
+  @override
+  String get khatmaReusePlan => 'استخدام هذه الخطة مرة أخرى';
+
+  @override
+  String get khatmaKindFull => 'القرآن كاملا';
+
+  @override
+  String get khatmaKindPartial => 'نطاق محدد';
+
+  @override
+  String get khatmaKindDaily => 'ورد يومي';
+
+  @override
+  String get khatmaKindCustom => 'نطاق مخصص';
+
+  @override
+  String get khatmaPresetLabel => 'قالب جاهز';
+
+  @override
+  String get khatmaPresetCustom => 'خطة مخصصة';
+
+  @override
+  String get khatmaPresetMonth => 'ختمة في شهر';
+
+  @override
+  String khatmaPresetRamadan30(String days) {
+    return 'رمضان: $days يوما';
+  }
+
+  @override
+  String get khatmaPresetRamadanTwice => 'ختمتان في رمضان';
+
+  @override
+  String get khatmaPresetBeforeLastTen => 'قبل العشر الأواخر';
+
+  @override
+  String get khatmaPresetWeekly => 'ختمة في أسبوع';
+
+  @override
+  String get khatmaPresetDailyJuz => 'جزء يوميا';
+
+  @override
+  String get khatmaFromSurah => 'من سورة';
+
+  @override
+  String get khatmaToSurah => 'إلى سورة';
+
+  @override
+  String get khatmaFromAyah => 'من آية';
+
+  @override
+  String get khatmaToAyah => 'إلى آية';
+
+  @override
+  String get khatmaRangeError => 'اختر آية بداية تسبق آية النهاية.';
+
+  @override
+  String get khatmaScheduleMode => 'طريقة توزيع الورد';
+
+  @override
+  String get khatmaScheduleAdaptive => 'متغير حسب التقدم';
+
+  @override
+  String get khatmaScheduleFixed => 'جدول ثابت';
+
+  @override
+  String get khatmaRestDays => 'أيام راحة (اختياري)';
+
+  @override
+  String get khatmaAtLeastOneReadingDay =>
+      'اترك يوما واحدا على الأقل للقراءة كل أسبوع.';
+
+  @override
+  String get khatmaCountingMode => 'طريقة احتساب القراءة';
+
+  @override
+  String get khatmaCountAuto => 'احتساب تلقائي';
+
+  @override
+  String get khatmaCountAsk => 'السؤال في كل مرة';
+
+  @override
+  String get khatmaCountManual => 'عند تحديدها كمقروءة فقط';
+
+  @override
+  String get khatmaMakePrimary => 'جعلها الختمة الأساسية';
+
+  @override
+  String get khatmaUnitRub => 'ربع حزب';
+
+  @override
+  String khatmaReviewRange(String from, String to) {
+    return 'النطاق: $from–$to';
+  }
+
+  @override
   String get khatmaNew => 'ختمة جديدة';
 
   @override
@@ -1070,7 +1310,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get khatmaBehindBody =>
-      'أُضيفت إلى ورد اليوم. يمكنك توزيعها على الأيام الباقية، أو تأخير موعد الختم.';
+      'ينضم ما فات إلى ورد اليوم. اختر إنجازه اليوم، أو تعويضه تدريجيا، أو توزيع الباقي، أو مد موعد الختم.';
 
   @override
   String get khatmaSpread => 'وزّعها على الأيام الباقية';
@@ -1148,24 +1388,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reportsDayRead => 'يوم فيه قراءة أو استماع';
 
   @override
-  String streakReadToday(String count) {
-    return 'قرأت اليوم. الأيام المتتالية: $count';
-  }
-
-  @override
-  String streakContinue(String count) {
-    return 'الأيام المتتالية حتى أمس: $count. صفحة اليوم تصلها.';
-  }
+  String get streakReadToday => 'قرأت اليوم.';
 
   @override
   String get streakWelcome => 'مرحبا بعودتك. تابع من حيث وقفت.';
+
+  @override
+  String readDaysOfLast(String read, String days) {
+    return 'قرأت $read من آخر $days يوما';
+  }
 
   @override
   String get streakNotesToggle => 'رسائل الاستمرار';
 
   @override
   String get streakNotesHint =>
-      'تعرض الأيام المتتالية فقط، ولا تعرض الأيام الفائتة.';
+      'ملاحظات هادئة عن قراءتك، لا تعدّ الأيام المتتالية ولا تعرض الأيام الفائتة.';
 
   @override
   String get journalTitle => 'دفتر التدبر';
@@ -2211,4 +2449,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get moreLabel => 'المزيد';
+
+  @override
+  String wirdIndicator(String read, String total) {
+    return 'ورد اليوم: $read من $total';
+  }
+
+  @override
+  String get khatmaContinueMine => 'متابعة ختمتي';
+
+  @override
+  String askCreditLine(String plan) {
+    return 'قراءتك الأخيرة تدخل في «$plan». أتُحتسب لها؟';
+  }
+
+  @override
+  String get askCreditCount => 'احتسب';
+
+  @override
+  String get askCreditNo => 'لا';
+
+  @override
+  String get khatmaPendingTitle => 'قراءات تنتظر الاحتساب';
+
+  @override
+  String khatmaPendingOn(String date) {
+    return 'قراءة $date';
+  }
 }

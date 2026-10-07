@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui' show Locale;
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
 
 import '../../core/db/user_database.dart';
 import '../../core/flags/feature_flags.dart';
@@ -14,6 +16,7 @@ import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/data/page_pack.dart';
 import '../mushaf/data/riwaya_data.dart';
 import '../mushaf/mushaf_providers.dart';
+import '../mushaf/presentation/navigation.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
 import 'data/activity_repository.dart';
@@ -275,14 +278,50 @@ final khatmaStatusProvider = FutureProvider<KhatmaStatus?>((ref) async {
   return statusOf(book, today, edition, pages);
 });
 
+/// Every active or paused khatma, with its state in the edition being read.
+final khatmaStatusesProvider = FutureProvider<List<KhatmaStatus>>((ref) async {
+  ref.watch(khatmahChangesProvider);
+  final today = ref.watch(todayProvider);
+  final edition = ref.watch(editionProvider);
+  final book = await ref.watch(khatmahBookProvider.future);
+  final pages =
+      await ref.watch(editionPagesProvider(edition).future) ??
+      book.index.madina1441;
+  final plans = await book.store.khatmahs(open: true);
+  plans.sort((a, b) {
+    if (a.isPrimary == b.isPrimary) return 0;
+    return a.isPrimary ? -1 : 1;
+  });
+  return [
+    for (final plan in plans)
+      ?await statusOf(book, today, edition, pages, khatmah: plan),
+  ];
+});
+
+/// A completed khatma for its read-only statistics screen.
+final completedKhatmaStatusProvider =
+    FutureProvider.family<KhatmaStatus?, String>((ref, uuid) async {
+      ref.watch(khatmahChangesProvider);
+      final today = ref.watch(todayProvider);
+      final edition = ref.watch(editionProvider);
+      final book = await ref.watch(khatmahBookProvider.future);
+      final pages =
+          await ref.watch(editionPagesProvider(edition).future) ??
+          book.index.madina1441;
+      final plan = await book.store.byUuid(uuid);
+      if (plan == null || plan.status != KhatmahStatus.completed) return null;
+      return statusOf(book, today, edition, pages, khatmah: plan);
+    });
+
 /// The primary khatma's state on [today], in [pages] of [edition].
 Future<KhatmaStatus?> statusOf(
   KhatmahBook book,
   Day today,
   MushafEdition edition,
-  EditionPageMap pages,
-) async {
-  final k = await book.primary();
+  EditionPageMap pages, {
+  Khatmah? khatmah,
+}) async {
+  final k = khatmah ?? await book.primary();
   if (k == null) return null;
   final row = await book.store.row(k.uuid);
   if (row == null) return null;
@@ -312,6 +351,24 @@ final pendingCreditsProvider = FutureProvider<List<PendingCredit>>((ref) async {
   return book.pending();
 });
 
+/// A limit the reader can act on (twenty khatmas with reminders): its
+/// message is shown as it is.
+class KhatmaLimitException implements Exception {
+  const KhatmaLimitException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+/// Whether the app is in the background (a completion found by listening
+/// with the screen off gets a notification instead of the dialog).
+bool _inBackground() {
+  final state = WidgetsBinding.instance.lifecycleState;
+  return state != null && state != AppLifecycleState.resumed;
+}
+
 /// Records reading and listening, keeps the khatmas, their reminders and
 /// the home screen widget up to date.
 class KhatmaService {
@@ -331,11 +388,25 @@ class KhatmaService {
       Day.logical(DateTime.now(), _ref.read(settingsProvider).dayStartHour);
 
   bool _prepared = false;
+  Future<void>? _preparing;
 
   /// Once per run: the khatmas made before v5 carried over, one primary
   /// khatma, the caches rebuilt.
   Future<void> _prepare(KhatmahBook book) async {
     if (_prepared) return;
+    final pending = _preparing;
+    if (pending != null) return pending;
+    final preparation = _prepareOnce(book);
+    _preparing = preparation;
+    try {
+      await preparation;
+    } on Object {
+      _preparing = null;
+      rethrow;
+    }
+  }
+
+  Future<void> _prepareOnce(KhatmahBook book) async {
     final editions = {for (final k in await _store.khatmahs()) k.edition};
     final rows = await (_ref
         .read(userDatabaseProvider)
@@ -348,6 +419,7 @@ class KhatmaService {
     };
     await book.prepare((e) => maps[e]);
     _prepared = true;
+    _preparing = null;
   }
 
   Future<KhatmaStatus?> status() async {
@@ -358,6 +430,32 @@ class KhatmaService {
         await _ref.read(editionPagesProvider(edition).future) ??
         book.index.madina1441;
     return statusOf(book, _today, edition, pages);
+  }
+
+  Future<List<KhatmaStatus>> openStatuses() async {
+    final book = await _book;
+    await _prepare(book);
+    final edition = _ref.read(editionProvider);
+    final pages =
+        await _ref.read(editionPagesProvider(edition).future) ??
+        book.index.madina1441;
+    final plans = await book.store.khatmahs(open: true);
+    plans.sort((a, b) {
+      if (a.isPrimary == b.isPrimary) return 0;
+      return a.isPrimary ? -1 : 1;
+    });
+    final statuses = <KhatmaStatus>[];
+    for (final plan in plans) {
+      final status = await statusOf(
+        book,
+        _today,
+        edition,
+        pages,
+        khatmah: plan,
+      );
+      if (status != null) statuses.add(status);
+    }
+    return statuses;
   }
 
   /// Pages of [to] holding the verses of [page] of [from] (a riwaya's
@@ -407,7 +505,7 @@ class KhatmaService {
     if (change.completed.isNotEmpty || change.started.isNotEmpty) {
       _ref.read(khatmahEventsProvider.notifier).completed(change);
     }
-    await refresh();
+    await refresh(completed: change.completed);
   }
 
   /// A page stayed on screen long enough: the verses it completes count
@@ -527,9 +625,6 @@ class KhatmaService {
     int? reminderTime,
   }) async {
     final book = await _book;
-    await _prepare(book);
-    final open = await book.primary();
-    if (open != null) await book.cancel(open.uuid);
     final pages =
         await _ref.read(editionPagesProvider(edition).future) ??
         book.index.madina1441;
@@ -540,7 +635,7 @@ class KhatmaService {
       PortionUnit.page => total / pages.textPages.length,
     };
     final days = target.difference(start) + 1;
-    await book.create(
+    await createPlan(
       Khatmah(
         uuid: newUuid(),
         title: title,
@@ -563,10 +658,30 @@ class KhatmaService {
         createdAt: DateTime.now(),
       ),
     );
+  }
+
+  Future<Khatmah> createPlan(Khatmah plan) async {
+    final book = await _book;
+    await _prepare(book);
+    final open = await book.store.khatmahs(open: true);
+    if (plan.reminderTime != null &&
+        open.where((k) => k.reminderTime != null).length >=
+            maxKhatmaReminderPlans) {
+      throw KhatmaLimitException(_l.khatmaReminderPlanLimit);
+    }
+    final made = await book.create(
+      plan.copyWith(
+        uuid: newUuid(),
+        isPrimary: plan.isPrimary || open.isEmpty,
+        createdAt: () => DateTime.now(),
+      ),
+    );
+    final reminderTime = made.reminderTime;
     if (reminderTime != null) {
       await _ref.read(reminderSchedulerProvider).requestPermission();
     }
     await refresh();
+    return made;
   }
 
   Future<void> delete(String uuid) async {
@@ -574,11 +689,22 @@ class KhatmaService {
     await refresh();
   }
 
-  Future<void> setReminder(int? minutes) async {
+  Future<void> setReminder(int? minutes, {String? uuid}) async {
     final book = await _book;
-    final k = await book.primary();
+    final k = uuid == null
+        ? await book.primary()
+        : await book.store.byUuid(uuid);
     if (k == null) return;
     if (minutes != null) {
+      if (k.reminderTime == null && k.isOpen) {
+        final open = await book.store.khatmahs(open: true);
+        final scheduled = open
+            .where((plan) => plan.reminderTime != null)
+            .length;
+        if (scheduled >= maxKhatmaReminderPlans) {
+          throw KhatmaLimitException(_l.khatmaReminderPlanLimit);
+        }
+      }
       await _ref.read(reminderSchedulerProvider).requestPermission();
     }
     await book.edit(k.copyWith(reminderTime: () => minutes));
@@ -587,11 +713,23 @@ class KhatmaService {
 
   /// Today's portion read in a printed mushaf (or another app): a manual
   /// session for the primary khatma.
-  Future<void> markTodayRead() async {
-    final s = await status();
+  Future<void> markTodayRead({String? uuid}) async {
+    final s = uuid == null ? await status() : await statusFor(uuid);
     final w = s?.wird;
     if (s == null || w == null) return;
     await markRead(s.khatmah.uuid, w.ranges);
+  }
+
+  Future<KhatmaStatus?> statusFor(String uuid) async {
+    final book = await _book;
+    await _prepare(book);
+    final plan = await book.store.byUuid(uuid);
+    if (plan == null || !plan.isOpen) return null;
+    final edition = _ref.read(editionProvider);
+    final pages =
+        await _ref.read(editionPagesProvider(edition).future) ??
+        book.index.madina1441;
+    return statusOf(book, _today, edition, pages, khatmah: plan);
   }
 
   /// «تحديد كمقروء» of a page, a range or a portion for khatma [uuid].
@@ -603,7 +741,7 @@ class KhatmaService {
     if (change.completed.isNotEmpty) {
       _ref.read(khatmahEventsProvider.notifier).completed(change);
     }
-    await refresh();
+    await refresh(completed: change.completed);
   }
 
   /// «احتسب» / «لا» for a session waiting in `ask` mode, and «تراجع».
@@ -612,7 +750,7 @@ class KhatmaService {
     if (change.completed.isNotEmpty) {
       _ref.read(khatmahEventsProvider.notifier).completed(change);
     }
-    await refresh();
+    await refresh(completed: change.completed);
   }
 
   Future<void> declinePending(PendingCredit p) async =>
@@ -638,37 +776,52 @@ class KhatmaService {
     await refresh();
   }
 
+  Future<void> updatePlan(Khatmah plan) async {
+    await (await _book).edit(plan);
+    await refresh();
+  }
+
   Future<void> _plan(
-    Khatmah Function(Recovery r, Khatmah k, Ledger l) f,
-  ) async {
+    Khatmah Function(Recovery r, Khatmah k, Ledger l) f, {
+    String? uuid,
+  }) async {
     final book = await _book;
-    final k = await book.primary();
+    final k = uuid == null
+        ? await book.primary()
+        : await book.store.byUuid(uuid);
     if (k == null) return;
     await book.edit(f(book.recovery, k, await book.ledger(k)));
     await refresh();
   }
 
   /// Catch-up: what is left spread over the days left.
-  Future<void> spreadRest() => _plan((r, k, l) => r.spreadRest(k, l, _today));
+  Future<void> spreadRest({String? uuid}) =>
+      _plan((r, k, l) => r.spreadRest(k, l, _today), uuid: uuid);
 
   /// Catch-up: the daily amount stays and the end date moves.
-  Future<void> moveTarget() => _plan((r, k, l) => r.extend(k, l, _today));
+  Future<void> moveTarget({String? uuid}) =>
+      _plan((r, k, l) => r.extend(k, l, _today), uuid: uuid);
 
   /// Catch-up: all of it today.
-  Future<void> catchUpToday() => _plan((r, k, l) => r.allToday(k, l, _today));
+  Future<void> catchUpToday({String? uuid}) =>
+      _plan((r, k, l) => r.allToday(k, l, _today), uuid: uuid);
 
   /// Catch-up: over the fewest days that add at most 25% a day.
-  Future<void> catchUpGradually() => _plan((r, k, l) => r.spread(k, l, _today));
+  Future<void> catchUpGradually({String? uuid}) =>
+      _plan((r, k, l) => r.spread(k, l, _today), uuid: uuid);
 
   /// The answer to «finish early, or a lighter portion?».
-  Future<void> answerAhead(AheadChoice choice) =>
-      _plan((r, k, l) => r.answerAhead(k, choice));
+  Future<void> answerAhead(AheadChoice choice, {String? uuid}) =>
+      _plan((r, k, l) => r.answerAhead(k, choice), uuid: uuid);
 
   /// Schedules the next days' reminders again (rolling) and rewrites the
   /// home screen widget. Run on start, on resume and after every change.
-  Future<void> refresh() async {
+  Future<void> refresh({List<Khatmah> completed = const []}) async {
     _ref.read(todayProvider.notifier).refresh();
-    final s = await status();
+    final statuses = await openStatuses();
+    final s =
+        statuses.where((status) => status.khatmah.isPrimary).firstOrNull ??
+        statuses.firstOrNull;
     final l = _l;
     final digits = NumberFormatter(
       _ref.read(settingsProvider).locale ?? const Locale('ar'),
@@ -694,32 +847,190 @@ class KhatmaService {
     }
 
     // Reminders.
-    final minutes = s?.row.reminderTime;
-    final notices = <ReminderNotice>[
-      if (s != null && minutes != null && s.khatmah.isActive)
-        for (final r in portionReminders(
-          now: DateTime.now(),
+    final book = await _book;
+    final settings = _ref.read(settingsProvider);
+    final reminderPlans = statuses
+        .where(
+          (status) =>
+              status.khatmah.isActive &&
+              !status.complete &&
+              status.row.reminderTime != null,
+        )
+        .toList();
+    final reminderNow = DateTime.now();
+    final candidates = <PlannedReminder>[];
+    final noticesById = <int, ReminderNotice>{};
+
+    ReminderNotice noticeFor(Khatmah plan, PlannedReminder reminder) {
+      final range = reminder.range;
+      final (title, body) = switch (reminder.type) {
+        KhatmaReminderType.completion => (
+          l.khatmaReminderCompletedTitle(plan.title),
+          l.khatmaReminderCompletedBody,
+        ),
+        KhatmaReminderType.recovery => (
+          l.khatmaReminderRecoveryTitle(plan.title),
+          l.khatmaReminderRecoveryBody(digits(range!.from), digits(range.to)),
+        ),
+        KhatmaReminderType.target => (
+          l.khatmaReminderTargetTitle(plan.title),
+          l.khatmaReminderTargetBody,
+        ),
+        KhatmaReminderType.portion => (
+          l.khatmaReminderForPlan(plan.title),
+          l.khatmaReminderBody(digits(range!.from), digits(range.to)),
+        ),
+        KhatmaReminderType.missed => (
+          l.khatmaReminderMissedTitle(plan.title),
+          l.khatmaReminderMissedBody(digits(range!.from), digits(range.to)),
+        ),
+      };
+      final path = reminder.type == KhatmaReminderType.completion
+          ? '/${plan.uuid}'
+          : '/${plan.uuid}/continue';
+      return (
+        plan: reminder,
+        title: title,
+        body: body,
+        payload: Uri(scheme: 'tibyan', host: 'khatmah', path: path).toString(),
+      );
+    }
+
+    for (var i = 0; i < reminderPlans.length; i++) {
+      final status = reminderPlans[i];
+      final minutes = status.row.reminderTime!;
+      final snap = Snapper(
+        book.index,
+        status.pages,
+        quarters: !status.edition.isRiwaya,
+      );
+      final plan = book.planner.upcoming(
+        status.khatmah,
+        status.ledger,
+        today,
+        snap,
+        count: khatmaReminderDaysAhead,
+      );
+      final portions = <Day, PageRange>{
+        for (final MapEntry(key: day, value: wird) in plan.entries)
+          day: (
+            from: status.pages.pageOf(wird.from),
+            to: status.pages.lastPageOf(wird.to),
+          ),
+      };
+      final plannedPortions = portionReminders(
+        now: reminderNow,
+        today: today,
+        minutes: minutes,
+        portions: portions,
+        last: status.khatmah.targetDate,
+        days: khatmaReminderDaysAhead,
+        idBase: khatmaReminderId(i, 0, KhatmaReminderType.portion),
+        idStep: khatmaReminderTypesPerDay,
+        dayStartHour: settings.dayStartHour,
+        planIndex: i,
+        planKey: status.khatmah.uuid,
+      );
+      final todayPortion = status.todayPortion;
+      for (final portion in plannedPortions) {
+        final useRecovery =
+            status.recovery.suggest &&
+            portion.day == today &&
+            todayPortion != null;
+        final reminder = useRecovery
+            ? PlannedReminder(
+                id: khatmaReminderId(i, 0, KhatmaReminderType.recovery),
+                at: portion.at,
+                day: portion.day,
+                range: portion.range,
+                planIndex: i,
+                planKey: status.khatmah.uuid,
+                type: KhatmaReminderType.recovery,
+              )
+            : portion;
+        candidates.add(reminder);
+        noticesById[reminder.id] = noticeFor(status.khatmah, reminder);
+      }
+
+      final todayReminder = plannedPortions
+          .where((reminder) => reminder.day == today)
+          .firstOrNull;
+      if (todayPortion != null && todayReminder != null) {
+        final missed = missedPortionReminder(
+          now: reminderNow,
           today: today,
           minutes: minutes,
-          portions: upcoming,
-          last: s.khatmah.targetDate,
-        ))
-          (
-            plan: r,
-            title: l.khatmaReminderTitle,
-            body: l.khatmaReminderBody(
-              digits(r.range!.from),
-              digits(r.range!.to),
-            ),
-            payload: widgetUri(r.range!.from, s.edition.name).toString(),
-          ),
+          range: todayReminder.range!,
+          planIndex: i,
+          planKey: status.khatmah.uuid,
+          dayStartHour: settings.dayStartHour,
+        );
+        if (missed != null) {
+          candidates.add(missed);
+          noticesById[missed.id] = noticeFor(status.khatmah, missed);
+        }
+      }
+
+      final target = status.khatmah.targetDate;
+      if (target != null) {
+        final targetDay = target.add(-1);
+        final dayOffset = targetDay.difference(today);
+        if (dayOffset >= 0 &&
+            dayOffset < khatmaReminderDaysAhead &&
+            status.khatmah.readsOn(targetDay)) {
+          final at = reminderAt(targetDay, minutes, settings.dayStartHour);
+          if (at.isAfter(reminderNow)) {
+            final targetReminder = PlannedReminder(
+              id: khatmaReminderId(i, dayOffset, KhatmaReminderType.target),
+              at: at,
+              day: targetDay,
+              planIndex: i,
+              planKey: status.khatmah.uuid,
+              type: KhatmaReminderType.target,
+            );
+            candidates.add(targetReminder);
+            noticesById[targetReminder.id] = noticeFor(
+              status.khatmah,
+              targetReminder,
+            );
+          }
+        }
+      }
+    }
+
+    final completionPlans = completed.isNotEmpty && _inBackground()
+        ? completed
+              .where((plan) => plan.reminderTime != null)
+              .take(maxKhatmaReminderPlans)
+              .toList()
+        : const <Khatmah>[];
+    for (var i = 0; i < completionPlans.length; i++) {
+      final plan = completionPlans[i];
+      final reminder = PlannedReminder(
+        id: khatmaCompletionIdBase + i,
+        at: reminderNow.add(const Duration(seconds: 2)),
+        day: today,
+        planIndex: reminderPlans.length + i,
+        planKey: plan.uuid,
+        type: KhatmaReminderType.completion,
+      );
+      candidates.add(reminder);
+      noticesById[reminder.id] = noticeFor(plan, reminder);
+    }
+
+    final selected = limitKhatmaReminders(
+      candidates,
+      planCount: max(1, reminderPlans.length + completionPlans.length),
+    );
+    final notices = [
+      for (final reminder in selected) noticesById[reminder.id]!,
     ];
     try {
       await _ref
           .read(reminderSchedulerProvider)
           .replace(notices, channel: l.khatmaReminderChannel);
-    } catch (_) {
-      // Notifications unavailable: the khatma works without them.
+    } catch (error, stackTrace) {
+      debugPrint('Khatma reminder scheduling failed: $error\n$stackTrace');
     }
 
     // Home screen widget.
@@ -760,15 +1071,71 @@ class KhatmaService {
         );
   }
 
-  /// The page to open for a widget or reminder tap
-  /// (`tibyan://khatma?page=…&edition=…`), in the edition being read now.
-  Future<String> routeFor(Uri uri) async {
+  /// The destination for Khatma links. The old `khatma?page=…` payload
+  /// remains supported for reminders and widgets already on devices.
+  Future<String> routeFor(Uri uri, {EntryPoint? entry}) async {
+    final source = entry ?? khatmaEntryOfLink(uri);
+    if (uri.host == 'khatmat') return '/khatma';
+    if (uri.host == 'khatmah') {
+      final segments = uri.pathSegments;
+      if (segments.isEmpty) return '/khatma';
+      final uuid = segments.first;
+      if (segments.length == 1) {
+        return Uri(path: '/khatma', queryParameters: {'plan': uuid}).toString();
+      }
+      if (segments.length == 2 && segments[1] == 'continue') {
+        return _continueRoute(uuid, source);
+      }
+      return '/khatma';
+    }
+    if (uri.host == 'reader') {
+      final plan = uri.queryParameters['plan'];
+      return _readerRoute(
+        planUuid: plan == null || plan.isEmpty ? null : plan,
+        ayahId: int.tryParse(uri.queryParameters['ayah'] ?? ''),
+        entry: source,
+      );
+    }
+
     final page = int.tryParse(uri.queryParameters['page'] ?? '');
     if (page == null) return '/khatma';
     final from = editionNamed(uri.queryParameters['edition'] ?? '');
     final now = _ref.read(editionProvider);
     final pages = await pagesIn(page, from, now);
-    return '/mushaf?page=${pages.isEmpty ? page : pages.reduce(min)}';
+    return mushafLocation(
+      pages.isEmpty ? page : pages.reduce(min),
+      entry: source,
+    );
+  }
+
+  Future<String> _continueRoute(String uuid, EntryPoint entry) async =>
+      _readerRoute(planUuid: uuid, entry: entry);
+
+  Future<String> _readerRoute({
+    String? planUuid,
+    int? ayahId,
+    required EntryPoint entry,
+  }) async {
+    final book = await _book;
+    await _prepare(book);
+    final plan = planUuid == null
+        ? await book.primary()
+        : await book.store.byUuid(planUuid);
+    if (planUuid != null && (plan == null || !plan.isOpen)) return '/khatma';
+
+    final target =
+        ayahId != null && ayahId >= 1 && ayahId <= book.index.ayahCount
+        ? ayahId
+        : plan == null
+        ? null
+        : book.engine.resolveContinue(await book.ledger(plan));
+    if (target == null) return '/khatma';
+
+    final edition = _ref.read(editionProvider);
+    final pages = await _ref.read(editionPagesProvider(edition).future);
+    // Navigation turns to the page; it never selects the verse.
+    final page = (pages ?? book.index.madina1441).pageOf(target);
+    return mushafLocation(page, entry: entry);
   }
 }
 
