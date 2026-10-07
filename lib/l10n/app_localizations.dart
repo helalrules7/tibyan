@@ -3852,6 +3852,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعذرت قراءة مواضع هذا الحكم.'**
   String get tajweedIndexLoadError;
+
+  /// No description provided for @tajweedMarksInkNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'حين يقع الحكم على علامة وحدها (مثل الميم الصغيرة) تبقى العلامة هنا بلون النص: الخط لا يلوّن العلامة دون جزء من حرفها. وتظهر ملونة في صفحة المصحف.'**
+  String get tajweedMarksInkNote;
 }
 
 class _AppLocalizationsDelegate

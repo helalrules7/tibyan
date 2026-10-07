@@ -2207,4 +2207,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tajweedIndexLoadError =>
       'The places of this rule could not be read.';
+
+  @override
+  String get tajweedMarksInkNote =>
+      'Where a rule falls on a mark alone (like the small meem), the mark stays in the text colour here: the font cannot colour a mark without part of its letter. The mushaf page shows it in colour.';
 }

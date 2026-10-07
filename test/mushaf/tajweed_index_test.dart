@@ -124,6 +124,9 @@ void main() {
           );
           expect(runs.map((r) => r.$1).join(), t.text);
         }
+        // Something is coloured, unless the rule is on marks only here
+        // (those stay in ink in written text, see tokenRuns).
+        if (p.letters.every((l) => l.marksOnly)) continue;
         expect(
           tokens.any(
             (t) => tokenRuns(
@@ -146,6 +149,129 @@ void main() {
         );
       }
     }
+  });
+
+  test(
+    'a rule on marks only leaves its letter in ink: al-Baqarah 19',
+    () async {
+      const red = Color(0xFFFF0000);
+      final place = (await repo.tajweedPlaces(TajweedRule.iqlab.key))
+          .singleWhere((p) => p.surah == 2 && p.ayah == 19);
+      // The iqlab: the small meem over the ta of «مُحِيطُۢ» (word 18, its
+      // marks only) and the ba of «بِٱلۡكَٰفِرِينَ» (word 19, the letter).
+      expect(place.letters, contains((word: 18, letter: 3, marksOnly: true)));
+      expect(place.letters, contains((word: 19, letter: 0, marksOnly: false)));
+      final letters = [
+        for (final l in place.letters)
+          ShareTajweedLetter(
+            word: l.word,
+            letter: l.letter,
+            marksOnly: l.marksOnly,
+            color: red,
+          ),
+      ];
+      final tokens = tajweedTokens(place);
+      final muhit = tokens.singleWhere((t) => t.firstWord == 18);
+      expect(muhit.text, 'مُحِيطُۢ');
+      final runs = tokenRuns(
+        muhit.text,
+        firstWord: 18,
+        endsVerse: muhit.endsVerse,
+        letters: letters,
+      );
+      // Nothing of the word is coloured: not the ta, not its marks.
+      expect(runs, [('مُحِيطُۢ', null)]);
+      final bi = tokens.singleWhere((t) => t.firstWord == 19);
+      final biRuns = tokenRuns(
+        bi.text,
+        firstWord: 19,
+        endsVerse: bi.endsVerse,
+        letters: letters,
+      );
+      expect(biRuns.first, ('بِ', red));
+      expect(biRuns.map((r) => r.$1).join(), bi.text);
+    },
+  );
+
+  test('no letter of the written text is coloured by a rule on marks '
+      'only, in any verse', () async {
+    const body = Color(0xFF00AA00);
+    const marks = Color(0xFFFF0000);
+    final rows = await db
+        .customSelect(
+          'SELECT a.display_text AS text, '
+          "group_concat(t.word || ':' || t.letter || ':' || t.part, ' ') "
+          'AS letters FROM tajweed_letter t '
+          'JOIN ayah a ON a.surah = t.surah AND a.number = t.ayah '
+          "WHERE t.riwaya = 'hafs' GROUP BY t.surah, t.ayah",
+        )
+        .get();
+    var marksOnly = 0;
+    var bodyLetters = 0;
+    for (final r in rows) {
+      final text = r.read<String>('text');
+      final letters = TajweedPlace.parseLetters(r.read<String>('letters'));
+      final shown = [
+        for (final l in letters)
+          ShareTajweedLetter(
+            word: l.word,
+            letter: l.letter,
+            marksOnly: l.marksOnly,
+            color: l.marksOnly ? marks : body,
+          ),
+      ];
+      final bodies = {
+        for (final l in letters)
+          if (!l.marksOnly) (l.word, l.letter),
+      };
+      marksOnly += letters.where((l) => l.marksOnly).length;
+      final tokens = text.split(' ');
+      var word = 1;
+      for (var i = 0; i < tokens.length; i++) {
+        final endsVerse = i == tokens.length - 1;
+        final runs = tokenRuns(
+          tokens[i],
+          firstWord: word,
+          endsVerse: endsVerse,
+          letters: shown,
+        );
+        expect(runs.map((r) => r.$1).join(), tokens[i]);
+        expect(runs.where((r) => r.$2 == marks), isEmpty, reason: text);
+        // Character by character: a letter is coloured only by a rule on
+        // the letter itself.
+        final colors = [for (final (t, c) in runs) ...List.filled(t.length, c)];
+        var offset = 0;
+        var w = word;
+        final pieces = tokens[i].split(nbsp);
+        for (var k = 0; k < pieces.length; k++) {
+          final piece = pieces[k];
+          if (wordsInToken(
+                piece,
+                endsVerse: endsVerse && k == pieces.length - 1,
+              ) ==
+              1) {
+            final spans = letterSpans(piece);
+            for (var li = 0; li < spans.length; li++) {
+              final (s, e) = spans[li];
+              final coloured = bodies.contains((w, li));
+              if (coloured) bodyLetters++;
+              for (var c = s; c < e; c++) {
+                expect(
+                  colors[offset + c],
+                  coloured ? body : isNull,
+                  reason: '$text word $w letter $li',
+                );
+              }
+            }
+            w++;
+          }
+          offset += piece.length + 1;
+        }
+        word += wordsInToken(tokens[i], endsVerse: endsVerse);
+      }
+    }
+    expect(marksOnly, 13509);
+    expect(bodyLetters, greaterThan(0));
   });
 
   test('a verse is on its page in each Hafs edition', () {

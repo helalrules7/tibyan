@@ -82,7 +82,13 @@ int wordsInToken(String text, {required bool endsVerse}) {
 /// chosen here, never characters.
 ///
 /// [firstWord] is the number of the token's first word in its verse;
-/// [letters] the verse's tajweed letters (empty when tajweed is off); a
+/// [letters] the verse's tajweed letters (empty when tajweed is off). A
+/// letter whose rule covers only its marks ([ShareTajweedLetter.marksOnly],
+/// like the small meem of «مُحِيطُۢ») is left in ink: the text engine colours
+/// a letter and its marks as one cluster, cut in vertical slices by their
+/// place in the text, so a mark cannot be coloured without part of the
+/// letter under it, and shaping the mark apart detaches it. The pages draw
+/// these marks in colour from their own shapes. A
 /// divine name is coloured [divine] when given (its tajweed letters keep
 /// their colours); the verse number is coloured [number].
 List<(String, Color?)> tokenRuns(
@@ -109,9 +115,12 @@ List<(String, Color?)> tokenRuns(
       }
       final spans = letterSpans(piece);
       for (final l in letters) {
-        if (l.word != word || l.letter >= spans.length) continue;
+        // A rule on the marks only stays in ink: see [tokenRuns].
+        if (l.marksOnly || l.word != word || l.letter >= spans.length) {
+          continue;
+        }
         final (s, e) = spans[l.letter];
-        for (var k = l.marksOnly ? s + 1 : s; k < e; k++) {
+        for (var k = s; k < e; k++) {
           colors[offset + k] = l.color;
         }
       }

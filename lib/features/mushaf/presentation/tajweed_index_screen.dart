@@ -129,6 +129,15 @@ class TajweedRuleScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           if (!editionHasTajweed(edition))
             Text(l.tajweedNoDataRiwaya, style: TextStyle(color: t.muted)),
+          if (places.value?.any((p) => p.letters.any((x) => x.marksOnly)) ??
+              false)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                l.tajweedMarksInkNote,
+                style: TextStyle(color: t.muted, fontSize: 12, height: 1.6),
+              ),
+            ),
           Text(
             '${l.tajweedIndexColorNote}\n${l.tajweedSourceNote}',
             style: TextStyle(color: t.muted, fontSize: 12, height: 1.6),

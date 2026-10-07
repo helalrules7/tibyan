@@ -2192,4 +2192,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tajweedIndexLoadError => 'تعذرت قراءة مواضع هذا الحكم.';
+
+  @override
+  String get tajweedMarksInkNote =>
+      'حين يقع الحكم على علامة وحدها (مثل الميم الصغيرة) تبقى العلامة هنا بلون النص: الخط لا يلوّن العلامة دون جزء من حرفها. وتظهر ملونة في صفحة المصحف.';
 }
