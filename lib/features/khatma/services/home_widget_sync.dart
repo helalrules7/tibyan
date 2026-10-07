@@ -41,8 +41,8 @@ Uri widgetUri(int page, String edition) => Uri(
 /// queues it and the app applies it the next time it runs (see
 /// [HomeWidgetSync.takePending]).
 enum WidgetAction {
-  continueReading('continue', '/mushaf'),
-  listen('listen', '/mushaf?listen=1'),
+  continueReading('continue', '/mushaf?entry=widget'),
+  listen('listen', '/mushaf?listen=1&entry=widget'),
   search('search', '/search'),
   khatma('khatma', '/khatma'),
   hifz('hifz', '/hifz'),

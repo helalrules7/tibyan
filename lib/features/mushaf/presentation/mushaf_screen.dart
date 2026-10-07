@@ -40,6 +40,7 @@ import '../../khatma/domain/reading_tracker.dart';
 import '../../../core/router/cover_observer.dart';
 import '../../khatma/khatma_providers.dart';
 import '../../khatma/presentation/journal_screen.dart';
+import '../../khatma/presentation/reader_khatma.dart';
 import '../data/mushaf_repository.dart';
 import '../data/tajweed.dart';
 import '../data/riwaya_data.dart';
@@ -992,6 +993,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             key: const ValueKey('focus-bar'),
             onIndex: () => context.push('/mushaf/index'),
             onGoTo: _goToPage,
+            wird: const WirdIndicator(dense: true),
             infos: [
               for (final pg in shownPages)
                 isCover(pg) ? null : ref.watch(frameInfoProvider(pg)).value,
@@ -1226,33 +1228,48 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               child: Reveal(
                 visible: _chrome,
                 from: const Offset(0, -0.25),
-                child: _TopControls(
-                  items: [
-                    (
-                      Icons.list_alt,
-                      l.indexTitle,
-                      () => context.push('/mushaf/index'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _TopControls(
+                      items: [
+                        (
+                          Icons.list_alt,
+                          l.indexTitle,
+                          () => context.push('/mushaf/index'),
+                        ),
+                        (
+                          Icons.bookmarks_outlined,
+                          l.fawasilTitle,
+                          () => context.push('/mushaf/fawasil'),
+                        ),
+                        (
+                          assistantIcon,
+                          l.assistantTitle,
+                          () => context.push(assistantLocation),
+                        ),
+                        (
+                          Icons.home_outlined,
+                          l.homeTitle,
+                          () => context.go('/'),
+                        ),
+                        (
+                          Icons.search_outlined,
+                          l.sectionSearch,
+                          () => context.push('/search'),
+                        ),
+                        (
+                          Icons.tune,
+                          l.settingsTitle,
+                          () => context.push('/settings'),
+                        ),
+                      ],
                     ),
-                    (
-                      Icons.bookmarks_outlined,
-                      l.fawasilTitle,
-                      () => context.push('/mushaf/fawasil'),
-                    ),
-                    (
-                      assistantIcon,
-                      l.assistantTitle,
-                      () => context.push(assistantLocation),
-                    ),
-                    (Icons.home_outlined, l.homeTitle, () => context.go('/')),
-                    (
-                      Icons.search_outlined,
-                      l.sectionSearch,
-                      () => context.push('/search'),
-                    ),
-                    (
-                      Icons.tune,
-                      l.settingsTitle,
-                      () => context.push('/settings'),
+                    // «ورد اليوم · 18 / 20» under the menus; a tap
+                    // continues the khatma.
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: WirdIndicator(),
                     ),
                   ],
                 ),
@@ -1411,6 +1428,27 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                         range,
                         onClose: () => setState(() => _selA = _selB = null),
                       ),
+              ),
+            ),
+            // «ask»: a khatma that asks before counting, once a session
+            // has ended; never over the player, the menus or the sajdah
+            // card.
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: AskCreditLine(
+                currentSession: () => _tracker.session,
+                allowed:
+                    !_chrome &&
+                    !_testing &&
+                    !_recite &&
+                    !_autoScroll &&
+                    !_multi &&
+                    range == null &&
+                    !recitation.active &&
+                    !(focus && _focusTools) &&
+                    ref.watch(sajdahCardProvider) == null,
               ),
             ),
             const SajdahCardLayer(),

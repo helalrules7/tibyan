@@ -53,6 +53,18 @@ Uri verseLink(int surah, int ayah) => Uri(
   queryParameters: {'s': '$surah', 'a': '$ayah'},
 );
 
+/// The source attached to a Khatma link when opening the reader.
+EntryPoint khatmaEntryOfLink(Uri uri) {
+  if (uri.queryParameters.containsKey('homeWidget') || uri.host == 'action') {
+    return EntryPoint.widget;
+  }
+  if (uri.host == 'khatmah' || uri.host == 'reader') {
+    return EntryPoint.khatmahContinue;
+  }
+  if (uri.host == 'khatma') return EntryPoint.notification;
+  return EntryPoint.other;
+}
+
 /// The verse a `tibyan://verse` link names, if it is one and is valid.
 ({int surah, int ayah})? verseOfLink(Uri? uri) {
   if (uri == null || uri.scheme != 'tibyan' || uri.host != 'verse') return null;

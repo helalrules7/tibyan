@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/router/app_router.dart';
+import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
@@ -33,7 +35,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     _timer = Timer(widget.duration, () {
-      if (mounted) context.go(_start);
+      if (!mounted) return;
+      context.go(_start);
+      if (ref.read(settingsProvider).onboardingDone) {
+        markAppRouterReady(ref.read(appRouterReadyProvider));
+      }
     });
   }
 
