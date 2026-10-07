@@ -41,6 +41,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>يستخدم تبيان الميكروفون للتسميع على هذا الجهاز فقط، ولا يحفظ التسجيل ولا يرسله. Tibyan uses the microphone for recitation practice on this device only; audio is not saved or sent.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSMainNibFile</key>

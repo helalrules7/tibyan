@@ -17,12 +17,34 @@ import UserNotifications
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     // «Save to Photos» for shared verse pictures, on whichever engine runs.
     PhotoSaverChannel.attach(engineBridge.applicationRegistrar.messenger())
+    // The tasmee's «open device settings» when the microphone is off.
+    AppSettingsChannel.attach(engineBridge.applicationRegistrar.messenger())
     // CarPlay may have started the app first: the phone's view controller
     // then adopted the launch engine CarPlay set up (CarPlaySceneDelegate
     // .swift), whose plugins and car channel are already registered.
     if engineBridge.pluginRegistry.hasPlugin(CarPlayBridge.pluginKey) { return }
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     CarPlayBridge.shared.attach(engineBridge.applicationRegistrar.messenger())
+  }
+}
+
+/// Opens this app's page in the Settings app (the tasmee asks for the
+/// microphone there once it was refused).
+enum AppSettingsChannel {
+  private static var channel: FlutterMethodChannel?
+
+  static func attach(_ messenger: FlutterBinaryMessenger) {
+    let c = FlutterMethodChannel(name: "app.tibyan/settings", binaryMessenger: messenger)
+    c.setMethodCallHandler { call, result in
+      guard call.method == "openAppSettings",
+        let url = URL(string: UIApplication.openSettingsURLString)
+      else {
+        result(FlutterMethodNotImplemented)
+        return
+      }
+      UIApplication.shared.open(url) { ok in result(ok) }
+    }
+    channel = c
   }
 }
 

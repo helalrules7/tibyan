@@ -32,6 +32,10 @@ import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
 import '../../features/reading/continuous_screen.dart';
 import '../../features/reading/one_verse_screen.dart';
+import '../../features/tasmee/domain/tasmee_session_request.dart';
+import '../../features/tasmee/presentation/tasmee_session_screen.dart';
+import '../../features/tasmee/presentation/tasmee_settings_screen.dart';
+import '../../features/tasmee/presentation/tasmee_setup_screen.dart';
 import '../../features/settings/settings_screen.dart';
 import '../../features/settings/storage_screen.dart';
 import '../settings/app_settings.dart';
@@ -75,6 +79,21 @@ final appRouterProvider = Provider<GoRouter>(
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+        path: '/tasmee',
+        builder: (context, state) => const TasmeeSetupScreen(),
+        routes: [
+          GoRoute(
+            path: 'session',
+            builder: (context, state) {
+              final request = state.extra;
+              return request is TasmeeSessionRequest
+                  ? TasmeeSessionScreen(request: request)
+                  : const TasmeeSetupScreen();
+            },
+          ),
+        ],
+      ),
+      GoRoute(
         path: '/onboarding/language',
         builder: (context, state) => const OnboardingLanguageScreen(),
       ),
@@ -109,6 +128,10 @@ final appRouterProvider = Provider<GoRouter>(
               GoRoute(
                 path: 'player',
                 builder: (context, state) => const PlayerSettingsScreen(),
+              ),
+              GoRoute(
+                path: 'tasmee',
+                builder: (context, state) => const TasmeeSettingsScreen(),
               ),
             ],
           ),

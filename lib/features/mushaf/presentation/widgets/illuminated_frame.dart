@@ -9,6 +9,7 @@ import '../../../../core/theme/duotone.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'art_frame.dart';
 import 'opening_art.dart';
+import 'page_interaction.dart' show PageGround;
 import 'raster_frame.dart';
 
 /// Ornament images for the Zakhrafa frame (built by tools/build_ornaments.py).
@@ -1191,7 +1192,8 @@ class PlainFrame extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: child,
+            // No paper here: the page lies on the screen's background.
+            child: PageGround(color: t.bg, child: child),
           ),
         ),
         SizedBox(

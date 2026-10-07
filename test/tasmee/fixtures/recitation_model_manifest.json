@@ -1,0 +1,22 @@
+{
+  "id": "nvidia-ar-fastconformer-ctc",
+  "version": "1",
+  "license": "CC-BY-4.0",
+  "engine": "sherpa-onnx-nemo-ctc",
+  "language": "ar",
+  "attribution": "Arabic FastConformer by NVIDIA (nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0), CC BY 4.0; CTC branch exported to ONNX and quantised to int8 by Tibyan.",
+  "files": [
+    {
+      "name": "model.int8.onnx",
+      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/nvidia-ar-fastconformer-ctc/1/model.int8.onnx",
+      "sha256": "d4f6424a8a27be687b4666506ef40f20d155d4837bc88c6f7b91d84e99fda9e6",
+      "bytes": 131652624
+    },
+    {
+      "name": "tokens.txt",
+      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/nvidia-ar-fastconformer-ctc/1/tokens.txt",
+      "sha256": "9b938381a19a69bb279cdcfc299419f25a049ea1de192e0d10317274a0f20074",
+      "bytes": 12858
+    }
+  ]
+}

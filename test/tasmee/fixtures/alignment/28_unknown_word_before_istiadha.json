@@ -1,0 +1,25 @@
+{
+ "name": "an unknown word before the isti'adha does not end the preamble",
+ "range": {
+  "verses": [
+   3,
+   2,
+   3,
+   2
+  ]
+ },
+ "steps": [
+  {
+   "say": "مم أعوذ بالله من الشيطان الرجيم بسم الله الرحمن الرحيم الله لا إله إلا هو الحي القيوم"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": [
+  "مم"
+ ],
+ "ignored": {
+  "preamble": 9
+ }
+}

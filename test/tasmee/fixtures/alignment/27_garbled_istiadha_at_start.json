@@ -1,0 +1,26 @@
+{
+ "name": "strict: an isti'adha the recogniser garbled at the start is still no error",
+ "range": {
+  "verses": [
+   3,
+   2,
+   3,
+   2
+  ]
+ },
+ "options": {
+  "strictness": "strict"
+ },
+ "steps": [
+  {
+   "say": "اعود بالله من الشيطان الرجين بسم الله الرحمن الرحيم الله لا إله إلا هو الحي القيوم"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": [],
+ "ignored": {
+  "preamble": 9
+ }
+}

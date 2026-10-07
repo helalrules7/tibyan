@@ -2494,4 +2494,530 @@ class AppLocalizationsEn extends AppLocalizations {
   String khatmaPendingOn(String date) {
     return 'Reading on $date';
   }
+
+  @override
+  String get tasmeeTitle => 'Recitation practice';
+
+  @override
+  String get tasmeeDescription =>
+      'Recite from memory. Tibyan listens on this device, reveals words, and marks possible mistakes. Audio is not sent anywhere; tajweed is not graded.';
+
+  @override
+  String get tasmeeSelectRange => 'Choose a practice range';
+
+  @override
+  String get tasmeeSurah => 'Surah';
+
+  @override
+  String get tasmeeJuz => 'Juz';
+
+  @override
+  String get tasmeeHizb => 'Hizb';
+
+  @override
+  String get tasmeeFirstHalf => 'First';
+
+  @override
+  String get tasmeeSecondHalf => 'Second';
+
+  @override
+  String get tasmeeFromSecondQuarter => 'Start from the second quarter';
+
+  @override
+  String get tasmeeMode => 'Practice mode';
+
+  @override
+  String get tasmeeContinuous => 'Continuous';
+
+  @override
+  String get tasmeeVerseByVerse => 'Verse by verse';
+
+  @override
+  String get tasmeeInvalidRange => 'Check the selected range numbers.';
+
+  @override
+  String get tasmeeDownloadModel => 'Download recitation model';
+
+  @override
+  String get tasmeeListening => 'Listening';
+
+  @override
+  String get tasmeeNotListening => 'Tap to start and recite from memory';
+
+  @override
+  String get tasmeeModelLoad => 'Preparing model';
+
+  @override
+  String get tasmeeWordWrong => 'Mistake';
+
+  @override
+  String get tasmeeWordSkipped => 'Skipped';
+
+  @override
+  String get tasmeeSessionComplete => 'Recitation complete';
+
+  @override
+  String tasmeeSessionDoubtful(String count) {
+    return '$count unsure words, not counted in the accuracy';
+  }
+
+  @override
+  String get tasmeeAccuracy => 'Accuracy';
+
+  @override
+  String get tasmeeAccuracyShort => 'accuracy';
+
+  @override
+  String tasmeeAcrossSurahs(
+    String fromSurah,
+    String fromAyah,
+    String toSurah,
+    String toAyah,
+    String mode,
+  ) {
+    return '$fromSurah $fromAyah – $toSurah $toAyah · $mode';
+  }
+
+  @override
+  String get tasmeeAyah => 'Verse';
+
+  @override
+  String get tasmeeCancelDownload => 'Cancel download';
+
+  @override
+  String get tasmeeClearHistory => 'Clear the tasmee history';
+
+  @override
+  String get tasmeeClearHistoryBody =>
+      'What the app keeps of your past sessions (the last tasmee) is removed. No audio is ever kept.';
+
+  @override
+  String get tasmeeClearHistoryHint => 'The last tasmee and its result';
+
+  @override
+  String get tasmeeClose => 'Close';
+
+  @override
+  String get tasmeeConfirm => 'Confirm';
+
+  @override
+  String get tasmeeContinueLast => 'Continue';
+
+  @override
+  String get tasmeeContinuousHint =>
+      'Read on; each word appears in place as you read it';
+
+  @override
+  String get tasmeeDefaultsNote => 'Defaults come from Settings › Tasmee';
+
+  @override
+  String get tasmeeDeleteModel => 'Delete the model';
+
+  @override
+  String get tasmeeDeleteModelBody =>
+      'The tasmee model is removed from this device. You will need to download it again before the next tasmee.';
+
+  @override
+  String get tasmeeDone => 'Done';
+
+  @override
+  String get tasmeeDownloadShort => 'Get model';
+
+  @override
+  String tasmeeDownloadSize(String size) {
+    return 'Download ($size MB)';
+  }
+
+  @override
+  String tasmeeDurationWords(String minutes, String seconds, String words) {
+    return '$minutes min $seconds s · $words words';
+  }
+
+  @override
+  String get tasmeeElapsed => 'Time';
+
+  @override
+  String get tasmeeEnd => 'Finish';
+
+  @override
+  String get tasmeeFeedback => 'While reciting';
+
+  @override
+  String get tasmeeFinishing => 'Finishing…';
+
+  @override
+  String get tasmeeFromPage => 'From page';
+
+  @override
+  String get tasmeeFromSurah => 'From surah';
+
+  @override
+  String get tasmeeHelp => 'Help';
+
+  @override
+  String get tasmeeHint => 'Hint';
+
+  @override
+  String get tasmeeHistory => 'History';
+
+  @override
+  String get tasmeeKindHalfHizb => 'Half hizb';
+
+  @override
+  String get tasmeeKindHizb => 'Hizb';
+
+  @override
+  String get tasmeeKindJuz => 'Juz';
+
+  @override
+  String get tasmeeKindPages => 'Pages';
+
+  @override
+  String get tasmeeKindQuarter => 'Quarter';
+
+  @override
+  String get tasmeeKindSurah => 'Surah';
+
+  @override
+  String get tasmeeKindThreeQuarters => '¾ hizb';
+
+  @override
+  String get tasmeeKindVerses => 'Verses';
+
+  @override
+  String tasmeeLastSession(String range, String accuracy) {
+    return 'Last tasmee: $range · $accuracy';
+  }
+
+  @override
+  String get tasmeeLenient => 'Lenient';
+
+  @override
+  String get tasmeeLenientHint => 'Accepts a word heard less exactly';
+
+  @override
+  String get tasmeeLess => 'Less';
+
+  @override
+  String tasmeeListeningVerse(String ayah) {
+    return 'Verse $ayah: listening';
+  }
+
+  @override
+  String get tasmeeMarkAndGoOn => 'Mark and go on';
+
+  @override
+  String get tasmeeMedium => 'Medium';
+
+  @override
+  String get tasmeeMediumHint => 'Forgives one letter in a long word';
+
+  @override
+  String get tasmeeMicOff => 'Microphone access is off';
+
+  @override
+  String get tasmeeMicPrivacy =>
+      'Tasmee listens on this device only. Nothing is sent or kept.';
+
+  @override
+  String tasmeeMistakes(String count) {
+    return '$count mistakes';
+  }
+
+  @override
+  String get tasmeeModelChecking => 'Checking the size…';
+
+  @override
+  String get tasmeeModelDetails =>
+      'Source and licence in About this mushaf › Sources';
+
+  @override
+  String get tasmeeModelFailed =>
+      'Could not connect. Check the internet and try again.';
+
+  @override
+  String tasmeeModelInstalled(String version) {
+    return 'Model installed (version $version)';
+  }
+
+  @override
+  String get tasmeeModelMissing => 'The tasmee model is not downloaded';
+
+  @override
+  String get tasmeeModelOffline => 'Works offline afterwards';
+
+  @override
+  String tasmeeModelProgress(String done, String total) {
+    return '$done of $total MB';
+  }
+
+  @override
+  String get tasmeeModelRemove => 'Remove it any time in Settings › Tasmee';
+
+  @override
+  String tasmeeModelSize(String size) {
+    return '$size MB · one time';
+  }
+
+  @override
+  String get tasmeeModelSizeUnknown => 'One time';
+
+  @override
+  String tasmeeModelSpace(String size) {
+    return 'Space used: $size MB';
+  }
+
+  @override
+  String get tasmeeModelTitle => 'Tasmee model';
+
+  @override
+  String get tasmeeModelVoiceStays =>
+      'Your voice stays on this device, never sent or kept';
+
+  @override
+  String get tasmeeModelWifiNote => 'Best on Wi‑Fi; mobile data may be charged';
+
+  @override
+  String get tasmeeMore => 'More';
+
+  @override
+  String get tasmeeNew => 'New tasmee';
+
+  @override
+  String get tasmeeNoAudioKept =>
+      'The last tasmee is kept so you can continue. No audio is kept.';
+
+  @override
+  String get tasmeeNoMistakes => 'no mistakes';
+
+  @override
+  String get tasmeeNotNow => 'Not now';
+
+  @override
+  String get tasmeeNothingToReview => 'Well done: no verse needs review.';
+
+  @override
+  String get tasmeeNoticeDeviceBody =>
+      'Your voice is never sent anywhere or kept.';
+
+  @override
+  String get tasmeeNoticeDeviceTitle => 'It runs on your device';
+
+  @override
+  String get tasmeeNoticeMishearBody =>
+      'A word it is unsure of gets a dotted line and does not count against you.';
+
+  @override
+  String get tasmeeNoticeMishearTitle => 'It can mishear';
+
+  @override
+  String get tasmeeNoticeOk => 'Got it';
+
+  @override
+  String get tasmeeNoticeStart => 'Got it, start';
+
+  @override
+  String get tasmeeNoticeTajweedBody =>
+      'Nor makharij, madd, or where you stop and start.';
+
+  @override
+  String get tasmeeNoticeTajweedTitle => 'It does not judge tajweed';
+
+  @override
+  String get tasmeeNoticeTitle =>
+      'Tasmee checks your memorisation, not your tajweed';
+
+  @override
+  String get tasmeeNoticeWordsBody =>
+      'Did you read what is in the mushaf, word by word?';
+
+  @override
+  String get tasmeeNoticeWordsTitle => 'It checks the words and their order';
+
+  @override
+  String get tasmeeOnError => 'On a mistake';
+
+  @override
+  String get tasmeeOneMistake => 'one mistake';
+
+  @override
+  String tasmeeOneTo(String max) {
+    return '1 to $max';
+  }
+
+  @override
+  String get tasmeeOpenDeviceSettings => 'Open device settings';
+
+  @override
+  String get tasmeeOtherEdition =>
+      'Tasmee follows the pages of the new Madina mushaf (1441); with your edition the words appear here in order.';
+
+  @override
+  String get tasmeePause => 'Pause';
+
+  @override
+  String get tasmeePaused => 'Paused';
+
+  @override
+  String get tasmeeProgress => 'Range recited';
+
+  @override
+  String get tasmeeQuarterOfHizb => 'Quarter';
+
+  @override
+  String get tasmeeRange => 'Range';
+
+  @override
+  String tasmeeRangeSummary(
+    String from,
+    String to,
+    String verses,
+    String words,
+    String pages,
+  ) {
+    return 'From $from to $to · $verses verses · $words words · p. $pages';
+  }
+
+  @override
+  String get tasmeeReReadWord => 'Re-read the word marked in red';
+
+  @override
+  String get tasmeeReciteAgain => 'Recite these again';
+
+  @override
+  String get tasmeeReciteVerse => 'Recite verse';
+
+  @override
+  String get tasmeeRedownload => 'Download the model again';
+
+  @override
+  String get tasmeeRedownloadBody =>
+      'The current model is removed and downloaded again.';
+
+  @override
+  String get tasmeeRepeat => 'Again';
+
+  @override
+  String get tasmeeResume => 'Resume';
+
+  @override
+  String get tasmeeRetry => 'Try again';
+
+  @override
+  String tasmeeReviewRow(String ayah, String accuracy) {
+    return 'Verse $ayah, accuracy $accuracy';
+  }
+
+  @override
+  String tasmeeRingSemantics(String title, String note, String value) {
+    return '$title, $note: $value';
+  }
+
+  @override
+  String tasmeeSeconds(String count) {
+    return '$count s';
+  }
+
+  @override
+  String tasmeeSessionTitle(String surah) {
+    return 'Tasmee · $surah';
+  }
+
+  @override
+  String get tasmeeSettingsNote => 'Mode, mistakes, the model';
+
+  @override
+  String get tasmeeSkipWord => 'Skip it';
+
+  @override
+  String get tasmeeStart => 'Start';
+
+  @override
+  String get tasmeeStartReciting => 'Start reciting';
+
+  @override
+  String get tasmeeStopToCorrect => 'Stop to correct';
+
+  @override
+  String get tasmeeStopToCorrectHint => 'Waits until you read the right word';
+
+  @override
+  String get tasmeeStrict => 'Strict';
+
+  @override
+  String get tasmeeStrictHint => 'The word letter for letter';
+
+  @override
+  String get tasmeeStrictness => 'Matching';
+
+  @override
+  String get tasmeeSummary => 'Summary';
+
+  @override
+  String get tasmeeTestByTouch => 'Test yourself by tapping instead';
+
+  @override
+  String get tasmeeThisVerse => 'this verse';
+
+  @override
+  String get tasmeeToPage => 'To page';
+
+  @override
+  String get tasmeeToReview => 'Verses to review';
+
+  @override
+  String get tasmeeToSurah => 'To surah';
+
+  @override
+  String get tasmeeToastDuration => 'How long a verse result shows';
+
+  @override
+  String get tasmeeVerseByVerseHint =>
+      'Tap, recite one verse, then see it whole with its result';
+
+  @override
+  String get tasmeeVerseDone => 'Verse done';
+
+  @override
+  String tasmeeVerseNumber(String ayah) {
+    return 'Verse $ayah';
+  }
+
+  @override
+  String tasmeeVerseOf(String n, String count) {
+    return 'Verse $n of $count: tap and recite it';
+  }
+
+  @override
+  String tasmeeVerseResult(String ayah, String accuracy, String detail) {
+    return 'Verse $ayah · $accuracy · $detail';
+  }
+
+  @override
+  String get tasmeeVersesHeading => 'Verses';
+
+  @override
+  String tasmeeVersesLine(String from, String to, String mode) {
+    return 'Verses $from–$to · $mode';
+  }
+
+  @override
+  String get tasmeeVibration => 'Vibrate on a mistake';
+
+  @override
+  String get tasmeeVibrationHint =>
+      'A light buzz when a word is marked wrong or skipped';
+
+  @override
+  String get tasmeeWholeSession => 'whole tasmee';
+
+  @override
+  String get tasmeeWordCorrectedShort => 'Corrected';
+
+  @override
+  String get tasmeeWordHinted => 'Hinted';
+
+  @override
+  String get tasmeeAllowMicHint =>
+      'Open the device settings and allow Tibyan to use the microphone.';
 }

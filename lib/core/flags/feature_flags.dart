@@ -21,7 +21,10 @@ enum Feature {
   oldMadinaEdition('old_madina_edition'),
   meaningSearch('meaning_search'),
   accountsSync('accounts_sync'),
-  groupKhatma('group_khatma');
+  groupKhatma('group_khatma'),
+
+  /// Audio tasmee: the hint button that shows the next word.
+  tasmeeHint('tasmee_hint');
 
   const Feature([this._key]);
   final String? _key;

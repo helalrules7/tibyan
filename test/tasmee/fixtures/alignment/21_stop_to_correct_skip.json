@@ -1,0 +1,36 @@
+{
+ "name": "stop to correct: a skipped word stops the reading too, until it is read",
+ "range": {
+  "verses": [
+   2,
+   3,
+   2,
+   3
+  ]
+ },
+ "options": {
+  "onError": "stopToCorrect"
+ },
+ "steps": [
+  {
+   "say": "الذين يؤمنون ويقيمون الصلاة"
+  },
+  {
+   "say": "يؤمنون بالغيب ويقيمون الصلاة ومما رزقناهم ينفقون"
+  }
+ ],
+ "statuses": {
+  "*": "correct",
+  "2:3:3": "correctedAfterError"
+ },
+ "accuracy": {
+  "2:3": 0.875
+ },
+ "corrected": {
+  "2:3": 1
+ },
+ "ignored": {
+  "whileStopped": 2,
+  "repetition": 1
+ }
+}

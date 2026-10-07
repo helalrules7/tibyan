@@ -13,6 +13,7 @@ import '../khatma/khatma_providers.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
+import '../tasmee/presentation/tasmee_setup_screen.dart' show showTasmeeSetup;
 import 'whats_new.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -212,6 +213,12 @@ class HomeScreen extends ConsumerWidget {
                           ? '${l.hifzToday} ${digits(due)}'
                           : l.hifzTileNote,
                       onTap: () => context.push('/hifz'),
+                    ),
+                    _SectionTile(
+                      icon: Icons.graphic_eq,
+                      label: l.tasmeeTitle,
+                      note: l.tasmeeSelectRange,
+                      onTap: () => showTasmeeSetup(context),
                     ),
                   ],
                 ),
@@ -453,6 +460,13 @@ class _ElderlyHome extends ConsumerWidget {
               icon: Icons.search,
               label: l.sectionSearch,
               onTap: () => context.go('/search'),
+            ),
+            const SizedBox(height: 16),
+            _BigAction(
+              icon: Icons.graphic_eq,
+              label: l.tasmeeTitle,
+              detail: l.tasmeeDescription,
+              onTap: () => showTasmeeSetup(context),
             ),
           ],
         ),

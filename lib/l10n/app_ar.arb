@@ -529,7 +529,13 @@
   "sajdahTapToContinue": "اضغط للاستكمال",
   "sajdahContinue": "استكمال",
   "sajdahSecondsLeft": "{n} ثانية متبقية",
-  "@sajdahSecondsLeft": {"placeholders": {"n": {"type": "String"}}},
+  "@sajdahSecondsLeft": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "tapJumpLabel": "عند لمس آية أثناء الاستماع",
   "tapJumpHint": "لمسة على آية في الصفحة تنقل الشيخ إليها",
   "tapJumpVerseStart": "من أول الآية",
@@ -1441,14 +1447,29 @@
   "shareSurahImage": "مشاركة السورة كصورة",
   "shareImageTitle": "مشاركة كصورة",
   "shareImageOf": "{n} من {total}",
-  "@shareImageOf": {"placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}},
+  "@shareImageOf": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
   "sharePreviousImage": "الصورة السابقة",
   "shareNextImage": "الصورة التالية",
   "shareButton": "مشاركة",
   "saveToPhotos": "حفظ في الصور",
   "savedToPhotos": "حُفظت الصور",
   "savedToFolder": "حُفظت الصور في {folder}",
-  "@savedToFolder": {"placeholders": {"folder": {"type": "String"}}},
+  "@savedToFolder": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
   "saveToPhotosFailed": "تعذر الحفظ في الصور",
   "shareImageRiwayaUnavailable": "نص هذه الرواية وخطها غير متاحين على هذا الجهاز بعد، فلا تُشارك آياتها صورةً. نزّل صفحات الرواية أولا.",
   "backupTitle": "النسخ الاحتياطي",
@@ -1457,56 +1478,158 @@
   "backupImport": "استعادة من نسخة",
   "backupImportHint": "يدمج النسخة مع ما على جهازك: لا يحذف شيئا، ويأخذ الأحدث عند التعارض، ويعيد الإعدادات كما كانت في النسخة.",
   "backupDone": "تمت الاستعادة: {added} جديد، {updated} محدَّث",
-  "@backupDone": {"placeholders": {"added": {"type": "String"}, "updated": {"type": "String"}}},
+  "@backupDone": {
+    "placeholders": {
+      "added": {
+        "type": "String"
+      },
+      "updated": {
+        "type": "String"
+      }
+    }
+  },
   "backupInvalid": "هذا الملف ليس نسخة احتياطية من تبيان",
   "backupFailed": "تعذرت العملية",
   "playbackSpeedLabel": "سرعة التلاوة",
   "playbackSpeedValue": "×{value}",
-  "@playbackSpeedValue": {"placeholders": {"value": {"type": "String"}}},
+  "@playbackSpeedValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "storageTitle": "التخزين والتنزيلات",
   "storageOpen": "التخزين والتنزيلات",
   "storageOpenHint": "ما نُزِّل على الجهاز وأحجامه، وحذف ما لا تحتاجه",
   "storageIntro": "كل ما نزّله التطبيق على جهازك. يمكنك حذف أي منها وتنزيله لاحقا. بياناتك (الفواصل، الختمة، الملاحظات) لا تظهر هنا ولا تُمس.",
   "storageTotal": "المجموع: {size}",
-  "@storageTotal": {"placeholders": {"size": {"type": "String"}}},
+  "@storageTotal": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "storageBundled": "مضمّن مع التطبيق",
   "storageSize": "{mb} ميجا",
-  "@storageSize": {"placeholders": {"mb": {"type": "String"}}},
+  "@storageSize": {
+    "placeholders": {
+      "mb": {
+        "type": "String"
+      }
+    }
+  },
   "storageAudioOf": "تلاوات {name}",
-  "@storageAudioOf": {"placeholders": {"name": {"type": "String"}}},
+  "@storageAudioOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "storageSemantic": "حزمة البحث بالمعنى",
   "storageTiming": "تحديثات توقيت التلاوة",
   "storagePartial": "تنزيلات غير مكتملة",
   "storagePartialHint": "بقايا تنزيلات توقفت؛ حذفها آمن",
   "storageClean": "تنظيف",
   "storageDeleteAsk": "حذف {name} ({size})؟",
-  "@storageDeleteAsk": {"placeholders": {"name": {"type": "String"}, "size": {"type": "String"}}},
+  "@storageDeleteAsk": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "storageFreed": "تم تحرير {size}",
-  "@storageFreed": {"placeholders": {"size": {"type": "String"}}},
+  "@storageFreed": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "storageEmpty": "لا شيء منزَّل غير ما يأتي مع التطبيق",
   "storageUnknown": "ملفات أخرى",
   "asbabTitle": "أسباب النزول",
   "asbabCount": "أسباب النزول ({count})",
-  "@asbabCount": {"placeholders": {"count": {"type": "String"}}},
+  "@asbabCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "bookCitationTahqiq": "تحقيق {name}",
-  "@bookCitationTahqiq": {"placeholders": {"name": {"type": "String"}}},
+  "@bookCitationTahqiq": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "bookCitationVolume": "ج {volume}",
-  "@bookCitationVolume": {"placeholders": {"volume": {"type": "String"}}},
+  "@bookCitationVolume": {
+    "placeholders": {
+      "volume": {
+        "type": "String"
+      }
+    }
+  },
   "bookCitationPage": "ص {page}",
-  "@bookCitationPage": {"placeholders": {"page": {"type": "String"}}},
+  "@bookCitationPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
   "bookCitationPages": "ص {from}–{to}",
-  "@bookCitationPages": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
+  "@bookCitationPages": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "storageBook": "كتاب «{title}»",
-  "@storageBook": {"placeholders": {"title": {"type": "String"}}},
+  "@storageBook": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "storageBooksAvailable": "كتب يمكن تنزيلها",
   "bookPackDownload": "تنزيل",
   "munasabatTitle": "المناسبات",
   "munasabatCount": "المناسبات ({count})",
-  "@munasabatCount": {"placeholders": {"count": {"type": "String"}}},
+  "@munasabatCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "wujuhTitle": "الوجوه والنظائر",
   "bookKindTafsir": "تفسير",
   "bookEntryVerses": "الآيات {from}–{to}",
-  "@bookEntryVerses": {"placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
+  "@bookEntryVerses": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "continuousView": "عرض متتالي",
   "underVerseTitle": "ما يظهر تحت الآية",
   "underArabicOnly": "عربي فقط",
@@ -1524,10 +1647,22 @@
   "oneVerseHint": "آية واحدة في كل شاشة بخط كبير، والجهاز بالعرض",
   "oneVerseAutoOff": "الانتقال التلقائي متوقف. اضغط لتشغيله",
   "oneVerseAutoOn": "ينتقل للآية التالية كل {seconds} ثانية. اضغط للتغيير",
-  "@oneVerseAutoOn": {"placeholders": {"seconds": {"type": "String"}}},
+  "@oneVerseAutoOn": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
   "oneVerseAutoShort": "تلقائي",
   "secondsShort": "{n} ث",
-  "@secondsShort": {"placeholders": {"n": {"type": "String"}}},
+  "@secondsShort": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "searchScopeAll": "كل المصحف",
   "searchScopeJuz": "في جزء",
   "searchScopeSurah": "في سورة",
@@ -1551,9 +1686,27 @@
   "pagesMapRead": "مقروءة في الختمة",
   "pagesMapMarked": "فيها فاصل",
   "pagesRange": "ص {first}–{last}",
-  "@pagesRange": {"placeholders": {"first": {"type": "String"}, "last": {"type": "String"}}},
+  "@pagesRange": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
   "pagesMapJuzRead": "قُرئ {read} من {total}",
-  "@pagesMapJuzRead": {"placeholders": {"read": {"type": "String"}, "total": {"type": "String"}}},
+  "@pagesMapJuzRead": {
+    "placeholders": {
+      "read": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
   "focusModeTitle": "وضع التركيز",
   "focusModeHint": "الصفحة وحدها بلا إطار ولا شيء تحتها، وشريط رفيع في الأعلى",
   "focusToolsLabel": "إظهار الأدوات",
@@ -1647,5 +1800,363 @@
         "type": "String"
       }
     }
-  }
+  },
+  "tasmeeTitle": "التسميع",
+  "tasmeeDescription": "اقرأ من حفظك؛ يسمعك تبيان على جهازك ويُظهر الكلمات ويعلّم مواضع الخطأ. لا يُرسل الصوت ولا يُقيَّم التجويد.",
+  "tasmeeSelectRange": "اختر نطاق التسميع",
+  "tasmeeSurah": "السورة",
+  "tasmeeJuz": "الجزء",
+  "tasmeeHizb": "الحزب",
+  "tasmeeFirstHalf": "الأول",
+  "tasmeeSecondHalf": "الثاني",
+  "tasmeeFromSecondQuarter": "ابدأ من الربع الثاني",
+  "tasmeeMode": "طريقة التسميع",
+  "tasmeeContinuous": "متصل",
+  "tasmeeVerseByVerse": "آية بآية",
+  "tasmeeInvalidRange": "تحقق من أرقام النطاق.",
+  "tasmeeDownloadModel": "تنزيل نموذج التسميع",
+  "tasmeeListening": "أستمع إليك",
+  "tasmeeNotListening": "اضغط للبدء واقرأ من حفظك",
+  "tasmeeModelLoad": "جارٍ تجهيز النموذج",
+  "tasmeeWordWrong": "خطأ",
+  "tasmeeWordSkipped": "متجاوزة",
+  "tasmeeSessionComplete": "انتهى التسميع",
+  "tasmeeSessionDoubtful": "{count} كلمة مشكوك فيها، لم تُحسب في الدقة",
+  "@tasmeeSessionDoubtful": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeAccuracy": "الدقة",
+  "tasmeeAccuracyShort": "الدقة",
+  "tasmeeAcrossSurahs": "{fromSurah} {fromAyah} – {toSurah} {toAyah} · {mode}",
+  "@tasmeeAcrossSurahs": {
+    "placeholders": {
+      "fromSurah": {
+        "type": "String"
+      },
+      "fromAyah": {
+        "type": "String"
+      },
+      "toSurah": {
+        "type": "String"
+      },
+      "toAyah": {
+        "type": "String"
+      },
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeAyah": "آية",
+  "tasmeeCancelDownload": "إلغاء التنزيل",
+  "tasmeeClearHistory": "مسح سجل التسميع",
+  "tasmeeClearHistoryBody": "يُمسح ما يحفظه التطبيق عن جلساتك السابقة (آخر تسميع). لا يوجد صوت محفوظ أصلا.",
+  "tasmeeClearHistoryHint": "آخر تسميع ونتيجته",
+  "tasmeeClose": "إغلاق",
+  "tasmeeConfirm": "تأكيد",
+  "tasmeeContinueLast": "أكمل",
+  "tasmeeContinuousHint": "اقرأ متصلا؛ تظهر كل كلمة في موضعها لحظة قراءتها",
+  "tasmeeDefaultsNote": "القيم الافتراضية من الإعدادات › التسميع",
+  "tasmeeDeleteModel": "حذف النموذج",
+  "tasmeeDeleteModelBody": "يُحذف نموذج التسميع من الجهاز. تحتاج إلى تنزيله ثانية قبل التسميع القادم.",
+  "tasmeeDone": "تم",
+  "tasmeeDownloadShort": "نزّل النموذج",
+  "tasmeeDownloadSize": "نزّل ({size} م.ب)",
+  "@tasmeeDownloadSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeDurationWords": "المدة {minutes} د {seconds} ث · {words} كلمة",
+  "@tasmeeDurationWords": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "String"
+      },
+      "words": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeElapsed": "المدة",
+  "tasmeeEnd": "إنهاء",
+  "tasmeeFeedback": "أثناء التسميع",
+  "tasmeeFinishing": "أنهي التسميع…",
+  "tasmeeFromPage": "من صفحة",
+  "tasmeeFromSurah": "من سورة",
+  "tasmeeHelp": "المساعدة",
+  "tasmeeHint": "تلميح",
+  "tasmeeHistory": "السجل",
+  "tasmeeKindHalfHizb": "نصف حزب",
+  "tasmeeKindHizb": "حزب",
+  "tasmeeKindJuz": "جزء",
+  "tasmeeKindPages": "صفحات",
+  "tasmeeKindQuarter": "ربع حزب",
+  "tasmeeKindSurah": "سورة",
+  "tasmeeKindThreeQuarters": "٣ أرباع حزب",
+  "tasmeeKindVerses": "آيات",
+  "tasmeeLastSession": "آخر تسميع: {range} · {accuracy}",
+  "@tasmeeLastSession": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      },
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeLenient": "متسامح",
+  "tasmeeLenientHint": "يقبل فرقا أكبر في نطق الكلمة",
+  "tasmeeLess": "أقل",
+  "tasmeeListeningVerse": "الآية {ayah}: أستمع إليك",
+  "@tasmeeListeningVerse": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeMarkAndGoOn": "تابع وعلّمه",
+  "tasmeeMedium": "متوسط",
+  "tasmeeMediumHint": "يتجاوز عن حرف واحد في الكلمة الطويلة",
+  "tasmeeMicOff": "الميكروفون غير مسموح",
+  "tasmeeMicPrivacy": "التسميع يسمع قراءتك على جهازك فقط. لا يُرسل الصوت ولا يُحفظ.",
+  "tasmeeMistakes": "{count} أخطاء",
+  "@tasmeeMistakes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeModelChecking": "جارٍ معرفة الحجم…",
+  "tasmeeModelDetails": "المصدر والرخصة في «عن المصحف» › المصادر",
+  "tasmeeModelFailed": "تعذر الاتصال. تحقق من الإنترنت وحاول ثانية.",
+  "tasmeeModelInstalled": "النموذج منزّل (الإصدار {version})",
+  "@tasmeeModelInstalled": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeModelMissing": "نموذج التسميع غير منزّل",
+  "tasmeeModelOffline": "يعمل بعدها بلا إنترنت",
+  "tasmeeModelProgress": "{done} من {total} م.ب",
+  "@tasmeeModelProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeModelRemove": "تحذفه متى شئت من الإعدادات › التسميع",
+  "tasmeeModelSize": "{size} م.ب · مرة واحدة",
+  "@tasmeeModelSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeModelSizeUnknown": "مرة واحدة",
+  "tasmeeModelSpace": "المساحة المستخدمة: {size} م.ب",
+  "@tasmeeModelSpace": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeModelTitle": "نموذج التسميع",
+  "tasmeeModelVoiceStays": "صوتك يبقى على جهازك، لا يُرسل ولا يُحفظ",
+  "tasmeeModelWifiNote": "يُفضَّل التنزيل عبر Wi‑Fi؛ قد تُحسب بيانات الهاتف",
+  "tasmeeMore": "أكثر",
+  "tasmeeNew": "تسميع جديد",
+  "tasmeeNoAudioKept": "يُحفظ آخر تسميع لتكمل منه. لا يُحفظ أي صوت.",
+  "tasmeeNoMistakes": "بلا أخطاء",
+  "tasmeeNotNow": "ليس الآن",
+  "tasmeeNothingToReview": "أحسنت، لا آيات تحتاج مراجعة.",
+  "tasmeeNoticeDeviceBody": "صوتك لا يُرسل إلى أي خادم ولا يُحفظ.",
+  "tasmeeNoticeDeviceTitle": "يعمل على جهازك",
+  "tasmeeNoticeMishearBody": "الكلمة التي يشك فيها تُعلَّم بنقاط خفيفة ولا تُحسب عليك.",
+  "tasmeeNoticeMishearTitle": "قد يخطئ في السماع",
+  "tasmeeNoticeOk": "فهمت",
+  "tasmeeNoticeStart": "فهمت، ابدأ",
+  "tasmeeNoticeTajweedBody": "ولا المخارج ولا المدود ولا الوقف والابتداء.",
+  "tasmeeNoticeTajweedTitle": "لا يقيّم التجويد ولا أحكام الأداء",
+  "tasmeeNoticeTitle": "التسميع يختبر حفظك، لا تجويدك",
+  "tasmeeNoticeWordsBody": "هل قرأت ما في المصحف كلمة كلمة؟",
+  "tasmeeNoticeWordsTitle": "يتحقق من الكلمات وترتيبها",
+  "tasmeeOnError": "عند الخطأ",
+  "tasmeeOneMistake": "خطأ واحد",
+  "tasmeeOneTo": "من ١ إلى {max}",
+  "@tasmeeOneTo": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeOpenDeviceSettings": "افتح إعدادات الجهاز",
+  "tasmeeOtherEdition": "التسميع يتبع صفحات مصحف المدينة الجديد (١٤٤١)؛ في طبعتك تظهر الكلمات هنا متتابعة.",
+  "tasmeePause": "إيقاف مؤقت",
+  "tasmeePaused": "متوقف مؤقتا",
+  "tasmeeProgress": "ما سُمّع من النطاق",
+  "tasmeeQuarterOfHizb": "الربع",
+  "tasmeeRange": "النطاق",
+  "tasmeeRangeSummary": "من {from} إلى {to} · {verses} آية · {words} كلمة · ص {pages}",
+  "@tasmeeRangeSummary": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "verses": {
+        "type": "String"
+      },
+      "words": {
+        "type": "String"
+      },
+      "pages": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeReReadWord": "أعد قراءة الكلمة المعلّمة بالأحمر",
+  "tasmeeReciteAgain": "سمّع هذه الآيات ثانية",
+  "tasmeeReciteVerse": "سمّع الآية",
+  "tasmeeRedownload": "إعادة تنزيل النموذج",
+  "tasmeeRedownloadBody": "يُحذف النموذج الحالي ثم يُنزّل من جديد.",
+  "tasmeeRepeat": "أعد",
+  "tasmeeResume": "متابعة",
+  "tasmeeRetry": "حاول ثانية",
+  "tasmeeReviewRow": "الآية {ayah}، الدقة {accuracy}",
+  "@tasmeeReviewRow": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeRingSemantics": "{title}، {note}: {value}",
+  "@tasmeeRingSemantics": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "note": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeSeconds": "{count} ث",
+  "@tasmeeSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeSessionTitle": "تسميع · {surah}",
+  "@tasmeeSessionTitle": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeSettingsNote": "الطريقة، السلوك عند الخطأ، النموذج",
+  "tasmeeSkipWord": "تجاوزها",
+  "tasmeeStart": "ابدأ",
+  "tasmeeStartReciting": "ابدأ التسميع",
+  "tasmeeStopToCorrect": "توقّف للتصحيح",
+  "tasmeeStopToCorrectHint": "لا يتقدم حتى تقرأ الكلمة الصحيحة",
+  "tasmeeStrict": "صارم",
+  "tasmeeStrictHint": "الكلمة كما هي حرفا حرفا",
+  "tasmeeStrictness": "حساسية المطابقة",
+  "tasmeeSummary": "الملخص",
+  "tasmeeTestByTouch": "اختبر حفظك باللمس بدلا من ذلك",
+  "tasmeeThisVerse": "دقة الآية",
+  "tasmeeToPage": "إلى صفحة",
+  "tasmeeToReview": "آيات تحتاج مراجعة",
+  "tasmeeToSurah": "إلى سورة",
+  "tasmeeToastDuration": "مدة ظهور نتيجة الآية",
+  "tasmeeVerseByVerseHint": "اضغط، اقرأ آية، ثم تظهر كاملة بنتيجتها",
+  "tasmeeVerseDone": "انتهت الآية",
+  "tasmeeVerseNumber": "الآية {ayah}",
+  "@tasmeeVerseNumber": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeVerseOf": "الآية {n} من {count}: اضغط وسمّعها",
+  "@tasmeeVerseOf": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeVerseResult": "الآية {ayah} · {accuracy} · {detail}",
+  "@tasmeeVerseResult": {
+    "placeholders": {
+      "ayah": {
+        "type": "String"
+      },
+      "accuracy": {
+        "type": "String"
+      },
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeVersesHeading": "الآيات",
+  "tasmeeVersesLine": "الآيات {from}–{to} · {mode}",
+  "@tasmeeVersesLine": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeVibration": "الاهتزاز عند الخطأ",
+  "tasmeeVibrationHint": "اهتزاز خفيف حين تُعلَّم كلمة خطأ أو متجاوزة",
+  "tasmeeWholeSession": "للتسميع كله",
+  "tasmeeWordCorrectedShort": "صُحّحت",
+  "tasmeeWordHinted": "بتلميح",
+  "tasmeeAllowMicHint": "افتح إعدادات الجهاز، ثم اسمح لتبيان باستخدام الميكروفون."
 }

@@ -163,6 +163,12 @@ const _ar = <String, SourceText>{
     credit:
         'البحث بالمعنى: نموذج multilingual-e5-small (MIT)، في حزمة اختيارية',
   ),
+  'nvidia-stt-ar-fastconformer': (
+    title: 'نموذج التعرف على الكلام للتسميع (FastConformer العربي)',
+    publisher: 'NVIDIA، على Hugging Face (nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0)؛ حوّل تبيان فرعه CTC إلى صيغة ONNX وضغطه (int8)، دون تأييد من NVIDIA',
+    license: 'المشاع الإبداعي، النسبة 4.0 (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/',
+    credit: 'التسميع: نموذج NVIDIA العربي للتعرف على الكلام (FastConformer) برخصة CC BY 4.0، معدّلا: فرعه CTC وحده بصيغة ONNX مضغوطا (int8). يُنزَّل منفصلا عن التطبيق ويعمل على الجهاز.',
+  ),
 };
 
 const _en = <String, SourceText>{
@@ -312,6 +318,12 @@ const _en = <String, SourceText>{
     license: 'MIT License, as stated on the model card: use, copy, modify and distribute with the licence kept',
     credit: 'Search by meaning: the multilingual-e5-small model (MIT), in an optional pack',
   ),
+  'nvidia-stt-ar-fastconformer': (
+    title: 'Speech recognition model for tasmee (Arabic FastConformer)',
+    publisher: 'NVIDIA, on Hugging Face (nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0); its CTC branch converted to ONNX and quantised to int8 by Tibyan, not endorsed by NVIDIA',
+    license: 'Creative Commons Attribution 4.0 (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/',
+    credit: 'Tasmee: NVIDIA\'s Arabic speech recognition model (FastConformer) under CC BY 4.0, modified: its CTC branch alone, in ONNX, quantised to int8. Downloaded separately from the app; runs on the device.',
+  ),
 };
 
 /// Sources that are not in content.db (bundled with the app), listed after
@@ -326,6 +338,13 @@ const bundledSources = [
     key: 'multilingual-e5-small',
     url: 'https://huggingface.co/intfloat/multilingual-e5-small',
     version: '614241f622f53c4eeff9890bdc4f31cfecc418b3',
+  ),
+  // The tasmee's model (downloaded on first use, not bundled): credited
+  // here, in one place, rather than on the tasmee screens.
+  (
+    key: 'nvidia-stt-ar-fastconformer',
+    url: 'https://huggingface.co/nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0',
+    version: '7f32349',
   ),
 ];
 

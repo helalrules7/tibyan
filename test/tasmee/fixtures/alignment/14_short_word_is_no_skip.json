@@ -1,0 +1,25 @@
+{
+ "name": "a wrong word that occurs further on is not taken for a skip",
+ "range": {
+  "verses": [
+   2,
+   255,
+   2,
+   255
+  ]
+ },
+ "steps": [
+  {
+   "say": "الله لا إله إلا هو الحي القيوم ما تأخذه سنة ولا نوم"
+  }
+ ],
+ "statuses": {
+  "2:255:1-7": "correct",
+  "2:255:8": "wrong",
+  "2:255:9-12": "correct",
+  "2:255:13-50": "hidden"
+ },
+ "heard": {
+  "2:255:8": "ما"
+ }
+}

@@ -93,6 +93,19 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Card(
             child: ListTile(
+              leading: const Icon(Icons.graphic_eq),
+              title: Text(l.tasmeeTitle),
+              subtitle: Text(
+                l.tasmeeSettingsNote,
+                style: TextStyle(color: t.muted),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go('/settings/tasmee'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
               leading: const Icon(Icons.info_outline),
               title: Text(l.aboutMushafTitle),
               trailing: const Icon(Icons.chevron_right),

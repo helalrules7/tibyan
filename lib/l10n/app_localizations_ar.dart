@@ -2476,4 +2476,522 @@ class AppLocalizationsAr extends AppLocalizations {
   String khatmaPendingOn(String date) {
     return 'قراءة $date';
   }
+
+  @override
+  String get tasmeeTitle => 'التسميع';
+
+  @override
+  String get tasmeeDescription =>
+      'اقرأ من حفظك؛ يسمعك تبيان على جهازك ويُظهر الكلمات ويعلّم مواضع الخطأ. لا يُرسل الصوت ولا يُقيَّم التجويد.';
+
+  @override
+  String get tasmeeSelectRange => 'اختر نطاق التسميع';
+
+  @override
+  String get tasmeeSurah => 'السورة';
+
+  @override
+  String get tasmeeJuz => 'الجزء';
+
+  @override
+  String get tasmeeHizb => 'الحزب';
+
+  @override
+  String get tasmeeFirstHalf => 'الأول';
+
+  @override
+  String get tasmeeSecondHalf => 'الثاني';
+
+  @override
+  String get tasmeeFromSecondQuarter => 'ابدأ من الربع الثاني';
+
+  @override
+  String get tasmeeMode => 'طريقة التسميع';
+
+  @override
+  String get tasmeeContinuous => 'متصل';
+
+  @override
+  String get tasmeeVerseByVerse => 'آية بآية';
+
+  @override
+  String get tasmeeInvalidRange => 'تحقق من أرقام النطاق.';
+
+  @override
+  String get tasmeeDownloadModel => 'تنزيل نموذج التسميع';
+
+  @override
+  String get tasmeeListening => 'أستمع إليك';
+
+  @override
+  String get tasmeeNotListening => 'اضغط للبدء واقرأ من حفظك';
+
+  @override
+  String get tasmeeModelLoad => 'جارٍ تجهيز النموذج';
+
+  @override
+  String get tasmeeWordWrong => 'خطأ';
+
+  @override
+  String get tasmeeWordSkipped => 'متجاوزة';
+
+  @override
+  String get tasmeeSessionComplete => 'انتهى التسميع';
+
+  @override
+  String tasmeeSessionDoubtful(String count) {
+    return '$count كلمة مشكوك فيها، لم تُحسب في الدقة';
+  }
+
+  @override
+  String get tasmeeAccuracy => 'الدقة';
+
+  @override
+  String get tasmeeAccuracyShort => 'الدقة';
+
+  @override
+  String tasmeeAcrossSurahs(
+    String fromSurah,
+    String fromAyah,
+    String toSurah,
+    String toAyah,
+    String mode,
+  ) {
+    return '$fromSurah $fromAyah – $toSurah $toAyah · $mode';
+  }
+
+  @override
+  String get tasmeeAyah => 'آية';
+
+  @override
+  String get tasmeeCancelDownload => 'إلغاء التنزيل';
+
+  @override
+  String get tasmeeClearHistory => 'مسح سجل التسميع';
+
+  @override
+  String get tasmeeClearHistoryBody =>
+      'يُمسح ما يحفظه التطبيق عن جلساتك السابقة (آخر تسميع). لا يوجد صوت محفوظ أصلا.';
+
+  @override
+  String get tasmeeClearHistoryHint => 'آخر تسميع ونتيجته';
+
+  @override
+  String get tasmeeClose => 'إغلاق';
+
+  @override
+  String get tasmeeConfirm => 'تأكيد';
+
+  @override
+  String get tasmeeContinueLast => 'أكمل';
+
+  @override
+  String get tasmeeContinuousHint =>
+      'اقرأ متصلا؛ تظهر كل كلمة في موضعها لحظة قراءتها';
+
+  @override
+  String get tasmeeDefaultsNote => 'القيم الافتراضية من الإعدادات › التسميع';
+
+  @override
+  String get tasmeeDeleteModel => 'حذف النموذج';
+
+  @override
+  String get tasmeeDeleteModelBody =>
+      'يُحذف نموذج التسميع من الجهاز. تحتاج إلى تنزيله ثانية قبل التسميع القادم.';
+
+  @override
+  String get tasmeeDone => 'تم';
+
+  @override
+  String get tasmeeDownloadShort => 'نزّل النموذج';
+
+  @override
+  String tasmeeDownloadSize(String size) {
+    return 'نزّل ($size م.ب)';
+  }
+
+  @override
+  String tasmeeDurationWords(String minutes, String seconds, String words) {
+    return 'المدة $minutes د $seconds ث · $words كلمة';
+  }
+
+  @override
+  String get tasmeeElapsed => 'المدة';
+
+  @override
+  String get tasmeeEnd => 'إنهاء';
+
+  @override
+  String get tasmeeFeedback => 'أثناء التسميع';
+
+  @override
+  String get tasmeeFinishing => 'أنهي التسميع…';
+
+  @override
+  String get tasmeeFromPage => 'من صفحة';
+
+  @override
+  String get tasmeeFromSurah => 'من سورة';
+
+  @override
+  String get tasmeeHelp => 'المساعدة';
+
+  @override
+  String get tasmeeHint => 'تلميح';
+
+  @override
+  String get tasmeeHistory => 'السجل';
+
+  @override
+  String get tasmeeKindHalfHizb => 'نصف حزب';
+
+  @override
+  String get tasmeeKindHizb => 'حزب';
+
+  @override
+  String get tasmeeKindJuz => 'جزء';
+
+  @override
+  String get tasmeeKindPages => 'صفحات';
+
+  @override
+  String get tasmeeKindQuarter => 'ربع حزب';
+
+  @override
+  String get tasmeeKindSurah => 'سورة';
+
+  @override
+  String get tasmeeKindThreeQuarters => '٣ أرباع حزب';
+
+  @override
+  String get tasmeeKindVerses => 'آيات';
+
+  @override
+  String tasmeeLastSession(String range, String accuracy) {
+    return 'آخر تسميع: $range · $accuracy';
+  }
+
+  @override
+  String get tasmeeLenient => 'متسامح';
+
+  @override
+  String get tasmeeLenientHint => 'يقبل فرقا أكبر في نطق الكلمة';
+
+  @override
+  String get tasmeeLess => 'أقل';
+
+  @override
+  String tasmeeListeningVerse(String ayah) {
+    return 'الآية $ayah: أستمع إليك';
+  }
+
+  @override
+  String get tasmeeMarkAndGoOn => 'تابع وعلّمه';
+
+  @override
+  String get tasmeeMedium => 'متوسط';
+
+  @override
+  String get tasmeeMediumHint => 'يتجاوز عن حرف واحد في الكلمة الطويلة';
+
+  @override
+  String get tasmeeMicOff => 'الميكروفون غير مسموح';
+
+  @override
+  String get tasmeeMicPrivacy =>
+      'التسميع يسمع قراءتك على جهازك فقط. لا يُرسل الصوت ولا يُحفظ.';
+
+  @override
+  String tasmeeMistakes(String count) {
+    return '$count أخطاء';
+  }
+
+  @override
+  String get tasmeeModelChecking => 'جارٍ معرفة الحجم…';
+
+  @override
+  String get tasmeeModelDetails => 'المصدر والرخصة في «عن المصحف» › المصادر';
+
+  @override
+  String get tasmeeModelFailed => 'تعذر الاتصال. تحقق من الإنترنت وحاول ثانية.';
+
+  @override
+  String tasmeeModelInstalled(String version) {
+    return 'النموذج منزّل (الإصدار $version)';
+  }
+
+  @override
+  String get tasmeeModelMissing => 'نموذج التسميع غير منزّل';
+
+  @override
+  String get tasmeeModelOffline => 'يعمل بعدها بلا إنترنت';
+
+  @override
+  String tasmeeModelProgress(String done, String total) {
+    return '$done من $total م.ب';
+  }
+
+  @override
+  String get tasmeeModelRemove => 'تحذفه متى شئت من الإعدادات › التسميع';
+
+  @override
+  String tasmeeModelSize(String size) {
+    return '$size م.ب · مرة واحدة';
+  }
+
+  @override
+  String get tasmeeModelSizeUnknown => 'مرة واحدة';
+
+  @override
+  String tasmeeModelSpace(String size) {
+    return 'المساحة المستخدمة: $size م.ب';
+  }
+
+  @override
+  String get tasmeeModelTitle => 'نموذج التسميع';
+
+  @override
+  String get tasmeeModelVoiceStays => 'صوتك يبقى على جهازك، لا يُرسل ولا يُحفظ';
+
+  @override
+  String get tasmeeModelWifiNote =>
+      'يُفضَّل التنزيل عبر Wi‑Fi؛ قد تُحسب بيانات الهاتف';
+
+  @override
+  String get tasmeeMore => 'أكثر';
+
+  @override
+  String get tasmeeNew => 'تسميع جديد';
+
+  @override
+  String get tasmeeNoAudioKept => 'يُحفظ آخر تسميع لتكمل منه. لا يُحفظ أي صوت.';
+
+  @override
+  String get tasmeeNoMistakes => 'بلا أخطاء';
+
+  @override
+  String get tasmeeNotNow => 'ليس الآن';
+
+  @override
+  String get tasmeeNothingToReview => 'أحسنت، لا آيات تحتاج مراجعة.';
+
+  @override
+  String get tasmeeNoticeDeviceBody => 'صوتك لا يُرسل إلى أي خادم ولا يُحفظ.';
+
+  @override
+  String get tasmeeNoticeDeviceTitle => 'يعمل على جهازك';
+
+  @override
+  String get tasmeeNoticeMishearBody =>
+      'الكلمة التي يشك فيها تُعلَّم بنقاط خفيفة ولا تُحسب عليك.';
+
+  @override
+  String get tasmeeNoticeMishearTitle => 'قد يخطئ في السماع';
+
+  @override
+  String get tasmeeNoticeOk => 'فهمت';
+
+  @override
+  String get tasmeeNoticeStart => 'فهمت، ابدأ';
+
+  @override
+  String get tasmeeNoticeTajweedBody =>
+      'ولا المخارج ولا المدود ولا الوقف والابتداء.';
+
+  @override
+  String get tasmeeNoticeTajweedTitle => 'لا يقيّم التجويد ولا أحكام الأداء';
+
+  @override
+  String get tasmeeNoticeTitle => 'التسميع يختبر حفظك، لا تجويدك';
+
+  @override
+  String get tasmeeNoticeWordsBody => 'هل قرأت ما في المصحف كلمة كلمة؟';
+
+  @override
+  String get tasmeeNoticeWordsTitle => 'يتحقق من الكلمات وترتيبها';
+
+  @override
+  String get tasmeeOnError => 'عند الخطأ';
+
+  @override
+  String get tasmeeOneMistake => 'خطأ واحد';
+
+  @override
+  String tasmeeOneTo(String max) {
+    return 'من ١ إلى $max';
+  }
+
+  @override
+  String get tasmeeOpenDeviceSettings => 'افتح إعدادات الجهاز';
+
+  @override
+  String get tasmeeOtherEdition =>
+      'التسميع يتبع صفحات مصحف المدينة الجديد (١٤٤١)؛ في طبعتك تظهر الكلمات هنا متتابعة.';
+
+  @override
+  String get tasmeePause => 'إيقاف مؤقت';
+
+  @override
+  String get tasmeePaused => 'متوقف مؤقتا';
+
+  @override
+  String get tasmeeProgress => 'ما سُمّع من النطاق';
+
+  @override
+  String get tasmeeQuarterOfHizb => 'الربع';
+
+  @override
+  String get tasmeeRange => 'النطاق';
+
+  @override
+  String tasmeeRangeSummary(
+    String from,
+    String to,
+    String verses,
+    String words,
+    String pages,
+  ) {
+    return 'من $from إلى $to · $verses آية · $words كلمة · ص $pages';
+  }
+
+  @override
+  String get tasmeeReReadWord => 'أعد قراءة الكلمة المعلّمة بالأحمر';
+
+  @override
+  String get tasmeeReciteAgain => 'سمّع هذه الآيات ثانية';
+
+  @override
+  String get tasmeeReciteVerse => 'سمّع الآية';
+
+  @override
+  String get tasmeeRedownload => 'إعادة تنزيل النموذج';
+
+  @override
+  String get tasmeeRedownloadBody => 'يُحذف النموذج الحالي ثم يُنزّل من جديد.';
+
+  @override
+  String get tasmeeRepeat => 'أعد';
+
+  @override
+  String get tasmeeResume => 'متابعة';
+
+  @override
+  String get tasmeeRetry => 'حاول ثانية';
+
+  @override
+  String tasmeeReviewRow(String ayah, String accuracy) {
+    return 'الآية $ayah، الدقة $accuracy';
+  }
+
+  @override
+  String tasmeeRingSemantics(String title, String note, String value) {
+    return '$title، $note: $value';
+  }
+
+  @override
+  String tasmeeSeconds(String count) {
+    return '$count ث';
+  }
+
+  @override
+  String tasmeeSessionTitle(String surah) {
+    return 'تسميع · $surah';
+  }
+
+  @override
+  String get tasmeeSettingsNote => 'الطريقة، السلوك عند الخطأ، النموذج';
+
+  @override
+  String get tasmeeSkipWord => 'تجاوزها';
+
+  @override
+  String get tasmeeStart => 'ابدأ';
+
+  @override
+  String get tasmeeStartReciting => 'ابدأ التسميع';
+
+  @override
+  String get tasmeeStopToCorrect => 'توقّف للتصحيح';
+
+  @override
+  String get tasmeeStopToCorrectHint => 'لا يتقدم حتى تقرأ الكلمة الصحيحة';
+
+  @override
+  String get tasmeeStrict => 'صارم';
+
+  @override
+  String get tasmeeStrictHint => 'الكلمة كما هي حرفا حرفا';
+
+  @override
+  String get tasmeeStrictness => 'حساسية المطابقة';
+
+  @override
+  String get tasmeeSummary => 'الملخص';
+
+  @override
+  String get tasmeeTestByTouch => 'اختبر حفظك باللمس بدلا من ذلك';
+
+  @override
+  String get tasmeeThisVerse => 'دقة الآية';
+
+  @override
+  String get tasmeeToPage => 'إلى صفحة';
+
+  @override
+  String get tasmeeToReview => 'آيات تحتاج مراجعة';
+
+  @override
+  String get tasmeeToSurah => 'إلى سورة';
+
+  @override
+  String get tasmeeToastDuration => 'مدة ظهور نتيجة الآية';
+
+  @override
+  String get tasmeeVerseByVerseHint => 'اضغط، اقرأ آية، ثم تظهر كاملة بنتيجتها';
+
+  @override
+  String get tasmeeVerseDone => 'انتهت الآية';
+
+  @override
+  String tasmeeVerseNumber(String ayah) {
+    return 'الآية $ayah';
+  }
+
+  @override
+  String tasmeeVerseOf(String n, String count) {
+    return 'الآية $n من $count: اضغط وسمّعها';
+  }
+
+  @override
+  String tasmeeVerseResult(String ayah, String accuracy, String detail) {
+    return 'الآية $ayah · $accuracy · $detail';
+  }
+
+  @override
+  String get tasmeeVersesHeading => 'الآيات';
+
+  @override
+  String tasmeeVersesLine(String from, String to, String mode) {
+    return 'الآيات $from–$to · $mode';
+  }
+
+  @override
+  String get tasmeeVibration => 'الاهتزاز عند الخطأ';
+
+  @override
+  String get tasmeeVibrationHint =>
+      'اهتزاز خفيف حين تُعلَّم كلمة خطأ أو متجاوزة';
+
+  @override
+  String get tasmeeWholeSession => 'للتسميع كله';
+
+  @override
+  String get tasmeeWordCorrectedShort => 'صُحّحت';
+
+  @override
+  String get tasmeeWordHinted => 'بتلميح';
+
+  @override
+  String get tasmeeAllowMicHint =>
+      'افتح إعدادات الجهاز، ثم اسمح لتبيان باستخدام الميكروفون.';
 }

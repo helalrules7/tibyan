@@ -1,0 +1,29 @@
+{
+ "name": "reading words again after a pause is not an error",
+ "range": {
+  "verses": [
+   2,
+   4,
+   2,
+   4
+  ]
+ },
+ "steps": [
+  {
+   "say": "والذين يؤمنون بما أنزل إليك وما أنزل من قبلك"
+  },
+  {
+   "say": "وما أنزل من قبلك وبالآخرة هم يوقنون"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": [],
+ "ignored": {
+  "repetition": 4
+ },
+ "accuracy": {
+  "2:4": 1
+ }
+}

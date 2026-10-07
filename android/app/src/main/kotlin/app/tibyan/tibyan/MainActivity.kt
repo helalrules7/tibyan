@@ -2,11 +2,14 @@ package app.tibyan.tibyan
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import com.ryanheise.audioservice.AudioServiceActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -40,6 +43,25 @@ class MainActivity : AudioServiceActivity() {
                     return@setMethodCallHandler
                 }
                 saveAll(paths, result)
+            }
+        // The tasmee's «open device settings» when the microphone is off.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app.tibyan/settings")
+            .setMethodCallHandler { call, result ->
+                if (call.method != "openAppSettings") {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                try {
+                    startActivity(
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", packageName, null),
+                        ),
+                    )
+                    result.success(true)
+                } catch (e: Exception) {
+                    result.success(false)
+                }
             }
     }
 
