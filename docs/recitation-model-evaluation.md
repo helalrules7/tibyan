@@ -1,0 +1,94 @@
+# التسميع السماعي: تقييم نماذج التفريغ (المرحلة 0.2)
+
+**الحالة: ناقص ومتوقف على أحمد. لم يُجرَ أي قياس.** لا يحتوي هذا الملف على أي WER أو زمن استجابة أو ذاكرة أو بطارية قسناها نحن. كل رقم هنا منقول من مصدر علني مع رابطه، وهو **ليس** نتيجة اختبار على بياناتنا. لا توصية بنموذج؛ القرار لأحمد بعد المراجعة (الخطة: لا مرحلة 3 قبل موافقته).
+
+تاريخ التحقق من المصادر: 2026-10-07.
+
+## 1. حالة المراحل
+
+| المرحلة | الحالة | المرجع |
+|---|---|---|
+| 0.1 استكشاف الريبو | منجزة | [phase0-exploration.md](./recitation/phase0-exploration.md) |
+| 0.2 تجربة النماذج | **متوقفة**: مراجعة المصادر والرخص تمت (هذا الملف)، والقياس يحتاج تسجيلات وأجهزة (القسم 4) | هذا الملف |
+| 1 طبقة البيانات (النطاقات، الكلمات، التطبيع) | منجزة في الكود حسب التقرير | القسم 6 من phase0-exploration.md، commits `e690be9`, `140d660` |
+| 2 محرك المطابقة | منجزة في الكود مع اختبارات وfixtures (22 ملف fixture) | commit `864babe` |
+| 3 فصاعدا | **لم تبدأ**، وتنتظر موافقة أحمد على النموذج | الخطة |
+
+لم تُشغَّل اختبارات المرحلتين 1–2 في هذه الجلسة (قيد: لا `flutter test`)؛ الحالة أعلاه مستندة إلى الـ commits والتقرير الموجود فقط.
+
+## 2. المرشحون: حقائق موثقة
+
+التاريخ والرخصة من بطاقات HuggingFace API، والأحجام من قوائم الملفات (`?blobs=true`).
+
+| المرشح | الرخصة (المعلنة) | الحجم المنشور | الصيغة | ملاحظات يمكن التحقق منها | المصدر |
+|---|---|---|---|---|---|
+| `tarteel-ai/whisper-tiny-ar-quran` | Apache-2.0 | `pytorch_model.bin` ≈ 151 MB (fp32، PyTorch فقط) | PyTorch/Transformers | آخر تعديل 2022-12-14. WER في البطاقة 7.05 على مجموعة تقييم غير محددة | [النموذج](https://huggingface.co/tarteel-ai/whisper-tiny-ar-quran) |
+| `tarteel-ai/whisper-base-ar-quran` | Apache-2.0 | `pytorch_model.bin` ≈ 290 MB (fp32) | PyTorch/Transformers | آخر تعديل 2022-12-13. WER في البطاقة 5.75 على مجموعة تقييم غير محددة | [النموذج](https://huggingface.co/tarteel-ai/whisper-base-ar-quran) |
+| تحويلات ONNX مجتمعية لنموذج Tarteel base (مثل `YunusZJ/whisper-base-ar-quran-ONNX`) | Apache-2.0 (معلنة، وهي اشتقاق) | encoder int8 ≈ 23 MB، decoder int8 ≈ 79 MB (من قائمة الملفات) | ONNX | من طرف ثالث غير Tarteel؛ لم يُتحقق من سلامة التحويل أو مطابقته للأصل | [النموذج](https://huggingface.co/YunusZJ/whisper-base-ar-quran-ONNX) |
+| `mohammed/fastconformer-quran-ar` | CC-BY-4.0 (معلنة) | ≈ 459 MB `.nemo` | NeMo | مدرَّب على `tarteel-ai/everyayah`؛ البطاقة تعرض نقاط فحص بقيم WER متضاربة (0.0014 إلى 1.0) فلا يمكن الاعتماد عليها دون فهم | [النموذج](https://huggingface.co/mohammed/fastconformer-quran-ar) |
+| `Muno459/fastconformer-quran` | `other`، والملفات مقيدة بموافقة يدوية (gated) | ONNX q8 ≈ 132 MB، fp16 ≈ 230 MB | NeMo/ONNX | الأساس `nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0`. **الرخصة غير قابلة للقراءة دون تسجيل دخول وموافقة** | [النموذج](https://huggingface.co/Muno459/fastconformer-quran) |
+| `Quran-Lab/zipformer_p-arabic-v3` (zipformer، متدفق في اسم المجموعة) | `other`، مقيد (gated) | ONNX int8 ≈ 73 MB، fp32 ≈ 263 MB، Core ML fp16 ≈ 129 MB | ONNX/Core ML | حديث (2026-09-29). **الرخصة والشروط غير قابلة للقراءة دون طلب وصول** | [النموذج](https://huggingface.co/Quran-Lab/zipformer_p-arabic-v3) |
+
+نماذج أخرى ظهرت في بحث HF عن "quran" (wav2vec2 وwhisper-large-v3-turbo وغيرها) **لم تُفحص رخصها ولا ملاءمتها للجوال**، وهي خارج هذا التقييم.
+
+### محركات التشغيل (للمرحلة 3 لاحقا، لا تُضاف الآن)
+
+| المحرك | الرخصة | الدعم الموثق | المصدر |
+|---|---|---|---|
+| `whisper.cpp` | MIT | iOS وAndroid؛ Core ML/ANE على Apple؛ جدول README: tiny ≈ 75 MiB قرص / ≈ 273 MB ذاكرة، base ≈ 142 MiB / ≈ 388 MB (لنماذج Whisper الأصلية بصيغة ggml، لا لنماذج Tarteel المحولة) | [GitHub](https://github.com/ggml-org/whisper.cpp) |
+| `sherpa-onnx` / حزمة `sherpa_onnx` | Apache-2.0 (الريبو وpub.dev) | Flutter، Android وiOS؛ ASR متدفق وغير متدفق؛ يدعم Whisper | [GitHub](https://github.com/k2-fsa/sherpa-onnx)، [pub.dev](https://pub.dev/packages/sherpa_onnx) |
+| أوزان Whisper الأصلية (الأساس) | Apache-2.0 على بطاقات HF؛ كود OpenAI Whisper بترخيص MIT | – | [openai/whisper-base](https://huggingface.co/openai/whisper-base)، [openai/whisper](https://github.com/openai/whisper) |
+
+## 3. توافق الرخص مع GPL 3.0 (مبدأ ثابت 3 في الخطة)
+
+- Apache-2.0 وMIT: متوافقتان مع GPLv3 عند الاستخدام ضمن عمل GPLv3 (مع حفظ الإشعارات). هذا تقدير عام وليس استشارة قانونية.
+- CC-BY-4.0 للأوزان: قابلة للتوزيع بشرط النسبة، لكن توافق CC-BY-4.0 مع GPLv3 للبرمجيات غير محسوم هنا؛ تُعامَل كـ «يحتاج قرار أحمد» وتُوثَّق في `docs/licenses-pending.md` (الملف غير موجود الآن ولم أنشئه).
+- `other` / مقيدة: **لا تُعتمد ولا تُوزَّع** قبل قراءة نص الرخصة؛ أحمد يطلب الوصول أو يراسل أصحابها.
+- **ثغرة مهمة في كل المرشحين:** بطاقتا Tarteel تقولان «fine-tuned on the None dataset»، أي أن بيانات التدريب غير موثقة. رخصة الأوزان Apache-2.0 معلنة، لكن رخصة/مصدر بيانات التدريب (تسجيلات قراء) غير قابلة للتحقق من البطاقة. الريبو يوثق أصلا أن everyayah بلا رخصة (`docs/licenses/2026-09-28_everyayah_disclaimer_no-license.pdf`)، وبعض المرشحين الأحدث دُرِّب عليه. هذا قرار مخاطرة لأحمد.
+
+## 4. ما لم يُقَس (كل بنود المعايير في الخطة)
+
+| المعيار | الحالة | سبب |
+|---|---|---|
+| WER بعد التطبيع على 20 تسجيلا | لم يُقس | لا توجد تسجيلات؛ أرقام WER في البطاقات (5.75 / 7.05) من مجموعة تقييم مجهولة ولا تقارن بنا |
+| كشف الخطأ الحقيقي (يكتب ما قيل أم «يصحح» للمحفوظ) | لم يُقس | يحتاج تسجيلات فيها أخطاء متعمدة؛ أنماط Whisper المعروفة بالتصحيح التلقائي ليست مقاسة هنا |
+| زمن الاستجابة على أندرويد متوسط | لم يُقس | لا جهاز |
+| زمن الاستجابة على آيفون | لم يُقس | لا جهاز |
+| ذاكرة وبطارية أثناء الجلسة | لم يُقس | لا أجهزة |
+| الحجم بعد التحويل والتكميم للجوال | جزئي | أحجام الملفات المنشورة فقط؛ لم نحوّل شيئا |
+| رخصة بيانات التدريب | غير معروفة | انظر القسم 3 |
+| تدفق حقيقي (partial results) | لم يُختبر | Whisper غير متدفق أصلا؛ يحتاج تجزئة صوت. zipformer مصمم للتدفق حسب اسم الملفات فقط، دون تحقق |
+
+## 5. المطلوب من أحمد لإكمال 0.2
+
+**التسجيلات (20 على الأقل)، بأصوات حقيقية لا مولَّدة، والصوت يبقى محليا:**
+
+1. قارئ رجل: 5 تسجيلات بسرعات مختلفة (بطيء، متوسط، سريع).
+2. قارئة امرأة: 5 تسجيلات.
+3. طفل: 3 تسجيلات على الأقل.
+4. ضوضاء خفيفة: 4 تسجيلات (أي من الأصوات أعلاه في غرفة عادية).
+5. أخطاء متعمدة: 5 تسجيلات على الأقل، تغطي: كلمة مبدلة بقريبة، كلمة متجاوزة، تكرار، تغيير حرف واحد في كلمة طويلة (حالة «متوسط/صارم» في المحرك).
+6. لكل تسجيل: النطاق المقروء (سورة/آيات)، وملف النص المرجعي المفرغ يدويا ليُحسب WER منه. (النص أنت تُدخله؛ لم أولّد أي نص قرآني.)
+
+**الأجهزة:**
+
+1. آيفون واحد (الموديل ونظام التشغيل مطلوبان).
+2. أندرويد متوسط الفئة (الموديل، الذاكرة، المعالج).
+3. حساب HF مسجّل لطلب وصول `Quran-Lab/zipformer_p-arabic-v3` و`Muno459/fastconformer-quran` إن أردت قراءة رخصتيهما.
+
+**قرارات:**
+
+1. هل يقبل أحمد نموذجا بيانات تدريبه غير موثقة (Tarteel)؟
+2. هل نكمل بالقياس بعد توفر المواد، وبأي مرشحين (اقتراح للمراجعة وليس اختيارا: tiny وbase من Tarteel كما في الخطة، مع ONNX/sherpa كمسار تشغيل)؟
+
+## 6. المصادر
+
+- [tarteel-ai/whisper-base-ar-quran](https://huggingface.co/tarteel-ai/whisper-base-ar-quran)
+- [tarteel-ai/whisper-tiny-ar-quran](https://huggingface.co/tarteel-ai/whisper-tiny-ar-quran)
+- [YunusZJ/whisper-base-ar-quran-ONNX](https://huggingface.co/YunusZJ/whisper-base-ar-quran-ONNX)
+- [mohammed/fastconformer-quran-ar](https://huggingface.co/mohammed/fastconformer-quran-ar)
+- [Muno459/fastconformer-quran](https://huggingface.co/Muno459/fastconformer-quran)
+- [Quran-Lab/zipformer_p-arabic-v3](https://huggingface.co/Quran-Lab/zipformer_p-arabic-v3)
+- [openai/whisper-base](https://huggingface.co/openai/whisper-base)، [openai/whisper-tiny](https://huggingface.co/openai/whisper-tiny)
+- [ggml-org/whisper.cpp](https://github.com/ggml-org/whisper.cpp)
+- [k2-fsa/sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)، [sherpa_onnx على pub.dev](https://pub.dev/packages/sherpa_onnx)
