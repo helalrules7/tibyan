@@ -65,7 +65,7 @@ class ReadingTracker {
     required this.onSessionEnd,
     this.onVersesRead,
     DateTime Function()? clock,
-    this.minDwell = const Duration(seconds: 15),
+    this.minDwell = const Duration(seconds: 20),
     this.minSession = const Duration(seconds: 20),
     this.idleAfter = const Duration(minutes: 3),
     double Function(int page, String edition)? pageWeight,

@@ -90,7 +90,7 @@ void main() {
       tracker.show(2, 'madina1441', also: 3);
       wait(20); // long enough for one page, not two
       tracker.show(4, 'madina1441', also: 5);
-      wait(31);
+      wait(41);
       tracker.end();
       expect(reads.map((r) => r.page), [4, 5]);
       expect(spans.single.pages, 2);

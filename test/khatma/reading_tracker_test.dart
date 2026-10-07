@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tibyan/core/settings/app_settings.dart';
 import 'package:tibyan/features/khatma/domain/interval_set.dart';
 import 'package:tibyan/features/khatma/domain/reading_tracker.dart';
 
@@ -41,13 +42,13 @@ void main() {
     test('a heavier page needs longer, a light one at least 5 seconds', () {
       weights = {10: 1.2, 11: 0.1};
       tracker.show(10, 'shamarly');
-      wait(16); // 15 × 1.2 = 18 seconds needed
+      wait(20); // 20 × 1.2 = 24 seconds needed
       tracker.show(11, 'shamarly');
-      wait(4); // 1.5 needed, but never less than 5
+      wait(4); // 2 needed, but never less than 5
       tracker.show(12, 'shamarly');
-      wait(19);
+      wait(21);
       tracker.show(10, 'shamarly');
-      wait(19);
+      wait(25);
       tracker.end();
       expect(pages(), [12, 10]);
     });
@@ -65,11 +66,15 @@ void main() {
     });
 
     test('the reading speed sets the time a page needs', () {
-      tracker.minDwell = const Duration(seconds: 10);
+      // «سريعة»: 12 seconds a page.
+      tracker.minDwell = Duration(seconds: ReadingSpeed.fast.secondsPerPage);
       tracker.show(1, 'madina1441');
       wait(11);
+      tracker.show(2, 'madina1441');
+      wait(12);
       tracker.end();
-      expect(pages(), [1]);
+      expect(pages(), [2]);
+      expect(ReadingSpeed.values.map((s) => s.secondsPerPage), [30, 20, 12]);
     });
   });
 
@@ -118,10 +123,10 @@ void main() {
       wait(300);
       tracker.freeze(false);
       tracker.show(6, 'madina1441');
-      wait(16);
+      wait(21);
       tracker.end();
       expect(pages(), [5, 6]);
-      expect(spans.single.activeSeconds, 36);
+      expect(spans.single.activeSeconds, 41);
     });
   });
 
@@ -143,7 +148,7 @@ void main() {
       tracker.suspend(true);
       wait(60);
       tracker.suspend(false);
-      wait(16);
+      wait(21);
       tracker.end();
       expect(pages(), [7]);
     });
@@ -168,7 +173,7 @@ void main() {
       tracker = make(mode: 'verse');
       for (var id = 100; id < 130; id++) {
         tracker.showVerse(id);
-        wait(3); // 15 × 0.1 = 1.5, at least 2
+        wait(3); // 20 × 0.1 = 2, at least 2
       }
       tracker.end();
       expect(verseIds(), {for (var i = 100; i < 130; i++) i});

@@ -81,9 +81,9 @@ const sajdahTimerLengths = <int>[10, 15, 20, 30, 45, 60];
 /// «سرعة القراءة» of the khatmas: how long a whole page must stay on
 /// screen to count as read.
 enum ReadingSpeed {
-  slow(20),
-  medium(15),
-  fast(10);
+  slow(30),
+  medium(20),
+  fast(12);
 
   const ReadingSpeed(this.secondsPerPage);
   final int secondsPerPage;
