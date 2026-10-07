@@ -533,6 +533,27 @@ class PlayerOptions extends ConsumerWidget {
               value: ref.watch(translationAudioChoiceProvider),
               onChanged: c.setTranslationAfterVerses,
             ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(l.sajdahTimer),
+          subtitle: Text(l.sajdahTimerHint),
+          value: settings.sajdahTimer,
+          onChanged: ref.read(settingsProvider.notifier).setSajdahTimer,
+        ),
+        // The length shows only while the timer is on.
+        if (settings.sajdahTimer) ...[
+          Semantics(
+            header: true,
+            child: Text(l.sajdahTimerLength, style: title),
+          ),
+          const SizedBox(height: 6),
+          chips<int>(
+            [for (final n in sajdahTimerLengths) (n, l.seconds(digits(n)))],
+            settings.sajdahSeconds,
+            ref.read(settingsProvider.notifier).setSajdahSeconds,
+          ),
+          const SizedBox(height: 12),
+        ],
         OutlinedButton.icon(
           onPressed: () {
             if (inSheet) Navigator.pop(context);

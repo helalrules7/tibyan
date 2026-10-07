@@ -15,6 +15,8 @@ import '../content_extras/credits.dart';
 import '../content_extras/verse_audio_index.dart';
 import '../khatma/khatma_providers.dart' show listeningTrackerProvider;
 import '../mushaf/mushaf_providers.dart';
+import '../sajdah/sajdah_card.dart';
+import '../sajdah/sajdah_positions.dart';
 import 'verse_queue.dart';
 
 /// Every recitation in the content database, of every riwaya.
@@ -627,6 +629,14 @@ class RecitationController extends Notifier<RecitationState> {
   int? _clipResume;
   bool _clipEnding = false;
 
+  /// Paused at the end of a verse of prostration while the sajdah card
+  /// counts down; positions are ignored until it closes.
+  bool _sajdahWait = false;
+
+  /// The verse of prostration whose card was shown: playing on past it
+  /// does not show it again.
+  SajdahKey? _sajdahDone;
+
   RecitationAudio get _p => _player ??= _create();
 
   RecitationAudio _create() {
@@ -690,6 +700,8 @@ class RecitationController extends Notifier<RecitationState> {
     _waits++;
     _inSilence = false;
     _restartAt = null;
+    _leaveSajdah();
+    _sajdahDone = null;
     final reciter = await ref.read(currentReciterProvider.future);
     if (reciter == null) {
       _loading = false;
@@ -708,6 +720,7 @@ class RecitationController extends Notifier<RecitationState> {
     };
     final surahRow = (await ref.read(surahsProvider.future))[surah - 1];
     final after = timings.isEmpty ? null : await _translationAfterVerses();
+    await _loadSajdahPositions();
     if (load != _loads) return;
     // Only now, with everything at hand, does the new file's timing
     // replace the old: the old file may still be playing meanwhile.
@@ -918,6 +931,72 @@ class RecitationController extends Notifier<RecitationState> {
     }
   }
 
+  /// The verses of prostration, loaded before they are needed while the
+  /// sajdah timer is on.
+  Future<void> _loadSajdahPositions() async {
+    if (!ref.read(settingsProvider).sajdahTimer) return;
+    try {
+      await ref.read(sajdahPositionsProvider.future);
+    } on Object {
+      // None known: no card.
+    }
+  }
+
+  /// The recitation has just finished [ayah]: at a verse of prostration,
+  /// with «مؤقت سجدات التلاوة» on, it pauses and the sajdah card shows;
+  /// when the card closes (its countdown, or a tap), [resume] carries on.
+  /// Not during a clip, nor while a stretch still has repetitions to go.
+  /// True when it paused.
+  bool _sajdahAt(int ayah, Future<void> Function() resume) {
+    if (!ref.read(settingsProvider).sajdahTimer) return false;
+    if (state.clip != null || ref.read(sajdahMutedProvider)) return false;
+    final key = (surah: state.surah, ayah: ayah);
+    if (_sajdahDone == key) return false;
+    if (state.rangeTo != null &&
+        (state.repeat == 0 || state.repeatDone < state.repeat - 1)) {
+      return false;
+    }
+    final positions = ref.read(sajdahPositionsProvider).value;
+    if (positions == null || !positions.isSajdah(key.surah, key.ayah)) {
+      return false;
+    }
+    _sajdahDone = key;
+    _sajdahWait = true;
+    final wait = ++_waits;
+    unawaited(_p.pause());
+    ref
+        .read(sajdahCardProvider.notifier)
+        .show(
+          key,
+          SajdahFrom.listening,
+          onClose: () {
+            if (!_sajdahWait || wait != _waits) return;
+            _sajdahWait = false;
+            if (state.active) unawaited(resume());
+          },
+        );
+    return true;
+  }
+
+  /// The reader moved on while the card waited (play, stop, a jump): the
+  /// card goes, and nothing resumes from it.
+  void _leaveSajdah() {
+    if (!_sajdahWait) return;
+    _sajdahWait = false;
+    final card = ref.read(sajdahCardProvider);
+    if (card?.from == SajdahFrom.listening) {
+      ref.read(sajdahCardProvider.notifier).drop();
+    }
+  }
+
+  /// After the card: [ayah] from its start (a moment before its speech
+  /// when the pauses are shortened).
+  Future<void> _resumeAt(int ayah) async {
+    await _p.seek(_repeatStart(ayah));
+    _resumeMs = null;
+    unawaited(_p.play());
+  }
+
   /// Plays the clip after [ayah] (the translation), if any, when verses
   /// play on one after another; true when it does.
   bool _clipAfter(int ayah, int resume) {
@@ -1039,7 +1118,7 @@ class RecitationController extends Notifier<RecitationState> {
   }
 
   void _onPosition(Duration position) {
-    if (!state.active || _loading || _inSilence) return;
+    if (!state.active || _loading || _inSilence || _sajdahWait) return;
     if (state.clip != null) {
       final end = _clipEnd;
       if (end != null && position.inMilliseconds >= end) {
@@ -1069,10 +1148,20 @@ class RecitationController extends Notifier<RecitationState> {
     final word = w != null && w.$1 == ayah ? w.$2 : null;
     final verse = ayah != null && ayah > 0 ? ayah : state.ayah;
     if (verse != state.ayah || word != state.word) {
-      // The translation of the verse just recited plays before the next.
+      // Past the verse after a verse of prostration, its card may show
+      // again the next time the recitation gets there.
+      final shown = _sajdahDone;
+      if (shown != null &&
+          (shown.surah != state.surah ||
+              (verse != shown.ayah && verse != shown.ayah + 1))) {
+        _sajdahDone = null;
+      }
+      // A verse of prostration: the sajdah card, then the translation of
+      // the verse just recited plays before the next.
       final done = state.ayah;
-      if (done != null && verse == done + 1 && _clipAfter(done, done + 1)) {
-        return;
+      if (done != null && verse == done + 1) {
+        if (_sajdahAt(done, () => _resumeAt(done + 1))) return;
+        if (_clipAfter(done, done + 1)) return;
       }
       // Each verse is repeated afresh.
       final next = verse != state.ayah && state.rangeTo == null;
@@ -1166,8 +1255,10 @@ class RecitationController extends Notifier<RecitationState> {
     if (_timings.isNotEmpty && _stretchLast != null) {
       if (await _endOfStretch() || state.rangeTo != null) return;
     }
-    // The last verse's translation, before the next surah.
+    // A verse of prostration that ends the surah: the card first. Then
+    // the last verse's translation, before the next surah.
     final last = state.ayah;
+    if (last != null && _sajdahAt(last, _onSurahEnd)) return;
     if (last != null && _clipAfter(last, last + 1)) return;
     if (state.sleep is SleepAtSurahEnd || state.surah >= 114) {
       await _p.pause();
@@ -1192,6 +1283,18 @@ class RecitationController extends Notifier<RecitationState> {
   Future<void> toggle() async {
     if (!state.active || state.loading) return;
     if (state.playing) return _halt();
+    // Played during the sajdah card: the card goes and the recitation
+    // goes on from the next verse.
+    if (_sajdahWait) {
+      final next = _sajdahDone;
+      _leaveSajdah();
+      if (next != null && _endOf(next.ayah + 1) != null) {
+        return _resumeAt(next.ayah + 1);
+      }
+      if (_p.processingState == ProcessingState.completed) {
+        return _onSurahEnd();
+      }
+    }
     if (state.clip != null) {
       unawaited(_p.play());
       return;
@@ -1231,7 +1334,10 @@ class RecitationController extends Notifier<RecitationState> {
     if (!state.timed || current == null) return;
     final target = current + delta;
     if (target < 1 || _endOf(target) == null) return;
-    final silent = _inSilence;
+    final sajdah = _sajdahWait;
+    _leaveSajdah();
+    _sajdahDone = null;
+    final silent = _inSilence || sajdah;
     _waits++;
     _inSilence = false;
     _restartAt = null;
@@ -1288,6 +1394,8 @@ class RecitationController extends Notifier<RecitationState> {
       return VerseJump.jumped;
     }
     if (!s.timed || _endOf(ayah) == null) return VerseJump.noTiming;
+    _leaveSajdah();
+    _sajdahDone = null;
     final silent = _inSilence;
     _waits++;
     _inSilence = false;
@@ -1367,6 +1475,8 @@ class RecitationController extends Notifier<RecitationState> {
   }
 
   Future<void> stop() async {
+    _leaveSajdah();
+    _sajdahDone = null;
     _loads++;
     _waits++;
     _loading = false;

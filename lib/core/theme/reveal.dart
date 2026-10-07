@@ -19,9 +19,13 @@ class Reveal extends StatefulWidget {
     required this.visible,
     required this.child,
     this.from = const Offset(0, 0.25),
+    this.duration = defaultDuration,
   });
 
-  static const duration = Duration(milliseconds: 200);
+  static const defaultDuration = Duration(milliseconds: 200);
+
+  /// How long the fade takes.
+  final Duration duration;
 
   final bool visible;
   final Widget? child;
@@ -34,7 +38,7 @@ class Reveal extends StatefulWidget {
 class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
   late final _controller = AnimationController(
     vsync: this,
-    duration: Reveal.duration,
+    duration: widget.duration,
     value: widget.visible ? 1 : 0,
   );
   late final _curve = CurvedAnimation(

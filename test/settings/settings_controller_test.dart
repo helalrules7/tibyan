@@ -175,4 +175,31 @@ void main() {
       expect(r.autoScrollSpeed, 10);
     },
   );
+
+  test('sajdah timer: off and 20 seconds by default, kept, within the lengths offered', () async {
+    final c = await containerWith({});
+    final s = c.read(settingsProvider);
+    expect(s.sajdahTimer, isFalse);
+    expect(s.sajdahSeconds, 20);
+
+    final ctrl = c.read(settingsProvider.notifier);
+    await ctrl.setSajdahTimer(true);
+    await ctrl.setSajdahSeconds(45);
+    // Not a length offered: ignored.
+    await ctrl.setSajdahSeconds(7);
+    expect(c.read(settingsProvider).sajdahSeconds, 45);
+
+    final sp = await SharedPreferences.getInstance();
+    final restored = await containerWith({
+      for (final k in sp.getKeys()) k: sp.get(k)!,
+    });
+    final r = restored.read(settingsProvider);
+    expect(r.sajdahTimer, isTrue);
+    expect(r.sajdahSeconds, 45);
+
+    // A stored length that is not offered falls back to the default.
+    final odd = await containerWith({'settings.sajdahSeconds': 25});
+    expect(odd.read(settingsProvider).sajdahSeconds, 20);
+    expect(sajdahTimerLengths, [10, 15, 20, 30, 45, 60]);
+  });
 }

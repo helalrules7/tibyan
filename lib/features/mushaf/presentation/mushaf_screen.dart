@@ -43,6 +43,8 @@ import '../data/riwaya_data.dart';
 import '../data/verse_share.dart';
 import '../../share_image/share_preview_screen.dart';
 import '../../reading/under_verse.dart';
+import '../../sajdah/sajdah_card.dart';
+import '../../sajdah/sajdah_positions.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
 import 'page_spreads.dart';
@@ -188,9 +190,14 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   late final ReadingTracker _tracker;
   late final AppLifecycleListener _lifecycle;
 
+  /// No sajdah card during a hifz test; read now, as ref is not usable in
+  /// dispose.
+  late final SajdahMuted _sajdahMuted = ref.read(sajdahMutedProvider.notifier);
+
   @override
   void initState() {
     super.initState();
+    if (_testing) _muteSajdah(true);
     final service = ref.read(khatmaServiceProvider);
     _tracker = ReadingTracker(
       onPageRead: service.pageRead,
@@ -451,6 +458,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   @override
   void dispose() {
+    if (_testing) _muteSajdah(false);
     _lifecycle.dispose();
     _tracker.end();
     WakelockPlus.disable();
@@ -600,6 +608,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     // edition change they arrive later, so the page must rebuild then.
     ref.watch(pageAyahsProvider(_page));
     final recitation = ref.watch(recitationProvider);
+    // The verses of prostration, at hand for touch reading.
+    if (settings.sajdahTimer) ref.watch(sajdahPositionsProvider);
     ref.listen(recitationProvider.select((r) => (r.surah, r.ayah, r.word)), (
       before,
       now,
@@ -707,7 +717,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
             : jumps
             ? (v, point) => _listenFrom(v, pg, point)
             : _touchReading
-            ? (v, _) => setState(() => _touched = v)
+            ? (v, _) => _touch(v)
             : null,
         onListenFrom: jumps ? (v) => _listenFrom(v, pg, null) : null,
         touched: _touchReading ? _touched : null,
@@ -1329,6 +1339,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       ),
               ),
             ),
+            const SajdahCardLayer(),
           ],
         ),
       ),
@@ -1693,6 +1704,28 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     return edition == MushafEdition.madina1441 || edition.isRiwaya ? 2.0 : 6.0;
   }
 
+  /// Touch reading: shades [v]; when it follows a verse of prostration,
+  /// the sajdah card shows (with the timer on, not in a hifz test).
+  void _touch(VerseKey v) {
+    setState(() => _touched = v);
+    if (!ref.read(settingsProvider).sajdahTimer || _testing) return;
+    final sajdah = ref
+        .read(sajdahPositionsProvider)
+        .value
+        ?.before(v.surah, v.ayah);
+    if (sajdah == null) return;
+    // Already up for it: it keeps counting.
+    if (ref.read(sajdahCardProvider)?.verse == sajdah) return;
+    ref.read(sajdahCardProvider.notifier).show(sajdah, SajdahFrom.reading);
+  }
+
+  /// A hifz test mutes the sajdah card (set after the frame: not while
+  /// widgets build or unmount).
+  void _muteSajdah(bool muted) {
+    final notifier = _sajdahMuted;
+    Future.microtask(() => notifier.set(muted));
+  }
+
   /// Whether a tap on a verse moves the recitation there: while listening
   /// (playing or paused) in plain reading. Selecting, recitation mode, a
   /// hifz test, word picking and a tafsir played on its own keep their
@@ -2013,6 +2046,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _testing = false;
       _test.newPage();
     });
+    _muteSajdah(false);
     if (context.canPop()) context.pop();
   }
 

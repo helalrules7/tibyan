@@ -38,6 +38,18 @@ Both are saved like the other settings.
   sajdah verse.
 - It uses the same countdown. There is no audio.
 
+**«آية آية» (one verse a screen):**
+
+- The card shows as soon as the reader moves to the verse that follows a
+  sajdah verse: a swipe, the big arrow buttons, or the auto-turn.
+- While the card is up, the auto-turn countdown waits; it starts again
+  only once the card closes (its countdown ends, or a tap).
+- While the recitation plays there, the listening rule applies: the pause
+  at the sajdah verse's end, the card, then the recitation goes on. The
+  screen following the recitation to the next verse does not show the
+  card a second time.
+- The same card, over the verse.
+
 **Editions:** the card works in every edition, in line with edition parity.
 
 ## The card
@@ -49,7 +61,10 @@ Both are saved like the other settings.
   fades in and out in about 250 ms, and appears at once when the system
   asks for less motion.
 - **Contents, from top to bottom:**
-  - the sajdah sign ۩, drawn in the mushaf's font;
+  - a prostration pictogram (a person in sujood: knees, hands and forehead
+    on the ground), Tibyan's own single-colour SVG
+    (`assets/ornaments/sajdah.svg`), tinted with the theme's control
+    colour so it reads in every theme and mode;
   - the supplications, copied verbatim from Hisn al-Muslim (see
     *Sources*);
   - a circular countdown;
