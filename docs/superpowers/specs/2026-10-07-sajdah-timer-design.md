@@ -54,8 +54,12 @@ Both are saved like the other settings.
 
 ## The card
 
-- **Size and place:** centred on the screen, at most 40% of the screen's
-  height. Its width is about 85% of a phone and at most 420 pt.
+- **Size and place:** centred on the screen. Its width is about 85% of a
+  phone and at most 420 pt. Its height keeps to 40% of the screen. The
+  supplications are never scrolled (Ahmed, 2026-10-07): when they do not
+  fit, they first shrink to a floor, then the pictogram and the countdown
+  shrink, and only then does the card grow (at most 90%), as in elderly
+  mode on a small phone.
 - **Look:** a translucent background (the theme's paper colour, slightly
   see-through) that keeps the text readable in every theme and mode. It
   fades in and out in about 250 ms, and appears at once when the system
@@ -114,7 +118,8 @@ The golden rule applies: never generate, alter or paraphrase religious text.
   - With repetition, the card shows after the last repetition only.
   - Touch reading on the next verse shows the card.
   - With the setting off, nothing happens.
-  - The card stays within 40% of the screen at the five sizes used by
-    `opening_fit_test`, in elderly mode, and in the night mode.
+  - At the five sizes used by `opening_fit_test`, in elderly mode and in
+    the night mode, the card is centred, within 90% of the screen, and its
+    text has nothing left to scroll.
 - **Previews:** an env-gated render test, uploaded to
   `public_html/previews/sajdah_timer/` with an index.html.

@@ -141,31 +141,39 @@ void main() {
   for (final elderly in [false, true]) {
     for (final mode in [ThemeModeId.light, ThemeModeId.night]) {
       for (final MapEntry(key: name, value: size) in sizes.entries) {
-        testWidgets(
-          'within 40% of the screen: $name, ${mode.name}${elderly ? ', elderly' : ''}',
-          (tester) async {
-            tester.view
-              ..physicalSize = size
-              ..devicePixelRatio = 1;
-            addTearDown(tester.view.reset);
-            final (c, registry) = await setUpContainer(tester);
-            await pumpLayer(tester, c, registry, mode: mode, elderly: elderly);
-            c.read(sajdahCardProvider.notifier).show((
-              surah: 32,
-              ayah: 15,
-            ), SajdahFrom.listening);
-            await tester.pump();
-            await tester.pump(SajdahCardLayer.fade);
-            final box = tester.getRect(find.byType(SajdahCardView));
-            expect(box.height, lessThanOrEqualTo(size.height * 0.4 + 0.01));
-            expect(box.width, lessThanOrEqualTo(420));
-            expect(box.width, lessThanOrEqualTo(size.width * 0.85 + 0.01));
-            expect(box.center.dx, closeTo(size.width / 2, 1));
-            expect(box.center.dy, closeTo(size.height / 2, 1));
-            expect(tester.takeException(), isNull);
-            c.read(sajdahCardProvider.notifier).drop();
-          },
-        );
+        testWidgets('all the text in sight, no scrolling, centred: $name, '
+            '${mode.name}${elderly ? ', elderly' : ''}', (tester) async {
+          tester.view
+            ..physicalSize = size
+            ..devicePixelRatio = 1;
+          addTearDown(tester.view.reset);
+          final (c, registry) = await setUpContainer(tester);
+          await pumpLayer(tester, c, registry, mode: mode, elderly: elderly);
+          c.read(sajdahCardProvider.notifier).show((
+            surah: 32,
+            ayah: 15,
+          ), SajdahFrom.listening);
+          await tester.pump();
+          await tester.pump(SajdahCardLayer.fade);
+          final box = tester.getRect(find.byType(SajdahCardView));
+          // The card keeps to 40% of the screen when the text fits there;
+          // otherwise it grows, never past 90%, and the text is never
+          // scrolled.
+          expect(box.height, lessThanOrEqualTo(size.height * 0.9 + 0.01));
+          final scroll = tester.state<ScrollableState>(
+            find.descendant(
+              of: find.byType(SajdahCardView),
+              matching: find.byType(Scrollable),
+            ),
+          );
+          expect(scroll.position.maxScrollExtent, 0);
+          expect(box.width, lessThanOrEqualTo(420));
+          expect(box.width, lessThanOrEqualTo(size.width * 0.85 + 0.01));
+          expect(box.center.dx, closeTo(size.width / 2, 1));
+          expect(box.center.dy, closeTo(size.height / 2, 1));
+          expect(tester.takeException(), isNull);
+          c.read(sajdahCardProvider.notifier).drop();
+        });
       }
     }
   }

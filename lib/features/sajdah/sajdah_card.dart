@@ -167,20 +167,55 @@ class _SajdahCardViewState extends State<SajdahCardView>
     final size = MediaQuery.sizeOf(context);
     final digits = NumberFormatter(Localizations.localeOf(context));
     final width = math.min(size.width * 0.85, 420.0);
-    final maxHeight = size.height * 0.4;
+    final text = sajdahSupplications;
+    final scaler = MediaQuery.textScalerOf(context);
+    // The supplications are never scrolled: at their smallest size they
+    // must all be in sight. The card keeps to 40% of the screen; when the
+    // text does not fit there, the pictogram and countdown shrink first
+    // (as on a short screen), and only then does the card grow.
+    double iconFor(bool compact) =>
+        compact ? (elderly ? 40.0 : 34.0) : (elderly ? 64.0 : 52.0);
+    double gapFor(bool compact) => compact ? 4.0 : 8.0;
+    double dialFor(bool compact) => compact ? 34.0 : (elderly ? 48.0 : 40.0);
+    // Everything but the text: the paddings, gaps, pictogram, countdown
+    // and the «tap to continue» line.
+    double chrome(bool compact) {
+      final gap = gapFor(compact);
+      return (gap + 6) +
+          (gap + 4) +
+          iconFor(compact) +
+          gap +
+          (gap + 2) +
+          dialFor(compact) +
+          (gap - 2) +
+          scaler.scale(elderly ? 16 : 13) * 1.5;
+    }
+
+    final smallest = TextPainter(
+      text: TextSpan(text: text, style: _textStyle(_floor(elderly), t.ink)),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.rtl,
+      textScaler: scaler,
+    )..layout(maxWidth: width - 40);
+    final textHeight = smallest.height + 2;
+    smallest.dispose();
+    var maxHeight = size.height * 0.4;
     // A short screen (a phone held sideways): a smaller pictogram and
     // countdown leave room for the text.
-    final compact = maxHeight < 240;
-    final icon = compact ? (elderly ? 40.0 : 34.0) : (elderly ? 64.0 : 52.0);
-    final gap = compact ? 4.0 : 8.0;
-    final text = sajdahSupplications;
+    var compact = maxHeight < 240;
+    if (textHeight > maxHeight - chrome(compact)) compact = true;
+    if (textHeight > maxHeight - chrome(compact)) {
+      maxHeight = math.min(size.height * 0.9, chrome(true) + textHeight + 4);
+    }
+    final icon = iconFor(compact);
+    final gap = gapFor(compact);
 
     final countdown = AnimatedBuilder(
       animation: _count,
       builder: (context, _) {
         final left = (widget.seconds * (1 - _count.value)).ceil();
         return SizedBox.square(
-          dimension: compact ? 34 : (elderly ? 48 : 40),
+          dimension: dialFor(compact),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -253,14 +288,9 @@ class _SajdahCardViewState extends State<SajdahCardView>
                       child: LayoutBuilder(
                         builder: (context, box) {
                           final scaler = MediaQuery.textScalerOf(context);
-                          TextStyle at(double size) => TextStyle(
-                            fontFamily: 'UthmanTahaNaskh',
-                            fontSize: size,
-                            height: 1.8,
-                            color: t.ink,
-                          );
+                          TextStyle at(double size) => _textStyle(size, t.ink);
                           var size = elderly ? 24.0 : 20.0;
-                          final floor = elderly ? 17.0 : 14.0;
+                          final floor = _floor(elderly);
                           while (size > floor) {
                             final painter = TextPainter(
                               text: TextSpan(text: text, style: at(size)),
@@ -306,3 +336,14 @@ class _SajdahCardViewState extends State<SajdahCardView>
     );
   }
 }
+
+/// The supplications' style at [size].
+TextStyle _textStyle(double size, Color ink) => TextStyle(
+  fontFamily: 'UthmanTahaNaskh',
+  fontSize: size,
+  height: 1.8,
+  color: ink,
+);
+
+/// The smallest size the supplications are made, to fit the card.
+double _floor(bool elderly) => elderly ? 17.0 : 14.0;
