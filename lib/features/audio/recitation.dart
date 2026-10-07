@@ -13,7 +13,8 @@ import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../content_extras/credits.dart';
 import '../content_extras/verse_audio_index.dart';
-import '../khatma/khatma_providers.dart' show listeningTrackerProvider;
+import '../khatma/khatma_providers.dart'
+    show khatmaServiceProvider, listeningTrackerProvider;
 import '../mushaf/mushaf_providers.dart';
 import '../sajdah/sajdah_card.dart';
 import '../sajdah/sajdah_positions.dart';
@@ -637,6 +638,25 @@ class RecitationController extends Notifier<RecitationState> {
   /// does not show it again.
   SajdahKey? _sajdahDone;
 
+  /// The reader is moving the recitation (a step or a tap on a verse):
+  /// the verse left is not heard to its end.
+  bool _moving = false;
+
+  /// The last verse reported heard to its end (once each, though the
+  /// sajdah card or a translation clip comes back to the same point).
+  (int, int)? _heardLast;
+
+  /// Verse [ayah] of the surah playing was recited to its end (the
+  /// natural move to the next verse, or the end of the file): the khatma
+  /// may count it. Never for a verse stepped or jumped over.
+  void _verseHeard(int ayah) {
+    if (_moving || state.clip != null) return;
+    final key = (state.surah, ayah);
+    if (_heardLast == key) return;
+    _heardLast = key;
+    unawaited(ref.read(khatmaServiceProvider).verseRecited(key.$1, key.$2));
+  }
+
   RecitationAudio get _p => _player ??= _create();
 
   RecitationAudio _create() {
@@ -1160,6 +1180,7 @@ class RecitationController extends Notifier<RecitationState> {
       // the verse just recited plays before the next.
       final done = state.ayah;
       if (done != null && verse == done + 1) {
+        _verseHeard(done);
         if (_sajdahAt(done, () => _resumeAt(done + 1))) return;
         if (_clipAfter(done, done + 1)) return;
       }
@@ -1204,6 +1225,9 @@ class RecitationController extends Notifier<RecitationState> {
         state = state.copyWith(repeatDone: 0);
         return false;
       }
+      // The stretch's last repetition ended: its last verse was heard.
+      final last = state.ayah;
+      if (last != null) _verseHeard(last);
       _ending = true;
       try {
         await _p.pause();
@@ -1237,9 +1261,10 @@ class RecitationController extends Notifier<RecitationState> {
       state = state.copyWith(playing: playing);
       // Listening time for the reading reports: the recitation (with the
       // translation between its verses), not a tafsir on its own.
-      ref
-          .read(listeningTrackerProvider)
-          .playing(playing && !(state.clip?.standalone ?? false), _reciterId);
+      final recitation = playing && !(state.clip?.standalone ?? false);
+      ref.read(listeningTrackerProvider).playing(recitation, _reciterId);
+      // The khatma's listening session runs while the recitation plays.
+      ref.read(khatmaServiceProvider).recitationPlaying(recitation);
     }
     final before = _processing;
     _processing = s.processingState;
@@ -1258,6 +1283,7 @@ class RecitationController extends Notifier<RecitationState> {
     // A verse of prostration that ends the surah: the card first. Then
     // the last verse's translation, before the next surah.
     final last = state.ayah;
+    if (last != null && _timings.isNotEmpty) _verseHeard(last);
     if (last != null && _sajdahAt(last, _onSurahEnd)) return;
     if (last != null && _clipAfter(last, last + 1)) return;
     if (state.sleep is SleepAtSurahEnd || state.surah >= 114) {
@@ -1343,11 +1369,16 @@ class RecitationController extends Notifier<RecitationState> {
     _restartAt = null;
     _resumeMs = null;
     _verseDone = null;
-    await _p.seek(_startOf(target));
-    state = state.copyWith(
-      ayah: () => target,
-      repeatDone: state.rangeTo == null ? 0 : null,
-    );
+    _moving = true;
+    try {
+      await _p.seek(_startOf(target));
+      state = state.copyWith(
+        ayah: () => target,
+        repeatDone: state.rangeTo == null ? 0 : null,
+      );
+    } finally {
+      _moving = false;
+    }
     if (silent) unawaited(_p.play());
   }
 
@@ -1403,16 +1434,21 @@ class RecitationController extends Notifier<RecitationState> {
     _resumeMs = null;
     _jumpTo = null;
     _verseDone = null;
-    await _p.seek(_wordStart(ayah, word) ?? _repeatStart(ayah));
-    state = state.copyWith(
-      ayah: () => ayah,
-      word: () => null,
-      rangeFrom: inRange ? null : () => null,
-      rangeTo: inRange ? null : () => null,
-      repeat: repeat,
-      // A stretch whose repetitions were done plays afresh.
-      repeatDone: inRange && !_rangeFinished ? null : 0,
-    );
+    _moving = true;
+    try {
+      await _p.seek(_wordStart(ayah, word) ?? _repeatStart(ayah));
+      state = state.copyWith(
+        ayah: () => ayah,
+        word: () => null,
+        rangeFrom: inRange ? null : () => null,
+        rangeTo: inRange ? null : () => null,
+        repeat: repeat,
+        // A stretch whose repetitions were done plays afresh.
+        repeatDone: inRange && !_rangeFinished ? null : 0,
+      );
+    } finally {
+      _moving = false;
+    }
     if (silent || !state.playing) unawaited(_p.play());
     return VerseJump.jumped;
   }

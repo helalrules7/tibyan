@@ -1,5 +1,6 @@
 import '../../../core/db/content_database.dart';
 import '../../mushaf/data/riwaya_data.dart';
+import '../domain/interval_set.dart';
 import '../domain/quran_index.dart';
 
 /// Reads the verses' facts from content.db (6236 small rows) and builds
@@ -106,4 +107,26 @@ int? _idOrNull(QuranIndex index, int surah, int ayah) {
   } on RangeError {
     return null;
   }
+}
+
+/// The Hafs verses (`ayah.id`) a riwaya verse covers, with any Hafs verse
+/// the riwaya does not count that goes with it (the basmala of
+/// al-Fatiha goes with Warsh 1:1).
+IntervalSet riwayaVerseInHafs(
+  RiwayaData data,
+  QuranIndex index,
+  int surah,
+  int ayah,
+) {
+  final v = data.verse(surah, ayah);
+  if (v == null) return IntervalSet.empty;
+  final ids = <int>{for (final h in v.hafs) ?_idOrNull(index, h.surah, h.ayah)};
+  if (surah >= 1 && surah <= index.surahCount) {
+    for (var a = 1; a <= index.ayahCountOf(surah); a++) {
+      if (data.fromHafs(surah, a) == v.key && data.toHafs(surah, a).isEmpty) {
+        ids.add(index.idOf(surah, a));
+      }
+    }
+  }
+  return IntervalSet.of(ids);
 }

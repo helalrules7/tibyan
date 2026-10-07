@@ -1,11 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/db/content_database.dart';
+import '../../core/router/cover_observer.dart';
+import '../../core/settings/settings_controller.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../khatma/domain/khatmah.dart' show EntryPoint;
+import '../khatma/domain/reading_tracker.dart';
+import '../khatma/khatma_providers.dart';
 import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart' show surahName;
@@ -17,10 +24,18 @@ import 'under_verse.dart';
 /// or nothing). It opens at [ayah]. The text is the Hafs text whatever
 /// edition is being read (docs/features/translation_under_ayah.md).
 class ContinuousScreen extends ConsumerWidget {
-  const ContinuousScreen({super.key, required this.surah, this.ayah = 1});
+  const ContinuousScreen({
+    super.key,
+    required this.surah,
+    this.ayah = 1,
+    this.entry = EntryPoint.other,
+  });
 
   final int surah;
   final int ayah;
+
+  /// Where the reading was opened from (see [MushafScreen.entry]).
+  final EntryPoint entry;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -61,12 +76,13 @@ class ContinuousScreen extends ConsumerWidget {
               ayahs: ayahs,
               riwaya: riwaya,
               surahCount: surahs?.length ?? 114,
+              entry: entry,
             ),
     );
   }
 }
 
-class _VerseList extends ConsumerWidget {
+class _VerseList extends ConsumerStatefulWidget {
   const _VerseList({
     super.key,
     required this.surah,
@@ -74,6 +90,7 @@ class _VerseList extends ConsumerWidget {
     required this.ayahs,
     required this.riwaya,
     required this.surahCount,
+    required this.entry,
   });
 
   final int surah;
@@ -81,13 +98,136 @@ class _VerseList extends ConsumerWidget {
   final List<AyahRow> ayahs;
   final bool riwaya;
   final int surahCount;
-
-  static const _center = ValueKey('center');
+  final EntryPoint entry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_VerseList> createState() => _VerseListState();
+}
+
+class _VerseListState extends ConsumerState<_VerseList> {
+  static const _center = ValueKey('center');
+
+  /// The tile of each verse built, by `ayah.id`.
+  final _tiles = <int, GlobalKey>{};
+
+  /// Counts the verses that pass through the reading zone (the middle of
+  /// the screen) for the khatma, and saves the place read.
+  late final ReadingTracker _tracker;
+  late final AppLifecycleListener _lifecycle;
+  Route<dynamic>? _route;
+  int? _saved;
+
+  int get surah => widget.surah;
+  int get ayah => widget.ayah;
+  List<AyahRow> get ayahs => widget.ayahs;
+  bool get riwaya => widget.riwaya;
+  int get surahCount => widget.surahCount;
+
+  @override
+  void initState() {
+    super.initState();
+    // The tracker's callbacks also run from dispose, when ref is no longer
+    // usable: they read through the container.
+    final c = ProviderScope.containerOf(context, listen: false);
+    final service = ref.read(khatmaServiceProvider);
+    _tracker = ReadingTracker(
+      mode: 'continuous',
+      onPageRead: (_) {},
+      onVersesRead: (r) => unawaited(
+        service
+            .versesRead(
+              r,
+              entry: widget.entry,
+              mode: 'continuous',
+              edition: c.read(editionProvider).name,
+            )
+            .catchError((_) {}),
+      ),
+      onSessionEnd: (s) => unawaited(
+        service.sessionEnded(s, entry: widget.entry).catchError((_) {}),
+      ),
+      verseWeight: (id) =>
+          c.read(quranIndexProvider).value?.weight(id) ?? 1 / 15,
+      minDwell: Duration(
+        seconds: ref.read(settingsProvider).readingSpeed.secondsPerPage,
+      ),
+    );
+    ref.read(quranIndexProvider.future).ignore();
+    final landed = ayahs.where((a) => a.number == ayah).firstOrNull;
+    if (widget.entry.countsOnlyAfterLanding && landed != null) {
+      _tracker.onlyAfterVerse = landed.id;
+    }
+    _lifecycle = AppLifecycleListener(onHide: _tracker.end, onShow: _look);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _look());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null && route != _route) {
+      if (_route != null) coverObserver.unsubscribe(_route!);
+      _route = route;
+      coverObserver.subscribe(route, _tracker.freeze);
+    }
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    if (_route != null) coverObserver.unsubscribe(_route!);
+    _tracker.end();
+    super.dispose();
+  }
+
+  /// The verses whose tiles are in the reading zone: the middle half of
+  /// the screen.
+  void _look() {
+    if (!mounted) return;
+    final height = MediaQuery.sizeOf(context).height;
+    final top = height * 0.25, bottom = height * 0.75;
+    final inZone = <int>[];
+    for (final MapEntry(key: id, value: key) in _tiles.entries) {
+      final box = key.currentContext?.findRenderObject();
+      if (box is! RenderBox || !box.attached || !box.hasSize) continue;
+      final y = box.localToGlobal(Offset.zero).dy;
+      if (y + box.size.height > top && y < bottom) inZone.add(id);
+    }
+    inZone.sort();
+    _tracker.showVerses(inZone, edition: ref.read(editionProvider).name);
+    if (inZone.isNotEmpty && inZone.first != _saved) {
+      _saved = inZone.first;
+      unawaited(_save(inZone.first));
+    }
+  }
+
+  /// The first verse in the zone is the last place read.
+  Future<void> _save(int id) async {
+    final row = ayahs.where((a) => a.id == id).firstOrNull;
+    if (row == null) return;
+    try {
+      final page = await ref.read(
+        versePageProvider((row.surah, row.number)).future,
+      );
+      await ref
+          .read(userDatabaseProvider)
+          .savePosition(
+            edition: ref.read(editionProvider).name,
+            view: 'continuous',
+            surah: row.surah,
+            ayah: row.number,
+            page: page,
+          );
+    } catch (_) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final basmala = ref.watch(basmalaProvider).value;
+    _tracker.minDwell = Duration(
+      seconds: ref.watch(settingsProvider).readingSpeed.secondsPerPage,
+    );
 
     // The list from its top: the header, the verses, the way on.
     final items = <Widget>[
@@ -95,7 +235,8 @@ class _VerseList extends ConsumerWidget {
         basmala: surah != 1 && surah != 9 ? basmala : null,
         note: riwaya ? l.hafsTextNote : null,
       ),
-      for (final a in ayahs) _VerseTile(verse: a),
+      for (final a in ayahs)
+        _VerseTile(key: _tiles.putIfAbsent(a.id, GlobalKey.new), verse: a),
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
         child: Row(
@@ -127,24 +268,36 @@ class _VerseList extends ConsumerWidget {
     final above = items.sublist(0, center).reversed.toList();
     final below = items.sublist(center);
 
-    return SelectionArea(
-      child: CustomScrollView(
-        center: _center,
-        slivers: [
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, i) => above[i],
-              childCount: above.length,
-            ),
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _tracker.touch(),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (n) {
+          if (n is ScrollUpdateNotification || n is ScrollEndNotification) {
+            _look();
+          }
+          return false;
+        },
+        child: SelectionArea(
+          child: CustomScrollView(
+            center: _center,
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, i) => above[i],
+                  childCount: above.length,
+                ),
+              ),
+              SliverList(
+                key: _center,
+                delegate: SliverChildBuilderDelegate(
+                  (context, i) => below[i],
+                  childCount: below.length,
+                ),
+              ),
+            ],
           ),
-          SliverList(
-            key: _center,
-            delegate: SliverChildBuilderDelegate(
-              (context, i) => below[i],
-              childCount: below.length,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -184,7 +337,7 @@ class _Header extends StatelessWidget {
 }
 
 class _VerseTile extends StatelessWidget {
-  const _VerseTile({required this.verse});
+  const _VerseTile({super.key, required this.verse});
 
   final AyahRow verse;
 

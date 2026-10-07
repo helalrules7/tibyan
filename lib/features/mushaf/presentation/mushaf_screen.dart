@@ -34,7 +34,9 @@ import '../../word_study/data/word_study_repository.dart';
 import '../../word_study/word_pick.dart';
 import '../../word_study/word_study_providers.dart';
 import '../../word_study/word_study_sheet.dart';
+import '../../khatma/domain/khatmah.dart' show EntryPoint;
 import '../../khatma/domain/reading_tracker.dart';
+import '../../../core/router/cover_observer.dart';
 import '../../khatma/khatma_providers.dart';
 import '../../khatma/presentation/journal_screen.dart';
 import '../data/mushaf_repository.dart';
@@ -81,7 +83,12 @@ class MushafScreen extends ConsumerStatefulWidget {
     this.hifzFrom,
     this.hifzTo,
     this.listen = false,
+    this.entry = EntryPoint.other,
   });
+
+  /// Where the reading was opened from: from a search, a tafsir or the
+  /// hifz, the khatma counts only the pages after the one it landed on.
+  final EntryPoint entry;
 
   /// Start the recitation from the first verse of the opening page (the
   /// home screen widget's «استماع» button).
@@ -198,11 +205,23 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   void initState() {
     super.initState();
     if (_testing) _muteSajdah(true);
+    _container; // read now: ref is not usable in dispose
     final service = ref.read(khatmaServiceProvider);
     _tracker = ReadingTracker(
-      onPageRead: service.pageRead,
-      onSessionEnd: service.sessionEnded,
+      onPageRead: (r) => unawaited(
+        service.pageRead(r, entry: widget.entry).catchError((_) {}),
+      ),
+      onSessionEnd: (s) => unawaited(
+        service.sessionEnded(s, entry: widget.entry).catchError((_) {}),
+      ),
+      pageWeight: _pageWeight,
+      minDwell: Duration(
+        seconds: ref.read(settingsProvider).readingSpeed.secondsPerPage,
+      ),
     );
+    // The weights of the pages, at hand before the first page counts.
+    ref.read(quranIndexProvider.future).ignore();
+    ref.read(editionPagesProvider(ref.read(editionProvider)).future).ignore();
     _lifecycle = AppLifecycleListener(onHide: _tracker.end, onShow: _trackPage);
     if (widget.selectSurah != null && widget.selectAyah != null) {
       _selA = _selB = (surah: widget.selectSurah!, ayah: widget.selectAyah!);
@@ -429,6 +448,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     }
     final start = (page ?? 1).clamp(_first, edition.pageCount);
     if (!mounted) return;
+    // Opened at a verse found elsewhere: the page it landed on is not
+    // counted, only what is read on from there.
+    if (widget.entry.countsOnlyAfterLanding) _tracker.onlyAfterPage = start;
     setState(() {
       _page = start;
       if (_selA != null) _pageA = _pageB = start;
@@ -440,6 +462,40 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       // After the page's verses are loaded.
       await ref.read(pageAyahsProvider(_page).future);
       if (mounted) _listenFromPage();
+    }
+  }
+
+  /// A page's weight in Madina pages (1 until the verse index is loaded):
+  /// a page of the Shamarly edition needs more time than a Madina page.
+  double _pageWeight(int page, String edition) {
+    // Also called from dispose (the page on screen counts then), when ref
+    // is no longer usable: the container is.
+    final c = _container;
+    final index = c.read(quranIndexProvider).value;
+    final e = MushafEdition.values.asNameMap()[edition];
+    final pages = e == null ? null : c.read(editionPagesProvider(e)).value;
+    if (index == null || pages == null) return 1;
+    final w = pages.weightOfPage(page, index);
+    return w > 0 ? w : 1;
+  }
+
+  Route<dynamic>? _route;
+
+  late final ProviderContainer _container = ProviderScope.containerOf(
+    context,
+    listen: false,
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null && route != _route) {
+      if (_route != null) coverObserver.unsubscribe(_route!);
+      _route = route;
+      // The tafsir, the index or the continuous view pushed over the page:
+      // nothing counts until the page is back on top.
+      coverObserver.subscribe(route, _tracker.freeze);
     }
   }
 
@@ -460,6 +516,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   void dispose() {
     if (_testing) _muteSajdah(false);
     _lifecycle.dispose();
+    if (_route != null) coverObserver.unsubscribe(_route!);
     _tracker.end();
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -602,6 +659,12 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     };
 
     final settings = ref.watch(settingsProvider);
+    // The khatma counts nothing in a hifz test or recitation mode, and
+    // follows the reading speed and the view.
+    _tracker
+      ..suspend(_recite || _testing)
+      ..mode = _autoScroll ? 'scroll' : 'page'
+      ..minDwell = Duration(seconds: settings.readingSpeed.secondsPerPage);
     // Focus mode: the page alone, with no frame and nothing under it.
     final focus = settings.focusMode;
     // The current page's verses: recitation mode hides them, and after an
@@ -1566,37 +1629,43 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   Widget _keyboard(Widget child) {
     void turn(int by) => _turn(by);
 
-    return CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.arrowLeft): () => turn(1),
-        const SingleActivator(LogicalKeyboardKey.pageDown): () => turn(1),
-        const SingleActivator(LogicalKeyboardKey.arrowRight): () => turn(-1),
-        const SingleActivator(LogicalKeyboardKey.pageUp): () => turn(-1),
-        const SingleActivator(LogicalKeyboardKey.space): () {
-          final r = ref.read(recitationProvider);
-          r.active
-              ? unawaited(ref.read(recitationProvider.notifier).toggle())
-              : _listenFromPage();
+    // Any touch keeps the reading time going (it stops after 3 minutes
+    // without one).
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _tracker.touch(),
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.arrowLeft): () => turn(1),
+          const SingleActivator(LogicalKeyboardKey.pageDown): () => turn(1),
+          const SingleActivator(LogicalKeyboardKey.arrowRight): () => turn(-1),
+          const SingleActivator(LogicalKeyboardKey.pageUp): () => turn(-1),
+          const SingleActivator(LogicalKeyboardKey.space): () {
+            final r = ref.read(recitationProvider);
+            r.active
+                ? unawaited(ref.read(recitationProvider.notifier).toggle())
+                : _listenFromPage();
+          },
+          const SingleActivator(LogicalKeyboardKey.keyG): _goToPage,
+          const SingleActivator(LogicalKeyboardKey.slash): () =>
+              context.push('/search'),
+          const SingleActivator(LogicalKeyboardKey.keyF, control: true): () =>
+              context.push('/search'),
+          const SingleActivator(LogicalKeyboardKey.keyF, meta: true): () =>
+              context.push('/search'),
+          const SingleActivator(LogicalKeyboardKey.escape): () {
+            if (_selA != null || _multi) {
+              setState(() {
+                _selA = _selB = null;
+                _multi = false;
+              });
+            } else {
+              _setChrome(!_chrome);
+            }
+          },
         },
-        const SingleActivator(LogicalKeyboardKey.keyG): _goToPage,
-        const SingleActivator(LogicalKeyboardKey.slash): () =>
-            context.push('/search'),
-        const SingleActivator(LogicalKeyboardKey.keyF, control: true): () =>
-            context.push('/search'),
-        const SingleActivator(LogicalKeyboardKey.keyF, meta: true): () =>
-            context.push('/search'),
-        const SingleActivator(LogicalKeyboardKey.escape): () {
-          if (_selA != null || _multi) {
-            setState(() {
-              _selA = _selB = null;
-              _multi = false;
-            });
-          } else {
-            _setChrome(!_chrome);
-          }
-        },
-      },
-      child: Focus(autofocus: true, child: child),
+        child: Focus(autofocus: true, child: child),
+      ),
     );
   }
 
@@ -2200,7 +2269,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (a == null) return;
     final h = hafsKeyOf(_riwaya, (surah: a.surah, ayah: a.number));
     _setChrome(false);
-    context.go('/verse?s=${h.surah}&a=${h.ayah}');
+    context.go(
+      '/verse?s=${h.surah}&a=${h.ayah}'
+      '${widget.entry == EntryPoint.other ? '' : '&entry=${widget.entry.name}'}',
+    );
   }
 
   /// The continuous view at the first verse of this page (Hafs numbers).

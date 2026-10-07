@@ -62,6 +62,10 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kPlayerY = 'settings.playerY';
   static const _kSajdahTimer = 'settings.sajdahTimer';
   static const _kSajdahSeconds = 'settings.sajdahSeconds';
+  static const _kDayStartHour = 'settings.khatma.dayStartHour';
+  static const _kReadingSpeed = 'settings.khatma.readingSpeed';
+  static const _kCountListening = 'settings.khatma.countListening';
+  static const _kWirdIndicator = 'settings.khatma.showWirdIndicator';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -154,6 +158,12 @@ class SettingsController extends Notifier<AppSettings> {
       },
       sajdahTimer: _prefs.getBool(_kSajdahTimer) ?? false,
       sajdahSeconds: _sajdahLength(_prefs.getInt(_kSajdahSeconds)),
+      dayStartHour: (_prefs.getInt(_kDayStartHour) ?? 3).clamp(0, 23),
+      readingSpeed:
+          _enumByName(ReadingSpeed.values, _prefs.getString(_kReadingSpeed)) ??
+          ReadingSpeed.medium,
+      countListening: _prefs.getBool(_kCountListening) ?? true,
+      showWirdIndicator: _prefs.getBool(_kWirdIndicator) ?? true,
     );
   }
 
@@ -420,6 +430,28 @@ class SettingsController extends Notifier<AppSettings> {
     if (!sajdahTimerLengths.contains(seconds)) return;
     state = state.copyWith(sajdahSeconds: seconds);
     await _prefs.setInt(_kSajdahSeconds, seconds);
+  }
+
+  /// Khatmas: the hour the logical day starts (clamped to 0–23).
+  Future<void> setDayStartHour(int hour) async {
+    final h = hour.clamp(0, 23);
+    state = state.copyWith(dayStartHour: h);
+    await _prefs.setInt(_kDayStartHour, h);
+  }
+
+  Future<void> setReadingSpeed(ReadingSpeed speed) async {
+    state = state.copyWith(readingSpeed: speed);
+    await _prefs.setString(_kReadingSpeed, speed.name);
+  }
+
+  Future<void> setCountListening(bool on) async {
+    state = state.copyWith(countListening: on);
+    await _prefs.setBool(_kCountListening, on);
+  }
+
+  Future<void> setShowWirdIndicator(bool on) async {
+    state = state.copyWith(showWirdIndicator: on);
+    await _prefs.setBool(_kWirdIndicator, on);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

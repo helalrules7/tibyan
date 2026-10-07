@@ -15,6 +15,7 @@ import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'search_engine.dart';
 import '../mushaf/presentation/navigation.dart';
 import 'semantic/meaning_results.dart';
+import '../khatma/domain/khatmah.dart' show EntryPoint;
 
 /// Every verse's searchable text, loaded once.
 final searchVersesProvider = FutureProvider<List<SearchVerse>>((ref) async {
@@ -100,7 +101,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     // riwaya verse that holds the found one (and selects it there).
     final page = await ref.read(versePageProvider((surah, ayah)).future);
     if (!mounted) return;
-    context.go(mushafLocation(page, surah: surah, ayah: ayah));
+    context.go(
+      mushafLocation(page, surah: surah, ayah: ayah, entry: EntryPoint.search),
+    );
   }
 
   String _scopeLabel(

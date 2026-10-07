@@ -18,8 +18,11 @@ import '../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
 import 'data/activity_repository.dart';
 import 'data/khatma_repository.dart';
+import 'data/khatmah_store.dart';
 import 'data/quran_index_loader.dart';
 import 'domain/day.dart';
+import 'domain/interval_set.dart';
+import 'domain/khatmah.dart';
 import 'domain/quran_index.dart';
 import 'domain/khatma_plan.dart';
 import 'domain/reading_tracker.dart';
@@ -63,6 +66,10 @@ final editionPagesProvider =
       final data = await ref.watch(editionRiwayaDataProvider(edition).future);
       return data == null ? null : riwayaPages(edition.name, data, index);
     });
+
+final khatmahStoreProvider = Provider<KhatmahStore>(
+  (ref) => KhatmahStore(ref.watch(userDatabaseProvider)),
+);
 
 final khatmaRepositoryProvider = Provider<KhatmaRepository>(
   (ref) => KhatmaRepository(ref.watch(userDatabaseProvider)),
@@ -222,7 +229,6 @@ class KhatmaService {
   final Ref _ref;
 
   KhatmaRepository get _repo => _ref.read(khatmaRepositoryProvider);
-  ActivityRepository get _activity => _ref.read(activityRepositoryProvider);
   MushafRepository get _mushaf => _ref.read(mushafRepositoryProvider);
 
   AppLocalizations get _l => lookupAppLocalizations(
@@ -260,8 +266,128 @@ class KhatmaService {
     return b.pagesOf(verses.from, verses.to);
   }
 
+  KhatmahStore get _store => _ref.read(khatmahStoreProvider);
+
+  /// Adds [verses] to session [session] (written as it grows, so nothing
+  /// read is lost if the app is closed before the session ends).
+  Future<void> _recordVerses(
+    String session,
+    IntervalSet verses,
+    DateTime at, {
+    required SessionSource source,
+    EntryPoint entry = EntryPoint.other,
+    String? edition,
+    String mode = 'page',
+  }) async {
+    if (verses.isEmpty) return;
+    final had = await _store.session(session);
+    await _store.putSession(
+      SessionRecord(
+        uuid: session,
+        start: had?.start ?? at,
+        end: at.isAfter(had?.end ?? at) ? at : (had?.end ?? at),
+        ranges: (had?.ranges ?? IntervalSet.empty).union(verses),
+        activeSeconds: had?.activeSeconds,
+        pages: had?.pages ?? 0,
+        source: source,
+        entryPoint: had?.entryPoint ?? entry,
+        mode: had?.mode ?? mode,
+        edition: had?.edition ?? edition,
+      ),
+    );
+  }
+
+  /// The verses reading [page] of [edition] completes (none when the
+  /// edition's pages are not at hand).
+  Future<IntervalSet> versesOfPage(int page, MushafEdition edition) async {
+    final pages = await _ref.read(editionPagesProvider(edition).future);
+    return pages?.versesReadOn([page]) ?? IntervalSet.empty;
+  }
+
+  /// Verses read in «آية آية» or the continuous view.
+  Future<void> versesRead(
+    VersesRead r, {
+    EntryPoint entry = EntryPoint.other,
+    String mode = 'verse',
+    String? edition,
+  }) => _recordVerses(
+    r.session,
+    r.verses,
+    r.at,
+    source: SessionSource.reader,
+    entry: entry,
+    edition: edition,
+    mode: mode,
+  );
+
+  /// Counts the verses heard to their end while listening.
+  late final ListeningCounter _listening = ListeningCounter(
+    onHeard: (r) => unawaited(
+      _recordVerses(
+        r.session,
+        r.verses,
+        r.at,
+        source: SessionSource.audio,
+        mode: 'audio',
+      ).catchError((Object _) {}),
+    ),
+    onSessionEnd: (session, start, end, verses) => unawaited(
+      () async {
+        final had = await _store.session(session);
+        await _store.putSession(
+          SessionRecord(
+            uuid: session,
+            start: start,
+            end: end,
+            ranges: (had?.ranges ?? IntervalSet.empty).union(verses),
+            activeSeconds: end.difference(start).inSeconds,
+            source: SessionSource.audio,
+            mode: 'audio',
+          ),
+        );
+      }().catchError((Object _) {}),
+    ),
+  );
+
+  /// The recitation started or stopped playing.
+  void recitationPlaying(bool on) => _listening.playing(on);
+
+  /// Verse [ayah] of [surah] (numbered as in the edition being read) was
+  /// recited to its end. Counted when «احتساب الاستماع» is on.
+  Future<void> verseRecited(int surah, int ayah) async {
+    try {
+      if (!_ref.read(settingsProvider).countListening) return;
+      final index = await _ref.read(quranIndexProvider.future);
+      final edition = _ref.read(editionProvider);
+      final riwaya = edition.isRiwaya
+          ? await _ref.read(editionRiwayaDataProvider(edition).future)
+          : null;
+      final ids = edition.isRiwaya
+          ? (riwaya == null
+                ? IntervalSet.empty
+                : riwayaVerseInHafs(riwaya, index, surah, ayah))
+          : IntervalSet.of([index.idOf(surah, ayah)]);
+      _listening.heard(ids);
+    } catch (_) {
+      // No verse index here (tests without content.db): nothing counted.
+    }
+  }
+
   /// A page stayed on screen long enough: it counts for the khatma.
-  Future<void> pageRead(PageRead r) async {
+  Future<void> pageRead(
+    PageRead r, {
+    EntryPoint entry = EntryPoint.other,
+  }) async {
+    try {
+      await _recordVerses(
+        r.session,
+        await versesOfPage(r.page, editionNamed(r.edition)),
+        r.at,
+        source: SessionSource.reader,
+        entry: entry,
+        edition: r.edition,
+      );
+    } catch (_) {}
     final row = await _repo.active();
     if (row == null) return;
     final pages = await pagesIn(
@@ -280,12 +406,26 @@ class KhatmaService {
     await refresh();
   }
 
-  Future<void> sessionEnded(ReadingSpan s) => _activity.addReadingSession(
-    start: s.start,
-    end: s.end,
-    pages: s.pages,
-    edition: s.edition,
-  );
+  /// A reading session ended: written with its times, pages and verses.
+  Future<void> sessionEnded(
+    ReadingSpan s, {
+    EntryPoint entry = EntryPoint.other,
+  }) async {
+    final had = await _store.session(s.session);
+    await _store.putSession(
+      SessionRecord(
+        uuid: s.session,
+        start: s.start,
+        end: s.end,
+        ranges: (had?.ranges ?? IntervalSet.empty).union(s.verses),
+        activeSeconds: s.activeSeconds,
+        pages: s.pages,
+        entryPoint: entry,
+        mode: s.mode,
+        edition: s.edition.isEmpty ? null : s.edition,
+      ),
+    );
+  }
 
   /// Starts a khatma, setting aside the one still open.
   Future<void> create({
