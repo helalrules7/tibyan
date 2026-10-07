@@ -51,6 +51,9 @@ const uthmaniSpellingRules = <SpellingRule>[
   // written ا (ءَاتَىٰهُمُ → آتاهم), at its end ى (عَلَىٰ → على).
   SpellingRule('ى$_dagger\$', 'ى', 'عَلَىٰ → على'),
   SpellingRule('ى$_dagger', 'ا', 'ٱلتَّوۡرَىٰةَ → التوراة'),
+  // A verb ending in a yeh written once where the common spelling writes
+  // it twice: يُحۡيِ → يحيي، يَسۡتَحۡيِۦٓ → يستحيي (not ٱلۡحَيُّ).
+  SpellingRule('(?<=^[وفل]{0,2}(?:يست|[يتنأم]))حي\$', 'حيي', 'يُحۡيِ → يحيي'),
   // رَءَا is رأى.
   SpellingRule('رأا\$', 'رأى', 'رَءَا → رأى'),
 ];
