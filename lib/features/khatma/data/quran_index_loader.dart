@@ -122,8 +122,20 @@ IntervalSet riwayaVerseInHafs(
   if (v == null) return IntervalSet.empty;
   final ids = <int>{for (final h in v.hafs) ?_idOrNull(index, h.surah, h.ayah)};
   if (surah >= 1 && surah <= index.surahCount) {
+    // The Hafs verses of the surah some riwaya verse covers.
+    final covered = <int>{
+      for (var n = 1; n <= data.surahCounts[surah - 1]; n++)
+        for (final h in data.verse(surah, n)?.hafs ?? const <RiwayaKey>[])
+          h.ayah,
+    };
     for (var a = 1; a <= index.ayahCountOf(surah); a++) {
-      if (data.fromHafs(surah, a) == v.key && data.toHafs(surah, a).isEmpty) {
+      // Not counted by the riwaya: it goes with the riwaya verse holding
+      // the Hafs verse just after it.
+      final mine = {for (final h in v.hafs) h.ayah};
+      final next = [for (var b = a + 1; b <= a + 3; b++) b]
+          .where(covered.contains)
+          .firstOrNull;
+      if (!covered.contains(a) && next != null && mine.contains(next)) {
         ids.add(index.idOf(surah, a));
       }
     }
