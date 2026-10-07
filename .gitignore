@@ -12,6 +12,8 @@ key.properties
 *.p8
 *.p12
 *.mobileprovision
+# Voice recordings and local ASR evaluation notes; never commit or upload.
+/audio-training/
 # Raw downloads and generated data (rebuilt by tools/)
 /tools/.cache/
 /tools/out/
