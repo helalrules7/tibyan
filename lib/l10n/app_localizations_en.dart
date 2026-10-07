@@ -2207,4 +2207,143 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tajweedIndexLoadError =>
       'The places of this rule could not be read.';
+
+  @override
+  String get tasmeeTitle => 'Recitation practice';
+
+  @override
+  String get tasmeeDescription =>
+      'Recite from memory. Tibyan listens on this device, reveals words, and marks possible mistakes. Audio is not sent anywhere; tajweed is not graded.';
+
+  @override
+  String get tasmeeSelectRange => 'Choose a practice range';
+
+  @override
+  String get tasmeeRangeType => 'Range type';
+
+  @override
+  String get tasmeeSurah => 'Surah';
+
+  @override
+  String get tasmeeJuz => 'Juz';
+
+  @override
+  String get tasmeeHizb => 'Hizb';
+
+  @override
+  String get tasmeeQuarter => 'Quarter hizb';
+
+  @override
+  String get tasmeeHalfHizb => 'Half hizb';
+
+  @override
+  String get tasmeeThreeQuartersHizb => 'Three-quarter hizb';
+
+  @override
+  String get tasmeePages => 'Pages';
+
+  @override
+  String get tasmeeVerses => 'Verses';
+
+  @override
+  String get tasmeeFrom => 'From';
+
+  @override
+  String get tasmeeTo => 'To';
+
+  @override
+  String get tasmeeHalf => 'Half';
+
+  @override
+  String get tasmeeFirstHalf => 'First';
+
+  @override
+  String get tasmeeSecondHalf => 'Second';
+
+  @override
+  String get tasmeeFromSecondQuarter => 'Start from the second quarter';
+
+  @override
+  String get tasmeeMode => 'Practice mode';
+
+  @override
+  String get tasmeeContinuous => 'Continuous';
+
+  @override
+  String get tasmeeVerseByVerse => 'Verse by verse';
+
+  @override
+  String tasmeeWordsCount(String count) {
+    return '$count words';
+  }
+
+  @override
+  String get tasmeeContinue => 'Continue';
+
+  @override
+  String get tasmeeEmptyRange => 'The selected range contains no words.';
+
+  @override
+  String get tasmeeInvalidRange => 'Check the selected range numbers.';
+
+  @override
+  String get tasmeeDownloadModel => 'Download recitation model';
+
+  @override
+  String get tasmeeModelDownloading => 'Downloading model';
+
+  @override
+  String get tasmeeModelReady => 'Model ready';
+
+  @override
+  String tasmeeModelConsent(String size) {
+    return 'The model is about $size. It will use your internet connection and may use mobile data. Your voice audio is not uploaded.';
+  }
+
+  @override
+  String get tasmeeDownload => 'Download';
+
+  @override
+  String get tasmeeStartListening => 'Start reciting';
+
+  @override
+  String get tasmeeStopListening => 'Finish recitation';
+
+  @override
+  String get tasmeeListening => 'Listening';
+
+  @override
+  String get tasmeeNotListening => 'Tap to start and recite from memory';
+
+  @override
+  String get tasmeeModelLoad => 'Preparing model';
+
+  @override
+  String get tasmeeMicDenied =>
+      'Microphone permission was not granted. Enable it in device settings.';
+
+  @override
+  String tasmeeSessionFailed(String error) {
+    return 'Could not start recitation: $error';
+  }
+
+  @override
+  String get tasmeeWordCorrect => 'Correct';
+
+  @override
+  String get tasmeeWordWrong => 'Mistake';
+
+  @override
+  String get tasmeeWordSkipped => 'Skipped';
+
+  @override
+  String get tasmeeWordCorrected => 'Corrected after mistake';
+
+  @override
+  String get tasmeeSessionComplete => 'Recitation complete';
+
+  @override
+  String tasmeeSessionAccuracy(String accuracy) {
+    return 'Accuracy: $accuracy%';
+  }
 }

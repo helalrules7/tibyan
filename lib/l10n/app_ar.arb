@@ -1450,5 +1450,76 @@
     }
   },
   "tajweedIndexColorNote": "الألوان كما تُرسم في الصفحات الآن: اختيارك، أو اللون الافتراضي. وتُغيَّر من «شكل المصحف».",
-  "tajweedIndexLoadError": "تعذرت قراءة مواضع هذا الحكم."
+  "tajweedIndexLoadError": "تعذرت قراءة مواضع هذا الحكم.",
+  "tasmeeTitle": "التسميع",
+  "tasmeeDescription": "اقرأ من حفظك؛ يسمعك تبيان على جهازك ويُظهر الكلمات ويعلّم مواضع الخطأ. لا يُرسل الصوت ولا يُقيَّم التجويد.",
+  "tasmeeSelectRange": "اختر نطاق التسميع",
+  "tasmeeRangeType": "نوع النطاق",
+  "tasmeeSurah": "السورة",
+  "tasmeeJuz": "الجزء",
+  "tasmeeHizb": "الحزب",
+  "tasmeeQuarter": "ربع الحزب",
+  "tasmeeHalfHizb": "نصف الحزب",
+  "tasmeeThreeQuartersHizb": "ثلاثة أرباع الحزب",
+  "tasmeePages": "الصفحات",
+  "tasmeeVerses": "الآيات",
+  "tasmeeFrom": "من",
+  "tasmeeTo": "إلى",
+  "tasmeeHalf": "النصف",
+  "tasmeeFirstHalf": "الأول",
+  "tasmeeSecondHalf": "الثاني",
+  "tasmeeFromSecondQuarter": "ابدأ من الربع الثاني",
+  "tasmeeMode": "طريقة التسميع",
+  "tasmeeContinuous": "متصل",
+  "tasmeeVerseByVerse": "آية بآية",
+  "tasmeeWordsCount": "{count} كلمة",
+  "@tasmeeWordsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeContinue": "متابعة",
+  "tasmeeEmptyRange": "النطاق المختار لا يحتوي كلمات.",
+  "tasmeeInvalidRange": "تحقق من أرقام النطاق.",
+  "tasmeeDownloadModel": "تنزيل نموذج التسميع",
+  "tasmeeModelDownloading": "جارٍ تنزيل النموذج",
+  "tasmeeModelReady": "النموذج جاهز",
+  "tasmeeModelConsent": "سيُنزل نموذج حجمه نحو {size}. سيستخدم اتصال الإنترنت، وقد تُحسب بيانات الهاتف. الصوت نفسه لا يُرسل.",
+  "@tasmeeModelConsent": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeDownload": "تنزيل",
+  "tasmeeStartListening": "ابدأ التسميع",
+  "tasmeeStopListening": "إنهاء التسميع",
+  "tasmeeListening": "أستمع إليك",
+  "tasmeeNotListening": "اضغط للبدء واقرأ من حفظك",
+  "tasmeeModelLoad": "جارٍ تجهيز النموذج",
+  "tasmeeMicDenied": "لم تُمنح صلاحية الميكروفون. فعّلها من إعدادات الجهاز.",
+  "tasmeeSessionFailed": "تعذر بدء التسميع: {error}",
+  "@tasmeeSessionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeWordCorrect": "صحيحة",
+  "tasmeeWordWrong": "خطأ",
+  "tasmeeWordSkipped": "متجاوزة",
+  "tasmeeWordCorrected": "صُححت بعد خطأ",
+  "tasmeeSessionComplete": "انتهى التسميع",
+  "tasmeeSessionAccuracy": "الدقة: {accuracy}%",
+  "@tasmeeSessionAccuracy": {
+    "placeholders": {
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  }
 }

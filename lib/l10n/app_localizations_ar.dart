@@ -2192,4 +2192,143 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tajweedIndexLoadError => 'تعذرت قراءة مواضع هذا الحكم.';
+
+  @override
+  String get tasmeeTitle => 'التسميع';
+
+  @override
+  String get tasmeeDescription =>
+      'اقرأ من حفظك؛ يسمعك تبيان على جهازك ويُظهر الكلمات ويعلّم مواضع الخطأ. لا يُرسل الصوت ولا يُقيَّم التجويد.';
+
+  @override
+  String get tasmeeSelectRange => 'اختر نطاق التسميع';
+
+  @override
+  String get tasmeeRangeType => 'نوع النطاق';
+
+  @override
+  String get tasmeeSurah => 'السورة';
+
+  @override
+  String get tasmeeJuz => 'الجزء';
+
+  @override
+  String get tasmeeHizb => 'الحزب';
+
+  @override
+  String get tasmeeQuarter => 'ربع الحزب';
+
+  @override
+  String get tasmeeHalfHizb => 'نصف الحزب';
+
+  @override
+  String get tasmeeThreeQuartersHizb => 'ثلاثة أرباع الحزب';
+
+  @override
+  String get tasmeePages => 'الصفحات';
+
+  @override
+  String get tasmeeVerses => 'الآيات';
+
+  @override
+  String get tasmeeFrom => 'من';
+
+  @override
+  String get tasmeeTo => 'إلى';
+
+  @override
+  String get tasmeeHalf => 'النصف';
+
+  @override
+  String get tasmeeFirstHalf => 'الأول';
+
+  @override
+  String get tasmeeSecondHalf => 'الثاني';
+
+  @override
+  String get tasmeeFromSecondQuarter => 'ابدأ من الربع الثاني';
+
+  @override
+  String get tasmeeMode => 'طريقة التسميع';
+
+  @override
+  String get tasmeeContinuous => 'متصل';
+
+  @override
+  String get tasmeeVerseByVerse => 'آية بآية';
+
+  @override
+  String tasmeeWordsCount(String count) {
+    return '$count كلمة';
+  }
+
+  @override
+  String get tasmeeContinue => 'متابعة';
+
+  @override
+  String get tasmeeEmptyRange => 'النطاق المختار لا يحتوي كلمات.';
+
+  @override
+  String get tasmeeInvalidRange => 'تحقق من أرقام النطاق.';
+
+  @override
+  String get tasmeeDownloadModel => 'تنزيل نموذج التسميع';
+
+  @override
+  String get tasmeeModelDownloading => 'جارٍ تنزيل النموذج';
+
+  @override
+  String get tasmeeModelReady => 'النموذج جاهز';
+
+  @override
+  String tasmeeModelConsent(String size) {
+    return 'سيُنزل نموذج حجمه نحو $size. سيستخدم اتصال الإنترنت، وقد تُحسب بيانات الهاتف. الصوت نفسه لا يُرسل.';
+  }
+
+  @override
+  String get tasmeeDownload => 'تنزيل';
+
+  @override
+  String get tasmeeStartListening => 'ابدأ التسميع';
+
+  @override
+  String get tasmeeStopListening => 'إنهاء التسميع';
+
+  @override
+  String get tasmeeListening => 'أستمع إليك';
+
+  @override
+  String get tasmeeNotListening => 'اضغط للبدء واقرأ من حفظك';
+
+  @override
+  String get tasmeeModelLoad => 'جارٍ تجهيز النموذج';
+
+  @override
+  String get tasmeeMicDenied =>
+      'لم تُمنح صلاحية الميكروفون. فعّلها من إعدادات الجهاز.';
+
+  @override
+  String tasmeeSessionFailed(String error) {
+    return 'تعذر بدء التسميع: $error';
+  }
+
+  @override
+  String get tasmeeWordCorrect => 'صحيحة';
+
+  @override
+  String get tasmeeWordWrong => 'خطأ';
+
+  @override
+  String get tasmeeWordSkipped => 'متجاوزة';
+
+  @override
+  String get tasmeeWordCorrected => 'صُححت بعد خطأ';
+
+  @override
+  String get tasmeeSessionComplete => 'انتهى التسميع';
+
+  @override
+  String tasmeeSessionAccuracy(String accuracy) {
+    return 'الدقة: $accuracy%';
+  }
 }

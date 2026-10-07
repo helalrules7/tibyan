@@ -903,5 +903,76 @@
   "tajweedRuleCount": "Verses: {verses} · Coloured letters: {letters}",
   "tajweedPlaceAt": "{surah} {ayah} · page {page}",
   "tajweedIndexColorNote": "Colours as the pages draw them now: your choice, or the default. Change them in Mushaf look.",
-  "tajweedIndexLoadError": "The places of this rule could not be read."
+  "tajweedIndexLoadError": "The places of this rule could not be read.",
+  "tasmeeTitle": "Recitation practice",
+  "tasmeeDescription": "Recite from memory. Tibyan listens on this device, reveals words, and marks possible mistakes. Audio is not sent anywhere; tajweed is not graded.",
+  "tasmeeSelectRange": "Choose a practice range",
+  "tasmeeRangeType": "Range type",
+  "tasmeeSurah": "Surah",
+  "tasmeeJuz": "Juz",
+  "tasmeeHizb": "Hizb",
+  "tasmeeQuarter": "Quarter hizb",
+  "tasmeeHalfHizb": "Half hizb",
+  "tasmeeThreeQuartersHizb": "Three-quarter hizb",
+  "tasmeePages": "Pages",
+  "tasmeeVerses": "Verses",
+  "tasmeeFrom": "From",
+  "tasmeeTo": "To",
+  "tasmeeHalf": "Half",
+  "tasmeeFirstHalf": "First",
+  "tasmeeSecondHalf": "Second",
+  "tasmeeFromSecondQuarter": "Start from the second quarter",
+  "tasmeeMode": "Practice mode",
+  "tasmeeContinuous": "Continuous",
+  "tasmeeVerseByVerse": "Verse by verse",
+  "tasmeeWordsCount": "{count} words",
+  "@tasmeeWordsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeContinue": "Continue",
+  "tasmeeEmptyRange": "The selected range contains no words.",
+  "tasmeeInvalidRange": "Check the selected range numbers.",
+  "tasmeeDownloadModel": "Download recitation model",
+  "tasmeeModelDownloading": "Downloading model",
+  "tasmeeModelReady": "Model ready",
+  "tasmeeModelConsent": "The model is about {size}. It will use your internet connection and may use mobile data. Your voice audio is not uploaded.",
+  "@tasmeeModelConsent": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeDownload": "Download",
+  "tasmeeStartListening": "Start reciting",
+  "tasmeeStopListening": "Finish recitation",
+  "tasmeeListening": "Listening",
+  "tasmeeNotListening": "Tap to start and recite from memory",
+  "tasmeeModelLoad": "Preparing model",
+  "tasmeeMicDenied": "Microphone permission was not granted. Enable it in device settings.",
+  "tasmeeSessionFailed": "Could not start recitation: {error}",
+  "@tasmeeSessionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeWordCorrect": "Correct",
+  "tasmeeWordWrong": "Mistake",
+  "tasmeeWordSkipped": "Skipped",
+  "tasmeeWordCorrected": "Corrected after mistake",
+  "tasmeeSessionComplete": "Recitation complete",
+  "tasmeeSessionAccuracy": "Accuracy: {accuracy}%",
+  "@tasmeeSessionAccuracy": {
+    "placeholders": {
+      "accuracy": {
+        "type": "String"
+      }
+    }
+  }
 }
