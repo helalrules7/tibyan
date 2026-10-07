@@ -391,6 +391,7 @@ class Ledger {
     }
     return Ledger._(
       khatmah,
+      index,
       counted,
       covered,
       covered.weigh(index.weightOf),
@@ -402,6 +403,7 @@ class Ledger {
 
   Ledger._(
     this.khatmah,
+    this._index,
     this._credits,
     this.covered,
     this.coveredWeight,
@@ -416,7 +418,13 @@ class Ledger {
   }
 
   final Khatmah khatmah;
+  final QuranIndex _index;
   final List<Credit> _credits;
+
+  /// The ledger with [extra] credits as well (the planner supposes the
+  /// coming days' portions read).
+  Ledger withCredits(Iterable<Credit> extra) =>
+      Ledger(khatmah, [..._credits, ...extra], _index);
 
   /// The khatma's verses read.
   final IntervalSet covered;

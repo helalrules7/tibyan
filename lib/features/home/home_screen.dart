@@ -143,7 +143,7 @@ class HomeScreen extends ConsumerWidget {
                                       Uri(
                                         queryParameters: {
                                           'page': '${portion.range.from}',
-                                          'edition': khatma.row.edition,
+                                          'edition': khatma.edition.name,
                                         },
                                       ),
                                     ),

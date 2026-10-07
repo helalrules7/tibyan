@@ -188,6 +188,10 @@ class KhatmahStore {
         : out;
   }
 
+  Future<KhatmaRow?> row(String uuid) => (_db.select(
+    _db.khatmas,
+  )..where((t) => t.uuid.equals(uuid))).getSingleOrNull();
+
   Future<Khatmah?> byUuid(String uuid) async {
     final r = await (_db.select(
       _db.khatmas,

@@ -141,7 +141,7 @@ class _Active extends ConsumerWidget {
                         Uri(
                           queryParameters: {
                             'page': '${portion.range.from}',
-                            'edition': s.row.edition,
+                            'edition': s.edition.name,
                           },
                         ),
                       ),
@@ -172,14 +172,14 @@ class _Active extends ConsumerWidget {
                   const SizedBox(height: 8),
                   OutlinedButton(
                     onPressed: () async {
-                      final next = s.plan.nextPage(s.read);
+                      final next = s.nextPage;
                       if (next == null) return;
                       context.go(
                         await service.routeFor(
                           Uri(
                             queryParameters: {
                               'page': '$next',
-                              'edition': s.row.edition,
+                              'edition': s.edition.name,
                             },
                           ),
                         ),
@@ -248,7 +248,7 @@ class _Active extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(l.khatmaProgress(digits(s.done), digits(s.total))),
                 Text(
-                  '${l.khatmaEnds(formatDay(context, s.plan.target))} · '
+                  '${l.khatmaEnds(formatDay(context, s.target))} · '
                   '${l.khatmaDaysLeft(digits(s.daysLeft))}',
                   style: TextStyle(color: t.muted, fontSize: 13),
                 ),

@@ -189,6 +189,8 @@ class KhatmahEngine {
       planFrom: () => null,
       startAt: k.rangeStart,
       status: KhatmahStatus.active,
+      // «ختمتان في رمضان» starts again once only.
+      autoRestart: k.presetId == 'ramadan_twice' ? false : k.autoRestart,
       isPrimary: k.isPrimary,
       aheadChoice: () => null,
       recovery: () => null,

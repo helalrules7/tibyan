@@ -44,12 +44,31 @@ List<PlannedReminder> planReminders({
   int days = reminderDaysAhead,
 }) {
   if (plan.isComplete(read)) return const [];
-  final today = Day.of(now);
-  final portions = plan.upcoming(today, read, count: days);
+  return portionReminders(
+    now: now,
+    today: Day.of(now),
+    minutes: minutes,
+    portions: plan.upcoming(Day.of(now), read, count: days),
+    last: plan.target,
+    days: days,
+  );
+}
+
+/// The reminders for the coming days' [portions] (pages of the edition
+/// being read) at [minutes] after midnight, from [today] (a logical day):
+/// one a day with a portion, none past [last] or once its time has passed.
+List<PlannedReminder> portionReminders({
+  required DateTime now,
+  required Day today,
+  required int minutes,
+  required Map<Day, PageRange> portions,
+  Day? last,
+  int days = reminderDaysAhead,
+}) {
   final out = <PlannedReminder>[];
   for (var i = 0; i < days; i++) {
     final day = today.add(i);
-    if (day.isAfter(plan.target)) break;
+    if (last != null && day.isAfter(last)) break;
     final range = portions[day];
     // Nothing due that day (already read ahead, or a day with no new unit).
     if (range == null) continue;

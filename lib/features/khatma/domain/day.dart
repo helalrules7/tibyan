@@ -12,6 +12,15 @@ class Day implements Comparable<Day> {
 
   static Day today() => Day.of(DateTime.now());
 
+  /// The logical day of [t] (2.6): a day starts at [startHour] (3 by
+  /// default in the settings), so reading at 1:30 at night counts for the
+  /// day before. Worked out from the clock time, so a daylight-saving
+  /// night does not move it.
+  factory Day.logical(DateTime t, int startHour) {
+    final d = Day.of(t);
+    return t.hour < startHour ? d.add(-1) : d;
+  }
+
   final int year;
   final int month;
   final int day;
