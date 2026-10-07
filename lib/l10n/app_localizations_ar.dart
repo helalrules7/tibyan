@@ -2168,4 +2168,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get playerFull => 'المشغل كاملًا';
+
+  @override
+  String get aboutTajweedTitle => 'أحكام التجويد: ألوانها ومواضعها';
+
+  @override
+  String get aboutTajweedHint =>
+      'كل حكم بلونه في صفحات المصحف، ومواضعه في المصحف كله. اضغط الحكم لتعرض مواضعه، واضغط الموضع لتفتح صفحته.';
+
+  @override
+  String tajweedRuleCount(String verses, String letters) {
+    return 'الآيات: $verses · الحروف الملونة: $letters';
+  }
+
+  @override
+  String tajweedPlaceAt(String surah, String ayah, String page) {
+    return '$surah $ayah · الصفحة $page';
+  }
+
+  @override
+  String get tajweedIndexColorNote =>
+      'الألوان كما تُرسم في الصفحات الآن: اختيارك، أو اللون الافتراضي. وتُغيَّر من «شكل المصحف».';
+
+  @override
+  String get tajweedIndexLoadError => 'تعذرت قراءة مواضع هذا الحكم.';
 }

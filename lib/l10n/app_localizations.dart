@@ -3816,6 +3816,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'المشغل كاملًا'**
   String get playerFull;
+
+  /// No description provided for @aboutTajweedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أحكام التجويد: ألوانها ومواضعها'**
+  String get aboutTajweedTitle;
+
+  /// No description provided for @aboutTajweedHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل حكم بلونه في صفحات المصحف، ومواضعه في المصحف كله. اضغط الحكم لتعرض مواضعه، واضغط الموضع لتفتح صفحته.'**
+  String get aboutTajweedHint;
+
+  /// No description provided for @tajweedRuleCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآيات: {verses} · الحروف الملونة: {letters}'**
+  String tajweedRuleCount(String verses, String letters);
+
+  /// No description provided for @tajweedPlaceAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'{surah} {ayah} · الصفحة {page}'**
+  String tajweedPlaceAt(String surah, String ayah, String page);
+
+  /// No description provided for @tajweedIndexColorNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الألوان كما تُرسم في الصفحات الآن: اختيارك، أو اللون الافتراضي. وتُغيَّر من «شكل المصحف».'**
+  String get tajweedIndexColorNote;
+
+  /// No description provided for @tajweedIndexLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذرت قراءة مواضع هذا الحكم.'**
+  String get tajweedIndexLoadError;
 }
 
 class _AppLocalizationsDelegate
