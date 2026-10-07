@@ -6,12 +6,14 @@
 /// as the owner chose on 2026-10-07. The text is the machine-readable copy
 /// of the same items at hisnmuslim.com (api/ar/21.json and 19.json),
 /// checked against the printed pages; one mark differs there and follows
-/// the print: the fatha on the ba' of «فَتَبَارَكَ». Private mirror
+/// the print: the fatha on the ba' of «فَتَبَارَكَ». The book's quotation
+/// marks (( )) are shown as « », as the owner chose on 2026-10-07; the
+/// words and their marks are untouched. Private mirror
 /// hisn-almuslim, see docs/DATA_SOURCES.md; pending the scholarly review
 /// (docs/MISSING_DATA.md, ث14).
 const String sajdahSupplications =
-    '((سَجَدَ وَجْهِيَ لِلَّذِي خَلَقَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ بِحَوْلِهِ وَقُوَّتِهِ، ﴿فَتَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ﴾)).'
+    '«سَجَدَ وَجْهِيَ لِلَّذِي خَلَقَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ بِحَوْلِهِ وَقُوَّتِهِ، ﴿فَتَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ﴾».'
     '\n'
-    '((سُبْحَانَ رَبِّيَ الأَعْلَى)) ثلاث مرَّاتٍ.'
+    '«سُبْحَانَ رَبِّيَ الأَعْلَى» ثلاث مرَّاتٍ.'
     '\n'
-    '((سُبْحَانَكَ اللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، اللَّهُمَّ اغْفِرْ لِي)).';
+    '«سُبْحَانَكَ اللَّهُمَّ رَبَّنَا وَبِحَمْدِكَ، اللَّهُمَّ اغْفِرْ لِي».';
