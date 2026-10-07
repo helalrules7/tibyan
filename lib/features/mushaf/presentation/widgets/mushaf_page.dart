@@ -1149,6 +1149,42 @@ class _MushafPageState extends ConsumerState<MushafPage> {
                             }
                           }
                           drawEach(overItems);
+                          if (x.wordTints.isEmpty && x.wordOverlay == null) {
+                            return;
+                          }
+                          Rect toScreen(Rect r) {
+                            final line = layout._lineOf(r.center.dy);
+                            return Rect.fromPoints(
+                              layout.toScreen(r.topLeft, line: line),
+                              layout.toScreen(r.bottomRight, line: line),
+                            );
+                          }
+
+                          // A word's own letters in another colour: the
+                          // baked ink, recoloured, inside the word's box.
+                          if (art != null) {
+                            for (final MapEntry(key: colour, value: rects)
+                                in x.wordTints.entries) {
+                              final paint = Paint()
+                                ..colorFilter = ColorFilter.mode(
+                                  colour,
+                                  BlendMode.srcIn,
+                                );
+                              for (final r in rects) {
+                                canvas
+                                  ..save()
+                                  ..clipRect(toScreen(r).inflate(0.5))
+                                  ..drawImageRect(
+                                    art,
+                                    _imageRect(art),
+                                    Offset.zero & layout.size,
+                                    paint,
+                                  )
+                                  ..restore();
+                              }
+                            }
+                          }
+                          x.wordOverlay?.call(canvas, toScreen);
                         }),
                       ),
                     ),

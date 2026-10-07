@@ -64,7 +64,18 @@ class PageInteraction {
     this.tajweed = '',
     this.fill,
     this.onPageLongPress,
+    this.wordTints = const {},
+    this.wordOverlay,
   });
+
+  /// Words whose letters are drawn in another colour than the ink, by
+  /// colour (boxes in edition units). The new edition only.
+  final Map<Color, List<Rect>> wordTints;
+
+  /// Drawn over the page, last; [toScreen] places a box in edition units
+  /// on the widget. The new edition only.
+  final void Function(Canvas canvas, Rect Function(Rect box) toScreen)?
+  wordOverlay;
 
   /// A long press on the page off any verse; null: it does nothing.
   final VoidCallback? onPageLongPress;
