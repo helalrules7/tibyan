@@ -10,7 +10,7 @@ import '../../l10n/app_localizations.dart';
 /// The «what's new» notes: shown once after an update that brings them,
 /// never on a first install (the reader is new to all of it), and from
 /// the settings at any time. Bump [whatsNewId] when the list changes.
-const whatsNewId = '2026-10-a';
+const whatsNewId = '2026-10-b';
 
 /// Where the last notes seen are remembered.
 const whatsNewSeenKey = 'app.whatsNewSeen';
@@ -18,20 +18,15 @@ const whatsNewSeenKey = 'app.whatsNewSeen';
 typedef WhatsNewItem = ({IconData icon, String title, String body});
 
 List<WhatsNewItem> whatsNewItems(AppLocalizations l) => [
+  (icon: Icons.flag_outlined, title: l.newKhatmah, body: l.newKhatmahBody),
+  (icon: Icons.mic_none, title: l.newTasmee, body: l.newTasmeeBody),
+  (icon: Icons.timer_outlined, title: l.newSajdah, body: l.newSajdahBody),
   (
-    icon: Icons.screen_rotation_outlined,
-    title: l.newOneVerse,
-    body: l.newOneVerseBody,
+    icon: Icons.lightbulb_outline,
+    title: l.newAssistant,
+    body: l.newAssistantBody,
   ),
-  (icon: Icons.translate, title: l.newUnderVerse, body: l.newUnderVerseBody),
-  (icon: Icons.ios_share, title: l.newShare, body: l.newShareBody),
-  (
-    icon: Icons.auto_stories_outlined,
-    title: l.newSpread,
-    body: l.newSpreadBody,
-  ),
-  (icon: Icons.widgets_outlined, title: l.newWidgets, body: l.newWidgetsBody),
-  (icon: Icons.backup_outlined, title: l.newBackup, body: l.newBackupBody),
+  (icon: Icons.fullscreen, title: l.newFocus, body: l.newFocusBody),
 ];
 
 /// Whether the notes should open now: the reader has used the app before

@@ -5274,6 +5274,66 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'افتح إعدادات الجهاز، ثم اسمح لتبيان باستخدام الميكروفون.'**
   String get tasmeeAllowMicHint;
+
+  /// No description provided for @newKhatmah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الختمة الجديدة'**
+  String get newKhatmah;
+
+  /// No description provided for @newKhatmahBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكثر من ختمة معا، ومعالج إنشاء بقوالب جاهزة، وورد يومي يتكيّف، وإحصاءات وتذكيرات أدق، ومؤشر ورد اليوم في المصحف.'**
+  String get newKhatmahBody;
+
+  /// No description provided for @newTasmee.
+  ///
+  /// In ar, this message translates to:
+  /// **'التسميع بالصوت (تجريبي)'**
+  String get newTasmee;
+
+  /// No description provided for @newTasmeeBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ من حفظك، فتظهر كل كلمة في موضعها وتُعلَّم الأخطاء. يعمل على جهازك دون إنترنت بعد تنزيل النموذج، ويختبر الحفظ لا التجويد.'**
+  String get newTasmeeBody;
+
+  /// No description provided for @newSajdah.
+  ///
+  /// In ar, this message translates to:
+  /// **'مؤقت سجدات التلاوة'**
+  String get newSajdah;
+
+  /// No description provided for @newSajdahBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'عند آية السجدة يتوقف الشيخ وتظهر بطاقة بأذكار السجود وعدّ تنازلي، ثم تُستكمل التلاوة. يُفعَّل من الإعدادات.'**
+  String get newSajdahBody;
+
+  /// No description provided for @newAssistant.
+  ///
+  /// In ar, this message translates to:
+  /// **'المساعد وعلامات التجويد'**
+  String get newAssistant;
+
+  /// No description provided for @newAssistantBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'شاشة جديدة فيها أحكام التجويد بألوانها، ولكل حكم مواضعه في المصحف.'**
+  String get newAssistantBody;
+
+  /// No description provided for @newFocus.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع التركيز'**
+  String get newFocus;
+
+  /// No description provided for @newFocusBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة وحدها بلا إطار وتملأ الشاشة، والأدوات عند الحاجة، ومشغّل صغير تسحبه أينما شئت.'**
+  String get newFocusBody;
 }
 
 class _AppLocalizationsDelegate

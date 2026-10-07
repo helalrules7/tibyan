@@ -2994,4 +2994,39 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get tasmeeAllowMicHint =>
       'افتح إعدادات الجهاز، ثم اسمح لتبيان باستخدام الميكروفون.';
+
+  @override
+  String get newKhatmah => 'الختمة الجديدة';
+
+  @override
+  String get newKhatmahBody =>
+      'أكثر من ختمة معا، ومعالج إنشاء بقوالب جاهزة، وورد يومي يتكيّف، وإحصاءات وتذكيرات أدق، ومؤشر ورد اليوم في المصحف.';
+
+  @override
+  String get newTasmee => 'التسميع بالصوت (تجريبي)';
+
+  @override
+  String get newTasmeeBody =>
+      'اقرأ من حفظك، فتظهر كل كلمة في موضعها وتُعلَّم الأخطاء. يعمل على جهازك دون إنترنت بعد تنزيل النموذج، ويختبر الحفظ لا التجويد.';
+
+  @override
+  String get newSajdah => 'مؤقت سجدات التلاوة';
+
+  @override
+  String get newSajdahBody =>
+      'عند آية السجدة يتوقف الشيخ وتظهر بطاقة بأذكار السجود وعدّ تنازلي، ثم تُستكمل التلاوة. يُفعَّل من الإعدادات.';
+
+  @override
+  String get newAssistant => 'المساعد وعلامات التجويد';
+
+  @override
+  String get newAssistantBody =>
+      'شاشة جديدة فيها أحكام التجويد بألوانها، ولكل حكم مواضعه في المصحف.';
+
+  @override
+  String get newFocus => 'وضع التركيز';
+
+  @override
+  String get newFocusBody =>
+      'الصفحة وحدها بلا إطار وتملأ الشاشة، والأدوات عند الحاجة، ومشغّل صغير تسحبه أينما شئت.';
 }

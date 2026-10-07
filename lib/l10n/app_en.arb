@@ -1319,5 +1319,15 @@
   "tasmeeWholeSession": "whole tasmee",
   "tasmeeWordCorrectedShort": "Corrected",
   "tasmeeWordHinted": "Hinted",
-  "tasmeeAllowMicHint": "Open the device settings and allow Tibyan to use the microphone."
+  "tasmeeAllowMicHint": "Open the device settings and allow Tibyan to use the microphone.",
+  "newKhatmah": "The new khatma",
+  "newKhatmahBody": "Several khatmas at once, a setup wizard with ready plans, an adaptive daily portion, clearer stats and reminders, and today's portion shown in the mushaf.",
+  "newTasmee": "Recite from memory (beta)",
+  "newTasmeeBody": "Recite from memory and each word appears in its place, with mistakes marked. It runs on your device, offline after the model download, and checks memorisation, not tajweed.",
+  "newSajdah": "Sajdah timer",
+  "newSajdahBody": "At a verse of prostration the reciter pauses and a card shows the supplications with a countdown, then the recitation resumes. Turn it on in Settings.",
+  "newAssistant": "The Assistant and tajweed marks",
+  "newAssistantBody": "A new screen with the tajweed rules and their colours, each with its places in the mushaf.",
+  "newFocus": "Focus mode",
+  "newFocusBody": "The page alone, frameless and filling the screen, tools when you need them, and a small player you can drag anywhere."
 }

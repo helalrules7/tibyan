@@ -3020,4 +3020,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tasmeeAllowMicHint =>
       'Open the device settings and allow Tibyan to use the microphone.';
+
+  @override
+  String get newKhatmah => 'The new khatma';
+
+  @override
+  String get newKhatmahBody =>
+      'Several khatmas at once, a setup wizard with ready plans, an adaptive daily portion, clearer stats and reminders, and today\'s portion shown in the mushaf.';
+
+  @override
+  String get newTasmee => 'Recite from memory (beta)';
+
+  @override
+  String get newTasmeeBody =>
+      'Recite from memory and each word appears in its place, with mistakes marked. It runs on your device, offline after the model download, and checks memorisation, not tajweed.';
+
+  @override
+  String get newSajdah => 'Sajdah timer';
+
+  @override
+  String get newSajdahBody =>
+      'At a verse of prostration the reciter pauses and a card shows the supplications with a countdown, then the recitation resumes. Turn it on in Settings.';
+
+  @override
+  String get newAssistant => 'The Assistant and tajweed marks';
+
+  @override
+  String get newAssistantBody =>
+      'A new screen with the tajweed rules and their colours, each with its places in the mushaf.';
+
+  @override
+  String get newFocus => 'Focus mode';
+
+  @override
+  String get newFocusBody =>
+      'The page alone, frameless and filling the screen, tools when you need them, and a small player you can drag anywhere.';
 }
