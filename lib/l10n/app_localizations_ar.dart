@@ -2170,10 +2170,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get playerFull => 'المشغل كاملًا';
 
   @override
-  String get aboutTajweedTitle => 'أحكام التجويد: ألوانها ومواضعها';
+  String get tajweedMarksSubtitle => 'أحكام التجويد: ألوانها ومواضعها';
 
   @override
-  String get aboutTajweedHint =>
+  String get tajweedMarksHint =>
       'كل حكم بلونه في صفحات المصحف، ومواضعه في المصحف كله. اضغط الحكم لتعرض مواضعه، واضغط الموضع لتفتح صفحته.';
 
   @override
@@ -2196,4 +2196,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get tajweedMarksInkNote =>
       'حين يقع الحكم على علامة وحدها (مثل الميم الصغيرة) تبقى العلامة هنا بلون النص: الخط لا يلوّن العلامة دون جزء من حرفها. وتظهر ملونة في صفحة المصحف.';
+
+  @override
+  String get assistantTitle => 'المساعد';
+
+  @override
+  String get assistantIntro => 'أدوات تعينك على القراءة، لكل أداة بطاقة.';
+
+  @override
+  String get tajweedMarksTitle => 'علامات التجويد';
+
+  @override
+  String get moreLabel => 'المزيد';
 }

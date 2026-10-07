@@ -2184,10 +2184,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playerFull => 'Full player';
 
   @override
-  String get aboutTajweedTitle => 'Tajweed rules: colours and places';
+  String get tajweedMarksSubtitle => 'Tajweed rules: colours and places';
 
   @override
-  String get aboutTajweedHint =>
+  String get tajweedMarksHint =>
       'Each rule in the colour the mushaf pages give it, and every place it falls in the mushaf. Tap a rule to see its places, and a place to open its page.';
 
   @override
@@ -2211,4 +2211,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tajweedMarksInkNote =>
       'Where a rule falls on a mark alone (like the small meem), the mark stays in the text colour here: the font cannot colour a mark without part of its letter. The mushaf page shows it in colour.';
+
+  @override
+  String get assistantTitle => 'Assistant';
+
+  @override
+  String get assistantIntro => 'Helpers for your reading, one card for each.';
+
+  @override
+  String get tajweedMarksTitle => 'Tajweed marks';
+
+  @override
+  String get moreLabel => 'More';
 }

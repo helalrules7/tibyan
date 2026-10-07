@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../assistant/assistant_screen.dart';
 import '../hifz/hifz_providers.dart';
 import '../khatma/khatma_providers.dart';
 import '../mushaf/mushaf_providers.dart';
@@ -210,6 +211,15 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                // The seventh section spans the grid's width under its two
+                // rows, so the 3×2 grid stays whole.
+                _WideSectionTile(
+                  icon: assistantIcon,
+                  label: l.assistantTitle,
+                  note: l.tajweedMarksTitle,
+                  onTap: () => context.push(assistantLocation),
+                ),
               ],
             ),
           ),
@@ -265,6 +275,76 @@ class _SectionTile extends StatelessWidget {
               ),
               Text(note, style: TextStyle(color: t.goldText, fontSize: 12)),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A section as wide as the grid: its icon on the same disc as the tiles,
+/// its name and note beside it, and an arrow to open it.
+class _WideSectionTile extends StatelessWidget {
+  const _WideSectionTile({
+    required this.icon,
+    required this.label,
+    required this.note,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String note;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens.colors;
+    return Semantics(
+      button: true,
+      label: '$label. $note',
+      excludeSemantics: true,
+      onTap: onTap,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 12, 14),
+            child: Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: t.goldText.withValues(alpha: 0.12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Icon(icon, color: t.goldText, size: 24),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          color: t.ink,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        note,
+                        style: TextStyle(color: t.goldText, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: t.muted),
+              ],
+            ),
           ),
         ),
       ),

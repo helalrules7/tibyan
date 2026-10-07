@@ -3817,17 +3817,17 @@ abstract class AppLocalizations {
   /// **'المشغل كاملًا'**
   String get playerFull;
 
-  /// No description provided for @aboutTajweedTitle.
+  /// No description provided for @tajweedMarksSubtitle.
   ///
   /// In ar, this message translates to:
   /// **'أحكام التجويد: ألوانها ومواضعها'**
-  String get aboutTajweedTitle;
+  String get tajweedMarksSubtitle;
 
-  /// No description provided for @aboutTajweedHint.
+  /// No description provided for @tajweedMarksHint.
   ///
   /// In ar, this message translates to:
   /// **'كل حكم بلونه في صفحات المصحف، ومواضعه في المصحف كله. اضغط الحكم لتعرض مواضعه، واضغط الموضع لتفتح صفحته.'**
-  String get aboutTajweedHint;
+  String get tajweedMarksHint;
 
   /// No description provided for @tajweedRuleCount.
   ///
@@ -3858,6 +3858,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حين يقع الحكم على علامة وحدها (مثل الميم الصغيرة) تبقى العلامة هنا بلون النص: الخط لا يلوّن العلامة دون جزء من حرفها. وتظهر ملونة في صفحة المصحف.'**
   String get tajweedMarksInkNote;
+
+  /// No description provided for @assistantTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المساعد'**
+  String get assistantTitle;
+
+  /// No description provided for @assistantIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدوات تعينك على القراءة، لكل أداة بطاقة.'**
+  String get assistantIntro;
+
+  /// No description provided for @tajweedMarksTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'علامات التجويد'**
+  String get tajweedMarksTitle;
+
+  /// No description provided for @moreLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'المزيد'**
+  String get moreLabel;
 }
 
 class _AppLocalizationsDelegate

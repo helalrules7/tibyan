@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/assistant/assistant_screen.dart';
+import '../../features/assistant/tajweed_marks_screen.dart';
 import '../../features/hifz/presentation/hifz_map_screen.dart';
 import '../../features/hifz/presentation/hifz_screen.dart';
 import '../../features/audio/audio_downloads_screen.dart';
@@ -18,7 +20,6 @@ import '../../features/mushaf/presentation/fawasil_screen.dart';
 import '../../features/mushaf/presentation/index_screen.dart';
 import '../../features/mushaf/data/tajweed.dart';
 import '../../features/mushaf/presentation/mushaf_screen.dart';
-import '../../features/mushaf/presentation/tajweed_index_screen.dart';
 import '../../features/onboarding/onboarding_edition_screen.dart';
 import '../../features/onboarding/onboarding_language_screen.dart';
 import '../../features/onboarding/onboarding_style_screen.dart';
@@ -129,6 +130,30 @@ final appRouterProvider = Provider<GoRouter>(
           ),
         ],
       ),
+      // The reader's helpers, one card each; the first is the tajweed
+      // marks (the rules, their colours and places).
+      GoRoute(
+        path: assistantLocation,
+        builder: (context, state) => const AssistantScreen(),
+        routes: [
+          GoRoute(
+            path: 'tajweed',
+            builder: (context, state) => const TajweedMarksScreen(),
+            routes: [
+              GoRoute(
+                path: 'rule',
+                builder: (context, state) => TajweedRuleScreen(
+                  rule:
+                      TajweedRule.byKey(
+                        state.uri.queryParameters['rule'] ?? '',
+                      ) ??
+                      TajweedRule.madd6,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       GoRoute(
         path: '/verse',
         builder: (context, state) => OneVerseScreen(
@@ -194,18 +219,6 @@ final appRouterProvider = Provider<GoRouter>(
           GoRoute(
             path: 'about',
             builder: (context, state) => const AboutMushafScreen(),
-            routes: [
-              GoRoute(
-                path: 'tajweed',
-                builder: (context, state) => TajweedRuleScreen(
-                  rule:
-                      TajweedRule.byKey(
-                        state.uri.queryParameters['rule'] ?? '',
-                      ) ??
-                      TajweedRule.madd6,
-                ),
-              ),
-            ],
           ),
         ],
       ),

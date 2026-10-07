@@ -2,20 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/settings/settings_controller.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../l10n/app_localizations.dart';
-import '../../share_image/share_text_runs.dart';
-import '../data/tajweed.dart';
-import '../data/tajweed_index.dart';
-import '../mushaf_providers.dart';
-import 'mushaf_screen.dart' show surahName;
-import 'navigation.dart';
-import 'widgets/tajweed_legend.dart';
+import '../../core/settings/settings_controller.dart';
+import '../../core/theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
+import '../mushaf/data/tajweed.dart';
+import '../mushaf/data/tajweed_index.dart';
+import '../mushaf/mushaf_providers.dart';
+import '../mushaf/presentation/mushaf_screen.dart' show surahName;
+import '../mushaf/presentation/navigation.dart';
+import '../mushaf/presentation/widgets/tajweed_legend.dart';
+import '../share_image/share_text_runs.dart';
 
-/// Where the index of rule [rule] opens.
+/// Where the tajweed marks (the rules with their colours) open.
+const tajweedMarksLocation = '/assistant/tajweed';
+
+/// Where the places of rule [rule] open.
 String tajweedRuleLocation(TajweedRule rule) =>
-    '/mushaf/about/tajweed?rule=${rule.key}';
+    '$tajweedMarksLocation/rule?rule=${rule.key}';
 
 /// A rule's colour as the pages draw it now (the reader's choice or the
 /// default), on the current paper; null when the rule is left uncoloured.
@@ -24,10 +27,10 @@ Color? _drawnColor(BuildContext context, WidgetRef ref, TajweedRule rule) {
   return tajweedHueOf(rule, hues)?.on(darkPaper: !context.tokens.mode.isLight);
 }
 
-/// The tajweed part of «About this mushaf»: each rule of Tibyan's tajweed
-/// data with its colour and reach, opening the list of its places.
-class TajweedIndexCard extends ConsumerWidget {
-  const TajweedIndexCard({super.key});
+/// «علامات التجويد», the Assistant's first helper: each rule of Tibyan's
+/// tajweed data with its colour and reach, opening the list of its places.
+class TajweedMarksScreen extends ConsumerWidget {
+  const TajweedMarksScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,49 +40,69 @@ class TajweedIndexCard extends ConsumerWidget {
     // The riwaya editions have no tajweed data: the colours are listed,
     // the places (Hafs verses) are not offered.
     final hasData = editionHasTajweed(ref.watch(editionProvider));
-    return Card(
-      child: ExpansionTile(
-        leading: Icon(Icons.format_color_text, color: t.goldText),
-        title: Text(l.aboutTajweedTitle),
-        subtitle: Text(
-          l.aboutTajweedHint,
-          style: TextStyle(color: t.muted, height: 1.5),
-        ),
-        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
-        children: [
-          if (!hasData)
-            ListTile(
-              leading: Icon(Icons.info_outline, color: t.muted),
-              title: Text(
-                l.tajweedNoDataRiwaya,
-                style: TextStyle(color: t.muted, fontSize: 13),
-              ),
-            ),
-          for (final rule in tajweedLegendOrder)
-            ListTile(
-              leading: TajweedSwatch(_drawnColor(context, ref, rule)),
-              title: Text(tajweedRuleName(l, rule)),
-              subtitle: switch (counts?[rule.key]) {
-                final c? => Text(
-                  l.tajweedRuleCount('${c.verses}', '${c.letters}'),
-                  style: TextStyle(color: t.muted, fontSize: 12),
+    return Scaffold(
+      appBar: AppBar(title: Text(l.tajweedMarksTitle)),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        l.tajweedMarksSubtitle,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l.tajweedMarksHint,
+                      style: TextStyle(color: t.muted, height: 1.6),
+                    ),
+                  ],
                 ),
-                null => null,
-              },
-              trailing: hasData ? const Icon(Icons.chevron_right) : null,
-              onTap: hasData
-                  ? () => context.push(tajweedRuleLocation(rule))
-                  : null,
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-            child: Text(
-              '${l.tajweedIndexColorNote}\n${l.tajweedSourceNote}',
-              style: TextStyle(color: t.muted, fontSize: 12, height: 1.6),
-            ),
+              ),
+              if (!hasData)
+                ListTile(
+                  leading: Icon(Icons.info_outline, color: t.muted),
+                  title: Text(
+                    l.tajweedNoDataRiwaya,
+                    style: TextStyle(color: t.muted, fontSize: 13),
+                  ),
+                ),
+              for (final rule in tajweedLegendOrder)
+                ListTile(
+                  leading: TajweedSwatch(_drawnColor(context, ref, rule)),
+                  title: Text(tajweedRuleName(l, rule)),
+                  subtitle: switch (counts?[rule.key]) {
+                    final c? => Text(
+                      l.tajweedRuleCount('${c.verses}', '${c.letters}'),
+                      style: TextStyle(color: t.muted, fontSize: 12),
+                    ),
+                    null => null,
+                  },
+                  trailing: hasData ? const Icon(Icons.chevron_right) : null,
+                  onTap: hasData
+                      ? () => context.push(tajweedRuleLocation(rule))
+                      : null,
+                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Text(
+                  '${l.tajweedIndexColorNote}\n${l.tajweedSourceNote}',
+                  style: TextStyle(color: t.muted, fontSize: 12, height: 1.6),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

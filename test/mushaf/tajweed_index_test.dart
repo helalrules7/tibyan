@@ -17,9 +17,9 @@ import 'package:tibyan/features/mushaf/data/mushaf_repository.dart';
 import 'package:tibyan/features/mushaf/data/tajweed.dart';
 import 'package:tibyan/features/mushaf/data/tajweed_index.dart';
 import 'package:tibyan/features/mushaf/mushaf_providers.dart';
-import 'package:tibyan/features/mushaf/presentation/tajweed_index_screen.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/tajweed_legend.dart';
 import 'package:tibyan/features/share_image/share_text_runs.dart';
+import 'package:tibyan/features/assistant/tajweed_marks_screen.dart';
 import 'package:tibyan/l10n/app_localizations.dart';
 
 /// The tajweed index of «About this mushaf», against the real bundled
@@ -308,11 +308,10 @@ void main() {
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) =>
-              Scaffold(body: ListView(children: const [TajweedIndexCard()])),
+          builder: (context, state) => const TajweedMarksScreen(),
         ),
         GoRoute(
-          path: '/mushaf/about/tajweed',
+          path: '/assistant/tajweed/rule',
           builder: (context, state) => TajweedRuleScreen(
             rule: TajweedRule.byKey(state.uri.queryParameters['rule']!)!,
           ),
@@ -348,8 +347,6 @@ void main() {
     tester,
   ) async {
     await pumpIndex(tester);
-    await tester.tap(find.text('أحكام التجويد: ألوانها ومواضعها'));
-    await settle(tester);
     final l = lookupAppLocalizations(const Locale('ar'));
     for (final rule in TajweedRule.values) {
       expect(find.text(tajweedRuleName(l, rule)), findsOneWidget);
@@ -367,8 +364,6 @@ void main() {
     tester,
   ) async {
     await pumpIndex(tester, edition: MushafEdition.warsh);
-    await tester.tap(find.text('أحكام التجويد: ألوانها ومواضعها'));
-    await settle(tester);
     final l = lookupAppLocalizations(const Locale('ar'));
     expect(find.text(l.tajweedNoDataRiwaya), findsOneWidget);
     final tile = tester.widget<ListTile>(
