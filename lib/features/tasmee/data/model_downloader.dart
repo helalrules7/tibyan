@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
@@ -85,6 +86,29 @@ class ModelDownloader {
 
   void close() {
     if (_ownsClient) _client.close();
+  }
+
+  /// Fetches and checks a manifest (https only, a few kilobytes at most).
+  Future<ModelManifest> fetchManifest([
+    String url = recitationModelManifestUrl,
+  ]) async {
+    final uri = Uri.parse(url);
+    if (uri.scheme != 'https') {
+      throw ModelDownloadException('Not an https URL: $url');
+    }
+    final response = await _client.get(uri);
+    if (response.statusCode != 200 || response.bodyBytes.length > 64 * 1024) {
+      throw ModelDownloadException('HTTP ${response.statusCode} for $url');
+    }
+    final json = jsonDecode(utf8.decode(response.bodyBytes));
+    if (json is! Map<String, dynamic>) {
+      throw const ModelDownloadException('The manifest is not a JSON object');
+    }
+    try {
+      return ModelManifest.fromJson(json);
+    } on FormatException catch (e) {
+      throw ModelDownloadException('Bad manifest: ${e.message}');
+    }
   }
 
   /// Installs [manifest]; returns at once if exactly that version is already

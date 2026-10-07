@@ -1,3 +1,9 @@
+/// Where the recognition model's manifest is published: Tibyan's mirror,
+/// in its own folder (`mirror/recitation-models/<id>/`, files under `<version>/`).
+const recitationModelManifestUrl =
+    'https://tibyan.ahmedhelal.dev/mirror/recitation-models/'
+    'tarteel-whisper-base-ar-quran/manifest.json';
+
 /// One file of a recognition model: where to fetch it, how big it is and
 /// the SHA-256 it must have. The manager never trusts a file whose size or
 /// checksum differs from this.

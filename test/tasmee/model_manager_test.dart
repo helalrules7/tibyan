@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -130,6 +131,50 @@ void main() {
       expect(
         () => ModelManifest.fromJson({...json(), 'version': '../x'}),
         throwsFormatException,
+      );
+    });
+  });
+
+  group('published manifest', () {
+    test('the manifest on the mirror parses', () {
+      final json = jsonDecode(
+        File('test/tasmee/fixtures/recitation_model_manifest.json')
+            .readAsStringSync(),
+      ) as Map<String, dynamic>;
+      final m = ModelManifest.fromJson(json);
+      expect(m.id, 'tarteel-whisper-base-ar-quran');
+      expect(m.license, 'Apache-2.0');
+      expect(m.files.map((f) => f.name), [
+        'encoder.int8.onnx',
+        'decoder.int8.onnx',
+        'tokens.txt',
+      ]);
+      expect(
+        m.files.every(
+          (f) => f.url.toString().startsWith(
+            'https://tibyan.ahmedhelal.dev/mirror/recitation-models/',
+          ),
+        ),
+        isTrue,
+      );
+      expect(recitationModelManifestUrl, startsWith('https://'));
+    });
+
+    test('fetchManifest reads and validates it', () async {
+      final body = File('test/tasmee/fixtures/recitation_model_manifest.json')
+          .readAsStringSync();
+      final downloader = ModelDownloader(
+        store: store,
+        client: MockClient((_) async => http.Response(body, 200)),
+      );
+      expect((await downloader.fetchManifest()).version, '1');
+      final bad = ModelDownloader(
+        store: store,
+        client: MockClient((_) async => http.Response('{}', 200)),
+      );
+      await expectLater(
+        bad.fetchManifest(),
+        throwsA(isA<ModelDownloadException>()),
       );
     });
   });
