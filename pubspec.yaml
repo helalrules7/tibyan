@@ -73,6 +73,7 @@ dependencies:
   media_kit_libs_windows_audio: ^1.0.9
   app_links: ^7.2.1
   audio_service: ^0.18.18
+  sherpa_onnx: ^1.13.8
 
 dev_dependencies:
   flutter_test:
