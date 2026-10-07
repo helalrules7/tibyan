@@ -10,8 +10,9 @@ import '../../mushaf/mushaf_providers.dart';
 import '../../mushaf/presentation/widgets/illuminated_frame.dart'
     show NumberFormatter;
 import '../data/model_downloader.dart';
+import '../data/model_manifest.dart';
 import '../data/model_store.dart';
-import '../data/sherpa_whisper_recognizer.dart';
+import '../data/sherpa_offline_recognizer.dart';
 import '../data/tasmee_audio_capture.dart';
 import '../domain/alignment_engine.dart';
 import '../domain/expected_words.dart';
@@ -34,7 +35,7 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
   ModelDownloadProgress? _downloadProgress;
   ModelDownloadCancel? _cancelDownload;
   ModelDownloader? _downloader;
-  SherpaWhisperRecognizer? _recognizer;
+  RecitationRecognizer? _recognizer;
   TasmeeAudioCapture? _capture;
   StreamSubscription<List<String>>? _wordsSubscription;
   late final TasmeeEngine _engine = TasmeeEngine(widget.request.words);
@@ -70,7 +71,7 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
   Future<void> _loadInstalledModel() async {
     try {
       final store = await ModelStore.inAppSupport();
-      final model = await store.installed('tarteel-whisper-base-ar-quran');
+      final model = await store.installed(recitationModelId);
       if (!mounted) return;
       setState(() {
         _store = store;
@@ -99,7 +100,20 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(l.tasmeeDownloadModel),
-          content: Text(l.tasmeeModelConsent('$size MB')),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l.tasmeeModelConsent('$size MB')),
+                const SizedBox(height: 12),
+                Text(
+                  l.tasmeeModelAttribution,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -133,6 +147,10 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
           if (mounted) setState(() => _downloadProgress = progress);
         },
       );
+      // The model an earlier build used is no longer needed.
+      for (final id in retiredRecitationModelIds) {
+        if (id != installed.manifest.id) await _store!.delete(id);
+      }
       if (mounted) {
         setState(() {
           _model = installed;
@@ -163,7 +181,7 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
     try {
       final model = _model;
       if (model == null) throw StateError('The model is not installed');
-      final recognizer = SherpaWhisperRecognizer(model);
+      final recognizer = SherpaOfflineRecognizer.forModel(model);
       _recognizer = recognizer;
       _wordsSubscription = settledWords(recognizer.events).listen(
         _acceptWords,
@@ -478,6 +496,14 @@ class _TasmeeSessionScreenState extends ConsumerState<TasmeeSessionScreen> {
                             icon: const Icon(Icons.done),
                             label: Text(l.tasmeeSessionComplete),
                           ),
+                        if (!_loading && !modelReady) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            l.tasmeeModelAttribution,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: t.muted),
+                          ),
+                        ],
                         if (_downloading && _downloadProgress != null) ...[
                           const SizedBox(height: 8),
                           LinearProgressIndicator(

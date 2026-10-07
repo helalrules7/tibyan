@@ -1,27 +1,22 @@
 {
-  "id": "tarteel-whisper-base-ar-quran",
+  "id": "nvidia-ar-fastconformer-ctc",
   "version": "1",
-  "license": "Apache-2.0",
-  "engine": "sherpa-onnx-whisper",
+  "license": "CC-BY-4.0",
+  "engine": "sherpa-onnx-nemo-ctc",
   "language": "ar",
+  "attribution": "Arabic FastConformer by NVIDIA (nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0), CC BY 4.0; CTC branch exported to ONNX and quantised to int8 by Tibyan.",
   "files": [
     {
-      "name": "encoder.int8.onnx",
-      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/tarteel-whisper-base-ar-quran/1/encoder.int8.onnx",
-      "sha256": "5918c8d8a43072d0dbfe88aa9bbfaabb68881dfe0555ec01cf4770bdc157519c",
-      "bytes": 29104806
-    },
-    {
-      "name": "decoder.int8.onnx",
-      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/tarteel-whisper-base-ar-quran/1/decoder.int8.onnx",
-      "sha256": "1b19292bee6eb2bd1514aa80793b580303b2868f8596ccf1bce79c46f3128c2b",
-      "bytes": 130659024
+      "name": "model.int8.onnx",
+      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/nvidia-ar-fastconformer-ctc/1/model.int8.onnx",
+      "sha256": "d4f6424a8a27be687b4666506ef40f20d155d4837bc88c6f7b91d84e99fda9e6",
+      "bytes": 131652624
     },
     {
       "name": "tokens.txt",
-      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/tarteel-whisper-base-ar-quran/1/tokens.txt",
-      "sha256": "b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126",
-      "bytes": 816730
+      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/nvidia-ar-fastconformer-ctc/1/tokens.txt",
+      "sha256": "9b938381a19a69bb279cdcfc299419f25a049ea1de192e0d10317274a0f20074",
+      "bytes": 12858
     }
   ]
 }

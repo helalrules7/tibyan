@@ -2301,6 +2301,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tasmeeModelAttribution =>
+      'Tasmee uses NVIDIA\'s Arabic speech recognition model (FastConformer, nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0) under CC BY 4.0 (creativecommons.org/licenses/by/4.0). Tibyan converted its CTC branch to ONNX and quantised it to int8; NVIDIA does not endorse this. It is downloaded separately from the app and runs on your device.';
+
+  @override
   String get tasmeeDownload => 'Download';
 
   @override

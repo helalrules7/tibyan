@@ -355,6 +355,12 @@ class _TasmeeSetupScreenState extends ConsumerState<TasmeeSetupScreen> {
                               l.tasmeeDescription,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
+                            const SizedBox(height: 10),
+                            Text(
+                              l.tasmeeModelAttribution,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: t.muted),
+                            ),
                           ],
                         ),
                       ),

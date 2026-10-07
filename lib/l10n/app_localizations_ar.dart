@@ -2286,6 +2286,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get tasmeeModelAttribution =>
+      'يعمل التسميع بنموذج NVIDIA العربي للتعرف على الكلام (FastConformer، ‏nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0) برخصة CC BY 4.0 ‏(creativecommons.org/licenses/by/4.0). حوّل تبيان فرعه CTC إلى صيغة ONNX وضغطه (int8)، دون تأييد من NVIDIA. يُنزَّل منفصلا عن التطبيق ويعمل على جهازك.';
+
+  @override
   String get tasmeeDownload => 'تنزيل';
 
   @override

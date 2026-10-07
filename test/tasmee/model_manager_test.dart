@@ -142,22 +142,65 @@ void main() {
             .readAsStringSync(),
       ) as Map<String, dynamic>;
       final m = ModelManifest.fromJson(json);
-      expect(m.id, 'tarteel-whisper-base-ar-quran');
-      expect(m.license, 'Apache-2.0');
-      expect(m.files.map((f) => f.name), [
-        'encoder.int8.onnx',
-        'decoder.int8.onnx',
-        'tokens.txt',
-      ]);
+      expect(m.id, recitationModelId);
+      expect(m.license, 'CC-BY-4.0');
+      expect(m.engine, ModelEngine.sherpaNemoCtc);
+      expect(m.attribution, contains('NVIDIA'));
+      expect(m.files.map((f) => f.name), ['model.int8.onnx', 'tokens.txt']);
+      expect(m.totalBytes, 131652624 + 12858);
       expect(
         m.files.every(
           (f) => f.url.toString().startsWith(
-            'https://tibyan.ahmedhelal.dev/mirror/recitation-models/',
+            'https://tibyan.ahmedhelal.dev/mirror/recitation-models/'
+            '$recitationModelId/${m.version}/',
           ),
         ),
         isTrue,
       );
       expect(recitationModelManifestUrl, startsWith('https://'));
+      expect(recitationModelManifestUrl, contains('/$recitationModelId/'));
+      expect(retiredRecitationModelIds, isNot(contains(recitationModelId)));
+    });
+
+    test('the Whisper manifest, kept for comparison, still parses', () {
+      final json = jsonDecode(
+        File('test/tasmee/fixtures/whisper_comparison_manifest.json')
+            .readAsStringSync(),
+      ) as Map<String, dynamic>;
+      final m = ModelManifest.fromJson(json);
+      expect(m.engine, ModelEngine.sherpaWhisper);
+      expect(m.attribution, isNull);
+      expect(whisperComparisonManifestUrl, contains('/${m.id}/'));
+      expect(retiredRecitationModelIds, contains(m.id));
+    });
+
+    test('a manifest without engine is Whisper (the only engine before)', () {
+      final json = jsonDecode(
+        File('test/tasmee/fixtures/whisper_comparison_manifest.json')
+            .readAsStringSync(),
+      ) as Map<String, dynamic>;
+      expect(
+        ModelManifest.fromJson({...json}..remove('engine')).engine,
+        ModelEngine.sherpaWhisper,
+      );
+      expect(
+        () => ModelManifest.fromJson({...json, 'engine': '../x'}),
+        throwsFormatException,
+      );
+      expect(
+        () => ModelManifest.fromJson({...json, 'attribution': 3}),
+        throwsFormatException,
+      );
+    });
+
+    test('engine and attribution survive the installed marker', () {
+      final json = jsonDecode(
+        File('test/tasmee/fixtures/recitation_model_manifest.json')
+            .readAsStringSync(),
+      ) as Map<String, dynamic>;
+      final m = ModelManifest.fromJson(ModelManifest.fromJson(json).toJson());
+      expect(m.engine, ModelEngine.sherpaNemoCtc);
+      expect(m.attribution, json['attribution']);
     });
 
     test('fetchManifest reads and validates it', () async {

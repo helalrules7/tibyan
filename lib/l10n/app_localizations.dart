@@ -4027,6 +4027,12 @@ abstract class AppLocalizations {
   /// **'سيُنزل نموذج حجمه نحو {size}. سيستخدم اتصال الإنترنت، وقد تُحسب بيانات الهاتف. الصوت نفسه لا يُرسل.'**
   String tasmeeModelConsent(String size);
 
+  /// Credit for the CC BY 4.0 speech model, shown in the tasmee intro and on the model download screen.
+  ///
+  /// In ar, this message translates to:
+  /// **'يعمل التسميع بنموذج NVIDIA العربي للتعرف على الكلام (FastConformer، ‏nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0) برخصة CC BY 4.0 ‏(creativecommons.org/licenses/by/4.0). حوّل تبيان فرعه CTC إلى صيغة ONNX وضغطه (int8)، دون تأييد من NVIDIA. يُنزَّل منفصلا عن التطبيق ويعمل على جهازك.'**
+  String get tasmeeModelAttribution;
+
   /// No description provided for @tasmeeDownload.
   ///
   /// In ar, this message translates to:

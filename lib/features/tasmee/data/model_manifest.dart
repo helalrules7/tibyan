@@ -1,8 +1,32 @@
+/// The recognition model the app uses: NVIDIA's Arabic FastConformer (CTC
+/// branch, int8), CC-BY-4.0.
+const recitationModelId = 'nvidia-ar-fastconformer-ctc';
+
 /// Where the recognition model's manifest is published: Tibyan's mirror,
 /// in its own folder (`mirror/recitation-models/<id>/`, files under `<version>/`).
 const recitationModelManifestUrl =
     'https://tibyan.ahmedhelal.dev/mirror/recitation-models/'
+    '$recitationModelId/manifest.json';
+
+/// The first beta model (Whisper, Tarteel). It stays on the mirror only to
+/// compare recognisers; the app no longer downloads it.
+const whisperComparisonManifestUrl =
+    'https://tibyan.ahmedhelal.dev/mirror/recitation-models/'
     'tarteel-whisper-base-ar-quran/manifest.json';
+
+/// Models an earlier build may have installed and nothing uses now: removed
+/// once the current model is installed, to give back the space.
+const retiredRecitationModelIds = {'tarteel-whisper-base-ar-quran'};
+
+/// How a model is run (the manifest's `engine`).
+abstract final class ModelEngine {
+  /// A NeMo CTC model in sherpa_onnx (`OfflineNemoEncDecCtcModelConfig`).
+  static const sherpaNemoCtc = 'sherpa-onnx-nemo-ctc';
+
+  /// Whisper in sherpa_onnx. A manifest without `engine` is one of these:
+  /// it was the only engine before the field was read.
+  static const sherpaWhisper = 'sherpa-onnx-whisper';
+}
 
 /// One file of a recognition model: where to fetch it, how big it is and
 /// the SHA-256 it must have. The manager never trusts a file whose size or
@@ -73,6 +97,8 @@ class ModelManifest {
     required this.version,
     required this.license,
     required this.files,
+    this.engine = ModelEngine.sherpaWhisper,
+    this.attribution,
   });
 
   /// e.g. `whisper-base-ar-quran`.
@@ -86,6 +112,12 @@ class ModelManifest {
   final String license;
   final List<ModelFileSpec> files;
 
+  /// How the model is run: one of [ModelEngine].
+  final String engine;
+
+  /// The credit the licence asks for (CC-BY), as published with the model.
+  final String? attribution;
+
   int get totalBytes => files.fold(0, (sum, f) => sum + f.bytes);
 
   static final _token = RegExp(r'^[a-z0-9][a-z0-9._-]{0,63}$');
@@ -95,6 +127,8 @@ class ModelManifest {
     final version = json['version'];
     final license = json['license'];
     final files = json['files'];
+    final engine = json['engine'] ?? ModelEngine.sherpaWhisper;
+    final attribution = json['attribution'];
     if (id is! String || !_token.hasMatch(id)) {
       throw FormatException('Bad model id: $id');
     }
@@ -103,6 +137,12 @@ class ModelManifest {
     }
     if (license is! String || license.trim().isEmpty) {
       throw const FormatException('A model manifest needs its licence');
+    }
+    if (engine is! String || !_token.hasMatch(engine)) {
+      throw FormatException('Bad model engine: $engine');
+    }
+    if (attribution != null && attribution is! String) {
+      throw const FormatException('Bad attribution');
     }
     if (files is! List || files.isEmpty) {
       throw const FormatException('A model manifest needs files');
@@ -122,6 +162,8 @@ class ModelManifest {
       version: version,
       license: license.trim(),
       files: List.unmodifiable(specs),
+      engine: engine,
+      attribution: (attribution as String?)?.trim(),
     );
   }
 
@@ -129,6 +171,8 @@ class ModelManifest {
     'id': id,
     'version': version,
     'license': license,
+    'engine': engine,
+    if (attribution != null) 'attribution': attribution,
     'files': [for (final f in files) f.toJson()],
   };
 }

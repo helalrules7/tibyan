@@ -1,0 +1,27 @@
+{
+  "id": "tarteel-whisper-base-ar-quran",
+  "version": "1",
+  "license": "Apache-2.0",
+  "engine": "sherpa-onnx-whisper",
+  "language": "ar",
+  "files": [
+    {
+      "name": "encoder.int8.onnx",
+      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/tarteel-whisper-base-ar-quran/1/encoder.int8.onnx",
+      "sha256": "5918c8d8a43072d0dbfe88aa9bbfaabb68881dfe0555ec01cf4770bdc157519c",
+      "bytes": 29104806
+    },
+    {
+      "name": "decoder.int8.onnx",
+      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/tarteel-whisper-base-ar-quran/1/decoder.int8.onnx",
+      "sha256": "1b19292bee6eb2bd1514aa80793b580303b2868f8596ccf1bce79c46f3128c2b",
+      "bytes": 130659024
+    },
+    {
+      "name": "tokens.txt",
+      "url": "https://tibyan.ahmedhelal.dev/mirror/recitation-models/tarteel-whisper-base-ar-quran/1/tokens.txt",
+      "sha256": "b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126",
+      "bytes": 816730
+    }
+  ]
+}
