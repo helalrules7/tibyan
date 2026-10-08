@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ t('validate_title') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel wide">
+  <h1>{{ t('validate_title') }}</h1>
+  <p class="muted">{{ t('review_intro') }}</p>
+
+  {% if flash %}
+    <div class="success">{{ flash }}</div>
+  {% endif %}
+
+  {% if not clip %}
+    <p class="muted">{{ t('validate_none') }}</p>
+    <p><a class="btn primary" href="/record">{{ t('record_title') }}</a></p>
+  {% else %}
+    <div class="review-head">
+      <span class="review-ref">{{ surah_name }} — {{ clip.ayah }}{% if clip.ayah_end and clip.ayah_end > clip.ayah %}–{{ clip.ayah_end }}{% endif %}</span>
+    </div>
+
+    <div class="verse-prompt">
+      <span class="verse-label">{{ t('record_text_label') }}</span>
+      <p class="verse-text">{{ text }}</p>
+    </div>
+
+    <div class="preview-box">
+      <span class="block-label">{{ t('validate_listen') }}</span>
+      <audio controls src="/recordings/{{ clip.id }}/audio" preload="metadata"></audio>
+    </div>
+
+    <div class="review-actions">
+      <form method="post" action="/validate/{{ clip.id }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="verdict" value="reject">
+        <button type="submit" class="btn icon danger">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" fill="none"/></svg>
+          {{ t('validate_reject') }}
+        </button>
+      </form>
+
+      <form method="post" action="/validate/{{ clip.id }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="verdict" value="accept">
+        <button type="submit" class="btn primary icon">
+          <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z"/></svg>
+          {{ t('validate_accept') }}
+        </button>
+      </form>
+    </div>
+
+    <details class="report">
+      <summary>{{ t('validate_report') }}</summary>
+      <form method="post" action="/validate/{{ clip.id }}/report">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label>
+          <span>{{ t('validate_report_reason') }}</span>
+          <textarea name="reason" rows="3" maxlength="500"></textarea>
+        </label>
+        <button type="submit" class="btn">{{ t('validate_submit_report') }}</button>
+      </form>
+    </details>
+  {% endif %}
+</section>
+{% endblock %}

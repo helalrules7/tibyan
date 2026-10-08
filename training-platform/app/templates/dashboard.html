@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ t('nav_dashboard') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>{{ t('welcome') }}</h1>
+  <p>{{ t('signed_in_as') }}: <strong>{{ user.email or user.phone }}</strong></p>
+
+  {% if flash %}
+    <div class="success">{{ flash }}</div>
+  {% endif %}
+
+  <ul class="status">
+    <li>{{ t('consent_recorded') }}</li>
+    {% if user.consent_parental %}
+      <li>{{ t('parental_recorded') }}</li>
+    {% endif %}
+  </ul>
+
+  <p><a class="btn primary" href="/record">{{ t('record_title') }}</a></p>
+  <h2 class="section-title">{{ t('review_invite_title') }}</h2>
+  <p class="muted">{{ t('review_intro') }}</p>
+  <p><a class="btn" href="/validate">{{ t('nav_validate') }}</a></p>
+  {% if user.is_admin %}
+    <p><a class="btn" href="/admin">{{ t('admin_title') }}</a></p>
+  {% endif %}
+
+  <h2 class="section-title">{{ t('my_recordings') }}</h2>
+  {% if recordings %}
+    <table class="recordings">
+      <tbody>
+        {% for rec in recordings %}
+          <tr>
+            <td>{{ rec.surah }}:{{ rec.ayah }}{% if rec.ayah_end and rec.ayah_end > rec.ayah %}–{{ rec.ayah_end }}{% endif %}</td>
+            <td>{{ (rec.audio_duration_ms / 1000) | round(1) }}s</td>
+            <td>{{ status_label(rec.status) }}</td>
+            <td class="delete-cell">
+              <form method="post" action="/recordings/{{ rec.id }}/delete"
+                    onsubmit="return confirm('{{ t('rec_delete_confirm') }}')">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button type="submit" class="link-btn">{{ t('rec_delete') }}</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">{{ t('validate_none') }}</p>
+  {% endif %}
+</section>
+{% endblock %}
