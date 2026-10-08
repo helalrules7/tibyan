@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/duotone.dart';
 import '../../../../core/theme/theme_tokens.dart';
 
 /// Where things sit in the opening-page frames (docs/design/fateha-themes,
@@ -19,16 +20,22 @@ abstract final class OpeningArtLayout {
   ///
   /// The page's text is what it is — the printed artwork of al-Fatiha and the
   /// opening of al-Baqarah, which must not be re-laid-out — so the only way
-  /// to enlarge it is to give it more of the screen. Fitting the drawing's
-  /// whole width to the screen gives the panel 43% of it; dropping these two
-  /// strips gives it 63%, and the two cream cartouches stay where they are.
-  /// The strips are ornament on both sides, so what is lost is repeats of a
-  /// pattern that already repeats down every page.
+  /// to enlarge it is to give it more of the screen: the frame is cropped,
+  /// the text never made smaller. The strips are ornament on both sides, so
+  /// what is lost is repeats of a pattern that already repeats down every
+  /// page.
   static const sideCut = 190.0;
 
   /// What is left of the drawing's width once [sideCut] is taken off both
   /// sides, and therefore the width the drawing is scaled to fit.
   static const visibleWidth = 1200 - 2 * sideCut;
+
+  /// What must stay on screen in a room too short for the drawing's height:
+  /// the two cartouches and a little ornament beyond them. The rest of the
+  /// top and bottom borders is cropped, equally, rather than the text made
+  /// smaller.
+  static const keepTop = 201.0;
+  static const keepBottom = 1256.0;
 
   /// One period of the side borders, between the two cartouche rows: the
   /// rows 493 and 750 match across the whole width (the same in every
@@ -42,7 +49,10 @@ abstract final class OpeningArtLayout {
 }
 
 /// The opening frame fitted to [room]: [OpeningArtLayout.visibleWidth] of the
-/// drawing across, and made taller by repeating the side borders'
+/// drawing across, its side ornaments cropped (and, in a room too short for
+/// the rest, its top and bottom borders down to [OpeningArtLayout.keepTop] and
+/// [OpeningArtLayout.keepBottom]), and made taller by repeating the side
+/// borders'
 /// [OpeningArtLayout.bandTop] ([repeats] extra copies, each [stretch] times
 /// its height), so the art is never distorted beyond a slight stretch of that
 /// band.
@@ -54,8 +64,10 @@ class OpeningArtGeometry {
     var repeats = 0;
     var stretch = 1.0;
     if (art.height * k >= room.height) {
-      // Too tall already: fit the height, unchanged.
-      k = room.height / art.height;
+      // Too tall already: crop the top and bottom borders, and only if even
+      // the cartouches would not fit, scale down to fit them.
+      const keep = OpeningArtLayout.keepBottom - OpeningArtLayout.keepTop;
+      if (keep * k > room.height) k = room.height / keep;
     } else {
       final extra = room.height / k - art.height;
       // The band region (the band and its copies) takes up `extra`: of
@@ -191,48 +203,55 @@ class OpeningArtBody extends StatelessWidget {
         final g = OpeningArtGeometry.fit(room);
         final frame = g.frame;
         final panel = g.place(OpeningArtLayout.panel);
-        return Stack(
-          children: [
-            // The page's paper shows through the panel.
-            Positioned.fromRect(
-              rect: panel,
-              child: ColoredBox(color: tokens.colors.paper),
-            ),
-            Positioned.fill(
-              child: _SlicedArt(asset: asset, geometry: g),
-            ),
-            Positioned.fromRect(
-              rect: panel.deflate(panel.width * 0.03),
-              child: child,
-            ),
-            for (final c in [
-              (OpeningArtLayout.top, top),
-              (OpeningArtLayout.bottom, bottom),
-            ])
+        // The cropped ornament stays inside the page's room.
+        return ClipRect(
+          child: Stack(
+            children: [
+              // The page's paper shows through the panel.
               Positioned.fromRect(
-                // The cartouche's ends are notched: keep the text inside.
-                rect: () {
-                  final r = g.place(c.$1);
-                  return Rect.fromLTRB(
-                    r.left + r.width * 0.16,
-                    r.top + r.height * 0.14,
-                    r.right - r.width * 0.16,
-                    r.bottom - r.height * 0.14,
-                  );
-                }(),
-                child: _OnCream(
-                  child: FittedBox(fit: BoxFit.scaleDown, child: c.$2),
+                rect: panel,
+                child: ColoredBox(color: tokens.colors.paper),
+              ),
+              Positioned.fill(
+                child: _SlicedArt(asset: asset, geometry: g),
+              ),
+              Positioned.fromRect(
+                rect: panel.deflate(panel.width * 0.02),
+                child: child,
+              ),
+              for (final c in [
+                (OpeningArtLayout.top, top),
+                (OpeningArtLayout.bottom, bottom),
+              ])
+                Positioned.fromRect(
+                  // The cartouche's ends are notched: keep the text inside.
+                  rect: () {
+                    final r = g.place(c.$1);
+                    return Rect.fromLTRB(
+                      r.left + r.width * 0.16,
+                      r.top + r.height * 0.14,
+                      r.right - r.width * 0.16,
+                      r.bottom - r.height * 0.14,
+                    );
+                  }(),
+                  child: _OnCream(
+                    child: FittedBox(fit: BoxFit.scaleDown, child: c.$2),
+                  ),
                 ),
-              ),
-            if (pageNumber != null)
-              Positioned(
-                left: 0,
-                right: 0,
-                top: frame.bottom + 2,
-                height: numberSpace - 2,
-                child: Center(child: pageNumber),
-              ),
-          ],
+              if (pageNumber != null)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top:
+                      (frame.bottom < room.height
+                          ? frame.bottom
+                          : room.height) +
+                      2,
+                  height: numberSpace - 2,
+                  child: Center(child: pageNumber),
+                ),
+            ],
+          ),
         );
       },
     );
@@ -289,15 +308,24 @@ class _SlicedArtState extends State<_SlicedArt> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      CustomPaint(painter: _SlicedArtPainter(_info?.image, widget.geometry));
+  Widget build(BuildContext context) => CustomPaint(
+    painter: _SlicedArtPainter(
+      _info?.image,
+      widget.geometry,
+      context.tokens.colors.artTint,
+    ),
+  );
 }
 
 class _SlicedArtPainter extends CustomPainter {
-  _SlicedArtPainter(this.image, this.geometry);
+  _SlicedArtPainter(this.image, this.geometry, this.tint);
 
   final ui.Image? image;
   final OpeningArtGeometry geometry;
+
+  /// The mode's [ModeTokens.artTint]: the drawing recoloured to match the
+  /// page frame, or its own colours when null.
+  final (Color, Color)? tint;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -307,6 +335,7 @@ class _SlicedArtPainter extends CustomPainter {
     final sx = image.width / OpeningArtLayout.size.width;
     final sy = image.height / OpeningArtLayout.size.height;
     final paint = Paint()..filterQuality = FilterQuality.medium;
+    if (tint case final t?) paint.colorFilter = duotoneFilter(t);
     final slices = geometry.slices();
     for (var i = 0; i < slices.length; i++) {
       final (src, dst) = slices[i];
@@ -328,6 +357,7 @@ class _SlicedArtPainter extends CustomPainter {
   @override
   bool shouldRepaint(_SlicedArtPainter old) =>
       old.image != image ||
+      old.tint != tint ||
       old.geometry.frame != geometry.frame ||
       old.geometry.repeats != geometry.repeats;
 }

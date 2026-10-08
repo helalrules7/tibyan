@@ -161,13 +161,23 @@ class Entry {
   final String updatedAt;
   final List<Link> links;
 
-  String get kindLabel => switch (kind) {
-        'passage' => 'مقطع',
-        'surah_intro' => 'مطلع سورة',
-        'front_matter' => 'مقدمة الكتاب',
-        _ => kind,
-      };
+  String get kindLabel => entryKindLabel(kind);
 }
+
+/// The Arabic name of an entry kind (tools/review_schema.sql, `entry.kind`).
+/// Kinds written by the importers: passage, surah_intro, front_matter
+/// (every book); chapter, word, wajh (books of al-wujuh wa-l-nazair);
+/// tajweed_verse (the tajweed data, tools/import_tajweed_review.py).
+String entryKindLabel(String kind) => switch (kind) {
+      'passage' => 'مقطع',
+      'surah_intro' => 'مطلع سورة',
+      'front_matter' => 'مقدمة الكتاب',
+      'chapter' => 'باب',
+      'word' => 'كلمة ووجوهها',
+      'wajh' => 'وجه',
+      'tajweed_verse' => 'آية بأحكام تجويدها',
+      _ => kind,
+    };
 
 /// A short row for the entry list.
 class EntrySummary {

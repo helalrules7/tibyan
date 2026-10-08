@@ -131,6 +131,47 @@ void main() {
     expect(v.first.words, ['كلمة1', 'أخرى1']);
   });
 
+  test('entry kinds: listed in book order, with Arabic labels for every importer kind', () async {
+    final store = newStore();
+    store.db.execute(
+      "INSERT INTO entry (id, source_id, seq, kind, text, created_by, created_at, content_hash, updated_at) "
+      "VALUES (2, 1, 2, 'wajh', 'نص', 'script:test', 'x', 'h', 'x'), "
+      "(3, 1, 0, 'word', 'نص', 'script:test', 'x', 'h', 'x')",
+    );
+    expect(await store.kinds(), ['word', 'passage', 'wajh']);
+    expect(await store.entries(const EntryFilter(kind: 'wajh')), hasLength(1));
+    for (final k in ['passage', 'surah_intro', 'front_matter', 'chapter', 'word', 'wajh']) {
+      expect(entryKindLabel(k), isNot(k), reason: k);
+    }
+  });
+
+  test('every other review database present opens, and its hashes match the Dart hash', () async {
+    final files = Directory('../../data/review')
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.review.db') && f.path != drafts.path)
+        // Git LFS pointers (files not pulled) are skipped.
+        .where((f) => f.lengthSync() > 1024)
+        .toList();
+    if (files.isEmpty) return markTestSkipped('no other review databases present');
+    for (final f in files) {
+      final db = sqlite3.open(f.path, mode: OpenMode.readOnly);
+      final store = SqliteReviewStore(db, label: f.path);
+      final key = (await store.sources()).single.key;
+      expect(await store.kinds(), isNotEmpty, reason: f.path);
+      for (final s in await store.entries(const EntryFilter())) {
+        final e = (await store.entry(s.id))!;
+        expect(
+          contentHash(
+              sourceKey: key, volume: e.volume, page: e.page, pageEnd: e.pageEnd, text: e.text, links: e.links),
+          e.contentHash,
+          reason: '${f.path} entry ${e.seq}',
+        );
+      }
+      db.close();
+    }
+  });
+
   test('the shipped drafts database opens, and every hash matches the Dart hash', () async {
     if (!drafts.existsSync()) return markTestSkipped('data/review/wahidi_asbab.review.db not present');
     final db = sqlite3.open(drafts.path, mode: OpenMode.readOnly);

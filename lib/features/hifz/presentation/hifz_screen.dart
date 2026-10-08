@@ -32,7 +32,8 @@ Future<void> openHifzTest(
   if (verses.isEmpty || !context.mounted) return;
   final page = verses.first.pageIn(ref.read(editionProvider));
   await context.push(
-    '/mushaf?page=$page&hifz=${kind.name}&from=$fromRef&to=$toRef',
+    '/mushaf?page=$page&hifz=${kind.name}&from=$fromRef&to=$toRef'
+    '&entry=memorization',
   );
 }
 

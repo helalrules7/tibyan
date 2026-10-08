@@ -1,0 +1,5 @@
+// Build settings of the macOS widget extensions (see Widget-ios.xcconfig).
+#include? "../macos/Flutter/ephemeral/Flutter-Generated.xcconfig"
+
+// macOS app groups carry the team prefix.
+TIBYAN_APP_GROUP = $(TeamIdentifierPrefix)group.app.tibyan.tibyan

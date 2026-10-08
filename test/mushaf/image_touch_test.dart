@@ -189,7 +189,7 @@ void main() {
       ];
       final lines = [for (final b in boxes) b.line];
       for (final size in _sizes) {
-        final layout = StripLayout(size, g);
+        final layout = StripLayout(size, g, stretch: true);
         failures.addAll([
           for (final f in _checkPage(
             layout,
@@ -216,6 +216,21 @@ void main() {
     'Madina 1405: every touch over a line of text selects its verse',
     () async {
       final info = AyahInfoDatabase(NativeDatabase(glyphs));
+      // Each page's own ink, which a page fitted to the height is cropped to.
+      final ownInk = {
+        for (final e in (jsonDecode(
+          File('assets/config/old_page_ink.json').readAsStringSync(),
+        ) as Map<String, dynamic>).entries)
+          int.parse(e.key): switch (e.value) {
+            [num l, num t, num r, num b] => Rect.fromLTRB(
+              l.toDouble(),
+              t.toDouble(),
+              r.toDouble(),
+              b.toDouble(),
+            ),
+            _ => null,
+          },
+      };
       var checked = 0;
       final failures = <String>[];
       for (var page = 1; page <= 604; page++) {
@@ -229,6 +244,7 @@ void main() {
           opening: page <= 2,
           cuts: await repo.lineCuts('madina1405', page),
           overflow: overflow,
+          ownInk: ownInk[page],
         );
         final rows = [...await info.page(page)]
           ..sort((a, b) => a.glyphId.compareTo(b.glyphId));
@@ -240,7 +256,12 @@ void main() {
             ),
         ];
         for (final size in _sizes) {
-          final layout = StripLayout(size, g, withoutHeader: page <= 2);
+          final layout = StripLayout(
+            size,
+            g,
+            withoutHeader: page <= 2,
+            stretch: true,
+          );
           failures.addAll([
             for (final f in _checkPage(
               layout,

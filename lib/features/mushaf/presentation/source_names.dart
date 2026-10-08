@@ -102,6 +102,29 @@ const _ar = <String, SourceText>{
     license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
     credit: 'الميسر في غريب القرآن: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم',
   ),
+  // Streamed audio and an optional pack, each behind its flag
+  // (docs/features/audio_content.md); not in content.db, so not listed in
+  // «عن المصحف» until published.
+  'nuqayah-tafsir-audio': (
+    title: 'التفسير المسموع (الميسر والسعدي)',
+    publisher: 'نقاية (التفسير التفاعلي read.tafsir.one)، بإذن مكتوب',
+    license: 'إذن مكتوب من نقاية: بلا إعلانات ولا ربح',
+    credit: 'التفسير المسموع: عن التفسير التفاعلي لنقاية (read.tafsir.one)، بإذنهم، بلا إعلانات ولا ربح',
+  ),
+  'quranenc-english-rwwad-audio': (
+    title: 'الترجمة الإنجليزية المسموعة (مركز رواد الترجمة)',
+    publisher: 'مركز رواد الترجمة، عبر موقع QuranEnc.com',
+    license:
+        'شروط موسوعة القرآن الكريم (QuranEnc)، وسُئلوا عن الصوت (الرسالة 12)',
+    credit:
+        'الترجمة الإنجليزية المسموعة: مركز رواد الترجمة، عبر موقع QuranEnc.com',
+  ),
+  'quranenc-english-mokhtasar': (
+    title: 'المختصر في تفسير القرآن الكريم، بالإنجليزية',
+    publisher: 'مركز تفسير للدراسات القرآنية، عبر موقع QuranEnc.com',
+    license: 'شروط موسوعة القرآن الكريم (QuranEnc): دون تعديل أو إضافة أو حذف، مع ذكر الناشر والموقع ورقم الإصدار',
+    credit: 'المختصر في تفسير القرآن الكريم (بالإنجليزية): مركز تفسير للدراسات القرآنية، عبر موقع QuranEnc.com',
+  ),
   'quranicaudio': (
     title: 'تلاوة ياسر الدوسري (مرتل)',
     publisher: 'موقع quranicaudio.com (صوت Quran.com)',
@@ -139,6 +162,12 @@ const _ar = <String, SourceText>{
     license: 'رخصة MIT كما في بطاقة النموذج: يُسمح بالاستعمال والنسخ والتعديل والتوزيع مع ذكر الرخصة',
     credit:
         'البحث بالمعنى: نموذج multilingual-e5-small (MIT)، في حزمة اختيارية',
+  ),
+  'nvidia-stt-ar-fastconformer': (
+    title: 'نموذج التعرف على الكلام للتسميع (FastConformer العربي)',
+    publisher: 'NVIDIA، على Hugging Face (nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0)؛ حوّل تبيان فرعه CTC إلى صيغة ONNX وضغطه (int8)، دون تأييد من NVIDIA',
+    license: 'المشاع الإبداعي، النسبة 4.0 (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/',
+    credit: 'التسميع: نموذج NVIDIA العربي للتعرف على الكلام (FastConformer) برخصة CC BY 4.0، معدّلا: فرعه CTC وحده بصيغة ONNX مضغوطا (int8). يُنزَّل منفصلا عن التطبيق ويعمل على الجهاز.',
   ),
 };
 
@@ -234,6 +263,24 @@ const _en = <String, SourceText>{
     license: 'Written permission from Nuqayah: no ads and no profit',
     credit: 'Al-Muyassar fi Gharib al-Quran: from Nuqayah\'s read.tafsir.one, by permission',
   ),
+  'nuqayah-tafsir-audio': (
+    title: 'Tafsir audio (al-Muyassar and al-Sa\'di)',
+    publisher: 'Nuqayah (read.tafsir.one), by written permission',
+    license: 'Written permission from Nuqayah: no ads and no profit',
+    credit: 'Tafsir audio: from Nuqayah\'s read.tafsir.one, by permission, with no ads and no profit',
+  ),
+  'quranenc-english-rwwad-audio': (
+    title: 'English translation audio (Rowwad Translation Center)',
+    publisher: 'Rowwad Translation Center, via QuranEnc.com',
+    license: 'QuranEnc terms; asked about the audio (letter 12)',
+    credit: 'English translation audio: Rowwad Translation Center, via QuranEnc.com',
+  ),
+  'quranenc-english-mokhtasar': (
+    title: 'Al-Mukhtasar fi Tafsir al-Quran al-Karim (English)',
+    publisher: 'Tafsir Center for Quranic Studies, via QuranEnc.com',
+    license: 'QuranEnc terms: no change, addition or deletion; publisher, site and version named',
+    credit: 'Al-Mukhtasar in Tafsir (English): Tafsir Center for Quranic Studies, via QuranEnc.com',
+  ),
   'quranicaudio': (
     title: 'Yasser al-Dosari (murattal)',
     publisher: 'quranicaudio.com (Quran.com audio)',
@@ -271,6 +318,12 @@ const _en = <String, SourceText>{
     license: 'MIT License, as stated on the model card: use, copy, modify and distribute with the licence kept',
     credit: 'Search by meaning: the multilingual-e5-small model (MIT), in an optional pack',
   ),
+  'nvidia-stt-ar-fastconformer': (
+    title: 'Speech recognition model for tasmee (Arabic FastConformer)',
+    publisher: 'NVIDIA, on Hugging Face (nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0); its CTC branch converted to ONNX and quantised to int8 by Tibyan, not endorsed by NVIDIA',
+    license: 'Creative Commons Attribution 4.0 (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/',
+    credit: 'Tasmee: NVIDIA\'s Arabic speech recognition model (FastConformer) under CC BY 4.0, modified: its CTC branch alone, in ONNX, quantised to int8. Downloaded separately from the app; runs on the device.',
+  ),
 };
 
 /// Sources that are not in content.db (bundled with the app), listed after
@@ -285,6 +338,13 @@ const bundledSources = [
     key: 'multilingual-e5-small',
     url: 'https://huggingface.co/intfloat/multilingual-e5-small',
     version: '614241f622f53c4eeff9890bdc4f31cfecc418b3',
+  ),
+  // The tasmee's model (downloaded on first use, not bundled): credited
+  // here, in one place, rather than on the tasmee screens.
+  (
+    key: 'nvidia-stt-ar-fastconformer',
+    url: 'https://huggingface.co/nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0',
+    version: '7f32349',
   ),
 ];
 

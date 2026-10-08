@@ -48,9 +48,130 @@ class Khatmas extends Table with SyncColumns {
   IntColumn get reminderTime => integer().nullable()();
 
   /// The day the rest was spread again over the remaining days (catch-up).
+  /// Since v5 the day the plan's pace is counted from.
   TextColumn get rebasedOn => text().nullable()();
   DateTimeColumn get completedAt => dateTime().nullable()();
   DateTimeColumn get createdAt => dateTime().clientDefault(DateTime.now)();
+
+  // v5 (khatmah v1.1). A row from v4 has [rangeStart] null until its log is
+  // carried over to sessions (KhatmahStore.migrateLegacy).
+
+  /// `fullQuran`, `partial`, `dailyWird` or `custom`.
+  TextColumn get kind => text().withDefault(const Constant('fullQuran'))();
+
+  /// The verses of the khatma (`ayah.id`), and where reading starts.
+  IntColumn get rangeStart => integer().nullable()();
+  IntColumn get rangeEnd => integer().nullable()();
+  IntColumn get startAt => integer().nullable()();
+
+  /// `duration`, `endDate`, `dailyAmount` or `openEnded`.
+  TextColumn get pacingMode => text().withDefault(const Constant('endDate'))();
+
+  /// `adaptive` or `fixed`.
+  TextColumn get scheduleMode =>
+      text().withDefault(const Constant('adaptive'))();
+
+  /// The planned amount a day, in Madina pages (verse weights).
+  RealColumn get dailyWeight => real().nullable()();
+
+  /// Rest weekdays (`DateTime.weekday`, 1 = Monday), comma separated:
+  /// `5` for Friday.
+  TextColumn get restWeekdays => text().withDefault(const Constant(''))();
+
+  /// `auto`, `ask` or `manual`.
+  TextColumn get countingMode => text().withDefault(const Constant('auto'))();
+  BoolColumn get isPrimary => boolean().withDefault(const Constant(false))();
+
+  /// `active`, `paused`, `completed` or `cancelled`. Replaces reading it
+  /// from [completedAt] and `deletedAt`, which are still written.
+  TextColumn get status => text().withDefault(const Constant('active'))();
+  BoolColumn get autoRestart => boolean().withDefault(const Constant(false))();
+
+  /// The preset it was made from (`ramadan_30`…).
+  TextColumn get presetId => text().nullable()();
+
+  /// The answer to «finish early, or a lighter portion?»: null (not asked
+  /// yet), `finishEarly` or `lighter`.
+  TextColumn get aheadChoice => text().nullable()();
+
+  /// Notification kinds on for this khatma, comma separated.
+  TextColumn get reminderKinds => text().withDefault(const Constant(''))();
+
+  /// A catch-up the reader chose (JSON), or null.
+  TextColumn get recovery => text().nullable()();
+}
+
+/// A stretch a khatma was paused: its days are not counted.
+@DataClassName('KhatmaPauseRow')
+class KhatmaPauses extends Table with SyncColumns {
+  @override
+  String get tableName => 'khatma_pause';
+
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get khatmaUuid => text()();
+
+  /// First paused day, and the last (null while still paused).
+  TextColumn get fromDay => text()();
+  TextColumn get toDay => text().nullable()();
+}
+
+/// The part of a reading session counted for a khatma.
+@DataClassName('SessionAttributionRow')
+class SessionAttributions extends Table with SyncColumns {
+  @override
+  String get tableName => 'session_attribution';
+
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get sessionUuid => text()();
+  TextColumn get khatmaUuid => text()();
+
+  /// The verses counted, new to the khatma when counted (JSON runs).
+  TextColumn get ranges => text()();
+
+  /// Their weight then.
+  RealColumn get newWeight => real()();
+
+  /// `auto`, `userAccepted`, `manual`, or `declined` (an «ask» answered
+  /// no; kept so it is not asked again).
+  TextColumn get decidedBy => text()();
+  BoolColumn get undone => boolean().withDefault(const Constant(false))();
+
+  /// The logical day of the session, and when it started (for order).
+  TextColumn get day => text()();
+  DateTimeColumn get at => dateTime()();
+}
+
+/// Cache: a khatma's coverage, rebuilt from its attributions.
+@DataClassName('KhatmaCoverageRow')
+class KhatmaCoverages extends Table {
+  @override
+  String get tableName => 'khatma_coverage';
+
+  TextColumn get khatmaUuid => text()();
+  TextColumn get ranges => text()();
+  RealColumn get coveredWeight => real()();
+  IntColumn get frontier => integer().nullable()();
+  DateTimeColumn get updatedAt => dateTime().clientDefault(DateTime.now)();
+
+  @override
+  Set<Column> get primaryKey => {khatmaUuid};
+}
+
+/// Cache: what was read for a khatma on a logical day.
+@DataClassName('DailyStatRow')
+class DailyStats extends Table {
+  @override
+  String get tableName => 'daily_stat';
+
+  TextColumn get khatmaUuid => text()();
+  TextColumn get day => text()();
+  RealColumn get weightRead => real()();
+  IntColumn get sessions => integer()();
+  IntColumn get seconds => integer()();
+  RealColumn get target => real().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {khatmaUuid, day};
 }
 
 /// Pages of a khatma read on a day, as a run of pages.
@@ -81,9 +202,24 @@ class ReadingSessions extends Table with SyncColumns {
   /// Pages that stayed on screen long enough to count as read.
   IntColumn get pages => integer()();
 
-  /// `page` (the page view).
+  /// How it was read: `page` (the page view), `scroll` (auto-scroll),
+  /// `verse` («آية آية») or `continuous`.
   TextColumn get mode => text().withDefault(const Constant('page'))();
   TextColumn get edition => text().nullable()();
+
+  // v5 (khatmah v1.1).
+
+  /// `reader`, `audio` or `manual`.
+  TextColumn get source => text().withDefault(const Constant('reader'))();
+
+  /// Where the reading was opened from (`EntryPoint.name`).
+  TextColumn get entryPoint => text().withDefault(const Constant('other'))();
+
+  /// Time spent reading, idle stretches left out.
+  IntColumn get activeSeconds => integer().nullable()();
+
+  /// The verses read (JSON runs of `ayah.id`).
+  TextColumn get ranges => text().withDefault(const Constant(''))();
 }
 
 /// Time spent listening to a recitation, recorded automatically.
@@ -140,6 +276,8 @@ class Outbox extends Table {
 const syncedTables = [
   'khatma',
   'khatma_log',
+  'khatma_pause',
+  'session_attribution',
   'reading_session',
   'listening_session',
   'reflection',

@@ -1,0 +1,8 @@
+[
+  {"name": "R023_S5_Surah_036_Aya40_C2.wav", "path": "/AQQD/Surah_036/R023_S5_Surah_036_Aya40_C2.wav", "size": 882044, "hashes": {"sha256": "00"}, "id": "abc01", "download": "https://osf.io/download/abc01/"},
+  {"name": "R023_S5_Surah_036_Aya40_C1.wav", "path": "/AQQD/Surah_036/R023_S5_Surah_036_Aya40_C1.wav", "size": 529244, "hashes": null, "id": "abc02", "download": null},
+  {"name": "R101_S2_Surah_036_Aya40_C1.wav", "path": "/AQQD/Surah_036/R101_S2_Surah_036_Aya40_C1.wav", "size": 705644, "hashes": null, "id": "abc03", "download": "https://osf.io/download/abc03/"},
+  {"name": "R101_S2_Surah_001_Aya_4_C1.wav", "path": "/AQQD/Surah_001/R101_S2_Surah_001_Aya_4_C1.wav", "size": 617444, "hashes": null, "id": "abc04", "download": "https://osf.io/download/abc04/"},
+  {"name": "readme.txt", "path": "/AQQD/readme.txt", "size": 100, "hashes": null, "id": "abc05", "download": "https://osf.io/download/abc05/"},
+  {"name": "R009_S1_Surah_002_Aya3_C1.wav", "path": "/AQQD/Surah_002/R009_S1_Surah_002_Aya3_C1.wav", "size": 100, "hashes": null}
+]

@@ -12,11 +12,27 @@ key.properties
 *.p8
 *.p12
 *.mobileprovision
+# Voice recordings and local ASR evaluation notes; never commit or upload.
+/audio-training/
 # Raw downloads and generated data (rebuilt by tools/)
 /tools/.cache/
 /tools/out/
 /data/raw/
 /data/build/
+# Review drafts of the altafsir.com tafsirs (10-33 MB each): rebuilt with
+# `python3 tools/import_altafsir.py all` (docs/review/README.md). Remove a
+# book's line here and commit its file (Git LFS) once review work starts on it.
+/data/review/tafsir_tabari.review.db
+/data/review/tafsir_qurtubi.review.db
+/data/review/tafsir_ibn_kathir.review.db
+/data/review/tafsir_baghawi.review.db
+/data/review/tafsir_saadi.review.db
+/data/review/munasabat_biqai.review.db
+# al-Damghani (5.5 MB): `python3 tools/import_damghani_wujuh.py`. LFS uploads are
+# refused from the cloud session, so it waits here with the others.
+/data/review/wujuh_damghani.review.db
+# The tajweed sample (ن15): `python3 tools/import_tajweed_review.py`.
+/data/review/tajweed_hafs.review.db
 
 # ── Flutter / Dart ─────────────────────────────────────────────────
 .dart_tool/
@@ -101,3 +117,7 @@ server*.local*
 
 # Claude Code worktrees and local settings
 /.claude/
+
+# ── Apps to analyze ────────────────────────────────────────────────────
+/to-analyze
+to-analyze

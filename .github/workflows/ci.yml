@@ -36,5 +36,7 @@ jobs:
           flutter pub get
           flutter analyze
           flutter test
+      - name: Release scripts
+        run: python3 -m unittest discover -s tools/tests -p 'test_release.py'
       - name: Text verification tool compiles
         run: python3 -m py_compile tools/verify_text/compare_tanzil_kfgqpc.py

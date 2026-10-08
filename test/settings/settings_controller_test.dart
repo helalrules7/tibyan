@@ -8,6 +8,7 @@ import 'package:tibyan/core/settings/settings_controller.dart';
 import 'package:tibyan/core/theme/app_theme.dart';
 import 'package:tibyan/core/theme/theme_registry.dart';
 import 'package:tibyan/core/theme/theme_tokens.dart';
+import 'package:tibyan/features/audio/verse_queue.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +57,136 @@ void main() {
     expect(s.uiFont, UiFont.kfgqpcAn);
     expect(s.locale, const Locale('en'));
   });
+
+  test('foreign tafsir defaults follow the interface language', () async {
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'en',
+        languageCode: 'ar',
+      ),
+      isFalse,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'en',
+        languageCode: 'en',
+      ),
+      isTrue,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'ar',
+        languageCode: 'en',
+      ),
+      isFalse,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'tafsir',
+        contentLanguageCode: 'ar',
+        languageCode: 'en',
+      ),
+      isTrue,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: '',
+        languageCode: 'en',
+      ),
+      isFalse,
+    );
+    expect(
+      commentaryDefaultShown(
+        kind: 'translation',
+        contentLanguageCode: 'ur',
+        languageCode: 'en',
+      ),
+      isFalse,
+    );
+    final c = await containerWith({});
+    final controller = c.read(settingsProvider.notifier);
+    await controller.setCommentaryShown(42, true);
+    expect(
+      c.read(settingsProvider).isCommentaryShown(42, defaultShown: false),
+      isTrue,
+    );
+    final sp = await SharedPreferences.getInstance();
+    final restored = await containerWith({
+      for (final k in sp.getKeys()) k: sp.get(k)!,
+    });
+    expect(
+      restored
+          .read(settingsProvider)
+          .isCommentaryShown(42, defaultShown: false),
+      isTrue,
+    );
+    await controller.setCommentaryShown(42, false);
+    expect(
+      c.read(settingsProvider).isCommentaryShown(42, defaultShown: true),
+      isFalse,
+    );
+  });
+
+  test(
+    'English tafsir visibility override is saved across locale changes',
+    () async {
+      final c = await containerWith({});
+      final controller = c.read(settingsProvider.notifier);
+      expect(c.read(settingsProvider).isEnglishTafsirShown('ar'), isFalse);
+      expect(c.read(settingsProvider).isEnglishTafsirShown('en'), isTrue);
+
+      await controller.setEnglishTafsirShown(true);
+      await controller.setUnderVerse([7]);
+      await controller.setLanguage(LanguageSetting.en);
+      expect(c.read(settingsProvider).isEnglishTafsirShown('ar'), isTrue);
+      expect(c.read(settingsProvider).underVerse, [7]);
+
+      final sp = await SharedPreferences.getInstance();
+      final restored = await containerWith({
+        for (final k in sp.getKeys()) k: sp.get(k)!,
+      });
+      expect(
+        restored.read(settingsProvider).isEnglishTafsirShown('ar'),
+        isTrue,
+      );
+      expect(restored.read(settingsProvider).underVerse, [7]);
+    },
+  );
+
+  test(
+    'translation audio default follows language until explicitly chosen',
+    () async {
+      expect(
+        defaultTranslationAudioEnabled(
+          LanguageSetting.system,
+          systemLanguageCode: 'en',
+        ),
+        isTrue,
+      );
+      expect(
+        defaultTranslationAudioEnabled(
+          LanguageSetting.system,
+          systemLanguageCode: 'ar',
+        ),
+        isFalse,
+      );
+      final c = await containerWith({});
+      final controller = c.read(settingsProvider.notifier);
+      expect(c.read(translationAudioChoiceProvider), isFalse);
+
+      await controller.setLanguage(LanguageSetting.en);
+      expect(c.read(translationAudioChoiceProvider), isTrue);
+
+      c.read(translationAudioChoiceProvider.notifier).set(false);
+      await controller.setLanguage(LanguageSetting.ar);
+      await controller.setLanguage(LanguageSetting.en);
+      expect(c.read(translationAudioChoiceProvider), isFalse);
+    },
+  );
 
   test(
     'a new theme brings its own marker shape over an earlier choice',
@@ -126,5 +257,80 @@ void main() {
       s.copyWith(mode: ModeSetting.black).resolveMode(Brightness.light),
       ThemeModeId.black,
     );
+  });
+
+  test(
+    'focus mode and the player style: defaults, saved and restored',
+    () async {
+      final c = await containerWith({});
+      final s = c.read(settingsProvider);
+      expect(s.focusMode, isFalse);
+      expect(s.focusTools, FocusTools.button);
+      expect(s.pageFill, PageFill.lines);
+      expect(s.playerStyle, PlayerStyle.auto);
+      expect(s.playerPosition, isNull);
+      // Automatic: the normal bar, and the pill in focus mode.
+      expect(s.effectivePlayerStyle, PlayerStyle.normal);
+      expect(
+        s.copyWith(focusMode: true).effectivePlayerStyle,
+        PlayerStyle.pill,
+      );
+      expect(
+        s
+            .copyWith(focusMode: true, playerStyle: PlayerStyle.normal)
+            .effectivePlayerStyle,
+        PlayerStyle.normal,
+      );
+
+      final ctrl = c.read(settingsProvider.notifier);
+      await ctrl.setFocusMode(true);
+      await ctrl.setFocusTools(FocusTools.menu);
+      await ctrl.setPageFill(PageFill.full);
+      await ctrl.setPlayerStyle(PlayerStyle.button);
+      await ctrl.setPlayerPosition(const Offset(0.25, 1.4));
+      await ctrl.setFocusToolsShown(true);
+      await ctrl.setAutoScrollSpeed(12);
+      final sp = await SharedPreferences.getInstance();
+      final restored = await containerWith({
+        for (final k in sp.getKeys()) k: sp.get(k)!,
+      });
+      final r = restored.read(settingsProvider);
+      expect(r.focusMode, isTrue);
+      expect(r.focusTools, FocusTools.menu);
+      expect(r.pageFill, PageFill.full);
+      expect(r.playerStyle, PlayerStyle.button);
+      // Kept inside the screen.
+      expect(r.playerPosition, const Offset(0.25, 1));
+      expect(r.focusToolsShown, isTrue);
+      // Kept within 1–10.
+      expect(r.autoScrollSpeed, 10);
+    },
+  );
+
+  test('sajdah timer: off and 20 seconds by default, kept, within the lengths offered', () async {
+    final c = await containerWith({});
+    final s = c.read(settingsProvider);
+    expect(s.sajdahTimer, isFalse);
+    expect(s.sajdahSeconds, 20);
+
+    final ctrl = c.read(settingsProvider.notifier);
+    await ctrl.setSajdahTimer(true);
+    await ctrl.setSajdahSeconds(45);
+    // Not a length offered: ignored.
+    await ctrl.setSajdahSeconds(7);
+    expect(c.read(settingsProvider).sajdahSeconds, 45);
+
+    final sp = await SharedPreferences.getInstance();
+    final restored = await containerWith({
+      for (final k in sp.getKeys()) k: sp.get(k)!,
+    });
+    final r = restored.read(settingsProvider);
+    expect(r.sajdahTimer, isTrue);
+    expect(r.sajdahSeconds, 45);
+
+    // A stored length that is not offered falls back to the default.
+    final odd = await containerWith({'settings.sajdahSeconds': 25});
+    expect(odd.read(settingsProvider).sajdahSeconds, 20);
+    expect(sajdahTimerLengths, [10, 15, 20, 30, 45, 60]);
   });
 }

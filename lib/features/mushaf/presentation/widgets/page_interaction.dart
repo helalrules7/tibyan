@@ -9,9 +9,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/settings/app_settings.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/duotone.dart';
 import '../../data/tajweed.dart';
 import 'mushaf_page.dart';
 import 'theme_art.dart';
+
+/// The colour a page is drawn on. Recitation covers are painted in it, so
+/// a covered line is the page's own background and nothing more. The
+/// framed layouts lay the page on the theme's paper (the default); where
+/// no frame is drawn (the plain frame of plain themes and elderly mode,
+/// focus mode) the page lies on the screen's background, and the layout
+/// says so here.
+class PageGround extends InheritedWidget {
+  const PageGround({super.key, required this.color, required super.child});
+
+  final Color color;
+
+  static Color of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<PageGround>()?.color ??
+      context.tokens.colors.paper;
+
+  @override
+  bool updateShouldNotify(PageGround oldWidget) => oldWidget.color != color;
+}
 
 /// What the reader can do on a page; shared by both editions.
 class PageInteraction {
@@ -34,6 +54,7 @@ class PageInteraction {
     this.emphasisLines = const {},
     this.activeWord,
     this.onVerseTap,
+    this.onListenFrom,
     this.touched,
     this.touchColor,
     this.onPick,
@@ -41,7 +62,27 @@ class PageInteraction {
     this.verseText,
     this.tajweedColor,
     this.tajweed = '',
+    this.fill,
+    this.onPageLongPress,
+    this.wordTints = const {},
+    this.wordOverlay,
   });
+
+  /// Words whose letters are drawn in another colour than the ink, by
+  /// colour (boxes in edition units). The new edition only.
+  final Map<Color, List<Rect>> wordTints;
+
+  /// Drawn over the page, last; [toScreen] places a box in edition units
+  /// on the widget. The new edition only.
+  final void Function(Canvas canvas, Rect Function(Rect box) toScreen)?
+  wordOverlay;
+
+  /// A long press on the page off any verse; null: it does nothing.
+  final VoidCallback? onPageLongPress;
+
+  /// Focus mode: how the page fills the room it is given; null outside
+  /// focus mode, where each edition keeps its own layout.
+  final PageFill? fill;
 
   /// Screen readers: a verse's name («سورة البقرة، الآية ٥») and its text
   /// as stored (read after the name). Without [verseLabel] the page has no
@@ -62,8 +103,15 @@ class PageInteraction {
   /// px in the others) and the verse under it, if any.
   final void Function(Offset point, VerseKey? verse)? onPick;
 
-  /// Touch reading: a tap on a verse shades it (replacing the last one).
-  final ValueChanged<VerseKey>? onVerseTap;
+  /// A tap on a verse (not its marker), with the point in edition units
+  /// as for [onPick]: touch reading shades it, multi-verse selection
+  /// extends to it, listening moves the recitation there. While null, a
+  /// tap on a verse is a tap on the page ([onTap]).
+  final void Function(VerseKey verse, Offset point)? onVerseTap;
+
+  /// While listening: screen readers' action that moves the recitation to
+  /// a verse.
+  final ValueChanged<VerseKey>? onListenFrom;
   final VerseKey? touched;
   final Color? touchColor;
 
@@ -126,13 +174,17 @@ class PageInteraction {
 /// it covers ([areas], screen coordinates, in reading order). A double tap
 /// selects the verse (or, in recitation mode, shows or covers it; while
 /// picking a word, studies the verse), a long press does what it does on
-/// the page, and a custom action sets or removes the reading mark. The
-/// nodes take no touches: the page under them still answers every gesture.
+/// the page, and a custom action sets or removes the reading mark; while
+/// listening another ([listenAction]) moves the recitation to the verse.
+/// The nodes take no touches: the page under them still answers every
+/// gesture.
 List<Widget> verseSemanticNodes(
   PageInteraction x,
   List<(VerseKey, Rect)> areas, {
   required String markAction,
+  String? listenAction,
 }) {
+  final listen = x.onListenFrom;
   final label = x.verseLabel;
   if (label == null) return const [];
   return [
@@ -153,6 +205,8 @@ List<Widget> verseSemanticNodes(
           onLongPress: () => x.onVerseLongPress(v),
           customSemanticsActions: {
             CustomSemanticsAction(label: markAction): () => x.onMarkerTap(v),
+            if (listen != null && listenAction != null)
+              CustomSemanticsAction(label: listenAction): () => listen(v),
           },
           child: const SizedBox.expand(),
         ),
@@ -343,6 +397,7 @@ class MarkerLook {
     required this.paper,
     required this.ink,
     this.art,
+    this.artTint,
   });
 
   /// The shape drawn: [MarkerStyle.theme] only with [art].
@@ -357,6 +412,34 @@ class MarkerLook {
   final Color paper;
   final Color ink;
 
+  /// The theme's [ModeTokens.artTint]: the rosettes recoloured to match its
+  /// frame, or their own colours when null.
+  final (Color, Color)? artTint;
+
+  /// Paper over the printed marker at [c] (radius [r]: half its box's
+  /// shorter side). The printed marker reaches its box's sides (the 1405
+  /// marker's side ornaments, the Shamarly ring), so where its box is
+  /// wider than tall (a page stretched across) a circle leaves their ends
+  /// showing beside the new marker: the box's own oval, kept inside the
+  /// box so the words around keep their ink, covers them.
+  void _cover(Canvas canvas, Offset c, double r, Rect? printed) {
+    final paint = Paint()..color = paper;
+    canvas.drawCircle(c, r * 1.12, paint);
+    if (printed == null) return;
+    canvas
+      ..save()
+      ..clipRect(printed.inflate(printed.shortestSide * 0.04))
+      ..drawOval(
+        Rect.fromCenter(
+          center: printed.center,
+          width: printed.width * 1.12,
+          height: printed.height * 1.12,
+        ),
+        paint,
+      )
+      ..restore();
+  }
+
   /// Under the page ink: a tint that shows inside the printed marker.
   void paintUnder(Canvas canvas, Offset c, double r) {
     if (tint == null || image != null || art != null) return;
@@ -369,20 +452,22 @@ class MarkerLook {
 
   /// Over the page ink: a rosette with the verse number, covering the
   /// printed marker.
-  /// [marked] fills the centre with a mark's colour.
+  /// [marked] fills the centre with a mark's colour. [printed] is the
+  /// printed marker's box on screen, where the page image has one.
   void paintOver(
     Canvas canvas,
     Offset c,
     double r,
     int number, {
     Color? marked,
+    Rect? printed,
   }) {
     final art = this.art;
     if (art != null) {
       // The printed marker goes under the paper (the new edition leaves it
       // out; the page images have it), then the theme's marker with the
       // number in its number box.
-      canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
+      _cover(canvas, c, r, printed);
       paintArtMarker(
         canvas,
         art,
@@ -395,13 +480,15 @@ class MarkerLook {
     }
     final img = image;
     if (img == null) return;
-    canvas.drawCircle(c, r * 1.12, Paint()..color = paper);
+    _cover(canvas, c, r, printed);
     final size = r * 2.7;
     canvas.drawImageRect(
       img,
       Rect.fromLTWH(0, 0, img.width.toDouble(), img.height.toDouble()),
       Rect.fromCenter(center: c, width: size, height: size),
-      Paint()..filterQuality = FilterQuality.medium,
+      Paint()
+        ..filterQuality = FilterQuality.medium
+        ..colorFilter = artTint == null ? null : duotoneFilter(artTint!),
     );
     final fill = marked ?? tint;
     canvas.drawCircle(c, r * 0.86, Paint()..color = fill ?? paper);
@@ -411,7 +498,7 @@ class MarkerLook {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = r * 0.1
-        ..color = const Color(0xFF1C2F45),
+        ..color = artTint?.$1 ?? const Color(0xFF1C2F45),
     );
     final digits = number
         .toString()

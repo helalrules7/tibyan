@@ -10,7 +10,6 @@
   "sectionHifz": "Memorize",
   "sectionKhatma": "Khatma",
   "sectionSearch": "Search",
-  "comingSoon": "Coming soon",
   "settingsTitle": "Settings",
   "openSettings": "Open settings",
   "appearanceTitle": "Mushaf look",
@@ -33,7 +32,7 @@
   "crashReportsLabel": "Send crash reports",
   "crashReportsHint": "Sends technical crash details only, with no personal data. Off until you agree.",
   "aboutTitle": "About",
-  "aboutBody": "Tibyan is a free, non-profit app with no ads and no purchases, and its code is open. Every text in it comes from a verified source, shown next to it.",
+  "aboutBody": "Tibyan is an app for reading and reflecting on the Quran, and its code is open. Every text in it comes from a verified source, shown next to it.",
   "versionLabel": "Version {version}",
   "selected": "Selected",
   "onbLanguageTitle": "اختر اللغة\nChoose your language",
@@ -313,7 +312,7 @@
     }
   },
   "multiSelect": "Select several verses",
-  "multiSelectHint": "Drag the handles to select verses",
+  "multiSelectHint": "Drag the handles, or turn the page and tap a verse to extend the selection to it",
   "doneLabel": "Done",
   "markRemoved": "Mark removed",
   "tabMarks": "Reading marks",
@@ -327,6 +326,7 @@
   "tafsirFontInterface": "Interface font",
   "tafsirTextSize": "Text size",
   "tafsirShown": "Texts shown",
+  "englishTafsirVisibilityLabel": "English tafsir",
   "tafsirNoneShown": "All texts are hidden. Choose one in the tafsir settings.",
   "tafsirFootnotes": "Footnotes",
   "previousVerse": "Previous verse",
@@ -388,6 +388,26 @@
   },
   "sleepSurahEnd": "End of surah",
   "followRecitation": "Turn pages with the recitation",
+  "sajdahTimer": "Sajdah timer",
+  "sajdahTimerHint": "At a verse of prostration the reciter pauses and a card with the supplications of prostration counts down, then the recitation goes on",
+  "sajdahTimerLength": "Timer length",
+  "sajdahCardLabel": "Prostration of recitation",
+  "sajdahTapToContinue": "Tap to continue",
+  "sajdahContinue": "Continue",
+  "sajdahSecondsLeft": "{n} seconds left",
+  "@sajdahSecondsLeft": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "tapJumpLabel": "Tapping a verse while listening",
+  "tapJumpHint": "A tap on a verse on the page moves the reciter there",
+  "tapJumpVerseStart": "From the verse's start",
+  "tapJumpFromWord": "From the word tapped",
+  "tapJumpNoTiming": "This recitation can't jump to a verse",
+  "listenFromVerse": "Listen from this verse",
   "audioDownloads": "Download recitations",
   "downloadAll": "Download all",
   "audioDownloaded": "On this device",
@@ -407,6 +427,12 @@
     }
   },
   "audioCredit": "Recitations and verse timings: mp3quran.net",
+  "tafsirAudioListen": "Listen to the tafsir",
+  "tafsirAudioListenSurah": "Listen to the surah's tafsir",
+  "translationAudioAfterVerse": "Translation audio after each verse",
+  "translationAudioHint": "Each verse's translation is heard after it is recited, when verses play on without repeating",
+  "clipTranslationOf": "Translation of verse {ayah}",
+  "englishTafsirOffer": "Download the English tafsir: {title}",
   "touchReading": "Touch reading",
   "touchReadingOn": "Touch reading: tap the verse you are reading",
   "editionOnDevice": "On this device",
@@ -477,7 +503,7 @@
   "searchHistory": "Recent searches",
   "searchClearHistory": "Clear",
   "continueReading": "Continue reading",
-  "continueReadingAt": "{surah} · verse {ayah} · page {page}",
+  "continueReadingAt": "{surah} | verse {ayah} · page {page}",
   "@continueReadingAt": {
     "placeholders": {
       "surah": {
@@ -520,6 +546,170 @@
   },
   "themeArtCredit": "Ornaments: quran-assets by Quran.ws, developed by Abdullah Ibeid (github.com/quran-ws/quran-assets). Those traced from mushafs are under CC BY-NC-SA 4.0; the designs belong to the King Fahd Complex and other publishers.",
   "khatmaTitle": "Khatma",
+  "khatmaPrimaryLabel": "Primary khatma",
+  "khatmaOtherPlans": "Other khatmas",
+  "khatmaSetPrimary": "Set as primary",
+  "khatmaPause": "Pause",
+  "khatmaResume": "Resume",
+  "khatmaPaused": "Paused",
+  "khatmaStepPlan": "Plan",
+  "khatmaStepSchedule": "Schedule",
+  "khatmaStepReview": "Review",
+  "khatmaLoadFailed": "Couldn't load khatma setup data: {error}",
+  "@khatmaLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaCreateFailed": "Couldn't create the khatma: {error}",
+  "@khatmaCreateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaKindLabel": "Plan type",
+  "khatmaSettings": "Khatma settings",
+  "khatmaTabPlan": "Plan",
+  "khatmaTabStats": "Statistics",
+  "khatmaStatsPageEquivalents": "Page equivalents",
+  "khatmaStatsSessions": "Reading sessions",
+  "khatmaStatsMinutes": "Reading minutes",
+  "khatmaStatsNoActivity": "No khatma reading recorded in this period.",
+  "khatmaStatsWeek": "Week",
+  "khatmaStatsMonth": "Month",
+  "khatmaStatsYear": "Year",
+  "khatmaStatsPreviousPeriod": "Previous period",
+  "khatmaStatsNextPeriod": "Next period",
+  "khatmaReminderForPlan": "Khatma: {plan}",
+  "@khatmaReminderForPlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderMissedTitle": "Still time for {plan}",
+  "@khatmaReminderMissedTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderMissedBody": "Today's portion: pages {from} to {to}.",
+  "@khatmaReminderMissedBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderRecoveryTitle": "A catch-up plan for {plan}",
+  "@khatmaReminderRecoveryTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderRecoveryBody": "Today's portion is pages {from} to {to}. Open the plan to review gentle catch-up options.",
+  "@khatmaReminderRecoveryBody": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTargetTitle": "One day until {plan} is due",
+  "@khatmaReminderTargetTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderTargetBody": "Review your progress and plan before the target date.",
+  "khatmaReminderCompletedTitle": "Khatma completed: {plan}",
+  "@khatmaReminderCompletedTitle": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaReminderCompletedBody": "You completed the khatma. May Allah accept it from you.",
+  "khatmaReminderPlanLimit": "Reminders can be enabled for up to 20 open khatmas.",
+  "khatmaSaveSettings": "Save settings",
+  "khatmaSaveFailed": "Couldn't save khatma settings: {error}",
+  "@khatmaSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaAutoRestart": "Start this plan again when it finishes",
+  "khatmaReplan": "Adjust the plan",
+  "khatmaCatchUpToday": "Finish the missed portion today",
+  "khatmaCatchUpGradually": "Catch up gradually",
+  "khatmaCompletionBody": "You completed this khatma. May Allah accept it from you.",
+  "khatmaReusePlan": "Use this plan again",
+  "khatmaKindFull": "Full Quran",
+  "khatmaKindPartial": "Selected range",
+  "khatmaKindDaily": "Daily wird",
+  "khatmaKindCustom": "Custom range",
+  "khatmaPresetLabel": "Template",
+  "khatmaPresetCustom": "Custom plan",
+  "khatmaPresetMonth": "One month",
+  "khatmaPresetRamadan30": "Ramadan: {days} days",
+  "@khatmaPresetRamadan30": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaPresetRamadanTwice": "Two khatmas in Ramadan",
+  "khatmaPresetBeforeLastTen": "Before the last ten nights",
+  "khatmaPresetWeekly": "One week",
+  "khatmaPresetDailyJuz": "A juz a day",
+  "khatmaFromSurah": "From surah",
+  "khatmaToSurah": "To surah",
+  "khatmaFromAyah": "From verse",
+  "khatmaToAyah": "To verse",
+  "khatmaRangeError": "Choose a start verse before the end verse.",
+  "khatmaScheduleMode": "Schedule",
+  "khatmaScheduleAdaptive": "Adaptive",
+  "khatmaScheduleFixed": "Fixed",
+  "khatmaRestDays": "Rest days (optional)",
+  "khatmaAtLeastOneReadingDay": "Keep at least one reading day each week.",
+  "khatmaCountingMode": "How reading counts",
+  "khatmaCountAuto": "Count automatically",
+  "khatmaCountAsk": "Ask each time",
+  "khatmaCountManual": "Only when I mark it",
+  "khatmaMakePrimary": "Make this the primary khatma",
+  "khatmaUnitRub": "Quarter hizb",
+  "khatmaReviewRange": "Range: {from}–{to}",
+  "@khatmaReviewRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "khatmaNew": "New khatma",
   "khatmaEmptyTitle": "No khatma yet",
   "khatmaEmptyBody": "Plan a full reading of the mushaf: choose an end date or a daily amount. Pages you read in the mushaf are counted automatically.",
@@ -551,7 +741,7 @@
   "khatmaDaysLeft": "Days left: {count}",
   "khatmaEnds": "Ends on {date}",
   "khatmaBehindTitle": "Pages from earlier days: {count}",
-  "khatmaBehindBody": "They are added to today's portion. You can spread them over the days left, or move the end date.",
+  "khatmaBehindBody": "They join today's portion. Choose whether to finish them today, catch up gradually, spread the remaining amount, or move the end date.",
   "khatmaSpread": "Spread over the days left",
   "khatmaExtend": "Move the end date",
   "khatmaComplete": "Khatma complete",
@@ -575,11 +765,11 @@
   "reportsListeningMinutes": "Listening minutes",
   "reportsEmpty": "Your reading and listening appear here automatically.",
   "reportsDayRead": "A day with reading or listening",
-  "streakReadToday": "You read today. Days in a row: {count}",
-  "streakContinue": "Days in a row until yesterday: {count}. A page today continues it.",
+  "streakReadToday": "You read today.",
   "streakWelcome": "Welcome back. Pick up where you left off.",
-  "streakNotesToggle": "Streak notes",
-  "streakNotesHint": "Shows days in a row only; missed days are never shown.",
+  "readDaysOfLast": "You read on {read} of the last {days} days",
+  "streakNotesToggle": "Gentle notes",
+  "streakNotesHint": "Calm notes on your reading; they never count days in a row or show missed days.",
   "journalTitle": "Tadabbur journal",
   "journalSearch": "Search your notes",
   "journalEmpty": "No notes yet. Long-press a verse in the mushaf and choose “Reflection note”.",
@@ -588,7 +778,7 @@
   "journalHint": "Write your note on the verse",
   "journalEdit": "Edit",
   "journalOpenVerse": "Open the verse",
-  "journalVerseRef": "{surah} · verse {ayah}",
+  "journalVerseRef": "{surah} | verse {ayah}",
   "journalSaved": "Note saved",
   "journalEarlier": "Your notes on this verse",
   "elderlyMode": "Elderly mode",
@@ -723,7 +913,9 @@
   "riwayaShubah": "Shu'bah from Asim",
   "riwayatTitle": "Other riwayat",
   "riwayaEditionDesc": "The King Fahd Complex's Madina mushaf in this riwaya, with its own verse count and numbers. Tafsir, translation and bookmarks link to the matching verses in Hafs's count.",
-  "riwayaGaps": "In the riwaya editions: no word highlighting while listening, no colouring of the divine names, and no hizb or quarter in the frame (the page carries its own printed signs).",
+  "riwayaGaps": "In the riwaya editions: no word highlighting while listening (their recitations are timed by verse only), and no hizb or quarter in the frame (the page carries its own printed signs).",
+  "riwayaNoWordBoxes": "This riwaya's downloaded pages carry no word boxes, so the divine names are not coloured and words cannot be picked. The newer page pack carries them.",
+  "riwayaWordNoStudy": "No word study for this word here: word study is built on the words of Hafs, and opens for a riwaya's word only when it is the same word, letter for letter, in the same verse of Hafs.",
   "riwayaTafsirNote": "Verse {ayah} of surah {surah} in {riwaya} matches, in the count of Hafs: {hafs}. The tafsir, translation and verse text below follow Hafs.",
   "riwayaNoHafs": "no verse in the count of Hafs",
   "hafsVerseOne": "verse {number}",
@@ -736,5 +928,406 @@
   "unknownAuthor": "Unknown author",
   "otherRiwayaReciters": "Reciters of other riwayat",
   "otherRiwayaHint": "Chosen from the mushaf of their riwaya, whose verses are numbered differently.",
-  "reciterOfRiwaya": "Riwaya of {riwaya}"
+  "reciterOfRiwaya": "Riwaya of {riwaya}",
+  "copyVerses": "Copy",
+  "shareVerseText": "Share as text",
+  "shareVerseImage": "Share as image",
+  "sharePreparing": "Preparing the image…",
+  "shareImageFailed": "Could not prepare the image",
+  "shareSurahImage": "Share the surah as images",
+  "shareImageTitle": "Share as image",
+  "shareImageOf": "{n} of {total}",
+  "@shareImageOf": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePreviousImage": "Previous picture",
+  "shareNextImage": "Next picture",
+  "shareButton": "Share",
+  "saveToPhotos": "Save to Photos",
+  "savedToPhotos": "Saved to Photos",
+  "savedToFolder": "Saved in {folder}",
+  "@savedToFolder": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "saveToPhotosFailed": "Could not save to Photos",
+  "shareImageRiwayaUnavailable": "This riwaya's text and font are not on this device yet, so its verses cannot be shared as images. Download its pages first.",
+  "backupTitle": "Backup",
+  "backupExport": "Save a backup",
+  "backupExportHint": "One file with your bookmarks, marks, reading position, khatma, reports, tadabbur notes and hifz progress, and your settings. Keep it, or send it to yourself.",
+  "backupImport": "Restore from a backup",
+  "backupImportHint": "Merges the backup with what is on this device: nothing is deleted, the newer copy wins where they differ, and the settings come back as they were in the backup.",
+  "backupDone": "Restored: {added} new, {updated} updated",
+  "@backupDone": {
+    "placeholders": {
+      "added": {
+        "type": "String"
+      },
+      "updated": {
+        "type": "String"
+      }
+    }
+  },
+  "backupInvalid": "This file is not a Tibyan backup",
+  "backupFailed": "That did not work",
+  "playbackSpeedLabel": "Recitation speed",
+  "playbackSpeedValue": "×{value}",
+  "@playbackSpeedValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "storageTitle": "Storage and downloads",
+  "storageOpen": "Storage and downloads",
+  "storageOpenHint": "What is downloaded on this device and how big it is; delete what you do not need",
+  "storageIntro": "Everything the app downloaded to this device. You can delete any of it and download it again later. Your own data (bookmarks, khatma, notes) is not listed here and is never touched.",
+  "storageTotal": "Total: {size}",
+  "@storageTotal": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "storageBundled": "Comes with the app",
+  "storageSize": "{mb} MB",
+  "@storageSize": {
+    "placeholders": {
+      "mb": {
+        "type": "String"
+      }
+    }
+  },
+  "storageAudioOf": "{name}'s recitations",
+  "@storageAudioOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storageSemantic": "Search-by-meaning pack",
+  "storageTiming": "Recitation timing updates",
+  "storagePartial": "Unfinished downloads",
+  "storagePartialHint": "What is left of downloads that stopped; safe to delete",
+  "storageClean": "Clean up",
+  "storageDeleteAsk": "Delete {name} ({size})?",
+  "@storageDeleteAsk": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "storageFreed": "Freed {size}",
+  "@storageFreed": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "storageEmpty": "Nothing is downloaded beyond what comes with the app",
+  "storageUnknown": "Other files",
+  "asbabTitle": "Occasions of revelation",
+  "asbabCount": "Occasions of revelation ({count})",
+  "bookCitationTahqiq": "ed. {name}",
+  "bookCitationVolume": "vol. {volume}",
+  "bookCitationPage": "p. {page}",
+  "bookCitationPages": "pp. {from}–{to}",
+  "storageBook": "Book: {title}",
+  "storageBooksAvailable": "Books you can download",
+  "bookPackDownload": "Download",
+  "munasabatTitle": "Connections between verses",
+  "munasabatCount": "Connections between verses ({count})",
+  "wujuhTitle": "Senses of the word in the Quran",
+  "bookKindTafsir": "Tafsir",
+  "bookEntryVerses": "Verses {from}–{to}",
+  "continuousView": "Continuous view",
+  "underVerseTitle": "Under each verse",
+  "underArabicOnly": "Arabic only",
+  "underTranslation": "Arabic with a translation",
+  "underTranslationHint": "Choose one or two",
+  "underMuyassar": "Arabic with al-Tafsir al-Muyassar",
+  "splitTranslationLabel": "Beside the page on wide screens",
+  "splitTranslationHint": "The page as printed, with your choice for its verses beside it",
+  "nextSurah": "Next surah",
+  "previousSurah": "Previous surah",
+  "hafsTextNote": "The text here is in the Hafs riwaya",
+  "twoPageSpread": "Two facing pages",
+  "twoPageSpreadHint": "On wide screens held sideways, like an open mushaf",
+  "oneVerse": "Verse by verse",
+  "oneVerseHint": "One verse a screen in large print, the phone sideways",
+  "oneVerseAutoOff": "Auto-turn is off. Tap to turn it on",
+  "oneVerseAutoOn": "Turns to the next verse every {seconds} seconds. Tap to change",
+  "@oneVerseAutoOn": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "oneVerseAutoShort": "Auto",
+  "secondsShort": "{n} s",
+  "@secondsShort": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "searchScopeAll": "The whole mushaf",
+  "searchScopeJuz": "In a juz",
+  "searchScopeSurah": "In a surah",
+  "whatsNewTitle": "What's new",
+  "whatsNewDone": "OK",
+  "newOneVerse": "Verse by verse",
+  "newOneVerseBody": "A button under the page turns the phone sideways and shows one verse in large print, with an optional auto-turn.",
+  "newUnderVerse": "Translation under the verse",
+  "newUnderVerseBody": "The continuous view, from the page's tools: one or two translations, or al-Muyassar, under each verse.",
+  "newShare": "Copy and share",
+  "newShareBody": "Copy a verse, or share it as text or as a picture in Tibyan's design, even over a page break. Long-press the surah's name above the page to share the whole surah as pictures.",
+  "newSpread": "Two facing pages",
+  "newSpreadBody": "On a tablet or a wide screen held sideways, the mushaf opens like a printed copy.",
+  "newWidgets": "Widgets",
+  "newWidgetsBody": "Today's khatma portion and reading shortcuts on the home screen, and a Listen tile in Quick Settings.",
+  "newBackup": "Backup",
+  "newBackupBody": "Save your bookmarks, khatma, notes and settings in one file, and restore them on any device.",
+  "carContinue": "Continue where you stopped reading",
+  "carReciters": "Reciters",
+  "pagesMapCurrent": "Current page",
+  "pagesMapRead": "Read in the khatma",
+  "pagesMapMarked": "Has a bookmark",
+  "pagesRange": "p. {first}–{last}",
+  "pagesMapJuzRead": "{read} of {total} read",
+  "focusModeTitle": "Focus mode",
+  "focusModeHint": "The page alone, with no frame and nothing under it, and a thin bar at the top",
+  "focusToolsLabel": "Showing the tools",
+  "focusToolsButton": "Simple buttons",
+  "focusToolsButtonHint": "Three small buttons in the top bar",
+  "focusToolsMenu": "Menu",
+  "focusToolsMenuHint": "A long press on the page opens a window with every tool",
+  "pageFillLabel": "Filling the screen",
+  "pageFillLines": "Spread the lines",
+  "pageFillLinesHint": "Each line as wide as the screen, the lines spread over its height",
+  "pageFillStretch": "Spread + slight stretch",
+  "pageFillStretchHint": "Plus up to 12% wider where the page fills the height",
+  "pageFillFull": "Full stretch",
+  "pageFillFullHint": "The page fills the screen both ways, which changes the letters' shape",
+  "playerStyleLabel": "Player style",
+  "playerStyleAuto": "Automatic",
+  "playerStyleAutoHint": "The normal player when reading, the focus player in focus mode",
+  "playerStyleNormal": "Normal",
+  "playerStylePill": "Focus",
+  "playerStylePillHint": "Small and see-through, with play, settings and close",
+  "playerStyleButton": "Single button",
+  "playerStyleButtonHint": "A small button: tap to play or pause, long press for the menu",
+  "focusExit": "Exit focus",
+  "focusTools": "Tools",
+  "focusShowTools": "Show the tools",
+  "focusHideTools": "Hide the tools",
+  "focusMenus": "Menus",
+  "focusPageTools": "Page tools",
+  "playerFull": "Full player",
+  "tajweedMarksSubtitle": "Tajweed rules: colours and places",
+  "tajweedMarksHint": "Each rule in the colour the mushaf pages give it, and every place it falls in the mushaf. Tap a rule to see its places, and a place to open its page.",
+  "tajweedRuleCount": "Verses: {verses} · Coloured letters: {letters}",
+  "tajweedPlaceAt": "{surah} {ayah} · page {page}",
+  "tajweedIndexColorNote": "Colours as the pages draw them now: your choice, or the default. Change them in Mushaf look.",
+  "tajweedIndexLoadError": "The places of this rule could not be read.",
+  "tajweedMarksInkNote": "Where a rule falls on a mark alone (like the small meem), the mark stays in the text colour here: the font cannot colour a mark without part of its letter. The mushaf page shows it in colour.",
+  "assistantTitle": "Assistant",
+  "assistantIntro": "Helpers for your reading, one card for each.",
+  "tajweedMarksTitle": "Tajweed marks",
+  "moreLabel": "More",
+  "wirdIndicator": "Today's portion: {read} of {total}",
+  "khatmaContinueMine": "Continue my khatma",
+  "askCreditLine": "Your last reading is part of “{plan}”. Count it?",
+  "askCreditCount": "Count it",
+  "askCreditNo": "No",
+  "khatmaPendingTitle": "Readings waiting to be counted",
+  "khatmaPendingOn": "Reading on {date}",
+  "tasmeeTitle": "Recitation practice",
+  "tasmeeDescription": "Recite from memory. Tibyan listens on this device, reveals words, and marks possible mistakes. Audio is not sent anywhere; tajweed is not graded.",
+  "tasmeeSelectRange": "Choose a practice range",
+  "tasmeeSurah": "Surah",
+  "tasmeeJuz": "Juz",
+  "tasmeeHizb": "Hizb",
+  "tasmeeFirstHalf": "First",
+  "tasmeeSecondHalf": "Second",
+  "tasmeeFromSecondQuarter": "Start from the second quarter",
+  "tasmeeMode": "Practice mode",
+  "tasmeeContinuous": "Continuous",
+  "tasmeeVerseByVerse": "Verse by verse",
+  "tasmeeInvalidRange": "Check the selected range numbers.",
+  "tasmeeDownloadModel": "Download recitation model",
+  "tasmeeListening": "Listening",
+  "tasmeeNotListening": "Tap to start and recite from memory",
+  "tasmeeModelLoad": "Preparing model",
+  "tasmeeWordWrong": "Mistake",
+  "tasmeeWordSkipped": "Skipped",
+  "tasmeeSessionComplete": "Recitation complete",
+  "tasmeeSessionDoubtful": "{count} unsure words, not counted in the accuracy",
+  "@tasmeeSessionDoubtful": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tasmeeAccuracy": "Accuracy",
+  "tasmeeAccuracyShort": "accuracy",
+  "tasmeeAcrossSurahs": "{fromSurah} {fromAyah} – {toSurah} {toAyah} · {mode}",
+  "tasmeeAyah": "Verse",
+  "tasmeeCancelDownload": "Cancel download",
+  "tasmeeClearHistory": "Clear the tasmee history",
+  "tasmeeClearHistoryBody": "What the app keeps of your past sessions (the last tasmee) is removed. No audio is ever kept.",
+  "tasmeeClearHistoryHint": "The last tasmee and its result",
+  "tasmeeClose": "Close",
+  "tasmeeConfirm": "Confirm",
+  "tasmeeContinueLast": "Continue",
+  "tasmeeContinuousHint": "Read on; each word appears in place as you read it",
+  "tasmeeDefaultsNote": "Defaults come from Settings › Tasmee",
+  "tasmeeDeleteModel": "Delete the model",
+  "tasmeeDeleteModelBody": "The tasmee model is removed from this device. You will need to download it again before the next tasmee.",
+  "tasmeeDone": "Done",
+  "tasmeeDownloadShort": "Get model",
+  "tasmeeDownloadSize": "Download ({size} MB)",
+  "tasmeeDurationWords": "{minutes} min {seconds} s · {words} words",
+  "tasmeeElapsed": "Time",
+  "tasmeeEnd": "Finish",
+  "tasmeeFeedback": "While reciting",
+  "tasmeeFinishing": "Finishing…",
+  "tasmeeFromPage": "From page",
+  "tasmeeFromSurah": "From surah",
+  "tasmeeHelp": "Help",
+  "tasmeeHint": "Hint",
+  "tasmeeHistory": "History",
+  "tasmeeKindHalfHizb": "Half hizb",
+  "tasmeeKindHizb": "Hizb",
+  "tasmeeKindJuz": "Juz",
+  "tasmeeKindPages": "Pages",
+  "tasmeeKindQuarter": "Quarter",
+  "tasmeeKindSurah": "Surah",
+  "tasmeeKindThreeQuarters": "¾ hizb",
+  "tasmeeKindVerses": "Verses",
+  "tasmeeLastSession": "Last tasmee: {range} · {accuracy}",
+  "tasmeeLenient": "Lenient",
+  "tasmeeLenientHint": "Accepts a word heard less exactly",
+  "tasmeeLess": "Less",
+  "tasmeeListeningVerse": "Verse {ayah}: listening",
+  "tasmeeMarkAndGoOn": "Mark and go on",
+  "tasmeeMedium": "Medium",
+  "tasmeeMediumHint": "Forgives one letter in a long word",
+  "tasmeeMicOff": "Microphone access is off",
+  "tasmeeMicPrivacy": "Tasmee listens on this device only. Nothing is sent or kept.",
+  "tasmeeMistakes": "{count} mistakes",
+  "tasmeeModelChecking": "Checking the size…",
+  "tasmeeModelDetails": "Source and licence in About this mushaf › Sources",
+  "tasmeeModelFailed": "Could not connect. Check the internet and try again.",
+  "tasmeeModelInstalled": "Model installed (version {version})",
+  "tasmeeModelMissing": "The tasmee model is not downloaded",
+  "tasmeeModelOffline": "Works offline afterwards",
+  "tasmeeModelProgress": "{done} of {total} MB",
+  "tasmeeModelRemove": "Remove it any time in Settings › Tasmee",
+  "tasmeeModelSize": "{size} MB · one time",
+  "tasmeeModelSizeUnknown": "One time",
+  "tasmeeModelSpace": "Space used: {size} MB",
+  "tasmeeModelTitle": "Tasmee model",
+  "tasmeeModelVoiceStays": "Your voice stays on this device, never sent or kept",
+  "tasmeeModelWifiNote": "Best on Wi‑Fi; mobile data may be charged",
+  "tasmeeMore": "More",
+  "tasmeeNew": "New tasmee",
+  "tasmeeNoAudioKept": "The last tasmee is kept so you can continue. No audio is kept.",
+  "tasmeeNoMistakes": "no mistakes",
+  "tasmeeNotNow": "Not now",
+  "tasmeeNothingToReview": "Well done: no verse needs review.",
+  "tasmeeNoticeDeviceBody": "Your voice is never sent anywhere or kept.",
+  "tasmeeNoticeDeviceTitle": "It runs on your device",
+  "tasmeeNoticeMishearBody": "A word it is unsure of gets a dotted line and does not count against you.",
+  "tasmeeNoticeMishearTitle": "It can mishear",
+  "tasmeeNoticeOk": "Got it",
+  "tasmeeNoticeStart": "Got it, start",
+  "tasmeeNoticeTajweedBody": "Nor makharij, madd, or where you stop and start.",
+  "tasmeeNoticeTajweedTitle": "It does not judge tajweed",
+  "tasmeeNoticeTitle": "Tasmee checks your memorisation, not your tajweed",
+  "tasmeeNoticeWordsBody": "Did you read what is in the mushaf, word by word?",
+  "tasmeeNoticeWordsTitle": "It checks the words and their order",
+  "tasmeeOnError": "On a mistake",
+  "tasmeeOneMistake": "one mistake",
+  "tasmeeOneTo": "1 to {max}",
+  "tasmeeOpenDeviceSettings": "Open device settings",
+  "tasmeeOtherEdition": "Tasmee follows the pages of the new Madina mushaf (1441); with your edition the words appear here in order.",
+  "tasmeePause": "Pause",
+  "tasmeePaused": "Paused",
+  "tasmeeProgress": "Range recited",
+  "tasmeeQuarterOfHizb": "Quarter",
+  "tasmeeRange": "Range",
+  "tasmeeRangeSummary": "From {from} to {to} · {verses} verses · {words} words · p. {pages}",
+  "tasmeeReReadWord": "Re-read the word marked in red",
+  "tasmeeReciteAgain": "Recite these again",
+  "tasmeeReciteVerse": "Recite verse",
+  "tasmeeRedownload": "Download the model again",
+  "tasmeeRedownloadBody": "The current model is removed and downloaded again.",
+  "tasmeeRepeat": "Again",
+  "tasmeeResume": "Resume",
+  "tasmeeRetry": "Try again",
+  "tasmeeReviewRow": "Verse {ayah}, accuracy {accuracy}",
+  "tasmeeRingSemantics": "{title}, {note}: {value}",
+  "tasmeeSeconds": "{count} s",
+  "tasmeeSessionTitle": "Tasmee · {surah}",
+  "tasmeeSettingsNote": "Mode, mistakes, the model",
+  "tasmeeSkipWord": "Skip it",
+  "tasmeeStart": "Start",
+  "tasmeeStartReciting": "Start reciting",
+  "tasmeeStopToCorrect": "Stop to correct",
+  "tasmeeStopToCorrectHint": "Waits until you read the right word",
+  "tasmeeStrict": "Strict",
+  "tasmeeStrictHint": "The word letter for letter",
+  "tasmeeStrictness": "Matching",
+  "tasmeeSummary": "Summary",
+  "tasmeeTestByTouch": "Test yourself by tapping instead",
+  "tasmeeThisVerse": "this verse",
+  "tasmeeToPage": "To page",
+  "tasmeeToReview": "Verses to review",
+  "tasmeeToSurah": "To surah",
+  "tasmeeToastDuration": "How long a verse result shows",
+  "tasmeeVerseByVerseHint": "Tap, recite one verse, then see it whole with its result",
+  "tasmeeVerseDone": "Verse done",
+  "tasmeeVerseNumber": "Verse {ayah}",
+  "tasmeeVerseOf": "Verse {n} of {count}: tap and recite it",
+  "tasmeeVerseResult": "Verse {ayah} · {accuracy} · {detail}",
+  "tasmeeVersesHeading": "Verses",
+  "tasmeeVersesLine": "Verses {from}–{to} · {mode}",
+  "tasmeeVibration": "Vibrate on a mistake",
+  "tasmeeVibrationHint": "A light buzz when a word is marked wrong or skipped",
+  "tasmeeWholeSession": "whole tasmee",
+  "tasmeeWordCorrectedShort": "Corrected",
+  "tasmeeWordHinted": "Hinted",
+  "tasmeeAllowMicHint": "Open the device settings and allow Tibyan to use the microphone.",
+  "newKhatmah": "The new khatma",
+  "newKhatmahBody": "Several khatmas at once, a setup wizard with ready plans, an adaptive daily portion, clearer stats and reminders, and today's portion shown in the mushaf.",
+  "newTasmee": "Recite from memory (beta)",
+  "newTasmeeBody": "Recite from memory and each word appears in its place, with mistakes marked. It runs on your device, offline after the model download, and checks memorisation, not tajweed.",
+  "newSajdah": "Sajdah timer",
+  "newSajdahBody": "At a verse of prostration the reciter pauses and a card shows the supplications with a countdown, then the recitation resumes. Turn it on in Settings.",
+  "newAssistant": "The Assistant and tajweed marks",
+  "newAssistantBody": "A new screen with the tajweed rules and their colours, each with its places in the mushaf.",
+  "newFocus": "Focus mode",
+  "newFocusBody": "The page alone, frameless and filling the screen, tools when you need them, and a small player you can drag anywhere."
 }

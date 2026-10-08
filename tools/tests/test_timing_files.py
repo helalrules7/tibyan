@@ -96,6 +96,50 @@ class FilesTest(unittest.TestCase):
                 self.assertEqual(len(body['surahs']), len(list((tf.DATA / e['slug']).glob('[0-9]*.json'))))
 
 
+class FixTest(unittest.TestCase):
+    """fix_doc: the known source errors fixed without listening."""
+
+    @staticmethod
+    def doc(verses):
+        return {'format': 1, 'reciter': 't', 'surah': 1, 'verses': verses}
+
+    def test_point_word_overlap_within_a_frame(self):
+        doc = self.doc([[1, 1000, 3000, [[1, 1000, 1500], [2, 1600, 1601], [3, 1590, 2900]]]])
+        fixed, fixes = tf.fix_doc(doc)
+        self.assertEqual(fixed['verses'][0][3], [[1, 1000, 1500], [2, 1600, 1601], [3, 1601, 2900]])
+        self.assertEqual(fixes, [(1, 3, 'word_overlap', 1590, 1601)])
+        self.assertEqual(doc['verses'][0][3][2][1], 1590, 'the input is not changed')
+        self.assertEqual(tf.validate(fixed, 't', 1, [3], None), [])
+
+    def test_larger_overlaps_and_real_words_are_left(self):
+        for words in ([[1, 1000, 1500], [2, 1600, 1601], [3, 1580, 2900]],   # 21 ms: listen
+                      [[1, 1000, 1610], [2, 1600, 2900]]):                    # not a point word
+            fixed, fixes = tf.fix_doc(self.doc([[1, 1000, 3000, words]]))
+            self.assertEqual(fixes, [])
+            self.assertEqual(fixed['verses'][0][3], words)
+
+    def test_last_verse_past_the_audio_end(self):
+        fixed, fixes = tf.fix_doc(self.doc([[1, 0, 1000, []], [2, 1000, 2800, []]]), duration_ms=2000)
+        self.assertEqual(fixed['verses'][1], [2, 1000, 2000, []])
+        self.assertEqual(fixes, [(2, None, 'verse_duration', 2800, 2000)])
+        # A second or more past the end, or words past it: measured on another file.
+        for verses, duration in (([[1, 0, 1000, []], [2, 1000, 3000, []]], 2000),
+                                 ([[1, 0, 2800, [[1, 0, 1000], [2, 1000, 2700]]]], 2000)):
+            self.assertEqual(tf.fix_doc(self.doc(verses), duration)[1], [])
+
+    def test_fixes_in_the_files_touch_only_known_errors(self):
+        # The fixes are not applied to the files yet: content.db must be
+        # rebuilt with them in the same commit (docs/TIMING.md, fix-known).
+        known = tf.known_errors()
+        for slug, surah in sorted({(e[0], e[1]) for e in known}):
+            doc = tf.load_json(tf.surah_path(slug, surah))
+            duration = tf.durations(slug).get(surah)
+            fixed, fixes = tf.fix_doc(doc, duration)
+            for verse, word, code, _, _ in fixes:
+                self.assertIn((slug, surah, verse, word, code), known, (slug, surah))
+            self.assertEqual(tf.fix_doc(fixed, duration)[1], [], (slug, surah))
+
+
 @unittest.skipUnless(have_db(), 'content.db not fetched (git lfs pull)')
 class ContentDbTest(unittest.TestCase):
     """The files are the source of truth: build_content_db.py puts their

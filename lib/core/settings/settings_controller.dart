@@ -1,8 +1,10 @@
+import 'package:flutter/widgets.dart' show Offset;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/theme_registry.dart';
+import '../../features/home/whats_new.dart' show whatsNewId, whatsNewSeenKey;
 import 'app_settings.dart';
 
 /// Overridden in `main()` once assets and preferences are loaded.
@@ -33,16 +35,39 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kTafsirFont = 'settings.tafsirFont';
   static const _kTafsirScale = 'settings.tafsirFontScale';
   static const _kHiddenCommentaries = 'settings.hiddenCommentaries';
+  static const _kShownCommentaries = 'settings.shownCommentaries';
+  static const _kHiddenBookTafsirs = 'settings.hiddenBookTafsirs';
+  static const _kEnglishTafsirVisibility = 'settings.englishTafsirVisibility';
   static const _kKashida = 'settings.tafsirKashida';
   static const _kReciter = 'settings.reciterId';
   static const _kFollow = 'settings.followRecitation';
   static const _kTouchReading = 'settings.touchReading';
   static const _kVersePause = 'settings.versePause';
+  static const _kTapJumpWord = 'settings.tapJumpFromWord';
   static const _kRepeat = 'settings.repeat';
   static const _kRepeatSilence = 'settings.repeatSilence';
+  static const _kPlaybackSpeed = 'settings.playbackSpeed';
+  static const _kUnderVerse = 'settings.underVerse';
+  static const _kSplitTranslation = 'settings.splitTranslation';
+  static const _kTwoPageSpread = 'settings.twoPageSpread';
+  static const _kOneVerseAuto = 'settings.oneVerseAutoSeconds';
   static const _kElderly = 'settings.elderlyMode';
   static const _kTajweed = 'settings.tajweedColors';
   static const _kTajweedHues = 'settings.tajweedHues';
+  static const _kFocus = 'settings.focusMode';
+  static const _kFocusTools = 'settings.focusTools';
+  static const _kFocusToolsShown = 'settings.focusToolsShown';
+  static const _kAutoScrollSpeed = 'settings.autoScrollSpeed';
+  static const _kPageFill = 'settings.pageFill';
+  static const _kPlayerStyle = 'settings.playerStyle';
+  static const _kPlayerX = 'settings.playerX';
+  static const _kPlayerY = 'settings.playerY';
+  static const _kSajdahTimer = 'settings.sajdahTimer';
+  static const _kSajdahSeconds = 'settings.sajdahSeconds';
+  static const _kDayStartHour = 'settings.khatma.dayStartHour';
+  static const _kReadingSpeed = 'settings.khatma.readingSpeed';
+  static const _kCountListening = 'settings.khatma.countListening';
+  static const _kWirdIndicator = 'settings.khatma.showWirdIndicator';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -85,6 +110,14 @@ class SettingsController extends Notifier<AppSettings> {
         for (final id in _prefs.getStringList(_kHiddenCommentaries) ?? [])
           ?int.tryParse(id),
       },
+      shownCommentaries: {
+        for (final id in _prefs.getStringList(_kShownCommentaries) ?? [])
+          ?int.tryParse(id),
+      },
+      hiddenBookTafsirs: {...?_prefs.getStringList(_kHiddenBookTafsirs)},
+      englishTafsirVisibilityOverride: _prefs.getBool(
+        _kEnglishTafsirVisibility,
+      ),
       tafsirKashida: _prefs.getBool(_kKashida) ?? false,
       reciterId: _prefs.getInt(_kReciter) ?? 1,
       riwayaReciters: {
@@ -95,8 +128,17 @@ class SettingsController extends Notifier<AppSettings> {
       followRecitation: _prefs.getBool(_kFollow) ?? true,
       touchReading: _prefs.getBool(_kTouchReading) ?? true,
       versePause: _prefs.getInt(_kVersePause) ?? 500,
+      tapJumpFromWord: _prefs.getBool(_kTapJumpWord) ?? false,
       repeat: _prefs.getInt(_kRepeat) ?? 1,
       repeatSilence: _prefs.getInt(_kRepeatSilence) ?? 0,
+      playbackSpeed: _prefs.getDouble(_kPlaybackSpeed) ?? 1.0,
+      underVerse: [
+        for (final id in _prefs.getStringList(_kUnderVerse) ?? const <String>[])
+          ?int.tryParse(id),
+      ],
+      splitTranslation: _prefs.getBool(_kSplitTranslation) ?? false,
+      twoPageSpread: _prefs.getBool(_kTwoPageSpread) ?? true,
+      oneVerseAutoSeconds: _prefs.getInt(_kOneVerseAuto) ?? 0,
       elderlyMode: _prefs.getBool(_kElderly) ?? false,
       tajweedColors: _prefs.getBool(_kTajweed) ?? false,
       tajweedHues: {
@@ -104,8 +146,39 @@ class SettingsController extends Notifier<AppSettings> {
           if (e.indexOf('=') case final i when i > 0)
             e.substring(0, i): e.substring(i + 1),
       },
+      focusMode: _prefs.getBool(_kFocus) ?? false,
+      focusTools:
+          _enumByName(FocusTools.values, _prefs.getString(_kFocusTools)) ??
+          FocusTools.button,
+      focusToolsShown: _prefs.getBool(_kFocusToolsShown) ?? false,
+      autoScrollSpeed: (_prefs.getInt(_kAutoScrollSpeed) ?? 3).clamp(1, 10),
+      pageFill:
+          _enumByName(PageFill.values, _prefs.getString(_kPageFill)) ??
+          PageFill.lines,
+      playerStyle:
+          _enumByName(PlayerStyle.values, _prefs.getString(_kPlayerStyle)) ??
+          PlayerStyle.auto,
+      playerPosition: switch ((
+        _prefs.getDouble(_kPlayerX),
+        _prefs.getDouble(_kPlayerY),
+      )) {
+        (final double x, final double y) => Offset(x, y),
+        _ => null,
+      },
+      sajdahTimer: _prefs.getBool(_kSajdahTimer) ?? false,
+      sajdahSeconds: _sajdahLength(_prefs.getInt(_kSajdahSeconds)),
+      dayStartHour: (_prefs.getInt(_kDayStartHour) ?? 3).clamp(0, 23),
+      readingSpeed:
+          _enumByName(ReadingSpeed.values, _prefs.getString(_kReadingSpeed)) ??
+          ReadingSpeed.medium,
+      countListening: _prefs.getBool(_kCountListening) ?? true,
+      showWirdIndicator: _prefs.getBool(_kWirdIndicator) ?? true,
     );
   }
+
+  /// A kept length, or the default (20) when it is not one offered.
+  static int _sajdahLength(int? seconds) =>
+      sajdahTimerLengths.contains(seconds) ? seconds! : 20;
 
   /// Until the reader picks a marker shape, a heritage theme draws its own
   /// marker and Zakhrafa its 16-point rosette.
@@ -149,6 +222,8 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> completeOnboarding() async {
     state = state.copyWith(onboardingDone: true);
     await _prefs.setBool(_kOnboarding, true);
+    // A new reader meets everything at once: no «what's new» for them.
+    await _prefs.setString(whatsNewSeenKey, whatsNewId);
   }
 
   Future<void> setEdition(MushafEdition edition) async {
@@ -193,11 +268,37 @@ class SettingsController extends Notifier<AppSettings> {
 
   Future<void> setCommentaryShown(int sourceId, bool shown) async {
     final hidden = {...state.hiddenCommentaries};
-    shown ? hidden.remove(sourceId) : hidden.add(sourceId);
-    state = state.copyWith(hiddenCommentaries: hidden);
+    final explicitlyShown = {...state.shownCommentaries};
+    if (shown) {
+      hidden.remove(sourceId);
+      explicitlyShown.add(sourceId);
+    } else {
+      hidden.add(sourceId);
+      explicitlyShown.remove(sourceId);
+    }
+    state = state.copyWith(
+      hiddenCommentaries: hidden,
+      shownCommentaries: explicitlyShown,
+    );
     await _prefs.setStringList(_kHiddenCommentaries, [
       for (final id in hidden) '$id',
     ]);
+    await _prefs.setStringList(_kShownCommentaries, [
+      for (final id in explicitlyShown) '$id',
+    ]);
+  }
+
+  Future<void> setEnglishTafsirShown(bool shown) async {
+    state = state.copyWith(englishTafsirVisibilityOverride: shown);
+    await _prefs.setBool(_kEnglishTafsirVisibility, shown);
+  }
+
+  /// Shows or hides a book tafsir (by its source key).
+  Future<void> setBookTafsirShown(String key, bool shown) async {
+    final hidden = {...state.hiddenBookTafsirs};
+    shown ? hidden.remove(key) : hidden.add(key);
+    state = state.copyWith(hiddenBookTafsirs: hidden);
+    await _prefs.setStringList(_kHiddenBookTafsirs, [...hidden]);
   }
 
   Future<void> setTafsirKashida(bool value) async {
@@ -233,9 +334,44 @@ class SettingsController extends Notifier<AppSettings> {
     await _prefs.setInt(_kVersePause, ms);
   }
 
+  /// Where a tap on a verse while listening starts: the word tapped, or
+  /// the verse's start.
+  Future<void> setTapJumpFromWord(bool value) async {
+    state = state.copyWith(tapJumpFromWord: value);
+    await _prefs.setBool(_kTapJumpWord, value);
+  }
+
   Future<void> setRepeat(int times) async {
     state = state.copyWith(repeat: times);
     await _prefs.setInt(_kRepeat, times);
+  }
+
+  /// What shows under each verse: up to two source ids (see
+  /// [AppSettings.underVerse]).
+  Future<void> setUnderVerse(List<int> sourceIds) async {
+    final ids = sourceIds.take(2).toList();
+    state = state.copyWith(underVerse: ids);
+    await _prefs.setStringList(_kUnderVerse, [for (final i in ids) '$i']);
+  }
+
+  Future<void> setOneVerseAutoSeconds(int seconds) async {
+    state = state.copyWith(oneVerseAutoSeconds: seconds);
+    await _prefs.setInt(_kOneVerseAuto, seconds);
+  }
+
+  Future<void> setTwoPageSpread(bool on) async {
+    state = state.copyWith(twoPageSpread: on);
+    await _prefs.setBool(_kTwoPageSpread, on);
+  }
+
+  Future<void> setSplitTranslation(bool on) async {
+    state = state.copyWith(splitTranslation: on);
+    await _prefs.setBool(_kSplitTranslation, on);
+  }
+
+  Future<void> setPlaybackSpeed(double speed) async {
+    state = state.copyWith(playbackSpeed: speed);
+    await _prefs.setDouble(_kPlaybackSpeed, speed);
   }
 
   Future<void> setRepeatSilence(int seconds) async {
@@ -269,6 +405,80 @@ class SettingsController extends Notifier<AppSettings> {
     await _prefs.setStringList(_kTajweedHues, [
       for (final e in hues.entries) '${e.key}=${e.value}',
     ]);
+  }
+
+  Future<void> setFocusMode(bool value) async {
+    state = state.copyWith(focusMode: value);
+    await _prefs.setBool(_kFocus, value);
+  }
+
+  Future<void> setFocusTools(FocusTools value) async {
+    state = state.copyWith(focusTools: value);
+    await _prefs.setString(_kFocusTools, value.name);
+  }
+
+  Future<void> setFocusToolsShown(bool value) async {
+    state = state.copyWith(focusToolsShown: value);
+    await _prefs.setBool(_kFocusToolsShown, value);
+  }
+
+  Future<void> setAutoScrollSpeed(int value) async {
+    final speed = value.clamp(1, 10);
+    state = state.copyWith(autoScrollSpeed: speed);
+    await _prefs.setInt(_kAutoScrollSpeed, speed);
+  }
+
+  Future<void> setPageFill(PageFill value) async {
+    state = state.copyWith(pageFill: value);
+    await _prefs.setString(_kPageFill, value.name);
+  }
+
+  Future<void> setPlayerStyle(PlayerStyle value) async {
+    state = state.copyWith(playerStyle: value);
+    await _prefs.setString(_kPlayerStyle, value.name);
+  }
+
+  /// Keeps where the floating player was left (fractions of the screen,
+  /// each clamped to 0..1).
+  Future<void> setPlayerPosition(Offset at) async {
+    final kept = Offset(at.dx.clamp(0.0, 1.0), at.dy.clamp(0.0, 1.0));
+    state = state.copyWith(playerPosition: () => kept);
+    await _prefs.setDouble(_kPlayerX, kept.dx);
+    await _prefs.setDouble(_kPlayerY, kept.dy);
+  }
+
+  Future<void> setSajdahTimer(bool on) async {
+    state = state.copyWith(sajdahTimer: on);
+    await _prefs.setBool(_kSajdahTimer, on);
+  }
+
+  /// Sets the sajdah card's countdown; a length not offered is ignored.
+  Future<void> setSajdahSeconds(int seconds) async {
+    if (!sajdahTimerLengths.contains(seconds)) return;
+    state = state.copyWith(sajdahSeconds: seconds);
+    await _prefs.setInt(_kSajdahSeconds, seconds);
+  }
+
+  /// Khatmas: the hour the logical day starts (clamped to 0–23).
+  Future<void> setDayStartHour(int hour) async {
+    final h = hour.clamp(0, 23);
+    state = state.copyWith(dayStartHour: h);
+    await _prefs.setInt(_kDayStartHour, h);
+  }
+
+  Future<void> setReadingSpeed(ReadingSpeed speed) async {
+    state = state.copyWith(readingSpeed: speed);
+    await _prefs.setString(_kReadingSpeed, speed.name);
+  }
+
+  Future<void> setCountListening(bool on) async {
+    state = state.copyWith(countListening: on);
+    await _prefs.setBool(_kCountListening, on);
+  }
+
+  Future<void> setShowWirdIndicator(bool on) async {
+    state = state.copyWith(showWirdIndicator: on);
+    await _prefs.setBool(_kWirdIndicator, on);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

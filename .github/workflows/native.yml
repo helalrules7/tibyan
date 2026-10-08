@@ -1,0 +1,146 @@
+name: Native builds
+
+# Builds the platforms CI's Linux job does not: the Android widgets, the iOS
+# and macOS apps with their WidgetKit extensions (apple/), and the Windows
+# and Linux desktop apps. Only when something native changes, or by hand.
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'android/**'
+      - 'ios/**'
+      - 'macos/**'
+      - 'windows/**'
+      - 'linux/**'
+      - 'apple/**'
+      - 'tools/apple/**'
+      - 'pubspec.yaml'
+      - 'lib/main.dart'
+      - '.github/workflows/native.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android (debug APK)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --debug
+
+  ios:
+    name: iOS (unsigned) with widget extensions
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - name: Both widget extensions are in the app
+        run: |
+          ls build/ios/iphoneos/Runner.app/PlugIns
+          test -d build/ios/iphoneos/Runner.app/PlugIns/TibyanWidget.appex
+          test -d build/ios/iphoneos/Runner.app/PlugIns/TibyanActions.appex
+      # docs/CARPLAY.md: the scene is always built; only the entitlement waits.
+      - name: The CarPlay scene is in the app
+        run: |
+          app=build/ios/iphoneos/Runner.app
+          strings -a "$app/Runner" | grep -q CarPlaySceneDelegate
+          plutil -extract UIApplicationSceneManifest.UISceneConfigurations.CPTemplateApplicationSceneSessionRoleApplication xml1 -o - "$app/Info.plist" | grep -q CarPlaySceneDelegate
+
+  macos:
+    name: macOS with widget extensions
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter config --enable-macos-desktop
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - name: Both widget extensions are in the app
+        run: |
+          app=$(ls -d build/macos/Build/Products/Release/*.app | head -1)
+          ls "$app/Contents/PlugIns"
+          test -d "$app/Contents/PlugIns/TibyanWidget.appex"
+          test -d "$app/Contents/PlugIns/TibyanActions.appex"
+      # The same packaging as the release workflow, so it is checked here.
+      - name: Disk image
+        run: |
+          app=$(ls -d build/macos/Build/Products/Release/*.app | head -1)
+          hdiutil create -volname Tibyan -srcfolder "$app" -ov -format UDZO tibyan.dmg
+          test -s tibyan.dmg
+
+  linux:
+    name: Linux desktop
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - name: Build tools (GTK, and libmpv for the recitation player)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev libmpv-dev mpv libsecret-1-dev libjsoncpp-dev \
+            libcurl4-openssl-dev
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter config --enable-linux-desktop
+      - run: flutter pub get
+      - run: flutter build linux --release
+      - name: Archive the bundle (as the release does)
+        run: |
+          tar -C build/linux/x64/release/bundle -czf tibyan-linux-x64.tar.gz .
+          tar -tzf tibyan-linux-x64.tar.gz | grep -q '^./tibyan$'
+
+  windows:
+    name: Windows desktop
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          lfs: true
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - run: flutter config --enable-windows-desktop
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - name: Zip the app (as the release does)
+        shell: pwsh
+        run: |
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath tibyan-windows-x64.zip
+          if (-not (Test-Path build/windows/x64/runner/Release/tibyan.exe)) { exit 1 }

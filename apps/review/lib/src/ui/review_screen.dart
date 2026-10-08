@@ -6,6 +6,7 @@ import '../platform/file_io.dart';
 import 'controller.dart';
 import 'link_dialog.dart';
 import 'verse_view.dart';
+import 'tajweed_view.dart';
 
 /// The book's text (Uthman Taha Naskh) and the mushaf text (KFGQPC Hafs).
 const bookFont = 'UthmanTaha';
@@ -173,11 +174,9 @@ class _EntryListState extends State<_EntryList> {
               DropdownButton<String?>(
                 value: f.kind,
                 hint: const Text('كل الأنواع'),
-                items: const [
-                  DropdownMenuItem(value: null, child: Text('كل الأنواع')),
-                  DropdownMenuItem(value: 'passage', child: Text('مقاطع')),
-                  DropdownMenuItem(value: 'surah_intro', child: Text('مطالع السور')),
-                  DropdownMenuItem(value: 'front_matter', child: Text('مقدمة الكتاب')),
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('كل الأنواع')),
+                  for (final k in c.kinds) DropdownMenuItem(value: k, child: Text(entryKindLabel(k))),
                 ],
                 onChanged: (v) => _set(kind: v),
               ),
@@ -395,7 +394,7 @@ class _EntryDetailState extends State<_EntryDetail> {
           Text(
             '${source.title}، ${source.author}. تحقيق: ${source.tahqiq ?? 'غير مذكور'}. '
             '${source.publisher ?? ''}، ${source.edition ?? ''}. '
-            '${e.volume != null ? 'ج${e.volume} ' : ''}ص ${e.page ?? '?'}'
+            '${e.page == null ? 'بلا أرقام صفحات في المصدر' : '${e.volume != null ? 'ج${e.volume} ' : ''}ص ${e.page}'}'
             '${e.pageEnd != null && e.pageEnd != e.page ? '-${e.pageEnd}' : ''}',
             style: theme.textTheme.bodySmall,
           ),
@@ -405,7 +404,19 @@ class _EntryDetailState extends State<_EntryDetail> {
           style: theme.textTheme.bodySmall,
         ),
         const Divider(height: 32),
-        Text('نص الكتاب (كما هو، لا يُعدَّل)', style: theme.textTheme.labelLarge),
+        if (e.kind == 'tajweed_verse' && e.links.isNotEmpty) ...[
+          Text('الآية ملونة بأحكام البيانات', style: theme.textTheme.labelLarge),
+          const SizedBox(height: 8),
+          FutureBuilder<List<Verse>>(
+            future: c.verses(e.links.first.surah, e.links.first.ayahFrom, e.links.first.ayahFrom),
+            builder: (context, snap) => snap.hasData && snap.data!.isNotEmpty
+                ? TajweedVerseView(verse: snap.data!.first, marks: TajweedMark.parse(e.text))
+                : const LinearProgressIndicator(),
+          ),
+          const Divider(height: 32),
+        ],
+        Text(e.kind == 'tajweed_verse' ? 'الأحكام كما في البيانات (لا تُعدَّل)' : 'نص الكتاب (كما هو، لا يُعدَّل)',
+            style: theme.textTheme.labelLarge),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(16),

@@ -43,7 +43,6 @@ class CoverPage extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
         child: OrnateFrame(
-          catchword: basmala.split(' ').take(2).join(' '),
           top: Text(
             basmala,
             style: const TextStyle(fontFamily: 'UthmanicHafs', fontSize: 17),
@@ -177,10 +176,9 @@ class OpeningPage extends ConsumerWidget {
     required this.page,
     required this.surah,
     required this.child,
-    this.catchword,
     this.onPageTap,
     this.onSurahTap,
-    this.tools,
+    this.onSurahLongPress,
   });
 
   final int page;
@@ -188,12 +186,13 @@ class OpeningPage extends ConsumerWidget {
   /// The surah this opening page starts (1 or 2).
   final int surah;
   final Widget child;
-  final String? catchword;
   final VoidCallback? onPageTap;
 
   /// The surah's name was tapped (opens the index, as on other pages).
   final VoidCallback? onSurahTap;
-  final Widget? tools;
+
+  /// A long press on the surah's name (shares the surah as pictures).
+  final VoidCallback? onSurahLongPress;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -228,15 +227,15 @@ class OpeningPage extends ConsumerWidget {
     return OrnateFrame(
       page: page,
       onPageTap: onPageTap,
-      catchword: catchword,
-      tools: tools,
       top: s == null
           ? const SizedBox.shrink()
           : Semantics(
               button: onSurahTap != null,
+              onLongPress: onSurahLongPress,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: onSurahTap,
+                onLongPress: onSurahLongPress,
                 child: two(
                   l.surahWord(s.nameAr),
                   l.openingInfo(

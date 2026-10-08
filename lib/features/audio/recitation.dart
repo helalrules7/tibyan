@@ -11,8 +11,14 @@ import 'package:path/path.dart' as p;
 import '../../core/db/content_database.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
-import '../khatma/khatma_providers.dart' show listeningTrackerProvider;
+import '../content_extras/credits.dart';
+import '../content_extras/verse_audio_index.dart';
+import '../khatma/khatma_providers.dart'
+    show khatmaServiceProvider, listeningTrackerProvider;
 import '../mushaf/mushaf_providers.dart';
+import '../sajdah/sajdah_card.dart';
+import '../sajdah/sajdah_positions.dart';
+import 'verse_queue.dart';
 
 /// Every recitation in the content database, of every riwaya.
 final allRecitersProvider = FutureProvider<List<ReciterRow>>(
@@ -352,6 +358,49 @@ class SleepAtSurahEnd extends SleepTimer {
   const SleepAtSurahEnd();
 }
 
+/// A clip playing in the recitation's place: the translation read after a
+/// verse ([standalone] false: the recitation then carries on), or a
+/// verse's tafsir read aloud ([standalone]: nothing follows it). [source]
+/// is its credit key, shown while it plays.
+class RecitationClip {
+  const RecitationClip({
+    required this.kind,
+    required this.surah,
+    required this.ayah,
+    required this.titleAr,
+    required this.titleEn,
+    required this.source,
+    this.wholeSurah = false,
+    this.standalone = false,
+  });
+
+  RecitationClip.of(
+    VerseAudioIndex index,
+    this.surah,
+    this.ayah,
+    VerseAudioClip clip, {
+    required this.standalone,
+  }) : kind = index.kind,
+       titleAr = index.titleAr,
+       titleEn = index.titleEn,
+       source = index.source,
+       wholeSurah = clip.wholeSurah;
+
+  /// [VerseAudioKind].
+  final String kind;
+  final int surah;
+  final int ayah;
+  final String titleAr;
+  final String titleEn;
+  final String source;
+
+  /// The surah's whole file: the tafsir of the surah, not of one verse.
+  final bool wholeSurah;
+  final bool standalone;
+
+  String title(String languageCode) => languageCode == 'ar' ? titleAr : titleEn;
+}
+
 class RecitationState {
   const RecitationState({
     this.active = false,
@@ -368,6 +417,7 @@ class RecitationState {
     this.silence = Duration.zero,
     this.sleep,
     this.error,
+    this.clip,
   });
 
   /// The player bar is shown.
@@ -399,6 +449,9 @@ class RecitationState {
   final SleepTimer? sleep;
   final String? error;
 
+  /// A clip playing instead of the surah file; null while reciting.
+  final RecitationClip? clip;
+
   RecitationState copyWith({
     bool? active,
     bool? playing,
@@ -414,6 +467,7 @@ class RecitationState {
     Duration? silence,
     SleepTimer? Function()? sleep,
     String? Function()? error,
+    RecitationClip? Function()? clip,
   }) => RecitationState(
     active: active ?? this.active,
     playing: playing ?? this.playing,
@@ -429,7 +483,20 @@ class RecitationState {
     silence: silence ?? this.silence,
     sleep: sleep == null ? this.sleep : sleep(),
     error: error == null ? this.error : error(),
+    clip: clip == null ? this.clip : clip(),
   );
+}
+
+/// What a tap on a verse while listening did ([RecitationController.jumpTo]).
+enum VerseJump {
+  /// The recitation moved to the verse.
+  jumped,
+
+  /// The recitation has no timing for the verse: it plays on, unmoved.
+  noTiming,
+
+  /// Not listening, or a tafsir plays on its own: the tap is not a jump.
+  ignored,
 }
 
 /// The parts of the audio player the recitation uses; tests put a fake in
@@ -447,6 +514,9 @@ abstract class RecitationAudio {
   Future<void> pause();
   Future<void> seek(Duration position);
   Future<void> stop();
+
+  /// Playback speed, 1.0 as recorded.
+  Future<void> setSpeed(double speed);
   Future<void> dispose();
 }
 
@@ -464,6 +534,9 @@ class _JustAudio implements RecitationAudio {
 
   @override
   ProcessingState get processingState => _p.processingState;
+
+  @override
+  Future<void> setSpeed(double speed) => _p.setSpeed(speed);
 
   @override
   Future<void> load(Uri uri, MediaItem tag, Duration initial) => _p
@@ -498,6 +571,12 @@ final recitationProvider =
 /// from the faster host and saved as it plays), follows the verse being
 /// recited using the published timings, repeats each verse or a chosen
 /// stretch with silence between, and moves on to the next surah.
+///
+/// Clips go through the same single player: with «الترجمة المسموعة بعد كل
+/// آية» on, the queue of the surah ([buildVerseQueue]) puts the
+/// translation of each verse after it, and the recitation carries on from
+/// the next verse once the clip ends; [playTafsir] plays a verse's tafsir
+/// on its own.
 class RecitationController extends Notifier<RecitationState> {
   RecitationAudio? _player;
   List<AyahTimingRow> _timings = const [];
@@ -537,6 +616,46 @@ class RecitationController extends Notifier<RecitationState> {
   /// plays on into the next one.
   int? _verseDone;
   ProcessingState? _processing;
+
+  /// The clip that follows each verse of the surah file playing (from
+  /// [buildVerseQueue]); empty unless the translation after each verse is
+  /// on.
+  Map<int, ClipItem> _clipsAfter = const {};
+
+  /// The clip playing: where it starts and ends in its file (ms; no end
+  /// for a file of its own), and the verse the recitation goes on from
+  /// after it (null for a tafsir played on its own).
+  Duration _clipStart = Duration.zero;
+  int? _clipEnd;
+  int? _clipResume;
+  bool _clipEnding = false;
+
+  /// Paused at the end of a verse of prostration while the sajdah card
+  /// counts down; positions are ignored until it closes.
+  bool _sajdahWait = false;
+
+  /// The verse of prostration whose card was shown: playing on past it
+  /// does not show it again.
+  SajdahKey? _sajdahDone;
+
+  /// The reader is moving the recitation (a step or a tap on a verse):
+  /// the verse left is not heard to its end.
+  bool _moving = false;
+
+  /// The last verse reported heard to its end (once each, though the
+  /// sajdah card or a translation clip comes back to the same point).
+  (int, int)? _heardLast;
+
+  /// Verse [ayah] of the surah playing was recited to its end (the
+  /// natural move to the next verse, or the end of the file): the khatma
+  /// may count it. Never for a verse stepped or jumped over.
+  void _verseHeard(int ayah) {
+    if (_moving || state.clip != null) return;
+    final key = (state.surah, ayah);
+    if (_heardLast == key) return;
+    _heardLast = key;
+    unawaited(ref.read(khatmaServiceProvider).verseRecited(key.$1, key.$2));
+  }
 
   RecitationAudio get _p => _player ??= _create();
 
@@ -582,7 +701,9 @@ class RecitationController extends Notifier<RecitationState> {
   /// Starts reciting [surah] at [from] (the whole surah when null). With
   /// [to], only [rangeFrom] (by default [from])..[to] plays. [repeat]
   /// defaults to the reader's setting. Unless [start] is false, playback
-  /// begins once the file is ready.
+  /// begins once the file is ready. [nearSpeech] starts a moment before
+  /// the verse's speech when the pauses are shortened (after a clip).
+  /// [word] starts at that word of [from] when it has a word timing.
   Future<void> play(
     int surah, {
     int? from,
@@ -591,12 +712,16 @@ class RecitationController extends Notifier<RecitationState> {
     int? repeat,
     Duration? silence,
     bool start = true,
+    bool nearSpeech = false,
+    int? word,
   }) async {
     final load = ++_loads;
     _loading = true;
     _waits++;
     _inSilence = false;
     _restartAt = null;
+    _leaveSajdah();
+    _sajdahDone = null;
     final reciter = await ref.read(currentReciterProvider.future);
     if (reciter == null) {
       _loading = false;
@@ -614,6 +739,8 @@ class RecitationController extends Notifier<RecitationState> {
         s.ayah: (s.startMs, s.endMs),
     };
     final surahRow = (await ref.read(surahsProvider.future))[surah - 1];
+    final after = timings.isEmpty ? null : await _translationAfterVerses();
+    await _loadSajdahPositions();
     if (load != _loads) return;
     // Only now, with everything at hand, does the new file's timing
     // replace the old: the old file may still be playing meanwhile.
@@ -622,6 +749,16 @@ class RecitationController extends Notifier<RecitationState> {
     _speech = speech;
     _jumpTo = null;
     _verseDone = null;
+    _clipEnd = null;
+    _clipResume = null;
+    _clipsAfter = clipsAfterVerses(
+      buildVerseQueue(
+        surah: surah,
+        from: 1,
+        to: surahRow.ayahCount,
+        after: after,
+      ),
+    );
     final timed = timings.isNotEmpty;
     final ayah = timed ? (from ?? 1) : null;
     state = state.copyWith(
@@ -637,13 +774,16 @@ class RecitationController extends Notifier<RecitationState> {
       repeatDone: 0,
       silence: silence,
       error: () => null,
+      clip: () => null,
     );
     final files = ref.read(audioFilesProvider);
     final local = files.file(reciter.id, surah);
     final stream = !local.existsSync();
     // The copy on the device, else the faster host, then the other.
     final uris = stream ? hosts.urls(reciter, surah) : [local.uri];
-    final at = _startOf(ayah);
+    final at =
+        _wordStart(ayah, word) ??
+        (nearSpeech ? _repeatStart(ayah) : _startOf(ayah));
     Object? error;
     for (final uri in uris) {
       try {
@@ -658,6 +798,7 @@ class RecitationController extends Notifier<RecitationState> {
           at,
         );
         if (load != _loads) return;
+        unawaited(_p.setSpeed(ref.read(settingsProvider).playbackSpeed));
         _loading = false;
         _resumeMs = at > Duration.zero ? at.inMilliseconds : null;
         state = state.copyWith(loading: false);
@@ -671,6 +812,225 @@ class RecitationController extends Notifier<RecitationState> {
     }
     _loading = false;
     state = state.copyWith(loading: false, error: () => error.toString());
+  }
+
+  /// The translation read after each verse, when the reader chose it, its
+  /// flag is on and its index is available; Hafs numbering only.
+  Future<VerseAudioIndex?> _translationAfterVerses() async {
+    if (!ref.read(translationAudioChoiceProvider)) return null;
+    if (ref.read(editionProvider).riwaya != Riwaya.hafs) return null;
+    try {
+      return await ref.read(translationAudioIndexProvider.future);
+    } on Object {
+      return null;
+    }
+  }
+
+  /// Turns «الترجمة المسموعة بعد كل آية» on or off, now (from the next
+  /// verse) and for the next time.
+  Future<void> setTranslationAfterVerses(bool on) async {
+    ref.read(translationAudioChoiceProvider.notifier).set(on);
+    if (!state.active || _timings.isEmpty) return;
+    final surah = state.surah;
+    final after = await _translationAfterVerses();
+    final count = (await ref.read(surahsProvider.future))[surah - 1].ayahCount;
+    if (state.surah != surah || _timings.isEmpty) return;
+    _clipsAfter = clipsAfterVerses(
+      buildVerseQueue(surah: surah, from: 1, to: count, after: after),
+    );
+  }
+
+  /// Plays a verse's tafsir from [index] on its own, in place of the
+  /// recitation; nothing follows it. Does nothing when the index has no
+  /// audio for the verse.
+  Future<void> playTafsir(VerseAudioIndex index, int surah, int ayah) async {
+    final clip = index.clipFor(surah, ayah);
+    if (clip == null) return;
+    _timings = const [];
+    _words = const [];
+    _speech = const {};
+    _clipsAfter = const {};
+    _jumpTo = null;
+    _verseDone = null;
+    state = RecitationState(
+      active: true,
+      surah: surah,
+      ayah: ayah,
+      repeat: state.repeat,
+      silence: state.silence,
+      sleep: state.sleep,
+    );
+    await _playClip(
+      RecitationClip.of(index, surah, ayah, clip, standalone: true),
+      clip,
+    );
+  }
+
+  /// Loads and plays [clip] in the recitation's place. With [resume], the
+  /// recitation carries on from that verse once the clip ends; a clip that
+  /// cannot be loaded is then skipped, never stopping the recitation.
+  Future<void> _playClip(
+    RecitationClip info,
+    VerseAudioClip clip, {
+    int? resume,
+  }) async {
+    final load = ++_loads;
+    _loading = true;
+    _waits++;
+    _inSilence = false;
+    _restartAt = null;
+    _resumeMs = null;
+    _clipStart = clip.start;
+    _clipEnd = clip.end?.inMilliseconds;
+    _clipResume = resume;
+    state = state.copyWith(clip: () => info, loading: true, error: () => null);
+    try {
+      final surahs = await ref.read(surahsProvider.future);
+      final name = surahs[info.surah - 1].nameAr;
+      await _p.load(
+        clip.uri,
+        MediaItem(
+          id: 'clip/${info.kind}/${info.surah}/${info.ayah}',
+          title: info.wholeSurah
+              ? '${info.titleAr} · $name'
+              : '${info.titleAr} · $name ${info.ayah}',
+          artist: contentCredit(info.source, 'ar'),
+          album: 'تبيان',
+        ),
+        clip.start,
+      );
+    } catch (e) {
+      if (load != _loads) return;
+      _loading = false;
+      state = state.copyWith(loading: false);
+      if (resume != null) {
+        await _finishClip();
+      } else {
+        state = state.copyWith(error: () => e.toString());
+      }
+      return;
+    }
+    if (load != _loads) return;
+    _loading = false;
+    state = state.copyWith(loading: false);
+    unawaited(_p.play());
+  }
+
+  /// The clip has ended: a tafsir waits at its start to be played again;
+  /// after a translation the recitation goes on from the next verse, or,
+  /// past the surah's last verse, with the next surah.
+  Future<void> _finishClip() async {
+    final c = state.clip;
+    if (c == null || _loading || _clipEnding) return;
+    _clipEnding = true;
+    try {
+      if (c.standalone) {
+        await _p.pause();
+        await _p.seek(_clipStart);
+        return;
+      }
+      final next = _clipResume ?? c.ayah + 1;
+      _clipResume = null;
+      _clipEnd = null;
+      if (_endOf(next) != null) {
+        await play(
+          c.surah,
+          from: next,
+          repeat: state.repeat,
+          silence: state.silence,
+          nearSpeech: true,
+        );
+      } else if (state.sleep is SleepAtSurahEnd || c.surah >= 114) {
+        await play(c.surah, start: false);
+        state = state.copyWith(sleep: () => null);
+      } else {
+        await play(c.surah + 1);
+      }
+    } finally {
+      _clipEnding = false;
+    }
+  }
+
+  /// The verses of prostration, loaded before they are needed while the
+  /// sajdah timer is on.
+  Future<void> _loadSajdahPositions() async {
+    if (!ref.read(settingsProvider).sajdahTimer) return;
+    try {
+      await ref.read(sajdahPositionsProvider.future);
+    } on Object {
+      // None known: no card.
+    }
+  }
+
+  /// The recitation has just finished [ayah]: at a verse of prostration,
+  /// with «مؤقت سجدات التلاوة» on, it pauses and the sajdah card shows;
+  /// when the card closes (its countdown, or a tap), [resume] carries on.
+  /// Not during a clip, nor while a stretch still has repetitions to go.
+  /// True when it paused.
+  bool _sajdahAt(int ayah, Future<void> Function() resume) {
+    if (!ref.read(settingsProvider).sajdahTimer) return false;
+    if (state.clip != null || ref.read(sajdahMutedProvider)) return false;
+    final key = (surah: state.surah, ayah: ayah);
+    if (_sajdahDone == key) return false;
+    if (state.rangeTo != null &&
+        (state.repeat == 0 || state.repeatDone < state.repeat - 1)) {
+      return false;
+    }
+    final positions = ref.read(sajdahPositionsProvider).value;
+    if (positions == null || !positions.isSajdah(key.surah, key.ayah)) {
+      return false;
+    }
+    _sajdahDone = key;
+    _sajdahWait = true;
+    final wait = ++_waits;
+    unawaited(_p.pause());
+    ref
+        .read(sajdahCardProvider.notifier)
+        .show(
+          key,
+          SajdahFrom.listening,
+          onClose: () {
+            if (!_sajdahWait || wait != _waits) return;
+            _sajdahWait = false;
+            if (state.active) unawaited(resume());
+          },
+        );
+    return true;
+  }
+
+  /// The reader moved on while the card waited (play, stop, a jump): the
+  /// card goes, and nothing resumes from it.
+  void _leaveSajdah() {
+    if (!_sajdahWait) return;
+    _sajdahWait = false;
+    final card = ref.read(sajdahCardProvider);
+    if (card?.from == SajdahFrom.listening) {
+      ref.read(sajdahCardProvider.notifier).drop();
+    }
+  }
+
+  /// After the card: [ayah] from its start (a moment before its speech
+  /// when the pauses are shortened).
+  Future<void> _resumeAt(int ayah) async {
+    await _p.seek(_repeatStart(ayah));
+    _resumeMs = null;
+    unawaited(_p.play());
+  }
+
+  /// Plays the clip after [ayah] (the translation), if any, when verses
+  /// play on one after another; true when it does.
+  bool _clipAfter(int ayah, int resume) {
+    if (state.repeat != 1 || state.rangeTo != null) return false;
+    final c = _clipsAfter[ayah];
+    if (c == null) return false;
+    unawaited(
+      _playClip(
+        RecitationClip.of(c.index, c.surah, c.ayah, c.clip, standalone: false),
+        c.clip,
+        resume: resume,
+      ),
+    );
+    return true;
   }
 
   /// A streamed surah is saved to the device while it plays (the same file
@@ -697,7 +1057,7 @@ class RecitationController extends Notifier<RecitationState> {
         .read(settingsProvider.notifier)
         .setReciter(id, riwaya: ref.read(editionProvider).riwaya);
     final s = state;
-    if (!s.active) return;
+    if (!s.active || (s.clip?.standalone ?? false)) return;
     await play(
       s.surah,
       from: s.ayah,
@@ -716,6 +1076,17 @@ class RecitationController extends Notifier<RecitationState> {
       if (t.ayah == ayah) return Duration(milliseconds: t.startMs);
     }
     return Duration.zero;
+  }
+
+  /// Where [word] of [ayah] starts, when the recitation times it.
+  Duration? _wordStart(int? ayah, int? word) {
+    if (ayah == null || word == null) return null;
+    for (final w in _words) {
+      if (w.ayah == ayah && w.word == word) {
+        return Duration(milliseconds: w.startMs);
+      }
+    }
+    return null;
   }
 
   int? _endOf(int ayah) {
@@ -767,7 +1138,15 @@ class RecitationController extends Notifier<RecitationState> {
   }
 
   void _onPosition(Duration position) {
-    if (!state.active || _loading || _inSilence || _timings.isEmpty) return;
+    if (!state.active || _loading || _inSilence || _sajdahWait) return;
+    if (state.clip != null) {
+      final end = _clipEnd;
+      if (end != null && position.inMilliseconds >= end) {
+        unawaited(_finishClip());
+      }
+      return;
+    }
+    if (_timings.isEmpty) return;
     final ms = position.inMilliseconds;
     final resume = _resumeMs;
     if (resume != null) {
@@ -789,6 +1168,22 @@ class RecitationController extends Notifier<RecitationState> {
     final word = w != null && w.$1 == ayah ? w.$2 : null;
     final verse = ayah != null && ayah > 0 ? ayah : state.ayah;
     if (verse != state.ayah || word != state.word) {
+      // Past the verse after a verse of prostration, its card may show
+      // again the next time the recitation gets there.
+      final shown = _sajdahDone;
+      if (shown != null &&
+          (shown.surah != state.surah ||
+              (verse != shown.ayah && verse != shown.ayah + 1))) {
+        _sajdahDone = null;
+      }
+      // A verse of prostration: the sajdah card, then the translation of
+      // the verse just recited plays before the next.
+      final done = state.ayah;
+      if (done != null && verse == done + 1) {
+        _verseHeard(done);
+        if (_sajdahAt(done, () => _resumeAt(done + 1))) return;
+        if (_clipAfter(done, done + 1)) return;
+      }
       // Each verse is repeated afresh.
       final next = verse != state.ayah && state.rangeTo == null;
       if (next) _verseDone = null;
@@ -830,6 +1225,9 @@ class RecitationController extends Notifier<RecitationState> {
         state = state.copyWith(repeatDone: 0);
         return false;
       }
+      // The stretch's last repetition ended: its last verse was heard.
+      final last = state.ayah;
+      if (last != null) _verseHeard(last);
       _ending = true;
       try {
         await _p.pause();
@@ -861,8 +1259,12 @@ class RecitationController extends Notifier<RecitationState> {
     final playing = s.playing || _inSilence;
     if (state.playing != playing) {
       state = state.copyWith(playing: playing);
-      // Listening time for the reading reports.
-      ref.read(listeningTrackerProvider).playing(playing, _reciterId);
+      // Listening time for the reading reports: the recitation (with the
+      // translation between its verses), not a tafsir on its own.
+      final recitation = playing && !(state.clip?.standalone ?? false);
+      ref.read(listeningTrackerProvider).playing(recitation, _reciterId);
+      // The khatma's listening session runs while the recitation plays.
+      ref.read(khatmaServiceProvider).recitationPlaying(recitation);
     }
     final before = _processing;
     _processing = s.processingState;
@@ -870,7 +1272,7 @@ class RecitationController extends Notifier<RecitationState> {
         before != ProcessingState.completed &&
         state.active &&
         !_loading) {
-      unawaited(_onSurahEnd());
+      unawaited(state.clip != null ? _finishClip() : _onSurahEnd());
     }
   }
 
@@ -878,6 +1280,12 @@ class RecitationController extends Notifier<RecitationState> {
     if (_timings.isNotEmpty && _stretchLast != null) {
       if (await _endOfStretch() || state.rangeTo != null) return;
     }
+    // A verse of prostration that ends the surah: the card first. Then
+    // the last verse's translation, before the next surah.
+    final last = state.ayah;
+    if (last != null && _timings.isNotEmpty) _verseHeard(last);
+    if (last != null && _sajdahAt(last, _onSurahEnd)) return;
+    if (last != null && _clipAfter(last, last + 1)) return;
     if (state.sleep is SleepAtSurahEnd || state.surah >= 114) {
       await _p.pause();
       await _p.seek(Duration.zero);
@@ -901,6 +1309,22 @@ class RecitationController extends Notifier<RecitationState> {
   Future<void> toggle() async {
     if (!state.active || state.loading) return;
     if (state.playing) return _halt();
+    // Played during the sajdah card: the card goes and the recitation
+    // goes on from the next verse.
+    if (_sajdahWait) {
+      final next = _sajdahDone;
+      _leaveSajdah();
+      if (next != null && _endOf(next.ayah + 1) != null) {
+        return _resumeAt(next.ayah + 1);
+      }
+      if (_p.processingState == ProcessingState.completed) {
+        return _onSurahEnd();
+      }
+    }
+    if (state.clip != null) {
+      unawaited(_p.play());
+      return;
+    }
     final restart = _restartAt;
     _restartAt = null;
     if (restart != null) {
@@ -919,22 +1343,114 @@ class RecitationController extends Notifier<RecitationState> {
 
   /// Moves to the previous or next verse (timed files only).
   Future<void> step(int delta) async {
+    // During the translation after a verse: on to the next verse, or back
+    // to the verse itself. A tafsir on its own has no verses to step.
+    if (state.clip case final c? when !c.standalone) {
+      final target = delta > 0 ? (_clipResume ?? c.ayah + 1) : c.ayah;
+      if (_endOf(target) == null) return;
+      await play(
+        c.surah,
+        from: target,
+        repeat: state.repeat,
+        silence: state.silence,
+      );
+      return;
+    }
     final current = state.ayah;
     if (!state.timed || current == null) return;
     final target = current + delta;
     if (target < 1 || _endOf(target) == null) return;
-    final silent = _inSilence;
+    final sajdah = _sajdahWait;
+    _leaveSajdah();
+    _sajdahDone = null;
+    final silent = _inSilence || sajdah;
     _waits++;
     _inSilence = false;
     _restartAt = null;
     _resumeMs = null;
     _verseDone = null;
-    await _p.seek(_startOf(target));
-    state = state.copyWith(
-      ayah: () => target,
-      repeatDone: state.rangeTo == null ? 0 : null,
-    );
+    _moving = true;
+    try {
+      await _p.seek(_startOf(target));
+      state = state.copyWith(
+        ayah: () => target,
+        repeatDone: state.rangeTo == null ? 0 : null,
+      );
+    } finally {
+      _moving = false;
+    }
     if (silent) unawaited(_p.play());
+  }
+
+  /// The reader tapped [ayah] of [surah] on the page while listening: the
+  /// recitation moves there at once and plays (a pause ends), from [word]
+  /// when given and timed, else from the verse's start. A stretch being
+  /// repeated is kept when the verse lies in it and dropped otherwise;
+  /// each verse still repeats as set. Another surah's verse loads that
+  /// surah's file. Nothing moves when the recitation has no timing for
+  /// the verse ([VerseJump.noTiming]), nor during a tafsir played on its
+  /// own ([VerseJump.ignored]).
+  Future<VerseJump> jumpTo(int surah, int ayah, {int? word}) async {
+    final s = state;
+    if (!s.active || (s.clip?.standalone ?? false)) return VerseJump.ignored;
+    final inRange =
+        s.rangeTo != null &&
+        s.surah == surah &&
+        ayah >= (s.rangeFrom ?? 1) &&
+        ayah <= s.rangeTo!;
+    // Out of the stretch: each verse repeats as the reader set it.
+    final repeat = s.rangeTo == null || inRange
+        ? s.repeat
+        : ref.read(settingsProvider).repeat;
+    if (s.surah != surah || s.clip != null || s.loading || _loading) {
+      // Another file (or the recitation's own, after a translation clip
+      // or while it loads): only when it times the verse.
+      final reciter = await ref.read(currentReciterProvider.future);
+      if (reciter == null) return VerseJump.ignored;
+      final timings = await ref
+          .read(mushafRepositoryProvider)
+          .timings(reciter.id, surah);
+      if (!timings.any((t) => t.ayah == ayah)) return VerseJump.noTiming;
+      if (!state.active) return VerseJump.ignored;
+      await play(
+        surah,
+        from: ayah,
+        to: inRange ? s.rangeTo : null,
+        rangeFrom: inRange ? s.rangeFrom : null,
+        repeat: repeat,
+        silence: s.silence,
+        nearSpeech: true,
+        word: word,
+      );
+      return VerseJump.jumped;
+    }
+    if (!s.timed || _endOf(ayah) == null) return VerseJump.noTiming;
+    _leaveSajdah();
+    _sajdahDone = null;
+    final silent = _inSilence;
+    _waits++;
+    _inSilence = false;
+    _restartAt = null;
+    _resumeMs = null;
+    _jumpTo = null;
+    _verseDone = null;
+    _moving = true;
+    try {
+      await _p.seek(_wordStart(ayah, word) ?? _repeatStart(ayah));
+      state = state.copyWith(
+        ayah: () => ayah,
+        word: () => null,
+        rangeFrom: inRange ? null : () => null,
+        rangeTo: inRange ? null : () => null,
+        repeat: repeat,
+        // A stretch whose repetitions were done plays afresh.
+        repeatDone: inRange && !_rangeFinished ? null : 0,
+      );
+    } finally {
+      _moving = false;
+    }
+    if (silent || !state.playing) unawaited(_p.play());
+    return VerseJump.jumped;
   }
 
   /// Sets how many times each verse (or the chosen stretch) plays, and
@@ -942,6 +1458,12 @@ class RecitationController extends Notifier<RecitationState> {
   void setRepeat(int times) {
     state = state.copyWith(repeat: times);
     unawaited(ref.read(settingsProvider.notifier).setRepeat(times));
+  }
+
+  /// Sets the recitation speed, now and for the next time.
+  void setSpeed(double speed) {
+    unawaited(_p.setSpeed(speed));
+    unawaited(ref.read(settingsProvider.notifier).setPlaybackSpeed(speed));
   }
 
   /// Sets the silence between repetitions, and keeps it for the next time.
@@ -989,12 +1511,16 @@ class RecitationController extends Notifier<RecitationState> {
   }
 
   Future<void> stop() async {
+    _leaveSajdah();
+    _sajdahDone = null;
     _loads++;
     _waits++;
     _loading = false;
     _inSilence = false;
     _restartAt = null;
     _resumeMs = null;
+    _clipEnd = null;
+    _clipResume = null;
     _sleepTimer?.cancel();
     _sleepTimer = null;
     await _player?.stop();

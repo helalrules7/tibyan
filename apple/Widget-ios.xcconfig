@@ -1,0 +1,6 @@
+// Build settings of the iOS widget extensions. FLUTTER_BUILD_NAME and
+// FLUTTER_BUILD_NUMBER come from Flutter's generated file, so the
+// extensions carry the app's version.
+#include? "../ios/Flutter/Generated.xcconfig"
+
+TIBYAN_APP_GROUP = group.app.tibyan.tibyan

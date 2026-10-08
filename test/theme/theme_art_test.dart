@@ -13,6 +13,7 @@ import 'package:tibyan/core/theme/theme_registry.dart';
 import 'package:tibyan/core/theme/theme_tokens.dart';
 import 'package:tibyan/features/mushaf/mushaf_providers.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/illuminated_frame.dart';
+import 'package:tibyan/features/mushaf/presentation/widgets/reading_bar.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/page_interaction.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/theme_art.dart';
 import 'package:tibyan/l10n/app_localizations.dart';
@@ -194,7 +195,12 @@ void main() {
       expect(left.first.rect.width, closeTo(edgeV.width * k, 1e-9));
     });
 
-    test('the page starts at the deeper edge', () {
+    test('the page starts at each edge\'s own depth', () {
+      final dv = edgeV.width * k;
+      expect(layout.insets.top, closeTo(band, 1e-9));
+      expect(layout.insets.bottom, closeTo(band, 1e-9));
+      expect(layout.insets.left, closeTo(dv, 1e-9));
+      expect(layout.insets.right, closeTo(dv, 1e-9));
       expect(layout.inset, closeTo(band, 1e-9));
     });
 
@@ -229,6 +235,11 @@ void main() {
       final middle = l.placements[3];
       expect(middle.rect.height / middle.src!.height, greaterThan(k));
       expect(l.inset, closeTo(slot.top * k, 1e-9));
+      // The sides are thinner than the top: the page reaches each one.
+      expect(l.insets.left, closeTo(slot.left * k, 1e-9));
+      expect(l.insets.right, closeTo((view.width - slot.right) * k, 1e-9));
+      expect(l.insets.top, closeTo(slot.top * k, 1e-9));
+      expect(l.insets.bottom, closeTo((view.height - slot.bottom) * k, 1e-9));
       final union = l.placements
           .map((p) => p.rect)
           .reduce((a, b) => a.expandToInclude(b));
@@ -411,7 +422,6 @@ void main() {
             onHizbTap: () => taps.add('hizb'),
             onSurahTap: () => taps.add('surah'),
             onPageTap: () => taps.add('page'),
-            tools: const Text('tools'),
             child: const SizedBox.expand(),
           ),
         ),
@@ -423,8 +433,9 @@ void main() {
       await tester.tap(find.text('آل عمران'));
       await tester.tap(find.bySemanticsLabel('الصفحة 50'));
       expect(taps, ['juz', 'hizb', 'surah', 'page']);
-      expect(find.text('كلمة'), findsOneWidget);
-      expect(find.text('tools'), findsOneWidget);
+      // The catchword and the tools are the screen's reading bar's, not
+      // the page's: they do not turn with it.
+      expect(find.text('كلمة'), findsNothing);
       // The banner writes the surah in the header art.
       expect(find.textContaining('سورة آل عمران'), findsOneWidget);
       // The page number sits below the frame, the cartouche above it.
@@ -435,25 +446,41 @@ void main() {
       expect(page.bottom, greaterThan(screen.height * 0.85));
     });
 
-    testWidgets('the catchword hides in recitation mode', (tester) async {
+    testWidgets('the reading bar: quarter, tools, catchword; none in '
+        'recitation mode', (tester) async {
+      const info = FrameInfo(
+        page: 51,
+        juz: 3,
+        hizb: 5,
+        surahName: 'آل عمران',
+        catchword: 'كلمة',
+        quarters: [QuarterMark(line: 3, quarter: 18, surah: 3, ayah: 92)],
+      );
       await tester.pumpWidget(
         app(
           registry.byId('seljuk'),
-          const IlluminatedFrame(
-            info: FrameInfo(
-              page: 51,
-              juz: 3,
-              hizb: 5,
-              surahName: 'آل عمران',
-              catchword: 'كلمة',
-            ),
-            showCatchword: false,
-            child: SizedBox.expand(),
+          Column(
+            children: [
+              ReadingBar.of(const [info], page: 51, tools: const Text('tools')),
+              ReadingBar.of(
+                const [info],
+                page: 51,
+                showCatchword: false,
+                tools: const Text('hidden'),
+              ),
+            ],
           ),
         ),
       );
       await settle(tester);
-      expect(find.text('كلمة'), findsNothing);
+      expect(find.text('كلمة'), findsOneWidget);
+      expect(find.bySemanticsLabel('ربع الحزب ٥'), findsNWidgets(2));
+      expect(find.text('tools'), findsOneWidget);
+      // The quarter on the right, the catchword on the left.
+      expect(
+        tester.getCenter(find.bySemanticsLabel('ربع الحزب ٥').first).dx,
+        greaterThan(tester.getCenter(find.text('كلمة')).dx),
+      );
     });
 
     testWidgets('the opening page\'s surah name still opens the index', (

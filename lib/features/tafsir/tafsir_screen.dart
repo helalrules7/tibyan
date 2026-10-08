@@ -3,10 +3,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/content_database.dart';
+import '../../core/flags/feature_flags.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/mushaf_digits.dart';
 import '../../l10n/app_localizations.dart';
+import '../audio/recitation.dart';
+import '../books/books_providers.dart';
+import '../books/data/book_pack.dart';
+import '../books/presentation/asbab_section.dart';
+import '../content_extras/english_tafsir.dart';
+import '../content_extras/tafsir_audio_button.dart';
+import '../content_extras/verse_audio_index.dart';
+import '../books/presentation/book_section.dart';
 import '../mushaf/data/mushaf_repository.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
@@ -61,6 +71,19 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
     super.dispose();
   }
 
+  /// Leaving the tafsir: a tafsir read aloud from here stops with it, so
+  /// no player is left over the mushaf.
+  void _stopTafsirAudio() {
+    final s = ref.read(recitationProvider);
+    final clip = s.clip;
+    if (s.active &&
+        clip != null &&
+        clip.standalone &&
+        clip.kind == VerseAudioKind.tafsir) {
+      ref.read(recitationProvider.notifier).stop();
+    }
+  }
+
   void _go(int delta, int count) {
     final next = _ayah - 1 + delta;
     if (next < 0 || next >= count) return;
@@ -80,71 +103,76 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
     final ayahs = ref.watch(surahAyahsProvider(widget.surah)).value;
     final count = surah?.ayahCount ?? 0;
 
-    return Scaffold(
-      backgroundColor: t.paper,
-      appBar: AppBar(
-        title: Text(
-          surah == null
-              ? l.tafsirTitle
-              : '${l.surahWord(surahName(context, surah))} · ${digits(_ayah)}',
-        ),
-        actions: [
-          IconButton(
-            tooltip: l.tafsirSettings,
-            icon: const Icon(Icons.text_fields),
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
-              showDragHandle: true,
-              builder: (_) => const _TafsirSettingsSheet(),
-            ),
-          ),
-        ],
-      ),
-      body: ayahs == null
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                if (widget.riwaya != null && widget.riwayaAyah != null)
-                  _RiwayaNote(
-                    riwaya: widget.riwaya!,
-                    surah: widget.surah,
-                    ayah: widget.riwayaAyah!,
-                  ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pages,
-                    itemCount: ayahs.length,
-                    onPageChanged: (i) => setState(() => _ayah = i + 1),
-                    itemBuilder: (context, i) => _VersePage(ayah: ayahs[i]),
-                  ),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _stopTafsirAudio();
+      },
+      child: Scaffold(
+        backgroundColor: t.paper,
+        appBar: AppBar(
+          title: surah == null
+              ? Text(l.tafsirTitle)
+              : MushafDigitsText(
+                  '${l.surahWord(surahName(context, surah))} | ${digits(_ayah)}',
                 ),
-              ],
-            ),
-      bottomNavigationBar: SafeArea(
-        child: Row(
-          children: [
+          actions: [
             IconButton(
-              tooltip: l.previousVerse,
-              onPressed: _ayah > 1 ? () => _go(-1, count) : null,
-              icon: const Icon(Icons.chevron_left),
-            ),
-            const Spacer(),
-            Semantics(
-              liveRegion: true,
-              label: l.verseCounter(digits(_ayah), digits(count)),
-              excludeSemantics: true,
-              child: Text(
-                '${digits(_ayah)} / ${digits(count)}',
-                style: TextStyle(color: t.muted),
+              tooltip: l.tafsirSettings,
+              icon: const Icon(Icons.text_fields),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                showDragHandle: true,
+                builder: (_) => const _TafsirSettingsSheet(),
               ),
             ),
-            const Spacer(),
-            IconButton(
-              tooltip: l.nextVerse,
-              onPressed: _ayah < count ? () => _go(1, count) : null,
-              icon: const Icon(Icons.chevron_right),
-            ),
           ],
+        ),
+        body: ayahs == null
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  if (widget.riwaya != null && widget.riwayaAyah != null)
+                    _RiwayaNote(
+                      riwaya: widget.riwaya!,
+                      surah: widget.surah,
+                      ayah: widget.riwayaAyah!,
+                    ),
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pages,
+                      itemCount: ayahs.length,
+                      onPageChanged: (i) => setState(() => _ayah = i + 1),
+                      itemBuilder: (context, i) => _VersePage(ayah: ayahs[i]),
+                    ),
+                  ),
+                ],
+              ),
+        bottomNavigationBar: SafeArea(
+          child: Row(
+            children: [
+              IconButton(
+                tooltip: l.previousVerse,
+                onPressed: _ayah > 1 ? () => _go(-1, count) : null,
+                icon: const Icon(Icons.chevron_left),
+              ),
+              const Spacer(),
+              Semantics(
+                liveRegion: true,
+                label: l.verseCounter(digits(_ayah), digits(count)),
+                excludeSemantics: true,
+                child: MushafDigitsText(
+                  '${digits(_ayah)} / ${digits(count)}',
+                  style: TextStyle(color: t.muted),
+                ),
+              ),
+              const Spacer(),
+              IconButton(
+                tooltip: l.nextVerse,
+                onPressed: _ayah < count ? () => _go(1, count) : null,
+                icon: const Icon(Icons.chevron_right),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -234,6 +262,7 @@ class _VersePage extends ConsumerWidget {
     final t = context.tokens.colors;
     final settings = ref.watch(settingsProvider);
     final editions = ref.watch(commentaryEditionsProvider).value;
+    final languageCode = Localizations.localeOf(context).languageCode;
     final entries = ref
         .watch(verseCommentaryProvider((surah: ayah.surah, ayah: ayah.number)))
         .value;
@@ -246,9 +275,34 @@ class _VersePage extends ConsumerWidget {
     }
     final shown = [
       for (final e in editions)
-        if (!settings.hiddenCommentaries.contains(e.sourceId) &&
+        if (settings.isCommentaryShown(
+              e.sourceId,
+              defaultShown: commentaryDefaultShown(
+                kind: e.kind,
+                contentLanguageCode: e.language,
+                languageCode: languageCode,
+              ),
+            ) &&
             entries[e.sourceId] != null)
           e,
+    ];
+    // Book tafsirs from installed reviewed packs: more choices beside the
+    // ones above, each shown only when it has a passage for this verse.
+    final books = [
+      for (final b in ref.watch(installedBookSourcesProvider(BookKind.tafsir)))
+        if (!settings.hiddenBookTafsirs.contains(b.key) &&
+            ref
+                .watch(
+                  bookEntriesProvider((
+                    spec: BookSectionSpec.tafsir,
+                    surah: ayah.surah,
+                    ayah: ayah.number,
+                    source: b.key,
+                    word: null,
+                  )),
+                )
+                .isNotEmpty)
+          b,
     ];
     final cards = [
       for (final e in shown)
@@ -256,6 +310,16 @@ class _VersePage extends ConsumerWidget {
           edition: e,
           entry: entries[e.sourceId]!,
           source: sources[e.sourceId],
+        ),
+      for (final b in books)
+        BookSection(
+          key: ValueKey('book-tafsir-${b.key}'),
+          spec: BookSectionSpec.tafsir,
+          surah: ayah.surah,
+          ayah: ayah.number,
+          source: b.key,
+          title: b.title,
+          titleSize: 14,
         ),
     ];
 
@@ -295,6 +359,9 @@ class _VersePage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              // «استمع للتفسير» (flag tafsir_audio), when a recording has
+              // the verse; nothing otherwise.
+              TafsirAudioButtons(surah: ayah.surah, ayah: ayah.number),
               if (cards.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(24),
@@ -321,6 +388,30 @@ class _VersePage extends ConsumerWidget {
                   if (i > 0) const SizedBox(height: 12),
                   c,
                 ],
+              // The English tafsir pack (flag english_tafsir), English
+              // interface only; nothing otherwise.
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: EnglishTafsirSection(
+                  surah: ayah.surah,
+                  ayah: ayah.number,
+                ),
+              ),
+              // Reviewed occasions of revelation, when the feature is on
+              // and a pack has some for this verse; nothing otherwise.
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: AsbabSection(surah: ayah.surah, ayah: ayah.number),
+              ),
+              // Reviewed munasabat, under the same conditions.
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: BookSection(
+                  spec: BookSectionSpec.munasabat,
+                  surah: ayah.surah,
+                  ayah: ayah.number,
+                ),
+              ),
             ],
           );
         },
@@ -461,7 +552,11 @@ class _TafsirSettingsSheet extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
     final editions = ref.watch(commentaryEditionsProvider).value ?? const [];
-    final arabicUi = Localizations.localeOf(context).languageCode == 'ar';
+    final books = ref.watch(installedBookSourcesProvider(BookKind.tafsir));
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final arabicUi = languageCode == 'ar';
+    final flags = ref.watch(featureFlagsProvider);
+    final englishTafsirSpecs = ref.watch(englishTafsirSpecsProvider);
 
     return SafeArea(
       child: ListView(
@@ -518,8 +613,31 @@ class _TafsirSettingsSheet extends ConsumerWidget {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(arabicUi ? e.nameAr : e.nameEn),
-              value: !settings.hiddenCommentaries.contains(e.sourceId),
+              value: settings.isCommentaryShown(
+                e.sourceId,
+                defaultShown: commentaryDefaultShown(
+                  kind: e.kind,
+                  contentLanguageCode: e.language,
+                  languageCode: languageCode,
+                ),
+              ),
               onChanged: (v) => controller.setCommentaryShown(e.sourceId, v),
+            ),
+          if (englishTafsirSpecs.isNotEmpty &&
+              flags.isOn(Feature.englishTafsir))
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l.englishTafsirVisibilityLabel),
+              value: settings.isEnglishTafsirShown(languageCode),
+              onChanged: controller.setEnglishTafsirShown,
+            ),
+          for (final b in books)
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(b.title),
+              subtitle: Text(b.author),
+              value: !settings.hiddenBookTafsirs.contains(b.key),
+              onChanged: (v) => controller.setBookTafsirShown(b.key, v),
             ),
         ],
       ),

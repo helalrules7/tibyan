@@ -35,6 +35,8 @@ Usage:
   python3 tools/timing_files.py pack --out DIR       packs and manifest.json for the server
   python3 tools/timing_files.py site --out DIR       the editor with its data, for GitHub Pages
   python3 tools/timing_files.py verse-words          writes data/timing/verse_words.json
+  python3 tools/timing_files.py known-errors         writes data/timing/known_errors.json
+  python3 tools/timing_files.py fix-known [SLUG...]  fixes the known errors that need no listening
 """
 import argparse
 import gzip
@@ -363,6 +365,76 @@ def write_known_errors():
     print(f'{len(rows)} known errors')
 
 
+# ------------------------------------------------------ mechanical fixes
+
+# The only source errors fixed without listening (docs/TIMING.md, "known
+# errors"); everything else is left to a person in the editor, or to a
+# new measurement. Neither rule invents a time: each moves one edge onto a
+# time already in the file, by less than the source's own rounding.
+#
+# 1. A word of one millisecond is a word quran-align gave no length
+#    (build_word_timing.py writes such a word as start..start+1). When
+#    the next word starts inside that one millisecond, or up to one
+#    quran-align frame (10 ms) before it, the overlap is rounding: the
+#    next word starts where the point word ends (a boundary is one moment,
+#    as in the editor). Larger overlaps are left: the next word's start
+#    was measured somewhere else, and only listening can tell.
+POINT_WORD_MS = 1
+POINT_OVERLAP_MS = 12   # one 10 ms frame stretched onto the surah file, plus the 1 ms
+# 2. Nothing is heard after the audio ends: the last verse of a file whose
+#    published end runs past the end of the audio by less than a second
+#    (and none of whose words do) ends where the audio ends. Longer
+#    overruns mean the timing was measured on another file.
+AUDIO_END_FIX_MS = 1000
+
+
+def fix_doc(doc, duration_ms=None):
+    """(a fixed copy of doc, [(verse, word, code, before, after)]) by the two
+    rules above; doc itself is not changed."""
+    out = json.loads(json.dumps(doc))
+    fixes = []
+    for entry in out['verses']:
+        a, _, _, words = entry
+        for i in range(1, len(words)):
+            p, w = words[i - 1], words[i]
+            over = p[2] - w[1]
+            if (0 < over <= POINT_OVERLAP_MS and p[2] - p[1] <= POINT_WORD_MS
+                    and p[2] < w[2]):
+                fixes.append((a, w[0], 'word_overlap', w[1], p[2]))
+                w[1] = p[2]
+    if duration_ms is not None and out['verses']:
+        last = out['verses'][-1]
+        a, start, end, words = last
+        over = end - duration_ms
+        if (DURATION_SLACK_MS < over < AUDIO_END_FIX_MS and start < duration_ms
+                and all(w[2] <= duration_ms for w in words)):
+            fixes.append((a, None, 'verse_duration', end, duration_ms))
+            last[2] = duration_ms
+    return out, fixes
+
+
+def fix_known(slugs=None):
+    """Applies fix_doc to the files that have known errors (of [slugs], or
+    all). Returns the fixes, as (slug, surah, verse, word, code, before,
+    after). Run `known-errors` afterwards."""
+    done = []
+    files = sorted({(e[0], e[1]) for e in known_errors() if slugs is None or e[0] in slugs})
+    for slug, surah in files:
+        path = surah_path(slug, surah)
+        doc = load_json(path)
+        fixed, fixes = fix_doc(doc, durations(slug).get(surah))
+        if not fixes:
+            continue
+        before = {(i['verse'], i['word'], i['code']) for i in
+                  validate(doc, slug, surah, counts_for(slug, surah), durations(slug).get(surah))}
+        after = validate(fixed, slug, surah, counts_for(slug, surah), durations(slug).get(surah))
+        new = [i for i in after if i['level'] == 'error' and (i['verse'], i['word'], i['code']) not in before]
+        assert not new, (slug, surah, new)
+        path.write_text(dumps(fixed), encoding='utf-8')
+        done += [(slug, surah, *f) for f in fixes]
+    return done
+
+
 # ------------------------------------------------------------------- check
 
 def _file_label(slug, surah):
@@ -675,6 +747,8 @@ def main(argv=None):
     e = sub.add_parser('export')
     e.add_argument('slugs', nargs='+')
     sub.add_parser('known-errors', help='write data/timing/known_errors.json: the errors in the published data now')
+    fx = sub.add_parser('fix-known', help='fix the known errors that need no listening (fix_doc), then run known-errors')
+    fx.add_argument('slugs', nargs='*')
     c = sub.add_parser('check')
     c.add_argument('files', nargs='*')
     c.add_argument('--base', help='a checkout of the base branch, to tell changed verses from old ones')
@@ -692,6 +766,10 @@ def main(argv=None):
             export(slug)
     elif args.cmd == 'known-errors':
         write_known_errors()
+    elif args.cmd == 'fix-known':
+        for slug, surah, verse, word, code, before, after in fix_known(args.slugs or None):
+            where = f'{surah}:{verse}' + (f' word {word}' if word else '')
+            print(f'{slug} {where}: {code}, {before} -> {after}')
     elif args.cmd == 'verse-words':
         write_verse_words()
     elif args.cmd == 'pack':

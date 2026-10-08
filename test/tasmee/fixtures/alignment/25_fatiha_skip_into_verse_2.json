@@ -1,0 +1,17 @@
+{
+ "name": "al-Fatiha: a skip from the basmala into verse 2 is a real skip",
+ "range": {
+  "surah": 1
+ },
+ "steps": [
+  {
+   "say": "رب العالمين الرحمن الرحيم مالك يوم الدين إياك نعبد وإياك نستعين اهدنا الصراط المستقيم صراط الذين أنعمت عليهم غير المغضوب عليهم ولا الضالين"
+  }
+ ],
+ "statuses": {
+  "1:1:1-4": "skipped",
+  "1:2:1-2": "skipped",
+  "*": "correct"
+ },
+ "extras": []
+}

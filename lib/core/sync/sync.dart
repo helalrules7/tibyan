@@ -160,6 +160,18 @@ Future<bool> applyRemote(UserDatabase db, RemoteChange c) async {
       (j) => KhatmaLogRow.fromJson(noId(j)),
       (r) => r.toCompanion(true).copyWith(id: const Value.absent()),
     ),
+    'khatma_pause' => merge(
+      db.khatmaPauses,
+      db.khatmaPauses.uuid,
+      (j) => KhatmaPauseRow.fromJson(noId(j)),
+      (r) => r.toCompanion(true).copyWith(id: const Value.absent()),
+    ),
+    'session_attribution' => merge(
+      db.sessionAttributions,
+      db.sessionAttributions.uuid,
+      (j) => SessionAttributionRow.fromJson(noId(j)),
+      (r) => r.toCompanion(true).copyWith(id: const Value.absent()),
+    ),
     'reading_session' => merge(
       db.readingSessions,
       db.readingSessions.uuid,

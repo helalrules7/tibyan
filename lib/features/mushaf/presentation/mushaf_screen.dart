@@ -1,9 +1,13 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../core/db/content_database.dart';
@@ -11,7 +15,14 @@ import '../../../core/db/user_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/reveal.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../assistant/assistant_screen.dart';
+import '../../books/books_providers.dart';
+import '../../books/presentation/asbab_section.dart';
+import '../../books/presentation/book_section.dart';
+import '../../content_extras/verse_audio_index.dart';
+import '../../audio/floating_player.dart';
 import '../../audio/player_bar.dart';
 import '../../audio/recitation.dart';
 import '../../hifz/data/hifz_repository.dart';
@@ -20,16 +31,27 @@ import '../../hifz/domain/strength.dart';
 import '../../hifz/hifz_providers.dart';
 import '../../hifz/presentation/hifz_sheets.dart';
 import '../../hifz/presentation/similar_sheet.dart';
+import '../../word_study/data/word_study_repository.dart';
 import '../../word_study/word_pick.dart';
+import '../../word_study/word_study_providers.dart';
 import '../../word_study/word_study_sheet.dart';
+import '../../khatma/domain/khatmah.dart' show EntryPoint;
 import '../../khatma/domain/reading_tracker.dart';
+import '../../../core/router/cover_observer.dart';
 import '../../khatma/khatma_providers.dart';
 import '../../khatma/presentation/journal_screen.dart';
+import '../../khatma/presentation/reader_khatma.dart';
 import '../data/mushaf_repository.dart';
 import '../data/tajweed.dart';
 import '../data/riwaya_data.dart';
+import '../data/verse_share.dart';
+import '../../share_image/share_preview_screen.dart';
+import '../../reading/under_verse.dart';
+import '../../sajdah/sajdah_card.dart';
+import '../../sajdah/sajdah_positions.dart';
 import '../mushaf_providers.dart';
 import 'download_screen.dart';
+import 'page_spreads.dart';
 import 'widgets/art_frame.dart';
 import 'widgets/fasil_sheet.dart';
 import 'widgets/go_to_page.dart';
@@ -38,9 +60,15 @@ import 'widgets/mushaf_page.dart';
 import 'widgets/ornate_pages.dart';
 import 'widgets/old_mushaf_page.dart';
 import 'widgets/page_interaction.dart';
+import 'widgets/reading_bar.dart';
 import 'widgets/shamarly_page.dart';
 import 'widgets/tajweed_legend.dart';
 import 'widgets/verse_services.dart';
+
+part 'mushaf_screen_controls.dart';
+part 'mushaf_screen_focus.dart';
+part 'mushaf_screen_hifz.dart';
+part 'mushaf_screen_panes.dart';
 
 /// Name of a surah in the interface language (names from Tanzil metadata).
 String surahName(BuildContext context, SurahRow s) =>
@@ -56,7 +84,17 @@ class MushafScreen extends ConsumerStatefulWidget {
     this.hifzUnit,
     this.hifzFrom,
     this.hifzTo,
+    this.listen = false,
+    this.entry = EntryPoint.other,
   });
+
+  /// Where the reading was opened from: from a search, a tafsir or the
+  /// hifz, the khatma counts only the pages after the one it landed on.
+  final EntryPoint entry;
+
+  /// Start the recitation from the first verse of the opening page (the
+  /// home screen widget's «استماع» button).
+  final bool listen;
 
   final int? initialPage;
   final int? selectSurah;
@@ -78,8 +116,31 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   PageController? _controller;
   int _page = 1;
 
+  /// The pager's index the reading bar shows while a page is being turned:
+  /// the bar follows [_page] only once the pager settles.
+  int? _barHold;
+
   /// Reading is immersive: no bars until the reader touches the page.
   bool _chrome = false;
+
+  /// Focus mode: the reading tools under the page are shown (the top
+  /// bar's tools button); a tap on the page hides them. The reader's
+  /// choice is kept ([AppSettings.focusToolsShown]); «القائمة» has no such
+  /// tools.
+  bool get _focusTools {
+    // The build watches the settings, so this follows them.
+    final s = ref.read(settingsProvider);
+    return s.focusToolsShown && s.focusTools == FocusTools.button;
+  }
+
+  void _setFocusTools(bool shown) =>
+      ref.read(settingsProvider.notifier).setFocusToolsShown(shown);
+
+  /// The verse the «القائمة» window was opened on, shaded while it is open.
+  VerseKey? _menuVerse;
+
+  /// Focus mode is on (see [AppSettings.focusMode]).
+  bool get _focus => ref.read(settingsProvider).focusMode;
   int? _scrubPage;
 
   /// The selection: two ends on the current page, in either order.
@@ -89,6 +150,18 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Multi-verse selection: the handles are shown and every other control
   /// waits until the reader taps Done.
   bool _multi = false;
+
+  /// The pages of the selection's two ends: a stretch of verses may run
+  /// over page breaks (turn the page while selecting, tap a verse to extend).
+  int _pageA = 1;
+  int _pageB = 1;
+
+  /// Most pages one selection may cover.
+  static const _maxSelectionPages = 6;
+
+  /// Two pages side by side, like an open mushaf (a wide screen held
+  /// sideways); [_controller]'s index is then a spread, not a page.
+  bool _spread = false;
 
   /// Recitation mode: verses stay covered until revealed.
   bool _recite = false;
@@ -112,7 +185,10 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Auto-scroll: pages stacked vertically, moving at [_speed].
   bool _autoScroll = false;
   bool _paused = false;
-  int _speed = 3;
+
+  /// The reader's speed, kept between openings
+  /// ([AppSettings.autoScrollSpeed]).
+  int get _speed => ref.read(settingsProvider).autoScrollSpeed;
   ScrollController? _vertical;
   Ticker? _ticker;
   Duration _lastTick = Duration.zero;
@@ -123,14 +199,31 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   late final ReadingTracker _tracker;
   late final AppLifecycleListener _lifecycle;
 
+  /// No sajdah card during a hifz test; read now, as ref is not usable in
+  /// dispose.
+  late final SajdahMuted _sajdahMuted = ref.read(sajdahMutedProvider.notifier);
+
   @override
   void initState() {
     super.initState();
+    if (_testing) _muteSajdah(true);
+    _container; // read now: ref is not usable in dispose
     final service = ref.read(khatmaServiceProvider);
     _tracker = ReadingTracker(
-      onPageRead: service.pageRead,
-      onSessionEnd: service.sessionEnded,
+      onPageRead: (r) => unawaited(
+        service.pageRead(r, entry: widget.entry).catchError((_) {}),
+      ),
+      onSessionEnd: (s) => unawaited(
+        service.sessionEnded(s, entry: widget.entry).catchError((_) {}),
+      ),
+      pageWeight: _pageWeight,
+      minDwell: Duration(
+        seconds: ref.read(settingsProvider).readingSpeed.secondsPerPage,
+      ),
     );
+    // The weights of the pages, at hand before the first page counts.
+    ref.read(quranIndexProvider.future).ignore();
+    ref.read(editionPagesProvider(ref.read(editionProvider)).future).ignore();
     _lifecycle = AppLifecycleListener(onHide: _tracker.end, onShow: _trackPage);
     if (widget.selectSurah != null && widget.selectAyah != null) {
       _selA = _selB = (surah: widget.selectSurah!, ayah: widget.selectAyah!);
@@ -140,21 +233,199 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     _applySystemBars();
   }
 
+  /// The system's bars show with the menus; focus mode keeps them hidden
+  /// (immersive) all the time.
   void _applySystemBars() {
     SystemChrome.setEnabledSystemUIMode(
-      _chrome ? SystemUiMode.edgeToEdge : SystemUiMode.immersiveSticky,
+      _chrome && !_focus
+          ? SystemUiMode.edgeToEdge
+          : SystemUiMode.immersiveSticky,
     );
   }
 
   /// A tap on the page, its frame or the space around it: clears the
-  /// selection, or shows and hides the menus.
+  /// selection, or shows and hides the menus. In focus mode it only hides
+  /// what is shown (the tools, the menus); with nothing shown it does
+  /// nothing.
   void _onPageTap() {
     if (_multi) return;
     if (_selA != null) {
       setState(() => _selA = _selB = null);
+    } else if (_focus) {
+      if (_focusTools) _setFocusTools(false);
+      _setChrome(false);
     } else {
       _setChrome(!_chrome);
     }
+  }
+
+  /// Focus mode's tools button: shows the reading tools under the page, or
+  /// hides them.
+  void _toggleFocusTools() {
+    _setChrome(false);
+    _setFocusTools(!_focusTools);
+  }
+
+  /// The small reading tools (touch reading, listening, recitation mode,
+  /// tajweed colours), as [r] sees them; [before] runs ahead of each (it
+  /// closes focus mode's window).
+  _ReadingTools _readingTools(
+    WidgetRef r, {
+    bool labelled = false,
+    VoidCallback? before,
+  }) {
+    final settings = r.watch(settingsProvider);
+    VoidCallback act(VoidCallback f) => () {
+      before?.call();
+      f();
+    };
+    return _ReadingTools(
+      labelled: labelled,
+      touchReading: settings.touchReading,
+      onTouchReading: act(_toggleTouchReading),
+      listening: r.watch(recitationProvider).active,
+      onListen: act(_listenFromPage),
+      recite: _recite || _testing,
+      onRecite: act(
+        () => _testing
+            ? _closeTest()
+            : _recite
+            ? setState(() {
+                _recite = false;
+                _revealed.clear();
+              })
+            : _startRecite(),
+      ),
+      tajweed: editionHasTajweed(r.watch(editionProvider))
+          ? settings.tajweedColors
+          : null,
+      onTajweed: act(
+        () => ref
+            .read(settingsProvider.notifier)
+            .setTajweedColors(!settings.tajweedColors),
+      ),
+      onTajweedLegend: act(() => showTajweedLegend(context)),
+      focus: settings.focusMode,
+      onFocus: act(
+        () => settings.focusMode
+            ? _exitFocus()
+            : ref.read(settingsProvider.notifier).setFocusMode(true),
+      ),
+    );
+  }
+
+  /// «القائمة»: the window with every tool, opened by a long press on
+  /// [page]: today's top bar (and the exit from focus mode), the services
+  /// of the [verse] pressed (none off a verse), the page's tools, and the
+  /// reading tools with the page number. A tap outside closes it.
+  Future<void> _openFocusMenu(int page, VerseKey? verse) async {
+    HapticFeedback.selectionClick();
+    _setChrome(false);
+    setState(() {
+      _selA = _selB = null;
+      _menuVerse = verse;
+      // The services read the verse's page from here (copy, marks).
+      _pageA = _pageB = page;
+      _pickWord = false;
+    });
+    final l = AppLocalizations.of(context);
+    final screen = context;
+    await showDialog<void>(
+      context: context,
+      builder: (dialog) {
+        void close() => Navigator.of(dialog).pop();
+        VoidCallback then(VoidCallback f) => () {
+          close();
+          f();
+        };
+        return Consumer(
+          builder: (_, r, _) {
+            final info = r.watch(frameInfoProvider(page)).value;
+            return _FocusMenu(
+              header: [
+                (
+                  Icons.list_alt,
+                  l.indexTitle,
+                  then(() => screen.push('/mushaf/index')),
+                ),
+                (
+                  assistantIcon,
+                  l.assistantTitle,
+                  then(() => screen.push(assistantLocation)),
+                ),
+                (Icons.home_outlined, l.homeTitle, then(() => screen.go('/'))),
+                (
+                  Icons.search_outlined,
+                  l.sectionSearch,
+                  then(() => screen.push('/search')),
+                ),
+                (
+                  Icons.tune,
+                  l.settingsTitle,
+                  then(() => screen.push('/settings')),
+                ),
+                (Icons.fullscreen_exit, l.focusExit, then(_exitFocus)),
+              ],
+              verse: verse == null
+                  ? null
+                  : _verseServices(
+                      r,
+                      [verse],
+                      onClose: close,
+                      before: close,
+                      embedded: true,
+                    ),
+              pageTools: [
+                (Icons.menu_book_outlined, l.goToPage, then(_goToPage)),
+                (
+                  Icons.bookmarks_outlined,
+                  l.fawasilTitle,
+                  then(() => screen.push('/mushaf/fawasil')),
+                ),
+                (
+                  Icons.screen_rotation_outlined,
+                  l.oneVerse,
+                  then(_openOneVerse),
+                ),
+                (
+                  Icons.view_agenda_outlined,
+                  l.continuousView,
+                  then(_openContinuous),
+                ),
+                (
+                  Icons.keyboard_double_arrow_down,
+                  l.autoScroll,
+                  then(_startAutoScroll),
+                ),
+              ],
+              bar: info == null
+                  ? null
+                  : Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: ReadingBar.of(
+                        [info],
+                        page: page,
+                        showCatchword: !_recite && !_testing,
+                      ),
+                    ),
+              tools: _readingTools(
+                r,
+                labelled: screen.tokens.elderly,
+                before: close,
+              ),
+              page: page,
+              onPage: then(_goToPage),
+            );
+          },
+        );
+      },
+    );
+    if (mounted) setState(() => _menuVerse = null);
+  }
+
+  /// Leaves focus mode (its bar's exit button), back to the normal page.
+  void _exitFocus() {
+    ref.read(settingsProvider.notifier).setFocusMode(false);
   }
 
   void _setChrome(bool on) {
@@ -184,16 +455,65 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     }
     final start = (page ?? 1).clamp(_first, edition.pageCount);
     if (!mounted) return;
+    // Opened at a verse found elsewhere: the page it landed on is not
+    // counted, only what is read on from there.
+    if (widget.entry.countsOnlyAfterLanding) _tracker.onlyAfterPage = start;
     setState(() {
       _page = start;
-      _controller = PageController(initialPage: start - _first);
+      if (_selA != null) _pageA = _pageB = start;
+      _barHold = null;
+      _controller = PageController(initialPage: _indexOf(start));
     });
     _trackPage();
+    if (widget.listen) {
+      // After the page's verses are loaded.
+      await ref.read(pageAyahsProvider(_page).future);
+      if (mounted) _listenFromPage();
+    }
+  }
+
+  /// A page's weight in Madina pages (1 until the verse index is loaded):
+  /// a page of the Shamarly edition needs more time than a Madina page.
+  double _pageWeight(int page, String edition) {
+    // Also called from dispose (the page on screen counts then), when ref
+    // is no longer usable: the container is.
+    final c = _container;
+    final index = c.read(quranIndexProvider).value;
+    final e = MushafEdition.values.asNameMap()[edition];
+    final pages = e == null ? null : c.read(editionPagesProvider(e)).value;
+    if (index == null || pages == null) return 1;
+    final w = pages.weightOfPage(page, index);
+    return w > 0 ? w : 1;
+  }
+
+  Route<dynamic>? _route;
+
+  late final ProviderContainer _container = ProviderScope.containerOf(
+    context,
+    listen: false,
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null && route != _route) {
+      if (_route != null) coverObserver.unsubscribe(_route!);
+      _route = route;
+      // The tafsir, the index or the continuous view pushed over the page:
+      // nothing counts until the page is back on top.
+      coverObserver.subscribe(route, _tracker.freeze);
+    }
   }
 
   void _trackPage() {
     if (_page >= 1) {
-      _tracker.show(_page, ref.read(editionProvider).name);
+      final shown = _pagesAt(_indexOf(_page));
+      _tracker.show(
+        _page,
+        ref.read(editionProvider).name,
+        also: shown.length > 1 ? shown.last : null,
+      );
     } else {
       _tracker.leavePage();
     }
@@ -201,7 +521,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   @override
   void dispose() {
+    if (_testing) _muteSajdah(false);
     _lifecycle.dispose();
+    if (_route != null) coverObserver.unsubscribe(_route!);
     _tracker.end();
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -211,11 +533,27 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     super.dispose();
   }
 
-  Future<void> _onPageChanged(int index) async {
+  /// A turn starts: the reading bar keeps the page it shows until the
+  /// pager comes to rest, then takes the page settled on.
+  bool _onPagerScroll(ScrollNotification n) {
+    if (n.depth != 0) return false;
+    if (n is ScrollStartNotification) {
+      _barHold ??= _indexOf(_page);
+    } else if (n is ScrollEndNotification && _barHold != null) {
+      setState(() => _barHold = null);
+    }
+    return false;
+  }
+
+  /// The pager turned to [index] (a page, or a spread).
+  Future<void> _onPageChanged(int index) => _showPage(_pagesAt(index).first);
+
+  Future<void> _showPage(int page) async {
     setState(() {
-      _page = index + _first;
-      _selA = _selB = null;
-      _multi = false;
+      _page = page;
+      // Turning the page while selecting keeps the selection, so it can be
+      // extended onto the next page.
+      if (!_multi) _selA = _selB = null;
       _pickWord = false;
       // Recitation mode is for one page: turning the page ends it.
       _recite = false;
@@ -254,6 +592,48 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// Hafs editions.
   RiwayaData? get _riwaya => ref.read(riwayaDataProvider).value;
 
+  /// The first page that opens a spread: pages 1 and 2 (the opening
+  /// pages) face each other in the Madina editions, 2 and 3 in the
+  /// Shamarly; the pages before it (the covers) stand alone.
+  int get _spreadBase =>
+      ref.read(editionProvider) == MushafEdition.shamarly ? 2 : 1;
+
+  PageSpreads get _spreads => PageSpreads(
+    first: _first,
+    base: _spreadBase,
+    pageCount: ref.read(editionProvider).pageCount,
+    spread: _spread,
+  );
+
+  /// The pager's index of [page].
+  int _indexOf(int page) => _spreads.indexOf(page);
+
+  /// The pages shown at the pager's [index], right to left.
+  List<int> _pagesAt(int index) => _spreads.pagesAt(index);
+
+  /// Whether [page] is on screen now (in a spread, either page).
+  bool _onScreen(int page) => _pagesAt(_indexOf(_page)).contains(page);
+
+  /// Switches between single pages and spreads, keeping the page.
+  void _setSpread(bool on) {
+    if (on == _spread || !mounted) return;
+    final page = _page;
+    final old = _controller;
+    setState(() {
+      _spread = on;
+      _barHold = null;
+      _controller = PageController(initialPage: _indexOf(page));
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => old?.dispose());
+  }
+
+  /// Room kept around a page in focus mode, so its ink does not touch the
+  /// screen's edges.
+  static const _focusPagePadding = EdgeInsets.symmetric(
+    horizontal: 6,
+    vertical: 4,
+  );
+
   /// In the Zakhrafa style the mushaf opens with a cover as page 0.
   /// The Madina editions open with the app's cover as page 0. The
   /// Shamarly edition has its own cover as page 1, shown in the same frame,
@@ -270,6 +650,11 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final pageCount = edition.pageCount;
     // Page numbers differ between editions: reopen at the same verse.
     ref.listen(editionProvider, (_, _) => _open());
+    // Focus mode turned on or off (here, or in the settings): the system's
+    // bars follow.
+    ref.listen(settingsProvider.select((s) => s.focusMode), (_, _) {
+      _applySystemBars();
+    });
 
     // Bookmarks are kept in Hafs numbers; a riwaya page shows each on the
     // riwaya verse that holds it.
@@ -281,10 +666,20 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     };
 
     final settings = ref.watch(settingsProvider);
+    // The khatma counts nothing in a hifz test or recitation mode, and
+    // follows the reading speed and the view.
+    _tracker
+      ..suspend(_recite || _testing)
+      ..mode = _autoScroll ? 'scroll' : 'page'
+      ..minDwell = Duration(seconds: settings.readingSpeed.secondsPerPage);
+    // Focus mode: the page alone, with no frame and nothing under it.
+    final focus = settings.focusMode;
     // The current page's verses: recitation mode hides them, and after an
     // edition change they arrive later, so the page must rebuild then.
     ref.watch(pageAyahsProvider(_page));
     final recitation = ref.watch(recitationProvider);
+    // The verses of prostration, at hand for touch reading.
+    if (settings.sajdahTimer) ref.watch(sajdahPositionsProvider);
     ref.listen(recitationProvider.select((r) => (r.surah, r.ayah, r.word)), (
       before,
       now,
@@ -322,13 +717,21 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                 : Color(settings.markerTint!),
             paper: t.paper,
             ink: t.ink,
+            artTint: t.artTint,
           );
 
-    Widget pageAt(int i) {
-      final pg = i + _first;
-      if (pg == 0) return CoverPage(onTap: () => _setChrome(!_chrome));
-      if (edition == MushafEdition.shamarly && pg == 1) {
-        return CoverPage(onTap: () => _setChrome(!_chrome));
+    // Elderly mode: no small icon-only tools on the page; the same tools
+    // are labelled buttons in the bottom bar (in focus mode, in its tools).
+    _ReadingTools readingTools({bool labelled = false}) =>
+        _readingTools(ref, labelled: labelled);
+    final tools = context.tokens.elderly ? null : readingTools();
+    // Focus mode's «القائمة»: a long press on the page opens the window
+    // with every tool.
+    final menu = focus && settings.focusTools == FocusTools.menu;
+
+    Widget pageOf(int pg) {
+      if (pg == 0 || (edition == MushafEdition.shamarly && pg == 1)) {
+        return CoverPage(onTap: _onPageTap);
       }
       // The first two pages of the text (al-Fatiha, the opening of
       // al-Baqarah) sit in the ornate opening frame.
@@ -343,35 +746,65 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       final testCovers = _testing && pg == _page
           ? _test.covers(_pageKeys(pg), testUnits)
           : null;
+      final jumps = _tapJumps(recitation);
       final interaction = PageInteraction(
         // The reader's selection, or else the verse being recited.
-        selection: pg == _page && _selA != null
+        selection: _selA != null
             ? _selectionOn(pg)
+            : _menuVerse != null
+            ? {_menuVerse!}
             : recitation.active && recitation.ayah != null
             ? {(surah: recitation.surah, ayah: recitation.ayah!)}
             : const {},
         marks: marks,
         onTap: _onPageTap,
         onVerseLongPress: (v) {
+          if (menu) {
+            unawaited(_openFocusMenu(pg, v));
+            return;
+          }
           HapticFeedback.selectionClick();
           _setChrome(false);
           setState(() {
             _selA = _selB = v;
+            _pageA = _pageB = pg;
             _pickWord = false;
           });
         },
-        onMarkerTap: (v) => _toggleMark(v, pg),
-        onVerseTap: _touchReading && !_multi
-            ? (v) => setState(() => _touched = v)
+        onPageLongPress: menu
+            ? () => unawaited(_openFocusMenu(pg, null))
             : null,
+        onMarkerTap: (v) => _toggleMark(v, pg),
+        // Selecting several verses: a tap on a verse (on this page or a later
+        // or earlier one) extends the selection to it. While listening, it
+        // moves the recitation there.
+        onVerseTap: _multi
+            ? (v, _) => _extendTo(v, pg)
+            // The verse services are open: a tap on any verse closes them,
+            // as a tap anywhere else on the page does.
+            : _selA != null
+            ? (_, _) => setState(() => _selA = _selB = null)
+            : jumps
+            ? (v, point) => _listenFrom(v, pg, point)
+            : _touchReading
+            ? (v, _) => _touch(v)
+            : null,
+        onListenFrom: jumps ? (v) => _listenFrom(v, pg, null) : null,
         touched: _touchReading ? _touched : null,
         touchColor: _touchReading
             ? (context.tokens.mode.isLight
                   ? const Color(0x33D0453B)
                   : const Color(0x40FF8A80))
             : null,
-        onHandleDrag: (start, v) =>
-            setState(() => start ? _selA = v : _selB = v),
+        onHandleDrag: (start, v) => setState(() {
+          if (start) {
+            _selA = v;
+            _pageA = pg;
+          } else {
+            _selB = v;
+            _pageB = pg;
+          }
+        }),
         markerLook: markerLook,
         // Recitation mode covers the page being drawn, whatever the page
         // count says: after an edition change the two can differ for a
@@ -443,34 +876,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         tajweed: settings.tajweedColors
             ? ref.watch(tajweedPageProvider(pg)).value ?? ''
             : '',
+        fill: focus ? settings.pageFill : null,
       );
-      // Elderly mode: no small icon-only tools on the page; the same tools
-      // are labelled buttons in the bottom bar.
-      final tools = context.tokens.elderly
-          ? null
-          : _ReadingTools(
-              touchReading: _touchReading,
-              onTouchReading: _toggleTouchReading,
-              listening: recitation.active,
-              onListen: _listenFromPage,
-              recite: _recite || _testing,
-              onRecite: () => _testing
-                  ? _closeTest()
-                  : _recite
-                  ? setState(() {
-                      _recite = false;
-                      _revealed.clear();
-                    })
-                  : _startRecite(),
-              tajweed: editionHasTajweed(edition)
-                  ? settings.tajweedColors
-                  : null,
-              onTajweed: () => ref
-                  .read(settingsProvider.notifier)
-                  .setTajweedColors(!settings.tajweedColors),
-              onTajweedLegend: () => showTajweedLegend(context),
-            );
-      final pageWidget = switch (edition) {
+      final pageBody = switch (edition) {
         MushafEdition.madina1405 => OldMushafPage(
           page: pg,
           interaction: interaction,
@@ -487,6 +895,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           interaction: interaction,
         ),
       };
+      final pageWidget = pageBody;
       final info = ref.watch(frameInfoProvider(pg)).value;
       void openIndex(String tab) {
         final a = ref.read(pageAyahsProvider(pg)).value?.firstOrNull;
@@ -498,17 +907,26 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         );
       }
 
+      // Focus mode: no frame at all. The opening pages keep their text
+      // only (the top bar names the surah), as wide as the screen and
+      // centred; the cover stays as it is.
+      if (focus) {
+        return Padding(
+          padding: _focusPagePadding,
+          // No frame and no paper: the page lies on the screen's background.
+          child: PageGround(color: context.tokens.colors.bg, child: pageWidget),
+        );
+      }
+
       if (openingSurah != null) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(4, 14, 4, 0),
           child: OpeningPage(
             page: pg,
             surah: openingSurah,
-            // Recitation mode: the next page's first word would give it away.
-            catchword: _recite || _testing ? null : info?.catchword,
             onPageTap: _goToPage,
             onSurahTap: () => openIndex('surahs'),
-            tools: tools,
+            onSurahLongPress: () => _shareSurahImage(pg),
             child: pageWidget,
           ),
         );
@@ -521,9 +939,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
           onJuzTap: () => openIndex('juz'),
           onHizbTap: () => openIndex('hizb'),
           onSurahTap: () => openIndex('surahs'),
+          onSurahLongPress: () => _shareSurahImage(pg),
+          onBannerLongPress: _shareSurah,
           onPageTap: _goToPage,
-          tools: tools,
-          showCatchword: !_recite && !_testing,
           linePadding: edition == MushafEdition.shamarly
               ? shamarlyLinePadding
               : null,
@@ -532,75 +950,277 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       );
     }
 
+    Widget pageAt(int i) => pageOf(i + _first);
+
+    bool isCover(int pg) =>
+        pg == 0 || (edition == MushafEdition.shamarly && pg == 1);
+
+    /// The strip under the pages, for the page (or spread) the pager has
+    /// settled on: it does not change while a page is being turned.
+    Widget readingBar() {
+      final pages = _pagesAt(_barHold ?? _indexOf(_page));
+      final cover = pages.every(isCover);
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        // Laid out as the mushaf is: the quarter on the right, the next
+        // page's first word on the left.
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: ReadingBar.of(
+            [
+              for (final pg in pages)
+                isCover(pg) ? null : ref.watch(frameInfoProvider(pg)).value,
+            ],
+            key: const ValueKey('reading-bar'),
+            page: pages.last,
+            // Recitation mode: the next page's first word would give it away.
+            showCatchword: !_recite && !_testing,
+            coverCatchword: cover
+                ? (ref.watch(basmalaProvider).value ?? '')
+                      .split(' ')
+                      .take(2)
+                      .join(' ')
+                : null,
+            tools: cover ? null : tools,
+          ),
+        ),
+      );
+    }
+
     final scrubbing = _scrubPage ?? _page;
     final range = _range();
-    return Scaffold(
-      backgroundColor: t.bg,
-      body: Stack(
-        children: [
-          // The frame and the space above and below the page open the
-          // menus too; a tap on the page itself or on a frame label is
-          // taken by that (deeper) widget first.
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _onPageTap,
-            child: SafeArea(
-              // While listening, the page sits above the player bar so the
-              // catchword and the reading tools stay visible.
-              minimum: EdgeInsets.only(
-                bottom: recitation.active && !_autoScroll
-                    ? MediaQuery.paddingOf(context).bottom + 80
-                    : 0,
-              ),
-              child: _autoScroll
-                  ? LayoutBuilder(
-                      builder: (context, box) {
-                        _pageExtent = box.maxHeight;
-                        _vertical ??= ScrollController(
-                          initialScrollOffset: (_page - _first) * box.maxHeight,
-                        );
-                        return ListView.builder(
-                          controller: _vertical,
-                          itemExtent: box.maxHeight,
-                          itemCount: pageCount + 1 - _first,
-                          itemBuilder: (context, i) => pageAt(i),
-                        );
-                      },
-                    )
-                  : _controller == null
-                  ? Center(
-                      child: CircularProgressIndicator(
-                        semanticsLabel: l.loadingLabel,
+    final shownPages = _pagesAt(_barHold ?? _indexOf(_page));
+    final playerStyle = settings.effectivePlayerStyle;
+    final focusBar = !focus
+        ? null
+        : _FocusTopBar(
+            key: const ValueKey('focus-bar'),
+            onIndex: () => context.push('/mushaf/index'),
+            onGoTo: _goToPage,
+            wird: const WirdIndicator(dense: true),
+            infos: [
+              for (final pg in shownPages)
+                isCover(pg) ? null : ref.watch(frameInfoProvider(pg)).value,
+            ],
+            actions: [
+              (Icons.fullscreen_exit, l.focusExit, _exitFocus),
+              if (settings.focusTools == FocusTools.button) ...[
+                (
+                  Icons.handyman_outlined,
+                  _focusTools ? l.focusHideTools : l.focusShowTools,
+                  _toggleFocusTools,
+                ),
+                (Icons.menu, l.showMenus, () => _setChrome(true)),
+              ],
+            ],
+          );
+    return _keyboard(
+      Scaffold(
+        backgroundColor: t.bg,
+        body: Stack(
+          children: [
+            // The frame and the space above and below the page open the
+            // menus too; a tap on the page itself or on a frame label is
+            // taken by that (deeper) widget first.
+            // Wide screens may show the chosen texts beside the page.
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _onPageTap,
+                    onLongPress: menu
+                        ? () => unawaited(_openFocusMenu(_page, null))
+                        : null,
+                    child: SafeArea(
+                      // Focus mode's bar stands in the room above the page.
+                      top: !focus,
+                      // While listening, the page sits above the player bar so the
+                      // catchword and the reading tools stay visible. The
+                      // floating players stay over the page instead.
+                      minimum: EdgeInsets.only(
+                        bottom:
+                            recitation.active &&
+                                !_autoScroll &&
+                                playerStyle == PlayerStyle.normal
+                            ? MediaQuery.paddingOf(context).bottom + 80
+                            : 0,
                       ),
-                    )
-                  // The mushaf opens from the right in every interface language.
-                  : Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: PageView.builder(
-                        controller: _controller,
-                        itemCount: pageCount + 1 - _first,
-                        // The pages either side are built and their images
-                        // decoded before they are turned to, so a page turn
-                        // does not stop on a spinner.
-                        allowImplicitScrolling: true,
-                        onPageChanged: _onPageChanged,
-                        itemBuilder: (context, i) => pageAt(i),
+                      child: Column(
+                        children: [
+                          ?focusBar,
+                          Expanded(
+                            child: _autoScroll
+                                ? LayoutBuilder(
+                                    builder: (context, box) {
+                                      _pageExtent = box.maxHeight;
+                                      _vertical ??= ScrollController(
+                                        initialScrollOffset:
+                                            (_page - _first) * box.maxHeight,
+                                      );
+                                      return ListView.builder(
+                                        controller: _vertical,
+                                        itemExtent: box.maxHeight,
+                                        itemCount: pageCount + 1 - _first,
+                                        itemBuilder: (context, i) => pageAt(i),
+                                      );
+                                    },
+                                  )
+                                : _controller == null
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                      semanticsLabel: l.loadingLabel,
+                                    ),
+                                  )
+                                // The pages turn under one reading bar, which
+                                // stays put.
+                                : Column(
+                                    children: [
+                                      Expanded(
+                                        child: NotificationListener<ScrollNotification>(
+                                          onNotification: _onPagerScroll,
+                                          child:
+                                              // The mushaf opens from the right in every interface language.
+                                              Directionality(
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                child: LayoutBuilder(
+                                                  builder: (context, box) {
+                                                    // A wide screen held sideways shows two
+                                                    // pages; not in a hifz test, which is one
+                                                    // page at a time.
+                                                    final spread =
+                                                        settings
+                                                            .twoPageSpread &&
+                                                        !_testing &&
+                                                        box.maxWidth >
+                                                            box.maxHeight &&
+                                                        box.maxWidth >= 800;
+                                                    if (spread != _spread) {
+                                                      WidgetsBinding.instance
+                                                          .addPostFrameCallback(
+                                                            (_) => _setSpread(
+                                                              spread,
+                                                            ),
+                                                          );
+                                                    }
+                                                    // A mouse and a trackpad drag the pages
+                                                    // like a finger; the wheel turns them.
+                                                    return Listener(
+                                                      onPointerSignal: _onWheel,
+                                                      child: ScrollConfiguration(
+                                                        behavior:
+                                                            ScrollConfiguration.of(
+                                                              context,
+                                                            ).copyWith(
+                                                              dragDevices:
+                                                                  PointerDeviceKind
+                                                                      .values
+                                                                      .toSet(),
+                                                            ),
+                                                        child: PageView.builder(
+                                                          // A new controller (spreads turned on or off, another
+                                                          // edition) starts a new pager: the old one would keep its
+                                                          // place, now another page.
+                                                          key: ObjectKey(
+                                                            _controller,
+                                                          ),
+                                                          controller:
+                                                              _controller,
+                                                          itemCount:
+                                                              _spreads.count,
+                                                          // The pages either side are built and their images
+                                                          // decoded before they are turned to, so a page turn
+                                                          // does not stop on a spinner.
+                                                          allowImplicitScrolling:
+                                                              true,
+                                                          onPageChanged:
+                                                              _onPageChanged,
+                                                          itemBuilder: (context, i) {
+                                                            final pages =
+                                                                _pagesAt(i);
+                                                            if (pages.length ==
+                                                                1) {
+                                                              return pageOf(
+                                                                pages.single,
+                                                              );
+                                                            }
+                                                            // Right page first: the mushaf opens
+                                                            // from the right.
+                                                            return Row(
+                                                              textDirection:
+                                                                  TextDirection
+                                                                      .rtl,
+                                                              children: [
+                                                                for (final pg
+                                                                    in pages)
+                                                                  Expanded(
+                                                                    child:
+                                                                        pageOf(
+                                                                          pg,
+                                                                        ),
+                                                                  ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                        ),
+                                      ),
+                                      if (!_autoScroll && !focus) readingBar(),
+                                      // Focus mode's tools, while shown, take
+                                      // their own room under the page: the
+                                      // page's lines close up above them. At
+                                      // once, not animated: the page is drawn
+                                      // into an image of its exact size
+                                      // (MushafPage's bake), so every frame of
+                                      // a size animation drew it all again.
+                                      // The menus lie over it rather than
+                                      // resizing the page again.
+                                      if (!_autoScroll && focus && _focusTools)
+                                        _FocusToolsPanel(
+                                          key: const ValueKey('focus-tools'),
+                                          bar: readingBar(),
+                                          labelledTools: context.tokens.elderly
+                                              ? readingTools(labelled: true)
+                                              : null,
+                                        ),
+                                    ],
+                                  ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
+                ),
+                if (settings.splitTranslation &&
+                    settings.underVerse.isNotEmpty &&
+                    !_autoScroll &&
+                    MediaQuery.sizeOf(context).width >= 900)
+                  _SidePane(page: _page, riwaya: _riwaya),
+              ],
             ),
-          ),
-          if (_chrome) ...[
+            // The menus come and go with a short fade and slide (at once
+            // when less motion is asked for).
             // A light veil so the controls read as a layer over the page.
             Positioned.fill(
-              child: Semantics(
-                button: true,
-                label: l.hideMenus,
-                onTap: () => _setChrome(false),
-                excludeSemantics: true,
-                child: GestureDetector(
+              child: Reveal(
+                visible: _chrome,
+                from: Offset.zero,
+                child: Semantics(
+                  button: true,
+                  label: l.hideMenus,
                   onTap: () => _setChrome(false),
-                  child: ColoredBox(
-                    color: Colors.black.withValues(alpha: 0.28),
+                  excludeSemantics: true,
+                  child: GestureDetector(
+                    onTap: () => _setChrome(false),
+                    child: ColoredBox(
+                      color: Colors.black.withValues(alpha: 0.28),
+                    ),
                   ),
                 ),
               ),
@@ -609,236 +1229,559 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
               top: 0,
               left: 0,
               right: 0,
-              child: _TopControls(
-                items: [
-                  (
-                    Icons.list_alt,
-                    l.indexTitle,
-                    () => context.push('/mushaf/index'),
-                  ),
-                  (
-                    Icons.bookmarks_outlined,
-                    l.fawasilTitle,
-                    () => context.push('/mushaf/fawasil'),
-                  ),
-                  (Icons.home_outlined, l.homeTitle, () => context.go('/')),
-                  (
-                    Icons.search_outlined,
-                    l.sectionSearch,
-                    () => context.push('/search'),
-                  ),
-                  (
-                    Icons.tune,
-                    l.settingsTitle,
-                    () => context.push('/settings'),
-                  ),
-                ],
+              child: Reveal(
+                visible: _chrome,
+                from: const Offset(0, -0.25),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _TopControls(
+                      items: [
+                        (
+                          Icons.list_alt,
+                          l.indexTitle,
+                          () => context.push('/mushaf/index'),
+                        ),
+                        (
+                          Icons.bookmarks_outlined,
+                          l.fawasilTitle,
+                          () => context.push('/mushaf/fawasil'),
+                        ),
+                        (
+                          assistantIcon,
+                          l.assistantTitle,
+                          () => context.push(assistantLocation),
+                        ),
+                        (
+                          Icons.home_outlined,
+                          l.homeTitle,
+                          () => context.go('/'),
+                        ),
+                        (
+                          Icons.search_outlined,
+                          l.sectionSearch,
+                          () => context.push('/search'),
+                        ),
+                        (
+                          Icons.tune,
+                          l.settingsTitle,
+                          () => context.push('/settings'),
+                        ),
+                      ],
+                    ),
+                    // «ورد اليوم · 18 / 20» under the menus; a tap
+                    // continues the khatma.
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: WirdIndicator(),
+                    ),
+                  ],
+                ),
               ),
             ),
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              child: _BottomControls(
-                page: scrubbing,
-                pageCount: pageCount,
-                label: _scrubLabel(context, scrubbing, surahs),
-                onChanged: (p) => setState(() => _scrubPage = p),
-                onChangeEnd: (p) {
-                  setState(() => _scrubPage = null);
-                  _controller?.jumpToPage(p - _first);
-                },
-                onRecite: _startRecite,
-                onListen: _listenFromPage,
-                onGoTo: _goToPage,
-                onAutoScroll: _startAutoScroll,
-                touchReading: _touchReading,
-                onTouchReading: _toggleTouchReading,
-                recite: _recite,
-                listening: recitation.active,
+              child: Reveal(
+                visible: _chrome,
+                child: !_chrome
+                    ? null
+                    : _BottomControls(
+                        page: scrubbing,
+                        pageCount: pageCount,
+                        label: _scrubLabel(context, scrubbing, surahs),
+                        onChanged: (p) => setState(() => _scrubPage = p),
+                        onChangeEnd: (p) {
+                          setState(() => _scrubPage = null);
+                          _controller?.jumpToPage(_indexOf(p));
+                        },
+                        onRecite: _startRecite,
+                        onListen: _listenFromPage,
+                        onGoTo: _goToPage,
+                        onAutoScroll: _startAutoScroll,
+                        onContinuous: _openContinuous,
+                        onOneVerse: _openOneVerse,
+                        touchReading: _touchReading,
+                        onTouchReading: _toggleTouchReading,
+                        recite: _recite,
+                        listening: recitation.active,
+                      ),
               ),
             ),
-          ],
-          if (_autoScroll)
             Positioned(
               left: 16,
               right: 16,
               bottom: 16,
-              child: SafeArea(
-                top: false,
-                child: _AutoScrollBar(
-                  paused: _paused,
-                  speed: _speed,
-                  onPause: () => setState(() => _paused = !_paused),
-                  onSlower: () =>
-                      setState(() => _speed = (_speed - 1).clamp(1, 10)),
-                  onFaster: () =>
-                      setState(() => _speed = (_speed + 1).clamp(1, 10)),
-                  onClose: _stopAutoScroll,
+              child: Reveal(
+                visible: _autoScroll,
+                child: SafeArea(
+                  top: false,
+                  child: _AutoScrollBar(
+                    paused: _paused,
+                    speed: _speed,
+                    onPause: () => setState(() => _paused = !_paused),
+                    onSlower: () => ref
+                        .read(settingsProvider.notifier)
+                        .setAutoScrollSpeed(_speed - 1),
+                    onFaster: () => ref
+                        .read(settingsProvider.notifier)
+                        .setAutoScrollSpeed(_speed + 1),
+                    onClose: _stopAutoScroll,
+                  ),
                 ),
               ),
             ),
-          if (recitation.active && range == null && !_multi && !_chrome)
             Positioned(
               left: 12,
               right: 12,
               bottom: 12,
-              child: const SafeArea(top: false, child: PlayerBar()),
+              child: Reveal(
+                visible:
+                    playerStyle == PlayerStyle.normal &&
+                    recitation.active &&
+                    range == null &&
+                    !_multi &&
+                    !_chrome &&
+                    !(focus && _focusTools),
+                from: const Offset(0, 0.4),
+                child: const SafeArea(top: false, child: PlayerBar()),
+              ),
             ),
-          // The chosen edition is still downloading: say so, and that the
-          // new Madina edition is read meanwhile.
-          if (ref.watch(chosenEditionProvider) != edition && !_chrome)
-            const Positioned(
+            // «شكل المشغل»: the pill or the single button, over the page
+            // wherever the reader left it.
+            Positioned.fill(
+              child: Reveal(
+                visible:
+                    playerStyle != PlayerStyle.normal &&
+                    recitation.active &&
+                    range == null &&
+                    !_multi &&
+                    !_chrome,
+                from: Offset.zero,
+                child: playerStyle == PlayerStyle.normal
+                    ? null
+                    : FloatingPlayer(style: playerStyle),
+              ),
+            ),
+            // The chosen edition is still downloading: say so, and that the
+            // new Madina edition is read meanwhile.
+            Positioned(
               top: 0,
               left: 24,
               right: 24,
-              child: SafeArea(child: DownloadingBanner()),
+              child: Reveal(
+                visible:
+                    ref.watch(chosenEditionProvider) != edition && !_chrome,
+                from: const Offset(0, -0.25),
+                child: const SafeArea(child: DownloadingBanner()),
+              ),
             ),
-          if (_multi)
             Positioned(
               top: 0,
               left: 16,
               right: 16,
-              child: SafeArea(
-                child: _MultiSelectBar(
-                  count: range?.length ?? 1,
-                  onDone: () => setState(() => _multi = false),
+              child: Reveal(
+                visible: _multi,
+                from: const Offset(0, -0.25),
+                child: SafeArea(
+                  child: _MultiSelectBar(
+                    count: range?.length ?? 1,
+                    onDone: () => setState(() => _multi = false),
+                  ),
                 ),
               ),
             ),
-          if (_testing && !_chrome)
             Positioned(
               left: 12,
               right: 12,
               bottom: 12,
-              child: SafeArea(top: false, child: _testBar(context, surahs)),
+              child: Reveal(
+                visible: _testing && !_chrome,
+                from: const Offset(0, 0.4),
+                child: !_testing
+                    ? null
+                    : SafeArea(top: false, child: _testBar(context, surahs)),
+              ),
             ),
-          if (_pickWord)
             Positioned(
               top: 0,
               left: 16,
               right: 16,
-              child: SafeArea(
-                child: _WordPickBar(
-                  onCancel: () => setState(() => _pickWord = false),
+              child: Reveal(
+                visible: _pickWord,
+                from: const Offset(0, -0.25),
+                child: SafeArea(
+                  child: _WordPickBar(
+                    onCancel: () => setState(() => _pickWord = false),
+                  ),
                 ),
               ),
             ),
-          if (range != null && !_multi)
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              child: VerseServicesPanel(
-                verses: range,
-                surahs: surahs,
-                onMark: (kind) => _setMark(kind, range.first, _page),
-                onSaveToFasil: () => showSaveToFasil(
-                  context,
-                  ref,
-                  verse: hafsKeyOf(_riwaya, range.first),
-                  page: _page,
-                ),
-                onClose: () => setState(() => _selA = _selB = null),
-                onMultiSelect: () {
-                  _setChrome(false);
-                  setState(() => _multi = true);
-                },
-                onListen: () {
-                  final one = range.length == 1;
-                  setState(() => _selA = _selB = null);
-                  ref
-                      .read(recitationProvider.notifier)
-                      .play(
-                        range.first.surah,
-                        from: range.first.ayah,
-                        // Several verses: that stretch, repeated as set.
-                        to: one ? null : range.last.ayah,
-                      );
-                },
-                // Tafsir and translation are keyed by Hafs numbers; from a
-                // riwaya the screen also names the verse as read there.
-                onTafsir: () {
-                  final v = range.first;
-                  final h = hafsKeyOf(_riwaya, v);
-                  final r = ref.read(editionProvider).riwaya;
-                  context.push(
-                    '/mushaf/tafsir?s=${h.surah}&a=${h.ayah}'
-                    '${r == Riwaya.hafs ? '' : '&r=${r.name}&ra=${v.ayah}'}',
-                  );
-                },
-                // Word study reads the Hafs text's words: not offered on a
-                // riwaya's pages.
-                onWordStudy: edition.isRiwaya
+              child: Reveal(
+                visible: range != null && !_multi,
+                from: const Offset(0, 0.15),
+                child: range == null || _multi
                     ? null
-                    : () {
-                        _setChrome(false);
-                        setState(() {
-                          _selA = _selB = null;
-                          _pickWord = true;
-                        });
-                      },
-                // Meanings and reflections are kept by Hafs verse: a riwaya
-                // verse opens those of the Hafs verses it covers.
-                onWordMeanings: () => showVerseMeanings(
-                  context,
-                  verses: [
-                    for (final v in range) ...?_riwaya?.toHafs(v.surah, v.ayah),
-                    if (_riwaya == null)
-                      for (final v in range) (surah: v.surah, ayah: v.ayah),
-                  ],
-                ),
-                similarCount: range.length == 1
-                    ? ref
-                              .watch(
-                                similarCountProvider((
-                                  hafsKeyOf(_riwaya, range.first).surah,
-                                  hafsKeyOf(_riwaya, range.first).ayah,
-                                )),
-                              )
-                              .value ??
-                          0
-                    : 0,
-                onSimilar: () {
-                  final h = hafsKeyOf(_riwaya, range.first);
-                  showSimilarSheet(context, surah: h.surah, ayah: h.ayah);
-                },
-                onReflect: () {
-                  final h = hafsKeyOf(_riwaya, range.first);
-                  showReflectionSheet(context, surah: h.surah, ayah: h.ayah);
-                },
+                    : _verseServices(
+                        ref,
+                        range,
+                        onClose: () => setState(() => _selA = _selB = null),
+                      ),
               ),
             ),
-        ],
+            // «ask»: a khatma that asks before counting, once a session
+            // has ended; never over the player, the menus or the sajdah
+            // card.
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: AskCreditLine(
+                currentSession: () => _tracker.session,
+                allowed:
+                    !_chrome &&
+                    !_testing &&
+                    !_recite &&
+                    !_autoScroll &&
+                    !_multi &&
+                    range == null &&
+                    !recitation.active &&
+                    !(focus && _focusTools) &&
+                    ref.watch(sajdahCardProvider) == null,
+              ),
+            ),
+            const SajdahCardLayer(),
+          ],
+        ),
       ),
     );
   }
 
-  /// Verses between the two selection ends on the current page, in order.
+  /// The services of [range] (a verse or a stretch): the panel under the
+  /// page, or ([embedded]) the verse part of focus mode's window, which
+  /// [before] closes ahead of each service. [r] watches what the panel
+  /// shows (the window watches from its own route).
+  Widget _verseServices(
+    WidgetRef r,
+    List<VerseKey> range, {
+    required VoidCallback onClose,
+    VoidCallback? before,
+    bool embedded = false,
+  }) {
+    final settings = r.watch(settingsProvider);
+    final surahs = r.watch(surahsProvider).value;
+    final edition = r.watch(editionProvider);
+    VoidCallback act(VoidCallback f) => () {
+      before?.call();
+      f();
+    };
+    VoidCallback? maybe(VoidCallback? f) => f == null ? null : act(f);
+    return VerseServicesPanel(
+      verses: range,
+      surahs: surahs,
+      embedded: embedded,
+      onMark: (kind) {
+        before?.call();
+        _setMark(kind, range.first, _rangeFirstPage(range));
+      },
+      onSaveToFasil: act(
+        () => showSaveToFasil(
+          context,
+          ref,
+          verse: hafsKeyOf(_riwaya, range.first),
+          page: _rangeFirstPage(range),
+        ),
+      ),
+      onClose: act(onClose),
+      onMultiSelect: act(() {
+        _setChrome(false);
+        setState(() {
+          _selA = range.first;
+          _selB = range.last;
+          _multi = true;
+        });
+      }),
+      onListen: act(() {
+        final one = range.length == 1;
+        setState(() => _selA = _selB = null);
+        r
+            .read(recitationProvider.notifier)
+            .play(
+              range.first.surah,
+              from: range.first.ayah,
+              // Several verses: that stretch, repeated as set.
+              to: one ? null : range.last.ayah,
+            );
+      }),
+      // Tafsir and translation are keyed by Hafs numbers; from a
+      // riwaya the screen also names the verse as read there.
+      onTafsir: act(() {
+        final v = range.first;
+        final h = hafsKeyOf(_riwaya, v);
+        final riwaya = edition.riwaya;
+        context.push(
+          '/mushaf/tafsir?s=${h.surah}&a=${h.ayah}'
+          '${riwaya == Riwaya.hafs ? '' : '&r=${riwaya.name}&ra=${v.ayah}'}',
+        );
+      }),
+      // Word study reads the Hafs text's words: on a riwaya's
+      // pages it needs the pack's word boxes, and opens only
+      // for a word that is exactly a Hafs word (_pickAt).
+      onWordStudy: edition.isRiwaya && !(_riwaya?.hasWordBoxes ?? false)
+          ? null
+          : act(() {
+              _setChrome(false);
+              setState(() {
+                _selA = _selB = null;
+                _pickWord = true;
+              });
+            }),
+      // Meanings and reflections are kept by Hafs verse: a riwaya
+      // verse opens those of the Hafs verses it covers.
+      onWordMeanings: act(
+        () => showVerseMeanings(
+          context,
+          verses: [
+            for (final v in range) ...?_riwaya?.toHafs(v.surah, v.ayah),
+            if (_riwaya == null)
+              for (final v in range) (surah: v.surah, ayah: v.ayah),
+          ],
+        ),
+      ),
+      similarCount: range.length == 1
+          ? r
+                    .watch(
+                      similarCountProvider((
+                        hafsKeyOf(_riwaya, range.first).surah,
+                        hafsKeyOf(_riwaya, range.first).ayah,
+                      )),
+                    )
+                    .value ??
+                0
+          : 0,
+      onSimilar: act(() {
+        final h = hafsKeyOf(_riwaya, range.first);
+        showSimilarSheet(context, surah: h.surah, ayah: h.ayah);
+      }),
+      // Occasions of revelation are kept by Hafs verse.
+      asbabCount: range.length == 1
+          ? r
+                .watch(
+                  asbabProvider((
+                    surah: hafsKeyOf(_riwaya, range.first).surah,
+                    ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                  )),
+                )
+                .length
+          : 0,
+      onAsbab: act(() {
+        final h = hafsKeyOf(_riwaya, range.first);
+        showAsbabSheet(context, surah: h.surah, ayah: h.ayah);
+      }),
+      // A tafsir read aloud, by Hafs verse (flag tafsir_audio).
+      onTafsirAudio: range.length != 1
+          ? null
+          : switch (r
+                .watch(
+                  tafsirAudioForVerseProvider((
+                    surah: hafsKeyOf(_riwaya, range.first).surah,
+                    ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                  )),
+                )
+                .value
+                ?.firstOrNull) {
+              (final index, _) => act(() {
+                final h = hafsKeyOf(_riwaya, range.first);
+                setState(() => _selA = _selB = null);
+                r
+                    .read(recitationProvider.notifier)
+                    .playTafsir(index, h.surah, h.ayah);
+              }),
+              null => null,
+            },
+      munasabatCount: range.length == 1
+          ? r
+                .watch(
+                  munasabatProvider((
+                    surah: hafsKeyOf(_riwaya, range.first).surah,
+                    ayah: hafsKeyOf(_riwaya, range.first).ayah,
+                  )),
+                )
+                .length
+          : 0,
+      onMunasabat: act(() {
+        final h = hafsKeyOf(_riwaya, range.first);
+        showBookSheet(
+          context,
+          spec: BookSectionSpec.munasabat,
+          surah: h.surah,
+          ayah: h.ayah,
+        );
+      }),
+      onReflect: act(() {
+        final h = hafsKeyOf(_riwaya, range.first);
+        showReflectionSheet(context, surah: h.surah, ayah: h.ayah);
+      }),
+      // The text is Tanzil's, which is the Hafs text: a riwaya
+      // edition shares only the picture of its page.
+      onCopy: edition.isRiwaya ? null : act(() => _copyVerses(range)),
+      onShareText: maybe(
+        edition.isRiwaya ? null : () => _shareVerseText(range),
+      ),
+      onShareImage: act(() => _shareVerseImage(range)),
+      preview: settings.underVerse.isEmpty
+          ? null
+          : UnderVerseTexts(
+              surah: hafsKeyOf(_riwaya, range.first).surah,
+              ayah: hafsKeyOf(_riwaya, range.first).ayah,
+            ),
+    );
+  }
+
+  /// Keys for a keyboard (desktop, or a tablet's): the arrows and page
+  /// keys turn the page (the mushaf opens from the right, so left is
+  /// forward), space starts and pauses the recitation, G goes to a page,
+  /// / or Ctrl/Cmd+F searches, Escape clears the selection or the menus.
+  /// Turns [by] pages (positive is forward: to the left).
+  void _turn(int by) {
+    final c = _controller;
+    if (c == null || _autoScroll) return;
+    c.animateToPage(
+      (c.page?.round() ?? 0) + by,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
+  }
+
+  /// When the mouse wheel last turned a page: one notch, one page.
+  DateTime _lastWheelTurn = DateTime(0);
+
+  /// The mouse wheel turns the page: down or right is forward. A trackpad
+  /// swipe comes as a drag instead (see the page view's scroll behaviour).
+  void _onWheel(PointerSignalEvent e) {
+    if (e is! PointerScrollEvent || e.kind == PointerDeviceKind.trackpad) {
+      return;
+    }
+    final now = DateTime.now();
+    if (now.difference(_lastWheelTurn) < const Duration(milliseconds: 350)) {
+      return;
+    }
+    final d = e.scrollDelta.dy.abs() >= e.scrollDelta.dx.abs()
+        ? e.scrollDelta.dy
+        : -e.scrollDelta.dx;
+    if (d.abs() < 1) return;
+    _lastWheelTurn = now;
+    _turn(d > 0 ? 1 : -1);
+  }
+
+  Widget _keyboard(Widget child) {
+    void turn(int by) => _turn(by);
+
+    // Any touch keeps the reading time going (it stops after 3 minutes
+    // without one).
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _tracker.touch(),
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.arrowLeft): () => turn(1),
+          const SingleActivator(LogicalKeyboardKey.pageDown): () => turn(1),
+          const SingleActivator(LogicalKeyboardKey.arrowRight): () => turn(-1),
+          const SingleActivator(LogicalKeyboardKey.pageUp): () => turn(-1),
+          const SingleActivator(LogicalKeyboardKey.space): () {
+            final r = ref.read(recitationProvider);
+            r.active
+                ? unawaited(ref.read(recitationProvider.notifier).toggle())
+                : _listenFromPage();
+          },
+          const SingleActivator(LogicalKeyboardKey.keyG): _goToPage,
+          const SingleActivator(LogicalKeyboardKey.slash): () =>
+              context.push('/search'),
+          const SingleActivator(LogicalKeyboardKey.keyF, control: true): () =>
+              context.push('/search'),
+          const SingleActivator(LogicalKeyboardKey.keyF, meta: true): () =>
+              context.push('/search'),
+          const SingleActivator(LogicalKeyboardKey.escape): () {
+            if (_selA != null || _multi) {
+              setState(() {
+                _selA = _selB = null;
+                _multi = false;
+              });
+            } else {
+              _setChrome(!_chrome);
+            }
+          },
+        },
+        child: Focus(autofocus: true, child: child),
+      ),
+    );
+  }
+
+  /// Extends the selection to [v] on [page] (selecting several verses).
+  void _extendTo(VerseKey v, int page) {
+    if ((page - _pageA).abs() >= _maxSelectionPages) return;
+    setState(() {
+      _selB = v;
+      _pageB = page;
+    });
+  }
+
+  int get _firstSelPage => _pageA < _pageB ? _pageA : _pageB;
+  int get _lastSelPage => _pageA < _pageB ? _pageB : _pageA;
+
+  /// The verses between the two selection ends, in order, over the pages
+  /// they lie on.
   List<VerseKey>? _range() {
     if (_selA == null || _selB == null) return null;
-    final ayahs = ref.watch(pageAyahsProvider(_page)).value;
-    if (ayahs == null) return [_selA!];
-    final keys = [for (final a in ayahs) (surah: a.surah, ayah: a.number)];
+    final keys = <VerseKey>[];
+    for (var p = _firstSelPage; p <= _lastSelPage; p++) {
+      final ayahs = ref.watch(pageAyahsProvider(p)).value;
+      if (ayahs == null) return [_selA!];
+      keys.addAll([for (final a in ayahs) (surah: a.surah, ayah: a.number)]);
+    }
     final ia = keys.indexOf(_selA!);
     final ib = keys.indexOf(_selB!);
     if (ia < 0 || ib < 0) return [_selA!];
     return keys.sublist(ia < ib ? ia : ib, (ia < ib ? ib : ia) + 1);
   }
 
+  /// The page the selection's first verse is on.
+  int _rangeFirstPage(List<VerseKey> range) {
+    for (var p = _firstSelPage; p <= _lastSelPage; p++) {
+      final ayahs = ref.read(pageAyahsProvider(p)).value ?? const [];
+      if (ayahs.any(
+        (a) => a.surah == range.first.surah && a.number == range.first.ayah,
+      )) {
+        return p;
+      }
+    }
+    return _page;
+  }
+
   Set<VerseKey> _selectionOn(int page) => {...?_range()};
 
   /// Word study: the word under [point] (edition units) on [page]. A verse
   /// without word boxes there opens with its words to choose from; a tap
-  /// outside any verse keeps waiting for a word.
+  /// outside any verse keeps waiting for a word. On a riwaya's pages only
+  /// a word is taken ([_pickRiwayaWord]): the verse's words to choose
+  /// from would be Hafs's.
   void _pickAt(int page, Offset point, VerseKey? verse) {
     final boxes = ref.read(pageWordBoxesProvider(page)).value ?? const {};
-    final slop = ref.read(editionProvider) == MushafEdition.madina1441
-        ? 2.0
-        : 6.0;
+    final edition = ref.read(editionProvider);
+    final slop = _wordSlop;
     final hit =
         wordUnder(boxes, point, verse: verse, slop: slop) ??
         wordUnder(boxes, point, slop: slop);
+    final riwaya = _riwaya;
+    if (edition.isRiwaya && riwaya != null) {
+      if (hit != null) unawaited(_pickRiwayaWord(riwaya, hit));
+      return;
+    }
     if (hit == null && verse == null) return;
     HapticFeedback.selectionClick();
     setState(() => _pickWord = false);
@@ -848,6 +1791,112 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       ayah: hit?.$2 ?? verse!.ayah,
       word: hit?.$3,
     );
+  }
+
+  /// Word study from a riwaya's page: the word picked is studied as the
+  /// Hafs word it is when that is certain ([RiwayaData.hafsWord]: the
+  /// same verse, word and letters); any other word says why it has none.
+  Future<void> _pickRiwayaWord(RiwayaData riwaya, (int, int, int) hit) async {
+    final (surah, ayah, word) = hit;
+    HapticFeedback.selectionClick();
+    setState(() => _pickWord = false);
+    final hafs = riwaya.toHafs(surah, ayah);
+    (int, int, int)? target;
+    if (hafs.length == 1) {
+      final row = await ref.read(
+        verseRowProvider((surah: hafs.first.surah, ayah: hafs.first.ayah))
+            .future,
+      );
+      target = riwaya.hafsWord(surah, ayah, word, verseWords(row));
+    }
+    if (!mounted) return;
+    if (target == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).riwayaWordNoStudy)),
+      );
+      return;
+    }
+    showWordStudy(context, surah: target.$1, ayah: target.$2, word: target.$3);
+  }
+
+  /// How near a word's box a touch counts as on it: page units in the SVG
+  /// editions, image pixels in the others.
+  double get _wordSlop {
+    final edition = ref.read(editionProvider);
+    return edition == MushafEdition.madina1441 || edition.isRiwaya ? 2.0 : 6.0;
+  }
+
+  /// Touch reading: shades [v]; when it follows a verse of prostration,
+  /// the sajdah card shows (with the timer on, not in a hifz test).
+  void _touch(VerseKey v) {
+    setState(() => _touched = v);
+    if (!ref.read(settingsProvider).sajdahTimer || _testing) return;
+    final sajdah = ref
+        .read(sajdahPositionsProvider)
+        .value
+        ?.before(v.surah, v.ayah);
+    if (sajdah == null) return;
+    // Already up for it: it keeps counting.
+    if (ref.read(sajdahCardProvider)?.verse == sajdah) return;
+    ref.read(sajdahCardProvider.notifier).show(sajdah, SajdahFrom.reading);
+  }
+
+  /// A hifz test mutes the sajdah card (set after the frame: not while
+  /// widgets build or unmount).
+  void _muteSajdah(bool muted) {
+    final notifier = _sajdahMuted;
+    Future.microtask(() => notifier.set(muted));
+  }
+
+  /// Whether a tap on a verse moves the recitation there: while listening
+  /// (playing or paused) in plain reading. Selecting, recitation mode, a
+  /// hifz test, word picking and a tafsir played on its own keep their
+  /// own taps.
+  bool _tapJumps(RecitationState r) =>
+      r.active &&
+      !(r.clip?.standalone ?? false) &&
+      !_multi &&
+      _selA == null &&
+      !_recite &&
+      !_testing &&
+      !_pickWord;
+
+  /// While listening, a tap on [v] (at [point] on [page], edition units)
+  /// moves the recitation there: to the word tapped when the reader chose
+  /// so and the page has that word's box, else to the verse's start. Touch
+  /// reading shades the verse too. Verse and word numbers are those of
+  /// the page, which a riwaya's recitations share.
+  Future<void> _listenFrom(VerseKey v, int page, Offset? point) async {
+    if (_touchReading) setState(() => _touched = v);
+    int? word;
+    if (point != null && ref.read(settingsProvider).tapJumpFromWord) {
+      try {
+        final boxes = await ref.read(pageWordBoxesProvider(page).future);
+        word = wordUnder(boxes, point, verse: v, slop: _wordSlop)?.$3;
+      } on Object {
+        // No word boxes: from the verse's start.
+      }
+    }
+    final result = await ref
+        .read(recitationProvider.notifier)
+        .jumpTo(v.surah, v.ayah, word: word);
+    if (!mounted) return;
+    switch (result) {
+      case VerseJump.jumped:
+        HapticFeedback.lightImpact();
+      case VerseJump.noTiming:
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(milliseconds: 1800),
+              content: Text(AppLocalizations.of(context).tapJumpNoTiming),
+            ),
+          );
+      case VerseJump.ignored:
+        break;
+    }
   }
 
   /// Word boxes of [verses] on [page], by verse (edition units).
@@ -883,9 +1932,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     if (edition.isRiwaya) {
       // A riwaya's recitations are numbered by the riwaya, like its pages.
       final page = _riwaya?.pageOf(v.surah, v.ayah);
-      if (!mounted || page == null || page == _page) return;
+      if (!mounted || page == null || _onScreen(page)) return;
       _controller?.animateToPage(
-        page - _first,
+        _indexOf(page),
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
       );
@@ -901,9 +1950,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         return; // already on a page of this verse
       }
     }
-    if (!mounted || page == _page) return;
+    if (!mounted || _onScreen(page)) return;
     _controller?.animateToPage(
-      page - _first,
+      _indexOf(page),
       // Elderly mode: a slower turn that is easy to follow.
       duration: Duration(milliseconds: context.tokens.elderly ? 700 : 350),
       curve: Curves.easeInOut,
@@ -1119,6 +2168,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       _testing = false;
       _test.newPage();
     });
+    _muteSajdah(false);
     if (context.canPop()) context.pop();
   }
 
@@ -1162,7 +2212,7 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     );
     c.jumpTo(next);
     final page = (next / _pageExtent + 0.5).floor() + _first;
-    if (page != _page) _onPageChanged(page - _first);
+    if (page != _page) _showPage(page);
   }
 
   void _stopAutoScroll() {
@@ -1170,8 +2220,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final page = _page;
     setState(() {
       _autoScroll = false;
+      _barHold = null;
       _controller?.dispose();
-      _controller = PageController(initialPage: page - _first);
+      _controller = PageController(initialPage: _indexOf(page));
     });
   }
 
@@ -1203,13 +2254,96 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
       );
   }
 
+  /// The selected verses as Tanzil's rows (Hafs editions).
+  String _verseText(List<VerseKey> range) {
+    final l = AppLocalizations.of(context);
+    final surahs = ref.read(surahsProvider).value;
+    final ayahs = [
+      for (var p = _firstSelPage; p <= _lastSelPage; p++)
+        ...?ref.read(pageAyahsProvider(p)).value,
+    ];
+    return composeVerseText(
+      verses: [
+        for (final k in range)
+          ...ayahs.where((a) => a.surah == k.surah && a.number == k.ayah),
+      ],
+      surahLabel: (s) =>
+          l.surahWord(surahs == null ? '' : surahName(context, surahs[s - 1])),
+      digits: NumberFormatter(Localizations.localeOf(context)).call,
+      range: (s, a, b) => l.verseRange(s, a, b),
+    );
+  }
+
+  Future<void> _copyVerses(List<VerseKey> range) async {
+    final text = _verseText(range);
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    await Clipboard.setData(ClipboardData(text: text));
+    messenger.showSnackBar(SnackBar(content: Text(l.copied)));
+  }
+
+  Rect? _shareOrigin() {
+    final box = context.findRenderObject();
+    return box is RenderBox ? box.localToGlobal(Offset.zero) & box.size : null;
+  }
+
+  Future<void> _shareVerseText(List<VerseKey> range) async {
+    final origin = _shareOrigin();
+    await SharePlus.instance.share(
+      ShareParams(text: _verseText(range), sharePositionOrigin: origin),
+    );
+  }
+
+  /// The selected verses drawn on Tibyan's picture template, from the
+  /// text (the selection marks never show), in the preview.
+  Future<void> _shareVerseImage(List<VerseKey> range) =>
+      showSharePreview(context, range);
+
+  /// A long press on the surah's name in the frame: the whole surah as
+  /// pictures.
+  Future<void> _shareSurahImage(int page) async {
+    final a = ref.read(pageAyahsProvider(page)).value?.firstOrNull;
+    if (a == null) return;
+    await _shareSurah(a.surah);
+  }
+
+  /// A whole surah as pictures (a long press on its banner in the page).
+  Future<void> _shareSurah(int surah) async {
+    final count = await ref.read(surahAyahCountProvider(surah).future);
+    if (!mounted) return;
+    await showSharePreview(context, [
+      for (var i = 1; i <= count; i++) (surah: surah, ayah: i),
+    ]);
+  }
+
+  /// «آية آية» at the first verse of this page (Hafs numbers).
+  Future<void> _openOneVerse() async {
+    final a = ref.read(pageAyahsProvider(_page)).value?.firstOrNull;
+    if (a == null) return;
+    final h = hafsKeyOf(_riwaya, (surah: a.surah, ayah: a.number));
+    _setChrome(false);
+    context.go(
+      '/verse?s=${h.surah}&a=${h.ayah}'
+      '${widget.entry == EntryPoint.other ? '' : '&entry=${widget.entry.name}'}',
+    );
+  }
+
+  /// The continuous view at the first verse of this page (Hafs numbers).
+  Future<void> _openContinuous() async {
+    final a = ref.read(pageAyahsProvider(_page)).value?.firstOrNull;
+    if (a == null) return;
+    final h = hafsKeyOf(_riwaya, (surah: a.surah, ayah: a.number));
+    _setChrome(false);
+    await context.push('/read?s=${h.surah}&a=${h.ayah}');
+  }
+
   Future<void> _goToPage() async {
     final page = await showGoToPage(
       context,
       current: _page,
       max: ref.read(editionProvider).pageCount,
     );
-    if (page != null) _controller?.jumpToPage(page - _first);
+    if (page != null) _controller?.jumpToPage(_indexOf(page));
   }
 
   String _scrubLabel(BuildContext context, int page, List<SurahRow>? surahs) {
@@ -1217,722 +2351,5 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
     final digits = NumberFormatter(Localizations.localeOf(context));
     if (first == null || surahs == null) return digits(page);
     return '${surahName(context, surahs[first.surah - 1])} : ${digits(page)}';
-  }
-}
-
-/// Touch reading, listening from the top of the page and hiding the
-/// verses, just under the page number.
-class _ReadingTools extends StatelessWidget {
-  const _ReadingTools({
-    required this.touchReading,
-    required this.recite,
-    required this.listening,
-    required this.onTouchReading,
-    required this.onListen,
-    required this.onRecite,
-    required this.tajweed,
-    required this.onTajweed,
-    required this.onTajweedLegend,
-  });
-
-  /// Tajweed colouring: a tap turns it on or off; a long press shows the
-  /// colour key. null: the edition has no tajweed data, so no button.
-  final bool? tajweed;
-  final VoidCallback onTajweed;
-  final VoidCallback onTajweedLegend;
-
-  final bool touchReading;
-  final bool recite;
-  final bool listening;
-  final VoidCallback onTouchReading;
-  final VoidCallback onListen;
-  final VoidCallback onRecite;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    // [glyph] is an icon, or a letter drawn in its place.
-    Widget button(
-      Object glyph,
-      String label,
-      bool on,
-      VoidCallback onTap, {
-      VoidCallback? onLongPress,
-    }) => Semantics(
-      button: true,
-      toggled: on,
-      label: label,
-      excludeSemantics: true,
-      onTap: onTap,
-      child: Tooltip(
-        message: label,
-        excludeFromSemantics: true,
-        child: InkResponse(
-          onTap: onTap,
-          onLongPress: onLongPress,
-          radius: 24,
-          // A 48 px target around the small drawn button.
-          child: Container(
-            width: 48,
-            height: 48,
-            alignment: Alignment.center,
-            child: Container(
-              width: 30,
-              height: 22,
-              decoration: BoxDecoration(
-                color: on ? t.control.withValues(alpha: 0.15) : null,
-                borderRadius: BorderRadius.circular(11),
-                border: Border.all(
-                  color: on ? t.control : t.border,
-                  width: 0.8,
-                ),
-              ),
-              alignment: Alignment.center,
-              child: switch (glyph) {
-                IconData icon => Icon(
-                  icon,
-                  size: 15,
-                  color: on ? t.control : t.muted,
-                ),
-                _ => Text(
-                  '$glyph',
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1,
-                    fontWeight: FontWeight.w700,
-                    color: on ? t.control : t.muted,
-                  ),
-                ),
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        button(
-          Icons.touch_app_outlined,
-          l.touchReading,
-          touchReading,
-          onTouchReading,
-        ),
-        button(
-          Icons.headphones_outlined,
-          l.listenFromPage,
-          listening,
-          onListen,
-        ),
-        button(Icons.visibility_off_outlined, l.reciteMode, recite, onRecite),
-        if (tajweed case final on?) ...[
-          const SizedBox(width: 10),
-          button(
-            'ج',
-            l.tajweedColors,
-            on,
-            onTajweed,
-            onLongPress: onTajweedLegend,
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-/// Destinations shown at the top when the reader touches the page.
-class _TopControls extends StatelessWidget {
-  const _TopControls({required this.items});
-
-  final List<(IconData, String, VoidCallback)> items;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens.colors;
-    return Material(
-      color: t.paper,
-      elevation: 2,
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(4, 6, 4, 6),
-          child: Row(
-            children: [
-              for (final (icon, label, onTap) in items)
-                Expanded(
-                  child: InkWell(
-                    onTap: onTap,
-                    borderRadius: BorderRadius.circular(12),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 56),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(icon, color: t.muted, size: 24),
-                          const SizedBox(height: 3),
-                          Text(
-                            label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12, color: t.muted),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Page scrubber: drag to any page; a bubble shows the surah and page.
-class _BottomControls extends StatelessWidget {
-  const _BottomControls({
-    required this.page,
-    required this.pageCount,
-    required this.label,
-    required this.onChanged,
-    required this.onChangeEnd,
-    required this.onRecite,
-    required this.onListen,
-    required this.onGoTo,
-    required this.onAutoScroll,
-    required this.touchReading,
-    required this.onTouchReading,
-    required this.recite,
-    required this.listening,
-  });
-
-  final bool recite;
-  final bool listening;
-  final bool touchReading;
-  final VoidCallback onTouchReading;
-  final int page;
-  final int pageCount;
-  final String label;
-  final ValueChanged<int> onChanged;
-  final ValueChanged<int> onChangeEnd;
-  final VoidCallback onRecite;
-  final VoidCallback onListen;
-  final VoidCallback onGoTo;
-  final VoidCallback onAutoScroll;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens.colors;
-    final l = AppLocalizations.of(context);
-    return Material(
-      color: t.paper,
-      elevation: 2,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (context.tokens.elderly)
-                // Elderly mode: every tool with its name, large enough to
-                // press easily.
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    FilledButton.tonalIcon(
-                      onPressed: onListen,
-                      icon: const Icon(Icons.headphones_outlined),
-                      label: Text(l.listen),
-                    ),
-                    FilledButton.tonalIcon(
-                      onPressed: onGoTo,
-                      icon: const Icon(Icons.menu_book_outlined),
-                      label: Text(l.goToPage),
-                    ),
-                    Semantics(
-                      toggled: recite,
-                      child: FilledButton.tonalIcon(
-                        onPressed: onRecite,
-                        icon: const Icon(Icons.visibility_outlined),
-                        label: Text(l.reciteMode),
-                      ),
-                    ),
-                    Semantics(
-                      toggled: touchReading,
-                      child: FilledButton.tonalIcon(
-                        onPressed: onTouchReading,
-                        icon: Icon(
-                          touchReading
-                              ? Icons.touch_app
-                              : Icons.touch_app_outlined,
-                        ),
-                        label: Text(l.touchReading),
-                      ),
-                    ),
-                    FilledButton.tonalIcon(
-                      onPressed: onAutoScroll,
-                      icon: const Icon(Icons.keyboard_double_arrow_down),
-                      label: Text(l.autoScroll),
-                    ),
-                  ],
-                )
-              else
-                Row(
-                  children: [
-                    IconButton.filledTonal(
-                      tooltip: l.reciteMode,
-                      isSelected: recite,
-                      onPressed: onRecite,
-                      icon: const Icon(Icons.visibility_outlined),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton.filledTonal(
-                      tooltip: l.listen,
-                      isSelected: listening,
-                      onPressed: onListen,
-                      icon: const Icon(Icons.headphones_outlined),
-                    ),
-                    const Spacer(),
-                    FilledButton.tonalIcon(
-                      onPressed: onGoTo,
-                      icon: const Icon(Icons.menu_book_outlined, size: 18),
-                      label: Text(l.goToPage),
-                    ),
-                    const Spacer(),
-                    IconButton.filledTonal(
-                      tooltip: l.autoScroll,
-                      onPressed: onAutoScroll,
-                      icon: const Icon(Icons.keyboard_double_arrow_down),
-                    ),
-                  ],
-                ),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: t.bg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: t.border),
-                ),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: 'KFGQPCAN',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                    color: t.ink,
-                  ),
-                ),
-              ),
-              // Page 1 on the right, like the mushaf.
-              SizedBox(
-                width: double.infinity,
-                child: Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Slider(
-                    activeColor: t.control,
-                    inactiveColor: t.border,
-                    min: 1,
-                    max: pageCount.toDouble(),
-                    divisions: pageCount - 1,
-                    value: page.clamp(1, pageCount).toDouble(),
-                    semanticFormatterCallback: (v) => l.pageOf('${v.round()}'),
-                    onChanged: (v) => onChanged(v.round()),
-                    onChangeEnd: (v) => onChangeEnd(v.round()),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Shown while the reader drags the selection handles.
-class _MultiSelectBar extends StatelessWidget {
-  const _MultiSelectBar({required this.count, required this.onDone});
-
-  final int count;
-  final VoidCallback onDone;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    final digits = NumberFormatter(Localizations.localeOf(context));
-    return Material(
-      color: t.paper,
-      elevation: 6,
-      borderRadius: BorderRadius.circular(28),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
-        child: Row(
-          children: [
-            Expanded(
-              child: Semantics(
-                liveRegion: true,
-                child: Text(
-                  '${l.multiSelectHint} · ${count == 2 ? l.twoVerses : l.versesCount(digits(count))}',
-                  style: const TextStyle(fontSize: 13),
-                ),
-              ),
-            ),
-            FilledButton(onPressed: onDone, child: Text(l.doneLabel)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Word study: asks for a word to be tapped.
-class _WordPickBar extends StatelessWidget {
-  const _WordPickBar({required this.onCancel});
-
-  final VoidCallback onCancel;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    return Material(
-      color: t.paper,
-      elevation: 6,
-      borderRadius: BorderRadius.circular(28),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
-        child: Row(
-          children: [
-            Icon(Icons.touch_app_outlined, color: t.goldText),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Semantics(
-                liveRegion: true,
-                child: Text(
-                  l.wordPickHint,
-                  style: const TextStyle(fontSize: 13),
-                ),
-              ),
-            ),
-            TextButton(onPressed: onCancel, child: Text(l.cancel)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Hifz test toolbar.
-class _TestBar extends StatelessWidget {
-  const _TestBar({
-    required this.verse,
-    required this.result,
-    required this.byLine,
-    required this.counts,
-    required this.similar,
-    required this.onSimilar,
-    required this.onNextWord,
-    required this.onNextVerse,
-    required this.onAll,
-    required this.onRemembered,
-    required this.onMissed,
-    required this.onGrade,
-    required this.onClose,
-  });
-
-  /// The verse being recited, named; null before the first reveal.
-  final String? verse;
-  final VerseResult? result;
-
-  /// The current verse is revealed line by line (no word boxes).
-  final bool byLine;
-  final String? counts;
-
-  /// Passages similar to the current verse.
-  final int similar;
-  final VoidCallback? onSimilar;
-  final VoidCallback onNextWord;
-  final VoidCallback onNextVerse;
-  final VoidCallback onAll;
-  final VoidCallback? onRemembered;
-  final VoidCallback? onMissed;
-  final VoidCallback onGrade;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    final digits = NumberFormatter(Localizations.localeOf(context));
-    return Material(
-      color: t.paper,
-      elevation: 6,
-      borderRadius: BorderRadius.circular(24),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 8, 6, 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (verse != null) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: Semantics(
-                      liveRegion: true,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            verse!,
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          if (counts != null)
-                            Text(
-                              counts!,
-                              style: TextStyle(fontSize: 12, color: t.muted),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (similar > 0)
-                    TextButton.icon(
-                      onPressed: onSimilar,
-                      icon: const Icon(Icons.compare_arrows, size: 18),
-                      label: Text(l.similarCount(digits(similar))),
-                    ),
-                ],
-              ),
-              if (byLine)
-                Text(
-                  l.revealByLine,
-                  style: TextStyle(fontSize: 12, color: t.muted),
-                ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Expanded(
-                    child: _JudgeButton(
-                      label: l.verseRemembered,
-                      icon: Icons.check,
-                      chosen: result == VerseResult.remembered,
-                      onPressed: onRemembered,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: _JudgeButton(
-                      label: l.verseMissed,
-                      icon: Icons.close,
-                      chosen: result == VerseResult.missed,
-                      onPressed: onMissed,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-              ),
-              const SizedBox(height: 6),
-            ],
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton(
-                    onPressed: onNextWord,
-                    child: Text(l.revealNextWord),
-                  ),
-                ),
-                IconButton(
-                  tooltip: l.revealNextVerse,
-                  onPressed: onNextVerse,
-                  icon: const Icon(Icons.keyboard_double_arrow_left),
-                ),
-                IconButton(
-                  tooltip: l.revealAll,
-                  onPressed: onAll,
-                  icon: const Icon(Icons.visibility_outlined),
-                ),
-                IconButton(
-                  tooltip: l.gradeUnit,
-                  onPressed: onGrade,
-                  icon: const Icon(Icons.grading),
-                ),
-                IconButton(
-                  tooltip: l.endRecite,
-                  onPressed: onClose,
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// «حفظت» or «أخطأت» for the current verse; filled once chosen.
-class _JudgeButton extends StatelessWidget {
-  const _JudgeButton({
-    required this.label,
-    required this.icon,
-    required this.chosen,
-    required this.onPressed,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool chosen;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    selected: chosen,
-    child: chosen
-        ? FilledButton.tonalIcon(
-            onPressed: onPressed,
-            icon: Icon(icon, size: 18),
-            label: Text(label),
-          )
-        : OutlinedButton.icon(
-            onPressed: onPressed,
-            icon: Icon(icon, size: 18),
-            label: Text(label),
-          ),
-  );
-}
-
-/// Auto-scroll toolbar.
-class _AutoScrollBar extends StatelessWidget {
-  const _AutoScrollBar({
-    required this.paused,
-    required this.speed,
-    required this.onPause,
-    required this.onSlower,
-    required this.onFaster,
-    required this.onClose,
-  });
-
-  final bool paused;
-  final int speed;
-  final VoidCallback onPause;
-  final VoidCallback onSlower;
-  final VoidCallback onFaster;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    final digits = NumberFormatter(Localizations.localeOf(context));
-    return Material(
-      color: t.paper,
-      elevation: 6,
-      borderRadius: BorderRadius.circular(32),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Row(
-          children: [
-            IconButton.filled(
-              tooltip: paused ? l.resume : l.pause,
-              onPressed: onPause,
-              icon: Icon(paused ? Icons.play_arrow : Icons.pause),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Semantics(
-                liveRegion: true,
-                child: Text(
-                  l.speedLabel(digits(speed)),
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-            IconButton.filledTonal(
-              tooltip: l.slower,
-              onPressed: onSlower,
-              icon: const Icon(Icons.remove),
-            ),
-            const SizedBox(width: 4),
-            IconButton.filledTonal(
-              tooltip: l.faster,
-              onPressed: onFaster,
-              icon: const Icon(Icons.add),
-            ),
-            IconButton(
-              tooltip: l.stopAutoScroll,
-              onPressed: onClose,
-              icon: const Icon(Icons.close),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class VerseBar extends StatelessWidget {
-  const VerseBar({
-    super.key,
-    required this.verse,
-    required this.surahs,
-    required this.onSave,
-    required this.onClose,
-  });
-
-  final VerseKey verse;
-  final List<SurahRow>? surahs;
-  final VoidCallback onSave;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    final name = surahs == null
-        ? ''
-        : surahName(context, surahs![verse.surah - 1]);
-    return Material(
-      color: t.player,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-        child: Row(
-          children: [
-            Expanded(
-              child: Semantics(
-                liveRegion: true,
-                child: Text(
-                  '${l.surahWord(name)} · ${l.verseSelected('${verse.ayah}')}',
-                  style: TextStyle(
-                    color: t.playerFg,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            IconButton(
-              tooltip: l.fasilSaveHere,
-              onPressed: onSave,
-              icon: Icon(Icons.bookmark_add_outlined, color: t.playerFg),
-            ),
-            IconButton(
-              tooltip: l.cancel,
-              onPressed: onClose,
-              icon: Icon(Icons.close, color: t.playerFg),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

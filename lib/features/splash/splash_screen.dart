@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/router/app_router.dart';
+import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
@@ -22,6 +24,10 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
+/// Where the splash leads: home, or for store screenshots the screen given
+/// with `--dart-define=TIBYAN_START=/settings` (tools/store_screenshots.sh).
+const _start = String.fromEnvironment('TIBYAN_START', defaultValue: '/');
+
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   Timer? _timer;
 
@@ -29,7 +35,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     _timer = Timer(widget.duration, () {
-      if (mounted) context.go('/');
+      if (!mounted) return;
+      context.go(_start);
+      if (ref.read(settingsProvider).onboardingDone) {
+        markAppRouterReady(ref.read(appRouterReadyProvider));
+      }
     });
   }
 
@@ -88,7 +98,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(4),
                   child: OrnateFrame(
-                    catchwordSpace: false,
                     top: Text(
                       l.coverSubtitle,
                       style: const TextStyle(fontSize: 16),

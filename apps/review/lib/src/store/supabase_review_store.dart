@@ -39,6 +39,9 @@ class SupabaseReviewStore implements ReviewStore {
   Future<Map<ReviewState, int>> counts() => _todo("rpc('review_counts')");
 
   @override
+  Future<List<String>> kinds() => _todo("from('entry').select('kind')");
+
+  @override
   Future<List<EntrySummary>> entries(EntryFilter filter) =>
       _todo("from('entry_summary').select() with filters");
 

@@ -95,6 +95,7 @@ ModeTokens elderlyTokens(ModeTokens t) {
     highlight: t.highlight,
     control: control,
     onControl: onControl,
+    artTint: t.artTint,
   );
 }
 

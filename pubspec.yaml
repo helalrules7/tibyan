@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.4.0+5
+version: 0.4.0+22
 
 environment:
   sdk: ^3.13.4
@@ -43,6 +43,9 @@ dependencies:
     sdk: flutter
   drift: ^2.35.0
   drift_flutter: ^0.3.1
+  # Reviewed book packs are opened read-only, which drift cannot do
+  # without stamping its schema version into the file.
+  sqlite3: ^3.5.2
   path_provider: ^2.1.6
   path: ^1.9.1
   package_info_plus: ^10.2.1
@@ -63,6 +66,15 @@ dependencies:
   just_audio: ^0.10.6
   just_audio_background: ^0.0.1-beta.17
   background_downloader: ^9.6.3
+  share_plus: ^13.3.1
+  file_selector: ^1.1.0
+  just_audio_media_kit: ^2.1.0
+  media_kit_libs_linux: ^1.2.1
+  media_kit_libs_windows_audio: ^1.0.9
+  app_links: ^7.2.1
+  audio_service: ^0.18.18
+  sherpa_onnx: ^1.13.8
+  record: ^7.1.1
 
 dev_dependencies:
   flutter_test:
@@ -145,3 +157,9 @@ flutter:
     - family: KFGQPCKufiExtended
       fonts:
         - asset: assets/fonts/kfgqpc/KFGQPC-KufiExtV14.ttf
+
+# Media browsing (Android Auto) needs a hook the package does not offer:
+# packages/just_audio_background/TIBYAN.md.
+dependency_overrides:
+  just_audio_background:
+    path: packages/just_audio_background

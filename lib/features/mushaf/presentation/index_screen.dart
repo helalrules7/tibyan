@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/db/content_database.dart';
+import '../../../core/router/keyboard_dismiss.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
@@ -9,6 +10,7 @@ import '../data/mushaf_repository.dart';
 import '../mushaf_providers.dart';
 import 'mushaf_screen.dart';
 import 'navigation.dart';
+import 'pages_map.dart';
 
 /// Removes Arabic marks and unifies alef forms, for matching surah names.
 String _fold(String s) => s
@@ -91,6 +93,8 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
         appBar: AppBar(
           title: Text(l.indexTitle),
           bottom: TabBar(
+            // The surahs' search field is left behind: its keyboard goes.
+            onTap: (_) => dismissKeyboard(),
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             tabs: [
@@ -104,40 +108,47 @@ class _IndexScreenState extends ConsumerState<IndexScreen> {
         ),
         body: surahs == null
             ? Center(child: Text(l.loadingLabel))
-            : TabBarView(
-                children: [
-                  _surahTab(context, surahs),
-                  _StartsTab(
-                    surahs: surahs,
-                    // A riwaya edition: its own juz starts (KFGQPC).
-                    starts: riwaya != null
-                        ? [for (final v in riwaya.juzStarts()) riwaya.row(v)]
-                        : ref
-                              .watch(juzStartsProvider)
-                              .value
-                              ?.map((j) => j.ayah)
-                              .toList(),
-                    current: widget.juz,
-                    title: (n) => l.juzLabel('$n'),
-                  ),
-                  // The riwayat's hizb divisions are not in their sources.
-                  if (riwaya != null)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Text(l.riwayaGaps, textAlign: TextAlign.center),
-                      ),
-                    )
-                  else
+            : DismissKeyboardOnSwipe(
+                child: TabBarView(
+                  children: [
+                    _surahTab(context, surahs),
                     _StartsTab(
                       surahs: surahs,
-                      starts: ref.watch(hizbStartsProvider).value,
-                      current: widget.hizb,
-                      title: (n) => l.hizbLabel('$n'),
+                      // A riwaya edition: its own juz starts (KFGQPC).
+                      starts: riwaya != null
+                          ? [for (final v in riwaya.juzStarts()) riwaya.row(v)]
+                          : ref
+                                .watch(juzStartsProvider)
+                                .value
+                                ?.map((j) => j.ayah)
+                                .toList(),
+                      current: widget.juz,
+                      title: (n) => l.juzLabel('$n'),
                     ),
-                  _PagesTab(current: widget.page),
-                  _MarksTab(surahs: surahs),
-                ],
+                    // The riwayat's hizb divisions are not in their sources.
+                    if (riwaya != null)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Text(
+                            riwaya.hasWordBoxes
+                                ? l.riwayaGaps
+                                : '${l.riwayaGaps}\n\n${l.riwayaNoWordBoxes}',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    else
+                      _StartsTab(
+                        surahs: surahs,
+                        starts: ref.watch(hizbStartsProvider).value,
+                        current: widget.hizb,
+                        title: (n) => l.hizbLabel('$n'),
+                      ),
+                    PagesMap(current: widget.page),
+                    _MarksTab(surahs: surahs),
+                  ],
+                ),
               ),
       ),
     );
@@ -369,81 +380,6 @@ class _StartsTab extends ConsumerWidget {
           ),
           trailing: l.pageShort('$page'),
           onTap: () => openPage(context, ref, page),
-        );
-      },
-    );
-  }
-}
-
-class _PagesTab extends ConsumerStatefulWidget {
-  const _PagesTab({this.current});
-
-  final int? current;
-
-  @override
-  ConsumerState<_PagesTab> createState() => _PagesTabState();
-}
-
-class _PagesTabState extends ConsumerState<_PagesTab> {
-  ScrollController? _scroll;
-
-  @override
-  void dispose() {
-    _scroll?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = context.tokens.colors;
-    return LayoutBuilder(
-      builder: (context, box) {
-        const extent = 72.0;
-        final perRow = ((box.maxWidth - 24 + 8) / (extent + 8)).ceil();
-        final cell = (box.maxWidth - 24 - 8 * (perRow - 1)) / perRow;
-        _scroll ??= ScrollController(
-          initialScrollOffset: widget.current == null
-              ? 0
-              : (((widget.current! - 1) ~/ perRow - 2) * (cell + 8)).clamp(
-                  0,
-                  double.infinity,
-                ),
-        );
-        return GridView.builder(
-          controller: _scroll,
-          padding: const EdgeInsets.all(12),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: extent,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-          ),
-          itemCount: ref.watch(editionProvider).pageCount,
-          itemBuilder: (context, i) {
-            final current = i + 1 == widget.current;
-            return Semantics(
-              button: true,
-              selected: current,
-              label: l.pageOf('${i + 1}'),
-              excludeSemantics: true,
-              onTap: () => openPage(context, ref, i + 1),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  backgroundColor: current ? t.control : null,
-                  foregroundColor: current ? t.onControl : null,
-                  side: current ? BorderSide(color: t.control, width: 2) : null,
-                ),
-                onPressed: () => openPage(context, ref, i + 1),
-                child: Text(
-                  '${i + 1}',
-                  style: TextStyle(
-                    fontWeight: current ? FontWeight.w800 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            );
-          },
         );
       },
     );

@@ -174,6 +174,90 @@
       "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
     },
     {
+      "id": "openiti-tabari-tafsir01001",
+      "file": "0310Tabari.JamicBayan.Tafsir01001-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/0325AH/089e665b4958e0f145a46941987fb81cf3dda1b8/data/0310Tabari/0310Tabari.JamicBayan/0310Tabari.JamicBayan.Tafsir01001-ara1",
+      "method": "GET",
+      "sha256": "0a2e5bb66364f5eb81a7a22136a6ad9137940c372b66d5c65e409f8769f55499",
+      "repo": "OpenITI/0325AH",
+      "commit": "089e665b4958e0f145a46941987fb81cf3dda1b8",
+      "path": "data/0310Tabari/0310Tabari.JamicBayan/0310Tabari.JamicBayan.Tafsir01001-ara1",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Text scraped from altafsir.com (COBHUNI project); OpenITI marks it INCOMPLETE_VERSION, PAGINATION: no named edition or editor, no pages. The printed edition's and altafsir.com's rights are not covered. Review drafts only.",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "openiti-qurtubi-tafsir01005",
+      "file": "0671AbuCabdAllahQurtubi.JamicLiAhkamQuran.Tafsir01005-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/0675AH/4b1d2886508b435eb0377ccab96e1da96cc8ee0a/data/0671AbuCabdAllahQurtubi/0671AbuCabdAllahQurtubi.JamicLiAhkamQuran/0671AbuCabdAllahQurtubi.JamicLiAhkamQuran.Tafsir01005-ara1",
+      "method": "GET",
+      "sha256": "218e8c00b0a8016a50209106561a5a0b31c0dec09093760f1507de0841b0258d",
+      "repo": "OpenITI/0675AH",
+      "commit": "4b1d2886508b435eb0377ccab96e1da96cc8ee0a",
+      "path": "data/0671AbuCabdAllahQurtubi/0671AbuCabdAllahQurtubi.JamicLiAhkamQuran/0671AbuCabdAllahQurtubi.JamicLiAhkamQuran.Tafsir01005-ara1",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Text scraped from altafsir.com (COBHUNI project); OpenITI marks it INCOMPLETE_VERSION, PAGINATION: no named edition or editor, no pages. The printed edition's and altafsir.com's rights are not covered. Review drafts only.",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "openiti-ibnkathir-tafsir01007",
+      "file": "0774IbnKathir.TafsirQuran.Tafsir01007-ara7",
+      "url": "https://raw.githubusercontent.com/OpenITI/0775AH/61b0c7891699554aeff8dffdb8b1a2a59d2d22ab/data/0774IbnKathir/0774IbnKathir.TafsirQuran/0774IbnKathir.TafsirQuran.Tafsir01007-ara7",
+      "method": "GET",
+      "sha256": "219c4f0962c114d34571f64fc211306838453f0eeb35e2e52ac43f3150ffe97c",
+      "repo": "OpenITI/0775AH",
+      "commit": "61b0c7891699554aeff8dffdb8b1a2a59d2d22ab",
+      "path": "data/0774IbnKathir/0774IbnKathir.TafsirQuran/0774IbnKathir.TafsirQuran.Tafsir01007-ara7",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Text scraped from altafsir.com (COBHUNI project); OpenITI marks it INCOMPLETE_VERSION, PAGINATION: no named edition or editor, no pages. The printed edition's and altafsir.com's rights are not covered. Review drafts only.",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "openiti-baghawi-tafsir02013",
+      "file": "0510IbnMascudBaghawi.Tafsir.Tafsir02013-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/0525AH/6290621b58e063ed1aa47ffd0a6fc1630191e7cb/data/0510IbnMascudBaghawi/0510IbnMascudBaghawi.Tafsir/0510IbnMascudBaghawi.Tafsir.Tafsir02013-ara1",
+      "method": "GET",
+      "sha256": "0b2f93f0a9b2b0ef2c896ecdaf9906ca93698df383d70eba55c8c8b37b78107d",
+      "repo": "OpenITI/0525AH",
+      "commit": "6290621b58e063ed1aa47ffd0a6fc1630191e7cb",
+      "path": "data/0510IbnMascudBaghawi/0510IbnMascudBaghawi.Tafsir/0510IbnMascudBaghawi.Tafsir.Tafsir02013-ara1",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Text scraped from altafsir.com (COBHUNI project); OpenITI marks it INCOMPLETE_VERSION, PAGINATION: no named edition or editor, no pages. The printed edition's and altafsir.com's rights are not covered. Review drafts only.",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "openiti-saadi-tafsir10098",
+      "file": "1376CabdRahmanSacdi.TaysirKarimRahman.Tafsir10098-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/1400AH/6b4084ba42c8e0bd7c888a8c4b37c43ca771c322/data/1376CabdRahmanSacdi/1376CabdRahmanSacdi.TaysirKarimRahman/1376CabdRahmanSacdi.TaysirKarimRahman.Tafsir10098-ara1",
+      "method": "GET",
+      "sha256": "3dd8622b4414acb59405fcf4545f3e026fe2adca36c32fdeb12a822553129faf",
+      "repo": "OpenITI/1400AH",
+      "commit": "6b4084ba42c8e0bd7c888a8c4b37c43ca771c322",
+      "path": "data/1376CabdRahmanSacdi/1376CabdRahmanSacdi.TaysirKarimRahman/1376CabdRahmanSacdi.TaysirKarimRahman.Tafsir10098-ara1",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Text scraped from altafsir.com (COBHUNI project); OpenITI marks it INCOMPLETE_VERSION, PAGINATION: no named edition or editor, no pages. The printed edition's and altafsir.com's rights are not covered. Review drafts only. OpenITI notes the copy is incomplete. The author died 1376/1956: his text may still be under copyright in some countries.",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "openiti-biqai-nazmdurar-tafsir02025",
+      "file": "0885BurhanDinBiqaci.NazmDurar.Tafsir02025-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/0900AH/271ff65bd8364d3a46b5806ca529617d1ffc3393/data/0885BurhanDinBiqaci/0885BurhanDinBiqaci.NazmDurar/0885BurhanDinBiqaci.NazmDurar.Tafsir02025-ara1",
+      "method": "GET",
+      "sha256": "5548ea7c727d951bec640befa65016816cc4ca19a8437d10954bb886005409f8",
+      "repo": "OpenITI/0900AH",
+      "commit": "271ff65bd8364d3a46b5806ca529617d1ffc3393",
+      "path": "data/0885BurhanDinBiqaci/0885BurhanDinBiqaci.NazmDurar/0885BurhanDinBiqaci.NazmDurar.Tafsir02025-ara1",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Text scraped from altafsir.com (COBHUNI project); OpenITI marks it INCOMPLETE_VERSION, PAGINATION: no named edition or editor, no pages. The printed edition's and altafsir.com's rights are not covered. Review drafts only. (Nazm al-Durar; OpenITI's Shamela0009098 copy of the Dar al-Kitab al-Islami edition has pages but no verse headings.)",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
+      "id": "openiti-damghani-qamusquran-shamay0034085",
+      "file": "0478IbnMuhammadDamghani.QamusQuran.ShamAY0034085-ara1",
+      "url": "https://raw.githubusercontent.com/OpenITI/0500AH/fff9e21790e2e54f14826322ae49ab7671f12744/data/0478IbnMuhammadDamghani/0478IbnMuhammadDamghani.QamusQuran/0478IbnMuhammadDamghani.QamusQuran.ShamAY0034085-ara1",
+      "method": "GET",
+      "sha256": "972931b22a01fd05ec335e96ed40949fe24f7dcf6da5e5f3f67ed3fd0cc6a20e",
+      "repo": "OpenITI/0500AH",
+      "commit": "fff9e21790e2e54f14826322ae49ab7671f12744",
+      "path": "data/0478IbnMuhammadDamghani/0478IbnMuhammadDamghani.QamusQuran/0478IbnMuhammadDamghani.QamusQuran.ShamAY0034085-ara1",
+      "license": "OpenITI digitisation CC BY-NC-SA 4.0 (digitisation only). Edition (OpenITI metadata): tahqiq Abd al-Aziz Sayyid al-Ahl, Dar al-Ilm lil-Malayin, Beirut, 3rd ed. 1980; the editor's rights are not covered. OpenITI's only copy; the digitiser notes pages 426-450 are missing. Review drafts only.",
+      "evidence": "docs/licenses/2026-09-28_openiti_zenodo.pdf"
+    },
+    {
       "id": "waqar144-mutashabihat",
       "file": "waqar144_mutashabiha_data.json",
       "url": "https://raw.githubusercontent.com/Waqar144/Quran_Mutashabihat_Data/f35f6d5d6e7d07f44e6a652d868b298fcd12e318/mutashabiha_data.json",
@@ -181,6 +265,205 @@
       "sha256": "785d5efa266a19c405a449b0a01ebf34fe7dc09836d5b6ef301eae874db780f0",
       "license": "No licence file. README: 'The data in this project is free to use as you see fit', a mention appreciated. Links between verses only (no text). Used under the 2026-09-29 rule while the status is confirmed; mirrored at tibyan.ahmedhelal.dev/mirror/sources/waqar144-mutashabihat/",
       "evidence": "docs/licenses/2026-10-02_waqar144_mutashabihat_README.md"
+    },
+    {
+      "id": "quran-ws-warsh-json-1.1.1",
+      "file": "riwayat/warsh-kfqc-json.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/warsh-kfqc-json.zip",
+      "method": "GET",
+      "sha256": "7afc9145135a2571d225bc4c70c949f8e6266a48405ba6cafbc083ffcb300ff4",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "quran-ws-warsh-svg-1.1.1",
+      "file": "riwayat/warsh-kfqc-svg.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/warsh-kfqc-svg.zip",
+      "method": "GET",
+      "sha256": "bee1286ad1993e7c9feb835c2ab3018454bcb5915c48ec19f6073f70921280f2",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "quran-ws-qalon-json-1.1.1",
+      "file": "riwayat/qalon-kfqc-json.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/qalon-kfqc-json.zip",
+      "method": "GET",
+      "sha256": "c175a217a96c0a0ee3a2a722fd43ecef7a50e89b4b5b452f3cb234240c838796",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "quran-ws-qalon-svg-1.1.1",
+      "file": "riwayat/qalon-kfqc-svg.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/qalon-kfqc-svg.zip",
+      "method": "GET",
+      "sha256": "4f6b42a9247048addeeca498bf69c789a730dc503fc372324b1114f03e0d7b3b",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "quran-ws-douri-json-1.1.1",
+      "file": "riwayat/douri-kfqc-json.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/douri-kfqc-json.zip",
+      "method": "GET",
+      "sha256": "76ad9de9636dfe6225a4d05240e1a4235e2f41cfbedce1ffee427ffd69e19008",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "quran-ws-douri-svg-1.1.1",
+      "file": "riwayat/douri-kfqc-svg.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/douri-kfqc-svg.zip",
+      "method": "GET",
+      "sha256": "1460746a114a4f797a67ad8aa34e95680b0b025e1c5bad0113a100396764c945",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "quran-ws-shubah-json-1.1.1",
+      "file": "riwayat/shubah-kfqc-json.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/shubah-kfqc-json.zip",
+      "method": "GET",
+      "sha256": "5e9d8f1a4e261261ca7c192511dcd3f99df2352d30aaa0818935faf6e8c68651",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "quran-ws-shubah-svg-1.1.1",
+      "file": "riwayat/shubah-kfqc-svg.zip",
+      "url": "https://github.com/quran-ws/quran-svg/releases/download/v1.1.1/shubah-kfqc-svg.zip",
+      "method": "GET",
+      "sha256": "1b37e01d3b3e605aec3c253ec3122970255ed5c05c3e9f6158811e63378e37ed",
+      "license": "Artwork: KFGQPC (free use in software); quran-ws layer CC BY 4.0, attribution waived in products. Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quran-ws-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_quran-ws_quran-svg_NOTICE.md"
+    },
+    {
+      "id": "kfgqpc-uthmanic-warsh",
+      "file": "riwayat/UthmanicWarsh_v2-1.zip",
+      "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-warsh/UthmanicWarsh_v2-1.zip",
+      "method": "GET",
+      "sha256": "d847a7e7002dfbed5d28db6684fd1d9c3d50b8bb63ad64cb38a46b9dad788b47",
+      "license": "KFGQPC quran-dev riwaya text and font, the Complex's own file (MD5 as published by the Complex verified). Font: embedded KFGQPC licence, unmodified. Text: permission requested (letter 2). Original: download.qurancomplex.gov.sa/resources_dev/; mirrored at tibyan.ahmedhelal.dev/mirror/sources/kfgqpc-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
+    },
+    {
+      "id": "kfgqpc-uthmanic-qaloun",
+      "file": "riwayat/UthmanicQaloun_v2-1.zip",
+      "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-qaloun/UthmanicQaloun_v2-1.zip",
+      "method": "GET",
+      "sha256": "6988b782b4268c70a11bc807223fcf2b131a9879a48aad34eb65af523fcb144d",
+      "license": "KFGQPC quran-dev riwaya text and font, the Complex's own file (MD5 as published by the Complex verified). Font: embedded KFGQPC licence, unmodified. Text: permission requested (letter 2). Original: download.qurancomplex.gov.sa/resources_dev/; mirrored at tibyan.ahmedhelal.dev/mirror/sources/kfgqpc-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
+    },
+    {
+      "id": "kfgqpc-uthmanic-douri",
+      "file": "riwayat/UthmanicDouri_v2-0.zip",
+      "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-douri/UthmanicDouri_v2-0.zip",
+      "method": "GET",
+      "sha256": "84e5569790f96b05896b8f44ebe8d82d98377a929ac0e87dd8af4dbec52cb0c1",
+      "license": "KFGQPC quran-dev riwaya text and font, the Complex's own file (MD5 as published by the Complex verified). Font: embedded KFGQPC licence, unmodified. Text: permission requested (letter 2). Original: download.qurancomplex.gov.sa/resources_dev/; mirrored at tibyan.ahmedhelal.dev/mirror/sources/kfgqpc-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
+    },
+    {
+      "id": "kfgqpc-uthmanic-shuba",
+      "file": "riwayat/UthmanicShuba_v2-0.zip",
+      "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-shuba/UthmanicShuba_v2-0.zip",
+      "method": "GET",
+      "sha256": "977e64f3f889c084dc82aec4e97092836ca61777cdc93c3ee7da6f59592efbcf",
+      "license": "KFGQPC quran-dev riwaya text and font, the Complex's own file (MD5 as published by the Complex verified). Font: embedded KFGQPC licence, unmodified. Text: permission requested (letter 2). Original: download.qurancomplex.gov.sa/resources_dev/; mirrored at tibyan.ahmedhelal.dev/mirror/sources/kfgqpc-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
+    },
+    {
+      "id": "kfgqpc-uthmanic-sousi",
+      "file": "riwayat/UthmanicSousi_v2-0.zip",
+      "url": "https://cdn.quran.ws/KFGQPC/resources/quran-dev/uthmanic-sousi/UthmanicSousi_v2-0.zip",
+      "method": "GET",
+      "sha256": "e912273b3863bbf97ec4a7b1134967e3cdf21de7fcc06df9dee42bce655ce472",
+      "license": "KFGQPC quran-dev riwaya text and font, the Complex's own file (MD5 as published by the Complex verified). Font: embedded KFGQPC licence, unmodified. Text: permission requested (letter 2). Original: download.qurancomplex.gov.sa/resources_dev/; mirrored at tibyan.ahmedhelal.dev/mirror/sources/kfgqpc-riwayat/",
+      "evidence": "docs/licenses/2026-09-28_kfgqpc_copyright_wayback-20240518.txt"
+    },
+    {
+      "id": "quranpedia-mushafs-index",
+      "file": "riwayat/quranpedia/mushafs-index.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-index.json.gz",
+      "method": "GET",
+      "sha256": "bb682f0aa3885012aae5f50955a4ab6c4f6ea615ab75542c99af301053bb4120",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "quranpedia-mushafs-4",
+      "file": "riwayat/quranpedia/mushafs-4.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-4.json.gz",
+      "method": "GET",
+      "sha256": "d399ba2b1c4d53b47b4baa7511d23e0bdbbcaec3511342cf946cccf0cac5f5a4",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "quranpedia-mushafs-5",
+      "file": "riwayat/quranpedia/mushafs-5.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-5.json.gz",
+      "method": "GET",
+      "sha256": "2305e196e84e93ef1e9f5b81c55ca176b8bd5528bd41632c6d9ceb6a970da72c",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "quranpedia-mushafs-6",
+      "file": "riwayat/quranpedia/mushafs-6.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-6.json.gz",
+      "method": "GET",
+      "sha256": "56db8559719a2c4ca37e8b9014fe1650d504e5cf2a8e02406fa4319d69bc2e23",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "quranpedia-mushafs-7",
+      "file": "riwayat/quranpedia/mushafs-7.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-7.json.gz",
+      "method": "GET",
+      "sha256": "f65d990cdc9f6400a95507e95ac36838b03a577fd6b5d1e41fbaa99759443a3e",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "quranpedia-mushafs-8",
+      "file": "riwayat/quranpedia/mushafs-8.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-8.json.gz",
+      "method": "GET",
+      "sha256": "ee3281347d43602cba497452e448053f42932d16e80f2de4e3bb7004da00f894",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "quranpedia-mushafs-9",
+      "file": "riwayat/quranpedia/mushafs-9.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-9.json.gz",
+      "method": "GET",
+      "sha256": "aef553216858fa8ab43a468dae4d422cfcd0afe73af4f6a531422f5896d590cf",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "quranpedia-mushafs-10",
+      "file": "riwayat/quranpedia/mushafs-10.json.gz",
+      "url": "https://api.quranpedia.net/dumps/mushafs-10.json.gz",
+      "method": "GET",
+      "sha256": "09184381f024aefc20c7a071b2468fdc527d2904e5f4794be4ddc99ac9fbb494",
+      "license": "Quranpedia dumps 2026-10-02: free inside apps; republishing as a dataset requires credit and the version. Used only to check the riwaya verse maps (and al-Duri al-Mulk). Mirrored at tibyan.ahmedhelal.dev/mirror/sources/quranpedia/",
+      "evidence": "docs/licenses/2026-09-28_quranpedia_dumps_LICENSE.md"
+    },
+    {
+      "id": "mp3quran-riwaya-timing",
+      "file": "mp3quran_riwaya_timing.json",
+      "url": "https://www.mp3quran.net/api/v3/ayat_timing?surah={surah}&read={read}",
+      "method": "script",
+      "script": "tools/fetch_riwaya_timing.py",
+      "sha256": "7a8b0ccf64ab78960077116ed6855bb58dc25749bc779d7f8cfd3d328fba1b33",
+      "license": "mp3quran.net general permission to copy any material or use any link",
+      "evidence": "docs/licenses/2026-09-28_mp3quran_privacy.pdf"
     }
   ]
 }

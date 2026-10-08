@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اختبار تبيان</title>
+<meta name="description" content="ما المطلوب من المختبرين في النسخة التجريبية من تطبيق تبيان">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237a4a26'/%3E%3Cpath d='M9 22V10M16 22V8M23 22V12' stroke='%23f7edde' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f7edde; --panel: #fbf6ec; --ink: #1e1915; --muted: #6e6254;
+    --line: #e2d3bc; --accent: #7a4a26; --accent-ink: #fbf6ec; --soft: #efe2cc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a1612; --panel: #211c17; --ink: #ede3d2; --muted: #a99a87;
+      --line: #3a3128; --accent: #d9bc93; --accent-ink: #1a1612; --soft: #2a231c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 17px/1.75 "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 16px 64px; }
+  h1 { font-size: 30px; margin: 0 0 4px; }
+  h2 { font-size: 21px; margin: 36px 0 10px; color: var(--accent); }
+  p, li { margin: 6px 0; }
+  .lede { color: var(--muted); margin-bottom: 20px; }
+  .note {
+    background: var(--panel); border: 1px solid var(--line); border-inline-start: 4px solid var(--accent);
+    border-radius: 10px; padding: 14px 16px; margin: 18px 0;
+  }
+  ol, ul { padding-inline-start: 22px; }
+  .area { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin: 12px 0; }
+  .area h3 { margin: 0 0 6px; font-size: 18px; }
+  .area ul { margin: 0; }
+  label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+  input[type=checkbox] { width: 20px; height: 20px; margin-top: 5px; accent-color: var(--accent); flex: none; }
+  .done { color: var(--muted); text-decoration: line-through; }
+  .progress { position: sticky; top: 0; background: var(--bg); padding: 8px 0; z-index: 1; color: var(--muted); font-size: 15px; border-bottom: 1px solid var(--line); }
+  .bar { height: 6px; background: var(--soft); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  a { color: var(--accent); }
+  code { background: var(--soft); padding: 1px 6px; border-radius: 5px; font-size: 15px; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 16px; }
+  th, td { text-align: start; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  footer { margin-top: 40px; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>اختبار «تبيان»</h1>
+  <p class="lede">شكرًا لمشاركتك في تجربة النسخة الأولى. هذه الصفحة تشرح ما نحتاج منك أن تجربه، وكيف ترسل ملاحظاتك.</p>
+
+  <div class="note">
+    <strong>المطلوب الآن: الواجهة والأداء فقط.</strong>
+    هذه الجولة لا تشمل المراجعة الشرعية للنصوص (التفسير، والمعاني، وأحكام التجويد، والتوقيت). نحتاج رأيك في: سهولة الاستخدام، والسرعة، والشكل، والأعطال.
+  </div>
+
+  <h2>١. تثبيت النسخة التجريبية</h2>
+  <table>
+    <tr><th>آيفون</th><td>
+      <ol>
+        <li>ستصلك رسالة دعوة من App Store Connect على بريدك في iCloud. اقبلها.</li>
+        <li>ثبّت تطبيق <a href="https://apps.apple.com/app/testflight/id899247664">TestFlight</a> من App Store.</li>
+        <li>افتح TestFlight، وستجد «تبيان». اضغط «تثبيت».</li>
+      </ol>
+    </td></tr>
+    <tr><th>أندرويد</th><td>
+      <ol>
+        <li>افتح رابط الاختبار الذي أرسلناه لك، واضغط «أصبح مختبرًا».</li>
+        <li>ثبّت «تبيان» من Google Play بالحساب نفسه.</li>
+      </ol>
+    </td></tr>
+  </table>
+
+  <h2>٢. ما نحتاج منك تجربته</h2>
+  <div class="progress" aria-live="polite"><span id="count">٠ من ٠</span><div class="bar"><i id="fill"></i></div></div>
+  <p style="color:var(--muted);font-size:15px">علّم ما جربته. يُحفظ في متصفحك فقط.</p>
+
+  <div id="areas">
+    <section class="area"><h3>أول تشغيل</h3><ul>
+      <li>اختر اللغة، ثم شكل المصحف، ثم الطبعة. هل الخطوات واضحة؟</li>
+      <li>كم استغرق التطبيق ليفتح أول مرة؟ وفي المرات التالية؟</li>
+    </ul></section>
+
+    <section class="area"><h3>القراءة والتقليب</h3><ul>
+      <li>قلّب الصفحات بسرعة يمينًا ويسارًا. هل يوجد تقطيع أو تأخير؟</li>
+      <li>افتح «الفهرس» وانتقل إلى سورة، ثم إلى جزء، ثم إلى صفحة برقمها.</li>
+      <li>المس آية لتظليلها (القراءة اللمسية). هل تختار الآية الصحيحة، حتى في السطور الطويلة؟</li>
+      <li>اضغط مطولًا على آية وجرّب القائمة: نسخ، ومشاركة، وعلامة.</li>
+    </ul></section>
+
+    <section class="area"><h3>تغيير المصاحف</h3><ul>
+      <li>من الإعدادات، بدّل بين مصحف المدينة الحديث (١٤٤١) والقديم (١٤٠٥) والشمرلي.</li>
+      <li>نزّل مصحف رواية (ورش أو قالون أو الدوري أو شعبة) وافتحه.</li>
+      <li>أثناء التنزيل: هل يظهر التقدم؟ هل يكمل لو خرجت من التطبيق؟</li>
+      <li>بعد التبديل، هل تفتح على الصفحة نفسها تقريبًا؟</li>
+    </ul></section>
+
+    <section class="area"><h3>الشكل والألوان</h3><ul>
+      <li>من «شكل المصحف» جرّب الثيمات العشرة والأوضاع الأربعة (فاتح، وأبيض زاهي، وليلي، وأسود).</li>
+      <li>هل يوجد نص صعب القراءة، أو زر لا يظهر، في أي وضع؟</li>
+      <li>جرّب «وضع كبار السن» وتكبير الخط.</li>
+    </ul></section>
+
+    <section class="area"><h3>اللغة</h3><ul>
+      <li>بدّل اللغة إلى الإنجليزية ثم ارجع للعربية. هل ينقلب اتجاه الواجهة صحيحًا؟</li>
+      <li>هل توجد كلمة لم تُترجم، أو نص مقطوع؟</li>
+    </ul></section>
+
+    <section class="area"><h3>الاستماع</h3><ul>
+      <li>شغّل تلاوة من الصفحة، وتابع تظليل الآيات والكلمات.</li>
+      <li>غيّر القارئ، وجرّب التكرار، ومؤقت النوم، والإيقاف المؤقت.</li>
+      <li>أطفئ الشاشة أثناء التلاوة. هل تستمر؟ هل تظهر أزرار التحكم على شاشة القفل؟</li>
+      <li>في مصحف رواية: هل يظهر قراء الروايات الأخرى رمادية؟</li>
+    </ul></section>
+
+    <section class="area"><h3>التجويد والتفسير والبحث</h3><ul>
+      <li>شغّل ألوان التجويد (زر «ج») وقلّب الصفحات. هل بقي التقليب سريعًا؟</li>
+      <li>افتح التفسير لآية، وغيّر الخط وحجمه.</li>
+      <li>ابحث بكلمة، ثم بالمعنى. هل النتائج سريعة؟</li>
+    </ul></section>
+
+    <section class="area"><h3>الحفظ والختمة</h3><ul>
+      <li>ابدأ خطة ختمة، وجرّب التذكير.</li>
+      <li>افتح خريطة الحفظ وجرّب اختبار صفحة.</li>
+    </ul></section>
+
+    <section class="area"><h3>بلا إنترنت</h3><ul>
+      <li>فعّل وضع الطيران. هل يعمل كل ما نزّلته؟ هل تظهر رسالة واضحة لما يحتاج اتصالًا؟</li>
+    </ul></section>
+  </div>
+
+  <h2>٣. كيف ترسل ملاحظتك</h2>
+  <ul>
+    <li><strong>على آيفون:</strong> خذ لقطة شاشة وأنت داخل التطبيق، ثم اضغط «مشاركة مع تطبيق بيتا». تصلنا اللقطة مع ملاحظتك ونوع جهازك.</li>
+    <li><strong>على أندرويد أو آيفون:</strong> افتح <a href="https://github.com/helalrules7/tibyan/issues/new">ملاحظة جديدة على GitHub</a>، أو أرسلها لمن دعاك.</li>
+  </ul>
+  <p>في كل ملاحظة، اكتب:</p>
+  <ol>
+    <li>ما الذي فعلته (الخطوات).</li>
+    <li>ما الذي توقعته، وما الذي حدث.</li>
+    <li>الجهاز، ورقم النسخة (من الإعدادات ← حول التطبيق).</li>
+  </ol>
+
+  <footer>تبيان · <a href="https://github.com/helalrules7/tibyan">المستودع</a> · <a href="https://tibyan.ahmedhelal.dev/privacy/">سياسة الخصوصية</a></footer>
+</main>
+<script>
+  // Checkboxes for each item; ticks kept in this browser only.
+  (function () {
+    var KEY = 'tibyan-testing-v1';
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+    var items = Array.prototype.slice.call(document.querySelectorAll('#areas li'));
+    var digits = function (n) { return String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }); };
+    function update() {
+      var done = items.filter(function (li) { return li.querySelector('input').checked; }).length;
+      document.getElementById('count').textContent = digits(done) + ' من ' + digits(items.length);
+      document.getElementById('fill').style.width = (100 * done / items.length) + '%';
+    }
+    items.forEach(function (li, i) {
+      var text = li.innerHTML;
+      li.innerHTML = '<label><input type="checkbox"><span>' + text + '</span></label>';
+      var box = li.querySelector('input');
+      box.checked = !!saved[i];
+      li.querySelector('span').classList.toggle('done', box.checked);
+      box.addEventListener('change', function () {
+        saved[i] = box.checked;
+        li.querySelector('span').classList.toggle('done', box.checked);
+        try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+        update();
+      });
+    });
+    update();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+ "name": "a restart from the start of a long verse (more words than wait unsure) is repetition, not error",
+ "range": {
+  "verses": [
+   2,
+   4,
+   2,
+   4
+  ]
+ },
+ "steps": [
+  {
+   "say": "والذين يؤمنون بما أنزل إليك وما أنزل من قبلك"
+  },
+  {
+   "say": "والذين يؤمنون بما أنزل إليك وما أنزل من قبلك وبالآخرة هم يوقنون"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": [],
+ "ignored": {
+  "repetition": 9
+ },
+ "accuracy": {
+  "2:4": 1
+ }
+}

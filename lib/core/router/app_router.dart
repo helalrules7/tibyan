@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/assistant/assistant_screen.dart';
+import '../../features/assistant/tajweed_marks_screen.dart';
 import '../../features/hifz/presentation/hifz_map_screen.dart';
+import '../../features/khatma/domain/khatmah.dart' show EntryPoint, enumNamed;
 import '../../features/hifz/presentation/hifz_screen.dart';
 import '../../features/audio/audio_downloads_screen.dart';
 import '../../features/home/home_screen.dart';
@@ -16,6 +21,7 @@ import '../../features/mushaf/presentation/download_all_screen.dart';
 import '../../features/mushaf/presentation/download_screen.dart';
 import '../../features/mushaf/presentation/fawasil_screen.dart';
 import '../../features/mushaf/presentation/index_screen.dart';
+import '../../features/mushaf/data/tajweed.dart';
 import '../../features/mushaf/presentation/mushaf_screen.dart';
 import '../../features/onboarding/onboarding_edition_screen.dart';
 import '../../features/onboarding/onboarding_language_screen.dart';
@@ -24,9 +30,26 @@ import '../../features/settings/appearance_screen.dart';
 import '../../features/settings/player_settings_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../../features/tafsir/tafsir_screen.dart';
+import '../../features/reading/continuous_screen.dart';
+import '../../features/reading/one_verse_screen.dart';
+import '../../features/tasmee/domain/tasmee_session_request.dart';
+import '../../features/tasmee/presentation/tasmee_session_screen.dart';
+import '../../features/tasmee/presentation/tasmee_settings_screen.dart';
+import '../../features/tasmee/presentation/tasmee_setup_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../../features/settings/storage_screen.dart';
 import '../settings/app_settings.dart';
 import '../settings/settings_controller.dart';
+import 'cover_observer.dart';
+import 'keyboard_dismiss.dart';
+
+final appRouterReadyProvider = Provider<Completer<void>>(
+  (ref) => Completer<void>(),
+);
+
+void markAppRouterReady(Completer<void> ready) {
+  if (!ready.isCompleted) ready.complete();
+}
 
 int? _int(GoRouterState s, String key) =>
     int.tryParse(s.uri.queryParameters[key] ?? '');
@@ -34,6 +57,8 @@ int? _int(GoRouterState s, String key) =>
 final appRouterProvider = Provider<GoRouter>(
   (ref) => GoRouter(
     initialLocation: '/splash',
+    // A screen left or returned to never keeps the keyboard up.
+    observers: [KeyboardDismissObserver(), coverObserver],
     // First launch: language, then style and colours, then the edition.
     redirect: (context, state) {
       final done = ref.read(settingsProvider).onboardingDone;
@@ -52,6 +77,21 @@ final appRouterProvider = Provider<GoRouter>(
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/tasmee',
+        builder: (context, state) => const TasmeeSetupScreen(),
+        routes: [
+          GoRoute(
+            path: 'session',
+            builder: (context, state) {
+              final request = state.extra;
+              return request is TasmeeSessionRequest
+                  ? TasmeeSessionScreen(request: request)
+                  : const TasmeeSetupScreen();
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/onboarding/language',
@@ -82,8 +122,16 @@ final appRouterProvider = Provider<GoRouter>(
                 builder: (context, state) => const AppearanceScreen(),
               ),
               GoRoute(
+                path: 'storage',
+                builder: (context, state) => const StorageScreen(),
+              ),
+              GoRoute(
                 path: 'player',
                 builder: (context, state) => const PlayerSettingsScreen(),
+              ),
+              GoRoute(
+                path: 'tasmee',
+                builder: (context, state) => const TasmeeSettingsScreen(),
               ),
             ],
           ),
@@ -101,7 +149,8 @@ final appRouterProvider = Provider<GoRouter>(
       ),
       GoRoute(
         path: '/khatma',
-        builder: (context, state) => const KhatmaScreen(),
+        builder: (context, state) =>
+            KhatmaScreen(selectedPlanId: state.uri.queryParameters['plan']),
         routes: [
           GoRoute(
             path: 'new',
@@ -117,6 +166,57 @@ final appRouterProvider = Provider<GoRouter>(
           ),
         ],
       ),
+      // The reader's helpers, one card each; the first is the tajweed
+      // marks (the rules, their colours and places).
+      GoRoute(
+        path: assistantLocation,
+        builder: (context, state) => const AssistantScreen(),
+        routes: [
+          GoRoute(
+            path: 'tajweed',
+            builder: (context, state) => const TajweedMarksScreen(),
+            routes: [
+              GoRoute(
+                path: 'rule',
+                builder: (context, state) => TajweedRuleScreen(
+                  rule:
+                      TajweedRule.byKey(
+                        state.uri.queryParameters['rule'] ?? '',
+                      ) ??
+                      TajweedRule.madd6,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/verse',
+        builder: (context, state) => OneVerseScreen(
+          surah: _int(state, 's') ?? 1,
+          ayah: _int(state, 'a') ?? 1,
+          entry:
+              enumNamed(
+                EntryPoint.values,
+                state.uri.queryParameters['entry'],
+              ) ??
+              EntryPoint.other,
+        ),
+      ),
+      GoRoute(
+        path: '/read',
+        builder: (context, state) => ContinuousScreen(
+          key: ValueKey(state.uri.toString()),
+          surah: _int(state, 's') ?? 1,
+          ayah: _int(state, 'a') ?? 1,
+          entry:
+              enumNamed(
+                EntryPoint.values,
+                state.uri.queryParameters['entry'],
+              ) ??
+              EntryPoint.other,
+        ),
+      ),
       GoRoute(
         path: '/mushaf',
         builder: (context, state) => MushafScreen(
@@ -127,6 +227,15 @@ final appRouterProvider = Provider<GoRouter>(
           hifzUnit: state.uri.queryParameters['hifz'],
           hifzFrom: state.uri.queryParameters['from'],
           hifzTo: state.uri.queryParameters['to'],
+          listen: state.uri.queryParameters['listen'] == '1',
+          // `entry=`: where the reading was opened from (the reading
+          // tracker counts only past the landing page for some).
+          entry:
+              enumNamed(
+                EntryPoint.values,
+                state.uri.queryParameters['entry'],
+              ) ??
+              EntryPoint.other,
         ),
         routes: [
           GoRoute(

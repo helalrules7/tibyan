@@ -1,7 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../core/backup/backup.dart';
+import '../home/whats_new.dart';
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/app_theme.dart';
@@ -11,6 +21,16 @@ import '../audio/recitation.dart';
 import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/widgets/download_all_button.dart';
 import '../mushaf/presentation/widgets/edition_badge.dart';
+import '../mushaf/presentation/widgets/illuminated_frame.dart'
+    show NumberFormatter;
+
+/// The app's version as built (pubspec.yaml), e.g. `0.4.0 (5)`.
+final appVersionProvider = FutureProvider<String>((ref) async {
+  final info = await PackageInfo.fromPlatform();
+  return info.buildNumber.isEmpty
+      ? info.version
+      : '${info.version} (${info.buildNumber})';
+});
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -68,6 +88,19 @@ class SettingsScreen extends ConsumerWidget {
               }, style: TextStyle(color: t.muted)),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go('/settings/player'),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.graphic_eq),
+              title: Text(l.tasmeeTitle),
+              subtitle: Text(
+                l.tasmeeSettingsNote,
+                style: TextStyle(color: t.muted),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go('/settings/tasmee'),
             ),
           ),
           const SizedBox(height: 8),
@@ -166,6 +199,66 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.highlightDivineNames,
                   onChanged: controller.setHighlightDivineNames,
                 ),
+                SwitchListTile(
+                  title: Text(l.twoPageSpread),
+                  subtitle: Text(
+                    l.twoPageSpreadHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  value: settings.twoPageSpread,
+                  onChanged: controller.setTwoPageSpread,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _SectionTitle(l.focusModeTitle),
+          const _FocusModeCard(),
+          const SizedBox(height: 16),
+          // Here as well as in the player's settings: it also works with
+          // touch reading and «آية آية», with no recitation playing.
+          _SectionTitle(l.sajdahTimer),
+          const _SajdahTimerCard(),
+          const SizedBox(height: 16),
+          _SectionTitle(l.playerStyleLabel),
+          const _PlayerStyleCard(),
+          const SizedBox(height: 16),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.storage_outlined),
+              title: Text(l.storageOpen),
+              subtitle: Text(
+                l.storageOpenHint,
+                style: TextStyle(color: t.muted),
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/settings/storage'),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _SectionTitle(l.backupTitle),
+          Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.ios_share),
+                  title: Text(l.backupExport),
+                  subtitle: Text(
+                    l.backupExportHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  onTap: () => _export(context, ref),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.restore),
+                  title: Text(l.backupImport),
+                  subtitle: Text(
+                    l.backupImportHint,
+                    style: TextStyle(color: t.muted),
+                  ),
+                  onTap: () => _import(context, ref),
+                ),
               ],
             ),
           ),
@@ -185,6 +278,15 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           _SectionTitle(l.aboutTitle),
           Card(
+            child: ListTile(
+              leading: const Icon(Icons.new_releases_outlined),
+              title: Text(l.whatsNewTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showWhatsNew(context),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -193,7 +295,7 @@ class SettingsScreen extends ConsumerWidget {
                   Text(l.aboutBody),
                   const SizedBox(height: 8),
                   Text(
-                    l.versionLabel('0.1.1'),
+                    l.versionLabel(ref.watch(appVersionProvider).value ?? ''),
                     style: TextStyle(color: t.muted),
                   ),
                 ],
@@ -201,6 +303,233 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+Future<void> _export(BuildContext context, WidgetRef ref) async {
+  final l = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final text = await Backup(
+      ref.read(userDatabaseProvider),
+      prefs: ref.read(sharedPreferencesProvider),
+    ).export();
+    final dir = await getTemporaryDirectory();
+    final day = DateTime.now().toIso8601String().substring(0, 10);
+    final file = File('${dir.path}/tibyan-backup-$day.json');
+    await file.writeAsString(text, flush: true);
+    await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
+  } catch (_) {
+    messenger.showSnackBar(SnackBar(content: Text(l.backupFailed)));
+  }
+}
+
+Future<void> _import(BuildContext context, WidgetRef ref) async {
+  final l = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final digits = NumberFormatter(Localizations.localeOf(context));
+  try {
+    final picked = await openFile(
+      acceptedTypeGroups: const [
+        XTypeGroup(label: 'Tibyan backup', extensions: ['json']),
+      ],
+    );
+    if (picked == null) return;
+    final text = utf8.decode(await picked.readAsBytes());
+    final r = await Backup(
+      ref.read(userDatabaseProvider),
+      prefs: ref.read(sharedPreferencesProvider),
+    ).import(text);
+    // The restored settings take effect now.
+    if (r.settings > 0) ref.invalidate(settingsProvider);
+    messenger.showSnackBar(
+      SnackBar(content: Text(l.backupDone(digits(r.added), digits(r.updated)))),
+    );
+  } on BackupException {
+    messenger.showSnackBar(SnackBar(content: Text(l.backupInvalid)));
+  } catch (_) {
+    messenger.showSnackBar(SnackBar(content: Text(l.backupFailed)));
+  }
+}
+
+/// «وضع التركيز»: the switch, how the tools are reached, and how the page
+/// fills the screen.
+class _FocusModeCard extends ConsumerWidget {
+  const _FocusModeCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
+    final muted = TextStyle(color: context.tokens.colors.muted);
+    Widget label(String text) => Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700)),
+      ),
+    );
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: const Icon(Icons.fullscreen),
+            title: Text(l.focusModeTitle),
+            subtitle: Text(l.focusModeHint, style: muted),
+            value: settings.focusMode,
+            onChanged: controller.setFocusMode,
+          ),
+          const Divider(height: 1),
+          label(l.focusToolsLabel),
+          RadioGroup<FocusTools>(
+            groupValue: settings.focusTools,
+            onChanged: (v) => v == null ? null : controller.setFocusTools(v),
+            child: Column(
+              children: [
+                for (final (v, name, hint) in [
+                  (
+                    FocusTools.button,
+                    l.focusToolsButton,
+                    l.focusToolsButtonHint,
+                  ),
+                  (FocusTools.menu, l.focusToolsMenu, l.focusToolsMenuHint),
+                ])
+                  RadioListTile(
+                    value: v,
+                    title: Text(name),
+                    subtitle: Text(hint, style: muted),
+                  ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          label(l.pageFillLabel),
+          RadioGroup<PageFill>(
+            groupValue: settings.pageFill,
+            onChanged: (v) => v == null ? null : controller.setPageFill(v),
+            child: Column(
+              children: [
+                for (final (v, name, hint) in [
+                  (PageFill.lines, l.pageFillLines, l.pageFillLinesHint),
+                  (PageFill.stretch, l.pageFillStretch, l.pageFillStretchHint),
+                  (PageFill.full, l.pageFillFull, l.pageFillFullHint),
+                ])
+                  RadioListTile(
+                    value: v,
+                    title: Text(name),
+                    subtitle: Text(hint, style: muted),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// «مؤقت سجدات التلاوة»: on or off, and the card's countdown.
+class _SajdahTimerCard extends ConsumerWidget {
+  const _SajdahTimerCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = context.tokens.colors;
+    final settings = ref.watch(settingsProvider);
+    final controller = ref.read(settingsProvider.notifier);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile(
+            secondary: ExcludeSemantics(
+              child: SvgPicture.asset(
+                'assets/ornaments/sajdah.svg',
+                height: 24,
+                colorFilter: ColorFilter.mode(t.muted, BlendMode.srcIn),
+              ),
+            ),
+            title: Text(l.sajdahTimer),
+            subtitle: Text(l.sajdahTimerHint, style: TextStyle(color: t.muted)),
+            value: settings.sajdahTimer,
+            onChanged: controller.setSajdahTimer,
+          ),
+          // The length shows only while the timer is on.
+          if (settings.sajdahTimer) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      l.sajdahTimerLength,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final n in sajdahTimerLengths)
+                        ChoiceChip(
+                          label: Text(l.seconds(digits(n))),
+                          selected: settings.sajdahSeconds == n,
+                          onSelected: (_) => controller.setSajdahSeconds(n),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// «شكل المشغل»: how the player over the mushaf looks, with focus mode on
+/// or off.
+class _PlayerStyleCard extends ConsumerWidget {
+  const _PlayerStyleCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final muted = TextStyle(color: context.tokens.colors.muted);
+    return Card(
+      child: RadioGroup<PlayerStyle>(
+        groupValue: ref.watch(settingsProvider.select((s) => s.playerStyle)),
+        onChanged: (v) => v == null
+            ? null
+            : ref.read(settingsProvider.notifier).setPlayerStyle(v),
+        child: Column(
+          children: [
+            for (final (v, name, hint) in [
+              (PlayerStyle.auto, l.playerStyleAuto, l.playerStyleAutoHint),
+              (PlayerStyle.normal, l.playerStyleNormal, null),
+              (PlayerStyle.pill, l.playerStylePill, l.playerStylePillHint),
+              (
+                PlayerStyle.button,
+                l.playerStyleButton,
+                l.playerStyleButtonHint,
+              ),
+            ])
+              RadioListTile(
+                value: v,
+                title: Text(name),
+                subtitle: hint == null ? null : Text(hint, style: muted),
+              ),
+          ],
+        ),
       ),
     );
   }

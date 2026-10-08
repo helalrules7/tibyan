@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/settings/settings_controller.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../assistant/tajweed_marks_screen.dart' show tajweedMarksLocation;
 import '../../data/tajweed.dart';
 import '../../mushaf_providers.dart';
 
@@ -68,9 +70,10 @@ const tajweedLegendOrder = [
   TajweedRule.silent,
 ];
 
-/// A round colour sample on the page's paper.
-class _Swatch extends StatelessWidget {
-  const _Swatch(this.color);
+/// A round colour sample on the page's paper; a crossed circle for a rule
+/// left without colour.
+class TajweedSwatch extends StatelessWidget {
+  const TajweedSwatch(this.color, {super.key});
 
   static const size = 26.0;
 
@@ -122,19 +125,38 @@ class _Legend extends ConsumerWidget {
       controller: scroll,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       children: [
-        Semantics(
-          header: true,
-          child: Text(
-            l.tajweedLegend,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Text(
+                  l.tajweedLegend,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ),
+            // «المزيد»: the tajweed marks in the Assistant (the rules'
+            // places). The sheet closes first.
+            TextButton.icon(
+              key: const ValueKey('tajweed-legend-more'),
+              onPressed: () {
+                final router = GoRouter.of(context);
+                Navigator.of(context).pop();
+                router.push(tajweedMarksLocation);
+              },
+              icon: const Icon(Icons.chevron_right),
+              iconAlignment: IconAlignment.end,
+              label: Text(l.moreLabel),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         for (final rule in tajweedLegendOrder)
           if (tajweedHueOf(rule, hues) case final hue)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: _Swatch(hue?.on(darkPaper: dark)),
+              leading: TajweedSwatch(hue?.on(darkPaper: dark)),
               title: Text(
                 tajweedRuleName(l, rule),
                 style: TextStyle(color: hue?.on(darkPaper: dark) ?? t.muted),
@@ -211,7 +233,7 @@ class TajweedSettings extends ConsumerWidget {
                 ListTile(
                   dense: true,
                   title: Text(tajweedRuleName(l, rule)),
-                  trailing: _Swatch(hue?.on(darkPaper: dark)),
+                  trailing: TajweedSwatch(hue?.on(darkPaper: dark)),
                   onTap: () => _pick(context, ref, rule),
                 ),
             Align(
@@ -278,7 +300,7 @@ class TajweedSettings extends ConsumerWidget {
                       width: selected ? 2.5 : 1,
                     ),
                   ),
-                  child: Center(child: _Swatch(hue?.on(darkPaper: dark))),
+                  child: Center(child: TajweedSwatch(hue?.on(darkPaper: dark))),
                 ),
               ),
             );

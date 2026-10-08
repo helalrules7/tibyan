@@ -1,0 +1,25 @@
+{
+ "name": "a word that is not in the text is an extra word, not shown",
+ "range": {
+  "verses": [
+   2,
+   3,
+   2,
+   3
+  ]
+ },
+ "steps": [
+  {
+   "say": "الذين يؤمنون بالغيب ويقيمون الصلاة دائما ومما رزقناهم ينفقون"
+  }
+ ],
+ "statuses": {
+  "*": "correct"
+ },
+ "extras": [
+  "دائما"
+ ],
+ "accuracy": {
+  "2:3": 1
+ }
+}

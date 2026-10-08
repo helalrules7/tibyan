@@ -128,7 +128,7 @@ class MeaningResultCard extends ConsumerWidget {
                 label: l.verseLabel(name, digits(hit.ayah)),
                 excludeSemantics: true,
                 child: Text(
-                  '${l.surahWord(name)} · ${digits(hit.ayah)}',
+                  '${l.surahWord(name)} | ${digits(hit.ayah)}',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,

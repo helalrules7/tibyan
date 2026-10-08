@@ -14,6 +14,9 @@ abstract interface class ReviewStore {
   Future<List<Source>> sources();
   Future<List<SurahInfo>> surahs();
   Future<Map<ReviewState, int>> counts();
+
+  /// The entry kinds present, in the order they first appear in the book.
+  Future<List<String>> kinds();
   Future<List<EntrySummary>> entries(EntryFilter filter);
 
   /// The entry with its links, or null.

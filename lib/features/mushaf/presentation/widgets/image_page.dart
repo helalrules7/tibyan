@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/settings/app_settings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/tajweed.dart';
@@ -27,7 +28,13 @@ class PageGeometry {
     this.inkBelow = 0,
     this.whole = false,
     this.inkWithoutHeader,
+    this.ownInk,
   });
+
+  /// This page's own ink (image px), when known: a page fitted to the
+  /// height is cropped to it rather than to [ink], which covers every page
+  /// of the edition, and so is drawn larger.
+  final Rect? ownInk;
 
   /// The part of the image drawn; cropping to it never cuts a mark.
   final Rect ink;
@@ -88,22 +95,71 @@ EdgeInsets stripPadding(
 /// screen without stretching the calligraphy. Opening pages and screens
 /// wider than the page are scaled as a whole instead.
 class StripLayout {
-  StripLayout(this.size, this.g, {bool withoutHeader = false})
-    : ink = withoutHeader ? (g.inkWithoutHeader ?? g.ink) : g.ink {
+  StripLayout(
+    this.size,
+    this.g, {
+    bool withoutHeader = false,
+    bool stretch = false,
+    this.fill,
+  }) {
+    final shared = withoutHeader ? (g.inkWithoutHeader ?? g.ink) : g.ink;
+    // Focus mode's full stretch scales a text page on both axes to the
+    // room: never in strips.
+    final full = fill == PageFill.full && !g.whole;
+    strips =
+        !full &&
+        !g.whole &&
+        size.width / shared.width < size.height / shared.height;
+    // Fitted to the height, a page is cropped to its own ink with a margin
+    // (never past the shared crop, which never cuts a mark).
+    final own = g.ownInk;
+    ink = stretch && !strips && !g.whole && own != null
+        ? own.inflate(ownInkMargin).intersect(shared)
+        : shared;
     final byWidth = size.width / ink.width;
     final byHeight = size.height / ink.height;
-    scale = byWidth < byHeight ? byWidth : byHeight;
-    strips = !g.whole && byWidth < byHeight;
+    scale = full
+        ? byHeight
+        : strips || byWidth < byHeight
+        ? byWidth
+        : byHeight;
+    // A text page fitted to the height (a page of a two-page spread, a
+    // wide window) is stretched across toward the frame, a little.
+    // Only where the page itself is drawn by this layout ([stretch]): the
+    // new edition draws its own and uses this one for touches. In focus
+    // mode [fill] decides instead, for every edition alike.
+    final widen = fill == null ? stretch : fill == PageFill.stretch;
+    scaleX = full
+        ? byWidth
+        : widen && !strips && !g.whole
+        ? math.min(byWidth, scale * (1 + maxStretch))
+        : scale;
     offset = Offset(
-      (size.width - ink.width * scale) / 2,
+      (size.width - ink.width * scaleX) / 2,
       (size.height - ink.height * scale) / 2,
     );
   }
 
+  /// Focus mode's choice of how the page fills the room; null outside it.
+  final PageFill? fill;
+
+  /// How much wider than tall a page fitted to the height may be drawn,
+  /// to fill the width: enough for a spread's pages, not enough to change
+  /// the calligraphy's look.
+  static const maxStretch = 0.12;
+
+  /// Room kept around a page's own ink (image px): its marks stay clear of
+  /// the frame.
+  static const ownInkMargin = 8.0;
+
   final Size size;
   final PageGeometry g;
-  final Rect ink;
+  late final Rect ink;
+
+  /// Image px to screen: [scale] down (and across in strips), [scaleX]
+  /// across when the page is fitted to the height.
   late final double scale;
+  late final double scaleX;
   late final bool strips;
   late final Offset offset;
 
@@ -175,7 +231,12 @@ class StripLayout {
   }
 
   Offset toScreen(Offset p, {int? line}) {
-    if (!strips) return (p - ink.topLeft) * scale + offset;
+    if (!strips) {
+      return Offset(
+        (p.dx - ink.left) * scaleX + offset.dx,
+        (p.dy - ink.top) * scale + offset.dy,
+      );
+    }
     final j = line ?? lineOfImageY(p.dy);
     return Offset(
       (p.dx - ink.left) * scale,
@@ -206,7 +267,12 @@ class StripLayout {
   /// In strips, a touch in the gap around a line is taken to the nearest
   /// edge of that line's band: the screen there has no image of its own.
   Offset toImage(Offset p) {
-    if (!strips) return (p - offset) / scale + ink.topLeft;
+    if (!strips) {
+      return Offset(
+        (p.dx - offset.dx) / scaleX + ink.left,
+        (p.dy - offset.dy) / scale + ink.top,
+      );
+    }
     final j = lineAt(p.dy);
     return Offset(
       p.dx / scale + ink.left,
@@ -343,7 +409,7 @@ class StripLayout {
         Rect.fromLTWH(
           offset.dx,
           offset.dy,
-          ink.width * scale,
+          ink.width * scaleX,
           ink.height * scale,
         ),
         paint,
@@ -497,6 +563,8 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
               box.biggest,
               data.geometry,
               withoutHeader: x.ornateOpening,
+              stretch: true,
+              fill: x.fill,
             );
             // By the line first: the screen between two lines, and between
             // two words, belongs to the nearest.
@@ -734,11 +802,15 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                       final v = x.onVerseTap == null
                           ? null
                           : verseAt(d.localPosition);
-                      v != null ? x.onVerseTap!(v) : x.onTap();
+                      v != null
+                          ? x.onVerseTap!(v, layout.toImage(d.localPosition))
+                          : x.onTap();
                     },
                     onLongPressStart: (d) {
                       final v = verseAt(d.localPosition);
-                      if (v != null) x.onVerseLongPress(v);
+                      v != null
+                          ? x.onVerseLongPress(v)
+                          : x.onPageLongPress?.call();
                     },
                     child: Semantics(
                       label: l.pageOf('${widget.page}'),
@@ -782,7 +854,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                                   for (final e in markers.entries)
                                     (e.value, layout.toScreenRect(e.value)),
                                 ],
-                          paper: tokens.colors.paper,
+                          paper: PageGround.of(context),
                           line: tokens.colors.border,
                           divineNames: x.divineNames,
                           divineColor: x.divineColor,
@@ -805,6 +877,7 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
                       (k, layout.toScreenRect(r)),
                   ]),
                   markAction: l.markThisVerse,
+                  listenAction: l.listenFromVerse,
                 ),
                 ...handles,
               ],
@@ -822,7 +895,7 @@ List<(Rect, Color)> tajweedOf(PageInteraction x) {
   final colour = x.tajweedColor;
   if (colour == null || x.tajweed.isEmpty) return const [];
   return [
-    for (final (rule, r) in parseTajweedRects(x.tajweed))
+    for (final (rule, r) in tajweedRectsOf(x.tajweed))
       if (colour(rule) case final c?) (r, c),
   ];
 }
@@ -946,7 +1019,14 @@ class _ImagePagePainter extends CustomPainter {
       canvas.drawImageRect(image, r, layout.toScreenRect(r), tint);
     }
     for (final (r, n, marked) in markers) {
-      look?.paintOver(canvas, r.center, r.shortestSide / 2, n, marked: marked);
+      look?.paintOver(
+        canvas,
+        r.center,
+        r.shortestSide / 2,
+        n,
+        marked: marked,
+        printed: r,
+      );
     }
     if (hidden.isNotEmpty) {
       final cover = Paint()..color = paper;
@@ -974,6 +1054,7 @@ class _ImagePagePainter extends CustomPainter {
           r.shortestSide / 2,
           n,
           marked: marked,
+          printed: r,
         );
       }
     }
@@ -985,6 +1066,9 @@ class _ImagePagePainter extends CustomPainter {
       old.alphaInk != alphaInk ||
       old.layout.size != layout.size ||
       old.layout.ink != layout.ink ||
+      old.layout.scale != layout.scale ||
+      old.layout.scaleX != layout.scaleX ||
+      old.layout.strips != layout.strips ||
       old.ink != ink ||
       old.highlight != highlight ||
       old.word != word ||

@@ -1,0 +1,24 @@
+{
+ "name": "a word passed over is skipped",
+ "range": {
+  "verses": [
+   2,
+   3,
+   2,
+   3
+  ]
+ },
+ "steps": [
+  {
+   "say": "الذين يؤمنون ويقيمون الصلاة ومما رزقناهم ينفقون"
+  }
+ ],
+ "statuses": {
+  "*": "correct",
+  "2:3:3": "skipped"
+ },
+ "extras": [],
+ "accuracy": {
+  "2:3": 0.875
+ }
+}

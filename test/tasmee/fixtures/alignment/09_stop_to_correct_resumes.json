@@ -1,0 +1,39 @@
+{
+ "name": "stop to correct: reading the word corrects it and the reading goes on",
+ "range": {
+  "verses": [
+   2,
+   2,
+   2,
+   2
+  ]
+ },
+ "options": {
+  "onError": "stopToCorrect"
+ },
+ "steps": [
+  {
+   "say": "ذلك الكتاب لا شك فيه"
+  },
+  {
+   "say": "لا ريب فيه هدى للمتقين"
+  }
+ ],
+ "statuses": {
+  "*": "correct",
+  "2:2:4": "correctedAfterError"
+ },
+ "ignored": {
+  "whileStopped": 1,
+  "repetition": 1
+ },
+ "accuracy": {
+  "2:2": 0.857
+ },
+ "corrected": {
+  "2:2": 1
+ },
+ "completed": [
+  "2:2"
+ ]
+}

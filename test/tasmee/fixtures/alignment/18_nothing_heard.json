@@ -1,0 +1,22 @@
+{
+ "name": "nothing heard: every word stays hidden",
+ "range": {
+  "surah": 112
+ },
+ "steps": [
+  {
+   "say": "أعوذ بالله من الشيطان الرجيم"
+  },
+  {
+   "finish": true
+  }
+ ],
+ "statuses": {
+  "*": "hidden"
+ },
+ "extras": [],
+ "ignored": {
+  "preamble": 5
+ },
+ "completed": []
+}

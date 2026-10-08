@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import '../../../core/db/content_database.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../audio/timing_updates.dart';
+import 'riwaya_data.dart';
+import 'tajweed_index.dart';
 
 /// First verse of a juz, for the juz index.
 class JuzStart {
@@ -31,10 +33,33 @@ class MushafRepository {
 
   /// Verses on a page of the given edition, in order. In the Shamarly
   /// edition this includes a verse that started on the page before.
+  ///
+  /// A riwaya edition's pages are in its pack: with [riwaya] (that
+  /// edition's data), the Hafs verses its page holds; without it, none.
   Future<List<AyahRow>> ayahsOnPage(
     int page, [
     MushafEdition edition = MushafEdition.madina1441,
-  ]) =>
+    RiwayaData? riwaya,
+  ]) async {
+    if (edition.isRiwaya) {
+      if (riwaya == null) return const [];
+      final on = riwaya.versesTouching(page);
+      if (on.isEmpty) return const [];
+      final surahs = {for (final k in on) k.surah};
+      final rows =
+          await (_db.select(_db.ayah)
+                ..where((t) => t.surah.isIn(surahs))
+                ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+              .get();
+      return [
+        for (final r in rows)
+          if (riwaya.hafsOnPage(r.surah, r.number, page)) r,
+      ];
+    }
+    return _hafsAyahsOnPage(page, edition);
+  }
+
+  Future<List<AyahRow>> _hafsAyahsOnPage(int page, MushafEdition edition) =>
       (_db.select(_db.ayah)
             ..where(
               (t) => switch (edition) {
@@ -55,6 +80,18 @@ class MushafRepository {
       (_db.select(_db.ayah)
             ..where((t) => t.surah.equals(surah))
             ..orderBy([(t) => OrderingTerm.asc(t.number)]))
+          .get();
+
+  /// A verse by its row id (1 … 6236, in mushaf order).
+  Future<AyahRow> ayahById(int id) =>
+      (_db.select(_db.ayah)..where((t) => t.id.equals(id))).getSingle();
+
+  /// The verses of prostration (the `sajda` column, from Tanzil's
+  /// metadata), in mushaf order.
+  Future<List<AyahRow>> sajdaVerses() =>
+      (_db.select(_db.ayah)
+            ..where((t) => t.sajda.isNotNull())
+            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
           .get();
 
   Future<AyahRow> ayah(int surah, int number) => (_db.select(
@@ -115,6 +152,45 @@ class MushafRepository {
             ]))
           .get();
 
+  /// Word boxes of verses [from] to [to] of [surah] on the new edition's
+  /// pages (1441H), in reading order.
+  Future<List<WordBoxRow>> wordBoxesOfVerses(int surah, int from, int to) =>
+      (_db.select(_db.wordBox)
+            ..where(
+              (t) => t.surah.equals(surah) & t.ayah.isBetweenValues(from, to),
+            )
+            ..orderBy([
+              (t) => OrderingTerm.asc(t.ayah),
+              (t) => OrderingTerm.asc(t.word),
+            ]))
+          .get();
+
+  /// The cuts between the lines of pages [from] to [to] of [edition], by
+  /// page (as [lineCuts]; pages 1 and 2 have none).
+  Future<Map<int, List<double>>> lineCutsOfPages(
+    String edition,
+    int from,
+    int to,
+  ) async {
+    final rows =
+        await (_db.select(_db.lineCut)
+              ..where(
+                (t) =>
+                    t.edition.equals(edition) &
+                    t.page.isBetweenValues(from, to),
+              )
+              ..orderBy([
+                (t) => OrderingTerm.asc(t.page),
+                (t) => OrderingTerm.asc(t.gap),
+              ]))
+            .get();
+    final out = <int, List<double>>{};
+    for (final r in rows) {
+      (out[r.page] ??= []).add(r.y);
+    }
+    return out;
+  }
+
   /// The 14 cuts between the lines of a page, top to bottom; empty for
   /// pages 1 and 2.
   Future<List<double>> lineCuts(String edition, int page) async {
@@ -139,6 +215,86 @@ class MushafRepository {
         )
         .getSingleOrNull();
     return row?.read<String>('data') ?? '';
+  }
+
+  /// The Hafs tajweed letters of verses [from]..[to] of [surah]
+  /// (`tajweed_letter`): (verse, word, letter, marks only, rule key).
+  Future<List<(int, int, int, bool, String)>> tajweedLetters(
+    int surah,
+    int from,
+    int to,
+  ) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT ayah, word, letter, part, rule FROM tajweed_letter '
+          "WHERE riwaya = 'hafs' AND surah = ? AND ayah BETWEEN ? AND ? "
+          'ORDER BY ayah, word, letter',
+          variables: [
+            Variable.withInt(surah),
+            Variable.withInt(from),
+            Variable.withInt(to),
+          ],
+        )
+        .get();
+    return [
+      for (final r in rows)
+        (
+          r.read<int>('ayah'),
+          r.read<int>('word'),
+          r.read<int>('letter'),
+          r.read<String>('part') == 'marks',
+          r.read<String>('rule'),
+        ),
+    ];
+  }
+
+  /// For each tajweed rule key of the Hafs data (`tajweed_letter`): the
+  /// verses it falls in and the letters it colours.
+  Future<Map<String, TajweedRuleCount>> tajweedRuleCounts() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT rule, COUNT(*) AS letters, '
+          'COUNT(DISTINCT surah * 1000 + ayah) AS verses FROM tajweed_letter '
+          "WHERE riwaya = 'hafs' GROUP BY rule",
+        )
+        .get();
+    return {
+      for (final r in rows)
+        r.read<String>('rule'): (
+          verses: r.read<int>('verses'),
+          letters: r.read<int>('letters'),
+        ),
+    };
+  }
+
+  /// The verses the Hafs tajweed rule [ruleKey] falls in, in mushaf order,
+  /// each with its letters of the rule, its text and its pages.
+  Future<List<TajweedPlace>> tajweedPlaces(String ruleKey) async {
+    final rows = await _db
+        .customSelect(
+          'SELECT t.surah AS surah, t.ayah AS ayah, a.display_text AS text, '
+          'a.page AS p1441, a.page_1405 AS p1405, a.page_shamarly AS psh, '
+          "group_concat(t.word || ':' || t.letter || ':' || t.part, ' ') "
+          'AS letters '
+          'FROM tajweed_letter t '
+          'JOIN ayah a ON a.surah = t.surah AND a.number = t.ayah '
+          "WHERE t.riwaya = 'hafs' AND t.rule = ? "
+          'GROUP BY t.surah, t.ayah ORDER BY a.id',
+          variables: [Variable.withString(ruleKey)],
+        )
+        .get();
+    return [
+      for (final r in rows)
+        TajweedPlace(
+          surah: r.read<int>('surah'),
+          ayah: r.read<int>('ayah'),
+          text: r.read<String>('text'),
+          letters: TajweedPlace.parseLetters(r.read<String>('letters')),
+          page1441: r.read<int>('p1441'),
+          page1405: r.read<int>('p1405'),
+          pageShamarly: r.read<int>('psh'),
+        ),
+    ];
   }
 
   Future<List<LineOverflowRow>> lineOverflow(int page) =>
@@ -241,6 +397,19 @@ class MushafRepository {
       _db.commentary,
     )..where((t) => t.surah.equals(surah) & t.ayah.equals(ayah))).get();
     return {for (final r in rows) r.sourceId: r};
+  }
+
+  /// The entries of [sourceIds] for every verse of [surah], keyed by
+  /// (source id, verse).
+  Future<Map<(int, int), CommentaryRow>> commentaryOfSurah(
+    int surah,
+    List<int> sourceIds,
+  ) async {
+    if (sourceIds.isEmpty) return const {};
+    final rows = await (_db.select(
+      _db.commentary,
+    )..where((t) => t.surah.equals(surah) & t.sourceId.isIn(sourceIds))).get();
+    return {for (final r in rows) (r.sourceId, r.ayah): r};
   }
 
   /// Every entry of the given texts, for searching by meaning.

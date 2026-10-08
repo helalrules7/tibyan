@@ -232,6 +232,41 @@ class ExportPackTest(unittest.TestCase):
         with self.assertRaisesRegex(export_pack.ExportError, 'audit'):
             export_pack.export(self.path, self.dir / 'p.pack.db')
 
+    def test_test_drafts_exports_every_entry_stamped(self):
+        self.review(self.ids[0])
+        out = self.dir / 'test.pack.db'
+        index = export_pack.export(self.path, out, test_drafts=True)
+        pack = sqlite3.connect(out)
+        meta = dict(pack.execute('SELECT * FROM pack_index'))
+        self.assertEqual(meta['status'], export_pack.TEST_STATUS)
+        self.assertEqual(index['entries'], 3)
+        self.assertEqual(index['entries_reviewed'], 1)
+        self.assertEqual(pack.execute('SELECT title FROM source').fetchone()[0],
+                         'كتاب تجريبي' + export_pack.TEST_TITLE_SUFFIX)
+        rows = pack.execute('SELECT id, text, editor, reviewer FROM entry ORDER BY seq').fetchall()
+        # Text byte for byte; a draft's importer is its editor, its reviewer empty.
+        self.assertEqual([r[1] for r in rows], ['نص تجريبي 1', 'نص تجريبي 2', 'نص تجريبي 3'])
+        self.assertEqual(rows[0][2:], ('محرر', 'مراجع'))
+        self.assertEqual(rows[1][2:], ('script:test', ''))
+        self.assertEqual(pack.execute('SELECT count(*) FROM entry_link').fetchone()[0], 3)
+        pack.close()
+
+    def test_test_drafts_refuses_content_off_its_hash(self):
+        self.db.execute('UPDATE entry_link SET ayah_from = 7, ayah_to = 7 WHERE entry_id = ?',
+                        (self.ids[1],))
+        self.db.commit()
+        with self.assertRaisesRegex(export_pack.ExportError, 'does not match its hash'):
+            export_pack.export(self.path, self.dir / 't.pack.db', test_drafts=True)
+
+    def test_normal_export_never_stamped(self):
+        self.review(self.ids[0])
+        out = self.dir / 'p.pack.db'
+        export_pack.export(self.path, out)
+        pack = sqlite3.connect(out)
+        self.assertNotIn('status', dict(pack.execute('SELECT * FROM pack_index')))
+        self.assertEqual(pack.execute('SELECT title FROM source').fetchone()[0], 'كتاب تجريبي')
+        pack.close()
+
     def test_schema_enforces_the_rules(self):
         with self.assertRaises(sqlite3.IntegrityError):  # reviewer == editor
             self.db.execute("UPDATE entry SET state = 'reviewed', editor = 'أ', reviewer = 'أ' "

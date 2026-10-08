@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
-import 'catchword_view.dart';
 import 'illuminated_frame.dart';
 import 'theme_art.dart';
 import 'opening_art.dart';
@@ -13,10 +12,10 @@ import 'opening_art.dart';
 import 'raster_frame.dart';
 
 /// The page in a heritage theme, laid out as approved: the juz ✦ hizb ✦
-/// surah cartouche above the frame, the theme's frame around the page,
-/// the page number in the theme's verse marker below it (with the quarter
-/// that starts on the page and the next page's first word on either
-/// side), and the reading tools under it.
+/// surah cartouche above the frame, the theme's frame around the page, and
+/// the page number in the theme's verse marker below it. The quarter that
+/// starts on the page, the next page's first word and the reading tools
+/// are in the screen's reading bar, under the pages.
 class ArtPageFrame extends StatelessWidget {
   const ArtPageFrame({
     super.key,
@@ -26,18 +25,22 @@ class ArtPageFrame extends StatelessWidget {
     this.onJuzTap,
     this.onHizbTap,
     this.onSurahTap,
+    this.onSurahLongPress,
+    this.onBannerLongPress,
     this.onPageTap,
-    this.tools,
     this.linePadding,
-    this.showCatchword = true,
   });
 
   static const cartoucheSpace = 50.0;
   static const numberSpace = 40.0;
-  static const toolsSpace = 26.0;
 
-  /// Room between the frame and the page's text.
+  /// Room between the frame and the page's text on the ornate pages.
   static const gap = 8.0;
+
+  /// Room between the frame's inner edge, on each side, and the page on
+  /// a text page: small, since the page keeps its own margin around its
+  /// ink, and the same on every side.
+  static const clearance = 4.0;
 
   /// Null while the art loads.
   final ThemeArtPictures? art;
@@ -46,11 +49,15 @@ class ArtPageFrame extends StatelessWidget {
   final VoidCallback? onJuzTap;
   final VoidCallback? onHizbTap;
   final VoidCallback? onSurahTap;
+
+  /// A long press on the surah's name (shares the surah as pictures).
+  final VoidCallback? onSurahLongPress;
+
+  /// A long press on a surah's banner inside the page, with its number.
+  final void Function(int surah)? onBannerLongPress;
   final VoidCallback? onPageTap;
 
-  final Widget? tools;
   final EdgeInsets Function(Size page)? linePadding;
-  final bool showCatchword;
 
   @override
   Widget build(BuildContext context) {
@@ -61,17 +68,15 @@ class ArtPageFrame extends StatelessWidget {
 
     final framed = LayoutBuilder(
       builder: (context, box) {
-        final inset = art?.layout(box.biggest).inset ?? 20;
-        final pad = inset + gap;
+        final insets =
+            art?.layout(box.biggest).insets ?? const EdgeInsets.all(20);
+        final pad = insets + const EdgeInsets.all(clearance);
         final linePad =
-            linePadding?.call(
-              Size(box.maxWidth - 2 * pad, box.maxHeight - 2 * pad),
-            ) ??
-            EdgeInsets.zero;
+            linePadding?.call(pad.deflateSize(box.biggest)) ?? EdgeInsets.zero;
         final slot =
-            (box.maxHeight - 2 * pad - linePad.vertical) /
+            (box.maxHeight - pad.vertical - linePad.vertical) /
             IlluminatedFrame.lines;
-        final top = pad + linePad.top;
+        final top = pad.top + linePad.top;
         return Stack(
           clipBehavior: Clip.none,
           children: [
@@ -79,20 +84,24 @@ class ArtPageFrame extends StatelessWidget {
               child: RasterFrame(
                 cache:
                     'art|${t.paper.toARGB32()}|${identityHashCode(art)}'
-                    '|$gap',
+                    '|$clearance',
                 painter: ArtFramePainter(art: art, paper: t.paper),
               ),
             ),
             Positioned.fill(
-              child: Padding(padding: EdgeInsets.all(pad), child: child),
+              child: Padding(padding: pad, child: child),
             ),
             for (final b in info?.banners ?? const <SurahBanner>[])
               Positioned(
                 top: top + b.line * slot,
-                left: pad - 4,
-                right: pad - 4,
+                left: pad.left,
+                right: pad.right,
                 height: slot * b.slots,
-                child: ArtSurahBanner(banner: b, art: art),
+                child: surahBannerGestures(
+                  ArtSurahBanner(banner: b, art: art),
+                  b.number,
+                  onBannerLongPress,
+                ),
               ),
           ],
         );
@@ -124,6 +133,7 @@ class ArtPageFrame extends StatelessWidget {
                           bold: true,
                           fontSize: 16,
                           onTap: onSurahTap,
+                          onLongPress: onSurahLongPress,
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -151,73 +161,17 @@ class ArtPageFrame extends StatelessWidget {
         Expanded(child: framed),
         SizedBox(
           height: numberSpace,
-          child: Stack(
-            children: [
-              if (info != null)
-                Center(
+          child: info == null
+              ? null
+              : Center(
                   child: ArtPageNumber(
                     art: art,
                     page: info.page,
                     onTap: onPageTap,
                   ),
                 ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    // Start side (right in Arabic): the quarter that begins
-                    // on this page, so the reader notices it.
-                    if (info != null && info.quarters.isNotEmpty)
-                      QuarterLabel(
-                        text: quarterName(
-                          l,
-                          digits,
-                          info.quarters.last.quarter,
-                        ),
-                        color: t.muted,
-                      ),
-                    const Spacer(),
-                    if (showCatchword && (info?.hasCatchword ?? false))
-                      _Catchword(info!.catchword, page: info.page),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: toolsSpace,
-          child: tools == null ? null : Center(child: tools),
         ),
       ],
-    );
-  }
-}
-
-class _Catchword extends StatelessWidget {
-  const _Catchword(this.text, {this.page});
-
-  final String? text;
-
-  /// The page it stands under; with it, the Shamarly catchword is cut
-  /// from the next page's image ([CatchwordView]).
-  final int? page;
-
-  @override
-  Widget build(BuildContext context) {
-    final style = TextStyle(
-      fontFamily: 'UthmanicHafs',
-      fontSize: 15,
-      height: 1.4,
-      color: context.tokens.colors.muted,
-    );
-    if (page != null) {
-      return CatchwordView(page: page!, text: text, style: style);
-    }
-    return Text(
-      text!,
-      semanticsLabel: AppLocalizations.of(context).catchwordLabel(text!),
-      style: style,
     );
   }
 }
@@ -229,12 +183,14 @@ class _SmallTap extends StatelessWidget {
     required this.label,
     required this.fontSize,
     this.onTap,
+    this.onLongPress,
     this.bold = false,
   });
 
   final String label;
   final double fontSize;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final bool bold;
 
   @override
@@ -243,9 +199,11 @@ class _SmallTap extends StatelessWidget {
     label: label,
     excludeSemantics: true,
     onTap: onTap,
+    onLongPress: onLongPress,
     child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Text(
@@ -461,9 +419,6 @@ class ArtOrnateFrame extends StatelessWidget {
     required this.child,
     this.page,
     this.onPageTap,
-    this.catchword,
-    this.catchwordSpace = true,
-    this.tools,
   });
 
   final ThemeArtPictures? art;
@@ -472,9 +427,6 @@ class ArtOrnateFrame extends StatelessWidget {
   final Widget child;
   final int? page;
   final VoidCallback? onPageTap;
-  final String? catchword;
-  final bool catchwordSpace;
-  final Widget? tools;
 
   @override
   Widget build(BuildContext context) {
@@ -537,50 +489,16 @@ class ArtOrnateFrame extends StatelessWidget {
               );
             },
           );
-    final catchwordText = catchword == null
-        ? null
-        : _Catchword(catchword, page: page);
+    if (page == null) return body;
     return Column(
       children: [
         Expanded(child: body),
-        if (page != null) ...[
-          SizedBox(
-            height: ArtPageFrame.numberSpace,
-            child: Stack(
-              children: [
-                Center(
-                  child: ArtPageNumber(art: art, page: page!, onTap: onPageTap),
-                ),
-                Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: catchwordText,
-                  ),
-                ),
-              ],
-            ),
+        SizedBox(
+          height: ArtPageFrame.numberSpace,
+          child: Center(
+            child: ArtPageNumber(art: art, page: page!, onTap: onPageTap),
           ),
-          SizedBox(
-            height: ArtPageFrame.toolsSpace,
-            child: tools == null ? null : Center(child: tools),
-          ),
-        ] else if (catchwordSpace)
-          SizedBox(
-            height: IlluminatedFrame.catchwordSpace,
-            child: Stack(
-              children: [
-                if (tools != null) Center(child: tools),
-                Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: catchwordText,
-                  ),
-                ),
-              ],
-            ),
-          ),
+        ),
       ],
     );
   }

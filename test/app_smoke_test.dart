@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tibyan/features/home/whats_new.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tibyan/app.dart';
 import 'package:tibyan/core/flags/feature_flags.dart';
@@ -18,6 +19,8 @@ void main() {
     SharedPreferences.setMockInitialValues({
       'settings.language': 'ar',
       'settings.onboardingDone': true,
+      // Up to date: no «what's new» over the home screen.
+      whatsNewSeenKey: whatsNewId,
     });
     final registry = await ThemeRegistry.load(rootBundle);
     final flags = await FeatureFlags.load(rootBundle);

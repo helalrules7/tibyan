@@ -1,0 +1,30 @@
+{
+ "name": "a word passed over and then read after all is corrected",
+ "range": {
+  "verses": [
+   2,
+   3,
+   2,
+   3
+  ]
+ },
+ "steps": [
+  {
+   "say": "الذين يؤمنون ويقيمون الصلاة"
+  },
+  {
+   "say": "بالغيب ويقيمون الصلاة ومما رزقناهم ينفقون"
+  }
+ ],
+ "statuses": {
+  "*": "correct",
+  "2:3:3": "correctedAfterError"
+ },
+ "extras": [],
+ "accuracy": {
+  "2:3": 0.875
+ },
+ "corrected": {
+  "2:3": 1
+ }
+}

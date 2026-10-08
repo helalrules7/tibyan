@@ -116,25 +116,30 @@ class RealPagePreview extends ConsumerWidget {
           .watch(themeArtProvider((style: style.id, mode: mode)))
           .value;
       ready = ready && art != null;
-      final inset = art?.layout(_artSize).inset ?? style.art!.band;
+      final insets =
+          art?.layout(_artSize).insets ?? EdgeInsets.all(style.art!.band);
       body = FittedBox(
         child: SizedBox.fromSize(
           size: _artSize,
           child: CustomPaint(
             painter: ArtFramePainter(art: art, paper: t.paper),
-            child: Padding(padding: EdgeInsets.all(inset + 12), child: inked),
+            child: Padding(
+              padding: insets + const EdgeInsets.all(12),
+              child: inked,
+            ),
           ),
         ),
       );
     } else {
       // Zakhrafa: its own illuminated frame, drawn at the same size.
-      ready = ready && ref.watch(frameImagesProvider).value != null;
+      ready = ready && ref.watch(frameImagesProvider(t.artTint)).value != null;
       body = FittedBox(
         child: SizedBox.fromSize(
           size: _artSize,
           child: ZakhrafaFramePreview(
             paper: t.paper,
             rule: t.marker,
+            tint: t.artTint,
             child: Padding(padding: const EdgeInsets.all(6), child: inked),
           ),
         ),

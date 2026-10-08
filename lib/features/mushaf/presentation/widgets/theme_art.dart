@@ -202,12 +202,19 @@ class ArtPlacement {
 }
 
 class ArtFrameLayout {
-  const ArtFrameLayout(this.placements, this.inset);
+  const ArtFrameLayout(this.placements, this.insets);
 
   final List<ArtPlacement> placements;
 
-  /// Depth of the frame on every side: the page's paper starts here.
-  final double inset;
+  /// Depth of the frame on each side: the page's paper starts here. The
+  /// sides of a frame can be thinner than its top and bottom.
+  final EdgeInsets insets;
+
+  /// The frame's deepest side.
+  double get inset => math.max(
+    math.max(insets.left, insets.right),
+    math.max(insets.top, insets.bottom),
+  );
 }
 
 /// A frame from its slices at [size]: the top-left corner mirrored into
@@ -279,7 +286,10 @@ ArtFrameLayout sliceFrameLayout(
       flipY: true,
     ),
   ]);
-  return ArtFrameLayout(out, math.max(dh, dv));
+  return ArtFrameLayout(
+    out,
+    EdgeInsets.symmetric(horizontal: dv, vertical: dh),
+  );
 }
 
 /// A frame with no slices at [size]: the whole drawing at one scale (the
@@ -305,15 +315,23 @@ ArtFrameLayout wholeFrameLayout(
   final srcY = [0.0, cy, view.height - cy, view.height];
   final dstX = [0.0, cx * k, w - cx * k, w];
   final dstY = [0.0, cy * k, h - cy * k, h];
-  return ArtFrameLayout([
-    for (var j = 0; j < 3; j++)
-      for (var i = 0; i < 3; i++)
-        ArtPlacement(
-          ArtFramePiece.whole,
-          Rect.fromLTRB(dstX[i], dstY[j], dstX[i + 1], dstY[j + 1]),
-          src: Rect.fromLTRB(srcX[i], srcY[j], srcX[i + 1], srcY[j + 1]),
-        ),
-  ], math.max(slot.left, slot.top) * k);
+  return ArtFrameLayout(
+    [
+      for (var j = 0; j < 3; j++)
+        for (var i = 0; i < 3; i++)
+          ArtPlacement(
+            ArtFramePiece.whole,
+            Rect.fromLTRB(dstX[i], dstY[j], dstX[i + 1], dstY[j + 1]),
+            src: Rect.fromLTRB(srcX[i], srcY[j], srcX[i + 1], srcY[j + 1]),
+          ),
+    ],
+    EdgeInsets.fromLTRB(
+      slot.left * k,
+      slot.top * k,
+      (view.width - slot.right) * k,
+      (view.height - slot.bottom) * k,
+    ),
+  );
 }
 
 /// Draws [src] of [picture] (all of it by default) into [dst], mirrored if
@@ -353,9 +371,15 @@ class ArtFramePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final art = this.art;
     final layout = art?.layout(size);
-    final inset = layout?.inset ?? 20;
+    final insets = layout?.insets ?? const EdgeInsets.all(20);
+    // From a pixel under the frame's inner edge, so no seam shows.
     canvas.drawRect(
-      (Offset.zero & size).deflate(math.max(0, inset - 1)),
+      Rect.fromLTRB(
+        math.max(0, insets.left - 1),
+        math.max(0, insets.top - 1),
+        size.width - math.max(0, insets.right - 1),
+        size.height - math.max(0, insets.bottom - 1),
+      ),
       Paint()..color = paper,
     );
     if (art == null) return;

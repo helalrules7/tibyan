@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The paper of the app icon (tools/photos/first_icon.png). -->
+    <color name="ic_launcher_background">#F7EDDE</color>
+    <!-- The launch screen: the icon's paper (values-night: the Tibyan theme's night ground). -->
+    <color name="launch_background">#F7EDDE</color>
+</resources>

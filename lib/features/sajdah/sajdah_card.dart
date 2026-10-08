@@ -1,0 +1,349 @@
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../core/settings/settings_controller.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/reveal.dart';
+import '../../l10n/app_localizations.dart';
+import '../mushaf/presentation/widgets/illuminated_frame.dart'
+    show NumberFormatter;
+import 'sajdah_positions.dart';
+import 'supplications.dart';
+
+/// What brought the card up: the recitation reaching the end of a verse
+/// of prostration, or the reader moving to the verse after one.
+enum SajdahFrom { listening, reading }
+
+/// The sajdah card being shown.
+@immutable
+class SajdahCard {
+  const SajdahCard({
+    required this.verse,
+    required this.seconds,
+    required this.from,
+    required this.id,
+  });
+
+  /// The verse of prostration, in the edition's count.
+  final SajdahKey verse;
+
+  /// The countdown's length.
+  final int seconds;
+  final SajdahFrom from;
+
+  /// Each card shown gets its own id, so its countdown starts afresh.
+  final int id;
+}
+
+final sajdahCardProvider = NotifierProvider<SajdahCardController, SajdahCard?>(
+  SajdahCardController.new,
+);
+
+/// Shows the sajdah card and counts it down («مؤقت سجدات التلاوة»). The
+/// countdown runs here, not in the card, so that a recitation paused at a
+/// verse of prostration goes on even when no screen shows the card.
+class SajdahCardController extends Notifier<SajdahCard?> {
+  Timer? _timer;
+  VoidCallback? _onClose;
+  int _ids = 0;
+
+  @override
+  SajdahCard? build() {
+    ref.onDispose(() => _timer?.cancel());
+    return null;
+  }
+
+  /// Shows the card for [verse] with the reader's countdown. [onClose]
+  /// runs once, when the countdown ends or the reader taps the card; not
+  /// when the card is [drop]ped.
+  void show(SajdahKey verse, SajdahFrom from, {VoidCallback? onClose}) {
+    _timer?.cancel();
+    final seconds = ref.read(settingsProvider).sajdahSeconds;
+    _onClose = onClose;
+    state = SajdahCard(verse: verse, seconds: seconds, from: from, id: ++_ids);
+    _timer = Timer(Duration(seconds: seconds), close);
+  }
+
+  /// Closes the card (the countdown ended, or a tap) and runs its
+  /// `onClose`.
+  void close() {
+    if (state == null) return;
+    _timer?.cancel();
+    _timer = null;
+    state = null;
+    final f = _onClose;
+    _onClose = null;
+    f?.call();
+  }
+
+  /// Takes the card away without its `onClose`: the reader moved on.
+  void drop() {
+    _timer?.cancel();
+    _timer = null;
+    _onClose = null;
+    if (state != null) state = null;
+  }
+}
+
+/// A hifz test is under way: no sajdah card, while listening or reading.
+/// The reading screen sets it for the length of the test.
+final sajdahMutedProvider = NotifierProvider<SajdahMuted, bool>(
+  SajdahMuted.new,
+);
+
+class SajdahMuted extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool muted) => state = muted;
+}
+
+/// The card over a reading screen: fades in when a sajdah card is shown,
+/// centred, and fades out when it closes. Put it last in the screen's
+/// Stack; only the card itself takes touches.
+class SajdahCardLayer extends ConsumerWidget {
+  const SajdahCardLayer({super.key});
+
+  static const fade = Duration(milliseconds: 250);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final card = ref.watch(sajdahCardProvider);
+    return Positioned.fill(
+      child: Center(
+        child: Reveal(
+          visible: card != null,
+          from: Offset.zero,
+          duration: fade,
+          child: card == null
+              ? null
+              : SajdahCardView(
+                  key: ValueKey(card.id),
+                  seconds: card.seconds,
+                  onTap: ref.read(sajdahCardProvider.notifier).close,
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The card itself: the prostration pictogram, the supplications, a
+/// circular countdown from [seconds], and «اضغط للاستكمال». At most 40% of
+/// the screen's height; about 85% of a phone's width, at most 420.
+class SajdahCardView extends StatefulWidget {
+  const SajdahCardView({super.key, required this.seconds, this.onTap});
+
+  final int seconds;
+  final VoidCallback? onTap;
+
+  @override
+  State<SajdahCardView> createState() => _SajdahCardViewState();
+}
+
+class _SajdahCardViewState extends State<SajdahCardView>
+    with SingleTickerProviderStateMixin {
+  late final _count = AnimationController(
+    vsync: this,
+    duration: Duration(seconds: widget.seconds),
+  )..forward();
+
+  @override
+  void dispose() {
+    _count.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final tokens = context.tokens;
+    final t = tokens.colors;
+    final elderly = tokens.elderly;
+    final size = MediaQuery.sizeOf(context);
+    final digits = NumberFormatter(Localizations.localeOf(context));
+    final width = math.min(size.width * 0.85, 420.0);
+    final text = sajdahSupplications;
+    final scaler = MediaQuery.textScalerOf(context);
+    // The supplications are never scrolled: at their smallest size they
+    // must all be in sight. The card keeps to 40% of the screen; when the
+    // text does not fit there, the pictogram and countdown shrink first
+    // (as on a short screen), and only then does the card grow.
+    double iconFor(bool compact) =>
+        compact ? (elderly ? 40.0 : 34.0) : (elderly ? 64.0 : 52.0);
+    double gapFor(bool compact) => compact ? 4.0 : 8.0;
+    double dialFor(bool compact) => compact ? 34.0 : (elderly ? 48.0 : 40.0);
+    // Everything but the text: the paddings, gaps, pictogram, countdown
+    // and the «tap to continue» line.
+    double chrome(bool compact) {
+      final gap = gapFor(compact);
+      return (gap + 6) +
+          (gap + 4) +
+          iconFor(compact) +
+          gap +
+          (gap + 2) +
+          dialFor(compact) +
+          (gap - 2) +
+          scaler.scale(elderly ? 16 : 13) * 1.5;
+    }
+
+    final smallest = TextPainter(
+      text: TextSpan(text: text, style: _textStyle(_floor(elderly), t.ink)),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.rtl,
+      textScaler: scaler,
+    )..layout(maxWidth: width - 40);
+    final textHeight = smallest.height + 2;
+    smallest.dispose();
+    var maxHeight = size.height * 0.4;
+    // A short screen (a phone held sideways): a smaller pictogram and
+    // countdown leave room for the text.
+    var compact = maxHeight < 240;
+    if (textHeight > maxHeight - chrome(compact)) compact = true;
+    if (textHeight > maxHeight - chrome(compact)) {
+      maxHeight = math.min(size.height * 0.9, chrome(true) + textHeight + 4);
+    }
+    final icon = iconFor(compact);
+    final gap = gapFor(compact);
+
+    final countdown = AnimatedBuilder(
+      animation: _count,
+      builder: (context, _) {
+        final left = (widget.seconds * (1 - _count.value)).ceil();
+        return SizedBox.square(
+          dimension: dialFor(compact),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned.fill(
+                child: CircularProgressIndicator(
+                  value: 1 - _count.value,
+                  strokeWidth: 3,
+                  color: t.control,
+                  backgroundColor: t.border,
+                ),
+              ),
+              Text(
+                digits(left),
+                style: TextStyle(
+                  fontSize: elderly ? 18 : 15,
+                  fontWeight: FontWeight.w700,
+                  color: t.ink,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      label: l.sajdahCardLabel,
+      value: l.sajdahSecondsLeft(digits(widget.seconds)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints.tightFor(width: width)
+            .copyWith(maxHeight: maxHeight),
+        child: Material(
+          // The paper, slightly see-through: the page shows faintly behind.
+          color: t.paper.withValues(alpha: 0.97),
+          elevation: 6,
+          shadowColor: Colors.black38,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(color: t.border),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Semantics(
+            button: true,
+            label: l.sajdahContinue,
+            onTap: widget.onTap,
+            child: InkWell(
+              onTap: widget.onTap,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, gap + 6, 20, gap + 4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ExcludeSemantics(
+                      child: SvgPicture.asset(
+                        'assets/ornaments/sajdah.svg',
+                        height: icon,
+                        colorFilter: ColorFilter.mode(
+                          t.control,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: gap),
+                    Flexible(
+                      // All of the supplications in sight: the text is made
+                      // smaller (down to a floor) until it fits the card,
+                      // and only past that does it scroll.
+                      child: LayoutBuilder(
+                        builder: (context, box) {
+                          final scaler = MediaQuery.textScalerOf(context);
+                          TextStyle at(double size) => _textStyle(size, t.ink);
+                          var size = elderly ? 24.0 : 20.0;
+                          final floor = _floor(elderly);
+                          while (size > floor) {
+                            final painter = TextPainter(
+                              text: TextSpan(text: text, style: at(size)),
+                              textAlign: TextAlign.center,
+                              textDirection: TextDirection.rtl,
+                              textScaler: scaler,
+                            )..layout(maxWidth: box.maxWidth);
+                            final fits = painter.height <= box.maxHeight;
+                            painter.dispose();
+                            if (fits) break;
+                            size -= 1;
+                          }
+                          return SingleChildScrollView(
+                            child: Text(
+                              text,
+                              textAlign: TextAlign.center,
+                              textDirection: TextDirection.rtl,
+                              style: at(size),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: gap + 2),
+                    ExcludeSemantics(child: countdown),
+                    SizedBox(height: gap - 2),
+                    ExcludeSemantics(
+                      child: Text(
+                        l.sajdahTapToContinue,
+                        style: TextStyle(
+                          fontSize: elderly ? 16 : 13,
+                          color: t.muted,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The supplications' style at [size].
+TextStyle _textStyle(double size, Color ink) => TextStyle(
+  fontFamily: 'UthmanTahaNaskh',
+  fontSize: size,
+  height: 1.8,
+  color: ink,
+);
+
+/// The smallest size the supplications are made, to fit the card.
+double _floor(bool elderly) => elderly ? 17.0 : 14.0;

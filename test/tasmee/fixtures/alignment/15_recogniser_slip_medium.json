@@ -1,0 +1,22 @@
+{
+ "name": "medium: one letter off in a long word is no error, but doubtful",
+ "range": {
+  "verses": [
+   2,
+   255,
+   2,
+   255
+  ]
+ },
+ "steps": [
+  {
+   "say": "الله لا إله إلا هو الحي القيون لا تأخذه"
+  }
+ ],
+ "statuses": {
+  "2:255:1-6": "correct",
+  "2:255:7": "doubtful",
+  "2:255:8-9": "correct",
+  "2:255:10-50": "hidden"
+ }
+}

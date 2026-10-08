@@ -51,8 +51,7 @@ class NoReminders implements ReminderScheduler {
   set onTap(void Function(String payload)? handler) {}
 }
 
-/// flutter_local_notifications: one notification per day, scheduled ahead
-/// for [reminderDaysAhead] days (iOS keeps at most 64 pending), inexact so
+/// flutter_local_notifications: rolling per-plan reminders are inexact so
 /// no exact-alarm permission is needed on Android.
 class LocalReminderScheduler implements ReminderScheduler {
   final _plugin = FlutterLocalNotificationsPlugin();
@@ -79,6 +78,11 @@ class LocalReminderScheduler implements ReminderScheduler {
           requestBadgePermission: false,
           requestSoundPermission: false,
         ),
+        macOS: DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        ),
       ),
       onDidReceiveNotificationResponse: (r) {
         final p = r.payload;
@@ -87,8 +91,19 @@ class LocalReminderScheduler implements ReminderScheduler {
     );
   }();
 
+  /// Reminders are scheduled on the phones and the Mac; Windows and Linux
+  /// have no scheduled notifications in the plugin, so there the reminder
+  /// is simply not offered a time to fire.
+  bool get _supported => switch (defaultTargetPlatform) {
+    TargetPlatform.android ||
+    TargetPlatform.iOS ||
+    TargetPlatform.macOS => true,
+    _ => false,
+  };
+
   @override
   Future<bool> requestPermission() async {
+    if (!_supported) return false;
     await _init();
     if (defaultTargetPlatform == TargetPlatform.android) {
       return await _plugin
@@ -96,6 +111,14 @@ class LocalReminderScheduler implements ReminderScheduler {
                 AndroidFlutterLocalNotificationsPlugin
               >()
               ?.requestNotificationsPermission() ??
+          false;
+    }
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      return await _plugin
+              .resolvePlatformSpecificImplementation<
+                MacOSFlutterLocalNotificationsPlugin
+              >()
+              ?.requestPermissions(alert: true, sound: true) ??
           false;
     }
     return await _plugin
@@ -108,6 +131,7 @@ class LocalReminderScheduler implements ReminderScheduler {
 
   @override
   Future<String?> launchPayload() async {
+    if (!_supported) return null;
     await _init();
     final d = await _plugin.getNotificationAppLaunchDetails();
     return d?.didNotificationLaunchApp == true
@@ -120,9 +144,18 @@ class LocalReminderScheduler implements ReminderScheduler {
     List<ReminderNotice> notices, {
     required String channel,
   }) async {
+    if (!_supported) return;
     await _init();
-    for (var i = 0; i < reminderDaysAhead; i++) {
-      await _plugin.cancel(id: reminderIdBase + i);
+    final pending = await _plugin.pendingNotificationRequests();
+    for (final request in pending) {
+      final id = request.id;
+      final legacyReminder =
+          id >= reminderIdBase && id < reminderIdBase + reminderDaysAhead;
+      final khatmaReminder =
+          id >= khatmaReminderIdBase && id < khatmaReminderIdLimit;
+      if (legacyReminder || khatmaReminder) {
+        await _plugin.cancel(id: id);
+      }
     }
     final details = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -132,6 +165,7 @@ class LocalReminderScheduler implements ReminderScheduler {
         priority: Priority.defaultPriority,
       ),
       iOS: const DarwinNotificationDetails(),
+      macOS: const DarwinNotificationDetails(),
     );
     for (final n in notices) {
       await _plugin.zonedSchedule(
