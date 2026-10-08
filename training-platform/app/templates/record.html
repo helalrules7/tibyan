@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+{% block title %}{{ t('record_title') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel wide">
+  <h1>{{ t('record_title') }}</h1>
+
+  {% if flash_error %}
+    <div class="errors">{{ flash_error }}</div>
+  {% endif %}
+  {% if flash %}
+    <div class="success">{{ flash }}</div>
+  {% endif %}
+
+  {% if not verses_available %}
+    <p class="muted">{{ t('verses_unavailable') }}</p>
+  {% else %}
+    <ol class="stepper" id="stepper">
+      <li data-step="1" class="active">
+        <span class="dot">1</span><span class="label">{{ t('wizard_step1') }}</span>
+      </li>
+      <li data-step="2">
+        <span class="dot">2</span><span class="label">{{ t('wizard_step2') }}</span>
+      </li>
+      <li data-step="3">
+        <span class="dot">3</span><span class="label">{{ t('wizard_step3') }}</span>
+      </li>
+    </ol>
+
+    <form method="post" action="/record" enctype="multipart/form-data" id="record-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+
+      <!-- Step 1: choose the verses -->
+      <div class="step-panel" data-panel="1">
+        <label>
+          <span>{{ t('record_choose_surah') }}</span>
+          <select name="surah" id="surah" required></select>
+        </label>
+
+        <div class="ayah-range">
+          <label>
+            <span>{{ t('record_from_ayah') }}</span>
+            <select name="ayah" id="ayah-from" required disabled></select>
+          </label>
+          <label>
+            <span>{{ t('record_to_ayah') }}</span>
+            <select name="ayah_end" id="ayah-to" required disabled></select>
+          </label>
+        </div>
+
+        <div class="verse-prompt">
+          <span class="verse-label">{{ t('record_text_label') }}</span>
+          <p class="verse-text" id="verse-text" aria-live="polite"
+             data-unavailable="{{ t('verses_unavailable') }}"></p>
+        </div>
+      </div>
+
+      <!-- Step 2: read and record -->
+      <div class="step-panel" data-panel="2" hidden>
+        <div class="guide">
+          <h2>{{ t('how_record_title') }}</h2>
+          <ul>
+            <li>{{ t('how_record_1') }}</li>
+            <li>{{ t('how_record_2') }}</li>
+            <li>{{ t('how_record_3') }}</li>
+          </ul>
+        </div>
+
+        <div class="record-block">
+          <span class="block-label">{{ t('record_mic') }}</span>
+          <canvas id="spectrum" class="spectrum" width="600" height="80" hidden></canvas>
+          <div class="recorder">
+            <button type="button" class="btn primary icon" id="rec-btn">
+              <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2Z"/></svg>
+              {{ t('record_start') }}
+            </button>
+            <button type="button" class="btn icon" id="stop-btn" hidden>
+              <svg viewBox="0 0 24 24"><path d="M8 6h8v12H8z"/></svg>
+              {{ t('record_stop') }}
+            </button>
+            <button type="button" class="btn icon" id="again-btn" hidden>
+              <svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
+              {{ t('record_again') }}
+            </button>
+            <span class="muted" id="rec-duration"></span>
+          </div>
+        </div>
+
+        <label>
+          <span>{{ t('record_upload') }}</span>
+          <input type="file" name="audio" id="audio" accept="audio/*,.wav,.mp3,.m4a,.ogg,.webm,.opus,.flac" required>
+          <small>{{ t('record_upload_hint') }}</small>
+        </label>
+        <audio id="preview" controls hidden></audio>
+      </div>
+
+      <!-- Step 3: details and submit -->
+      <div class="step-panel" data-panel="3" hidden>
+        <div class="preview-box">
+          <span class="block-label">{{ t('preview_title') }}</span>
+          <audio id="preview-final" controls hidden></audio>
+        </div>
+
+        <div class="grid">
+          <label>
+            <span>{{ t('gender') }}</span>
+            <select name="gender">
+              <option value=""></option>
+              <option value="male">{{ t('gender_male') }}</option>
+              <option value="female">{{ t('gender_female') }}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>{{ t('age_bracket') }}</span>
+            <select name="age_bracket">
+              <option value=""></option>
+              <option value="under_18">{{ t('age_under18') }}</option>
+              <option value="18_40">{{ t('age_18_40') }}</option>
+              <option value="40_plus">{{ t('age_40plus') }}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>{{ t('dialect') }}</span>
+            <input type="text" name="dialect" maxlength="64">
+          </label>
+
+          <label>
+            <span>{{ t('native_language') }}</span>
+            <select name="native_language">
+              <option value=""></option>
+              <option value="ar">العربية</option>
+              <option value="en">English</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+
+          <label>
+            <span>{{ t('environment') }}</span>
+            <select name="environment">
+              <option value=""></option>
+              <option value="quiet">{{ t('env_quiet') }}</option>
+              <option value="noisy">{{ t('env_noisy') }}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>{{ t('speed') }}</span>
+            <select name="speed">
+              <option value=""></option>
+              <option value="slow">{{ t('speed_slow') }}</option>
+              <option value="medium">{{ t('speed_medium') }}</option>
+              <option value="fast">{{ t('speed_fast') }}</option>
+            </select>
+          </label>
+        </div>
+
+        <button class="btn primary icon" type="submit" id="submit-btn">
+          <svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2Z"/></svg>
+          {{ t('submit_record') }}
+        </button>
+      </div>
+    </form>
+
+    <div class="wizard-nav">
+      <button type="button" class="btn icon" id="back-btn" hidden>
+        <svg viewBox="0 0 24 24"><path d="M12 4 10.6 5.4 16.2 11H4v2h12.2l-5.6 5.6L12 20l8-8-8-8Z"/></svg>
+        {{ t('wizard_back') }}
+      </button>
+      <button type="button" class="btn primary icon" id="next-btn">
+        {{ t('wizard_next') }}
+        <svg viewBox="0 0 24 24"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8Z"/></svg>
+      </button>
+    </div>
+  {% endif %}
+</section>
+
+<script>
+(function () {
+  var surahSel = document.getElementById('surah');
+  var ayahFromSel = document.getElementById('ayah-from');
+  var ayahToSel = document.getElementById('ayah-to');
+  var verseText = document.getElementById('verse-text');
+  var audioInput = document.getElementById('audio');
+  var preview = document.getElementById('preview');
+  var previewFinal = document.getElementById('preview-final');
+  var submitBtn = document.getElementById('submit-btn');
+  var backBtn = document.getElementById('back-btn');
+  var nextBtn = document.getElementById('next-btn');
+  var panels = document.querySelectorAll('.step-panel');
+  var current = 1;
+  var currentAyahs = [];
+  var loadRequest = 0;
+
+  // ---- wizard ----
+  function show(step) {
+    current = step;
+    panels.forEach(function (p) { p.hidden = (p.dataset.panel !== String(step)); });
+    document.querySelectorAll('#stepper li').forEach(function (li) {
+      li.classList.toggle('active', li.dataset.step === String(step));
+      li.classList.toggle('done', Number(li.dataset.step) < step);
+    });
+    backBtn.hidden = step === 1;
+    nextBtn.hidden = step === 3;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  nextBtn.addEventListener('click', function () {
+    if (
+      current === 1
+      && !(surahSel.value && ayahFromSel.value && ayahToSel.value)
+    ) return;
+    if (current === 2 && !(audioInput.files && audioInput.files.length)) return;
+    show(current + 1);
+  });
+  backBtn.addEventListener('click', function () { show(current - 1); });
+
+  function renderVerseText() {
+    var start = Number(ayahFromSel.value);
+    var end = Number(ayahToSel.value);
+    if (!start || !end || end < start) {
+      verseText.textContent = '';
+      return;
+    }
+    var selected = currentAyahs.filter(function (ayah) {
+      return ayah.number >= start && ayah.number <= end;
+    });
+    verseText.textContent = selected.length === end - start + 1
+      ? selected.map(function (ayah) { return ayah.text; }).join(' ')
+      : '';
+  }
+
+  function populateToOptions(start, preferredEnd) {
+    ayahToSel.innerHTML = '';
+    currentAyahs.forEach(function (ayah) {
+      if (ayah.number < start) return;
+      var option = document.createElement('option');
+      option.value = ayah.number;
+      option.textContent = ayah.number;
+      ayahToSel.appendChild(option);
+    });
+    ayahToSel.value = String(preferredEnd >= start ? preferredEnd : start);
+    ayahToSel.disabled = currentAyahs.length === 0;
+  }
+
+  function loadSurah(number) {
+    var request = ++loadRequest;
+    currentAyahs = [];
+    ayahFromSel.disabled = true;
+    ayahToSel.disabled = true;
+    ayahFromSel.innerHTML = '';
+    ayahToSel.innerHTML = '';
+    verseText.textContent = '';
+    if (!number) return;
+
+    fetch('/api/surah/' + number)
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to load surah.');
+        return response.json();
+      })
+      .then(function (surah) {
+        if (request !== loadRequest) return;
+        currentAyahs = surah.ayahs;
+        currentAyahs.forEach(function (ayah) {
+          var option = document.createElement('option');
+          option.value = ayah.number;
+          option.textContent = ayah.number;
+          ayahFromSel.appendChild(option);
+        });
+        ayahFromSel.disabled = currentAyahs.length === 0;
+        if (currentAyahs.length) {
+          ayahFromSel.value = String(currentAyahs[0].number);
+          populateToOptions(currentAyahs[0].number, currentAyahs[0].number);
+          renderVerseText();
+        }
+      })
+      .catch(function () {
+        if (request === loadRequest) {
+          verseText.textContent = verseText.dataset.unavailable;
+        }
+      });
+  }
+
+  fetch('/api/surahs')
+    .then(function (response) {
+      if (!response.ok) throw new Error('Unable to load surahs.');
+      return response.json();
+    })
+    .then(function (list) {
+      list.forEach(function (surah) {
+        var option = document.createElement('option');
+        option.value = surah.number;
+        option.textContent = surah.number + '. ' + surah.name_ar + ' — ' + surah.name_en;
+        surahSel.appendChild(option);
+      });
+      if (list.some(function (surah) { return surah.number === 1; })) {
+        surahSel.value = '1';
+      }
+      loadSurah(surahSel.value);
+    })
+    .catch(function () {
+      verseText.textContent = verseText.dataset.unavailable;
+    });
+
+  surahSel.addEventListener('change', function () {
+    loadSurah(surahSel.value);
+  });
+  ayahFromSel.addEventListener('change', function () {
+    populateToOptions(Number(ayahFromSel.value), Number(ayahToSel.value));
+    renderVerseText();
+  });
+  ayahToSel.addEventListener('change', renderVerseText);
+
+  // ---- recording + spectrum ----
+  var recBtn = document.getElementById('rec-btn');
+  var stopBtn = document.getElementById('stop-btn');
+  var againBtn = document.getElementById('again-btn');
+  var recDur = document.getElementById('rec-duration');
+  var spectrum = document.getElementById('spectrum');
+  var ctx = spectrum.getContext('2d');
+  var mediaRecorder, chunks, startTime, timer, audioCtx, analyser, rafId, stream;
+
+  function drawSpectrum() {
+    rafId = requestAnimationFrame(drawSpectrum);
+    if (!analyser) return;
+    var data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+    ctx.clearRect(0, 0, spectrum.width, spectrum.height);
+    var bar = Math.floor(spectrum.width / 64);
+    for (var i = 0; i < 64; i++) {
+      var v = data[Math.floor(i * data.length / 64)] / 255;
+      var h = Math.max(2, v * (spectrum.height - 8));
+      ctx.fillStyle = v > 0.75 ? 'var(--gold)' : 'var(--bronze)';
+      ctx.fillRect(i * bar + 1, spectrum.height - h, bar - 2, h);
+    }
+  }
+
+  function stopSpectrum() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    ctx.clearRect(0, 0, spectrum.width, spectrum.height);
+    spectrum.hidden = true;
+  }
+
+  recBtn.addEventListener('click', function () {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (s) {
+      stream = s;
+      chunks = [];
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      audioCtx.createMediaStreamSource(s).connect(analyser);
+      spectrum.hidden = false;
+      drawSpectrum();
+
+      var mime = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mime = 'audio/webm;codecs=opus';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mime = 'audio/mp4';
+      }
+      mediaRecorder = new MediaRecorder(s, { mimeType: mime });
+      mediaRecorder.addEventListener('dataavailable', function (e) { if (e.data.size) chunks.push(e.data); });
+      mediaRecorder.addEventListener('stop', function () {
+        if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
+        if (audioCtx) audioCtx.close();
+        stopSpectrum();
+        clearInterval(timer);
+        var blob = new Blob(chunks, { type: mime });
+        var ext = mime.indexOf('webm') >= 0 ? 'webm' : (mime.indexOf('mp4') >= 0 ? 'm4a' : 'ogg');
+        var file = new File([blob], 'recording.' + ext, { type: mime });
+        var dt = new DataTransfer();
+        dt.items.add(file);
+        audioInput.files = dt.files;
+        setPreview(blob);
+        recBtn.hidden = false;
+        stopBtn.hidden = true;
+        againBtn.hidden = false;
+      });
+      startTime = Date.now();
+      timer = setInterval(function () {
+        recDur.textContent = Math.round((Date.now() - startTime) / 1000) + 's';
+      }, 250);
+      mediaRecorder.start();
+      recBtn.hidden = true;
+      stopBtn.hidden = false;
+    }).catch(function () {
+      recDur.textContent = '{{ t('err_audio_process') }}';
+    });
+  });
+
+  stopBtn.addEventListener('click', function () { if (mediaRecorder) mediaRecorder.stop(); });
+  againBtn.addEventListener('click', function () {
+    audioInput.value = '';
+    setPreview(null);
+    againBtn.hidden = true;
+    recDur.textContent = '';
+  });
+  audioInput.addEventListener('change', function () {
+    if (audioInput.files && audioInput.files[0]) {
+      setPreview(audioInput.files[0]);
+    }
+  });
+
+  function setPreview(blob) {
+    if (!blob) {
+      preview.hidden = true;
+      previewFinal.hidden = true;
+      preview.src = '';
+      previewFinal.src = '';
+      return;
+    }
+    var url = URL.createObjectURL(blob);
+    preview.src = url;
+    previewFinal.src = url;
+    preview.hidden = false;
+    previewFinal.hidden = false;
+  }
+})();
+</script>
+{% endblock %}

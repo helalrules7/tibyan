@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ t('register_title') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>{{ t('register_title') }}</h1>
+
+  {% if errors %}
+    <div class="errors"><ul>
+      {% for m in errors.values() %}<li>{{ m }}</li>{% endfor %}
+    </ul></div>
+  {% endif %}
+
+  <form method="post" action="/register" novalidate>
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+
+    <label>
+      <span>{{ t('email') }}</span>
+      <input type="email" name="email" value="{{ old.email }}" autocomplete="email">
+    </label>
+
+    <label>
+      <span>{{ t('phone') }}</span>
+      <input type="tel" name="phone" value="{{ old.phone }}" autocomplete="tel" dir="ltr">
+      <small>{{ t('phone_hint') }}</small>
+    </label>
+
+    <label>
+      <span>{{ t('password') }}</span>
+      <input type="password" name="password" required autocomplete="new-password" minlength="8">
+    </label>
+
+    <label>
+      <span>{{ t('password_confirm') }}</span>
+      <input type="password" name="password_confirm" required autocomplete="new-password" minlength="8">
+    </label>
+
+    <label>
+      <span>{{ t('birth_date') }}</span>
+      <input type="date" name="birth_date" value="{{ old.birth_date }}" required max="{{ today }}">
+      <small>{{ t('birth_hint') }}</small>
+    </label>
+
+    <label class="check">
+      <input type="checkbox" name="consent" value="1" {% if old.consent %}checked{% endif %}>
+      <span>{{ t('consent_label') }}</span>
+    </label>
+
+    <label class="check" id="parental-wrap" hidden>
+      <input type="checkbox" name="parental" value="1" {% if old.parental %}checked{% endif %}>
+      <span>{{ t('parental_label') }}</span>
+    </label>
+
+    <button class="btn primary" type="submit">{{ t('submit_register') }}</button>
+  </form>
+
+  <p class="muted">{{ t('have_account') }} <a href="/login">{{ t('nav_login') }}</a></p>
+</section>
+<script>
+  (function () {
+    var birth = document.querySelector('input[name="birth_date"]');
+    var wrap = document.getElementById('parental-wrap');
+    function update() {
+      if (!birth.value) { wrap.hidden = true; return; }
+      var age = Math.floor((Date.now() - new Date(birth.value).getTime()) / 31556952000);
+      wrap.hidden = age >= 18;
+    }
+    birth.addEventListener('change', update);
+    update();
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}</title>
+  <meta name="description" content="{% if lang == 'ar' %}موقع تبيان الجديد قريبًا. اكتشف منصة تدريب نموذج التسميع القرآني.{% else %}The new Tibyan website is coming soon. Discover our Quran recitation model training platform.{% endif %}">
+  <meta name="theme-color" content="#171610">
+  <link rel="canonical" href="https://altibyan.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="تبيان">
+  <meta property="og:title" content="{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}">
+  <meta property="og:description" content="{% if lang == 'ar' %}موقع تبيان الجديد قريبًا. اكتشف منصة تدريب نموذج التسميع القرآني.{% else %}The new Tibyan website is coming soon. Discover our Quran recitation model training platform.{% endif %}">
+  <meta property="og:url" content="https://altibyan.app/">
+  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=1">
+  <meta property="og:image:secure_url" content="https://altibyan.app/static/coming-soon-share.png?v=1">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{% if lang == 'ar' %}تبيان قريبًا، منصة تدريب نموذج التسميع{% else %}Tibyan is coming soon, with a Quran recitation training platform{% endif %}">
+  <meta property="og:locale" content="ar_EG">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}">
+  <meta name="twitter:description" content="{% if lang == 'ar' %}موقع تبيان الجديد قريبًا. اكتشف منصة تدريب نموذج التسميع القرآني.{% else %}The new Tibyan website is coming soon. Discover our Quran recitation model training platform.{% endif %}">
+  <meta name="twitter:image" content="https://altibyan.app/static/coming-soon-share.png?v=1">
+  <meta name="twitter:image:alt" content="{% if lang == 'ar' %}تبيان قريبًا، منصة تدريب نموذج التسميع{% else %}Tibyan is coming soon, with a Quran recitation training platform{% endif %}">
+  <link rel="stylesheet" href="/static/coming-soon.css">
+</head>
+<body>
+  <main class="launch-page">
+    <header class="launch-header">
+      <a class="wordmark" href="/" aria-label="{% if lang == 'ar' %}تبيان، الصفحة الرئيسية{% else %}Tibyan home{% endif %}">
+        <span class="wordmark-ar" lang="ar" dir="rtl">تبيان</span>
+        <span class="wordmark-en">TIBYAN</span>
+      </a>
+      <a class="language-link" href="/lang/{{ 'en' if lang == 'ar' else 'ar' }}">
+        {{ 'English' if lang == 'ar' else 'العربية' }}
+      </a>
+    </header>
+
+    <section class="hero" aria-labelledby="launch-title">
+      <div class="hero-copy">
+        <p class="coming-label">{{ 'قريبًا' if lang == 'ar' else 'COMING SOON' }}</p>
+        <h1 id="launch-title">
+          {{ 'تجربة جديدة من تبيان' if lang == 'ar' else 'A new experience from Tibyan' }}
+        </h1>
+        <p class="hero-description">
+          {{ 'نعمل على موقع جديد يقرّب أدوات تبيان لكل من يخدم القرآن ويتعلّمه.' if lang == 'ar' else 'We are building a new home for tools that help people learn and serve the Quran.' }}
+        </p>
+      </div>
+
+      <div class="logo-stage" aria-hidden="true">
+        <img class="coming-logo" src="/static/logo-gold.png" alt="">
+      </div>
+
+      <section class="training-note" aria-labelledby="training-title">
+        <div>
+          <h2 id="training-title">
+            {{ 'منصة تدريب نموذج التسميع' if lang == 'ar' else 'Recitation model training platform' }}
+          </h2>
+          <p>
+            {{ 'يمكن للمتطوعين المساهمة بتسجيل تلاواتهم في تدريب نموذج التسميع القرآني.' if lang == 'ar' else 'Volunteers can contribute recitations to help train a Quran recitation model.' }}
+          </p>
+        </div>
+        <a class="training-link" href="https://train.altibyan.app/">
+          {{ 'اكتشف المنصة' if lang == 'ar' else 'Visit the platform' }}
+          <span aria-hidden="true">↗</span>
+        </a>
+      </section>
+    </section>
+
+    <footer class="launch-footer">
+      <span>{{ 'تبيان لخدمة القرآن الكريم' if lang == 'ar' else 'Tibyan, tools in service of the Quran' }}</span>
+      <span class="footer-rule" aria-hidden="true"></span>
+      <span>altibyan.app</span>
+    </footer>
+  </main>
+</body>
+</html>

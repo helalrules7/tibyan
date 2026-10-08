@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ t('contact_title') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>{{ t('contact_title') }}</h1>
+
+  {% if flash %}
+    <div class="success">{{ flash }}</div>
+  {% endif %}
+
+  {% if errors %}
+    <div class="errors"><ul>
+      {% for m in errors.values() %}<li>{{ m }}</li>{% endfor %}
+    </ul></div>
+  {% endif %}
+
+  <form method="post" action="/contact" novalidate>
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+
+    <label>
+      <span>{{ t('contact_name') }}</span>
+      <input type="text" name="name" value="{{ old.name }}" required maxlength="120">
+    </label>
+
+    <label>
+      <span>{{ t('contact_email') }}</span>
+      <input type="email" name="email" value="{{ old.email }}" required autocomplete="email">
+    </label>
+
+    <label>
+      <span>{{ t('contact_subject') }}</span>
+      <input type="text" name="subject" value="{{ old.subject }}" maxlength="200">
+    </label>
+
+    <label>
+      <span>{{ t('contact_message') }}</span>
+      <textarea name="message" rows="5" required maxlength="5000">{{ old.message }}</textarea>
+    </label>
+
+    <button class="btn primary" type="submit">{{ t('contact_submit') }}</button>
+  </form>
+</section>
+{% endblock %}

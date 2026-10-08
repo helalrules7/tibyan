@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ t('app_name') }}{% endblock %}</title>
+  <meta name="description" content="{{ t('meta_description') }}">
+  <meta name="theme-color" content="#3A2B20">
+  <link rel="canonical" href="{{ site_url }}/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ t('app_name') }}">
+  <meta property="og:title" content="{% block og_title %}{{ t('hero_title') }}{% endblock %}">
+  <meta property="og:description" content="{{ t('meta_description') }}">
+  <meta property="og:url" content="{{ site_url }}/">
+  <meta property="og:image" content="{{ site_url }}/static/share.png?v=3">
+  <meta property="og:image:secure_url" content="{{ site_url }}/static/share.png?v=3">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ t('hero_title') }}، {{ t('share_action') }}">
+  <meta property="og:locale" content="ar_EG">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block tw_title %}{{ t('hero_title') }}{% endblock %}">
+  <meta name="twitter:description" content="{{ t('meta_description') }}">
+  <meta name="twitter:image" content="{{ site_url }}/static/share.png?v=3">
+  <meta name="twitter:image:alt" content="{{ t('hero_title') }}، {{ t('share_action') }}">
+
+  <link rel="stylesheet" href="/static/style.css?v=7">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/"><img class="brand-logo" src="/static/logo-gold.png" alt="Tibyan"> {{ t('app_name') }}</a>
+    <nav class="nav">
+      <a href="/">{{ t('nav_home') }}</a>
+  <a href="/contact">{{ t('nav_contact') }}</a>
+  {% if not request.session.get('user_id') %}
+    <a href="/register">{{ t('nav_register') }}</a>
+    <a href="/login">{{ t('nav_login') }}</a>
+  {% else %}
+    <a href="/record">{{ t('record_title') }}</a>
+    <a href="/validate">{{ t('nav_validate') }}</a>
+    <a href="/dashboard">{{ t('nav_dashboard') }}</a>
+    <a href="/logout">{{ t('nav_logout') }}</a>
+  {% endif %}
+      <a class="lang" href="/lang/{{ 'en' if lang == 'ar' else 'ar' }}">{{ t('lang_name') }}</a>
+    </nav>
+  </header>
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="foot">
+    <img class="foot-logo" src="/static/logo-gold.png" alt="Tibyan"> {{ t('app_name') }} — {{ t('footer_note') }}
+  </footer>
+</body>
+</html>

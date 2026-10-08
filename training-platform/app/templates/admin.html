@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ t('admin_title') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel wide">
+  <h1>{{ t('admin_title') }}</h1>
+
+  {% if flash %}
+    <div class="success">{{ flash }}</div>
+  {% endif %}
+
+  <div class="admin-summary">
+    <div class="stat"><span class="n">{{ counts.pending }}</span><span class="l">{{ t('admin_summary_pending') }}</span></div>
+    <div class="stat"><span class="n">{{ counts.accepted }}</span><span class="l">{{ t('admin_summary_accepted') }}</span></div>
+    <div class="stat"><span class="n">{{ counts.rejected }}</span><span class="l">{{ t('admin_summary_rejected') }}</span></div>
+    <div class="stat"><span class="n">{{ counts.flagged }}</span><span class="l">{{ t('admin_summary_flagged') }}</span></div>
+  </div>
+
+  <div class="admin-export">
+    <p>{{ t('admin_export') }}</p>
+    <form method="post" action="/admin/export">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button type="submit" class="btn primary icon">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10l4-4 1.4 1.4L12 15.8 6.6 10.4 8 9l4 4V3h-2V1h4v2h-2Z"/><path d="M5 13v6h14v-6h2v8H3v-8h2Z"/></svg>
+        {{ t('admin_export_btn') }}
+      </button>
+    </form>
+    <p class="muted">{% if exported %}{{ t('admin_export_done') | replace('{n}', exported) }} · <a href="/admin/manifest.jsonl">{{ t('admin_download_manifest') }}</a>{% endif %}</p>
+  </div>
+
+  <h2 class="section-title">{{ t('admin_recordings') }}</h2>
+  <p class="muted">{{ t('admin_decision_note') }}</p>
+  {% if not recordings %}
+    <p class="muted">{{ t('admin_none_recordings') }}</p>
+  {% else %}
+    <div class="table-scroll">
+      <table class="recordings admin-recordings">
+        <thead>
+          <tr>
+            <th scope="col">{{ t('admin_recording') }}</th>
+            <th scope="col">{{ t('admin_status') }}</th>
+            <th scope="col">{{ t('validate_listen') }}</th>
+            <th scope="col">{{ t('admin_actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in recordings %}
+            <tr>
+              <td>#{{ rec.id }} · {{ rec.surah }}:{{ rec.ayah }}{% if rec.ayah_end and rec.ayah_end > rec.ayah %}–{{ rec.ayah_end }}{% endif %}</td>
+              <td>{{ t('status_' ~ rec.status) }}</td>
+              <td>
+                <audio controls src="/recordings/{{ rec.id }}/audio" preload="none"
+                       aria-label="{{ t('admin_listen_recording') }} #{{ rec.id }}"></audio>
+              </td>
+              <td>
+                <div class="admin-actions">
+                  <form method="post" action="/admin/recordings/{{ rec.id }}/decision">
+                    <input type="hidden" name="csrf" value="{{ csrf }}">
+                    <input type="hidden" name="page" value="{{ page }}">
+                    <input type="hidden" name="verdict" value="accept">
+                    <button type="submit" class="btn primary">{{ t('admin_decision_accept') }}</button>
+                  </form>
+                  <form method="post" action="/admin/recordings/{{ rec.id }}/decision">
+                    <input type="hidden" name="csrf" value="{{ csrf }}">
+                    <input type="hidden" name="page" value="{{ page }}">
+                    <input type="hidden" name="verdict" value="reject">
+                    <button type="submit" class="btn danger">{{ t('admin_decision_reject') }}</button>
+                  </form>
+                  {% if rec.status == 'flagged' %}
+                    <form method="post" action="/admin/flagged/{{ rec.id }}/restore">
+                      <input type="hidden" name="csrf" value="{{ csrf }}">
+                      <input type="hidden" name="page" value="{{ page }}">
+                      <button type="submit" class="btn">{{ t('admin_restore') }}</button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if total_pages > 1 %}
+      <nav class="admin-pagination" aria-label="{{ t('admin_pagination') }}">
+        {% if page > 1 %}
+          <a class="btn" href="/admin?page={{ page - 1 }}">{{ t('admin_previous') }}</a>
+        {% endif %}
+        <span>{{ t('admin_page') | replace('{page}', page) | replace('{pages}', total_pages) }}</span>
+        {% if page < total_pages %}
+          <a class="btn" href="/admin?page={{ page + 1 }}">{{ t('admin_next') }}</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% endif %}
+
+  <h2 class="section-title">{{ t('admin_messages') }}</h2>
+  {% if not messages %}
+    <p class="muted">{{ t('admin_none_messages') }}</p>
+  {% else %}
+    <table class="recordings">
+      <tbody>
+        {% for m in messages %}
+          <tr>
+            <td>
+              <strong>{{ m.name }}</strong> · {{ m.email }}<br>
+              <span class="muted">{{ m.subject or '' }}</span>
+              <p class="msg-body">{{ m.message }}</p>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ t('logout') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <h1>{{ t('logout') }}</h1>
+  {% if user %}
+    <p>{{ t('logout_confirm') }}</p>
+    <form method="post" action="/logout">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button class="btn primary" type="submit">{{ t('logout') }}</button>
+      <a class="btn" href="/dashboard">{{ t('cancel') }}</a>
+    </form>
+  {% else %}
+    <p><a href="/">{{ t('nav_home') }}</a></p>
+  {% endif %}
+</section>
+{% endblock %}
