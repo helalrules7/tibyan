@@ -165,6 +165,7 @@ def job_page(job_id: int, request: Request, db: Session = Depends(get_db)):
         metrics=metrics,
         comparison=_comparison(metrics),
         files=training.job_files(job),
+        is_fake=training.is_fake(job),
         serving_version=str(manifest.get("version")) if manifest else None,
         flash=flash,
         flash_error=error,

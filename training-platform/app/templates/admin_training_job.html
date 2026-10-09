@@ -34,6 +34,7 @@
     </dl>
   </div>
 
+  {% if is_fake %}<div class="errors" role="alert">{{ t('job_fake') }}</div>{% endif %}
   <h2 class="section-title">{{ t('job_compare') }}</h2>
   {% if comparison %}
     <p class="muted small">{{ t('job_compare_help')|replace('{v}', job.compared_version or '—') }}</p>
@@ -73,13 +74,15 @@
   {% endif %}
 
   <div class="job-actions">
-    {% if job.status == 'review' %}
+    {% if job.status == 'review' and not is_fake %}
       <form method="post" action="/admin/training/{{ job.id }}/action" class="confirm-form">
         <input type="hidden" name="csrf" value="{{ csrf }}">
         <input type="hidden" name="action" value="publish">
         <label class="check"><input type="checkbox" name="confirm" value="yes" required> <span>{{ t('job_publish_confirm') }}</span></label>
         <button type="submit" class="btn primary">{{ t('job_publish') }}</button>
       </form>
+    {% endif %}
+    {% if job.status == 'review' %}
       <form method="post" action="/admin/training/{{ job.id }}/action">
         <input type="hidden" name="csrf" value="{{ csrf }}">
         <input type="hidden" name="action" value="reject">

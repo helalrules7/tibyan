@@ -52,7 +52,7 @@ DEFAULT_PARAMS = {
     "epochs": 5,
     "learning_rate": 3e-5,
     "batch_size": 4,
-    "max_duration_s": 20.0,
+    "max_duration_s": 30.0,
     "freeze_encoder": False,
     "text_norm": "plain",
     "seed": 42,
@@ -242,6 +242,12 @@ def job_metrics(job: TrainingJob) -> dict | None:
     return json.loads(job.metrics) if job.metrics else None
 
 
+def is_fake(job: TrainingJob) -> bool:
+    """Results from `tibyan-runner poll --fake` are pipeline tests only."""
+    m = job_metrics(job) or {}
+    return bool(m.get("fake") or (m.get("runner") or {}).get("fake"))
+
+
 def job_files(job: TrainingJob) -> dict:
     return json.loads(job.files) if job.files else {}
 
@@ -417,6 +423,8 @@ def publish_job(job: TrainingJob) -> str:
     """
     if job.status != "review":
         raise InvalidTransition(f"{job.status} cannot be published")
+    if is_fake(job):
+        raise RuntimeError("a fake-trainer (dry-run) result can never be published")
     root = model_root()
     manifest = read_manifest()
     if manifest is None:

@@ -202,6 +202,7 @@ ADMIN_STRINGS = {
         "job_no_metrics": "لا توجد نتائج بعد.",
         "job_note": "ملاحظة",
         "job_created": "أُنشئت",
+        "job_fake": "نتيجة تجربة (المشغّل الوهمي --fake): ليست نموذجًا حقيقيًا ولا يمكن نشرها. ارفضها.",
     },
     "en": {
         "nav_notifications": "Notifications",
@@ -396,5 +397,6 @@ ADMIN_STRINGS = {
         "job_no_metrics": "No results yet.",
         "job_note": "Note",
         "job_created": "Created",
+        "job_fake": "Dry-run result (fake runner --fake): not a real model and it can never be published. Reject it.",
     },
 }

@@ -524,6 +524,22 @@ class AdminTrainingTests(unittest.TestCase):
         with self.Session() as db:
             self.assertEqual(db.get(TrainingJob, job_id).status, "rolled_back")
 
+    def test_fake_runner_result_can_never_be_published(self):
+        job_id, _ = self._run_to_review()
+        with self.Session() as db:
+            job = db.get(TrainingJob, job_id)
+            job.metrics = json.dumps({"fake": True, "runner": {"fake": True}})
+            db.commit()
+        adm = self.client("a@example.test")
+        token = self.csrf(adm, f"/admin/training/{job_id}")
+        self.assertNotIn('value="publish"', adm.get(f"/admin/training/{job_id}").text)
+        adm.post(f"/admin/training/{job_id}/action",
+                 data={"csrf": token, "action": "publish", "confirm": "yes"})
+        self.assertEqual(training.read_manifest()["version"], "1")
+        self.assertFalse((self.model_dir / "2").exists())
+        with self.Session() as db:
+            self.assertEqual(db.get(TrainingJob, job_id).status, "review")
+
     def test_reject_keeps_nothing_public(self):
         job_id, _ = self._run_to_review()
         before = sorted(p.name for p in self.model_dir.iterdir())
