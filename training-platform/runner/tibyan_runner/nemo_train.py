@@ -159,7 +159,7 @@ def train(job_dir: Path, job: dict, dataset: dict, base_path: Path, report, stop
     for epoch in range(epoch0, epochs):
         batches = _batches(items, bs, seed + epoch)
         start = step_in_epoch0 if epoch == epoch0 else 0
-        running = 0.0
+        running, ran = 0.0, 0
         for i in range(start, len(batches)):
             if stop.is_set():
                 save_ckpt(epoch, i)
@@ -189,6 +189,7 @@ def train(job_dir: Path, job: dict, dataset: dict, base_path: Path, report, stop
             sched.step()
             global_step += 1
             running += float(loss.detach())
+            ran += 1
 
             if global_step % 5 == 0 or global_step == total:
                 rate = (time.time() - t0) / max(1, global_step - (epoch0 * steps_per_epoch + step_in_epoch0))
@@ -200,7 +201,7 @@ def train(job_dir: Path, job: dict, dataset: dict, base_path: Path, report, stop
             if global_step >= total:
                 done = True
                 break
-        report(None, None, [f"epoch {epoch + 1} mean loss {running / max(1, len(batches) - start):.4f}"])
+        report(None, None, [f"epoch {epoch + 1} mean loss {running / max(1, ran):.4f} over {ran} steps"])
         save_ckpt(epoch + 1, 0)
         if done:
             break

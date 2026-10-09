@@ -202,6 +202,8 @@ class Pipeline:
                     raise KeyboardInterrupt()
             state["trained"] = True
             self._save(jd, state)
+            # The optimiser checkpoint (~1.3 GB) is only needed mid-training.
+            (jd / "ckpt.pt").unlink(missing_ok=True)
 
         # 4. export
         if not state.get("exported"):
