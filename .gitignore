@@ -101,3 +101,6 @@ server*.local*
 
 # Claude Code worktrees and local settings
 /.claude/
+
+# Voice recordings and local ASR evaluation notes; never commit or upload.
+/audio-training/
