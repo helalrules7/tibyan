@@ -10,6 +10,7 @@ from starlette.responses import RedirectResponse
 from ..deps import get_db
 from ..mail import send_mail, valid_email
 from ..models import ContactMessage
+from ..notifications import notify_admins
 from ..web import check_csrf, msg, render
 
 router = APIRouter()
@@ -61,6 +62,9 @@ def contact_submit(
     db.add(db_message)
     db.commit()
     db.refresh(db_message)
+    notify_admins(
+        db, "contact_message", {"name": name[:60]}, "/admin/requests?tab=contact"
+    )
 
     # Keep the saved message even if notification delivery is unavailable.
     try:

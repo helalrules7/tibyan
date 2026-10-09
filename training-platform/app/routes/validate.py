@@ -150,6 +150,10 @@ def submit_vote(
     elif rejects >= REJECTS_TO_DROP:
         rec.status = "rejected"
     db.commit()
+    if rec.status in ("accepted", "rejected"):
+        from .admin import notify_owner_of_decision
+
+        notify_owner_of_decision(db, rec)
 
     request.session["flash"] = msg(request, "validate_thanks")
     return RedirectResponse("/validate", status_code=303)

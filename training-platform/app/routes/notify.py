@@ -9,6 +9,7 @@ from ..deps import get_db
 from ..i18n import get_lang
 from ..mail import valid_email
 from ..models import NotifySignup
+from ..notifications import notify_admins
 from ..web import check_csrf
 
 router = APIRouter()
@@ -37,15 +38,20 @@ def notify_submit(
         request.session["notify"] = "invalid"
     else:
         existing = db.query(NotifySignup).filter(NotifySignup.email == email).first()
+        new_beta = False
         if existing is None:
             db.add(NotifySignup(email=email, lang=get_lang(request), wants_beta=beta))
             try:
                 db.commit()
+                new_beta = beta
             except IntegrityError:
                 db.rollback()
         elif beta and not existing.wants_beta:
             existing.wants_beta = True
             db.commit()
+            new_beta = True
+        if new_beta:
+            notify_admins(db, "beta_request", {}, "/admin/requests?tab=beta")
         request.session["notify"] = "ok"
 
     return RedirectResponse("/#notify", status_code=303)

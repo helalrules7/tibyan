@@ -33,8 +33,14 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
-  <link rel="stylesheet" href="/static/style.css?v=8">
-  <script src="/static/site.js?v=1" defer></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="{{ t('app_short') }}">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="/static/style.css?v=9">
+  <script src="/static/site.js?v=2" defer></script>
+  {% block head_extra %}{% endblock %}
 </head>
 <body>
   <header class="topbar">
@@ -59,12 +65,18 @@
         <a href="/record">{{ t('record_title') }}</a>
         <a href="/validate">{{ t('nav_validate') }}</a>
         <a href="/dashboard">{{ t('nav_dashboard') }}</a>
+        <a class="nav-admin" href="/admin" hidden>{{ t('nav_admin') }}</a>
+        <a class="bell" href="/notifications" aria-label="{{ t('nav_notifications') }}" title="{{ t('nav_notifications') }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>
+          <span class="bell-label">{{ t('nav_notifications') }}</span>
+          <span class="bell-count" hidden></span>
+        </a>
         <a href="/logout">{{ t('nav_logout') }}</a>
       {% endif %}
       <a class="lang" href="/lang/{{ 'en' if lang == 'ar' else 'ar' }}">{{ t('lang_name') }}</a>
     </nav>
   </header>
-  <main class="page">
+  <main class="page{% block page_class %}{% endblock %}">
     {% block content %}{% endblock %}
   </main>
 

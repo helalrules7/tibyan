@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ t('notif_title') }} · {{ t('app_name') }}{% endblock %}
+{% block head_extra %}<script src="/static/push.js?v=1" defer></script>{% endblock %}
+{% block content %}
+<section class="panel wide">
+  <h1>{{ t('notif_title') }}</h1>
+  {% if user.is_admin %}{% set admin_section = '' %}{% include "_admin_nav.html" %}{% endif %}
+  {% if flash %}<div class="success" role="status">{{ flash }}</div>{% endif %}
+
+  <div id="push-box" class="push-box" data-csrf="{{ csrf }}" data-enabled="{{ '1' if push_enabled else '0' }}"
+       data-on="{{ t('notif_push_on') }}" data-off="{{ t('notif_push_off') }}"
+       data-unsupported="{{ t('notif_push_unsupported') }}" data-ios="{{ t('notif_push_ios') }}"
+       data-denied="{{ t('notif_push_denied') }}" data-server-off="{{ t('notif_push_server_off') }}"
+       data-error="{{ t('notif_push_error') }}" data-sent="{{ t('notif_test_sent') }}">
+    <h2>{{ t('notif_push_title') }}</h2>
+    <p class="muted small">{{ t('notif_push_intro') }}</p>
+    <p id="push-state" class="push-state" role="status" aria-live="polite">{% if not push_enabled %}{{ t('notif_push_server_off') }}{% endif %}</p>
+    <div class="admin-actions wrap">
+      <button type="button" id="push-enable" class="btn primary" hidden>{{ t('notif_push_enable') }}</button>
+      <button type="button" id="push-disable" class="btn" hidden>{{ t('notif_push_disable') }}</button>
+      <button type="button" id="push-test" class="btn" hidden>{{ t('notif_push_test') }}</button>
+    </div>
+    <p class="muted small">{{ t('notif_devices')|replace('{n}', push_count) }} · {{ t('notif_push_ios') }}</p>
+  </div>
+
+  <div class="notif-head">
+    <h2 class="section-title">{{ t('notif_title') }}{% if unread %} <b class="count">{{ unread }}</b>{% endif %}</h2>
+    {% if unread %}
+      <form method="post" action="/notifications/read-all">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button type="submit" class="link-btn ok">{{ t('notif_mark_all') }}</button>
+      </form>
+    {% endif %}
+  </div>
+  {% if not items %}
+    <p class="muted">{{ t('notif_none') }}</p>
+  {% else %}
+    <ul class="notif-list">
+      {% for n in items %}
+        <li class="{{ 'unread' if n.unread else '' }}">
+          <a href="/notifications/{{ n.id }}/open">
+            <span class="notif-title">{% if n.unread %}<span class="dot" aria-label="{{ t('notif_unread') }}"></span>{% endif %}{{ n.title }}</span>
+            <span class="notif-body">{{ n.body }}</span>
+            <span class="notif-time">{{ n.created_at.strftime('%Y-%m-%d %H:%M') if n.created_at else '' }}</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <form method="post" action="/notifications/test" class="test-form">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <button type="submit" class="link-btn ok">{{ t('notif_push_test') }}</button>
+  </form>
+</section>
+{% endblock %}

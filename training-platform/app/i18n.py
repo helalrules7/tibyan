@@ -399,3 +399,14 @@ def get_lang(request) -> str:
 
 def t(lang: str, key: str) -> str:
     return STRINGS[lang].get(key, key)
+
+
+def _merge_admin_strings() -> None:
+    from .i18n_admin import ADMIN_STRINGS
+
+    for lang, strings in ADMIN_STRINGS.items():
+        for key, value in strings.items():
+            STRINGS[lang].setdefault(key, value)
+
+
+_merge_admin_strings()

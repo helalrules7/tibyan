@@ -13,6 +13,7 @@ from ..audio import convert_to_wav, validate_clip
 from ..config import settings
 from ..deps import current_user, get_db
 from ..models import ClipReport, Recording, RecordingVote
+from ..notifications import notify_admins
 from ..web import check_csrf, msg, render
 
 router = APIRouter()
@@ -164,6 +165,8 @@ def record_submit(
     rec.audio_path = f"recordings/{rec.id}.wav"
     rec.audio_duration_ms = duration_ms
     db.commit()
+    ref = f"{rec.surah}:{rec.ayah}" + (f"-{rec.ayah_end}" if rec.ayah_end and rec.ayah_end > rec.ayah else "")
+    notify_admins(db, "new_recording", {"id": rec.id, "ref": ref}, "/admin?status=pending")
 
     request.session["flash"] = msg(request, "success_recorded")
     return RedirectResponse("/record", status_code=303)

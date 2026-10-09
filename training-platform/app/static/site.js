@@ -19,3 +19,31 @@
     }
   });
 })();
+
+// Notification bell: unread count (and the admin link for admins).
+(function () {
+  var bell = document.querySelector('.bell');
+  if (!bell || !window.fetch) return;
+  var badge = bell.querySelector('.bell-count');
+  var adminLink = document.querySelector('.nav-admin');
+  function refresh() {
+    fetch('/api/notifications/unread', { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        if (adminLink) adminLink.hidden = !data.admin;
+        if (data.count > 0) {
+          badge.textContent = data.count > 99 ? '99+' : String(data.count);
+          badge.hidden = false;
+          bell.classList.add('has-unread');
+        } else {
+          badge.hidden = true;
+          bell.classList.remove('has-unread');
+        }
+      })
+      .catch(function () {});
+  }
+  refresh();
+  setInterval(function () { if (!document.hidden) refresh(); }, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) refresh(); });
+})();
