@@ -104,3 +104,7 @@ server*.local*
 
 # Voice recordings and local ASR evaluation notes; never commit or upload.
 /audio-training/
+
+# Flutter build output regenerated on every build; never tracked.
+**/flutter/ephemeral/
+**/Flutter/ephemeral/
