@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}{{ t('req_title') }} · {{ t('app_name') }}{% endblock %}
+{% block page_class %} page-admin{% endblock %}
+{% block content %}
+<section class="panel admin">
+  <h1>{{ t('req_title') }}</h1>
+  {% include "_admin_nav.html" %}
+  {% if flash %}<div class="success" role="status">{{ flash }}</div>{% endif %}
+
+  <nav class="tabs" aria-label="{{ t('req_title') }}">
+    {% for key in ['contact', 'beta', 'notify', 'deletion'] %}
+      <a href="/admin/requests?tab={{ key }}"{% if tab == key %} aria-current="page"{% endif %}>
+        {{ t('req_tab_' ~ key) }}{% if counts[key] %} <b class="count">{{ counts[key] }}</b>{% endif %}
+      </a>
+    {% endfor %}
+  </nav>
+
+  {% if tab == 'contact' %}
+    {% if not messages %}<p class="muted">{{ t('req_none') }}</p>{% endif %}
+    <ul class="req-cards">
+      {% for m in messages %}
+        {% set st = 'replied' if m.replied_at else ('read' if m.read_at else 'unread') %}
+        <li class="req-card state-{{ st }}">
+          <div class="req-head">
+            <strong>{{ m.name }}</strong>
+            <span class="pill pill-{{ st }}">{{ t('req_state_' ~ st) }}</span>
+          </div>
+          <div class="req-meta"><span class="ltr">{{ m.email }}</span> · <span>{{ m.created_at.strftime('%Y-%m-%d %H:%M') if m.created_at else '' }}</span></div>
+          {% if m.subject %}<p class="req-subject">{{ m.subject }}</p>{% endif %}
+          <p class="msg-body">{{ m.message }}</p>
+          <div class="admin-actions wrap">
+            <a class="btn small" href="mailto:{{ m.email }}?subject={{ ('Re: ' ~ (m.subject or 'Tibyan'))|urlencode }}">{{ t('req_reply_email') }}</a>
+            {% for s in ['read', 'replied', 'unread'] if s != st %}
+              <form method="post" action="/admin/requests/contact/{{ m.id }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <input type="hidden" name="state" value="{{ s }}">
+                <button type="submit" class="btn small{% if s == 'replied' %} primary{% endif %}">{{ t('req_mark_' ~ s) }}</button>
+              </form>
+            {% endfor %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {% elif tab == 'beta' %}
+    <p class="muted">{{ t('req_beta_help') }} <a href="/admin/requests/notify.csv?beta=1">{{ t('req_csv_beta') }}</a></p>
+    {% if not signups %}<p class="muted">{{ t('req_none') }}</p>{% endif %}
+    <ul class="req-cards">
+      {% for s in signups %}
+        <li class="req-card">
+          <div class="req-head">
+            <strong class="ltr">{{ s.email }}</strong>
+            <span class="muted small">{{ s.lang }} · {{ s.created_at.strftime('%Y-%m-%d') if s.created_at else '' }}</span>
+          </div>
+          <div class="admin-actions wrap">
+            {% for p, label, stamp in [('play', t('req_play'), s.play_added_at), ('testflight', t('req_testflight'), s.testflight_added_at)] %}
+              <form method="post" action="/admin/requests/beta/{{ s.id }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <input type="hidden" name="platform" value="{{ p }}">
+                {% if stamp %}
+                  <input type="hidden" name="value" value="0">
+                  <span class="pill pill-replied">✓ {{ label }} · {{ stamp.strftime('%Y-%m-%d') }}</span>
+                  <button type="submit" class="link-btn">{{ t('req_unmark') }}</button>
+                {% else %}
+                  <input type="hidden" name="value" value="1">
+                  <button type="submit" class="btn small">{{ t('req_mark_added')|replace('{p}', label) }}</button>
+                {% endif %}
+              </form>
+            {% endfor %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {% elif tab == 'notify' %}
+    <p class="muted">{{ t('req_notify_help') }} <a class="btn small" href="/admin/requests/notify.csv">{{ t('req_csv') }}</a></p>
+    {% if not signups %}<p class="muted">{{ t('req_none') }}</p>{% else %}
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>{{ t('req_email') }}</th><th>{{ t('req_lang') }}</th><th>{{ t('req_beta') }}</th><th>{{ t('req_date') }}</th></tr></thead>
+          <tbody>
+            {% for s in signups %}
+              <tr><td class="ltr">{{ s.email }}</td><td>{{ s.lang }}</td><td>{{ '✓' if s.wants_beta else '' }}</td><td>{{ s.created_at.strftime('%Y-%m-%d') if s.created_at else '' }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <p class="muted">{{ t('req_deletion_help') }}</p>
+    {% if not deletions %}<p class="muted">{{ t('req_none') }}</p>{% endif %}
+    <ul class="req-cards">
+      {% for d in deletions %}
+        <li class="req-card state-{{ d.status }}">
+          <div class="req-head">
+            <strong class="ltr">{{ d.email }}</strong>
+            <span class="pill pill-{{ d.status }}">{{ t('req_status_' ~ d.status) }}</span>
+          </div>
+          <div class="req-meta">
+            <span>{{ t('req_scope_' ~ d.scope) }}</span> ·
+            <span>{{ d.created_at.strftime('%Y-%m-%d %H:%M') if d.created_at else '' }}</span> ·
+            {% if matches.get(d.id) %}
+              <span>{{ t('req_account_match')|replace('{id}', matches[d.id].user_id)|replace('{n}', matches[d.id].recordings) }}</span>
+            {% else %}
+              <span>{{ t('req_no_account') }}</span>
+            {% endif %}
+          </div>
+          {% if d.details %}<p class="msg-body">{{ d.details }}</p>{% endif %}
+          <div class="admin-actions wrap">
+            {% for s, label in [('done', 'req_mark_done'), ('declined', 'req_mark_declined'), ('open', 'req_reopen')] if s != d.status %}
+              <form method="post" action="/admin/requests/deletion/{{ d.id }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <input type="hidden" name="state" value="{{ s }}">
+                <button type="submit" class="btn small{% if s == 'done' %} primary{% endif %}">{{ t(label) }}</button>
+              </form>
+            {% endfor %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>
+{% endblock %}

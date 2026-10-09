@@ -1,18 +1,68 @@
 {% extends "base.html" %}
 {% block title %}{{ t('admin_title') }} · {{ t('app_name') }}{% endblock %}
+{% block page_class %} page-admin{% endblock %}
 {% block content %}
-<section class="panel wide">
+<section class="panel admin">
   <h1>{{ t('admin_title') }}</h1>
+  {% include "_admin_nav.html" %}
 
   {% if flash %}
-    <div class="success">{{ flash }}</div>
+    <div class="success" role="status">{{ flash }}</div>
   {% endif %}
 
-  <div class="admin-summary">
-    <div class="stat"><span class="n">{{ counts.pending }}</span><span class="l">{{ t('admin_summary_pending') }}</span></div>
-    <div class="stat"><span class="n">{{ counts.accepted }}</span><span class="l">{{ t('admin_summary_accepted') }}</span></div>
-    <div class="stat"><span class="n">{{ counts.rejected }}</span><span class="l">{{ t('admin_summary_rejected') }}</span></div>
-    <div class="stat"><span class="n">{{ counts.flagged }}</span><span class="l">{{ t('admin_summary_flagged') }}</span></div>
+  <div class="dash-grid">
+    <a class="dash-card accent" href="/admin?status=pending">
+      <span class="n">{{ stats.awaiting_review }}</span>
+      <span class="l">{{ t('dash_awaiting') }}</span>
+    </a>
+    <div class="dash-card">
+      <span class="n">{{ stats.accepted_total_minutes }}</span>
+      <span class="l">{{ t('dash_minutes') }}</span>
+    </div>
+    <div class="dash-card">
+      <span class="n">{{ stats.volunteers }}</span>
+      <span class="l">{{ t('dash_volunteers') }} · {{ stats.contributors }} {{ t('dash_contributors') }}</span>
+    </div>
+    <a class="dash-card" href="/admin/requests">
+      <span class="n">{{ stats.unread_messages + stats.beta_waiting + stats.open_deletions }}</span>
+      <span class="l">{{ t('dash_requests') }}</span>
+    </a>
+  </div>
+
+  <div class="dash-row">
+    <div class="dash-box">
+      <h2>{{ t('dash_minutes_by_group') }}</h2>
+      {% set maxm = [stats.accepted_minutes.values()|max, 0.1]|max %}
+      <ul class="bars">
+        {% for g in ['men', 'women', 'children', 'unspecified'] %}
+          <li>
+            <span class="bar-label">{{ t('group_' ~ g) }}</span>
+            <span class="bar-track"><span class="bar-fill" style="width: {{ (stats.accepted_minutes[g] / maxm * 100)|round(1) }}%"></span></span>
+            <span class="bar-value">{{ stats.accepted_minutes[g] }} <small>· {{ t('dash_clips')|replace('{n}', stats.accepted_clips[g]) }}</small></span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="dash-box">
+      <h2>{{ t('dash_requests') }}</h2>
+      <ul class="req-list">
+        <li><a href="/admin/requests?tab=contact">{{ t('dash_unread_messages') }}</a><b>{{ stats.unread_messages }}</b></li>
+        <li><a href="/admin/requests?tab=beta">{{ t('dash_beta_waiting') }}</a><b>{{ stats.beta_waiting }}</b></li>
+        <li><a href="/admin/requests?tab=deletion">{{ t('dash_open_deletions') }}</a><b>{{ stats.open_deletions }}</b></li>
+        <li><a href="/admin/requests?tab=notify">{{ t('dash_notify_total') }}</a><b>{{ stats.notify_total }}</b></li>
+      </ul>
+      <h2>{{ t('dash_model') }}</h2>
+      <p class="muted">
+        {% if stats.model_version %}{{ t('dash_model_version')|replace('{v}', stats.model_version) }}{% else %}—{% endif %}
+        ·
+        {% if stats.latest_job %}
+          <a href="/admin/training/{{ stats.latest_job.id }}">{{ t('dash_latest_job') }} #{{ stats.latest_job.id }}</a>:
+          <span class="job-badge job-{{ stats.latest_job.status }}">{{ t('job_' ~ stats.latest_job.status) }}</span>
+        {% else %}
+          <a href="/admin/training">{{ t('dash_no_job') }}</a>
+        {% endif %}
+      </p>
+    </div>
   </div>
 
   <div class="admin-export">
@@ -20,20 +70,28 @@
     <form method="post" action="/admin/export">
       <input type="hidden" name="csrf" value="{{ csrf }}">
       <button type="submit" class="btn primary icon">
-        <svg viewBox="0 0 24 24"><path d="M12 3v10l4-4 1.4 1.4L12 15.8 6.6 10.4 8 9l4 4V3h-2V1h4v2h-2Z"/><path d="M5 13v6h14v-6h2v8H3v-8h2Z"/></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10l4-4 1.4 1.4L12 15.8 6.6 10.4 8 9l4 4V3h-2V1h4v2h-2Z"/><path d="M5 13v6h14v-6h2v8H3v-8h2Z"/></svg>
         {{ t('admin_export_btn') }}
       </button>
     </form>
     <p class="muted">{% if exported %}{{ t('admin_export_done') | replace('{n}', exported) }} · <a href="/admin/manifest.jsonl">{{ t('admin_download_manifest') }}</a>{% endif %}</p>
   </div>
 
-  <h2 class="section-title">{{ t('admin_recordings') }}</h2>
+  <h2 class="section-title" id="recordings">{{ t('admin_recordings') }}</h2>
   <p class="muted">{{ t('admin_decision_note') }}</p>
+
+  <nav class="filter-chips" aria-label="{{ t('admin_filter_label') }}">
+    <a href="/admin#recordings"{% if not status_filter %} aria-current="true"{% endif %}>{{ t('admin_filter_all') }}</a>
+    {% for s in ['pending', 'flagged', 'accepted', 'rejected'] %}
+      <a href="/admin?status={{ s }}#recordings"{% if status_filter == s %} aria-current="true"{% endif %}>{{ t('status_' ~ s) }} <b>{{ counts[s] }}</b></a>
+    {% endfor %}
+  </nav>
+
   {% if not recordings %}
     <p class="muted">{{ t('admin_none_recordings') }}</p>
   {% else %}
     <div class="table-scroll">
-      <table class="recordings admin-recordings">
+      <table class="recordings admin-recordings rec-table">
         <thead>
           <tr>
             <th scope="col">{{ t('admin_recording') }}</th>
@@ -44,9 +102,19 @@
         </thead>
         <tbody>
           {% for rec in recordings %}
-            <tr>
-              <td>#{{ rec.id }} · {{ rec.surah }}:{{ rec.ayah }}{% if rec.ayah_end and rec.ayah_end > rec.ayah %}–{{ rec.ayah_end }}{% endif %}</td>
-              <td>{{ t('status_' ~ rec.status) }}</td>
+            {% set v = votes.get(rec.id, {}) %}
+            <tr class="status-{{ rec.status }}">
+              <td>#{{ rec.id }} · {{ rec.surah }}:{{ rec.ayah }}{% if rec.ayah_end and rec.ayah_end > rec.ayah %}–{{ rec.ayah_end }}{% endif %}
+                <div class="rec-meta">
+                  <span>{{ (rec.audio_duration_ms / 1000) | round(1) }}s</span>
+                  <span>{{ t('group_' ~ group_of(rec)) }}</span>
+                  {% if rec.speed %}<span>{{ t('speed_' ~ rec.speed) }}</span>{% endif %}
+                  {% if rec.environment %}<span>{{ t('env_' ~ rec.environment) }}</span>{% endif %}
+                  <span>{{ t('admin_votes') }}: ✓{{ v.get('accept', 0) }} ✗{{ v.get('reject', 0) }}</span>
+                  {% if owners.get(rec.user_id) %}<span class="ltr">{{ owners[rec.user_id].email or owners[rec.user_id].phone }}</span>{% endif %}
+                </div>
+              </td>
+              <td><span class="rec-status">{{ t('status_' ~ rec.status) }}</span></td>
               <td>
                 <audio controls src="/recordings/{{ rec.id }}/audio" preload="none"
                        aria-label="{{ t('admin_listen_recording') }} #{{ rec.id }}"></audio>
@@ -56,12 +124,14 @@
                   <form method="post" action="/admin/recordings/{{ rec.id }}/decision">
                     <input type="hidden" name="csrf" value="{{ csrf }}">
                     <input type="hidden" name="page" value="{{ page }}">
+                    <input type="hidden" name="status_filter" value="{{ status_filter }}">
                     <input type="hidden" name="verdict" value="accept">
                     <button type="submit" class="btn primary">{{ t('admin_decision_accept') }}</button>
                   </form>
                   <form method="post" action="/admin/recordings/{{ rec.id }}/decision">
                     <input type="hidden" name="csrf" value="{{ csrf }}">
                     <input type="hidden" name="page" value="{{ page }}">
+                    <input type="hidden" name="status_filter" value="{{ status_filter }}">
                     <input type="hidden" name="verdict" value="reject">
                     <button type="submit" class="btn danger">{{ t('admin_decision_reject') }}</button>
                   </form>
@@ -81,34 +151,16 @@
     </div>
     {% if total_pages > 1 %}
       <nav class="admin-pagination" aria-label="{{ t('admin_pagination') }}">
+        {% set sq = '&status=' ~ status_filter if status_filter else '' %}
         {% if page > 1 %}
-          <a class="btn" href="/admin?page={{ page - 1 }}">{{ t('admin_previous') }}</a>
+          <a class="btn" href="/admin?page={{ page - 1 }}{{ sq }}#recordings">{{ t('admin_previous') }}</a>
         {% endif %}
         <span>{{ t('admin_page') | replace('{page}', page) | replace('{pages}', total_pages) }}</span>
         {% if page < total_pages %}
-          <a class="btn" href="/admin?page={{ page + 1 }}">{{ t('admin_next') }}</a>
+          <a class="btn" href="/admin?page={{ page + 1 }}{{ sq }}#recordings">{{ t('admin_next') }}</a>
         {% endif %}
       </nav>
     {% endif %}
-  {% endif %}
-
-  <h2 class="section-title">{{ t('admin_messages') }}</h2>
-  {% if not messages %}
-    <p class="muted">{{ t('admin_none_messages') }}</p>
-  {% else %}
-    <table class="recordings">
-      <tbody>
-        {% for m in messages %}
-          <tr>
-            <td>
-              <strong>{{ m.name }}</strong> · {{ m.email }}<br>
-              <span class="muted">{{ m.subject or '' }}</span>
-              <p class="msg-body">{{ m.message }}</p>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   {% endif %}
 </section>
 {% endblock %}

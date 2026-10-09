@@ -10,7 +10,19 @@ from starlette.responses import RedirectResponse
 from ..config import settings
 from ..deps import current_user, get_db
 from ..export import build_export
-from ..models import ContactMessage, Recording, RecordingVote
+from sqlalchemy import func
+
+from .. import training
+from ..models import (
+    ContactMessage,
+    DeletionRequest,
+    NotifySignup,
+    Recording,
+    RecordingVote,
+    TrainingJob,
+    User,
+)
+from ..notifications import notify_users
 from ..web import check_csrf, msg, render
 
 router = APIRouter()
@@ -26,6 +38,45 @@ def require_admin(request: Request, db: Session):
     return None
 
 
+def dashboard_stats(db: Session) -> dict:
+    """Counts for the admin dashboard."""
+    minutes = {g: 0.0 for g in training.VOICE_GROUPS}
+    clips = {g: 0 for g in training.VOICE_GROUPS}
+    for rec in db.query(Recording).filter(Recording.status == "accepted").all():
+        g = training.voice_group(rec)
+        minutes[g] += (rec.audio_duration_ms or 0) / 60000
+        clips[g] += 1
+    contributors = db.query(func.count(func.distinct(Recording.user_id))).scalar() or 0
+    latest_job = db.query(TrainingJob).order_by(TrainingJob.id.desc()).first()
+    manifest = training.read_manifest()
+    return {
+        "awaiting_review": db.query(Recording)
+        .filter(Recording.status.in_(("pending", "flagged")))
+        .count(),
+        "accepted_minutes": {g: round(m, 1) for g, m in minutes.items()},
+        "accepted_clips": clips,
+        "accepted_total_minutes": round(sum(minutes.values()), 1),
+        "volunteers": db.query(User).count(),
+        "contributors": int(contributors),
+        "unread_messages": db.query(ContactMessage)
+        .filter(ContactMessage.read_at.is_(None))
+        .count(),
+        "beta_waiting": db.query(NotifySignup)
+        .filter(
+            NotifySignup.wants_beta.is_(True),
+            NotifySignup.play_added_at.is_(None),
+            NotifySignup.testflight_added_at.is_(None),
+        )
+        .count(),
+        "notify_total": db.query(NotifySignup).count(),
+        "open_deletions": db.query(DeletionRequest)
+        .filter(DeletionRequest.status == "open")
+        .count(),
+        "latest_job": latest_job,
+        "model_version": (manifest or {}).get("version"),
+    }
+
+
 def _export_root() -> Path:
     return Path(settings.media_dir).resolve() / "export"
 
@@ -35,10 +86,13 @@ def admin_dashboard(
     request: Request,
     db: Session = Depends(get_db),
     page: int = Query(1, ge=1),
+    status: str = Query(""),
 ):
     blocked = require_admin(request, db)
     if blocked is not None:
         return blocked
+    if status not in ("", "pending", "accepted", "rejected", "flagged"):
+        status = ""
 
     counts = {
         status: db.query(Recording)
@@ -46,24 +100,36 @@ def admin_dashboard(
         .count()
         for status in ("pending", "accepted", "rejected", "flagged")
     }
-    total_recordings = db.query(Recording).count()
+    query = db.query(Recording)
+    if status:
+        query = query.filter(Recording.status == status)
+    total_recordings = query.count()
     total_pages = max(
         1, (total_recordings + RECORDINGS_PER_PAGE - 1) // RECORDINGS_PER_PAGE
     )
     page = min(page, total_pages)
     recordings = (
-        db.query(Recording)
+        query
         .order_by(Recording.id.desc())
         .offset((page - 1) * RECORDINGS_PER_PAGE)
         .limit(RECORDINGS_PER_PAGE)
         .all()
     )
-    messages = (
-        db.query(ContactMessage)
-        .order_by(ContactMessage.id.desc())
-        .limit(20)
+    owners = {
+        u.id: u
+        for u in db.query(User)
+        .filter(User.id.in_({r.user_id for r in recordings} or {0}))
         .all()
-    )
+    }
+    votes = {}
+    if recordings:
+        for rid, verdict, n in (
+            db.query(RecordingVote.recording_id, RecordingVote.verdict, func.count())
+            .filter(RecordingVote.recording_id.in_([r.id for r in recordings]))
+            .group_by(RecordingVote.recording_id, RecordingVote.verdict)
+            .all()
+        ):
+            votes.setdefault(rid, {})[verdict] = n
     manifest = _export_root() / "manifest.jsonl"
     exported = (
         sum(1 for _ in manifest.open(encoding="utf-8"))
@@ -79,9 +145,14 @@ def admin_dashboard(
         total_recordings=total_recordings,
         page=page,
         total_pages=total_pages,
-        messages=messages,
+        status_filter=status,
+        owners=owners,
+        votes=votes,
+        group_of=training.voice_group,
+        stats=dashboard_stats(db),
         exported=exported,
         flash=flash,
+        admin_section="dashboard",
     )
 
 
@@ -93,6 +164,7 @@ def decide_recording(
     verdict: str = Form(""),
     csrf: str = Form(""),
     page: int = Form(1),
+    status_filter: str = Form(""),
 ):
     blocked = require_admin(request, db)
     if blocked is not None:
@@ -129,12 +201,32 @@ def decide_recording(
     else:
         vote.verdict = verdict
 
+    old_status = rec.status
     rec.status = "accepted" if verdict == "accept" else "rejected"
     db.commit()
+    if rec.status != old_status:
+        notify_owner_of_decision(db, rec)
     request.session["flash"] = msg(request, "admin_decision_saved")
+    suffix = f"&status={status_filter}" if status_filter in ("pending", "accepted", "rejected", "flagged") else ""
     return RedirectResponse(
-        f"/admin?page={max(page, 1)}",
+        f"/admin?page={max(page, 1)}{suffix}",
         status_code=303,
+    )
+
+
+def notify_owner_of_decision(db: Session, rec: Recording) -> None:
+    """Tell the volunteer their recording was accepted or rejected."""
+    if rec.status not in ("accepted", "rejected"):
+        return
+    ref = f"{rec.surah}:{rec.ayah}" + (
+        f"-{rec.ayah_end}" if rec.ayah_end and rec.ayah_end > rec.ayah else ""
+    )
+    notify_users(
+        db,
+        [rec.user_id],
+        "recording_accepted" if rec.status == "accepted" else "recording_rejected",
+        {"ref": ref},
+        "/dashboard",
     )
 
 
@@ -174,6 +266,7 @@ def reject_flagged(
     if rec is not None and rec.status == "flagged":
         rec.status = "rejected"
         db.commit()
+        notify_owner_of_decision(db, rec)
     return RedirectResponse("/admin", status_code=303)
 
 

@@ -1,0 +1,6 @@
+<nav class="admin-nav" aria-label="{{ t('admin_nav_label') }}">
+  <a href="/admin"{% if admin_section == 'dashboard' %} aria-current="page"{% endif %}>{{ t('admin_nav_dashboard') }}</a>
+  <a href="/admin/requests"{% if admin_section == 'requests' %} aria-current="page"{% endif %}>{{ t('admin_nav_requests') }}</a>
+  <a href="/admin/training"{% if admin_section == 'training' %} aria-current="page"{% endif %}>{{ t('admin_nav_training') }}</a>
+  <a href="/notifications">{{ t('nav_notifications') }}</a>
+</nav>

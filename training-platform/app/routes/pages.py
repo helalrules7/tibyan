@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse, PlainTextResponse, RedirectResponse, Response
 
 from ..deps import current_user, get_db
-from ..models import Recording
+from ..mail import valid_email
+from ..models import DeletionRequest, Recording
+from ..notifications import notify_admins
 from ..stats import public_progress
 from ..templating import STATIC_DIR
-from ..web import msg, render
+from ..web import check_csrf, msg, render
 
 router = APIRouter()
 
@@ -43,7 +45,49 @@ def voice(request: Request, db: Session = Depends(get_db)):
     """How volunteers' recordings are used and how to delete them."""
     if is_root_host(request):
         return RedirectResponse(f"{TRAIN_ORIGIN}/voice", status_code=301)
-    return render(request, "voice.html", user=current_user(request, db))
+    return render(
+        request,
+        "voice.html",
+        user=current_user(request, db),
+        deletion=request.session.pop("deletion", None),
+    )
+
+
+@router.post("/voice/delete-request")
+def deletion_request(
+    request: Request,
+    db: Session = Depends(get_db),
+    email: str = Form(""),
+    scope: str = Form("account"),
+    details: str = Form(""),
+    website: str = Form(""),
+    csrf: str = Form(""),
+):
+    """Ask the team to delete recordings or a whole account. A logged-in
+    request is linked to the account; `website` is a honeypot."""
+    check_csrf(request, csrf)
+    user = current_user(request, db)
+    email = email.strip().lower()[:255]
+    if user is not None and not email:
+        email = (user.email or "").lower()
+    if website:
+        request.session["deletion"] = "ok"
+    elif not valid_email(email) or scope not in ("recordings", "account"):
+        request.session["deletion"] = "invalid"
+    else:
+        row = DeletionRequest(
+            user_id=user.id if user else None,
+            email=email,
+            scope=scope,
+            details=details.strip()[:2000] or None,
+        )
+        db.add(row)
+        db.commit()
+        notify_admins(
+            db, "deletion_request", {"scope": scope}, "/admin/requests?tab=deletion"
+        )
+        request.session["deletion"] = "ok"
+    return RedirectResponse("/voice#delete-request", status_code=303)
 
 
 @router.get("/robots.txt")
