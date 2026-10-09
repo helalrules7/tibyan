@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tibyan-runner"
+version = "0.1.0"
+description = "Tibyan recitation-model training runner (NeMo FastConformer CTC on Apple Silicon)"
+requires-python = ">=3.11,<3.13"
+license = { text = "GPL-3.0-or-later" }
+dependencies = ["numpy>=1.26"]
+
+[project.optional-dependencies]
+# The ML stack; install from requirements-train.txt for the tested pins.
+train = [
+    "torch>=2.4",
+    "nemo_toolkit[asr]>=2.0",
+    "onnx>=1.16",
+    "onnxruntime>=1.18",
+    "sherpa-onnx>=1.10",
+]
+
+[project.scripts]
+tibyan-runner = "tibyan_runner.cli:main"
+
+[tool.setuptools]
+packages = ["tibyan_runner"]

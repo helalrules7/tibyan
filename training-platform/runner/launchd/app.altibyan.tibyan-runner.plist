@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Tibyan training runner as a per-user LaunchAgent.
+  Copy to ~/Library/LaunchAgents/, replace YOUR_USER, then:
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/app.altibyan.tibyan-runner.plist
+  The token is NOT here: it lives in ~/.config/tibyan-runner/env (chmod 600).
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>app.altibyan.tibyan-runner</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/YOUR_USER/tibyan-runner/venv/bin/tibyan-runner</string>
+    <string>poll</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PYTORCH_ENABLE_MPS_FALLBACK</key>
+    <string>1</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <!-- Restart after a crash, but not after a clean exit (e.g. a pause). -->
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+  <key>ThrottleInterval</key>
+  <integer>60</integer>
+
+  <!-- Keep the Mac responsive: background QoS, low I/O priority, nice 10. -->
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>LowPriorityIO</key>
+  <true/>
+  <key>LowPriorityBackgroundIO</key>
+  <true/>
+  <key>Nice</key>
+  <integer>10</integer>
+
+  <!-- launchd sends SIGTERM on unload; the runner checkpoints and exits. -->
+  <key>ExitTimeOut</key>
+  <integer>120</integer>
+
+  <key>StandardOutPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/tibyan-runner.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/YOUR_USER/Library/Logs/tibyan-runner.log</string>
+</dict>
+</plist>

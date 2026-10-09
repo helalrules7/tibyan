@@ -1,0 +1,9 @@
+# Tested on an Apple M4 (macOS, Python 3.12) on 2026-10-09.
+# Install into the runner's own venv only, never system-wide.
+torch==2.14.1
+nemo_toolkit[asr]==3.0.0
+lightning==2.4.0
+onnx==1.23.2
+onnxruntime==1.30.0
+sherpa-onnx==1.13.8
+numpy==2.5.3
