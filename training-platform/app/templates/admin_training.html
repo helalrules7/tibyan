@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ t('train_title') }} · {{ t('app_name') }}{% endblock %}
+{% block page_class %} page-admin{% endblock %}
+{% block content %}
+<section class="panel admin">
+  <h1>{{ t('train_title') }}</h1>
+  {% include "_admin_nav.html" %}
+  {% if flash %}<div class="success" role="status">{{ flash }}</div>{% endif %}
+  {% if flash_error %}<div class="errors" role="alert">{{ flash_error }}</div>{% endif %}
+
+  <p class="muted">{{ t('train_how') }}
+    {% if manifest %}<br>{{ t('train_serving') }}: <b>{{ manifest.version }}</b> <span class="ltr">({{ manifest.id }})</span>{% endif %}
+  </p>
+  {% if not runner_ready %}<p class="note">{{ t('train_runner_missing') }}</p>{% endif %}
+
+  <div class="dash-row">
+    <div class="dash-box">
+      <h2>{{ t('train_eval_title') }}</h2>
+      <p class="muted small">{{ t('train_eval_help')|replace('{p}', eval_fraction) }}</p>
+      {% if eval_set %}
+        <p><b>{{ t('train_eval_status')|replace('{name}', eval_set.name)|replace('{n}', eval_count) }}</b></p>
+        <ul class="group-list">
+          {% for g in ['men', 'women', 'children', 'unspecified'] %}
+            <li><span>{{ t('group_' ~ g) }}</span><b>{{ eval_summary[g].n }}</b><small>{{ eval_summary[g].minutes }} min</small></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">{{ t('train_eval_none')|replace('{n}', min_eval) }} ({{ accepted_total }})</p>
+        <form method="post" action="/admin/training/eval-set">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button type="submit" class="btn primary"{% if accepted_total < min_eval %} disabled{% endif %}>{{ t('train_eval_freeze') }}</button>
+        </form>
+      {% endif %}
+    </div>
+
+    <div class="dash-box">
+      <h2>{{ t('train_start_title') }}</h2>
+      <p class="muted small">{{ t('train_snapshot')|replace('{n}', train_count)|replace('{m}', (train_summary.values()|sum(attribute='minutes'))|round(1)) }}</p>
+      <ul class="group-list">
+        {% for g in ['men', 'women', 'children', 'unspecified'] %}
+          <li><span>{{ t('group_' ~ g) }}</span><b>{{ train_summary[g].n }}</b><small>{{ train_summary[g].minutes }} min</small></li>
+        {% endfor %}
+      </ul>
+      <form method="post" action="/admin/training/jobs" class="train-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label>
+          <span>{{ t('train_base') }}</span>
+          <select name="base_model">
+            <option value="nvidia-base">{{ t('train_base_nvidia') }}</option>
+            {% for j in bases %}
+              <option value="job:{{ j.id }}">{{ t('train_base_job')|replace('{id}', j.id)|replace('{v}', j.published_version or '—') }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <details>
+          <summary>{{ t('train_advanced') }}</summary>
+          <div class="grid">
+            <label><span>{{ t('train_epochs') }}</span><input type="number" name="epochs" min="1" max="100" value="{{ defaults.epochs }}"></label>
+            <label><span>{{ t('train_lr') }}</span><input type="text" inputmode="decimal" name="learning_rate" value="{{ defaults.learning_rate }}" class="ltr"></label>
+            <label><span>{{ t('train_batch') }}</span><input type="number" name="batch_size" min="1" max="64" value="{{ defaults.batch_size }}"></label>
+            <label><span>{{ t('train_maxdur') }}</span><input type="number" name="max_duration_s" min="2" max="60" step="0.5" value="{{ defaults.max_duration_s }}"></label>
+            <label><span>{{ t('train_seed') }}</span><input type="number" name="seed" min="0" value="{{ defaults.seed }}"></label>
+          </div>
+          <label class="check"><input type="checkbox" name="freeze_encoder" value="1"> <span>{{ t('train_freeze_encoder') }}</span></label>
+        </details>
+        <label><span>{{ t('train_note') }}</span><input type="text" name="note" maxlength="255"></label>
+        <button type="submit" class="btn primary"{% if not eval_set or not train_count %} disabled{% endif %}>{{ t('train_start') }}</button>
+      </form>
+    </div>
+  </div>
+
+  <h2 class="section-title">{{ t('train_jobs') }}</h2>
+  {% if not jobs %}
+    <p class="muted">{{ t('train_none_jobs') }}</p>
+  {% else %}
+    <ul class="job-list">
+      {% for j in jobs %}
+        <li>
+          <a href="/admin/training/{{ j.id }}">
+            <span class="job-id">#{{ j.id }}</span>
+            <span class="job-badge job-{{ j.status }}">{{ t('job_' ~ j.status) }}</span>
+            <span class="muted small">{{ j.train_count }} · {{ (j.train_ms / 60000)|round(1) }} min · {{ j.created_at.strftime('%Y-%m-%d %H:%M') if j.created_at else '' }}</span>
+            {% if j.status in ('queued', 'running') %}<span class="mini-bar"><span style="width: {{ (j.progress * 100)|round(1) }}%"></span></span>{% endif %}
+            {% if j.published_version %}<span class="muted small">v{{ j.published_version }}</span>{% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>
+{% endblock %}

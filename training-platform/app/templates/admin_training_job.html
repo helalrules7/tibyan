@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ t('job_title')|replace('{id}', job.id) }} · {{ t('app_name') }}{% endblock %}
+{% block page_class %} page-admin{% endblock %}
+{% block head_extra %}<script src="/static/admin.js?v=1" defer></script>{% endblock %}
+{% block content %}
+<section class="panel admin">
+  <h1>{{ t('job_title')|replace('{id}', job.id) }}</h1>
+  {% include "_admin_nav.html" %}
+  {% if flash %}<div class="success" role="status">{{ flash }}</div>{% endif %}
+  {% if flash_error %}<div class="errors" role="alert">{{ flash_error }}</div>{% endif %}
+
+  <div id="job-live" class="job-live" data-url="/admin/training/{{ job.id }}/status.json"
+       data-last-log="{{ logs[-1].id if logs else 0 }}" data-ago="{{ t('job_seconds_ago') }}"
+       data-active="{{ '1' if job.status in ('queued', 'running') else '0' }}">
+    <div class="job-top">
+      <span id="job-status" class="job-badge job-{{ job.status }}">{{ t('job_' ~ job.status) }}</span>
+      {% if job.published_version %}
+        <span class="pill pill-replied">{{ t('job_published_as')|replace('{v}', job.published_version) }}</span>
+        {% if serving_version == job.published_version and job.status == 'published' %}<span class="muted small">{{ t('job_serving_now') }}</span>{% endif %}
+      {% endif %}
+    </div>
+    <div class="progress-bar" aria-label="{{ t('job_progress') }}"><span id="job-bar" style="width: {{ (job.progress * 100)|round(1) }}%"></span></div>
+    <dl class="kv">
+      <dt>{{ t('job_progress') }}</dt><dd id="job-pct">{{ (job.progress * 100)|round(1) }}%</dd>
+      <dt>{{ t('job_stage') }}</dt><dd id="job-stage">{{ job.stage or '—' }}</dd>
+      <dt>{{ t('job_runner') }}</dt><dd class="ltr">{{ job.runner or '—' }}</dd>
+      <dt>{{ t('job_heartbeat') }}</dt><dd id="job-heartbeat">{{ job.heartbeat_at.strftime('%Y-%m-%d %H:%M:%S') ~ ' UTC' if job.heartbeat_at else '—' }}</dd>
+      <dt>{{ t('job_dataset') }}</dt><dd>{{ t('job_dataset_value')|replace('{n}', job.train_count)|replace('{m}', (job.train_ms / 60000)|round(1))|replace('{e}', job.eval_set_id or '—') }}</dd>
+      <dt>{{ t('train_base') }}</dt><dd class="ltr">{{ job.base_model }}</dd>
+      <dt>{{ t('job_params') }}</dt><dd class="ltr small">{% for k, v in params.items() %}{{ k }}={{ v }}{% if not loop.last %} · {% endif %}{% endfor %}</dd>
+      <dt>{{ t('job_created') }}</dt><dd>{{ job.created_at.strftime('%Y-%m-%d %H:%M') if job.created_at else '' }}</dd>
+      {% if job.note %}<dt>{{ t('job_note') }}</dt><dd>{{ job.note }}</dd>{% endif %}
+      {% if job.error %}<dt>{{ t('job_error') }}</dt><dd class="err-text ltr">{{ job.error }}</dd>{% endif %}
+    </dl>
+  </div>
+
+  <h2 class="section-title">{{ t('job_compare') }}</h2>
+  {% if comparison %}
+    <p class="muted small">{{ t('job_compare_help')|replace('{v}', job.compared_version or '—') }}</p>
+    <div class="table-scroll">
+      <table class="data-table compare">
+        <thead>
+          <tr>
+            <th>{{ t('job_group') }}</th><th>{{ t('job_clips') }}</th>
+            <th>WER {{ t('job_cur') }}</th><th>WER {{ t('job_new') }}</th><th>{{ t('job_delta') }}</th>
+            <th>CER {{ t('job_cur') }}</th><th>CER {{ t('job_new') }}</th><th>{{ t('job_delta') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in comparison %}
+            <tr{% if r.group == 'all' %} class="total"{% endif %}>
+              <td>{{ t('group_' ~ r.group) }}</td><td>{{ r.n }}</td>
+              {% for k in ['wer', 'cer'] %}
+                <td>{{ '%.1f%%'|format(r['cur_' ~ k]) if r['cur_' ~ k] is not none else '—' }}</td>
+                <td>{{ '%.1f%%'|format(r['new_' ~ k]) if r['new_' ~ k] is not none else '—' }}</td>
+                {% set d = r['delta_' ~ k] %}
+                <td class="{{ 'better' if d is not none and d < 0 else ('worse' if d is not none and d > 0 else '') }}">{{ ('%+.1f'|format(d)) if d is not none else '—' }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">{{ t('job_no_metrics') }}</p>
+  {% endif %}
+
+  {% if files %}
+    <h2 class="section-title">{{ t('job_files') }}</h2>
+    <ul class="file-list ltr">
+      {% for name, f in files.items() %}<li><b>{{ name }}</b> · {{ f.bytes }} B · <code>{{ f.sha256 }}</code></li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <div class="job-actions">
+    {% if job.status == 'review' %}
+      <form method="post" action="/admin/training/{{ job.id }}/action" class="confirm-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="publish">
+        <label class="check"><input type="checkbox" name="confirm" value="yes" required> <span>{{ t('job_publish_confirm') }}</span></label>
+        <button type="submit" class="btn primary">{{ t('job_publish') }}</button>
+      </form>
+      <form method="post" action="/admin/training/{{ job.id }}/action">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="reject">
+        <button type="submit" class="btn danger">{{ t('job_reject') }}</button>
+      </form>
+    {% endif %}
+    {% if job.status in ('queued', 'running') %}
+      <form method="post" action="/admin/training/{{ job.id }}/action">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="cancel">
+        <button type="submit" class="btn danger">{{ t('job_cancel') }}</button>
+      </form>
+    {% endif %}
+    {% if job.status == 'failed' %}
+      <form method="post" action="/admin/training/{{ job.id }}/action">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="retry">
+        <button type="submit" class="btn">{{ t('job_retry') }}</button>
+      </form>
+    {% endif %}
+    {% if job.status == 'published' and serving_version == job.published_version %}
+      <form method="post" action="/admin/training/{{ job.id }}/action" class="confirm-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="rollback">
+        <label class="check"><input type="checkbox" name="confirm" value="yes" required> <span>{{ t('job_rollback_confirm')|replace('{v}', job.previous_version) }}</span></label>
+        <button type="submit" class="btn danger">{{ t('job_rollback') }}</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <h2 class="section-title">{{ t('job_logs') }}</h2>
+  <pre id="job-log" class="job-log" dir="ltr" tabindex="0">{% for l in logs %}{{ l.line }}
+{% endfor %}</pre>
+</section>
+{% endblock %}
