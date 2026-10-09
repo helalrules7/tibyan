@@ -117,7 +117,8 @@ Set `SECRET_KEY` and `DATABASE_URL` in `.env` for production (see
 ## Tests
 
 Install test-only dependencies with `pip install -r requirements-test.txt`,
-then run `python -m unittest discover -s tests -v`. The end-to-end workflow
+then run `python -m pytest tests` (or `python -m unittest discover -s tests -v`).
+Runner unit tests: `python -m unittest discover -s runner/tests`. The end-to-end workflow
 test uses a temporary SQLite database and media directory plus synthetic tone
 audio; it requires `ffmpeg` and `ffprobe` and never trains on that test data.
 
@@ -185,6 +186,91 @@ hostname.
 - Security headers live in the Hestia custom include
   `conf/web/<domain>/nginx.ssl.conf_security`; HSTS and HTTPS redirect use
   Hestia's own `v-add-web-domain-ssl-hsts` / `-ssl-force`.
+
+## Admin panel, notifications and training (2026-10-09)
+
+### Admin panel (`/admin`, admins only; Arabic RTL and English)
+
+- **Dashboard** (`/admin`): recordings awaiting review (pending + reported),
+  accepted minutes per voice group (men / women / children /
+  unspecified, from the recording's gender and age bracket), volunteer
+  accounts and contributors, open requests, the published model version
+  and the latest training job. Below it, the review list (filter by
+  status, owner, votes, metadata, audio, direct accept/reject); on phones
+  each row becomes a card.
+- **Requests & emails** (`/admin/requests`): «تواصل معنا» messages
+  (read / replied, reply by email), beta-join requests from altibyan.app
+  (mark "added to Google Play" / "added to TestFlight"), all «أبلغني»
+  sign-ups with CSV export (`/admin/requests/notify.csv`, `?beta=1` for
+  beta only; formula-safe), and data-deletion requests sent from the
+  `/voice` form (open / done / declined, with the matching account and
+  its recording count). Deletions themselves are carried out by hand.
+- Additive migration `migrate_request_columns` adds nullable
+  `read_at`/`replied_at` (contact) and `play_added_at`/
+  `testflight_added_at` (notify sign-ups); new tables are created by
+  `create_all`. Existing rows are never changed.
+
+### Notification centre and Web Push
+
+- Every signed-in user has `/notifications` and a bell with the unread
+  count in the header. Rows are stored per user (`notifications`) and
+  rendered in the reader's language.
+- Events — admins: new recording awaiting review, new beta request, new
+  contact message, new deletion request, training job finished / failed.
+  Volunteers: their recording accepted / rejected (by votes or by an
+  admin).
+- Web Push uses VAPID (`pywebpush`). Keys: `python -m app.vapid >> .env`
+  on the server (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`; never in git).
+  Without keys push is off and the in-app centre still works.
+- The service worker is `/sw.js` (scope `/`, push only, no offline cache);
+  the PWA manifest is `/manifest.webmanifest` (standalone, 192/512 icons).
+  `/notifications` has the opt-in, opt-out and test buttons; each browser
+  subscription belongs to one user (`push_subscriptions`), and endpoints
+  the push service reports gone (404/410) are deleted.
+- **iPhone / iPad:** Web Push works only on iOS/iPadOS 16.4+ for a site
+  added to the Home Screen (Safari → Share → Add to Home Screen) and
+  opened from that icon; permission must be requested from a tap (the
+  "Turn on notifications" button). The page shows these steps on iOS.
+
+### Training jobs (decision: train on Ahmed's Mac, publish only on approval)
+
+- `/admin/training`: freeze the **fixed held-out evaluation set** once
+  (about `EVAL_FRACTION` of accepted recordings per voice group, chosen by
+  a stable hash; at least `EVAL_MIN_RECORDINGS` accepted needed). Its
+  recordings never train. Then **Start training**: base model (the
+  official NVIDIA checkpoint or an earlier job) and hyperparameters
+  (defaults: 5 epochs, lr 3e-5, batch 4, clips up to 30 s). The list of
+  accepted recordings outside the evaluation set is frozen into the job.
+- States: `queued → running → review → published → rolled_back`;
+  `running → failed → queued` (retry); `queued/running → cancelled`;
+  `review → rejected`. `/admin/training/<id>` shows live progress, stage,
+  heartbeat and logs (polled every 5 s), then the WER/CER comparison per
+  voice group between the published model and the candidate.
+- **Runner API** (`/api/runner/*`, `Authorization: Bearer $RUNNER_TOKEN`
+  only; 503 when the token is unset): `POST claim`, `GET jobs/<id>`,
+  `POST jobs/<id>/progress` (logs, progress; answers `stop` when
+  cancelled), `GET jobs/<id>/dataset` (train + eval entries with verse
+  text), `GET jobs/<id>/audio/<rec>` (only recordings in that job's
+  snapshot or evaluation set, only while it runs, only if still accepted;
+  `X-Sha256` header), `PUT jobs/<id>/files/<name>?offset=N` (resumable
+  chunks ≤ 16 MiB, under nginx's 60m body limit),
+  `POST jobs/<id>/complete` (server re-checks sizes and SHA-256),
+  `POST jobs/<id>/fail`. Uploads stay private under
+  `media/training/jobs/<id>/files/`.
+- **Approve & publish** (explicit checkbox) copies `model.int8.onnx` and
+  `tokens.txt` into `<MIRROR_DIR>/<MODEL_NAME>/<next version>/` with
+  `LICENSE.txt` (NVIDIA CC BY 4.0 + «متطوعو تبيان / Tibyan volunteers»
+  CC BY 4.0) and `SHA256SUMS` (verified before the directory becomes
+  visible), saves the old manifest as `manifest.v<old>.json`, writes the
+  new `manifest.json` atomically and updates the model's top-level
+  `SHA256SUMS`. Older version directories are kept. **Roll back** restores
+  the previous manifest after checking its files. **Reject** deletes the
+  uploads; nothing becomes public. Results of the fake runner can never
+  be published.
+- The runner itself is in [`runner/`](runner/README.md).
+- Production mounts the mirror's `recitation-models` directory into the
+  container (`MIRROR_DIR=/app/mirror`); published files are chowned to the
+  mirror directory's owner.
 
 ## Rules
 
