@@ -174,6 +174,18 @@ on `127.0.0.1:8001` and have a Let's Encrypt certificate. Keep any existing
 mail DNS records unchanged. The app selects the Coming Soon page by request
 hostname.
 
+## Root site, privacy and headers (2026-10-09)
+
+- `altibyan.app` "notify me" addresses go to the `notify_signups` table
+  (`email`, `lang`, `wants_beta`). nginx limits `POST /notify` to 6/min per
+  IP (`/etc/nginx/conf.d/tibyan-notify-ratelimit.conf`).
+- Sign-up stores the birth year only (`users.birth_year`, nullable, added by
+  `migrate_user_birth_year`); older rows keep `birth_date`/`phone`.
+- `/voice` explains how recordings are used (CC BY 4.0) and deleted.
+- Security headers live in the Hestia custom include
+  `conf/web/<domain>/nginx.ssl.conf_security`; HSTS and HTTPS redirect use
+  Hestia's own `v-add-web-domain-ssl-hsts` / `-ssl-force`.
+
 ## Rules
 
 - Quran verse text (the reading prompts, phase 2) is exported verbatim
