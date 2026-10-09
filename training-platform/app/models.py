@@ -120,6 +120,9 @@ class ContactMessage(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.current_timestamp()
     )
+    # Added by migrate_request_columns (nullable; old rows stay unread).
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    replied_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
 
 class NotifySignup(Base):
@@ -131,6 +134,145 @@ class NotifySignup(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     lang: Mapped[str] = mapped_column(String(8), default="ar")
     wants_beta: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.current_timestamp()
+    )
+    # Beta testers an admin added to Google Play / TestFlight (nullable,
+    # added by migrate_request_columns).
+    play_added_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    testflight_added_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
+class DeletionRequest(Base):
+    """A request (from /voice) to delete recordings or a whole account."""
+
+    __tablename__ = "deletion_requests"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id"), index=True, nullable=True
+    )
+    email: Mapped[str] = mapped_column(String(255))
+    # recordings | account
+    scope: Mapped[str] = mapped_column(String(16), default="account")
+    details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # open | done | declined
+    status: Mapped[str] = mapped_column(String(16), default="open", index=True)
+    handled_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    handled_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.current_timestamp()
+    )
+
+
+class Notification(Base):
+    """In-app notification; the text is rendered from `kind` + `data` in
+    the reader's language, so one row serves Arabic and English."""
+
+    __tablename__ = "notifications"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(40))
+    data: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    url: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.current_timestamp()
+    )
+
+
+class PushSubscription(Base):
+    """A browser's Web Push subscription for one user."""
+
+    __tablename__ = "push_subscriptions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    # sha256(endpoint): unique without a long-text index (MariaDB limits).
+    endpoint_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    endpoint: Mapped[str] = mapped_column(Text)
+    p256dh: Mapped[str] = mapped_column(String(255))
+    auth: Mapped[str] = mapped_column(String(64))
+    lang: Mapped[str] = mapped_column(String(8), default="ar")
+    user_agent: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    failures: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.current_timestamp()
+    )
+    last_success_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
+class EvalSet(Base):
+    """A frozen, held-out evaluation set. Its recordings never train."""
+
+    __tablename__ = "eval_sets"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(64))
+    created_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.current_timestamp()
+    )
+
+
+class EvalSetItem(Base):
+    __tablename__ = "eval_set_items"
+    __table_args__ = (
+        UniqueConstraint("eval_set_id", "recording_id", name="uq_eval_item"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    eval_set_id: Mapped[int] = mapped_column(ForeignKey("eval_sets.id"), index=True)
+    # No FK: an owner may delete the recording; the item then drops out.
+    recording_id: Mapped[int] = mapped_column(Integer, index=True)
+
+
+class TrainingJob(Base):
+    """One fine-tune run on the Mac runner (see app/training.py)."""
+
+    __tablename__ = "training_jobs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    status: Mapped[str] = mapped_column(String(16), default="queued", index=True)
+    # nvidia-base | job:<id>
+    base_model: Mapped[str] = mapped_column(String(64), default="nvidia-base")
+    params: Mapped[str] = mapped_column(Text)  # JSON hyperparameters
+    # JSON {"train": [recording ids]} frozen at creation.
+    dataset: Mapped[str] = mapped_column(Text)
+    eval_set_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    train_count: Mapped[int] = mapped_column(Integer, default=0)
+    train_ms: Mapped[int] = mapped_column(Integer, default=0)
+    note: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    created_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.current_timestamp()
+    )
+
+    runner: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    claimed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    heartbeat_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    progress: Mapped[float] = mapped_column(default=0.0)
+    stage: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # Model version the runner compared against (manifest version at claim).
+    compared_version: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    metrics: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+    files: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON
+
+    decided_by: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    decided_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    published_version: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    previous_version: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+
+
+class TrainingJobLog(Base):
+    __tablename__ = "training_job_logs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("training_jobs.id"), index=True)
+    line: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.current_timestamp()
     )

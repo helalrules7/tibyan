@@ -52,5 +52,39 @@ def migrate_user_birth_year(bind: Engine = engine) -> None:
                 raise
 
 
+def add_missing_columns(bind: Engine, table: str, columns: dict[str, str]) -> None:
+    """Additive migration: ALTER TABLE ADD COLUMN for each missing nullable
+    column; existing rows and columns are never touched."""
+    inspector = inspect(bind)
+    if table not in inspector.get_table_names():
+        return
+    present = {c["name"] for c in inspector.get_columns(table)}
+    for name, ddl in columns.items():
+        if name in present:
+            continue
+        try:
+            with bind.begin() as connection:
+                connection.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {ddl}"))
+        except Exception:
+            # Another worker added it first; fail only if it is still missing.
+            if name not in {c["name"] for c in inspect(bind).get_columns(table)}:
+                raise
+
+
+def migrate_request_columns(bind: Engine = engine) -> None:
+    """Read/replied state for contact messages, Play/TestFlight marks for
+    beta requests. All nullable."""
+    add_missing_columns(
+        bind,
+        "contact_messages",
+        {"read_at": "DATETIME NULL", "replied_at": "DATETIME NULL"},
+    )
+    add_missing_columns(
+        bind,
+        "notify_signups",
+        {"play_added_at": "DATETIME NULL", "testflight_added_at": "DATETIME NULL"},
+    )
+
+
 class Base(DeclarativeBase):
     pass
