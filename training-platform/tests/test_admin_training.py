@@ -58,7 +58,9 @@ def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-class AdminTrainingTests(unittest.TestCase):
+class PlatformCase(unittest.TestCase):
+    """Shared fixture: temp DB, media, mirror; fake push sender."""
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         root = Path(self.tmp.name)
@@ -187,6 +189,73 @@ class AdminTrainingTests(unittest.TestCase):
         return [self.recording(owner, gender=groups[i % 3][0], age=groups[i % 3][1])
                 for i in range(n)]
 
+    def _queued_job(self):
+        a = self.user("a@example.test", is_admin=True)
+        vol = self.user("v@example.test")
+        ids = self.seed_dataset(vol, 12)
+        rejected = self.recording(vol, status="rejected")
+        with self.Session() as db:
+            training.freeze_eval_set(db, a)
+            job = training.create_job(db, a, "nvidia-base", {})
+            return job.id, ids, rejected
+
+    def _upload(self, c, job_id, name, data):
+        size = 0
+        while size < len(data):
+            chunk = data[size:size + settings.runner_chunk_bytes]
+            r = c.put(f"/api/runner/jobs/{job_id}/files/{name}?offset={size}", content=chunk,
+                      headers=self.auth())
+            self.assertEqual(r.status_code, 200, r.text)
+            size = r.json()["size"]
+
+    def _run_to_review(self, new_model=b"new-model-" * 20, tokens=b"<blk> 0\n"):
+        job_id, ids, rejected = self._queued_job()
+        c = self.client()
+        claim = c.post("/api/runner/claim", headers=self.auth()).json()
+        self.assertEqual(claim["job"]["id"], job_id)
+        self.assertEqual(claim["job"]["current_model"]["version"], "1")
+        # Another runner gets nothing while it is fresh.
+        self.assertIsNone(c.post("/api/runner/claim", headers=self.auth(name="other")).json()["job"])
+        # Same runner resumes the same job.
+        self.assertTrue(c.post("/api/runner/claim", headers=self.auth()).json()["resumed"])
+
+        ds = c.get(f"/api/runner/jobs/{job_id}/dataset", headers=self.auth()).json()
+        self.assertEqual(len(ds["train"]) + len(ds["eval"]), 12)
+        self.assertEqual(ds["train"][0]["text"], "fixture verse one fixture verse two")
+        audio = c.get(ds["train"][0]["audio"], headers=self.auth())
+        self.assertEqual(audio.headers["x-sha256"], sha(audio.content))
+        self.assertEqual(c.get(f"/api/runner/jobs/{job_id}/audio/{rejected}",
+                               headers=self.auth()).status_code, 403)
+        self.assertEqual(c.get(ds["train"][0]["audio"]).status_code, 401)
+
+        r = c.post(f"/api/runner/jobs/{job_id}/progress", headers=self.auth(),
+                   json={"progress": 0.5, "stage": "training", "logs": ["epoch 1 loss 1.0"]})
+        self.assertEqual(r.json(), {"status": "running", "stop": False})
+
+        bad = c.put(f"/api/runner/jobs/{job_id}/files/model.int8.onnx?offset=5",
+                    content=b"x", headers=self.auth())
+        self.assertEqual(bad.status_code, 409)
+        self.assertEqual(c.put(f"/api/runner/jobs/{job_id}/files/evil.sh?offset=0",
+                               content=b"x", headers=self.auth()).status_code, 400)
+        self._upload(c, job_id, "model.int8.onnx", new_model)
+        self._upload(c, job_id, "tokens.txt", tokens)
+        files = {"model.int8.onnx": {"sha256": sha(new_model), "bytes": len(new_model)},
+                 "tokens.txt": {"sha256": sha(tokens), "bytes": len(tokens)}}
+        wrong = dict(files, **{"tokens.txt": {"sha256": "0" * 64, "bytes": len(tokens)}})
+        metrics = {"current": {"groups": {"all": {"n": 3, "wer": 20.0, "cer": 8.0}}},
+                   "candidate": {"groups": {"all": {"n": 3, "wer": 15.0, "cer": 6.0}}}}
+        self.assertEqual(c.post(f"/api/runner/jobs/{job_id}/complete", headers=self.auth(),
+                                json={"metrics": metrics, "files": wrong}).status_code, 409)
+        r = c.post(f"/api/runner/jobs/{job_id}/complete", headers=self.auth(),
+                   json={"metrics": metrics, "files": files})
+        self.assertEqual(r.json()["status"], "review")
+        with self.Session() as db:
+            admin_id = db.query(User).filter(User.is_admin.is_(True)).first().id
+        self.assertIn("training_done", self.notifications_of(admin_id))
+        return job_id, new_model
+
+
+class AdminTrainingTests(PlatformCase):
     # ---------- permissions ---------------------------------------------
     def test_admin_pages_require_admin(self):
         self.user("vol@example.test")
@@ -413,72 +482,6 @@ class AdminTrainingTests(unittest.TestCase):
             self.assertEqual(set(training.job_train_ids(job)), set(ids) - held)
             self.assertEqual(training.job_params(job)["epochs"], 2)
         self.assertEqual(c.get("/admin/training/1").status_code, 200)
-
-    # ---------- runner end to end + publish / rollback -------------------
-    def _queued_job(self):
-        a = self.user("a@example.test", is_admin=True)
-        vol = self.user("v@example.test")
-        ids = self.seed_dataset(vol, 12)
-        rejected = self.recording(vol, status="rejected")
-        with self.Session() as db:
-            training.freeze_eval_set(db, a)
-            job = training.create_job(db, a, "nvidia-base", {})
-            return job.id, ids, rejected
-
-    def _upload(self, c, job_id, name, data):
-        size = 0
-        while size < len(data):
-            chunk = data[size:size + settings.runner_chunk_bytes]
-            r = c.put(f"/api/runner/jobs/{job_id}/files/{name}?offset={size}", content=chunk,
-                      headers=self.auth())
-            self.assertEqual(r.status_code, 200, r.text)
-            size = r.json()["size"]
-
-    def _run_to_review(self, new_model=b"new-model-" * 20, tokens=b"<blk> 0\n"):
-        job_id, ids, rejected = self._queued_job()
-        c = self.client()
-        claim = c.post("/api/runner/claim", headers=self.auth()).json()
-        self.assertEqual(claim["job"]["id"], job_id)
-        self.assertEqual(claim["job"]["current_model"]["version"], "1")
-        # Another runner gets nothing while it is fresh.
-        self.assertIsNone(c.post("/api/runner/claim", headers=self.auth(name="other")).json()["job"])
-        # Same runner resumes the same job.
-        self.assertTrue(c.post("/api/runner/claim", headers=self.auth()).json()["resumed"])
-
-        ds = c.get(f"/api/runner/jobs/{job_id}/dataset", headers=self.auth()).json()
-        self.assertEqual(len(ds["train"]) + len(ds["eval"]), 12)
-        self.assertEqual(ds["train"][0]["text"], "fixture verse one fixture verse two")
-        audio = c.get(ds["train"][0]["audio"], headers=self.auth())
-        self.assertEqual(audio.headers["x-sha256"], sha(audio.content))
-        self.assertEqual(c.get(f"/api/runner/jobs/{job_id}/audio/{rejected}",
-                               headers=self.auth()).status_code, 403)
-        self.assertEqual(c.get(ds["train"][0]["audio"]).status_code, 401)
-
-        r = c.post(f"/api/runner/jobs/{job_id}/progress", headers=self.auth(),
-                   json={"progress": 0.5, "stage": "training", "logs": ["epoch 1 loss 1.0"]})
-        self.assertEqual(r.json(), {"status": "running", "stop": False})
-
-        bad = c.put(f"/api/runner/jobs/{job_id}/files/model.int8.onnx?offset=5",
-                    content=b"x", headers=self.auth())
-        self.assertEqual(bad.status_code, 409)
-        self.assertEqual(c.put(f"/api/runner/jobs/{job_id}/files/evil.sh?offset=0",
-                               content=b"x", headers=self.auth()).status_code, 400)
-        self._upload(c, job_id, "model.int8.onnx", new_model)
-        self._upload(c, job_id, "tokens.txt", tokens)
-        files = {"model.int8.onnx": {"sha256": sha(new_model), "bytes": len(new_model)},
-                 "tokens.txt": {"sha256": sha(tokens), "bytes": len(tokens)}}
-        wrong = dict(files, **{"tokens.txt": {"sha256": "0" * 64, "bytes": len(tokens)}})
-        metrics = {"current": {"groups": {"all": {"n": 3, "wer": 20.0, "cer": 8.0}}},
-                   "candidate": {"groups": {"all": {"n": 3, "wer": 15.0, "cer": 6.0}}}}
-        self.assertEqual(c.post(f"/api/runner/jobs/{job_id}/complete", headers=self.auth(),
-                                json={"metrics": metrics, "files": wrong}).status_code, 409)
-        r = c.post(f"/api/runner/jobs/{job_id}/complete", headers=self.auth(),
-                   json={"metrics": metrics, "files": files})
-        self.assertEqual(r.json()["status"], "review")
-        with self.Session() as db:
-            admin_id = db.query(User).filter(User.is_admin.is_(True)).first().id
-        self.assertIn("training_done", self.notifications_of(admin_id))
-        return job_id, new_model
 
     def test_runner_flow_publish_and_rollback(self):
         job_id, new_model = self._run_to_review()
