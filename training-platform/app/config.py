@@ -9,8 +9,11 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-change-me"
     # Secure session cookie; true in production (HTTPS).
     cookie_secure: bool = False
-    consent_version: str = "1.0"
+    consent_version: str = "1.1"
     adult_age: int = 18
+
+    # Public progress counter on the training home page.
+    training_goal_minutes: int = 600
 
     # Public origin used for meta/share tags.
     site_url: str = "https://train.altibyan.app"

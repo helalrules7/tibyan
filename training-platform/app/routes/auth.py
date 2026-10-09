@@ -26,19 +26,44 @@ def _normalize_phone(raw: str) -> str:
     return ("+" + digits) if plus and digits else digits
 
 
-def age_on(birth: date, when: date | None = None) -> int:
-    when = when or date.today()
-    years = when.year - birth.year
-    if (when.month, when.day) < (birth.month, birth.day):
-        years -= 1
-    return years
+def may_be_minor(birth_year: int, today: date | None = None) -> bool:
+    """True when someone born in birth_year could still be under adult_age.
+
+    With only the year known, a person who turns adult_age this year may not
+    have had the birthday yet, so that year still asks for guardian consent.
+    """
+    today = today or date.today()
+    return today.year - birth_year <= settings.adult_age
+
+
+def parse_birth_year(raw: str, today: date | None = None) -> int | None:
+    today = today or date.today()
+    raw = raw.strip()
+    if not raw.isdigit():
+        return None
+    year = int(raw)
+    if not (today.year - 120 <= year <= today.year):
+        return None
+    return year
 
 
 @router.get("/register")
 def register_form(request: Request, db: Session = Depends(get_db)):
     if current_user(request, db):
         return RedirectResponse("/dashboard", status_code=303)
-    return render(request, "register.html", errors={}, old={}, today=date.today().isoformat())
+    return _register_page(request, errors={}, old={})
+
+
+def _register_page(request: Request, errors: dict, old: dict):
+    this_year = date.today().year
+    return render(
+        request,
+        "register.html",
+        errors=errors,
+        old=old,
+        this_year=this_year,
+        minor_from_year=this_year - settings.adult_age,
+    )
 
 
 @router.post("/register")
@@ -49,7 +74,7 @@ def register_submit(
     phone: str = Form(""),
     password: str = Form(""),
     password_confirm: str = Form(""),
-    birth_date: str = Form(""),
+    birth_year: str = Form(""),
     consent: bool = Form(False),
     parental: bool = Form(False),
     csrf: str = Form(""),
@@ -61,7 +86,7 @@ def register_submit(
     old = {
         "email": email,
         "phone": phone,
-        "birth_date": birth_date,
+        "birth_year": birth_year,
         "consent": consent,
         "parental": parental,
     }
@@ -82,38 +107,32 @@ def register_submit(
     if password != password_confirm:
         errors["password"] = msg(request, "err_password_mismatch")
 
-    birth: date | None = None
-    try:
-        birth = date.fromisoformat(birth_date)
-        if birth > date.today():
-            birth = None
-    except ValueError:
-        birth = None
-    if birth is None:
+    year = parse_birth_year(birth_year)
+    if year is None:
         errors["birth"] = msg(request, "err_birth")
 
     if not consent:
         errors["consent"] = msg(request, "err_consent")
 
-    minor = birth is not None and age_on(birth) < settings.adult_age
+    minor = year is not None and may_be_minor(year)
     if minor and not parental:
         errors["parental"] = msg(request, "err_parental")
 
     if errors:
-        return render(request, "register.html", errors=errors, old=old, today=date.today().isoformat())
+        return _register_page(request, errors=errors, old=old)
 
     if email and db.query(User).filter(User.email == email).first() is not None:
         errors["email"] = msg(request, "err_email_exists")
-        return render(request, "register.html", errors=errors, old=old, today=date.today().isoformat())
+        return _register_page(request, errors=errors, old=old)
     if phone and db.query(User).filter(User.phone == phone).first() is not None:
         errors["phone"] = msg(request, "err_phone_exists")
-        return render(request, "register.html", errors=errors, old=old, today=date.today().isoformat())
+        return _register_page(request, errors=errors, old=old)
 
     user = User(
         email=email or None,
         phone=phone or None,
         password_hash=hash_password(password),
-        birth_date=birth,
+        birth_year=year,
         consent_ccby=True,
         consent_parental=parental,
         consent_version=settings.consent_version,

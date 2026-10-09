@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ t('voice_title') }} · {{ t('app_name') }}{% endblock %}
+{% block content %}
+<section class="panel voice">
+  <h1>{{ t('voice_title') }}</h1>
+
+  <h2 class="section-title">{{ t('voice_collect_title') }}</h2>
+  <p>{{ t('voice_collect_body') }}</p>
+
+  <h2 class="section-title">{{ t('voice_use_title') }}</h2>
+  <ul>
+    <li>{{ t('voice_use_1') }}</li>
+    <li>{{ t('voice_use_2') }}</li>
+    <li>{{ t('voice_use_3') }} <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">CC BY 4.0</a></li>
+    <li>{{ t('voice_use_4') }}</li>
+  </ul>
+
+  <h2 class="section-title" id="delete">{{ t('voice_delete_title') }}</h2>
+  <ol>
+    <li>{{ t('voice_delete_1') }}</li>
+    <li>{{ t('voice_delete_2') }}</li>
+  </ol>
+  <p class="note">{{ t('voice_delete_3') }}</p>
+
+  <p class="actions-row">
+    {% if user %}
+      <a class="btn primary" href="/dashboard">{{ t('nav_dashboard') }}</a>
+    {% else %}
+      <a class="btn primary" href="/login">{{ t('nav_login') }}</a>
+    {% endif %}
+    <a class="btn" href="/contact">{{ t('voice_contact') }}</a>
+  </p>
+</section>
+{% endblock %}

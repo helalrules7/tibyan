@@ -15,13 +15,7 @@
 
     <label>
       <span>{{ t('email') }}</span>
-      <input type="email" name="email" value="{{ old.email }}" autocomplete="email">
-    </label>
-
-    <label>
-      <span>{{ t('phone') }}</span>
-      <input type="tel" name="phone" value="{{ old.phone }}" autocomplete="tel" dir="ltr">
-      <small>{{ t('phone_hint') }}</small>
+      <input type="email" name="email" value="{{ old.email }}" autocomplete="email" required>
     </label>
 
     <label>
@@ -36,7 +30,10 @@
 
     <label>
       <span>{{ t('birth_date') }}</span>
-      <input type="date" name="birth_date" value="{{ old.birth_date }}" required max="{{ today }}">
+      <input type="number" name="birth_year" value="{{ old.birth_year }}" required
+             inputmode="numeric" min="{{ this_year - 120 }}" max="{{ this_year }}" step="1"
+             placeholder="{{ this_year - 30 }}" autocomplete="bday-year" dir="ltr"
+             data-minor-from="{{ minor_from_year }}">
       <small>{{ t('birth_hint') }}</small>
     </label>
 
@@ -50,6 +47,8 @@
       <span>{{ t('parental_label') }}</span>
     </label>
 
+    <p class="muted small"><a href="/voice">{{ t('voice_link') }}</a></p>
+
     <button class="btn primary" type="submit">{{ t('submit_register') }}</button>
   </form>
 
@@ -57,14 +56,15 @@
 </section>
 <script>
   (function () {
-    var birth = document.querySelector('input[name="birth_date"]');
+    var year = document.querySelector('input[name="birth_year"]');
     var wrap = document.getElementById('parental-wrap');
+    var minorFrom = parseInt(year.getAttribute('data-minor-from'), 10);
     function update() {
-      if (!birth.value) { wrap.hidden = true; return; }
-      var age = Math.floor((Date.now() - new Date(birth.value).getTime()) / 31556952000);
-      wrap.hidden = age >= 18;
+      var value = parseInt(year.value, 10);
+      // Someone turning 18 this year may not have had the birthday yet.
+      wrap.hidden = !(value >= 1000 && value >= minorFrom);
     }
-    birth.addEventListener('change', update);
+    year.addEventListener('input', update);
     update();
   })();
 </script>

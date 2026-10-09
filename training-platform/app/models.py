@@ -26,7 +26,10 @@ class User(Base):
     email: Mapped[Optional[str]] = mapped_column(String(255), unique=True, index=True, nullable=True)
     phone: Mapped[Optional[str]] = mapped_column(String(32), unique=True, index=True, nullable=True)
     password_hash: Mapped[str] = mapped_column(String(255))
+    # Legacy: full birth date from accounts created before consent 1.1.
+    # New sign-ups store only the birth year (privacy notice promise).
     birth_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    birth_year: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     # CC-BY-4.0 consent is required at sign-up.
     consent_ccby: Mapped[bool] = mapped_column(Boolean, default=False)
     # Parental consent, required when the volunteer is a minor.
@@ -114,6 +117,20 @@ class ContactMessage(Base):
     email: Mapped[str] = mapped_column(String(255))
     subject: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     message: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.current_timestamp()
+    )
+
+
+class NotifySignup(Base):
+    """An address that asked to hear when Tibyan launches (altibyan.app)."""
+
+    __tablename__ = "notify_signups"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    lang: Mapped[str] = mapped_column(String(8), default="ar")
+    wants_beta: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.current_timestamp()
     )

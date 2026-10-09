@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}</title>
-  <meta name="description" content="{% if lang == 'ar' %}موقع تبيان الجديد قريبًا. اكتشف منصة تدريب نموذج التسميع القرآني.{% else %}The new Tibyan website is coming soon. Discover our Quran recitation model training platform.{% endif %}">
+  <meta name="description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. اشترك ليصلك خبر الإطلاق.{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. Sign up to hear when it launches.{% endif %}">
   <meta name="theme-color" content="#171610">
   <link rel="canonical" href="https://altibyan.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="تبيان">
   <meta property="og:title" content="{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}">
-  <meta property="og:description" content="{% if lang == 'ar' %}موقع تبيان الجديد قريبًا. اكتشف منصة تدريب نموذج التسميع القرآني.{% else %}The new Tibyan website is coming soon. Discover our Quran recitation model training platform.{% endif %}">
+  <meta property="og:description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. اشترك ليصلك خبر الإطلاق.{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. Sign up to hear when it launches.{% endif %}">
   <meta property="og:url" content="https://altibyan.app/">
   <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=1">
   <meta property="og:image:secure_url" content="https://altibyan.app/static/coming-soon-share.png?v=1">
@@ -22,58 +22,123 @@
   <meta property="og:locale:alternate" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}">
-  <meta name="twitter:description" content="{% if lang == 'ar' %}موقع تبيان الجديد قريبًا. اكتشف منصة تدريب نموذج التسميع القرآني.{% else %}The new Tibyan website is coming soon. Discover our Quran recitation model training platform.{% endif %}">
+  <meta name="twitter:description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. اشترك ليصلك خبر الإطلاق.{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. Sign up to hear when it launches.{% endif %}">
   <meta name="twitter:image" content="https://altibyan.app/static/coming-soon-share.png?v=1">
   <meta name="twitter:image:alt" content="{% if lang == 'ar' %}تبيان قريبًا، منصة تدريب نموذج التسميع{% else %}Tibyan is coming soon, with a Quran recitation training platform{% endif %}">
-  <link rel="stylesheet" href="/static/coming-soon.css">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="stylesheet" href="/static/coming-soon.css?v=2">
 </head>
 <body>
+  {% set ar = lang == 'ar' %}
   <main class="launch-page">
     <header class="launch-header">
-      <a class="wordmark" href="/" aria-label="{% if lang == 'ar' %}تبيان، الصفحة الرئيسية{% else %}Tibyan home{% endif %}">
-        <span class="wordmark-ar" lang="ar" dir="rtl">تبيان</span>
+      <a class="wordmark" href="/" aria-label="{{ 'تبيان، الصفحة الرئيسية' if ar else 'Tibyan home' }}">
+        <img class="wordmark-logo" src="/static/logo-gold.png" alt="">
         <span class="wordmark-en">TIBYAN</span>
       </a>
-      <a class="language-link" href="/lang/{{ 'en' if lang == 'ar' else 'ar' }}">
-        {{ 'English' if lang == 'ar' else 'العربية' }}
-      </a>
+      <nav class="launch-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
+        <a href="#notify">{{ 'تابع الإطلاق' if ar else 'Get updates' }}</a>
+        <a href="https://train.altibyan.app/">{{ 'منصة التدريب' if ar else 'Training platform' }}</a>
+        <a class="language-link" href="/lang/{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
+      </nav>
     </header>
 
     <section class="hero" aria-labelledby="launch-title">
       <div class="hero-copy">
-        <p class="coming-label">{{ 'قريبًا' if lang == 'ar' else 'COMING SOON' }}</p>
+        <p class="coming-label">{{ 'قريبًا' if ar else 'COMING SOON' }}</p>
         <h1 id="launch-title">
-          {{ 'تجربة جديدة من تبيان' if lang == 'ar' else 'A new experience from Tibyan' }}
+          {{ 'تجربة جديدة من تبيان' if ar else 'A new experience from Tibyan' }}
         </h1>
         <p class="hero-description">
-          {{ 'نعمل على موقع جديد يقرّب أدوات تبيان لكل من يخدم القرآن ويتعلّمه.' if lang == 'ar' else 'We are building a new home for tools that help people learn and serve the Quran.' }}
+          {{ 'تبيان تطبيق قرآن غير ربحي بلا إعلانات، للقراءة والتفسير والتسميع من الحفظ.' if ar else 'Tibyan is a non-profit, ad-free Quran app for reading, tafsir and reciting from memory.' }}
         </p>
+        <a class="cta" href="#notify">{{ 'أبلغني عند الإطلاق' if ar else 'Notify me at launch' }}</a>
       </div>
 
       <div class="logo-stage" aria-hidden="true">
         <img class="coming-logo" src="/static/logo-gold.png" alt="">
       </div>
+    </section>
 
-      <section class="training-note" aria-labelledby="training-title">
-        <div>
-          <h2 id="training-title">
-            {{ 'منصة تدريب نموذج التسميع' if lang == 'ar' else 'Recitation model training platform' }}
-          </h2>
-          <p>
-            {{ 'يمكن للمتطوعين المساهمة بتسجيل تلاواتهم في تدريب نموذج التسميع القرآني.' if lang == 'ar' else 'Volunteers can contribute recitations to help train a Quran recitation model.' }}
-          </p>
-        </div>
-        <a class="training-link" href="https://train.altibyan.app/">
-          {{ 'اكتشف المنصة' if lang == 'ar' else 'Visit the platform' }}
-          <span aria-hidden="true">↗</span>
-        </a>
-      </section>
+    <section class="features" aria-label="{{ 'مزايا تبيان' if ar else 'Tibyan features' }}">
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
+        <h2>{{ 'بدون إنترنت وبلا إعلانات' if ar else 'Offline, no ads' }}</h2>
+        <p>{{ 'كل شيء على جهازك، ولا إعلانات إطلاقًا.' if ar else 'Everything stays on your device, with no ads at all.' }}</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg>
+        <h2>{{ 'التفسير بجوار الآية' if ar else 'Tafsir beside the verse' }}</h2>
+        <p>{{ 'تفاسير من مصادر موثّقة ومذكورة.' if ar else 'Tafsir from documented, credited sources.' }}</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        <h2>{{ 'سمّع من حفظك بصوتك' if ar else 'Recite from memory' }}</h2>
+        <p>{{ 'التسميع يعمل على جهازك، وصوتك لا يغادره.' if ar else 'Voice checking runs on your device; your voice never leaves it.' }}</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>
+        <h2>{{ 'ختمتك وورْدك' if ar else 'Your khatma' }}</h2>
+        <p>{{ 'تابع تقدّمك في الختمة يومًا بيوم.' if ar else 'Follow your khatma progress day by day.' }}</p>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="2.5"/><circle cx="16" cy="9" r="2.5"/><circle cx="12" cy="16" r="2.5"/></svg>
+        <h2>{{ 'ألوان التجويد' if ar else 'Tajweed colours' }}</h2>
+        <p>{{ 'أحكام التجويد ملوّنة على النص.' if ar else 'Tajweed rules coloured on the text.' }}</p>
+      </div>
+    </section>
+
+    <section class="notify-card" id="notify" aria-labelledby="notify-title">
+      <div>
+        <h2 id="notify-title">{{ 'أبلغني عند الإطلاق' if ar else 'Tell me when it launches' }}</h2>
+        <p>{{ 'اترك بريدك وسنرسل لك رسالة واحدة عند الإطلاق. لن نشارك بريدك مع أي جهة.' if ar else 'Leave your email and we will send one message at launch. We never share your address.' }}</p>
+      </div>
+      {% if notify == 'ok' %}
+        <p class="notify-status ok" role="status">{{ 'تم التسجيل، شكرًا لك.' if ar else 'You are on the list, thank you.' }}</p>
+      {% else %}
+        {% if notify == 'invalid' %}
+          <p class="notify-status error" role="alert">{{ 'أدخل بريدًا إلكترونيًا صحيحًا.' if ar else 'Enter a valid email address.' }}</p>
+        {% endif %}
+        <form class="notify-form" method="post" action="/notify">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <div class="hp" aria-hidden="true">
+            <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <label class="sr-only" for="notify-email">{{ 'البريد الإلكتروني' if ar else 'Email address' }}</label>
+          <div class="notify-row">
+            <input id="notify-email" type="email" name="email" required maxlength="255"
+                   autocomplete="email" placeholder="{{ 'بريدك الإلكتروني' if ar else 'you@example.com' }}" dir="ltr">
+            <button type="submit">{{ 'أبلغني' if ar else 'Notify me' }}</button>
+          </div>
+          <label class="beta-check">
+            <input type="checkbox" name="beta" value="1">
+            <span>{{ 'أريد أيضًا الانضمام لاختبار النسخة التجريبية (أندرويد أو آيفون).' if ar else 'I also want to join the beta test (Android or iPhone).' }}</span>
+          </label>
+        </form>
+      {% endif %}
+    </section>
+
+    <section class="training-note" aria-labelledby="training-title">
+      <div>
+        <h2 id="training-title">
+          {{ 'منصة تدريب نموذج التسميع' if ar else 'Recitation model training platform' }}
+        </h2>
+        <p>
+          {{ 'ساهم بتسجيل تلاوتك من حفظك لتدريب نموذج التسميع القرآني.' if ar else 'Contribute a recitation from memory to help train the Quran recitation model.' }}
+        </p>
+      </div>
+      <a class="training-link" href="https://train.altibyan.app/">
+        {{ 'اكتشف المنصة' if ar else 'Visit the platform' }}
+        <span aria-hidden="true">↗</span>
+      </a>
     </section>
 
     <footer class="launch-footer">
-      <span>{{ 'تبيان لخدمة القرآن الكريم' if lang == 'ar' else 'Tibyan, tools in service of the Quran' }}</span>
+      <span>{{ 'تبيان لخدمة القرآن الكريم' if ar else 'Tibyan, tools in service of the Quran' }}</span>
       <span class="footer-rule" aria-hidden="true"></span>
-      <span>altibyan.app</span>
+      <a href="https://train.altibyan.app/">train.altibyan.app</a>
     </footer>
   </main>
 </body>

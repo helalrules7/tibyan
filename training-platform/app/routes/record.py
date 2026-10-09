@@ -196,6 +196,8 @@ def delete_recording(
     db.commit()
 
     path.unlink(missing_ok=True)
+    # Also drop any copy left in the training export from an earlier run.
+    (media_root() / "export" / "wavs" / f"{recording_id}.wav").unlink(missing_ok=True)
 
     request.session["flash"] = msg(request, "rec_deleted")
     return RedirectResponse("/dashboard", status_code=303)

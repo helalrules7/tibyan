@@ -33,5 +33,24 @@ def migrate_recording_ayah_end(bind: Engine = engine) -> None:
             )
 
 
+def migrate_user_birth_year(bind: Engine = engine) -> None:
+    """Additive: a nullable birth_year column; existing rows stay untouched."""
+    inspector = inspect(bind)
+    if "users" not in inspector.get_table_names():
+        return
+    columns = {column["name"] for column in inspector.get_columns("users")}
+    if "birth_year" not in columns:
+        try:
+            with bind.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE users ADD COLUMN birth_year INTEGER NULL")
+                )
+        except Exception:
+            # Another worker added it first; fail only if it is still missing.
+            columns = {c["name"] for c in inspect(bind).get_columns("users")}
+            if "birth_year" not in columns:
+                raise
+
+
 class Base(DeclarativeBase):
     pass

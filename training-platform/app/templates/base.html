@@ -30,23 +30,37 @@
   <meta name="twitter:image" content="{{ site_url }}/static/share.png?v=3">
   <meta name="twitter:image:alt" content="{{ t('hero_title') }}، {{ t('share_action') }}">
 
-  <link rel="stylesheet" href="/static/style.css?v=7">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="stylesheet" href="/static/style.css?v=8">
+  <script src="/static/site.js?v=1" defer></script>
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="/"><img class="brand-logo" src="/static/logo-gold.png" alt="Tibyan"> {{ t('app_name') }}</a>
-    <nav class="nav">
+    <a class="brand" href="/">
+      <img class="brand-logo" src="/static/logo-gold.png" alt="Tibyan">
+      <span class="brand-full">{{ t('app_name') }}</span>
+      <span class="brand-short">{{ t('app_short') }}</span>
+    </a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" hidden>
+      <span class="menu-icon" aria-hidden="true"></span>
+      <span>{{ t('menu') }}</span>
+    </button>
+    <nav class="nav" id="site-nav">
+      <a class="home-site" href="https://altibyan.app/">{{ t('nav_tibyan') }} <span aria-hidden="true">↗</span></a>
       <a href="/">{{ t('nav_home') }}</a>
-  <a href="/contact">{{ t('nav_contact') }}</a>
-  {% if not request.session.get('user_id') %}
-    <a href="/register">{{ t('nav_register') }}</a>
-    <a href="/login">{{ t('nav_login') }}</a>
-  {% else %}
-    <a href="/record">{{ t('record_title') }}</a>
-    <a href="/validate">{{ t('nav_validate') }}</a>
-    <a href="/dashboard">{{ t('nav_dashboard') }}</a>
-    <a href="/logout">{{ t('nav_logout') }}</a>
-  {% endif %}
+      <a href="/voice">{{ t('nav_voice') }}</a>
+      <a href="/contact">{{ t('nav_contact') }}</a>
+      {% if not request.session.get('user_id') %}
+        <a href="/register">{{ t('nav_register') }}</a>
+        <a href="/login">{{ t('nav_login') }}</a>
+      {% else %}
+        <a href="/record">{{ t('record_title') }}</a>
+        <a href="/validate">{{ t('nav_validate') }}</a>
+        <a href="/dashboard">{{ t('nav_dashboard') }}</a>
+        <a href="/logout">{{ t('nav_logout') }}</a>
+      {% endif %}
       <a class="lang" href="/lang/{{ 'en' if lang == 'ar' else 'ar' }}">{{ t('lang_name') }}</a>
     </nav>
   </header>
@@ -56,6 +70,11 @@
 
   <footer class="foot">
     <img class="foot-logo" src="/static/logo-gold.png" alt="Tibyan"> {{ t('app_name') }} — {{ t('footer_note') }}
+    <div class="foot-links">
+      <a href="https://altibyan.app/">altibyan.app</a>
+      <a href="/voice">{{ t('nav_voice') }}</a>
+      <a href="/contact">{{ t('nav_contact') }}</a>
+    </div>
   </footer>
 </body>
 </html>
