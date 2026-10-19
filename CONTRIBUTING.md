@@ -25,9 +25,28 @@ These are not negotiable:
 2. Branch from `main`. Keep one change per pull request.
 3. Before pushing: `dart format .`, `flutter analyze` and `flutter test` must pass (CI runs the same).
 4. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) in English, e.g. `fix(mushaf): keep the page when the reciter changes`.
-5. Every user-visible string goes in `lib/l10n/` (Arabic is the template; add the English too).
+5. Every user-visible string goes in `lib/l10n/` (Arabic is the template; add the English too). See [Adding a string](#adding-a-string).
 6. Every feature works in both the 1441 and 1405 Madina editions.
 7. Add a line under `## [Unreleased]` in [`CHANGELOG.md`](CHANGELOG.md) for user-visible changes.
+
+## Adding a string
+
+1. Add the key to `lib/l10n/app_ar.arb` first (the template in `l10n.yaml`), then to `lib/l10n/app_en.arb` with the same name.
+2. For placeholders, add `@key` metadata to the template, following its existing `@versionLabel` entry. Here is the English value with that metadata:
+
+   ```json
+   {
+     "versionLabel": "Version {version}",
+     "@versionLabel": {
+       "placeholders": {
+         "version": { "type": "String" }
+       }
+     }
+   }
+   ```
+
+3. Run `flutter gen-l10n` from the project root and commit the updated ARB files and generated `lib/l10n/app_localizations*.dart` files.
+4. Import `lib/l10n/app_localizations.dart` using a relative path (for example, `import 'l10n/app_localizations.dart';` from `lib/main.dart`). Use `AppLocalizations.of(context).key` for a plain string, or `AppLocalizations.of(context).versionLabel(version)` for this placeholder (`version` is a `String`). Check the generated file for the exact getter or method signature.
 
 ## License
 
