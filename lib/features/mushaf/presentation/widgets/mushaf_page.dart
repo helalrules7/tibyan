@@ -19,6 +19,7 @@ import '../../mushaf_providers.dart';
 import '../fit_width_scroll.dart';
 import 'image_page.dart';
 import 'page_interaction.dart';
+import 'route_settle.dart';
 
 typedef _PageData = (
   PictureInfo,
@@ -472,6 +473,9 @@ class _MushafPageState extends ConsumerState<MushafPage> {
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
+      // A neighbour page waits for the screen's transition to end.
+      await neighbourSettled(context);
+      if (!mounted || _artKey != key) return;
       Future<ui.Image> render(void Function(Canvas, bool, int) draw) async {
         final recorder = ui.PictureRecorder();
         final canvas = Canvas(recorder)..scale(dpr);

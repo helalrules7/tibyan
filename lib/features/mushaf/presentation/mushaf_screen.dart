@@ -74,6 +74,7 @@ import 'download_screen.dart';
 import '../../../core/ui/responsive.dart';
 import 'page_spreads.dart';
 import 'widgets/page_turn_effect.dart';
+import 'widgets/route_settle.dart';
 import 'widgets/art_frame.dart';
 import 'widgets/fasil_bookmarks.dart';
 import 'widgets/fasil_sheet.dart';
@@ -709,6 +710,16 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// this half way through the turn; the page's state, overlays and saved
   /// position wait for the turn to finish, so the animation keeps the
   /// frame budget.
+  /// The pager index on screen (the one landed on while the pager is new).
+  int _shownIndex() {
+    final c = _controller;
+    if (c == null) return -1;
+    if (c.hasClients && c.position.hasContentDimensions) {
+      return c.page!.round();
+    }
+    return c.initialPage;
+  }
+
   Future<void> _onPageChanged(int index) async {
     if (_barHold != null) {
       _pendingIndex = index;
@@ -1445,87 +1456,83 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                                                                       true,
                                                                   onPageChanged:
                                                                       _onPageChanged,
-                                                                  itemBuilder: (context, i) => PageTurnEffect(
-                                                                    controller:
-                                                                        _controller,
-                                                                    index: i,
-                                                                    effect: settings
-                                                                        .pageTurn,
-                                                                    isSpread: (j) =>
-                                                                        _spread &&
-                                                                        j >=
-                                                                            0 &&
-                                                                        j < _spreads.count &&
-                                                                        _pagesAt(
-                                                                              j,
-                                                                            ).length ==
-                                                                            2,
-                                                                    child: () {
-                                                                      final pages =
+                                                                  itemBuilder: (context, i) => PageNeighbourScope(
+                                                                    neighbour:
+                                                                        i !=
+                                                                        _shownIndex(),
+                                                                    child: PageTurnEffect(
+                                                                      controller:
+                                                                          _controller,
+                                                                      index: i,
+                                                                      effect: settings
+                                                                          .pageTurn,
+                                                                      isSpread: (j) =>
+                                                                          _spread &&
+                                                                          j >=
+                                                                              0 &&
+                                                                          j < _spreads.count &&
                                                                           _pagesAt(
-                                                                            i,
-                                                                          );
-                                                                      if (pages
-                                                                              .length ==
-                                                                          1) {
-                                                                        final one =
-                                                                            pageOf(
-                                                                              pages.single,
+                                                                                j,
+                                                                              ).length ==
+                                                                              2,
+                                                                      child: () {
+                                                                        final pages =
+                                                                            _pagesAt(
+                                                                              i,
                                                                             );
-                                                                        final fit = fitWidthHeight(
-                                                                          box.biggest,
-                                                                          largeDevice:
-                                                                              context.isLargeDevice,
-                                                                          fit: settings
-                                                                              .landscapeFit,
-                                                                        );
-                                                                        if (fit ==
-                                                                            null) {
-                                                                          return one;
+                                                                        if (pages.length ==
+                                                                            1) {
+                                                                          final one = pageOf(
+                                                                            pages.single,
+                                                                          );
+                                                                          final fit = fitWidthHeight(
+                                                                            box.biggest,
+                                                                            largeDevice:
+                                                                                context.isLargeDevice,
+                                                                            fit:
+                                                                                settings.landscapeFit,
+                                                                          );
+                                                                          if (fit ==
+                                                                              null) {
+                                                                            return one;
+                                                                          }
+                                                                          // A phone held sideways: the page
+                                                                          // as wide as the screen, read by
+                                                                          // scrolling down.
+                                                                          return FitWidthScroll(
+                                                                            key: PageStorageKey(
+                                                                              'fit-width-${pages.single}',
+                                                                            ),
+                                                                            child: SizedBox(
+                                                                              height: fit,
+                                                                              child: one,
+                                                                            ),
+                                                                          );
                                                                         }
-                                                                        // A phone held sideways: the page
-                                                                        // as wide as the screen, read by
-                                                                        // scrolling down.
-                                                                        return FitWidthScroll(
-                                                                          key: PageStorageKey(
-                                                                            'fit-width-${pages.single}',
+                                                                        // Right page first: the mushaf opens
+                                                                        // from the right.
+                                                                        return FasilSpineLayer(
+                                                                          right: fawasilOn(
+                                                                            pages.first,
                                                                           ),
-                                                                          child: SizedBox(
-                                                                            height:
-                                                                                fit,
-                                                                            child:
-                                                                                one,
+                                                                          left: fawasilOn(
+                                                                            pages.last,
+                                                                          ),
+                                                                          look:
+                                                                              fasilLook,
+                                                                          onLongPress:
+                                                                              _fasilActions,
+                                                                          child: Row(
+                                                                            textDirection:
+                                                                                TextDirection.rtl,
+                                                                            children: [
+                                                                              for (final pg in pages)
+                                                                                Expanded(child: pageOf(pg, bookmarks: false)),
+                                                                            ],
                                                                           ),
                                                                         );
-                                                                      }
-                                                                      // Right page first: the mushaf opens
-                                                                      // from the right.
-                                                                      return FasilSpineLayer(
-                                                                        right: fawasilOn(
-                                                                          pages
-                                                                              .first,
-                                                                        ),
-                                                                        left: fawasilOn(
-                                                                          pages
-                                                                              .last,
-                                                                        ),
-                                                                        look:
-                                                                            fasilLook,
-                                                                        onLongPress:
-                                                                            _fasilActions,
-                                                                        child: Row(
-                                                                          textDirection:
-                                                                              TextDirection.rtl,
-                                                                          children: [
-                                                                            for (final pg
-                                                                                in pages)
-                                                                              Expanded(
-                                                                                child: pageOf(pg, bookmarks: false),
-                                                                              ),
-                                                                          ],
-                                                                        ),
-                                                                      );
-                                                                    }(),
+                                                                      }(),
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),

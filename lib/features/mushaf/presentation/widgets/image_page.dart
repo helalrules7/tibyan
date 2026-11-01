@@ -15,6 +15,7 @@ import '../../data/tajweed.dart';
 import '../fit_width_scroll.dart';
 import 'mushaf_page.dart';
 import 'page_interaction.dart';
+import 'route_settle.dart';
 
 /// The lines of one page image, in image pixels. Shared by the editions
 /// drawn from page images (Madina 1405H and Shamarly).
@@ -536,6 +537,9 @@ class _ImageMushafPageState extends ConsumerState<ImageMushafPage> {
   }
 
   Future<ImagePageData> _fetch() async {
+    // A neighbour page decodes after the screen's transition ends.
+    await null;
+    if (mounted) await neighbourSettled(context);
     final data = await widget.load(ref, widget.page);
     _image?.dispose();
     _image = data.image;

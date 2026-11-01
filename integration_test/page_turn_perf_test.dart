@@ -37,6 +37,7 @@ import 'package:tibyan/features/mushaf/presentation/mushaf_screen.dart';
 import 'package:tibyan/features/mushaf/presentation/navigation.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/page_turn_effect.dart';
 import 'package:tibyan/features/mushaf/presentation/widgets/mushaf_page.dart';
+import 'package:tibyan/features/mushaf/presentation/widgets/route_settle.dart';
 import 'package:tibyan/main.dart' as app;
 
 const _set = String.fromEnvironment('PERF_SET', defaultValue: 'phone');
@@ -51,9 +52,12 @@ const _effects = String.fromEnvironment('PERF_EFFECTS');
 const _repeat = int.fromEnvironment('PERF_REPEAT', defaultValue: 1);
 
 /// A fix to time against the old way in the same run, case by case:
-/// `fade`, `memo`, `precache`, `reuse` or `artcache`; each case then runs twice, the
+/// `fade`, `memo`, `precache`, `reuse`, `artcache` or `defer`; each case then runs twice, the
 /// old way (`~old`) and the new (`~new`).
 const _abFix = String.fromEnvironment('PERF_AB');
+
+/// Bake every page anew in every case (cold opens), whatever the A/B.
+const _cold = bool.fromEnvironment('PERF_COLD');
 
 List<String> get _abs => _abFix.isEmpty ? const [''] : const ['old', 'new'];
 
@@ -65,7 +69,8 @@ void _setAb(String ab) {
   MushafScreen.debugFreshFawasil = old && _abFix == 'memo';
   PageTurnEffect.debugLazySnapshots = old && _abFix == 'precache';
   debugMushafKeyedByUri = old && _abFix == 'reuse';
-  MushafPage.debugNoArtCache = old && _abFix == 'artcache';
+  MushafPage.debugNoArtCache = _cold || (old && _abFix == 'artcache');
+  debugNoNeighbourDefer = old && _abFix == 'defer';
 }
 
 bool _wanted(String scenario) =>
@@ -228,11 +233,19 @@ void main() {
             _setAb(ab);
             await s.setPageTurn(effect);
             final lookup = <double>[], ttff = <double>[], settle = <double>[];
+            // Frames until the transition settles, and the worst frame of
+            // the first turn right after landing (onto a neighbour).
+            final trans = <FrameTiming>[];
+            final turnMax = <double>[];
             timings.clear();
             for (final (surah, page) in [(3, 50), (18, 293), (36, 440)]) {
               // As the reader does: the index pushed over the page.
               unawaited(c.read(appRouterProvider).push('/mushaf/index'));
               await pumpFor(t, const Duration(seconds: 2));
+              // Engine frame clock, the same as FrameTiming's (reports come
+              // in batches, so frames are told apart by time, not count).
+              final from =
+                  SchedulerBinding.instance.currentSystemFrameTimeStamp;
               SchedulerBinding.instance.addTimingsCallback(collect);
               final sw = Stopwatch()..start();
               final p = await c.read(versePageProvider((surah, 1)).future);
@@ -255,8 +268,38 @@ void main() {
                     : 0;
               }
               settle.add(sw.elapsedMicroseconds / 1000);
+              final atSettle =
+                  SchedulerBinding.instance.currentSystemFrameTimeStamp;
               await pumpFor(t, const Duration(milliseconds: 300));
               SchedulerBinding.instance.removeTimingsCallback(collect);
+              trans.addAll(
+                timings.where((f) {
+                  final v = f.timestampInMicroseconds(FramePhase.vsyncStart);
+                  return v > from.inMicroseconds &&
+                      v <= atSettle.inMicroseconds;
+                }),
+              );
+              final kept = [...timings];
+              timings.clear();
+              SchedulerBinding.instance.addTimingsCallback(collect);
+              await t.fling(
+                find.byType(PageView).first,
+                const Offset(320, 0),
+                1400,
+              );
+              await pumpFor(t, const Duration(milliseconds: 1200));
+              SchedulerBinding.instance.removeTimingsCallback(collect);
+              turnMax.add(
+                timings.fold<double>(
+                  0,
+                  (m, f) => f.rasterDuration.inMicroseconds / 1000 > m
+                      ? f.rasterDuration.inMicroseconds / 1000
+                      : m,
+                ),
+              );
+              timings
+                ..clear()
+                ..addAll(kept);
             }
             double ms(Duration d) => d.inMicroseconds / 1000;
             final build = [for (final f in timings) ms(f.buildDuration)];
@@ -272,7 +315,10 @@ void main() {
               'PERF index-$scenario${_tag(ab)} ${effect.name} frames=${timings.length} '
               'lookup=${stats(lookup)} ttff=${stats(ttff)} '
               'settle=${stats(settle)} build=${stats(build)} '
-              'raster=${stats(raster)} jank60=$janky',
+              'raster=${stats(raster)} jank60=$janky '
+              'transframes=${trans.length} transraster=${stats([for (final f in trans) ms(f.rasterDuration)])} '
+              'transjank=${trans.where((f) => f.buildDuration.inMicroseconds > 16667 || f.rasterDuration.inMicroseconds > 16667).length} '
+              'turnmax=${stats(turnMax)}',
             );
           }
         }
@@ -310,6 +356,7 @@ void main() {
           await pumpFor(t, const Duration(seconds: 2));
           timings.clear();
           SchedulerBinding.instance.addTimingsCallback(collect);
+          final from = SchedulerBinding.instance.currentSystemFrameTimeStamp;
           final sw = Stopwatch()..start();
           c.read(appRouterProvider).go('/mushaf?entry=home');
           bool shown() => find
@@ -329,8 +376,37 @@ void main() {
                 : 0;
           }
           final settle = sw.elapsedMicroseconds / 1000;
+          final atSettle =
+              SchedulerBinding.instance.currentSystemFrameTimeStamp;
           await pumpFor(t, const Duration(milliseconds: 300));
           SchedulerBinding.instance.removeTimingsCallback(collect);
+          final trans = [
+            for (final f in timings)
+              if (f.timestampInMicroseconds(FramePhase.vsyncStart) >
+                      from.inMicroseconds &&
+                  f.timestampInMicroseconds(FramePhase.vsyncStart) <=
+                      atSettle.inMicroseconds)
+                f,
+          ];
+          final kept = [...timings];
+          timings.clear();
+          SchedulerBinding.instance.addTimingsCallback(collect);
+          await t.fling(
+            find.byType(PageView).first,
+            const Offset(320, 0),
+            1400,
+          );
+          await pumpFor(t, const Duration(milliseconds: 1200));
+          SchedulerBinding.instance.removeTimingsCallback(collect);
+          final turnMax = timings.fold<double>(
+            0,
+            (m, f) => f.rasterDuration.inMicroseconds / 1000 > m
+                ? f.rasterDuration.inMicroseconds / 1000
+                : m,
+          );
+          timings
+            ..clear()
+            ..addAll(kept);
           double ms(Duration d) => d.inMicroseconds / 1000;
           final build = [for (final f in timings) ms(f.buildDuration)];
           final raster = [for (final f in timings) ms(f.rasterDuration)];
@@ -348,7 +424,11 @@ void main() {
             'ttff=${ttff.toStringAsFixed(1)} '
             'settle=${settle.toStringAsFixed(1)} build=${stats(build)} '
             'raster=${stats(raster)} buildsum=${sum(build).toStringAsFixed(0)} '
-            'rastersum=${sum(raster).toStringAsFixed(0)} jank60=$janky',
+            'rastersum=${sum(raster).toStringAsFixed(0)} jank60=$janky '
+            'transframes=${trans.length} '
+            'transraster=${stats([for (final f in trans) ms(f.rasterDuration)])} '
+            'transjank=${trans.where((f) => f.buildDuration.inMicroseconds > 16667 || f.rasterDuration.inMicroseconds > 16667).length} '
+            'turnmax=${turnMax.toStringAsFixed(1)}',
           );
         }
       }
