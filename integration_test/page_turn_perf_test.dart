@@ -29,6 +29,8 @@ import 'package:tibyan/app.dart';
 import 'package:tibyan/core/router/app_router.dart';
 import 'package:tibyan/core/settings/app_settings.dart';
 import 'package:tibyan/core/settings/settings_controller.dart';
+import 'package:tibyan/features/home/whats_new.dart'
+    show whatsNewId, whatsNewSeenKey;
 import 'package:tibyan/features/hifz/data/memorize_prefs.dart';
 import 'package:tibyan/features/hifz/domain/memorize_session.dart';
 import 'package:tibyan/features/mushaf/data/page_pack.dart';
@@ -106,6 +108,8 @@ void main() {
       'settings.onboardingDone': true,
       'settings.mode': 'light',
       'settings.defaultsRev': 1,
+      // The «what's new» sheet would cover the home screen.
+      whatsNewSeenKey: whatsNewId,
     });
     unawaited(app.main());
     while (find.byType(TibyanApp).evaluate().isEmpty) {
