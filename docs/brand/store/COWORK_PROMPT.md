@@ -78,16 +78,16 @@
   المجلد `docs/brand/store/screenshots/mac/` (8 صور).
 - **صور شاشة Apple Watch (Watch Ultra / Series 10):**
   المجلد `docs/brand/appstore/watch/` و `docs/brand/play/wear/`.
-- **فيديو معاينة التطبيق (App Preview):**
-  `docs/brand/store/video/preview_30s_portrait.mp4` (1080×1920، مدته 30 ثانية بتلاوة قرآنية فقط).
+- **فيديو معاينة التطبيق (App Preview):** لا تَرفع أي فيديو لـ Apple. `preview_30s_portrait.mp4` فيه «مجاني · غير ربحي» وأسماء منصات أخرى ويخالف 2.3.10 و2.3.14.
+- **صور شاشة Mac البديلة:** `docs/brand/store/templates/mac/2880x1800/` (01 إلى 10).
 
 ### 2. الحقول النصية (العربية الأساسية)
-- **اسم التطبيق (Name):** `تبيان - القرآن الكريم`
-- **العنوان الفرعي (Subtitle - 30 حرف):** `مصحف بلا إعلانات: تلاوة وحفظ`
+- **اسم التطبيق (Name):** `تبيان`
+- **العنوان الفرعي (Subtitle - 30 حرف):** `مصحف شامل: تلاوة وحفظ`
 - **الكلمات المفتاحية (Keywords - 100 حرف):**
   `قرآن,مصحف,تلاوة,تفسير,تسميع,حفظ,المدينة,الشمرلي,أذكار,مسبحة,ختمة`
 - **الوصف (Description):**
-  انسخ النص الكامل من قسم «الوصف الكامل بالعربية» في `docs/brand/store/LISTING.md`.
+  انسخ النص الكامل من قسم «الوصف الكامل لـ App Store بالعربية» في `docs/brand/store/LISTING.md` (لا تستخدم وصف Google Play).
 - **الفئة الأساسية (Primary Category):** `Reference` (مراجع).
 - **الفئة الثانوية (Secondary Category):** `Education` (تعليم).
 - **رابط سياسة الخصوصية:** `https://altibyan.app/privacy`.
@@ -95,12 +95,12 @@
 - **رابط التسويق:** `https://altibyan.app/beta`.
 
 ### 3. الحقول النصية (الإنجليزية - English Localization)
-- **Name:** `Tibyan: Quran`
-- **Subtitle (30 chars):** `Ad-free Quran: Recite & Study`
+- **Name:** `Tibyan`
+- **Subtitle (30 chars):** `Quran: Recite, Study, Memorize`
 - **Keywords (100 chars):**
   `quran,mushaf,quranic,tafsir,recitation,islam,tajweed,khatmah,tasbih,misbaha`
 - **Description:**
-  انسخ النص من قسم «Full Description - English» في `docs/brand/store/LISTING.md`.
+  انسخ النص من قسم «الوصف الكامل لـ App Store بالإنجليزية» في `docs/brand/store/LISTING.md`.
 
 ---
 
