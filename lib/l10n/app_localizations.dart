@@ -9007,6 +9007,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'خروج'**
   String get storePrivacyExit;
+
+  /// No description provided for @khatmaActGroup.
+  ///
+  /// In ar, this message translates to:
+  /// **'جماعية'**
+  String get khatmaActGroup;
+
+  /// No description provided for @khatmaActReports.
+  ///
+  /// In ar, this message translates to:
+  /// **'التقارير'**
+  String get khatmaActReports;
+
+  /// No description provided for @khatmaActJournal.
+  ///
+  /// In ar, this message translates to:
+  /// **'التدبر'**
+  String get khatmaActJournal;
 }
 
 class _AppLocalizationsDelegate

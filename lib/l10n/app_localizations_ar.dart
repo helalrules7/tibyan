@@ -5378,4 +5378,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get storePrivacyExit => 'خروج';
+
+  @override
+  String get khatmaActGroup => 'جماعية';
+
+  @override
+  String get khatmaActReports => 'التقارير';
+
+  @override
+  String get khatmaActJournal => 'التدبر';
 }

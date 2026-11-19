@@ -114,12 +114,14 @@ class _ReadingTools extends StatelessWidget {
             width: 48,
             height: 48,
             alignment: Alignment.center,
+            // Drawn large enough to see and aim at (readers with weaker
+            // sight and hands), inside the same 48 px target.
             child: Container(
-              width: 30,
-              height: 22,
+              width: 40,
+              height: 30,
               decoration: BoxDecoration(
                 color: on ? t.control.withValues(alpha: 0.15) : null,
-                borderRadius: BorderRadius.circular(11),
+                borderRadius: BorderRadius.circular(15),
                 border: Border.all(
                   color: on ? t.control : t.border,
                   width: 0.8,
@@ -129,13 +131,13 @@ class _ReadingTools extends StatelessWidget {
               child: switch (glyph) {
                 IconData icon => Icon(
                   icon,
-                  size: 15,
+                  size: 20,
                   color: on ? t.control : t.muted,
                 ),
                 _ => Text(
                   '$glyph',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 18,
                     height: 1,
                     fontWeight: FontWeight.w700,
                     color: on ? t.control : t.muted,

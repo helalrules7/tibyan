@@ -38,7 +38,9 @@ double _scale(BuildContext context) => context.isExpanded ? 1.3 : 1.0;
 typedef _Section = ({
   IconData icon,
   String label,
-  String note,
+  // A live line under the label (today's portion, verses due); null when
+  // there is nothing to say, rather than a filler «افتح».
+  String? note,
   VoidCallback onTap,
 });
 
@@ -77,25 +79,25 @@ class HomeScreen extends ConsumerWidget {
       (
         icon: railIcon(RailItem.mushaf),
         label: l.sectionMushaf,
-        note: l.mushafOpen,
+        note: null,
         onTap: () => context.go('/mushaf?entry=home'),
       ),
       (
         icon: railIcon(RailItem.listen),
         label: l.sectionListen,
-        note: l.openLabel,
+        note: null,
         onTap: () => context.push('/mushaf/audio'),
       ),
       (
         icon: railIcon(RailItem.tafsir),
         label: l.sectionTafsir,
-        note: l.openLabel,
+        note: null,
         onTap: () => context.push('/mushaf/tafsir?s=$surah&a=$ayah'),
       ),
       (
         icon: railIcon(RailItem.search),
         label: l.sectionSearch,
-        note: l.openLabel,
+        note: null,
         onTap: () => context.go('/search'),
       ),
       (
@@ -736,18 +738,19 @@ class _SectionTile extends StatelessWidget {
             color: look.ink,
           ),
         ),
-        Text(
-          s.note,
-          textAlign: TextAlign.center,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 11 * k, color: look.sub),
-        ),
+        if (s.note case final note?)
+          Text(
+            note,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11 * k, color: look.sub),
+          ),
       ],
     );
     return Semantics(
       button: true,
-      label: '${s.label}. ${s.note}',
+      label: s.note == null ? s.label : '${s.label}. ${s.note}',
       excludeSemantics: true,
       onTap: s.onTap,
       child: card

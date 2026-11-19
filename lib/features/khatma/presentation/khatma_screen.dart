@@ -69,20 +69,23 @@ class _KhatmaScreenState extends ConsumerState<KhatmaScreen> {
               title: l.khatmaTitle,
               actions: [
                 if (ref.watch(featureFlagsProvider).isOn(Feature.groupKhatma))
-                  IconButton(
+                  _LabeledAction(
                     key: const Key('group-khatma-entry'),
                     tooltip: l.gkTitle,
-                    icon: const Icon(Icons.groups_outlined),
+                    label: l.khatmaActGroup,
+                    icon: Icons.groups_outlined,
                     onPressed: () => context.push('/khatma/group'),
                   ),
-                IconButton(
+                _LabeledAction(
                   tooltip: l.reportsTitle,
-                  icon: const Icon(Icons.insights_outlined),
+                  label: l.khatmaActReports,
+                  icon: Icons.insights_outlined,
                   onPressed: () => context.push('/khatma/reports'),
                 ),
-                IconButton(
+                _LabeledAction(
                   tooltip: l.journalTitle,
-                  icon: const Icon(Icons.edit_note_outlined),
+                  label: l.khatmaActJournal,
+                  icon: Icons.edit_note_outlined,
                   onPressed: () => context.push('/khatma/journal'),
                 ),
               ],
@@ -1447,6 +1450,69 @@ class _Past extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// A top-bar action with its name under the icon: three bare icons left
+/// readers guessing what each opens.
+class _LabeledAction extends StatelessWidget {
+  const _LabeledAction({
+    super.key,
+    required this.tooltip,
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final String tooltip;
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = IconTheme.of(context).color;
+    return Tooltip(
+      message: tooltip,
+      excludeFromSemantics: true,
+      child: Semantics(
+        button: true,
+        label: tooltip,
+        excludeSemantics: true,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(12),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 52, minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 22, color: color),
+                  const SizedBox(height: 2),
+                  // The bar keeps its height at large text: the name
+                  // grows a little, then shrinks to fit (the tooltip and
+                  // the screen reader carry the full name).
+                  MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: 1.3,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 11, color: color),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

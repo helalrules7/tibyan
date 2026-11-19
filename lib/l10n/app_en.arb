@@ -2001,5 +2001,8 @@
   "storePrivacyBody": "Tibyan needs no account, collects no personal data, and keeps your data on your device. Please read the privacy policy before you continue.",
   "storePrivacyRead": "Read the privacy policy",
   "storePrivacyAccept": "OK",
-  "storePrivacyExit": "Exit"
+  "storePrivacyExit": "Exit",
+  "khatmaActGroup": "Group",
+  "khatmaActReports": "Reports",
+  "khatmaActJournal": "Journal"
 }

@@ -3708,5 +3708,8 @@
   "storePrivacyBody": "لا يحتاج تبيان إلى حساب، ولا يجمع أي بيانات شخصية، وتبقى بياناتك على جهازك. يُرجى قراءة سياسة الخصوصية قبل المتابعة.",
   "storePrivacyRead": "اقرأ سياسة الخصوصية",
   "storePrivacyAccept": "موافق",
-  "storePrivacyExit": "خروج"
+  "storePrivacyExit": "خروج",
+  "khatmaActGroup": "جماعية",
+  "khatmaActReports": "التقارير",
+  "khatmaActJournal": "التدبر"
 }

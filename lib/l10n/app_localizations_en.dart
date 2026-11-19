@@ -5318,4 +5318,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storePrivacyExit => 'Exit';
+
+  @override
+  String get khatmaActGroup => 'Group';
+
+  @override
+  String get khatmaActReports => 'Reports';
+
+  @override
+  String get khatmaActJournal => 'Journal';
 }
