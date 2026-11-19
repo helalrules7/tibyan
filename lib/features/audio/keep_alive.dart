@@ -43,7 +43,9 @@ class RecitationKeepAlive {
   Future<void> _end(int id) async {
     try {
       await _channel.invokeMethod<void>('end', id);
-    } catch (_) {}
+    } catch (_) {
+      // Ending a task that already expired is harmless.
+    }
   }
 }
 

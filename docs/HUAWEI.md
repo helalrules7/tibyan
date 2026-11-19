@@ -46,7 +46,7 @@ registration and R8.
 ```sh
 cp ~/.config/tibyan/key.properties android/key.properties   # once per checkout
 N=43   # the build number
-flutter build apk --release --build-number=$N \
+flutter build apk --release --split-per-abi --build-number=$N \
   --dart-define-from-file=$HOME/.config/tibyan/sentry.env \
   --dart-define=TIBYAN_CHANNEL=huawei \
   --dart-define=TIBYAN_STORE=huawei \
@@ -54,9 +54,27 @@ flutter build apk --release --build-number=$N \
 tools/upload_symbols.sh $N   # matched by debug id, sharing N with Play is fine
 ```
 
-For an AAB use `flutter build appbundle` with the same flags. Don't pass
-`google.env` because Drive is off. The output is
-`build/app/outputs/flutter-apk/app-release.apk`, signed with the upload key.
+`--split-per-abi` gives one APK per CPU type instead of one universal
+APK (~205 MB → ~153 MB for arm64-v8a). The outputs are in
+`build/app/outputs/flutter-apk/`, signed with the upload key:
+
+| File | ABI | versionCode |
+|---|---|---|
+| `app-arm64-v8a-release.apk` | arm64-v8a (all current Huawei phones) | 2000 + N |
+| `app-armeabi-v7a-release.apk` | armeabi-v7a (old 32-bit phones) | 1000 + N |
+| `app-x86_64-release.apk` | x86_64 (emulators; don't upload) | 4000 + N |
+
+Flutter adds `1000 × ABI` to the build number in split builds, so each ABI
+has its own versionCode and all of them are above the old universal ones
+(≤ 56). Once a split APK is live, don't go back to a universal APK with the
+plain build number: it would be lower than 2000 + N and AppGallery would
+refuse it as a downgrade. (Passing `-Pforce-version-code-ignoring-abi=true`
+keeps the plain number, but then two APKs share one versionCode.)
+
+In AppGallery Connect upload the arm64-v8a and armeabi-v7a APKs together in
+**Software package** (multi-APK). An AAB (`flutter build appbundle`, same
+flags, no `--split-per-abi`) also works and AppGallery splits it itself.
+Don't pass `google.env` because Drive is off.
 
 ## 3. AppGallery Connect, step by step (browser)
 
@@ -74,7 +92,7 @@ You need a Huawei Developer account (developer.huawei.com, identity verified).
 5. **App signing**: choose "AppGallery Connect manages the app signing key" and upload the upload key's certificate only:
    `keytool -export -rfc -keystore ~/.config/tibyan/upload-keystore.jks -alias <alias from key.properties> -file upload_cert.pem`
    Never upload the .jks or its passwords.
-6. **Software package**: upload `app-release.apk` (or the .aab).
+6. **Software package**: upload `app-arm64-v8a-release.apk` and `app-armeabi-v7a-release.apk` (or the .aab).
 7. Countries: the same as Play (or start with the Arab region). Free, no in-app purchases, no ads.
 8. **Review notes** (paste):
    > Tibyan is a free, non-profit Quran reader with no ads, no accounts and no in-app purchases. The microphone is used only for the optional on-device recitation check; no audio leaves the device. Google Drive sync and Wear OS are not available in this build because they need Google services; the app offers file backup instead. No login is needed to test any feature.

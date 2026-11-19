@@ -32,7 +32,9 @@ final _canPinProvider = FutureProvider<bool>((ref) async {
 Future<void> refreshHomeWidgets(WidgetRef ref) async {
   try {
     await ref.read(khatmaServiceProvider).refresh();
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('home widgets: refresh failed: $e');
+  }
   final settings = ref.read(settingsProvider);
   await ref
       .read(homeWidgetSyncProvider)

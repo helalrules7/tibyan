@@ -120,14 +120,18 @@ class ChannelRecitationActivity implements RecitationActivityHost {
   Future<void> update(RecitationActivityContent content) async {
     try {
       await _channel.invokeMethod<bool>('update', content.toMap());
-    } catch (_) {}
+    } catch (_) {
+      // Live Activities are optional (disabled or unsupported OS).
+    }
   }
 
   @override
   Future<void> end() async {
     try {
       await _channel.invokeMethod<bool>('end');
-    } catch (_) {}
+    } catch (_) {
+      // Live Activities are optional (disabled or unsupported OS).
+    }
   }
 }
 

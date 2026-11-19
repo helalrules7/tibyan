@@ -258,14 +258,18 @@ void _startKhatma(ProviderContainer container) {
         if (a == WidgetAction.portionDone) await service.markTodayRead();
       }
       await service.refresh();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('widget actions/khatma refresh failed: $e');
+    }
     // The weekly report reminder, a few weeks ahead (off by default).
     try {
       await syncWeeklyReminder(
         container.read(reminderSchedulerProvider),
         container.read(settingsProvider),
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('weekly reminder sync failed: $e');
+    }
     // The Friday Surah Al-Kahf reminder (on by default, scheduled only
     // when notifying is already allowed).
     try {
@@ -273,7 +277,9 @@ void _startKhatma(ProviderContainer container) {
         container.read(reminderSchedulerProvider),
         container.read(settingsProvider),
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Kahf reminder sync failed: $e');
+    }
     // «آية اليوم»: a month ahead, whether or not there is a khatma. After
     // the first frame (it is ~30 lookups), and only when what the widgets
     // hold runs short or is in another language.
@@ -302,7 +308,9 @@ void _startKhatma(ProviderContainer container) {
         verseOfDayStampKey,
         verseOfDayStamp(l.localeName, today),
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('verse of the day scheduling failed: $e');
+    }
   }
 
   unawaited(refresh());
@@ -502,7 +510,9 @@ void _startLiveActivity(ProviderContainer container) {
       final reciters = await container.read(recitersProvider.future);
       final r = reciters.where((r) => r.id == s.reciterId).firstOrNull;
       if (r != null) reciter = ar ? r.nameAr : r.nameEn;
-    } catch (_) {}
+    } catch (_) {
+      // Labels only: fall back to the defaults above.
+    }
     final digits = NumberFormatter(Locale(l.localeName));
     return RecitationActivityContent(
       reciter: reciter ?? '',

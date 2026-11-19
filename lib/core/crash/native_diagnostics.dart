@@ -32,7 +32,9 @@ Future<void> forwardNativeDiagnostics({
   for (final json in payloads) {
     try {
       await (capture ?? _capture)(json);
-    } catch (_) {}
+    } catch (_) {
+      // Reporting is best effort; a failed send must not crash the reporter.
+    }
   }
 }
 

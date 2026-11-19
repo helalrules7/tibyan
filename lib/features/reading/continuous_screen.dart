@@ -236,7 +236,9 @@ class _VerseListState extends ConsumerState<_VerseList> {
             ayah: row.number,
             page: page,
           );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('continuous: savePosition failed: $e');
+    }
   }
 
   @override

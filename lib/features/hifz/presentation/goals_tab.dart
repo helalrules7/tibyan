@@ -396,7 +396,9 @@ class _GoalCard extends ConsumerWidget {
 Future<void> _refreshReminders(WidgetRef ref) async {
   try {
     await ref.read(khatmaServiceProvider).refresh();
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('goals: reminder refresh failed: $e');
+  }
 }
 
 /// A day as «الثلاثاء، ١٣ أكتوبر».

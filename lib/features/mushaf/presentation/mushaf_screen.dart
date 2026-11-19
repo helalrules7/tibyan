@@ -746,7 +746,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         ref.read(pageAyahsProvider(page).future),
         ref.read(frameInfoProvider(page).future),
       ).wait.timeout(const Duration(seconds: 2));
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      // Slow or failed loads: reveal the page anyway after the wait.
+    }
     for (var i = 0; i < 3 && mounted; i++) {
       await WidgetsBinding.instance.endOfFrame;
     }
@@ -3039,7 +3041,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
         ),
         applyMemory: false,
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('mushaf: saving review result failed: $e');
+    }
   }
 
   /// What reveal by reciting can do in this edition, on this device.
