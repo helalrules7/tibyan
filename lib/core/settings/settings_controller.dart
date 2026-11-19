@@ -105,6 +105,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kFasilPlace = 'settings.fasilPlace';
   static const _kFasilMaterial = 'settings.fasilMaterial';
   static const _kFasilTassel = 'settings.fasilTassel';
+  static const _kCellularDownloads = 'settings.cellularDownloads';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -253,6 +254,7 @@ class SettingsController extends Notifier<AppSettings> {
           ) ??
           FasilMaterial.silk,
       fasilTassel: _prefs.getBool(_kFasilTassel) ?? true,
+      cellularDownloads: _prefs.getBool(_kCellularDownloads) ?? false,
     );
   }
 
@@ -655,6 +657,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setFasilTassel(bool value) async {
     state = state.copyWith(fasilTassel: value);
     await _prefs.setBool(_kFasilTassel, value);
+  }
+
+  Future<void> setCellularDownloads(bool value) async {
+    state = state.copyWith(cellularDownloads: value);
+    await _prefs.setBool(_kCellularDownloads, value);
   }
 
   static T? _enumByName<T extends Enum>(List<T> values, String? name) {

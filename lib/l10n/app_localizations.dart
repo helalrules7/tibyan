@@ -9007,6 +9007,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'خروج'**
   String get storePrivacyExit;
+
+  /// No description provided for @cellularDownloadsToggle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحميل عبر بيانات الجوال'**
+  String get cellularDownloadsToggle;
+
+  /// No description provided for @cellularDownloadsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'عند الإيقاف تنتظر التحميلات شبكة Wi‑Fi، ويسألك التطبيق قبل استخدام بيانات الجوال'**
+  String get cellularDownloadsHint;
+
+  /// No description provided for @cellularPausedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحميلات متوقفة: أنت على بيانات الجوال'**
+  String get cellularPausedTitle;
+
+  /// No description provided for @cellularPausedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'تبقّى نحو {size} ميجا، وتكمل تلقائيًا عند الاتصال بشبكة Wi‑Fi.'**
+  String cellularPausedBody(String size);
+
+  /// No description provided for @cellularPausedBodyNoSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكمل تلقائيًا عند الاتصال بشبكة Wi‑Fi.'**
+  String get cellularPausedBodyNoSize;
+
+  /// No description provided for @cellularContinue.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة عبر البيانات'**
+  String get cellularContinue;
+
+  /// No description provided for @cellularWait.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتظار Wi‑Fi'**
+  String get cellularWait;
 }
 
 class _AppLocalizationsDelegate

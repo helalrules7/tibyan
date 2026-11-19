@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/downloads/cellular_policy.dart' show cellularPolicyApplies;
 import '../../core/settings/app_settings.dart';
 import '../../core/settings/settings_controller.dart';
 import '../../core/theme/interface_style.dart';
@@ -636,6 +637,22 @@ final Map<SettingsSection, List<SettingsGroup>> settingsCatalog = {
           onTap: () => c.push('/downloads'),
         ),
         keywords: 'التحميلات تحميل تنزيل إيقاف متابعة downloads download pause resume',
+      ),
+      SettingEntry(
+        'cellularDownloads',
+        (l) => l.cellularDownloadsToggle,
+        (c, r) => cellularPolicyApplies
+            ? _switch(
+                c,
+                r,
+                icon: Icons.signal_cellular_alt,
+                title: (l) => l.cellularDownloadsToggle,
+                hint: (l) => l.cellularDownloadsHint,
+                value: (s) => s.cellularDownloads,
+                set: (ctrl, v) => ctrl.setCellularDownloads(v),
+              )
+            : const SizedBox.shrink(),
+        keywords: 'بيانات الجوال الهاتف واي فاي باقة تحميل mobile data cellular wifi wi-fi download',
       ),
       SettingEntry(
         'sync',

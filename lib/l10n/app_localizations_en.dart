@@ -5318,4 +5318,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storePrivacyExit => 'Exit';
+
+  @override
+  String get cellularDownloadsToggle => 'Download over mobile data';
+
+  @override
+  String get cellularDownloadsHint =>
+      'When off, downloads wait for Wi‑Fi and the app asks before using mobile data';
+
+  @override
+  String get cellularPausedTitle => 'Downloads paused: you\'re on mobile data';
+
+  @override
+  String cellularPausedBody(String size) {
+    return 'About $size MB left. They continue on their own once you\'re on Wi‑Fi.';
+  }
+
+  @override
+  String get cellularPausedBodyNoSize =>
+      'They continue on their own once you\'re on Wi‑Fi.';
+
+  @override
+  String get cellularContinue => 'Continue on mobile data';
+
+  @override
+  String get cellularWait => 'Wait for Wi‑Fi';
 }

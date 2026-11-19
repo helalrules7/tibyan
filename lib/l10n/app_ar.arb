@@ -3708,5 +3708,19 @@
   "storePrivacyBody": "لا يحتاج تبيان إلى حساب، ولا يجمع أي بيانات شخصية، وتبقى بياناتك على جهازك. يُرجى قراءة سياسة الخصوصية قبل المتابعة.",
   "storePrivacyRead": "اقرأ سياسة الخصوصية",
   "storePrivacyAccept": "موافق",
-  "storePrivacyExit": "خروج"
+  "storePrivacyExit": "خروج",
+  "cellularDownloadsToggle": "التحميل عبر بيانات الجوال",
+  "cellularDownloadsHint": "عند الإيقاف تنتظر التحميلات شبكة Wi‑Fi، ويسألك التطبيق قبل استخدام بيانات الجوال",
+  "cellularPausedTitle": "التحميلات متوقفة: أنت على بيانات الجوال",
+  "cellularPausedBody": "تبقّى نحو {size} ميجا، وتكمل تلقائيًا عند الاتصال بشبكة Wi‑Fi.",
+  "cellularPausedBodyNoSize": "تكمل تلقائيًا عند الاتصال بشبكة Wi‑Fi.",
+  "cellularContinue": "متابعة عبر البيانات",
+  "cellularWait": "انتظار Wi‑Fi",
+  "@cellularPausedBody": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  }
 }

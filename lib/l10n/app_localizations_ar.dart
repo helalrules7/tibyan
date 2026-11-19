@@ -5378,4 +5378,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get storePrivacyExit => 'خروج';
+
+  @override
+  String get cellularDownloadsToggle => 'التحميل عبر بيانات الجوال';
+
+  @override
+  String get cellularDownloadsHint =>
+      'عند الإيقاف تنتظر التحميلات شبكة Wi‑Fi، ويسألك التطبيق قبل استخدام بيانات الجوال';
+
+  @override
+  String get cellularPausedTitle => 'التحميلات متوقفة: أنت على بيانات الجوال';
+
+  @override
+  String cellularPausedBody(String size) {
+    return 'تبقّى نحو $size ميجا، وتكمل تلقائيًا عند الاتصال بشبكة Wi‑Fi.';
+  }
+
+  @override
+  String get cellularPausedBodyNoSize =>
+      'تكمل تلقائيًا عند الاتصال بشبكة Wi‑Fi.';
+
+  @override
+  String get cellularContinue => 'متابعة عبر البيانات';
+
+  @override
+  String get cellularWait => 'انتظار Wi‑Fi';
 }

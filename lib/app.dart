@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'core/downloads/cellular_banner.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,9 +88,12 @@ class TibyanApp extends ConsumerWidget {
       // mode: text at least a quarter larger, whatever the device asks for
       // (a larger system size is kept).
       builder: (context, child) {
-        final player = MacMenu(
-          router: router,
-          child: GlobalPlayer(router: router, child: child!),
+        // Downloads held on mobile data ask here, over every screen.
+        final player = CellularDownloadsBanner(
+          child: MacMenu(
+            router: router,
+            child: GlobalPlayer(router: router, child: child!),
+          ),
         );
         if (!settings.elderlyMode && !settings.forceReduceMotion) {
           return player;

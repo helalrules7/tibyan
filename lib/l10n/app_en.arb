@@ -2001,5 +2001,19 @@
   "storePrivacyBody": "Tibyan needs no account, collects no personal data, and keeps your data on your device. Please read the privacy policy before you continue.",
   "storePrivacyRead": "Read the privacy policy",
   "storePrivacyAccept": "OK",
-  "storePrivacyExit": "Exit"
+  "storePrivacyExit": "Exit",
+  "cellularDownloadsToggle": "Download over mobile data",
+  "cellularDownloadsHint": "When off, downloads wait for Wi‑Fi and the app asks before using mobile data",
+  "cellularPausedTitle": "Downloads paused: you're on mobile data",
+  "cellularPausedBody": "About {size} MB left. They continue on their own once you're on Wi‑Fi.",
+  "cellularPausedBodyNoSize": "They continue on their own once you're on Wi‑Fi.",
+  "cellularContinue": "Continue on mobile data",
+  "cellularWait": "Wait for Wi‑Fi",
+  "@cellularPausedBody": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  }
 }
