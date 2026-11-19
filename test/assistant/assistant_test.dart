@@ -174,30 +174,27 @@ void main() {
   });
 
   for (final elderly in [false, true]) {
-    testWidgets(
-      'the reader\'s top menu opens it${elderly ? ' (elderly)' : ''}',
-      (tester) async {
-        await start(
-          tester,
-          '/mushaf?page=50',
-          prefs: {'settings.elderlyMode': elderly},
-        );
-        await settle(tester, find.byType(MushafPage));
-        await settle(tester);
-        final page = tester.getRect(find.byType(MushafPage));
-        await tester.tapAt(Offset(page.center.dx, page.top + 30));
-        await settle(tester);
-        // The test font is wider than the app's: the reader's bottom tools
-        // (and in elderly mode the frame's header) overflow here only.
-        tester.takeException();
-        await tester.tap(find.text('المساعد'));
-        await settle(tester, hub);
-        expect(hub, findsOneWidget);
-      },
-    );
+    testWidgets('the reader\'s top menu has «الاستماع» in its place'
+        '${elderly ? ' (elderly)' : ''}', (tester) async {
+      await start(
+        tester,
+        '/mushaf?page=50',
+        prefs: {'settings.elderlyMode': elderly},
+      );
+      await settle(tester, find.byType(MushafPage));
+      await settle(tester);
+      final page = tester.getRect(find.byType(MushafPage));
+      await tester.tapAt(Offset(page.center.dx, page.top + 30));
+      await settle(tester);
+      // The test font is wider than the app's: the reader's bottom tools
+      // (and in elderly mode the frame's header) overflow here only.
+      tester.takeException();
+      expect(find.text('المساعد'), findsNothing);
+      expect(find.text('الاستماع'), findsOneWidget);
+    });
   }
 
-  testWidgets('focus mode\'s «القائمة» opens it from its header', (
+  testWidgets('focus mode\'s «القائمة» has «الاستماع» in its header', (
     tester,
   ) async {
     await start(
@@ -212,10 +209,30 @@ void main() {
     await settle(tester);
     final menu = find.byKey(const ValueKey('focus-menu'));
     expect(menu, findsOneWidget);
-    await tester.tap(find.descendant(of: menu, matching: find.text('المساعد')));
-    await settle(tester, hub);
-    expect(menu, findsNothing);
-    expect(hub, findsOneWidget);
+    expect(
+      find.descendant(of: menu, matching: find.text('المساعد')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: menu, matching: find.text('الاستماع')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('focus mode, touch reading off: a tap opens «القائمة»', (
+    tester,
+  ) async {
+    await start(
+      tester,
+      '/mushaf?page=50',
+      prefs: {'settings.focusMode': true, 'settings.touchReading': false},
+    );
+    await settle(tester, find.byType(MushafPage));
+    await settle(tester);
+    final page = tester.getRect(find.byType(MushafPage));
+    await tester.tapAt(page.center);
+    await settle(tester);
+    expect(find.byKey(const ValueKey('focus-menu')), findsOneWidget);
   });
 
   testWidgets('«المزيد» in the colour key opens the tajweed marks', (

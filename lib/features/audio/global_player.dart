@@ -51,7 +51,16 @@ class _GlobalPlayerState extends ConsumerState<GlobalPlayer> {
     },
   );
 
-  String _read() => widget.router.routeInformationProvider.value.uri.path;
+  /// The top screen's path. The route information alone goes stale after
+  /// a pushed screen is popped (it still names the popped one), which
+  /// showed this bar over the mushaf's own: two players.
+  String _read() {
+    try {
+      return widget.router.state.uri.path;
+    } catch (_) {
+      return widget.router.routeInformationProvider.value.uri.path;
+    }
+  }
 
   void _changed() {
     final path = _read();
@@ -69,11 +78,13 @@ class _GlobalPlayerState extends ConsumerState<GlobalPlayer> {
   void initState() {
     super.initState();
     widget.router.routeInformationProvider.addListener(_changed);
+    widget.router.routerDelegate.addListener(_changed);
   }
 
   @override
   void dispose() {
     widget.router.routeInformationProvider.removeListener(_changed);
+    widget.router.routerDelegate.removeListener(_changed);
     super.dispose();
   }
 

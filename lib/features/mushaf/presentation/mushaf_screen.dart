@@ -30,7 +30,6 @@ import '../../../core/settings/settings_controller.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/reveal.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../assistant/assistant_screen.dart';
 import '../../books/books_providers.dart';
 import '../../books/presentation/asbab_section.dart';
 import '../../books/presentation/book_section.dart';
@@ -394,16 +393,20 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   }
 
   /// A tap on the page, its frame or the space around it: clears the
-  /// selection, or shows and hides the menus. In focus mode it only hides
-  /// what is shown (the tools, the menus); with nothing shown it does
-  /// nothing.
+  /// selection, or shows and hides the menus. In focus mode it hides what
+  /// is shown (the tools, the menus); with nothing shown it opens «القائمة»
+  /// (touch reading off: a tap on a verse then reads nothing).
   void _onPageTap() {
     if (_multi) return;
     if (_selA != null) {
       setState(() => _selA = _selB = null);
     } else if (_focus) {
-      if (_focusTools) _setFocusTools(false);
-      _setChrome(false);
+      if (_focusTools || _chrome) {
+        if (_focusTools) _setFocusTools(false);
+        _setChrome(false);
+      } else if (!_touchReading) {
+        unawaited(_openFocusMenu(_page, null));
+      }
     } else {
       _setChrome(!_chrome);
     }
@@ -509,9 +512,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                       then(() => screen.push('/mushaf/index')),
                     ),
                     (
-                      assistantIcon,
-                      l.assistantTitle,
-                      then(() => screen.push(assistantLocation)),
+                      railIcon(RailItem.listen),
+                      l.sectionListen,
+                      then(_listenFromPage),
                     ),
                     (
                       Icons.home_outlined,
@@ -1796,9 +1799,9 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
                               () => context.push('/mushaf/index'),
                             ),
                             (
-                              assistantIcon,
-                              l.assistantTitle,
-                              () => context.push(assistantLocation),
+                              railIcon(RailItem.listen),
+                              l.sectionListen,
+                              _listenFromPage,
                             ),
                             (
                               Icons.home_rounded,

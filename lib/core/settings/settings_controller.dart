@@ -547,8 +547,13 @@ class SettingsController extends Notifier<AppSettings> {
   }
 
   Future<void> setFocusMode(bool value) async {
-    state = state.copyWith(focusMode: value);
+    // Turning focus on also turns touch reading off, so one tap opens the
+    // menu; turning focus off leaves touch reading as it is.
+    state = value
+        ? state.copyWith(focusMode: true, touchReading: false)
+        : state.copyWith(focusMode: false);
     await _prefs.setBool(_kFocus, value);
+    if (value) await _prefs.setBool(_kTouchReading, false);
   }
 
   Future<void> setFocusTools(FocusTools value) async {
