@@ -808,6 +808,8 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
 
   @override
   void dispose() {
+    _turnPos?.isScrollingNotifier.removeListener(_onTurning);
+    MushafPage.turning.value = false;
     final shot = _placeholder;
     _placeholder = null;
     shot?.$2.dispose();
@@ -954,9 +956,30 @@ class _MushafScreenState extends ConsumerState<MushafScreen>
   /// so it starts there.
   int get _first => ref.read(editionProvider) == MushafEdition.shamarly ? 1 : 0;
 
+  /// The pager position whose turns [MushafPage.turning] follows.
+  ScrollPosition? _turnPos;
+
+  void _onTurning() =>
+      MushafPage.turning.value = _turnPos?.isScrollingNotifier.value ?? false;
+
+  /// Follows the pager's position (a new controller brings a new one), so
+  /// page bakes wait until a turn settles.
+  void _watchTurns() {
+    final c = _controller;
+    final pos = c != null && c.hasClients ? c.position : null;
+    if (identical(pos, _turnPos)) return;
+    _turnPos?.isScrollingNotifier.removeListener(_onTurning);
+    _turnPos = pos;
+    pos?.isScrollingNotifier.addListener(_onTurning);
+    _onTurning();
+  }
+
   @override
   Widget build(BuildContext context) {
     MushafScreen.debugBuildCount++;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _watchTurns();
+    });
     if (!ref.watch(pagesInstalledProvider)) return const DownloadScreen();
     _window = (
       size: MediaQuery.sizeOf(context),
