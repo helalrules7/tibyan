@@ -46,6 +46,17 @@ class WordStudyRepository {
             ..orderBy([(t) => OrderingTerm.asc(t.ord)]))
           .get();
 
+  /// Every root the corpus gives, as stored («ر ح م»).
+  Future<List<String>> roots() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT DISTINCT root FROM word_root WHERE root IS NOT NULL',
+          readsFrom: {_db.wordRoot},
+        )
+        .get();
+    return [for (final r in rows) r.read<String>('root')];
+  }
+
   /// Every verse where [root] occurs, in mushaf order.
   Future<RootOccurrences> rootOccurrences(String root) async {
     final rows = await _db

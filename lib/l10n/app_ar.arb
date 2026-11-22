@@ -4185,6 +4185,17 @@
     }
   },
   "qiblaNoPlace": "اختر مدينتك أولًا لمعرفة اتجاه القبلة.",
+  "searchModeRoot": "بالجذر",
+  "searchRootHint": "اكتب جذرًا، مثل «رحم» أو «ر ح م»",
+  "searchRootFound": "الجذر «{root}»",
+  "searchRootNone": "لا جذر بهذه الحروف",
+  "@searchRootFound": {
+    "placeholders": {
+      "root": {
+        "type": "String"
+      }
+    }
+  },
   "adhkarTitle": "الأذكار",
   "adhkarMorning": "الصباح",
   "adhkarEvening": "المساء",

@@ -16,6 +16,7 @@ import '../mushaf/mushaf_providers.dart';
 import '../mushaf/presentation/mushaf_screen.dart';
 import '../mushaf/presentation/widgets/illuminated_frame.dart';
 import 'search_engine.dart';
+import '../word_study/word_study_providers.dart';
 import '../mushaf/presentation/navigation.dart';
 import 'semantic/meaning_results.dart';
 import '../khatma/domain/khatmah.dart' show EntryPoint;
@@ -47,7 +48,48 @@ const _modeKey = 'search.mode';
 
 /// What the query is compared with: the Quran's words, or the meaning
 /// texts (tafsir and translations).
-enum SearchMode { words, meaning }
+enum SearchMode { words, root, meaning }
+
+/// Every root of the corpus, loaded the first time a root is searched.
+final searchRootsProvider = FutureProvider<List<String>>(
+  (ref) => ref.watch(wordStudyRepositoryProvider).roots(),
+);
+
+/// The root [query] names (null when none) and every verse where it
+/// occurs, its words marked in the mushaf's own numbering.
+final rootSearchProvider = FutureProvider.autoDispose
+    .family<(String?, List<SearchHit>, Map<(int, int), int>), String>((
+      ref,
+      query,
+    ) async {
+      final root = matchRoot(
+        query,
+        await ref.watch(searchRootsProvider.future),
+      );
+      if (root == null) {
+        return (null, const <SearchHit>[], const <(int, int), int>{});
+      }
+      final found = await ref
+          .read(wordStudyRepositoryProvider)
+          .rootOccurrences(root);
+      return (
+        root,
+        [
+          for (final o in found.verses)
+            SearchHit(
+              o.ayah.surah,
+              o.ayah.number,
+              {for (final w in o.words) w - 1},
+              o.words.length,
+              mushafWords: true,
+            ),
+        ],
+        {
+          for (final o in found.verses)
+            (o.ayah.surah, o.ayah.number): o.ayah.juz,
+        },
+      );
+    });
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -64,10 +106,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   /// Where the words are looked for.
   SearchScope _scope = const WholeMushaf();
   late SearchMode _mode =
-      ref.read(sharedPreferencesProvider).getString(_modeKey) ==
-          SearchMode.meaning.name
-      ? SearchMode.meaning
-      : SearchMode.words;
+      SearchMode.values.asNameMap()[ref
+          .read(sharedPreferencesProvider)
+          .getString(_modeKey)] ??
+      SearchMode.words;
 
   void _setMode(SearchMode mode) {
     setState(() => _mode = mode);
@@ -189,10 +231,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       for (final s in surahs ?? const <SurahRow>[]) s.id: [s.nameAr, s.nameEn],
     };
     final meaning = _mode == SearchMode.meaning;
-    final ref0 = _query.isEmpty || meaning
+    final byRoot = _mode == SearchMode.root;
+    final ref0 = _query.isEmpty || meaning || byRoot
         ? null
         : parseReference(_query, names);
-    final hits = verses == null || _query.isEmpty || meaning
+    final rootResult = byRoot && _query.trim().isNotEmpty
+        ? ref.watch(rootSearchProvider(_query.trim())).value
+        : null;
+    final hits = byRoot
+        ? [
+            for (final h in rootResult?.$2 ?? const <SearchHit>[])
+              if (switch (_scope) {
+                WholeMushaf() => true,
+                InSurah(:final surah) => h.surah == surah,
+                InJuz(:final juz) => rootResult!.$3[(h.surah, h.ayah)] == juz,
+              })
+                h,
+          ]
+        : verses == null || _query.isEmpty || meaning
         ? const <SearchHit>[]
         : searchIn(verses, _query, _scope);
     final total = hits.fold<int>(0, (n, h) => n + h.count);
@@ -209,7 +265,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 autofocus: true,
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
-                  hintText: meaning ? l.searchMeaningHint : l.searchHint,
+                  hintText: meaning
+                      ? l.searchMeaningHint
+                      : byRoot
+                      ? l.searchRootHint
+                      : l.searchHint,
                   border: InputBorder.none,
                 ),
                 onChanged: _changed,
@@ -248,6 +308,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             value: SearchMode.words,
                             icon: const Icon(Icons.text_fields),
                             label: Text(l.searchModeWords),
+                          ),
+                          ButtonSegment(
+                            value: SearchMode.root,
+                            icon: const Icon(Icons.account_tree_outlined),
+                            label: Text(l.searchModeRoot),
                           ),
                           ButtonSegment(
                             value: SearchMode.meaning,
@@ -329,13 +394,29 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               },
                             ),
                           ),
+                        if (byRoot && rootResult != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              rootResult.$1 == null
+                                  ? l.searchRootNone
+                                  : l.searchRootFound(rootResult.$1!),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: t.goldText,
+                              ),
+                            ),
+                          ),
                         Semantics(
                           liveRegion: true,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Text(
                               hits.isEmpty
-                                  ? (ref0 == null ? l.searchNothing : '')
+                                  ? (ref0 == null &&
+                                            !(byRoot && rootResult == null)
+                                        ? l.searchNothing
+                                        : '')
                                   : l.searchCount(
                                       total,
                                       digits(total),
@@ -399,7 +480,7 @@ class _Result extends ConsumerWidget {
         .substring(row.searchBasmalaPrefix)
         .split(' ')
         .length;
-    final mark = search == words.length;
+    final mark = hit.mushafWords || search == words.length;
     return Card(
       child: InkWell(
         onTap: onTap,

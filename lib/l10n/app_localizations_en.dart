@@ -6058,6 +6058,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose your city first to find the Qibla direction.';
 
   @override
+  String get searchModeRoot => 'By root';
+
+  @override
+  String get searchRootHint => 'Type a root, such as رحم or ر ح م';
+
+  @override
+  String searchRootFound(String root) {
+    return 'Root «$root»';
+  }
+
+  @override
+  String get searchRootNone => 'No root with these letters';
+
+  @override
   String get adhkarTitle => 'Adhkar';
 
   @override

@@ -2280,6 +2280,10 @@
     }
   },
   "qiblaNoPlace": "Choose your city first to find the Qibla direction.",
+  "searchModeRoot": "By root",
+  "searchRootHint": "Type a root, such as رحم or ر ح م",
+  "searchRootFound": "Root «{root}»",
+  "searchRootNone": "No root with these letters",
   "adhkarTitle": "Adhkar",
   "adhkarMorning": "Morning",
   "adhkarEvening": "Evening",

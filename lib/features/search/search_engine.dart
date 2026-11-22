@@ -57,7 +57,13 @@ class SearchVerse {
 
 /// A verse that matched, and which of its words the query touches.
 class SearchHit {
-  const SearchHit(this.surah, this.ayah, this.words, this.count);
+  const SearchHit(
+    this.surah,
+    this.ayah,
+    this.words,
+    this.count, {
+    this.mushafWords = false,
+  });
 
   final int surah;
   final int ayah;
@@ -67,13 +73,17 @@ class SearchHit {
 
   /// Occurrences of the query in the verse.
   final int count;
+
+  /// [words] count the mushaf's own words (as in the word boxes, from a
+  /// root search), not the searched text's.
+  final bool mushafWords;
 }
 
 /// A reference the query names: a whole surah or one verse.
 typedef VerseRef = ({int surah, int? ayah});
 
-/// Reads «2:255», «2 255», «٢:٢٥٥», «البقرة 255», «سورة البقرة»,
-/// «al-baqarah 255». [surahNames] maps a surah's number to its names
+/// Reads «2:255», «2 255», «٢:٢٥٥», «البقرة 255», «255 البقرة»,
+/// «سورة البقرة», «al-baqarah 255». [surahNames] maps a surah's number to its names
 /// (Arabic and English). Returns null when the query is not a reference.
 VerseRef? parseReference(String query, Map<int, List<String>> surahNames) {
   final q = asciiDigits(query).trim();
@@ -83,17 +93,44 @@ VerseRef? parseReference(String query, Map<int, List<String>> surahNames) {
     if (s < 1 || s > 114) return null;
     return (surah: s, ayah: int.parse(numbers[2]!));
   }
-  final named = RegExp(r'^(.*?)\s*(\d{1,3})?$').firstMatch(q);
-  if (named == null) return null;
-  final name = _foldName(named[1]!);
+  // The name, then the verse («البقرة 255»), or the verse first
+  // («255 البقرة»).
+  final after = RegExp(r'^(.*?)\s*(\d{1,3})?$').firstMatch(q);
+  final before = RegExp(r'^(\d{1,3})\s+(\D.*)$').firstMatch(q);
+  final (rawName, rawAyah) = before != null
+      ? (before[2]!, before[1])
+      : (after![1]!, after[2]);
+  final name = _foldName(rawName);
   if (name.isEmpty) return null;
   for (final e in surahNames.entries) {
     for (final n in e.value) {
       if (_foldName(n) == name) {
-        final a = named[2];
-        return (surah: e.key, ayah: a == null ? null : int.parse(a));
+        return (
+          surah: e.key,
+          ayah: rawAyah == null ? null : int.parse(rawAyah),
+        );
       }
     }
+  }
+  return null;
+}
+
+/// A root as compared: its letters folded by [normalize], without the
+/// spaces the corpus puts between them («ر ح م» → «رحم»).
+String foldRoot(String s) => normalize(s).replaceAll(' ', '');
+
+/// The stored root (as in `word_root`, «ر ح م») that [query] names, typed
+/// with or without spaces and hamza forms; null when it names none. A
+/// root has two to four letters.
+String? matchRoot(String query, Iterable<String> roots) {
+  final q = foldRoot(query);
+  if (q.length < 2 ||
+      q.length > 4 ||
+      !RegExp(r'^[\u0621-\u064A]+$').hasMatch(q)) {
+    return null;
+  }
+  for (final r in roots) {
+    if (foldRoot(r) == q) return r;
   }
   return null;
 }

@@ -10243,6 +10243,30 @@ abstract class AppLocalizations {
   /// **'اختر مدينتك أولًا لمعرفة اتجاه القبلة.'**
   String get qiblaNoPlace;
 
+  /// No description provided for @searchModeRoot.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالجذر'**
+  String get searchModeRoot;
+
+  /// No description provided for @searchRootHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب جذرًا، مثل «رحم» أو «ر ح م»'**
+  String get searchRootHint;
+
+  /// No description provided for @searchRootFound.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجذر «{root}»'**
+  String searchRootFound(String root);
+
+  /// No description provided for @searchRootNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا جذر بهذه الحروف'**
+  String get searchRootNone;
+
   /// No description provided for @adhkarTitle.
   ///
   /// In ar, this message translates to:
