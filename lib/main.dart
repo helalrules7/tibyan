@@ -220,6 +220,12 @@ Future<void> _initAudio() async {
         // Android draws as a blank blob in the status bar).
         androidNotificationIcon: 'drawable/ic_stat_tibyan',
         notificationColor: const Color(0xFF0F6660),
+        // Android Auto: lists, not a grid, for both folders and surahs.
+        androidBrowsableRootExtras: const {
+          'android.media.browse.CONTENT_STYLE_SUPPORTED': true,
+          'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 1,
+          'android.media.browse.CONTENT_STYLE_PLAYABLE_HINT': 1,
+        },
       );
       // The session is set for playback before anything plays, so
       // iOS keeps the recitation going in the background (the .playback
@@ -542,11 +548,17 @@ void _startCarBrowsing(ProviderContainer container) {
       final c = container.read(recitationProvider.notifier);
       if (reciter != null) await c.changeReciter(reciter);
       await c.play(surah, from: ayah);
+      // The controller keeps a failure in its state (the phone shows it);
+      // the car is told through the playback state instead.
+      final error = container.read(recitationProvider).error;
+      if (error != null) throw StateError(error);
     },
     text: CarText(
       continueReading: text.carContinue,
       reciters: text.carReciters,
       surah: (n, name) => '$n. ${text.surahWord(name)}',
+      unavailable: text.carUnavailable,
+      playbackError: text.carPlaybackError,
     ),
   );
   if (android) {

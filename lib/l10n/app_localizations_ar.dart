@@ -2553,6 +2553,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get carReciters => 'القراء';
 
   @override
+  String get carUnavailable =>
+      'تعذّر تحميل التلاوات. صِل الهاتف بالإنترنت أو نزّل تلاوة من التطبيق.';
+
+  @override
+  String get carPlaybackError =>
+      'تعذّر تشغيل التلاوة. صِل الهاتف بالإنترنت أو نزّل التلاوة من التطبيق.';
+
+  @override
   String get pagesMapCurrent => 'الصفحة الحالية';
 
   @override

@@ -1170,6 +1170,8 @@
   "newBackupBody": "Save your bookmarks, khatma, notes and settings in one file, and restore them on any device.",
   "carContinue": "Continue where you stopped reading",
   "carReciters": "Reciters",
+  "carUnavailable": "Recitations couldn't load. Connect the phone to the internet or download a recitation in the app.",
+  "carPlaybackError": "The recitation couldn't start. Connect the phone to the internet or download it in the app.",
   "pagesMapCurrent": "Current page",
   "pagesMapRead": "Read in the khatma",
   "pagesMapMarked": "Has a bookmark",

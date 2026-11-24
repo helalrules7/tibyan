@@ -38,6 +38,16 @@ class CarBrowser implements MediaBrowserDelegate {
   static const continueId = 'continue';
   static const recitersId = 'reciters';
 
+  /// The one item shown when a list can't be loaded (not playable, does
+  /// nothing): the car says why instead of showing an empty list.
+  static const unavailableId = 'unavailable';
+
+  MediaItem get _unavailable =>
+      MediaItem(id: unavailableId, title: text.unavailable, playable: false);
+
+  @override
+  String get playbackError => text.playbackError;
+
   @override
   Future<List<MediaItem>> children(String parentMediaId) async {
     if (parentMediaId == root ||
@@ -47,6 +57,17 @@ class CarBrowser implements MediaBrowserDelegate {
         MediaItem(id: recitersId, title: text.reciters, playable: false),
       ];
     }
+    try {
+      final items = await _list(parentMediaId);
+      return items.isEmpty && parentMediaId != unavailableId
+          ? [_unavailable]
+          : items;
+    } catch (_) {
+      return [_unavailable];
+    }
+  }
+
+  Future<List<MediaItem>> _list(String parentMediaId) async {
     if (parentMediaId == recitersId) {
       return [
         for (final r in await reciters())
@@ -57,12 +78,13 @@ class CarBrowser implements MediaBrowserDelegate {
       final id = int.tryParse(parentMediaId.substring('reciter/'.length));
       if (id == null) return const [];
       final reciter = (await reciters()).where((r) => r.id == id).firstOrNull;
+      if (reciter == null) return const [];
       return [
         for (final s in await surahs())
           MediaItem(
             id: 'play/$id/${s.id}',
             title: text.surah(s.id, s.nameAr),
-            artist: reciter?.nameAr,
+            artist: reciter.nameAr,
             playable: true,
           ),
       ];
@@ -73,7 +95,11 @@ class CarBrowser implements MediaBrowserDelegate {
   @override
   Future<void> play(String mediaId) async {
     if (mediaId == continueId) {
-      final at = await position();
+      // No reading position yet (a fresh install): Al-Fatiha.
+      ({int surah, int ayah})? at;
+      try {
+        at = await position();
+      } catch (_) {}
       return start(surah: at?.surah ?? 1, ayah: at?.ayah);
     }
     final parts = mediaId.split('/');
@@ -84,6 +110,7 @@ class CarBrowser implements MediaBrowserDelegate {
         return start(reciter: reciter, surah: surah);
       }
     }
+    throw ArgumentError.value(mediaId, 'mediaId', 'not playable');
   }
 }
 
@@ -93,9 +120,17 @@ class CarText {
     required this.continueReading,
     required this.reciters,
     required this.surah,
+    required this.unavailable,
+    required this.playbackError,
   });
 
   final String continueReading;
   final String reciters;
   final String Function(int number, String name) surah;
+
+  /// Shown in place of a list that can't be loaded.
+  final String unavailable;
+
+  /// Shown when a recitation can't start (offline, nothing downloaded).
+  final String playbackError;
 }

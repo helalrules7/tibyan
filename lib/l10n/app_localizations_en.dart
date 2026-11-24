@@ -2514,6 +2514,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get carReciters => 'Reciters';
 
   @override
+  String get carUnavailable =>
+      'Recitations couldn\'t load. Connect the phone to the internet or download a recitation in the app.';
+
+  @override
+  String get carPlaybackError =>
+      'The recitation couldn\'t start. Connect the phone to the internet or download it in the app.';
+
+  @override
   String get pagesMapCurrent => 'Current page';
 
   @override

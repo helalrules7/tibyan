@@ -4243,6 +4243,18 @@ abstract class AppLocalizations {
   /// **'القراء'**
   String get carReciters;
 
+  /// No description provided for @carUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل التلاوات. صِل الهاتف بالإنترنت أو نزّل تلاوة من التطبيق.'**
+  String get carUnavailable;
+
+  /// No description provided for @carPlaybackError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تشغيل التلاوة. صِل الهاتف بالإنترنت أو نزّل التلاوة من التطبيق.'**
+  String get carPlaybackError;
+
   /// No description provided for @pagesMapCurrent.
   ///
   /// In ar, this message translates to:

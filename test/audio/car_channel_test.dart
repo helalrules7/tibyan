@@ -5,7 +5,7 @@ import 'package:tibyan/features/audio/car_browser.dart';
 import 'package:tibyan/features/audio/car_channel.dart';
 
 /// A browser with a top and one reciter, recording what is asked and played.
-class _Browser implements MediaBrowserDelegate {
+class _Browser extends MediaBrowserDelegate {
   final played = <String>[];
   final asked = <String>[];
 
@@ -124,6 +124,8 @@ void main() {
         continueReading: 'تابع من موضع القراءة',
         reciters: 'القراء',
         surah: (n, name) => '$n. $name',
+        unavailable: 'تعذر',
+        playbackError: 'تعذر التشغيل',
       ),
     );
     await CarChannel(car).attach();

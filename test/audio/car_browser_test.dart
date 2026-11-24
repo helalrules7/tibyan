@@ -39,6 +39,8 @@ void main() {
       continueReading: 'تابع',
       reciters: 'القراء',
       surah: (n, name) => '$n. $name',
+      unavailable: 'تعذر',
+      playbackError: 'تعذر التشغيل',
     ),
   );
 
@@ -66,9 +68,53 @@ void main() {
     () async {
       await browser.play('play/3/36');
       await browser.play('continue');
-      await browser.play('play/3/999'); // ignored
-      await browser.play('nonsense'); // ignored
+      await expectLater(browser.play('play/3/999'), throwsArgumentError);
+      await expectLater(browser.play('nonsense'), throwsArgumentError);
       expect(played, ['3/36/null', 'null/18/10']);
     },
   );
+
+  CarBrowser broken({
+    Future<List<ReciterRow>> Function()? reciters,
+    Future<({int surah, int ayah})?> Function()? position,
+  }) => CarBrowser(
+    reciters: reciters ?? () async => const [],
+    surahs: () async => const [],
+    position: position ?? () async => null,
+    start: ({int? reciter, required int surah, int? ayah}) async =>
+        played.add('$reciter/$surah/$ayah'),
+    text: browser.text,
+  );
+
+  test('no reciters: one message item, never an empty list', () async {
+    final items = await broken().children('reciters');
+    expect(items.single.id, CarBrowser.unavailableId);
+    expect(items.single.title, 'تعذر');
+    expect(items.single.playable, isFalse);
+  });
+
+  test('a list that fails to load shows the message', () async {
+    final b = broken(reciters: () async => throw StateError('db'));
+    expect((await b.children('reciters')).single.id, CarBrowser.unavailableId);
+    expect((await b.children('reciter/3')).single.id, CarBrowser.unavailableId);
+    // The top never depends on the content.
+    expect(await b.children(CarBrowser.root), hasLength(2));
+  });
+
+  test('an unknown reciter shows the message', () async {
+    expect(
+      (await browser.children('reciter/77')).single.id,
+      CarBrowser.unavailableId,
+    );
+  });
+
+  test('continue with no reading position yet starts Al-Fatiha', () async {
+    await broken().play('continue');
+    await broken(position: () async => throw StateError('x')).play('continue');
+    expect(played, ['null/1/null', 'null/1/null']);
+  });
+
+  test('the playback error text comes from CarText', () {
+    expect(browser.playbackError, 'تعذر التشغيل');
+  });
 }

@@ -23,11 +23,80 @@ abstract class MediaBrowserDelegate {
 
   /// Plays a playable item chosen in the browser.
   Future<void> play(String mediaId);
+
+  /// The message a car shows when [play] fails.
+  String get playbackError => 'Playback failed';
 }
 
 class JustAudioBackground {
   /// Set by the app; null when it offers nothing to browse.
-  static MediaBrowserDelegate? browser;
+  ///
+  /// A car can bind the audio service before the app is ready (Android Auto
+  /// starts the app without its screen): requests that arrive earlier wait
+  /// for this, and the car is told to reload the lists it already asked for.
+  static MediaBrowserDelegate? get browser => _browser;
+  static set browser(MediaBrowserDelegate? value) {
+    _browser = value;
+    if (value == null) return;
+    if (!_browserReady.isCompleted) _browserReady.complete();
+    for (final s in _childrenChanged.values) {
+      s.add(const <String, dynamic>{});
+    }
+    // A car that connected before AudioService.init finished got an empty
+    // root from the native side, which never asked this side: tell it
+    // to load the root again.
+    if (_initialized) {
+      // ignore: deprecated_member_use
+      unawaited(AudioServiceBackground.notifyChildrenChanged(
+              AudioService.browsableRootId)
+          .catchError((_) {}));
+    }
+  }
+
+  static bool _initialized = false;
+
+  static MediaBrowserDelegate? _browser;
+  static Completer<void> _browserReady = Completer<void>();
+  static final _childrenChanged =
+      <String, BehaviorSubject<Map<String, dynamic>>>{};
+
+  /// How long a car's request waits for [browser] before giving up.
+  static Duration browserWait = const Duration(seconds: 20);
+
+  /// The browser, waiting up to [browserWait] for the app to set it.
+  static Future<MediaBrowserDelegate?> readyBrowser() async {
+    if (_browser == null) {
+      await _browserReady.future.timeout(browserWait, onTimeout: () {});
+    }
+    return _browser;
+  }
+
+  /// Forgets the browser (tests).
+  @visibleForTesting
+  static void reset() {
+    _browser = null;
+    _browserReady = Completer<void>();
+    for (final s in _childrenChanged.values) {
+      s.close();
+    }
+    _childrenChanged.clear();
+  }
+
+  /// The stream audio_service listens to for [parentMediaId]: an event
+  /// makes it call notifyChildrenChanged, so the car reloads that list.
+  @visibleForTesting
+  static ValueStream<Map<String, dynamic>> childrenChanged(
+    String parentMediaId,
+  ) =>
+      _childrenChanged.putIfAbsent(
+        parentMediaId,
+        () => BehaviorSubject<Map<String, dynamic>>(),
+      );
+
+  /// [MediaBrowserDelegate.children] for a car, after waiting for the app.
+  @visibleForTesting
+  static Future<List<MediaItem>> carChildren(String parentMediaId) async =>
+      await (await readyBrowser())?.children(parentMediaId) ?? const [];
 
   /// Initialise just_audio for background playback. This should be called from
   /// your app's `main` method. e.g.:
@@ -85,6 +154,7 @@ class JustAudioBackground {
       preloadArtwork: preloadArtwork,
       androidBrowsableRootExtras: androidBrowsableRootExtras,
     );
+    JustAudioBackground._initialized = true;
   }
 }
 
@@ -154,7 +224,8 @@ class _JustAudioBackgroundPlugin extends JustAudioPlatform {
 
   @override
   Future<DisposePlayerResponse> disposePlayer(
-      DisposePlayerRequest request) async {
+    DisposePlayerRequest request,
+  ) async {
     if (request.id == _playerId) {
       _playerId = null;
       final player = _player;
@@ -166,7 +237,8 @@ class _JustAudioBackgroundPlugin extends JustAudioPlatform {
 
   @override
   Future<DisposeAllPlayersResponse> disposeAllPlayers(
-      DisposeAllPlayersRequest request) async {
+    DisposeAllPlayersRequest request,
+  ) async {
     final player = _player;
     _player = null;
     await player?.release();
@@ -178,18 +250,20 @@ final _PlayerAudioHandler _playerAudioHandler = _PlayerAudioHandler();
 
 class _JustAudioPlayer extends AudioPlayerPlatform {
   final InitRequest initRequest;
-  final eventController =
-      StreamController<PlaybackEventMessage>.broadcast(sync: true);
-  final playerDataController =
-      StreamController<PlayerDataMessage>.broadcast(sync: true);
+  final eventController = StreamController<PlaybackEventMessage>.broadcast(
+    sync: true,
+  );
+  final playerDataController = StreamController<PlayerDataMessage>.broadcast(
+    sync: true,
+  );
 
   _JustAudioPlayer({required this.initRequest}) : super(initRequest.id) {
     eventController.onCancel = _playerAudioHandler.cancelStreamSubscriptions;
     _playerAudioHandler._initPlayer(initRequest);
     _audioHandler.inner = _playerAudioHandler;
-    _audioHandler.customEvent
-        .whereType<PlaybackEventMessage>()
-        .listen(eventController.add);
+    _audioHandler.customEvent.whereType<PlaybackEventMessage>().listen(
+          eventController.add,
+        );
     _audioHandler.customEvent
         .whereType<_PlayingEvent>()
         .map((event) => event.playing)
@@ -247,34 +321,40 @@ class _JustAudioPlayer extends AudioPlayerPlatform {
 
   @override
   Future<SetSkipSilenceResponse> setSkipSilence(
-      SetSkipSilenceRequest request) async {
+    SetSkipSilenceRequest request,
+  ) async {
     await _playerAudioHandler.customSetSkipSilence(request);
     return SetSkipSilenceResponse();
   }
 
   @override
   Future<SetLoopModeResponse> setLoopMode(SetLoopModeRequest request) async {
-    await _audioHandler
-        .setRepeatMode(AudioServiceRepeatMode.values[request.loopMode.index]);
+    await _audioHandler.setRepeatMode(
+      AudioServiceRepeatMode.values[request.loopMode.index],
+    );
     return SetLoopModeResponse();
   }
 
   @override
   Future<SetShuffleModeResponse> setShuffleMode(
-      SetShuffleModeRequest request) async {
+    SetShuffleModeRequest request,
+  ) async {
     await _audioHandler.setShuffleMode(
-        AudioServiceShuffleMode.values[request.shuffleMode.index]);
+      AudioServiceShuffleMode.values[request.shuffleMode.index],
+    );
     return SetShuffleModeResponse();
   }
 
   @override
   Future<SetShuffleOrderResponse> setShuffleOrder(
-          SetShuffleOrderRequest request) =>
+    SetShuffleOrderRequest request,
+  ) =>
       _playerAudioHandler.customSetShuffleOrder(request);
 
   @override
   Future<SetWebCrossOriginResponse> setWebCrossOrigin(
-      SetWebCrossOriginRequest request) async {
+    SetWebCrossOriginRequest request,
+  ) async {
     _playerAudioHandler.customSetWebCrossOrigin(request);
     return SetWebCrossOriginResponse();
   }
@@ -291,70 +371,82 @@ class _JustAudioPlayer extends AudioPlayerPlatform {
 
   @override
   Future<ConcatenatingInsertAllResponse> concatenatingInsertAll(
-          ConcatenatingInsertAllRequest request) =>
+    ConcatenatingInsertAllRequest request,
+  ) =>
       _playerAudioHandler.customConcatenatingInsertAll(request);
 
   @override
   Future<ConcatenatingRemoveRangeResponse> concatenatingRemoveRange(
-          ConcatenatingRemoveRangeRequest request) =>
+    ConcatenatingRemoveRangeRequest request,
+  ) =>
       _playerAudioHandler.customConcatenatingRemoveRange(request);
 
   @override
   Future<ConcatenatingMoveResponse> concatenatingMove(
-          ConcatenatingMoveRequest request) =>
+    ConcatenatingMoveRequest request,
+  ) =>
       _playerAudioHandler.customConcatenatingMove(request);
 
   @override
   Future<SetAndroidAudioAttributesResponse> setAndroidAudioAttributes(
-          SetAndroidAudioAttributesRequest request) =>
+    SetAndroidAudioAttributesRequest request,
+  ) =>
       _playerAudioHandler.customSetAndroidAudioAttributes(request);
 
   @override
   Future<SetAutomaticallyWaitsToMinimizeStallingResponse>
       setAutomaticallyWaitsToMinimizeStalling(
-              SetAutomaticallyWaitsToMinimizeStallingRequest request) =>
-          _playerAudioHandler
-              .customSetAutomaticallyWaitsToMinimizeStalling(request);
+    SetAutomaticallyWaitsToMinimizeStallingRequest request,
+  ) =>
+          _playerAudioHandler.customSetAutomaticallyWaitsToMinimizeStalling(
+            request,
+          );
 
   @override
   Future<AndroidEqualizerBandSetGainResponse> androidEqualizerBandSetGain(
-          AndroidEqualizerBandSetGainRequest request) =>
+    AndroidEqualizerBandSetGainRequest request,
+  ) =>
       _playerAudioHandler.customAndroidEqualizerBandSetGain(request);
 
   @override
   Future<AndroidEqualizerGetParametersResponse> androidEqualizerGetParameters(
-          AndroidEqualizerGetParametersRequest request) =>
+    AndroidEqualizerGetParametersRequest request,
+  ) =>
       _playerAudioHandler.customAndroidEqualizerGetParameters(request);
 
   @override
   Future<AndroidLoudnessEnhancerSetTargetGainResponse>
       androidLoudnessEnhancerSetTargetGain(
-              AndroidLoudnessEnhancerSetTargetGainRequest request) =>
+    AndroidLoudnessEnhancerSetTargetGainRequest request,
+  ) =>
           _playerAudioHandler
               .customAndroidLoudnessEnhancerSetTargetGain(request);
 
   @override
   Future<AudioEffectSetEnabledResponse> audioEffectSetEnabled(
-          AudioEffectSetEnabledRequest request) =>
+    AudioEffectSetEnabledRequest request,
+  ) =>
       _playerAudioHandler.customAudioEffectSetEnabled(request);
 
   @override
   Future<SetAllowsExternalPlaybackResponse> setAllowsExternalPlayback(
-          SetAllowsExternalPlaybackRequest request) =>
+    SetAllowsExternalPlaybackRequest request,
+  ) =>
       _playerAudioHandler.customSetAllowsExternalPlayback(request);
 
   @override
   Future<SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse>
       setCanUseNetworkResourcesForLiveStreamingWhilePaused(
-              SetCanUseNetworkResourcesForLiveStreamingWhilePausedRequest
-                  request) =>
+    SetCanUseNetworkResourcesForLiveStreamingWhilePausedRequest request,
+  ) =>
           _playerAudioHandler
               .customSetCanUseNetworkResourcesForLiveStreamingWhilePaused(
                   request);
 
   @override
   Future<SetPreferredPeakBitRateResponse> setPreferredPeakBitRate(
-          SetPreferredPeakBitRateRequest request) =>
+    SetPreferredPeakBitRateRequest request,
+  ) =>
       _playerAudioHandler.customSetPreferredPeakBitRate(request);
 }
 
@@ -368,15 +460,34 @@ mixin _Browsing on BaseAudioHandler {
   Future<List<MediaItem>> getChildren(
     String parentMediaId, [
     Map<String, dynamic>? options,
-  ]) async =>
-      await JustAudioBackground.browser?.children(parentMediaId) ?? const [];
+  ]) =>
+      JustAudioBackground.carChildren(parentMediaId);
+
+  @override
+  ValueStream<Map<String, dynamic>> subscribeToChildren(String parentMediaId) =>
+      JustAudioBackground.childrenChanged(parentMediaId);
 
   @override
   Future<void> playFromMediaId(
     String mediaId, [
     Map<String, dynamic>? extras,
-  ]) async =>
-      await JustAudioBackground.browser?.play(mediaId);
+  ]) async {
+    final browser = await JustAudioBackground.readyBrowser();
+    try {
+      if (browser == null) throw StateError('no media browser');
+      await browser.play(mediaId);
+    } catch (_) {
+      // The car shows this instead of a spinner that never ends.
+      playbackState.add(
+        playbackState.value.copyWith(
+          processingState: AudioProcessingState.error,
+          playing: false,
+          errorCode: 1,
+          errorMessage: browser?.playbackError ?? 'Playback failed',
+        ),
+      );
+    }
+  }
 }
 
 class _PlayerAudioHandler extends BaseAudioHandler
@@ -414,47 +525,50 @@ class _PlayerAudioHandler extends BaseAudioHandler
   List<MediaItem> get currentQueue => queue.value;
   StreamSubscription<TrackInfo>? _trackInfoSubscription;
 
-  Future<void> _initPlayer(InitRequest initRequest) =>
-      _lock.synchronized(() async {
-        final player = await _platform.init(initRequest);
-        _playerCompleter.complete(player);
-        final playbackEventMessageStream = player.playbackEventMessageStream;
-        _trackInfoSubscription = playbackEventMessageStream
-            .map((event) {
-              index = event.currentIndex ?? _justAudioEvent.currentIndex;
-              _justAudioEvent = event;
-              customEvent.add(event);
-              _broadcastState();
-              return event;
-            })
-            .map((event) => TrackInfo(event.currentIndex, event.duration))
-            .distinct()
-            .debounceTime(const Duration(milliseconds: 100))
-            .map((track) {
-              // Platform may send us a null duration on dispose, which we should
-              // ignore.
-              final currentMediaItem = this.currentMediaItem;
-              if (currentMediaItem != null) {
-                if (track.duration == null &&
-                    currentMediaItem.duration != null) {
-                  return TrackInfo(track.index, currentMediaItem.duration);
+  Future<void> _initPlayer(InitRequest initRequest) => _lock.synchronized(
+        () async {
+          final player = await _platform.init(initRequest);
+          _playerCompleter.complete(player);
+          final playbackEventMessageStream = player.playbackEventMessageStream;
+          _trackInfoSubscription = playbackEventMessageStream
+              .map((event) {
+                index = event.currentIndex ?? _justAudioEvent.currentIndex;
+                _justAudioEvent = event;
+                customEvent.add(event);
+                _broadcastState();
+                return event;
+              })
+              .map((event) => TrackInfo(event.currentIndex, event.duration))
+              .distinct()
+              .debounceTime(const Duration(milliseconds: 100))
+              .map((track) {
+                // Platform may send us a null duration on dispose, which we should
+                // ignore.
+                final currentMediaItem = this.currentMediaItem;
+                if (currentMediaItem != null) {
+                  if (track.duration == null &&
+                      currentMediaItem.duration != null) {
+                    return TrackInfo(track.index, currentMediaItem.duration);
+                  }
                 }
-              }
-              return track;
-            })
-            .distinct()
-            .listen((track) {
-              if (currentMediaItem != null && index != null) {
-                if (track.duration != currentMediaItem!.duration &&
-                    (index! < queue.nvalue!.length && track.duration != null)) {
-                  currentQueue[index!] =
-                      currentQueue[index!].copyWith(duration: track.duration);
-                  queue.add(currentQueue);
+                return track;
+              })
+              .distinct()
+              .listen((track) {
+                if (currentMediaItem != null && index != null) {
+                  if (track.duration != currentMediaItem!.duration &&
+                      (index! < queue.nvalue!.length &&
+                          track.duration != null)) {
+                    currentQueue[index!] = currentQueue[index!].copyWith(
+                      duration: track.duration,
+                    );
+                    queue.add(currentQueue);
+                  }
+                  mediaItem.add(currentMediaItem!);
                 }
-                mediaItem.add(currentMediaItem!);
-              }
-            }, onError: (Object e, [StackTrace? st]) {});
-      });
+              }, onError: (Object e, [StackTrace? st]) {});
+        },
+      );
 
   Future<void> cancelStreamSubscriptions() async {
     final trackInfoSubscription = _trackInfoSubscription;
@@ -479,11 +593,13 @@ class _PlayerAudioHandler extends BaseAudioHandler
     _source = request.audioSourceMessage;
     _updateShuffleIndices();
     _updateQueue();
-    final response = await (await _player).load(LoadRequest(
-      audioSourceMessage: _source!,
-      initialPosition: request.initialPosition,
-      initialIndex: request.initialIndex,
-    ));
+    final response = await (await _player).load(
+      LoadRequest(
+        audioSourceMessage: _source!,
+        initialPosition: request.initialPosition,
+        initialIndex: request.initialIndex,
+      ),
+    );
     return LoadResponse(duration: response.duration);
   }
 
@@ -497,38 +613,46 @@ class _PlayerAudioHandler extends BaseAudioHandler
       await (await _player).setPitch(request);
 
   Future<SetSkipSilenceResponse> customSetSkipSilence(
-          SetSkipSilenceRequest request) async =>
+    SetSkipSilenceRequest request,
+  ) async =>
       await (await _player).setSkipSilence(request);
 
   Future<SeekResponse> customPlayerSeek(SeekRequest request) async =>
       await (await _player).seek(request);
 
   Future<SetShuffleOrderResponse> customSetShuffleOrder(
-      SetShuffleOrderRequest request) async {
+    SetShuffleOrderRequest request,
+  ) async {
     _source = request.audioSourceMessage;
     _updateShuffleIndices();
     _broadcastStateIfActive();
-    return await (await _player).setShuffleOrder(SetShuffleOrderRequest(
-      audioSourceMessage: _source!,
-    ));
+    return await (await _player).setShuffleOrder(
+      SetShuffleOrderRequest(audioSourceMessage: _source!),
+    );
   }
 
   Future<SetWebCrossOriginResponse> customSetWebCrossOrigin(
-      SetWebCrossOriginRequest request) async {
+    SetWebCrossOriginRequest request,
+  ) async {
     return await (await _player).setWebCrossOrigin(request);
   }
 
   Future<SetWebSinkIdResponse> customSetWebSinkId(
-      SetWebSinkIdRequest request) async {
+    SetWebSinkIdRequest request,
+  ) async {
     return await (await _player).setWebSinkId(request);
   }
 
   Future<ConcatenatingInsertAllResponse> customConcatenatingInsertAll(
-      ConcatenatingInsertAllRequest request) async {
+    ConcatenatingInsertAllRequest request,
+  ) async {
     final cat = _source!.findCat(request.id)!;
     cat.children.insertAll(request.index, request.children);
-    cat.shuffleOrder
-        .replaceRange(0, cat.shuffleOrder.length, request.shuffleOrder);
+    cat.shuffleOrder.replaceRange(
+      0,
+      cat.shuffleOrder.length,
+      request.shuffleOrder,
+    );
     _updateShuffleIndices();
     _broadcastStateIfActive();
     _updateQueue();
@@ -536,11 +660,15 @@ class _PlayerAudioHandler extends BaseAudioHandler
   }
 
   Future<ConcatenatingRemoveRangeResponse> customConcatenatingRemoveRange(
-      ConcatenatingRemoveRangeRequest request) async {
+    ConcatenatingRemoveRangeRequest request,
+  ) async {
     final cat = _source!.findCat(request.id)!;
     cat.children.removeRange(request.startIndex, request.endIndex);
-    cat.shuffleOrder
-        .replaceRange(0, cat.shuffleOrder.length, request.shuffleOrder);
+    cat.shuffleOrder.replaceRange(
+      0,
+      cat.shuffleOrder.length,
+      request.shuffleOrder,
+    );
     _updateShuffleIndices();
     _broadcastStateIfActive();
     _updateQueue();
@@ -548,12 +676,18 @@ class _PlayerAudioHandler extends BaseAudioHandler
   }
 
   Future<ConcatenatingMoveResponse> customConcatenatingMove(
-      ConcatenatingMoveRequest request) async {
+    ConcatenatingMoveRequest request,
+  ) async {
     final cat = _source!.findCat(request.id)!;
-    cat.children
-        .insert(request.newIndex, cat.children.removeAt(request.currentIndex));
-    cat.shuffleOrder
-        .replaceRange(0, cat.shuffleOrder.length, request.shuffleOrder);
+    cat.children.insert(
+      request.newIndex,
+      cat.children.removeAt(request.currentIndex),
+    );
+    cat.shuffleOrder.replaceRange(
+      0,
+      cat.shuffleOrder.length,
+      request.shuffleOrder,
+    );
     _updateShuffleIndices();
     _broadcastStateIfActive();
     _updateQueue();
@@ -561,51 +695,61 @@ class _PlayerAudioHandler extends BaseAudioHandler
   }
 
   Future<SetAndroidAudioAttributesResponse> customSetAndroidAudioAttributes(
-          SetAndroidAudioAttributesRequest request) async =>
+    SetAndroidAudioAttributesRequest request,
+  ) async =>
       await (await _player).setAndroidAudioAttributes(request);
 
   Future<SetAutomaticallyWaitsToMinimizeStallingResponse>
       customSetAutomaticallyWaitsToMinimizeStalling(
-              SetAutomaticallyWaitsToMinimizeStallingRequest request) async =>
+    SetAutomaticallyWaitsToMinimizeStallingRequest request,
+  ) async =>
           await (await _player)
               .setAutomaticallyWaitsToMinimizeStalling(request);
 
   Future<AndroidEqualizerBandSetGainResponse> customAndroidEqualizerBandSetGain(
-          AndroidEqualizerBandSetGainRequest request) async =>
+    AndroidEqualizerBandSetGainRequest request,
+  ) async =>
       await (await _player).androidEqualizerBandSetGain(request);
 
   Future<AndroidEqualizerGetParametersResponse>
       customAndroidEqualizerGetParameters(
-              AndroidEqualizerGetParametersRequest request) async =>
+    AndroidEqualizerGetParametersRequest request,
+  ) async =>
           await (await _player).androidEqualizerGetParameters(request);
 
   Future<AndroidLoudnessEnhancerSetTargetGainResponse>
       customAndroidLoudnessEnhancerSetTargetGain(
-              AndroidLoudnessEnhancerSetTargetGainRequest request) async =>
+    AndroidLoudnessEnhancerSetTargetGainRequest request,
+  ) async =>
           await (await _player).androidLoudnessEnhancerSetTargetGain(request);
 
   Future<AudioEffectSetEnabledResponse> customAudioEffectSetEnabled(
-          AudioEffectSetEnabledRequest request) async =>
+    AudioEffectSetEnabledRequest request,
+  ) async =>
       await (await _player).audioEffectSetEnabled(request);
 
   Future<SetAllowsExternalPlaybackResponse> customSetAllowsExternalPlayback(
-          SetAllowsExternalPlaybackRequest request) async =>
+    SetAllowsExternalPlaybackRequest request,
+  ) async =>
       await (await _player).setAllowsExternalPlayback(request);
 
   Future<SetCanUseNetworkResourcesForLiveStreamingWhilePausedResponse>
       customSetCanUseNetworkResourcesForLiveStreamingWhilePaused(
-              SetCanUseNetworkResourcesForLiveStreamingWhilePausedRequest
-                  request) async =>
+    SetCanUseNetworkResourcesForLiveStreamingWhilePausedRequest request,
+  ) async =>
           await (await _player)
               .setCanUseNetworkResourcesForLiveStreamingWhilePaused(request);
 
   Future<SetPreferredPeakBitRateResponse> customSetPreferredPeakBitRate(
-          SetPreferredPeakBitRateRequest request) async =>
+    SetPreferredPeakBitRateRequest request,
+  ) async =>
       await (await _player).setPreferredPeakBitRate(request);
 
   void _updateQueue() {
-    assert(sequence.every((source) => source.tag is MediaItem),
-        'Error : When using just_audio_background, you should always set a MediaItem tag on every AudioSource. See AudioSource.uri documentation for more information.');
+    assert(
+      sequence.every((source) => source.tag is MediaItem),
+      'Error : When using just_audio_background, you should always set a MediaItem tag on every AudioSource. See AudioSource.uri documentation for more information.',
+    );
     queue.add(sequence.map((source) => source.tag as MediaItem).toList());
   }
 
@@ -725,9 +869,12 @@ class _PlayerAudioHandler extends BaseAudioHandler
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
     _repeatMode = repeatMode;
     _broadcastStateIfActive();
-    (await _player).setLoopMode(SetLoopModeRequest(
+    (await _player).setLoopMode(
+      SetLoopModeRequest(
         loopMode: LoopModeMessage
-            .values[min(LoopModeMessage.values.length - 1, repeatMode.index)]));
+            .values[min(LoopModeMessage.values.length - 1, repeatMode.index)],
+      ),
+    );
   }
 
   @override
@@ -735,9 +882,14 @@ class _PlayerAudioHandler extends BaseAudioHandler
     _shuffleMode = shuffleMode;
     _updateShuffleIndices();
     _broadcastStateIfActive();
-    (await _player).setShuffleMode(SetShuffleModeRequest(
-        shuffleMode: ShuffleModeMessage.values[
-            min(ShuffleModeMessage.values.length - 1, shuffleMode.index)]));
+    (await _player).setShuffleMode(
+      SetShuffleModeRequest(
+        shuffleMode: ShuffleModeMessage.values[min(
+          ShuffleModeMessage.values.length - 1,
+          shuffleMode.index,
+        )],
+      ),
+    );
   }
 
   @override
@@ -758,11 +910,12 @@ class _PlayerAudioHandler extends BaseAudioHandler
     if (_playing &&
         _justAudioEvent.processingState == ProcessingStateMessage.ready) {
       return Duration(
-          milliseconds: (_justAudioEvent.updatePosition.inMilliseconds +
-                  ((DateTime.now().millisecondsSinceEpoch -
-                          _justAudioEvent.updateTime.millisecondsSinceEpoch) *
-                      _speed))
-              .toInt());
+        milliseconds: (_justAudioEvent.updatePosition.inMilliseconds +
+                ((DateTime.now().millisecondsSinceEpoch -
+                        _justAudioEvent.updateTime.millisecondsSinceEpoch) *
+                    _speed))
+            .toInt(),
+      );
     } else {
       return _justAudioEvent.updatePosition;
     }
@@ -786,9 +939,12 @@ class _PlayerAudioHandler extends BaseAudioHandler
   void _seekContinuously(bool begin, int direction) {
     _seeker?.stop();
     if (begin) {
-      _seeker = _Seeker(this, Duration(seconds: 10 * direction),
-          const Duration(seconds: 1), currentMediaItem!.duration!)
-        ..start();
+      _seeker = _Seeker(
+        this,
+        Duration(seconds: 10 * direction),
+        const Duration(seconds: 1),
+        currentMediaItem!.duration!,
+      )..start();
     }
   }
 
@@ -806,38 +962,43 @@ class _PlayerAudioHandler extends BaseAudioHandler
       MediaControl.stop,
       if (hasNext) MediaControl.skipToNext,
     ];
-    playbackState.add(playbackState.nvalue!.copyWith(
-      controls: controls,
-      systemActions: {
-        MediaAction.seek,
-        MediaAction.seekForward,
-        MediaAction.seekBackward,
-      },
-      androidCompactActionIndices: List.generate(controls.length, (i) => i)
-          .where((i) => controls[i].action != MediaAction.stop)
-          .toList(),
-      processingState: _justAudioEvent.errorCode != null
-          ? AudioProcessingState.error
-          : const {
-                ProcessingStateMessage.idle: AudioProcessingState.idle,
-                ProcessingStateMessage.loading: AudioProcessingState.loading,
-                ProcessingStateMessage.buffering:
-                    AudioProcessingState.buffering,
-                ProcessingStateMessage.ready: AudioProcessingState.ready,
-                ProcessingStateMessage.completed:
-                    AudioProcessingState.completed,
-              }[_justAudioEvent.processingState] ??
-              AudioProcessingState.idle,
-      playing: _playing &&
-          !{ProcessingStateMessage.idle, ProcessingStateMessage.completed}
-              .contains(_justAudioEvent.processingState),
-      updatePosition: currentPosition,
-      bufferedPosition: _justAudioEvent.bufferedPosition,
-      speed: _speed,
-      queueIndex: _justAudioEvent.currentIndex,
-      errorCode: _justAudioEvent.errorCode,
-      errorMessage: _justAudioEvent.errorMessage,
-    ));
+    playbackState.add(
+      playbackState.nvalue!.copyWith(
+        controls: controls,
+        systemActions: {
+          MediaAction.seek,
+          MediaAction.seekForward,
+          MediaAction.seekBackward,
+        },
+        androidCompactActionIndices: List.generate(
+          controls.length,
+          (i) => i,
+        ).where((i) => controls[i].action != MediaAction.stop).toList(),
+        processingState: _justAudioEvent.errorCode != null
+            ? AudioProcessingState.error
+            : const {
+                  ProcessingStateMessage.idle: AudioProcessingState.idle,
+                  ProcessingStateMessage.loading: AudioProcessingState.loading,
+                  ProcessingStateMessage.buffering:
+                      AudioProcessingState.buffering,
+                  ProcessingStateMessage.ready: AudioProcessingState.ready,
+                  ProcessingStateMessage.completed:
+                      AudioProcessingState.completed,
+                }[_justAudioEvent.processingState] ??
+                AudioProcessingState.idle,
+        playing: _playing &&
+            !{
+              ProcessingStateMessage.idle,
+              ProcessingStateMessage.completed,
+            }.contains(_justAudioEvent.processingState),
+        updatePosition: currentPosition,
+        bufferedPosition: _justAudioEvent.bufferedPosition,
+        speed: _speed,
+        queueIndex: _justAudioEvent.currentIndex,
+        errorCode: _justAudioEvent.errorCode,
+        errorMessage: _justAudioEvent.errorMessage,
+      ),
+    );
   }
 }
 
@@ -915,9 +1076,10 @@ extension AudioSourceExtension on AudioSourceMessage {
     if (self is ConcatenatingAudioSourceMessage) {
       return self.children.expand((child) => child.sequence).toList();
     } else if (self is LoopingAudioSourceMessage) {
-      return List.generate(self.count, (i) => self.child.sequence)
-          .expand((sequence) => sequence)
-          .toList();
+      return List.generate(
+        self.count,
+        (i) => self.child.sequence,
+      ).expand((sequence) => sequence).toList();
     } else {
       return [self as IndexedAudioSourceMessage];
     }
