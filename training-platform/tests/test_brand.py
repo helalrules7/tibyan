@@ -88,7 +88,7 @@ class PageTests(unittest.TestCase):
 
     def test_root_site_has_follow_line_and_footer_link(self):
         root = TestClient(app, base_url="https://altibyan.app")
-        for path in ("/", "/beta"):
+        for path in ("/",):
             body = root.get(path).text
             self.assertIn('class="follow-line"', body, path)
             self.assertEqual(body.count(f'href="{FACEBOOK_URL}"'), 2, path)

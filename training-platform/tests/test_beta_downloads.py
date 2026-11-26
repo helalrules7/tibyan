@@ -108,24 +108,6 @@ class DownloadsTest(unittest.TestCase):
         with patch.object(releases, "_fetch", return_value=[RELEASES[2]]):
             self.assertEqual(self.get("macos").headers["location"], releases.RELEASES_PAGE)
 
-    def test_beta_page_shows_buttons_version_and_size(self):
-        with patch.object(releases, "_fetch", return_value=RELEASES):
-            html = self.client.get("/beta").text
-        for href in ("/download/android", "/download/macos", "/download/windows", "/download/linux",
-                     "https://testflight.apple.com/join/gxJ4rrdd",
-                     "https://play.google.com/apps/internaltest/4701465992904267136"):
-            self.assertIn(f'href="{href}"', html)
-        self.assertIn("v0.5.0 · 142 MB", html)
-        self.assertLess(html.index('class="downloads"'), html.index('class="beta-form"'))
-
-    def test_beta_page_renders_when_api_down(self):
-        with patch.object(releases, "_fetch", side_effect=OSError("down")):
-            r = self.client.get("/beta")
-        self.assertEqual(r.status_code, 200)
-        self.assertIn('href="/download/android"', r.text)
-        self.assertNotIn("dl-meta", r.text)
-
-
 class HeadTest(DownloadsTest):
     def test_head_redirects(self):
         with patch.object(releases, "_fetch", return_value=RELEASES):

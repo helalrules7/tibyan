@@ -54,11 +54,10 @@ def _page(request: Request, status_code: int = 200, **context):
 
 @router.get("/beta")
 def beta_page(request: Request):
-    state = request.session.pop("beta", None)
-    if state is None and request.query_params.get("n") == "busy":
-        state = "busy"  # nginx's 429 redirect lands here
-    chosen = request.session.pop("beta_platforms", None) or []
-    return _page(request, state=state, chosen=chosen, errors={}, old={})
+    """Tibyan launched (26 Nov 2026): the beta page now sends visitors to the
+    download page, in the visitor's language."""
+    prefix = "/en" if request.scope.get("tibyan_lang") == "en" else ""
+    return RedirectResponse(f"{prefix}/download", status_code=301)
 
 
 @router.post("/beta/join")

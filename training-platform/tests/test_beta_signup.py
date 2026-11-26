@@ -79,7 +79,7 @@ class NotifyFormTests(LaunchFormsBase):
     def test_page_has_beta_button_not_checkbox(self):
         with self.client() as c:
             html = c.get("/").text
-        self.assertIn('href="/beta"', html)
+        self.assertIn('href="/download"', html)
         self.assertIn("انضم لاختبار النسخة التجريبية", html)
         self.assertNotIn('name="beta"', html)
 
@@ -131,146 +131,16 @@ class NotifyFormTests(LaunchFormsBase):
             self.assertIn("محاولات كثيرة", c.get("/?n=busy").text)
 
 
-class BetaFormTests(LaunchFormsBase):
-    def join(self, c, platforms=("ios",), **data):
-        if not getattr(c, "csrf", None):
-            c.csrf = csrf_from(c.get("/beta"))
-        body = {"csrf": c.csrf, "email": "tester@example.test", **data}
-        body["platform"] = list(platforms)
-        return c.post("/beta/join", data=body, follow_redirects=False)
+class BetaRedirectTests(unittest.TestCase):
+    """After the launch, /beta sends visitors to the download page."""
 
-    def _admin(self):
-        with self.Session() as db:
-            db.add(User(
-                email="admin@example.test", password_hash=hash_password(PASSWORD),
-                birth_date=date(1990, 1, 1), consent_ccby=True, consent_parental=False,
-                consent_version="test", is_admin=True,
-            ))
-            db.commit()
-
-    def _login(self, c):
-        page = c.get("/login")
-        c.post("/login", data={"identifier": "admin@example.test", "password": PASSWORD, "csrf": csrf_from(page)})
-
-    def test_page_shows_links_and_steps_without_signup(self):
-        with self.client() as c:
-            html = c.get("/beta").text
-        self.assertIn("https://play.google.com/apps/internaltest/4701465992904267136", html)
-        self.assertIn("https://testflight.apple.com/join/gxJ4rrdd", html)
-        self.assertIn("أصبح مختبِرًا", html)
-        self.assertIn("الإبلاغ عن مشكلة", html)
-
-    def test_nginx_429_redirect_shows_message(self):
-        with self.client() as c:
-            self.assertIn("محاولات كثيرة", c.get("/beta?n=busy").text)
-
-    def test_english_page(self):
-        with self.client() as c:
-            c.cookies.set("lang", "en")
-            html = c.get("/beta").text
-        self.assertIn("Join the beta test", html)
-        self.assertIn("Become a tester", html)
-
-    def test_join_stores_platforms_notifies_and_emails(self):
-        self._admin()
-        with self.client() as c:
-            r = self.join(c, platforms=("android", "mac"), email=" Tester@Example.test")
-            self.assertEqual(r.status_code, 303)
-            self.assertEqual(r.headers["location"], "/beta#install")
-            html = c.get("/beta").text
-        self.assertIn("تم تسجيل طلبك", html)
-        self.assertIn("من اختيارك", html)
-        row = self.rows()[0]
-        self.assertEqual(row.email, "tester@example.test")
-        self.assertTrue(row.wants_beta)
-        self.assertEqual(row.platforms, ["android", "mac"])
-        self.assertIsNotNone(row.beta_requested_at)
-        self.assertIn(("send_beta_confirmation", ("tester@example.test", "ar", ["android", "mac"])), self.mails)
-        self.assertIn(("send_signup_alert", ("beta", "tester@example.test", "ar", ["android", "mac"])), self.mails)
-        with self.Session() as db:
-            self.assertEqual(db.query(Notification).one().kind, "beta_request")
-
-    def test_repeat_merges_platforms_and_only_new_ones_notify(self):
-        with self.client() as c:
-            self.join(c, platforms=("ios",))
-            self.join(c, platforms=("ios",))
-            self.join(c, platforms=("android",))
-        self.assertEqual(self.rows()[0].platforms, ["ios", "android"])
-        self.assertEqual(len(self.mails), 4)  # confirmation + alert, twice
-
-    def test_existing_notify_signup_is_upgraded(self):
-        with self.Session() as db:
-            db.add(NotifySignup(email="tester@example.test", lang="en"))
-            db.commit()
-        with self.client() as c:
-            self.join(c, platforms=("ios",))
-        rows = self.rows()
-        self.assertEqual(len(rows), 1)
-        self.assertTrue(rows[0].wants_beta)
-
-    def test_validation(self):
-        with self.client() as c:
-            bad_email = self.join(c, email="nope")
-            self.assertEqual(bad_email.status_code, 422)
-            self.assertIn("أدخل بريدًا إلكترونيًا صحيحًا", bad_email.text)
-            no_platform = self.join(c, platforms=())
-            self.assertEqual(no_platform.status_code, 422)
-            self.assertIn("اختر جهازًا واحدًا على الأقل", no_platform.text)
-            self.assertIn('value="tester@example.test"', no_platform.text)
-            junk = self.join(c, platforms=("windows",))
-            self.assertEqual(junk.status_code, 422)
-            r = c.post("/beta/join", data={"email": "a@example.test", "platform": "ios"})
-            self.assertEqual(r.status_code, 400)
-        self.assertEqual(self.rows(), [])
-
-    def test_honeypot(self):
-        with self.client() as c:
-            r = self.join(c, website="spam")
-        self.assertEqual(r.status_code, 303)
-        self.assertEqual(self.rows(), [])
-        self.assertEqual(self.mails, [])
-
-    def test_rate_limit(self):
-        with self.client() as c:
-            for i in range(5):
-                self.join(c, email=f"t{i}@example.test")
-            r = self.join(c, email="late@example.test")
-        self.assertEqual(r.status_code, 429)
-        self.assertIn("محاولات كثيرة", r.text)
-        self.assertEqual(len(self.rows()), 5)
-
-    def test_admin_list_filters_and_csv(self):
-        self._admin()
-        with self.client(ip="198.51.100.1") as c:
-            self.join(c, email="ios@example.test", platforms=("ios",))
-            self.join(c, email="droid@example.test", platforms=("android",))
-            self.join(c, email="both@example.test", platforms=("android", "mac"))
-        with self.Session() as db:
-            db.add(NotifySignup(email="plain@example.test", lang="ar"))
-            db.commit()
-        with self.client(ip="198.51.100.2") as c:
-            self._login(c)
-            page = c.get("/admin/requests?tab=beta")
-            self.assertEqual(page.status_code, 200)
-            for email in ("ios@example.test", "droid@example.test", "both@example.test"):
-                self.assertIn(email, page.text)
-            self.assertNotIn("plain@example.test", page.text)
-            android = c.get("/admin/requests?tab=beta&platform=android").text
-            self.assertIn("droid@example.test", android)
-            self.assertIn("both@example.test", android)
-            self.assertNotIn("ios@example.test", android)
-            csv = c.get("/admin/requests/notify.csv?beta=1&platform=mac")
-            self.assertEqual(csv.status_code, 200)
-            self.assertIn("beta_platforms", csv.text)
-            self.assertIn("both@example.test", csv.text)
-            self.assertIn("android mac", csv.text)
-            self.assertNotIn("droid@example.test", csv.text)
-            row_id = next(r.id for r in self.rows() if r.email == "ios@example.test")
-            c.post(f"/admin/requests/beta/{row_id}", data={"platform": "testflight", "value": "1", "csrf": csrf_from(page)})
-            pending = c.get("/admin/requests?tab=beta&status=pending").text
-            self.assertNotIn("ios@example.test", pending)
-            added = c.get("/admin/requests?tab=beta&status=added").text
-            self.assertIn("ios@example.test", added)
+    def test_beta_redirects_to_download(self):
+        from app.main import app
+        c = TestClient(app, base_url=ROOT)
+        for path, target in (("/beta", "/download"), ("/en/beta", "/en/download")):
+            r = c.get(path, follow_redirects=False)
+            self.assertEqual(r.status_code, 301, path)
+            self.assertEqual(r.headers.get("location"), target, path)
 
 
 class SignupAlertTests(unittest.TestCase):

@@ -102,8 +102,6 @@ class PrivacyPageTests(unittest.TestCase):
         with self.client() as c:
             home = c.get("/").text
             self.assertIn("بالضغط على الزر توافق على", home)
-            beta_page = c.get("/beta").text
-            self.assertIn("بالضغط على الزر توافق على", beta_page)
             c.cookies.set("lang", "en")
             self.assertIn("you agree to the", c.get("/").text)
 

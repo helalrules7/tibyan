@@ -207,10 +207,8 @@ def sitemap(request: Request):
     if is_root_host(request):
         urls = [
             f"{ROOT_ORIGIN}/",
-            f"{ROOT_ORIGIN}/beta",
             f"{ROOT_ORIGIN}/download",
             f"{ROOT_ORIGIN}/en/",
-            f"{ROOT_ORIGIN}/en/beta",
             f"{ROOT_ORIGIN}/en/download",
             f"{ROOT_ORIGIN}/privacy",
             f"{ROOT_ORIGIN}/privacy/en",
