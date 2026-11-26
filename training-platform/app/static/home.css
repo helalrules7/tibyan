@@ -6,9 +6,13 @@
    Scale  one modular scale (--t-*), one spacing scale (--sp-*),
           one content width (--wrap).
    Rhythm paper -> night -> sand -> charcoal -> teal -> paper.
-          The reader steps down from the paper into the night; the
-          arch line of the app's own home screen frames the first
-          and the last scene.
+          The reader steps down from the paper into the night.
+   Ornament: none. The only graphic devices are
+          - hairline rules (--rule / --rule-dark) that structure lists,
+          - one panel radius (--r-panel) for the two real objects on
+            the page, the reader and the phone, which alone cast a shadow,
+          - flat colour fields. No gradients, patterns, blur, rotation
+            or looping animation.
    ============================================================ */
 @font-face { font-family: 'TibyanText'; src: url('/static/fonts/IBMPlexSansArabic-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'TibyanText'; src: url('/static/fonts/IBMPlexSansArabic-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
@@ -99,11 +103,8 @@
 .x-nav .x-nav-get:hover { background: var(--ink); color: var(--paper); }
 
 /* ---------- scene 1: opening ---------- */
-.x-open { position: relative; padding-top: clamp(28px, 4.5vw, 64px); overflow-x: clip; }
-.x .x-arch { position: absolute; z-index: 0; width: auto; height: auto; fill: none; stroke: var(--sand-deep); stroke-width: 1.2; pointer-events: none; }
-.x-arch path { vector-effect: non-scaling-stroke; }
-.x .x-open .x-arch { inset-inline-end: max(calc((100% - var(--wrap)) / 2 - 36px), 0px); top: 8px; width: min(770px, 60vw); height: calc(100% - 8px); }
-.x-open-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 5.3fr) minmax(0, 6.7fr); gap: clamp(24px, 3.4vw, 56px); align-items: start; }
+.x-open { position: relative; padding-top: clamp(28px, 4.5vw, 64px); }
+.x-open-grid { display: grid; grid-template-columns: minmax(0, 5.3fr) minmax(0, 6.7fr); gap: clamp(24px, 3.4vw, 56px); align-items: start; }
 .x-say { padding-top: clamp(12px, 5vw, 76px); }
 .x-say h1 { font-size: var(--t-display); line-height: 1.3; color: var(--teal-deep); text-wrap: nowrap; }
 .x-lead { max-width: 36ch; margin-top: var(--sp-3); font-size: var(--t-lead); line-height: 1.95; }
@@ -130,7 +131,7 @@
   background: var(--leaf);
   border: 1px solid var(--rule);
   border-radius: var(--r-panel);
-  box-shadow: 0 34px 70px -38px rgb(6 30 28 / 60%);
+  box-shadow: 0 24px 48px -32px rgb(6 30 28 / 45%);
   overflow: hidden;
 }
 .x-reader-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-1); padding: 10px 12px; border-bottom: 1px solid var(--rule); }
@@ -207,19 +208,15 @@
 .x-reciters button { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); width: 100%; min-height: 46px; padding: 6px 0; text-align: start; font-family: var(--f-head); font-size: 1.08rem; font-weight: 400; transition: color 160ms, padding 240ms var(--ease-out); }
 .x-reciters button:hover { color: var(--mint); padding-inline-start: 10px; }
 .x-reciters button[aria-pressed="true"] { font-weight: 700; color: var(--gold); padding-inline-start: 10px; }
-.x-reciters i { display: none; width: 18px; height: 14px; background: linear-gradient(currentColor 0 0) 0 100% / 3px 60% no-repeat, linear-gradient(currentColor 0 0) 50% 100% / 3px 100% no-repeat, linear-gradient(currentColor 0 0) 100% 100% / 3px 40% no-repeat; }
+.x-reciters i { display: none; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .x-reciters button[aria-pressed="true"] i { display: block; }
-@media (prefers-reduced-motion: no-preference) {
-  .x.is-playing .x-reciters button[aria-pressed="true"] i { animation: x-bars 900ms ease-in-out infinite alternate; }
-  @keyframes x-bars { to { background-size: 3px 100%, 3px 45%, 3px 85%; } }
-}
 .x-listen .x-fine { margin-top: var(--sp-3); color: var(--sage); }
-/* the stage: the verse being recited right now, as text to read */
-.x-stage { position: sticky; top: var(--sp-5); display: flex; flex-direction: column; justify-content: center; min-height: clamp(300px, 46vh, 460px); padding: clamp(24px, 3.4vw, 48px); border: 1px solid var(--rule-dark); border-radius: var(--r-panel); background: linear-gradient(160deg, rgb(15 102 96 / 34%), rgb(15 102 96 / 6%) 62%); }
+/* the stage: the verse being recited right now, set as text on the night field */
+.x-stage { position: sticky; top: var(--sp-5); display: flex; flex-direction: column; padding-top: var(--sp-3); border-top: 1px solid var(--rule-dark); }
 .x-stage-ref { font-family: var(--f-head); font-weight: 600; font-size: var(--t-small); color: var(--gold); }
-.x-stage-text { margin-top: var(--sp-2); font-family: var(--font-quran); font-size: clamp(1.7rem, 2.6vw, 2.5rem); line-height: 2.15; color: var(--leaf); max-height: 9em; overflow-y: auto; }
+.x-stage-text { margin-top: var(--sp-3); font-family: var(--font-quran); font-size: clamp(1.8rem, 2.9vw, 2.7rem); line-height: 2.15; color: var(--leaf); max-height: 8.8em; overflow-y: auto; }
 .x-stage-text:empty { display: none; }
-.x-stage-hint { margin-top: var(--sp-2); max-width: 34ch; font-size: var(--t-lead); color: var(--sage); }
+.x-stage-hint { margin-top: var(--sp-2); max-width: 30ch; font-family: var(--f-head); font-weight: 300; font-size: clamp(1.4rem, 2.2vw, 2rem); line-height: 1.6; color: rgb(246 241 232 / 46%); }
 .x-stage-play { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 46px; margin-top: var(--sp-4); padding: 0 22px 0 16px; border-radius: 999px; background: var(--paper); color: var(--night); font-family: var(--f-head); font-weight: 600; }
 .x-stage-play:hover { background: var(--mint); }
 
@@ -228,8 +225,7 @@
 .x-why-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: clamp(28px, 5vw, 80px); align-items: center; }
 .x-why h2 { display: flex; flex-direction: column; font-size: clamp(2.2rem, 4.4vw, 4rem); line-height: 1.35; font-weight: 700; color: var(--ink); }
 .x-why h2 span { opacity: var(--o, 1); transition: opacity 180ms linear; }
-.x-why h2 span:nth-child(2) { padding-inline-start: 1.1em; }
-.x-why h2 span:nth-child(3) { padding-inline-start: 2.2em; color: var(--teal-deep); }
+.x-why h2 span:nth-child(3) { color: var(--teal-deep); }
 .x-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4) clamp(18px, 3vw, 40px); }
 .x-facts div { padding-top: var(--sp-2); border-top: 1px solid rgb(30 25 21 / 28%); }
 .x-facts dt { font-family: var(--f-head); font-weight: 700; font-size: var(--t-h3); }
@@ -250,14 +246,13 @@
 .x-shots button[aria-selected="true"] b { color: var(--gold); }
 .x-shots button[aria-selected="true"] span { opacity: 1; }
 .x-more .x-link { color: var(--mint); }
-.x-phone { justify-self: center; width: min(300px, 100%); padding: 9px; border-radius: 38px; background: #0A0D0C; border: 1px solid rgb(246 241 232 / 20%); box-shadow: 0 50px 90px -50px #000; transform: rotate(-2.5deg); }
+.x-phone { justify-self: center; width: min(300px, 100%); padding: 9px; border-radius: 38px; background: #0A0D0C; border: 1px solid rgb(246 241 232 / 20%); box-shadow: 0 30px 60px -36px #000; }
 .x-phone img { display: block; width: 100%; height: auto; aspect-ratio: 420 / 911; object-fit: cover; object-position: top; border-radius: 30px; background: #111; transition: opacity 200ms; }
 .x-phone img.is-swapping { opacity: 0; }
 
 /* ---------- scene 5: get ---------- */
-.x-get { position: relative; background: var(--teal-deep); color: var(--paper); padding: var(--scene) 0; overflow: hidden; }
-.x .x-get .x-arch { inset-inline-start: max(calc((100% - var(--wrap)) / 2 - 60px), -40px); top: 28px; width: min(520px, 60vw); height: 130%; stroke: rgb(246 241 232 / 20%); }
-.x-get-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 80px); align-items: start; }
+.x-get { background: var(--teal-deep); color: var(--paper); padding: var(--scene) 0; }
+.x-get-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 80px); align-items: start; }
 .x-get h2 { font-size: var(--t-display); line-height: 1.28; }
 .x-get-side > p { margin-top: var(--sp-1); color: #CFE3DF; max-width: 30ch; }
 .x-get-side > .x-totals { display: flex; flex-wrap: wrap; gap: 4px var(--sp-4); margin-top: var(--sp-5); max-width: none; font-family: var(--f-head); }
@@ -293,7 +288,7 @@
 .x.has-dock .launch-footer { padding-bottom: 120px; }
 
 /* ---------- player dock ---------- */
-.x-dock { position: fixed; inset-inline: 0; bottom: 0; z-index: 40; background: rgb(11 30 29 / 96%); backdrop-filter: blur(10px); color: var(--paper); border-top: 1px solid var(--rule-dark); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.x-dock { position: fixed; inset-inline: 0; bottom: 0; z-index: 40; background: var(--night); color: var(--paper); border-top: 1px solid var(--rule-dark); padding-bottom: env(safe-area-inset-bottom, 0px); }
 @media (prefers-reduced-motion: no-preference) { .x-dock { animation: x-dock 280ms var(--ease-out); } @keyframes x-dock { from { transform: translateY(100%); } } }
 .x-dock-bar { position: relative; height: 14px; margin-top: -7px; }
 .x-dock-bar::before { content: ""; position: absolute; inset: 5px 0; background: rgb(246 241 232 / 20%); }
@@ -321,13 +316,12 @@
   .x-say { padding-top: var(--sp-3); }
   .x-lead, .x-open-note { max-width: 52ch; }
   .x-open-note { margin-top: var(--sp-4); }
-  .x .x-open .x-arch { width: 92vw; inset-inline-end: 4vw; }
   .x-say h1 { text-wrap: balance; }
   .x-dock-vol { display: none; }
 }
 @media (max-width: 900px) {
   .x-listen-grid, .x-why-grid, .x-more-grid, .x-get-grid, .x-help-grid { grid-template-columns: minmax(0, 1fr); }
-  .x-stage { position: static; order: -1; min-height: 240px; }
+  .x-stage { position: static; order: -1; }
   .x-listen-grid { gap: var(--sp-5); }
   .x-phone { width: min(260px, 70%); }
   .x-shots button { grid-template-columns: minmax(0, 1fr); min-height: 52px; padding: 10px 0; }
@@ -350,8 +344,6 @@
   .x-pane-close { display: inline-grid; }
   .x-view-index { padding-top: 52px; }
   .x-view-tafsir, .x-view-memo { padding-inline-end: 52px; }
-  .x-why h2 span:nth-child(2) { padding-inline-start: 0.6em; }
-  .x-why h2 span:nth-child(3) { padding-inline-start: 1.2em; }
   .x-facts, .x-help-actions { grid-template-columns: minmax(0, 1fr); }
   .x-dock-row { flex-wrap: wrap; row-gap: 6px; }
   .x-dock-ctl { order: -1; }

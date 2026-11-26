@@ -43,9 +43,9 @@
     var paint = function () {
       raf = 0;
       var r = why.getBoundingClientRect(), vh = window.innerHeight;
-      var p = Math.min(1, Math.max(0, (vh * 0.9 - r.top) / (vh * 0.5)));
+      var p = Math.min(1, Math.max(0, (vh * 0.95 - r.top) / (vh * 0.4)));
       lines.forEach(function (el, i) {
-        el.style.setProperty('--o', Math.min(1, Math.max(0.18, p * lines.length - i)).toFixed(2));
+        el.style.setProperty('--o', Math.min(1, Math.max(0.22, p * lines.length - i)).toFixed(2));
       });
     };
     window.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
