@@ -18,6 +18,13 @@
            aria-label="{{ 'قناة تبيان على يوتيوب (تفتح في نافذة جديدة)' if ar else 'Tibyan on YouTube (opens in a new tab)' }}">
           <svg class="yt-glyph" aria-hidden="true" viewBox="0 0 24 24" width="1.35em" height="1.35em" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z" fill="currentColor"/></svg><span>{{ 'يوتيوب' if ar else 'YouTube' }}</span>
         </a>
+        {% set site = 'https://altibyan.app' ~ ('' if ar else '/en') %}
+        <a href="{{ site }}/features">{{ 'المزايا' if ar else 'Features' }}</a>
+        <a href="{{ site }}/about">{{ 'عن تبيان' if ar else 'About' }}</a>
+        <a href="{{ site }}/sources">{{ 'المصادر' if ar else 'Sources' }}</a>
+        <a href="{{ site }}/changelog">{{ 'التحديثات' if ar else 'Changelog' }}</a>
+        <a href="{{ site }}/help">{{ 'كيف تساعد' if ar else 'How to help' }}</a>
+        <a href="{{ site }}/press">{{ 'للإعلام' if ar else 'Press' }}</a>
         <a href="https://train.altibyan.app/">train.altibyan.app</a>
         <a href="https://altibyan.app/privacy{{ '' if ar else '/en' }}">{{ 'سياسة الخصوصية' if ar else 'Privacy policy' }}</a>
       </span>

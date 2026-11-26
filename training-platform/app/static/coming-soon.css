@@ -760,3 +760,34 @@ a { color: inherit; }
 }
 .shots-strip figcaption { margin-top: 8px; color: var(--c-ink-2); font-size: 0.88rem; text-align: center; }
 @media (max-width: 760px) { .shots-strip { grid-auto-columns: 62%; } }
+
+/* Info pages (/features, /about, /sources, /changelog, /help, /press):
+   built from the shared blocks above; only these few additions. */
+.dl-grid.site-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.site-cards .guide h3 { margin: 0 0 6px; font-size: 1.1rem; font-weight: 600; }
+.site-cards .guide p { margin: 0; color: var(--c-ink-2); }
+.site-page .guide p { margin: 0; }
+.site-page .install .beta-button { text-decoration: none; }
+.credit-list { list-style: none; padding-inline-start: 0 !important; }
+.credit-list li { display: grid; gap: 2px; padding: 8px 0; border-bottom: 1px dashed var(--c-line); }
+.credit-list li:last-child { border-bottom: 0; }
+.credit-list span { color: var(--c-ink-2); font-size: 0.92rem; }
+.changelog section h2 { font-size: 1.12rem; }
+.changelog code { font-size: 0.86em; }
+.press-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; list-style: none; padding-inline-start: 0 !important; }
+.press-grid li { margin: 0; }
+.press-grid a { display: grid; gap: 6px; color: var(--c-ink-2); font-size: 0.86rem; text-decoration: none; }
+.press-grid img { width: 100%; box-sizing: border-box; border-radius: 12px; border: 1px solid var(--c-line); background: var(--c-bg); }
+.press-logo img { aspect-ratio: 1; object-fit: contain; padding: 16px; }
+.press-logo img { background: #F6F1E8; }
+.press-logo.is-dark img { background: #0E1A1B; }
+.press-shots img { aspect-ratio: 9 / 19; object-fit: cover; object-position: top; }
+.press-shots img.is-wide { object-fit: contain; background: var(--c-surface); }
+@media (max-width: 760px) {
+  .launch-footer { flex-wrap: wrap; padding-block: 14px; }
+}
+@media (max-width: 980px) { .dl-grid.site-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .dl-grid.site-cards { grid-template-columns: minmax(0, 1fr); }
+  .press-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

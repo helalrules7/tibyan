@@ -1,0 +1,39 @@
+<!doctype html>
+{% set ar = lang == 'ar' %}
+{% set url = 'https://altibyan.app' ~ prefix ~ page_path %}
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %} | {{ 'تبيان' if ar else 'Tibyan' }}</title>
+  <meta name="description" content="{% block desc %}{% endblock %}">
+  <link rel="canonical" href="{{ url }}">
+  <link rel="alternate" hreflang="ar" href="https://altibyan.app{{ page_path }}">
+  <link rel="alternate" hreflang="en" href="https://altibyan.app/en{{ page_path }}">
+  <link rel="alternate" hreflang="x-default" href="https://altibyan.app{{ page_path }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="تبيان">
+  <meta property="og:title" content="{{ self.title() }} | {{ 'تبيان' if ar else 'Tibyan' }}">
+  <meta property="og:description" content="{{ self.desc() }}">
+  <meta property="og:url" content="{{ url }}">
+  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=2">
+  <meta name="twitter:card" content="summary_large_image">
+  {% include "_launch_head.html" %}
+</head>
+<body>
+  <main class="launch-page site-page">
+{% include "_launch_header.html" %}
+      <nav class="launch-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
+        <a href="{{ prefix }}/">{{ 'الصفحة الرئيسية' if ar else 'Home' }}</a>
+        {% if page_path != '/features' %}<a href="{{ prefix }}/features">{{ 'المزايا' if ar else 'Features' }}</a>{% endif %}
+        <a href="{{ prefix }}/download">{{ 'التحميل' if ar else 'Download' }}</a>
+        <a class="language-link" href="/lang/{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
+      </nav>
+    </header>
+
+{% block content %}{% endblock %}
+
+{% include "_launch_footer.html" %}
+  </main>
+</body>
+</html>

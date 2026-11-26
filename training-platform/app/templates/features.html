@@ -1,0 +1,41 @@
+{% extends "_site_page.html" %}
+{% block title %}{{ 'مزايا تبيان' if ar else 'Tibyan features' }}{% endblock %}
+{% block desc %}{{ 'مزايا تطبيق تبيان: مصاحف متعددة، وتلاوة متزامنة، وتفاسير بجوار الآية، وتسميع على جهازك، ومواقيت الصلاة والأذان والقبلة، بلا إعلانات.' if ar else 'What Tibyan does: several mushaf editions, synced recitation, tafsir beside the verse, on-device tasmee, prayer times, adhan and qibla, with no ads.' }}{% endblock %}
+{% block content %}
+{% set editions = [
+  ('مصحف المدينة: الطبعة الحديثة', 'Madina Mushaf: new edition', 'طبعة ١٤٤١هـ من مجمع الملك فهد، مع تظليل الآية أثناء التلاوة.', 'The 1441H print of the King Fahd Complex, with verse highlighting during recitation.'),
+  ('مصحف المدينة: الطبعة القديمة', 'Madina Mushaf: classic edition', 'طبعة ١٤٠٥هـ المشهورة في التطبيقات القديمة، مع تظليل الكلمة.', 'The well-known 1405H print used by older apps, with word highlighting.'),
+  ('مصحف الشمرلي (الطبعة المصرية)', 'Shamarly (Egyptian edition)', 'طبعة الشمرلي المصرية المعروفة، ٥٢٢ صفحة، مع تظليل الآية وتظليل الكلمة في كثير من الآيات.', 'The well-known Egyptian Shamarly print, 522 pages, with verse highlighting and word highlighting in many verses.'),
+  ('مصحف المدينة برواية ورش عن نافع', 'Madina Mushaf: Warsh from Nafi', 'صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها.', 'The King Fahd Complex’s Madina pages for this riwaya, with its own verse count and numbering.'),
+  ('مصحف المدينة برواية قالون عن نافع', 'Madina Mushaf: Qalun from Nafi', 'صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها.', 'The King Fahd Complex’s Madina pages for this riwaya, with its own verse count and numbering.'),
+  ('مصحف المدينة برواية الدوري عن أبي عمرو', 'Madina Mushaf: al-Duri from Abu Amr', 'صفحات مصحف المدينة لهذه الرواية من مجمع الملك فهد، بعدّ آياتها وترقيمها.', 'The King Fahd Complex’s Madina pages for this riwaya, with its own verse count and numbering.'),
+] %}
+    <section class="install" aria-labelledby="features-title">
+      <p class="coming-label"><span class="star" aria-hidden="true"></span>{{ 'المزايا' if ar else 'Features' }}</p>
+      <h1 id="features-title" class="install-title">{{ 'كل ما في تبيان' if ar else 'Everything in Tibyan' }}</h1>
+      <p class="install-lead">{{ 'مصحف رقمي متكامل، غير ربحي وبلا أي إعلانات، رفيقك اليومي في التلاوة والتدبر والحفظ.' if ar else 'A complete digital mushaf, non-profit and free of ads: a daily companion for reading, reflection and memorization.' }}</p>
+    </section>
+
+{% include "_app_features.html" %}
+
+    <section class="install" id="editions" aria-labelledby="editions-title">
+      <h2 id="editions-title">{{ 'طبعات المصحف' if ar else 'Mushaf editions' }}</h2>
+      <p class="install-lead">{{ 'اختر طبعتك من الإعدادات. صفحات الطبعات الإضافية تُحمّل مرة واحدة ثم تعمل دون اتصال.' if ar else 'Pick your edition in Settings. Extra editions download once, then work offline.' }}</p>
+      <div class="dl-grid site-cards">
+        {% for e in editions %}
+        <article class="guide">
+          <h3>{{ e[0] if ar else e[1] }}</h3>
+          <p>{{ e[2] if ar else e[3] }}</p>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+{% include "_app_gallery.html" %}
+
+    <section class="install" aria-labelledby="more-title">
+      <h2 id="more-title">{{ 'جرّبه بنفسك' if ar else 'Try it yourself' }}</h2>
+      <p class="install-lead">{{ 'تبيان مجاني على أندرويد وويندوز ولينكس، وعلى آيفون وماك قريبًا.' if ar else 'Tibyan is free on Android, Windows and Linux, and coming soon to iPhone and Mac.' }}</p>
+      <a class="beta-button" href="{{ prefix }}/download">{{ 'نزّل تبيان' if ar else 'Get Tibyan' }}</a>
+    </section>
+{% endblock %}

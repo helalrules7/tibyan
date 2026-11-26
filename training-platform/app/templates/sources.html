@@ -1,0 +1,35 @@
+{% extends "_site_page.html" %}
+{% block title %}{{ 'المصادر والشكر' if ar else 'Sources and credits' }}{% endblock %}
+{% block desc %}{{ 'مصادر صفحات المصحف ونصوصه والتفاسير والتلاوات والبيانات في تطبيق تبيان، مع الشكر لأصحابها.' if ar else 'Where the mushaf pages and text, tafsir, recitations and data in the Tibyan app come from, with thanks to their providers.' }}{% endblock %}
+{% block content %}
+{% set headings = {
+  'mushaf': ('المصحف ونصه', 'The mushaf and its text'),
+  'tafsir': ('التفاسير والترجمات', 'Tafsir and translations'),
+  'audio': ('التلاوات والتوقيت', 'Recitations and timings'),
+  'data': ('البيانات والأذكار والنماذج', 'Data, adhkar and models'),
+} %}
+    <article class="policy" aria-labelledby="sources-title">
+      <header class="policy-head">
+        <p class="coming-label">{{ 'المصادر' if ar else 'Sources' }}</p>
+        <h1 id="sources-title">{{ 'المصادر والشكر' if ar else 'Sources and credits' }}</h1>
+        <p class="policy-meta">{{ 'كل نص في تبيان منقول من مصدر موثق، ولا يُعدَّل بأيدينا. وهذه المصادر كما يذكرها التطبيق نفسه، مع خالص الشكر لأصحابها.' if ar else 'Every text in Tibyan comes from a verified source and is never edited by us. These are the sources as the app itself credits them, with sincere thanks to their providers.' }}</p>
+      </header>
+
+      {% for key, items in groups %}
+      <section aria-labelledby="src-{{ key }}">
+        <h2 id="src-{{ key }}">{{ headings[key][0] if ar else headings[key][1] }}</h2>
+        <ul class="credit-list">
+          {% for s in items %}
+          {% set t = s.ar if ar else s.en %}
+          <li><strong>{{ t[0] }}</strong><span>{{ t[1] }}</span></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endfor %}
+
+      <section aria-labelledby="src-more">
+        <h2 id="src-more">{{ 'التفاصيل والتراخيص' if ar else 'Details and licences' }}</h2>
+        <p>{{ 'الإصدار ونص الترخيص لكل مصدر في التطبيق من «عن تبيان ← المصادر»، ووثائق التراخيص منشورة في المستودع:' if ar else 'Each source’s version and licence text are in the app under About › Sources, and the licence documents are published in the repository:' }} <a href="https://github.com/helalrules7/tibyan/blob/main/docs/DATA_SOURCES.md" rel="noopener" dir="ltr">docs/DATA_SOURCES.md</a></p>
+      </section>
+    </article>
+{% endblock %}

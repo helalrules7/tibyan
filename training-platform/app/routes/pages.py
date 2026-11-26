@@ -15,7 +15,7 @@ from ..analytics import public_totals
 from ..stats import public_progress
 from ..launch_mail import TESTFLIGHT_URL
 from ..templating import STATIC_DIR, launch_at
-from .. import releases, stores
+from .. import changelog, releases, site_sources, stores
 from ..i18n import get_lang
 from ..web import check_csrf, msg, render
 
@@ -100,6 +100,46 @@ def download_page(request: Request):
         human_size=releases.human_size,
         prefix=lang_prefix(request),
     )
+
+
+# Informational pages of altibyan.app (Arabic here, English under /en).
+SITE_PAGES = ("/features", "/about", "/sources", "/changelog", "/help", "/press")
+
+
+def _site_page(request: Request, path: str, template: str, **context):
+    if not is_root_host(request):
+        return RedirectResponse(f"{ROOT_ORIGIN}{path}", status_code=301)
+    return render(request, template, prefix=lang_prefix(request), page_path=path, **context)
+
+
+@router.get("/features")
+def features_page(request: Request):
+    return _site_page(request, "/features", "features.html")
+
+
+@router.get("/about")
+def about_page(request: Request):
+    return _site_page(request, "/about", "about.html")
+
+
+@router.get("/sources")
+def sources_page(request: Request):
+    return _site_page(request, "/sources", "sources.html", groups=site_sources.SOURCES)
+
+
+@router.get("/changelog")
+def changelog_page(request: Request):
+    return _site_page(request, "/changelog", "changelog.html", releases=changelog.releases())
+
+
+@router.get("/help")
+def help_page(request: Request):
+    return _site_page(request, "/help", "help.html", stores=stores.STORES)
+
+
+@router.get("/press")
+def press_page(request: Request):
+    return _site_page(request, "/press", "press.html")
 
 
 @router.get("/voice")
@@ -213,6 +253,8 @@ def sitemap(request: Request):
             f"{ROOT_ORIGIN}/privacy",
             f"{ROOT_ORIGIN}/privacy/en",
         ]
+        for path in SITE_PAGES:
+            urls += [f"{ROOT_ORIGIN}{path}", f"{ROOT_ORIGIN}/en{path}"]
     else:
         urls = [f"{TRAIN_ORIGIN}{path}" for path in TRAIN_PUBLIC_PATHS]
     entries = "".join(f"  <url><loc>{url}</loc></url>\n" for url in urls)
@@ -276,7 +318,7 @@ def set_language(code: str, request: Request):
 
 # Pages of altibyan.app that exist in both languages: Arabic at the bare
 # path, English under /en (see main.py's _en_prefix middleware).
-LOCALIZED = ("/", "/download", "/beta")
+LOCALIZED = ("/", "/download", "/beta", *SITE_PAGES)
 
 
 def localized_path(url: str, lang: str) -> str:

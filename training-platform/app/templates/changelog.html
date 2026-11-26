@@ -1,0 +1,20 @@
+{% extends "_site_page.html" %}
+{% block title %}{{ 'سجل التحديثات' if ar else 'Changelog' }}{% endblock %}
+{% block desc %}{{ 'ما الجديد في كل إصدار من تطبيق تبيان، الأحدث أولًا.' if ar else 'What is new in each release of the Tibyan app, newest first.' }}{% endblock %}
+{% block content %}
+    <article class="policy changelog" aria-labelledby="changelog-title">
+      <header class="policy-head">
+        <p class="coming-label">{{ 'التحديثات' if ar else 'Updates' }}</p>
+        <h1 id="changelog-title">{{ 'سجل التحديثات' if ar else 'Changelog' }}</h1>
+        <p class="policy-meta">{{ 'الأحدث أولًا. للحصول على آخر إصدار:' if ar else 'Newest first. To get the latest release:' }} <a href="{{ prefix }}/download">{{ 'التحميل' if ar else 'Download' }}</a></p>
+      </header>
+
+      {% for r in releases %}
+      {% set title, body = r.ar if ar else r.en %}
+      <section id="v{{ r.version }}" aria-labelledby="h-{{ loop.index }}">
+        <h2 id="h-{{ loop.index }}">{{ title }}</h2>
+        {{ body }}
+      </section>
+      {% endfor %}
+    </article>
+{% endblock %}

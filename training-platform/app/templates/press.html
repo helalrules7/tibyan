@@ -1,0 +1,67 @@
+{% extends "_site_page.html" %}
+{% block title %}{{ 'الحقيبة الإعلامية' if ar else 'Press kit' }}{% endblock %}
+{% block desc %}{{ 'وصف قصير لتطبيق تبيان بالعربية والإنجليزية، مع الشعارات ولقطات الشاشة للنشر.' if ar else 'Short descriptions of the Tibyan app in Arabic and English, with logos and screenshots for publication.' }}{% endblock %}
+{% block content %}
+{% set logos = [
+  ('/static/brand/logo-teal.svg', 'الشعار بالفيروزي (SVG)', 'Logo, teal (SVG)', ''),
+  ('/static/brand/tibyan-logo.svg', 'الشعار بالأسود (SVG)', 'Logo, black (SVG)', ''),
+  ('/static/brand/logo-cream.png', 'الشعار بالكريمي (PNG)', 'Logo, cream (PNG)', 'is-dark'),
+  ('/static/icon-512.png', 'أيقونة التطبيق (PNG)', 'App icon (PNG)', ''),
+] %}
+{% set shots = [
+  ('home', 'الشاشة الرئيسية', 'The home screen'),
+  ('mushaf-page', 'صفحة المصحف', 'A mushaf page'),
+  ('tafsir', 'التفسير بجوار الآية', 'Tafsir beside the verse'),
+  ('player-highlight', 'الاستماع مع تظليل الآية', 'Listening with verse highlighting'),
+  ('tasmee', 'التسميع من الحفظ', 'Reciting from memory'),
+  ('prayer-times', 'مواقيت الصلاة', 'Prayer times'),
+  ('qibla', 'بوصلة القبلة', 'The qibla compass'),
+  ('hifz-map', 'خريطة الحفظ', 'The memorization map'),
+  ('home-layli', 'النمط الليلي', 'The night style'),
+  ('desktop-spread', 'الصفحتان المتقابلتان على الحاسوب', 'Two-page spread on desktop'),
+] %}
+    <article class="policy" aria-labelledby="press-title">
+      <header class="policy-head">
+        <p class="coming-label">{{ 'للإعلام' if ar else 'Press' }}</p>
+        <h1 id="press-title">{{ 'الحقيبة الإعلامية' if ar else 'Press kit' }}</h1>
+        <p class="policy-meta">{{ 'يمكنك نشر هذه النصوص والصور عند الكتابة عن تبيان.' if ar else 'You may publish these texts and images when writing about Tibyan.' }}</p>
+      </header>
+
+      <section aria-labelledby="desc-title">
+        <h2 id="desc-title">{{ 'وصف قصير' if ar else 'Short description' }}</h2>
+        <p lang="ar" dir="rtl"><strong>تبيان - القرآن الكريم:</strong> مصحف بلا إعلانات: تلاوة وتفسير وتسميع، ومواقيت الصلاة والأذان والقبلة.</p>
+        <p lang="en" dir="ltr"><strong>Tibyan: Quran:</strong> Ad-free Quran: recitation, tafsir, tasmee, prayer times, adhan and qibla.</p>
+      </section>
+
+      <section aria-labelledby="long-title">
+        <h2 id="long-title">{{ 'نبذة' if ar else 'Boilerplate' }}</h2>
+        <p lang="ar" dir="rtl">«تبيان» مصحف رقمي متكامل، غير ربحي وبلا أي إعلانات، صُمم ليكون رفيقك اليومي في تلاوة كتاب الله وتدبره وحفظه. يضم مصاحف متعددة، وتلاوة متزامنة كلمةً كلمة، وتفاسير بجوار الآية، وتسميعًا يعمل على الجهاز دون إنترنت، ومواقيت الصلاة والأذان والقبلة. شيفرته مفتوحة المصدر، ولا يحوي أدوات تتبّع.</p>
+        <p lang="en" dir="ltr">Tibyan is a complete digital mushaf, non-profit and free of ads, made to be a daily companion for reading, reflecting on and memorizing the Quran. It brings several mushaf editions, word-by-word synced recitation, tafsir beside the verse, tasmee that runs on the device without internet, and prayer times, adhan and qibla. Its code is open source, and it has no trackers.</p>
+      </section>
+
+      <section aria-labelledby="logos-title">
+        <h2 id="logos-title">{{ 'الشعارات' if ar else 'Logos' }}</h2>
+        <ul class="press-grid">
+          {% for src, ar_name, en_name, cls in logos %}
+          <li><a class="press-logo {{ cls }}" href="{{ src }}" download><img src="{{ src }}" alt="" loading="lazy"><span>{{ ar_name if ar else en_name }}</span></a></li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section aria-labelledby="shots-title-press">
+        <h2 id="shots-title-press">{{ 'لقطات الشاشة' if ar else 'Screenshots' }}</h2>
+        <p>{{ 'لقطات حقيقية من الإصدار الحالي. اضغط على اللقطة لفتحها بحجمها الكامل.' if ar else 'Real screenshots from the current version. Click one to open it at full size.' }}</p>
+        <ul class="press-grid press-shots">
+          {% for name, ar_cap, en_cap in shots %}
+          <li><a href="/static/screens/{{ name }}.webp" download><img src="/static/screens/{{ name }}.webp?v={{ asset_v }}" alt="{{ ar_cap if ar else en_cap }}" loading="lazy"{% if name == 'desktop-spread' %} class="is-wide"{% endif %}><span>{{ ar_cap if ar else en_cap }}</span></a></li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section aria-labelledby="press-contact">
+        <h2 id="press-contact">{{ 'للتواصل' if ar else 'Contact' }}</h2>
+        <p>{{ 'لطلبات الإعلام والمقابلات:' if ar else 'For press requests and interviews:' }} <a href="https://train.altibyan.app/contact">{{ 'صفحة التواصل' if ar else 'the contact page' }}</a> · <a href="mailto:info@altibyan.app" dir="ltr">info@altibyan.app</a></p>
+        <p>{{ 'مزيد عن المشروع:' if ar else 'More about the project:' }} <a href="{{ prefix }}/about">{{ 'عن تبيان' if ar else 'About Tibyan' }}</a> · <a href="{{ prefix }}/features">{{ 'المزايا' if ar else 'Features' }}</a></p>
+      </section>
+    </article>
+{% endblock %}

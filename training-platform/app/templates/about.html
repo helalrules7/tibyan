@@ -1,0 +1,47 @@
+{% extends "_site_page.html" %}
+{% block title %}{{ 'عن تبيان' if ar else 'About Tibyan' }}{% endblock %}
+{% block desc %}{{ 'تبيان تطبيق غير ربحي لقراءة القرآن الكريم وتدبّره، بلا إعلانات ولا أدوات تتبّع، وشيفرته مفتوحة المصدر.' if ar else 'Tibyan is a non-profit app for reading and reflecting on the Quran, with no ads and no trackers, and its code is open source.' }}{% endblock %}
+{% block content %}
+    <article class="policy" aria-labelledby="about-title">
+      <header class="policy-head">
+        <p class="coming-label">{{ 'عن تبيان' if ar else 'About' }}</p>
+        <h1 id="about-title">{{ 'عن تبيان' if ar else 'About Tibyan' }}</h1>
+        <p class="policy-meta">{{ 'تبيان لخدمة القرآن الكريم' if ar else 'Tibyan, tools in service of the Quran' }}</p>
+      </header>
+
+      <section class="policy-summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">{{ 'باختصار' if ar else 'In short' }}</h2>
+        <ul>
+          {% if ar %}
+          <li>تبيان تطبيق لقراءة القرآن الكريم وتدبّره، وشيفرته مفتوحة. كل نص فيه من مصدر موثق مذكور بجانبه.</li>
+          <li>مشروع غير ربحي: لا إعلانات، ولا اشتراكات، ولا مزايا مدفوعة.</li>
+          <li>لا أدوات تحليلات ولا تتبّع، ولا يحتاج التطبيق إلى حساب.</li>
+          {% else %}
+          <li>Tibyan is an app for reading and reflecting on the Quran, and its code is open. Every text in it comes from a verified source, shown next to it.</li>
+          <li>A non-profit project: no ads, no subscriptions and no paid features.</li>
+          <li>No analytics and no trackers, and the app needs no account.</li>
+          {% endif %}
+        </ul>
+      </section>
+
+      <section aria-labelledby="open-title">
+        <h2 id="open-title">{{ 'مفتوح المصدر' if ar else 'Open source' }}</h2>
+        <p>{{ 'شيفرة التطبيق كاملة منشورة برخصة GPL-3.0، يمكن لأي أحد قراءتها ومراجعتها والمساهمة فيها:' if ar else 'The app’s full code is published under the GPL-3.0 licence; anyone can read it, review it and contribute:' }} <a href="https://github.com/helalrules7/tibyan" rel="noopener" dir="ltr">github.com/helalrules7/tibyan</a></p>
+      </section>
+
+      <section aria-labelledby="privacy-title">
+        <h2 id="privacy-title">{{ 'بياناتك على جهازك' if ar else 'Your data stays on your device' }}</h2>
+        <p>{{ 'الإعدادات والفواصل والختمات والحفظ تُحفظ على جهازك فقط، والتسميع يعمل على جهازك فلا يغادره صوتك.' if ar else 'Settings, bookmarks, khatmas and memorization are kept on your device only, and tasmee runs on your device, so your voice never leaves it.' }} <a href="https://altibyan.app/privacy{{ '' if ar else '/en' }}">{{ 'سياسة الخصوصية' if ar else 'Privacy policy' }}</a></p>
+      </section>
+
+      <section aria-labelledby="sources-title">
+        <h2 id="sources-title">{{ 'مصادر موثقة' if ar else 'Verified sources' }}</h2>
+        <p>{{ 'كل نص في تبيان منقول من مصدر موثق، ولا يُعدَّل بأيدينا.' if ar else 'Every text in Tibyan comes from a verified source and is never edited by us.' }} <a href="{{ prefix }}/sources">{{ 'المصادر والشكر' if ar else 'Sources and credits' }}</a></p>
+      </section>
+
+      <section aria-labelledby="contact-title">
+        <h2 id="contact-title">{{ 'تواصل معنا' if ar else 'Contact us' }}</h2>
+        <p>{{ 'لأي ملاحظة أو سؤال:' if ar else 'For any feedback or question:' }} <a href="https://train.altibyan.app/contact">{{ 'صفحة التواصل' if ar else 'the contact page' }}</a> · <a href="mailto:info@altibyan.app" dir="ltr">info@altibyan.app</a></p>
+      </section>
+    </article>
+{% endblock %}
