@@ -791,3 +791,7 @@ a { color: inherit; }
   .dl-grid.site-cards { grid-template-columns: minmax(0, 1fr); }
   .press-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ---------- live home: «كيف تساعد» card (replaces the notify card) ---------- */
+.help-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.guide[id] { scroll-margin-top: 20px; }

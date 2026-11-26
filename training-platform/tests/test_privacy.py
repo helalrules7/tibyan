@@ -1,4 +1,6 @@
 from __future__ import annotations
+from unittest import mock
+import os
 
 import unittest
 
@@ -17,6 +19,7 @@ ROOT = "altibyan.app"
 TRAIN = "train.altibyan.app"
 
 
+@mock.patch.dict(os.environ, {"LAUNCH_FORCE": "before"})  # the notify form exists only before launch
 class PrivacyPageTests(unittest.TestCase):
     def setUp(self):
         self.engine = create_engine(

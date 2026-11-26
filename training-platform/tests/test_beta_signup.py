@@ -1,4 +1,5 @@
 from __future__ import annotations
+from unittest import mock
 
 import os
 import tempfile
@@ -70,6 +71,7 @@ class LaunchFormsBase(unittest.TestCase):
             return db.query(NotifySignup).order_by(NotifySignup.id).all()
 
 
+@mock.patch.dict(os.environ, {"LAUNCH_FORCE": "before"})  # the notify form exists only before launch
 class NotifyFormTests(LaunchFormsBase):
     def submit(self, c, **data):
         if not getattr(c, "csrf", None):

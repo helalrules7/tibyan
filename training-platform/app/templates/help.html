@@ -7,19 +7,19 @@
       <h1 id="help-title" class="install-title">{{ 'كيف تساعد' if ar else 'How to help' }}</h1>
       <p class="install-lead">{{ 'تبيان مشروع غير ربحي يكبر بمشاركة الناس. هذه طرق تساعد بها، ولا تحتاج أيّ منها إلى مال.' if ar else 'Tibyan is a non-profit project that grows with people’s help. Here are ways to help; none of them needs money.' }}</p>
       <div class="platform-guides">
-        <article class="guide">
+        <article class="guide" id="share">
           <header class="guide-head"><h3>{{ 'شارك تبيان' if ar else 'Share Tibyan' }}</h3></header>
           <p>{{ 'أرسل رابط الموقع لمن تعرف، وتابع صفحات تبيان وشارك منشوراتها.' if ar else 'Send the site link to people you know, and follow Tibyan’s pages and share their posts.' }}</p>
           <p class="guide-note" dir="ltr">altibyan.app</p>
         </article>
-        <article class="guide">
+        <article class="guide" id="rate">
           <header class="guide-head"><h3>{{ 'قيّمه في المتاجر' if ar else 'Rate it in the stores' }}</h3></header>
           <p>{{ 'تقييمك ومراجعتك يساعدان غيرك على الوصول إلى التطبيق.' if ar else 'Your rating and review help others find the app.' }}</p>
           <p class="guide-note">
             {% for s in stores if s.live %}<a href="{{ s.url }}" rel="noopener">{{ s.name(ar) }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
           </p>
         </article>
-        <article class="guide">
+        <article class="guide" id="report">
           <header class="guide-head"><h3>{{ 'أبلغ عن المشكلات' if ar else 'Report problems' }}</h3></header>
           <p>{{ 'من داخل التطبيق عبر «الإبلاغ عن مشكلة»، أو من صفحة التواصل، أو بفتح بلاغ في المستودع.' if ar else 'From inside the app with «Report a problem», from the contact page, or by opening an issue in the repository.' }}</p>
           <p class="guide-note"><a href="https://train.altibyan.app/contact">{{ 'صفحة التواصل' if ar else 'Contact page' }}</a> · <a href="https://github.com/helalrules7/tibyan/issues" rel="noopener">{{ 'البلاغات على GitHub' if ar else 'Issues on GitHub' }}</a></p>

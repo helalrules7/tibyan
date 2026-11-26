@@ -104,6 +104,33 @@
     </section>
     {% endif %}
 
+    {% if live %}
+    <section class="notify-card" id="help" aria-labelledby="help-card-title">
+      <div>
+        <h2 id="help-card-title">{{ 'ساعد غيرك على الوصول إلى تبيان' if ar else 'Help others find Tibyan' }}</h2>
+        <p>{{ 'تبيان مشروع غير ربحي، ومشاركتك وتقييمك يوصلانه إلى غيرك. لا تحتاج أيّ طريقة منها إلى مال.' if ar else 'Tibyan is non-profit; your shares and ratings bring it to others. None of these needs money.' }}</p>
+      </div>
+      <div class="notify-side">
+        <div class="help-actions">
+          <button type="button" class="beta-button" data-share data-copied="{{ 'نُسخ الرابط' if ar else 'Link copied' }}">{{ 'شارك الرابط' if ar else 'Share the link' }}</button>
+          <a class="beta-button" href="{{ prefix }}/help#rate">{{ 'قيّمه في المتجر' if ar else 'Rate it' }}</a>
+          <a class="beta-button" href="{{ prefix }}/help#report">{{ 'أبلغ عن مشكلة' if ar else 'Report a problem' }}</a>
+        </div>
+        {% include "_follow_line.html" %}
+      </div>
+    </section>
+    <script>
+    (function () {
+      var b = document.querySelector('[data-share]');
+      if (!b) return;
+      b.addEventListener('click', function () {
+        var url = 'https://altibyan.app{{ prefix }}/';
+        if (navigator.share) { navigator.share({ title: document.title, url: url }).catch(function () {}); return; }
+        if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { b.textContent = b.getAttribute('data-copied'); });
+      });
+    })();
+    </script>
+    {% else %}
     <section class="notify-card" id="notify" aria-labelledby="notify-title" data-prelaunch{% if live %} hidden{% endif %}>
       <div>
         <h2 id="notify-title">{{ 'أبلغني عند الإطلاق' if ar else 'Tell me when it launches' }}</h2>
@@ -137,11 +164,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
           <span>{{ 'انضم لاختبار النسخة التجريبية' if ar else 'Join the beta test' }}</span>
         </a>
-        {% if not live %}{% include "_follow_line.html" %}{% endif %}
+        {% include "_follow_line.html" %}
       </div>
     </section>
-
-    {% if live %}<div class="launch-follow">{% include "_follow_line.html" %}</div>{% endif %}
+    {% endif %}
 
     <section class="training-note" aria-labelledby="training-title">
       <div>

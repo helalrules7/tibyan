@@ -2,7 +2,9 @@
 /help and /press, in Arabic and under /en."""
 from __future__ import annotations
 
+import os
 import unittest
+from unittest import mock
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -103,3 +105,16 @@ class SitePagesTests(unittest.TestCase):
         for path in SITE_PAGES:
             self.assertIn(f'href="{ROOT}{path}"', home)
         self.assertIn(f'href="{ROOT}/en/press"', self.get("/en/"))
+
+
+class LiveHomeHelpCardTests(unittest.TestCase):
+    """After launch the notify form is gone and the help card takes its place."""
+
+    def test_live_home_has_help_card_not_notify_form(self):
+        from fastapi.testclient import TestClient
+        from app.main import app
+        with mock.patch.dict(os.environ, {"LAUNCH_FORCE": "live"}):
+            html = TestClient(app, base_url="https://altibyan.app").get("/").text
+        self.assertIn('id="help-card-title"', html)
+        self.assertIn('href="/help#rate"', html)
+        self.assertNotIn('action="/notify"', html)
