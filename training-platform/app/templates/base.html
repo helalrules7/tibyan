@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ t('app_name') }}{% endblock %}</title>
   <meta name="description" content="{{ t('meta_description') }}">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#0F6660" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0A1314" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#F6F1E8">
   <link rel="canonical" href="{{ site_url }}/">
 
   <!-- Open Graph -->
@@ -54,6 +53,7 @@
   <link rel="preload" href="/static/fonts/Changa.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="/static/tokens.css?v={{ asset_v }}">
   <link rel="stylesheet" href="/static/style.css?v={{ asset_v }}">
+  <link rel="stylesheet" href="/static/train.css?v={{ asset_v }}">
   <script src="/static/site.js?v={{ asset_v }}" defer></script>
   {% block head_extra %}{% endblock %}
 </head>
@@ -63,7 +63,7 @@
     <a {% if cls %}class="{{ cls }}" {% endif %}href="{{ href }}"{% if path == href %} aria-current="page"{% endif %}>{{ label }}</a>
   {%- endmacro %}
   <a class="skip-link" href="#main">{{ 'تخطَّ إلى المحتوى' if lang == 'ar' else 'Skip to content' }}</a>
-  <header class="topbar has-pattern">
+  <header class="topbar">
     <a class="brand" href="/">
       <span class="logo-mark" role="img" aria-label="{{ 'تبيان' if lang == 'ar' else 'Tibyan' }}"></span>
       <span class="brand-name brand-full">{{ t('app_name').split('—')[-1].strip() }}</span>
@@ -100,7 +100,7 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="foot has-pattern">
+  <footer class="foot">
     <div class="foot-brand">
       <span class="logo-mark" role="img" aria-label="{{ 'تبيان' if lang == 'ar' else 'Tibyan' }}"></span>
       <span>{{ t('app_name') }} — {{ t('footer_note') }}</span>

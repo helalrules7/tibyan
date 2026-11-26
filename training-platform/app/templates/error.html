@@ -6,17 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <title>{{ t('err_%d_title' % code) }} | {{ 'تبيان' if ar else 'Tibyan' }}</title>
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#0F6660" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0A1314" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#F6F1E8">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ asset_v }}">
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png?v={{ asset_v }}">
   <link rel="stylesheet" href="/static/tokens.css?v={{ asset_v }}">
   <link rel="stylesheet" href="/static/style.css?v={{ asset_v }}">
+  <link rel="stylesheet" href="/static/train.css?v={{ asset_v }}">
 </head>
 <body class="error-page">
-  <header class="topbar has-pattern">
+  <header class="topbar">
     <a class="brand" href="/">
       <span class="logo-mark" role="img" aria-label="{{ 'تبيان' if ar else 'Tibyan' }}"></span>
     </a>
@@ -36,7 +36,7 @@
       <p class="muted small">{{ t('err_code') }}: <span dir="ltr">{{ code }}</span></p>
     </section>
   </main>
-  <footer class="foot has-pattern">
+  <footer class="foot">
     <div class="foot-links">
       <a href="https://altibyan.app/">altibyan.app</a>
       <a href="https://altibyan.app/privacy{{ '' if ar else '/en' }}">{{ t('nav_privacy') }}</a>
