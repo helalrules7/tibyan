@@ -33,7 +33,7 @@ templates.env.filters["ar_digits"] = arabic_digits
 
 # Public launch moment (Cairo, after Maghrib, night of 27 Rajab 1448).
 # The one place it lives; LAUNCH_AT (ISO 8601 with offset) overrides it.
-LAUNCH_AT_DEFAULT = "2027-01-04T18:00:00+02:00"
+LAUNCH_AT_DEFAULT = "2026-11-26T00:00:00+02:00"
 
 
 def launch_at() -> datetime:

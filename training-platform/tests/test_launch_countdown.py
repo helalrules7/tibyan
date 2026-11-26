@@ -37,7 +37,7 @@ class LaunchCountdownTests(unittest.TestCase):
     def test_default_target_in_page(self):
         with mock.patch.dict(os.environ, {"LAUNCH_AT": ""}):
             body = index(make_request(), db=None).body.decode()
-        self.assertIn('data-launch="2027-01-04T18:00:00+02:00"', body)
+        self.assertIn('data-launch="2026-11-26T00:00:00+02:00"', body)
 
     def test_before_launch(self):
         body = render_at(timedelta(days=30))
@@ -61,7 +61,7 @@ class LaunchCountdownTests(unittest.TestCase):
         self.assertIn('<p class="launched" data-launched>انطلق تبيان، الحمد لله</p>', body)
         self.assertIn('data-prelaunch hidden', body)
         self.assertIn("play.google.com/store/apps/details?id=app.tibyan.tibyan", body)
-        self.assertIn("apps.apple.com/app/id6818990351", body)
+        self.assertNotIn("apps.apple.com/app/id6818990351", body)  # iOS/Mac: «قريبًا» until Apple approves
         self.assertIn("apps.microsoft.com/detail/9N944SZ21PTS", body)
         self.assertIn('href="/download"', body)
         self.assertNotIn('data-launched hidden', body)

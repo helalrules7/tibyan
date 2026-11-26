@@ -30,7 +30,8 @@ class StoresTests(unittest.TestCase):
         self.assertIn("id=app.tibyan.tibyan", stores.get("google-play").url)
         self.assertIn("6818990351", stores.get("app-store").url)
         self.assertEqual(stores.get("microsoft-store").url, "https://apps.microsoft.com/detail/9N944SZ21PTS")
-        self.assertTrue(all(s.live for s in stores.STORES))
+        # Apple stores show «قريبًا» until the iOS/Mac release; the rest are live.
+        self.assertEqual([s.key for s in stores.STORES if not s.live], ["app-store", "mac-app-store"])
 
     def test_direct_downloads_use_counted_redirect(self):
         for key in ("apk", "windows-setup", "linux-appimage"):
@@ -60,7 +61,7 @@ class LaunchSwitchTests(unittest.TestCase):
             self.assertEqual(launch_state()["launch_phase"], "before")
 
     def test_switch_moment(self):
-        at = datetime(2027, 1, 4, 16, 0, tzinfo=timezone.utc)  # 18:00 Cairo
+        at = datetime(2026, 11, 25, 22, 0, tzinfo=timezone.utc)  # 00:00 Cairo, 26 Nov
         with mock.patch.dict(os.environ, {"LAUNCH_AT": "", "LAUNCH_FORCE": ""}):
             self.assertEqual(launch_state(at - timedelta(seconds=1))["launch_phase"], "last24")
             self.assertEqual(launch_state(at)["launch_phase"], "live")
