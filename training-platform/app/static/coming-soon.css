@@ -795,3 +795,4 @@ a { color: inherit; }
 /* ---------- live home: «كيف تساعد» card (replaces the notify card) ---------- */
 .help-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .guide[id] { scroll-margin-top: 20px; }
+button.beta-button { background: transparent; font: inherit; font-weight: 600; cursor: pointer; }
