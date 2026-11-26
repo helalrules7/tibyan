@@ -44,11 +44,11 @@
     <section class="hero has-pattern" aria-labelledby="launch-title">
       <div class="hero-copy">
         {% set live = launch_phase == 'live' %}
-        <p class="coming-label launch-date" data-prelaunch{% if live %} hidden{% endif %}>
+        {% if not live %}        <p class="coming-label launch-date" data-prelaunch>
           <span class="star" aria-hidden="true"></span>
           {% if ar %}<span class="date-long">الإطلاق ليلة ٢٧ رجب ١٤٤٨ · <b>٤ يناير ٢٠٢٧</b></span><span class="date-short">ليلة ٢٧ رجب · <b>٤ يناير</b></span>
           {% else %}<span class="date-long">Launching on the night of 27 Rajab 1448 · <b>4 January 2027</b></span><span class="date-short">Night of 27 Rajab · <b>4 January</b></span>{% endif %}
-        </p>
+        </p>{% endif %}
         <h1 id="launch-title">
           {{ 'تجربة جديدة من تبيان' if ar else 'A new experience from Tibyan' }}
         </h1>
