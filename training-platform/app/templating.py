@@ -25,7 +25,7 @@ templates.env.globals["tiktok_url"] = TIKTOK_URL
 YOUTUBE_URL = "https://www.youtube.com/@altibyanApp"
 templates.env.globals["youtube_url"] = YOUTUBE_URL
 # Bump when CSS/JS/brand assets change so browsers refetch them.
-templates.env.globals["asset_v"] = "launch2"
+templates.env.globals["asset_v"] = "launch3"
 
 from .analytics import arabic_digits  # noqa: E402
 
