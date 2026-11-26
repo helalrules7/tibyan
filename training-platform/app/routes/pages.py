@@ -15,7 +15,7 @@ from ..analytics import public_totals
 from ..stats import public_progress
 from ..launch_mail import TESTFLIGHT_URL
 from ..templating import STATIC_DIR, launch_at
-from .. import changelog, releases, site_sources, stores
+from .. import changelog, quran_site, releases, site_sources, stores
 from ..i18n import get_lang
 from ..web import check_csrf, msg, render
 
@@ -27,6 +27,8 @@ ROOT_HOSTS = {
     "altibyan.app",
     "www.altibyan.app",
 }
+# A local run can serve the root site on another host: ROOT_HOSTS_EXTRA="localhost".
+ROOT_HOSTS |= set(os.environ.get("ROOT_HOSTS_EXTRA", "").split())
 ROOT_ORIGIN = "https://altibyan.app"
 TRAIN_ORIGIN = "https://train.altibyan.app"
 # Public, indexable pages of the training platform (the rest needs a login).
@@ -84,6 +86,28 @@ def index(request: Request, db: Session = Depends(get_db)):
 
     user = current_user(request, db)
     return render(request, "index.html", user=user, progress=public_progress(db))
+
+
+def home_context(request: Request, db: Session) -> dict:
+    """The redesigned home: the working reader, the reciters and the stores."""
+    return dict(
+        reader=quran_site.surah(1) if quran_site.available() else None,
+        surahs=quran_site.surahs(),
+        reciters=quran_site.reciters(),
+        credits=quran_site.credits(),
+        stores=stores.STORES,
+        my_os=stores.detect_os(request.headers.get("user-agent")),
+        totals=public_totals(db),
+        prefix=lang_prefix(request),
+    )
+
+
+@router.get("/next")
+def home_next(request: Request, db: Session = Depends(get_db)):
+    """Preview of the redesigned home (not indexed) until it replaces "/"."""
+    if not is_root_host(request):
+        return RedirectResponse(f"{ROOT_ORIGIN}/next", status_code=301)
+    return render(request, "home.html", noindex=True, **home_context(request, db))
 
 
 @router.get("/download")

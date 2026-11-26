@@ -17,6 +17,7 @@ from .routes import (
     annotations,
     auth,
     beta,
+    quran,
     contact,
     khatma,
     notifications,
@@ -96,6 +97,7 @@ app.include_router(runner.router)
 app.include_router(reports.router)
 app.include_router(annotations.router)
 app.include_router(khatma.router)
+app.include_router(quran.router)
 
 
 @app.on_event("startup")

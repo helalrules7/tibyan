@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     # Verse prompts, exported verbatim from content.db by
     # tools/export_verse_prompts.py.
     verses_path: str = "./data/verses.json"
+    # The live reader on altibyan.app (tools/build_site_quran.py); absent = reader hidden.
+    quran_db_path: str = "data/site-quran.db"
 
     # Private media root (outside the web root in production).
     media_dir: str = "./media"

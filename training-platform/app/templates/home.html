@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+  {% set ar = lang == 'ar' %}
+  {% set title = 'تبيان | اقرأ، تدبّر، احفظ' if ar else 'Tibyan | Read, reflect, memorize' %}
+  {% set desc = 'تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. جرّب القارئ هنا، ثم نزّل التطبيق.' if ar else 'Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. Try the reader here, then get the app.' %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ desc }}">
+  {% if noindex %}<meta name="robots" content="noindex">{% endif %}
+  <link rel="canonical" href="https://altibyan.app{{ prefix }}/">
+  <link rel="alternate" hreflang="ar" href="https://altibyan.app/">
+  <link rel="alternate" hreflang="en" href="https://altibyan.app/en/">
+  <link rel="alternate" hreflang="x-default" href="https://altibyan.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="تبيان">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ desc }}">
+  <meta property="og:url" content="https://altibyan.app{{ prefix }}/">
+  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ 'تبيان، تطبيق قرآن غير ربحي بلا إعلانات' if ar else 'Tibyan, a non-profit, ad-free Quran app' }}">
+  <meta property="og:locale" content="ar_EG">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ desc }}">
+  <meta name="twitter:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#F6F1E8">
+  <meta property="og:see_also" content="{{ facebook_url }}">
+  <meta property="og:see_also" content="{{ instagram_url }}">
+  <meta property="og:see_also" content="{{ tiktok_url }}">
+  <meta property="og:see_also" content="{{ youtube_url }}">
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "Organization", "name": "Tibyan", "alternateName": "تبيان",
+   "url": "https://altibyan.app/", "logo": "https://altibyan.app/static/icon-512.png",
+   "sameAs": ["{{ facebook_url }}", "{{ instagram_url }}", "{{ tiktok_url }}", "{{ youtube_url }}"]}
+  </script>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ asset_v }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png?v={{ asset_v }}">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png?v={{ asset_v }}">
+  <link rel="preload" href="/static/fonts/Changa.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="/static/fonts/uthmanic_hafs_v20.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="/static/tokens.css?v={{ asset_v }}">
+  <link rel="stylesheet" href="/static/home.css?v={{ asset_v }}">
+</head>
+<body class="x">
+  <a class="x-skip" href="#reader">{{ 'انتقل إلى القارئ' if ar else 'Skip to the reader' }}</a>
+
+  <header class="x-top">
+    <a class="x-logo" href="{{ prefix }}/" aria-label="{{ 'تبيان، الصفحة الرئيسية' if ar else 'Tibyan home' }}"><span aria-hidden="true"></span></a>
+    <nav class="x-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
+      <a href="{{ prefix }}/features">{{ 'المزايا' if ar else 'Features' }}</a>
+      <a href="https://train.altibyan.app/">{{ 'منصة التدريب' if ar else 'Training platform' }}</a>
+      <a href="/lang/{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
+      <a class="x-nav-get" href="#get">{{ 'نزّل تبيان' if ar else 'Get Tibyan' }}</a>
+    </nav>
+  </header>
+
+  <main>
+    {# ---------- the opening: three verbs that drive a real reader ---------- #}
+    <section class="x-open" id="open" aria-labelledby="open-title">
+      <div class="x-say">
+        <h1 id="open-title" class="x-verbs" data-verbs>
+          <button type="button" class="x-verb is-on" data-mode="read" aria-pressed="true">{{ 'اقرأ' if ar else 'Read' }}</button>
+          <button type="button" class="x-verb" data-mode="reflect" aria-pressed="false">{{ 'تدبّر' if ar else 'Reflect' }}</button>
+          <button type="button" class="x-verb" data-mode="memorize" aria-pressed="false">{{ 'احفظ' if ar else 'Memorize' }}</button>
+        </h1>
+        <p class="x-lead" data-lead
+           data-read="{{ 'هذا قارئ حقيقي، لا صورة. اختر سورة، واضغط آية، واستمع لها.' if ar else 'This is a working reader, not a picture. Pick a surah, tap a verse, and listen.' }}"
+           data-reflect="{{ 'اضغط أيّ آية ليظهر تفسيرها من «التفسير الميسر»، كما في التطبيق.' if ar else 'Tap any verse to read its tafsir from «Al-Tafsir al-Muyassar», as in the app.' }}"
+           data-memorize="{{ 'الآيات مخفيّة. اقرأ من حفظك، ثم اضغط الآية لتتحقق. وفي التطبيق تسمّع بصوتك ويصحّح لك.' if ar else 'The verses are hidden. Recite from memory, then tap a verse to check. In the app you recite aloud and it corrects you.' }}">{{ 'هذا قارئ حقيقي، لا صورة. اختر سورة، واضغط آية، واستمع لها.' if ar else 'This is a working reader, not a picture. Pick a surah, tap a verse, and listen.' }}</p>
+        <div class="x-open-actions">
+          <a class="x-btn" href="#get">{{ 'نزّل تبيان' if ar else 'Get Tibyan' }}</a>
+          <span class="x-open-note">{{ 'غير ربحي، وبلا إعلانات إطلاقًا.' if ar else 'Non-profit, with no ads at all.' }}</span>
+        </div>
+      </div>
+
+      {% if reader %}
+      <div class="x-reader" id="reader" data-reader data-mode="read"
+           data-surah="{{ reader.id }}" aria-label="{{ 'قارئ تبيان' if ar else 'Tibyan reader' }}">
+        <div class="x-reader-bar">
+          <button type="button" class="x-surah-btn" data-open-surahs aria-haspopup="dialog">
+            <span data-surah-name>{{ ('سورة ' ~ reader.name_ar) if ar else reader.name_en }}</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="x-reader-tools">
+            <button type="button" class="x-icon" data-toggle-search aria-expanded="false" aria-controls="reader-search" aria-label="{{ 'ابحث في القرآن' if ar else 'Search the Quran' }}">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+            </button>
+            <button type="button" class="x-play" data-play aria-label="{{ 'استمع إلى السورة' if ar else 'Listen to the surah' }}">
+              <svg viewBox="0 0 24 24" aria-hidden="true" data-icon-play><path d="M8 5.5v13l11-6.5z"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true" data-icon-pause hidden><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+              <span>{{ 'استمع' if ar else 'Listen' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <form class="x-search" id="reader-search" data-search hidden role="search">
+          <label class="x-sr" for="q">{{ 'ابحث بكلمة من القرآن' if ar else 'Search by a word from the Quran' }}</label>
+          <input id="q" name="q" type="search" dir="rtl" lang="ar" autocomplete="off" maxlength="80"
+                 placeholder="{{ 'كلمة من آية، مثل: الصابرين' if ar else 'A word from a verse, e.g. الصابرين' }}">
+          <ol class="x-results" data-results aria-live="polite"></ol>
+        </form>
+
+        <div class="x-page" data-page tabindex="0" lang="ar" dir="rtl" aria-label="{{ 'نص السورة' if ar else 'Surah text' }}">
+          {% if reader.basmala %}<p class="x-basmala" data-basmala>{{ reader.basmala }}</p>{% endif %}
+          <p class="x-flow" data-flow>{% for a in reader.ayahs %}<span class="x-ayah" role="button" tabindex="0" data-n="{{ a.n }}">{{ a.t }}</span> {% endfor %}</p>
+        </div>
+
+        <div class="x-sheet" data-sheet hidden>
+          <div class="x-sheet-head">
+            <strong data-sheet-title></strong>
+            <button type="button" class="x-icon" data-close-sheet aria-label="{{ 'إغلاق' if ar else 'Close' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+          </div>
+          <p class="x-sheet-text" data-sheet-text lang="ar" dir="rtl"></p>
+          <p class="x-sheet-credit">{{ credits.tafsir.line }}</p>
+        </div>
+
+        <div class="x-memo" data-memo hidden>
+          <span>{{ 'اضغط الآية لتظهر.' if ar else 'Tap a verse to reveal it.' }}</span>
+          <button type="button" data-hide-all>{{ 'أخفِ الكل' if ar else 'Hide all' }}</button>
+        </div>
+
+        <p class="x-reader-credit">
+          <a href="{{ credits.text.url }}" rel="noopener">{{ 'نص المصحف: مجمع الملك فهد لطباعة المصحف الشريف' if ar else credits.text.line }}</a>
+        </p>
+      </div>
+
+      <dialog class="x-dialog" data-surahs aria-label="{{ 'اختر سورة' if ar else 'Choose a surah' }}">
+        <div class="x-dialog-head">
+          <label class="x-sr" for="surah-filter">{{ 'ابحث باسم السورة' if ar else 'Filter by surah name' }}</label>
+          <input id="surah-filter" type="search" data-surah-filter autocomplete="off" placeholder="{{ 'اسم السورة أو رقمها' if ar else 'Surah name or number' }}">
+          <button type="button" class="x-icon" data-close-surahs aria-label="{{ 'إغلاق' if ar else 'Close' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        </div>
+        <ol class="x-surahs" data-surah-list>
+          {% for s in surahs %}<li><button type="button" data-pick="{{ s.id }}" data-name-ar="{{ s.name_ar }}" data-name-en="{{ s.name_en }}"><b>{{ s.id }}</b><span>{{ s.name_ar if ar else s.name_en }}</span><small>{{ s.ayah_count }} {{ 'آية' if ar else 'verses' }}</small></button></li>{% endfor %}
+        </ol>
+      </dialog>
+      {% endif %}
+    </section>
+
+    {# ---------- listen: the reciters ARE the interface ---------- #}
+    {% if reader %}
+    <section class="x-listen" id="listen" aria-labelledby="listen-title">
+      <div class="x-listen-head">
+        <h2 id="listen-title">{{ 'استمع' if ar else 'Listen' }}</h2>
+        <p>{{ 'اختر قارئًا، فتبدأ السورة المفتوحة في القارئ، وتتبع الإضاءة الآية المتلوّة.' if ar else 'Pick a reciter: the surah open in the reader starts playing, and the highlight follows the verse being recited.' }}</p>
+      </div>
+      <ol class="x-reciters" data-reciters>
+        {% for r in reciters %}<li><button type="button" data-reciter="{{ r.id }}" aria-pressed="false"><span>{{ r.name_ar if ar else r.name_en }}</span><i aria-hidden="true"></i></button></li>{% endfor %}
+      </ol>
+      <p class="x-listen-credit">{{ 'التلاوات من mp3quran.net و quranicaudio.com، وتُبثّ من مصدرها مباشرة.' if ar else 'Recitations from mp3quran.net and quranicaudio.com, streamed straight from their source.' }}</p>
+    </section>
+    {% endif %}
+
+    {# ---------- why: one statement, four facts ---------- #}
+    <section class="x-why" id="why" aria-labelledby="why-title">
+      <h2 id="why-title" data-reveal>
+        <span>{{ 'لا إعلانات.' if ar else 'No ads.' }}</span>
+        <span>{{ 'لا تشتيت.' if ar else 'No distraction.' }}</span>
+        <span>{{ 'أنت والقرآن.' if ar else 'You and the Quran.' }}</span>
+      </h2>
+      <dl class="x-facts">
+        <div><dt>{{ 'غير ربحي' if ar else 'Non-profit' }}</dt><dd>{{ 'لا اشتراكات ولا مشتريات داخل التطبيق.' if ar else 'No subscriptions and no in-app purchases.' }}</dd></div>
+        <div><dt>{{ 'دون إنترنت' if ar else 'Offline' }}</dt><dd>{{ 'كل شيء على جهازك، والتسميع يعمل عليه، وصوتك لا يغادره.' if ar else 'Everything stays on your device; recitation checking runs on it and your voice never leaves it.' }}</dd></div>
+        <div><dt>{{ 'مفتوح المصدر' if ar else 'Open source' }}</dt><dd><a href="https://github.com/helalrules7/tibyan" rel="noopener" dir="ltr">github.com/helalrules7/tibyan</a></dd></div>
+        <div><dt>{{ 'مصادر موثّقة' if ar else 'Credited sources' }}</dt><dd><a href="{{ prefix }}/sources">{{ 'كل نص منقول من مصدره، وهذه مصادره.' if ar else 'Every text is copied from its source. See them all.' }}</a></dd></div>
+      </dl>
+    </section>
+
+    {# ---------- more: what the reader above cannot show ---------- #}
+    <section class="x-more" id="more" aria-labelledby="more-title">
+      <div class="x-more-head">
+        <h2 id="more-title">{{ 'وفي التطبيق أكثر' if ar else 'And more in the app' }}</h2>
+        <a href="{{ prefix }}/features">{{ 'كل المزايا' if ar else 'All features' }}</a>
+      </div>
+{% include "_app_features.html" %}
+{% include "_app_gallery.html" %}
+    </section>
+
+    {# ---------- get ---------- #}
+    <section class="x-get" id="get" aria-labelledby="get-title">
+      <h2 id="get-title">{{ 'نزّل تبيان' if ar else 'Get Tibyan' }}</h2>
+      <ul class="x-stores">
+        {% for s in stores %}
+        <li class="{{ 'is-mine' if s.os == my_os else '' }}">
+          {% if s.live %}<a href="{{ s.url }}" rel="noopener"><b>{{ s.name(ar) }}</b><span>{{ s.kind(ar) }}</span></a>
+          {% else %}<span class="is-soon"><b>{{ s.name(ar) }}</b><span>{{ s.kind(ar) }}، {{ 'قريبًا' if ar else 'coming soon' }}</span></span>{% endif %}
+        </li>
+        {% endfor %}
+        <li><a href="{{ prefix }}/download"><b>{{ 'تحميل مباشر' if ar else 'Direct download' }}</b><span>{{ 'ملف APK، وويندوز، ولينكس' if ar else 'APK file, Windows and Linux' }}</span></a></li>
+      </ul>
+      {% if totals %}
+      <p class="x-totals">
+        <span><b>{{ totals.downloads }}</b> {{ 'تحميل' if ar else 'downloads' }}</span>
+        <span><b>{{ totals.visits }}</b> {{ 'زيارة' if ar else 'visits' }}</span>
+        <small>{{ 'نعدّ الزيارات دون ملفات تعريف الارتباط ودون حفظ عناوين IP.' if ar else 'Counted without cookies and without storing IP addresses.' }}</small>
+      </p>
+      {% endif %}
+    </section>
+
+    <section class="x-help" id="help" aria-labelledby="help-card-title">
+      <div>
+        <h2 id="help-card-title">{{ 'ساعد غيرك على الوصول إلى تبيان' if ar else 'Help others find Tibyan' }}</h2>
+        <p>{{ 'تبيان مشروع غير ربحي، ومشاركتك وتقييمك يوصلانه إلى غيرك. لا تحتاج أيّ طريقة منها إلى مال.' if ar else 'Tibyan is non-profit; your shares and ratings bring it to others. None of these needs money.' }}</p>
+      </div>
+      <div class="x-help-actions">
+        <button type="button" data-share data-copied="{{ 'نُسخ الرابط' if ar else 'Link copied' }}" data-url="https://altibyan.app{{ prefix }}/">{{ 'شارك الرابط' if ar else 'Share the link' }}</button>
+        <a href="{{ prefix }}/help#rate">{{ 'قيّمه في المتجر' if ar else 'Rate it' }}</a>
+        <a href="{{ prefix }}/help#report">{{ 'أبلغ عن مشكلة' if ar else 'Report a problem' }}</a>
+        <a href="https://train.altibyan.app/">{{ 'ساهم بتلاوتك في تدريب التسميع' if ar else 'Contribute a recitation to train tasmee' }}</a>
+      </div>
+    </section>
+  </main>
+
+{% include "_launch_footer.html" %}
+
+  {% if reader %}
+  {# ---------- the player: appears once something plays, stays while you browse ---------- #}
+  <div class="x-dock" data-dock hidden role="region" aria-label="{{ 'مشغّل التلاوة' if ar else 'Recitation player' }}">
+    <div class="x-dock-bar" data-bar>
+      <div class="x-dock-fill" data-fill></div>
+      <input type="range" min="0" max="1000" value="0" step="1" data-seek aria-label="{{ 'موضع التلاوة' if ar else 'Playback position' }}">
+    </div>
+    <div class="x-dock-row">
+      <div class="x-dock-ctl">
+        <button type="button" class="x-icon" data-prev aria-label="{{ 'الآية السابقة' if ar else 'Previous verse' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6v12M14 12 5 6v12z" transform="matrix(-1 0 0 1 22 0)"/></svg></button>
+        <button type="button" class="x-dock-play" data-play aria-label="{{ 'تشغيل أو إيقاف' if ar else 'Play or pause' }}">
+          <svg viewBox="0 0 24 24" aria-hidden="true" data-icon-play><path d="M8 5.5v13l11-6.5z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" data-icon-pause hidden><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+        </button>
+        <button type="button" class="x-icon" data-next aria-label="{{ 'الآية التالية' if ar else 'Next verse' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6v12M14 12 5 6v12z"/></svg></button>
+      </div>
+      <a class="x-dock-now" href="#reader"><b data-now-surah></b><span data-now-ayah></span></a>
+      <label class="x-dock-reciter"><span class="x-sr">{{ 'القارئ' if ar else 'Reciter' }}</span>
+        <select data-reciter-select>{% for r in reciters %}<option value="{{ r.id }}">{{ r.name_ar if ar else r.name_en }}</option>{% endfor %}</select>
+      </label>
+      <button type="button" class="x-icon" data-stop aria-label="{{ 'أغلق المشغّل' if ar else 'Close the player' }}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <p class="x-dock-msg" data-dock-msg role="status"></p>
+    <audio data-audio preload="none"></audio>
+  </div>
+  <script type="application/json" id="x-strings">{{ {
+    "ar": ar,
+    "surah": 'سورة' if ar else 'Surah',
+    "ayah": 'الآية' if ar else 'Verse',
+    "tafsir": 'التفسير الميسر' if ar else 'Al-Tafsir al-Muyassar',
+    "loading": 'جارٍ التحميل…' if ar else 'Loading…',
+    "loadError": 'تعذّر التحميل. تحقّق من الاتصال ثم أعد المحاولة.' if ar else 'Could not load. Check your connection and try again.',
+    "audioError": 'تعذّر تشغيل التلاوة من مصدرها. جرّب قارئًا آخر.' if ar else 'The recitation could not be played from its source. Try another reciter.',
+    "noResults": 'لا نتائج. جرّب كلمة أخرى.' if ar else 'No results. Try another word.',
+    "opening": 'الافتتاح' if ar else 'Opening'
+  } | tojson }}</script>
+  <script src="/static/home.js?v={{ asset_v }}" defer></script>
+  {% endif %}
+</body>
+</html>
