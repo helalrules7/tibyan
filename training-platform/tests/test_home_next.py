@@ -1,4 +1,4 @@
-"""The redesigned home (/next) and the reader API behind it."""
+"""The home page and the reader API behind it."""
 from __future__ import annotations
 
 import sys
@@ -43,14 +43,18 @@ class ReaderTests(unittest.TestCase):
         cls.tmp.cleanup()
 
     def test_page_has_a_working_reader_and_is_not_indexed(self):
-        for path in ("/next", "/en/next"):
+        for path in ("/", "/en/"):
             html = self.c.get(path).text
             self.assertIn('data-reader', html, path)
-            self.assertIn('name="robots" content="noindex"', html, path)
+            self.assertNotIn('name="robots" content="noindex"', html, path)
             self.assertEqual(html.count('class="x-ayah"'), 7, path)  # Al-Fatiha, rendered on the server
             self.assertIn('data-reciter="1"', html, path)
             self.assertIn("play.google.com/store/apps/details?id=app.tibyan.tibyan", html, path)
             self.assertNotIn("apps.apple.com", html, path)  # «قريبًا» until Apple releases
+
+    def test_preview_address_redirects_home(self):
+        r = TestClient(app, base_url=ROOT).get("/next", follow_redirects=False)
+        self.assertEqual((r.status_code, r.headers["location"]), (301, "https://altibyan.app/"))
 
     def test_surah_is_verbatim_from_the_app_database(self):
         import sqlite3
@@ -86,7 +90,7 @@ class ReaderTests(unittest.TestCase):
         keep, settings.quran_db_path = settings.quran_db_path, "/nonexistent/q.db"
         _clear()
         try:
-            html = self.c.get("/next").text
+            html = self.c.get("/").text
             self.assertNotIn("data-reader", html)
             self.assertIn('id="get"', html)
             self.assertEqual(self.c.get("/api/quran/surah/1").status_code, 503)

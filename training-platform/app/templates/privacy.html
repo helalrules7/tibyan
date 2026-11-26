@@ -18,19 +18,15 @@
   <meta property="og:title" content="{{ title }}">
   <meta property="og:description" content="{{ desc }}">
   <meta property="og:url" content="{{ url }}">
-  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=2">
+  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
   <meta name="twitter:card" content="summary_large_image">
-  {% include "_launch_head.html" %}
+  {% include "_site_head.html" %}
+  <link rel="stylesheet" href="/static/pages.css?v={{ asset_v }}">
 </head>
-<body>
-  <main class="launch-page privacy-page">
-{% include "_launch_header.html" %}
-      <nav class="launch-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
-        <a href="/">{{ 'الصفحة الرئيسية' if ar else 'Home' }}</a>
-        <a href="https://train.altibyan.app/">{{ 'منصة التدريب' if ar else 'Training platform' }}</a>
-        <a class="language-link" href="{{ '/privacy/en' if ar else '/privacy' }}" lang="{{ 'en' if ar else 'ar' }}" hreflang="{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
-      </nav>
-    </header>
+<body class="x x-inner">
+{% set lang_href = '/privacy/en' if ar else '/privacy' %}
+{% include "_site_header.html" %}
+  <main class="x-wrap x-doc">
 
     <article class="policy" aria-labelledby="policy-title">
       <header class="policy-head">
@@ -368,7 +364,9 @@
 {% endif %}
     </article>
 
-{% include "_launch_footer.html" %}
   </main>
+  <div class="x-wrap">
+{% include "_launch_footer.html" %}
+  </div>
 </body>
 </html>

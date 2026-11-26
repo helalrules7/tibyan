@@ -17,11 +17,12 @@
   <meta property="og:title" content="{{ title }}">
   <meta property="og:description" content="{{ desc }}">
   <meta property="og:url" content="https://altibyan.app{{ prefix }}/download">
-  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=2">
+  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
   <meta name="twitter:card" content="summary_large_image">
-  {% include "_launch_head.html" %}
+  {% include "_site_head.html" %}
+  <link rel="stylesheet" href="/static/pages.css?v={{ asset_v }}">
 </head>
-<body>
+<body class="x x-inner">
 {% set icons = {
   'android': '<rect x="6" y="9" width="12" height="10" rx="2"/><path d="M6 9a6 6 0 0 1 12 0M8.5 4.5 7.5 3m8 1.5 1-1.5M9.5 7v.01m5-.01v.01M3.5 11v5m17-5v5M9.5 19v2.5m5-2.5v2.5"/>',
   'ios': '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
@@ -53,14 +54,8 @@
   {% if d %}<span class="dl-meta" dir="ltr">v{{ d.version }}{% if d.size %} · {{ human_size(d.size, false) }}{% endif %}</span>{% endif %}
 {%- endmacro %}
 
-  <main class="launch-page beta-page">
-{% include "_launch_header.html" %}
-      <nav class="launch-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
-        <a href="{{ prefix }}/">{{ 'الصفحة الرئيسية' if ar else 'Home' }}</a>
-        <a href="#linux">{{ 'لينكس' if ar else 'Linux' }}</a>
-        <a class="language-link" href="/lang/{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
-      </nav>
-    </header>
+{% include "_site_header.html" %}
+  <main class="x-wrap x-doc">
 
     <section class="install" aria-labelledby="download-title">
       <p class="coming-label"><span class="star" aria-hidden="true"></span>{{ 'التحميل' if ar else 'Download' }}</p>
@@ -135,8 +130,10 @@
       </div>
     </section>
 
-{% include "_launch_footer.html" %}
   </main>
+  <div class="x-wrap">
+{% include "_launch_footer.html" %}
+  </div>
   <script>
   (function () {
     // Refine the server's guess (iPadOS reports itself as a Mac).

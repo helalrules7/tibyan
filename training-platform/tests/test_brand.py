@@ -90,11 +90,11 @@ class PageTests(unittest.TestCase):
         root = TestClient(app, base_url="https://altibyan.app")
         for path in ("/",):
             body = root.get(path).text
-            self.assertIn('class="follow-line"', body, path)
-            self.assertEqual(body.count(f'href="{FACEBOOK_URL}"'), 2, path)
-            self.assertEqual(body.count(f'href="{INSTAGRAM_URL}"'), 2, path)
-            self.assertEqual(body.count(f'href="{TIKTOK_URL}"'), 2, path)
-            self.assertEqual(body.count(f'href="{YOUTUBE_URL}"'), 2, path)
+            # the new home carries the social links once, in the footer
+            self.assertEqual(body.count(f'href="{FACEBOOK_URL}"'), 1, path)
+            self.assertEqual(body.count(f'href="{INSTAGRAM_URL}"'), 1, path)
+            self.assertEqual(body.count(f'href="{TIKTOK_URL}"'), 1, path)
+            self.assertEqual(body.count(f'href="{YOUTUBE_URL}"'), 1, path)
             self.assertIn(YOUTUBE_URL + '"]', body, path)
             self.assertIn(f'<meta property="og:see_also" content="{YOUTUBE_URL}">', body, path)
             self.assertIn(f'<meta property="og:see_also" content="{TIKTOK_URL}">', body, path)

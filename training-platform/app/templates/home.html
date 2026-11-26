@@ -28,39 +28,15 @@
   <meta name="twitter:title" content="{{ title }}">
   <meta name="twitter:description" content="{{ desc }}">
   <meta name="twitter:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#F6F1E8">
-  <meta property="og:see_also" content="{{ facebook_url }}">
-  <meta property="og:see_also" content="{{ instagram_url }}">
-  <meta property="og:see_also" content="{{ tiktok_url }}">
-  <meta property="og:see_also" content="{{ youtube_url }}">
-  <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "Organization", "name": "Tibyan", "alternateName": "تبيان",
-   "url": "https://altibyan.app/", "logo": "https://altibyan.app/static/icon-512.png",
-   "sameAs": ["{{ facebook_url }}", "{{ instagram_url }}", "{{ tiktok_url }}", "{{ youtube_url }}"]}
-  </script>
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ asset_v }}">
-  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png?v={{ asset_v }}">
-  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png?v={{ asset_v }}">
-  <link rel="preload" href="/static/fonts/Changa.ttf" as="font" type="font/ttf" crossorigin>
+  {% include "_site_head.html" %}
   <link rel="preload" href="/static/fonts/uthmanic_hafs_v20.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="/static/tokens.css?v={{ asset_v }}">
   <link rel="stylesheet" href="/static/home.css?v={{ asset_v }}">
 </head>
 <body class="x">
   <a class="x-skip" href="#reader">{{ 'انتقل إلى القارئ' if ar else 'Skip to the reader' }}</a>
 
-  <header class="x-top x-wrap">
-    <a class="x-logo" href="{{ prefix }}/" aria-label="{{ 'تبيان، الصفحة الرئيسية' if ar else 'Tibyan home' }}"><span aria-hidden="true"></span></a>
-    <nav class="x-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
-      <a href="{{ prefix }}/features">{{ 'المزايا' if ar else 'Features' }}</a>
-      <a href="{{ prefix }}/sources">{{ 'المصادر' if ar else 'Sources' }}</a>
-      <a href="https://train.altibyan.app/">{{ 'منصة التدريب' if ar else 'Training platform' }}</a>
-      <a href="/lang/{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
-      <a class="x-nav-get" href="#get">{{ 'نزّل تبيان' if ar else 'Get Tibyan' }}</a>
-    </nav>
-  </header>
+  {% set is_home = true %}
+{% include "_site_header.html" %}
 
   <main>
     {# ---------- scene 1 (paper): the statement, and the reader it introduces ---------- #}
@@ -230,8 +206,8 @@
           <p>{{ 'على هاتفك وحاسوبك، بلا حساب وبلا مقابل.' if ar else 'On your phone and your computer, with no account and no cost.' }}</p>
           {% if totals %}
           <p class="x-totals">
-            <span><b>{{ totals.downloads }}</b> {{ 'تحميل' if ar else 'downloads' }}</span>
-            <span><b>{{ totals.visits }}</b> {{ 'زيارة' if ar else 'visits' }}</span>
+            <span><b>{{ totals.downloads|ar_digits if ar else '{:,}'.format(totals.downloads) }}</b> {{ 'تحميل' if ar else 'downloads' }}</span>
+            <span><b>{{ totals.visits|ar_digits if ar else '{:,}'.format(totals.visits) }}</b> {{ 'زيارة' if ar else 'visits' }}</span>
           </p>
           <p class="x-fine">{{ 'نعدّ الزيارات دون ملفات تعريف الارتباط ودون حفظ عناوين IP.' if ar else 'Counted without cookies and without storing IP addresses.' }}</p>
           {% endif %}

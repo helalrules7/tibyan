@@ -1,0 +1,120 @@
+/* ============================================================
+   altibyan.app: the shared shell (tokens, type, header, footer).
+   Scenes of the home page live in home.css, inner pages in pages.css.
+
+   Type   Changa for headings (the brand face), IBM Plex Sans Arabic
+          for running text, UthmanicHafs for verse text ONLY.
+   Scale  one modular scale (--t-*), one spacing scale (--sp-*),
+          one content width (--wrap).
+   Rhythm paper -> night -> sand -> charcoal -> teal -> paper.
+          The reader steps down from the paper into the night.
+   Ornament: none. The only graphic devices are
+          - hairline rules (--rule / --rule-dark) that structure lists,
+          - one panel radius (--r-panel) for the two real objects on
+            the page, the reader and the phone, which alone cast a shadow,
+          - flat colour fields. No gradients, patterns, blur, rotation
+            or looping animation.
+   ============================================================ */
+@font-face { font-family: 'TibyanText'; src: url('/static/fonts/IBMPlexSansArabic-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'TibyanText'; src: url('/static/fonts/IBMPlexSansArabic-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'TibyanText'; src: url('/static/fonts/IBMPlexSansArabic-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+
+.x {
+  /* colour */
+  --paper: #F6F1E8;
+  --leaf: #FFFCF6;
+  --sand: #EAE1CF;
+  --sand-deep: #DDD0B6;
+  --ink: #1E1915;
+  --ink-2: #5E5A52;
+  --charcoal: #1B1F1E;
+  --night: #0B1E1D;
+  --teal: #0F6660;
+  --teal-deep: #0A4F4A;
+  --mint: #8BD3C8;
+  --sage: #A9BDB0;
+  --gold: #D9B266;
+  --rule: rgb(30 25 21 / 13%);
+  --rule-dark: rgb(246 241 232 / 15%);
+
+  /* type */
+  --f-head: 'TibyanDigits', 'Tibyan', system-ui, sans-serif;
+  --f-text: 'TibyanText', 'Tibyan', system-ui, sans-serif;
+  --t-display: clamp(2.4rem, 4.3vw, 4rem);
+  --t-h2: clamp(1.9rem, 3.1vw, 2.9rem);
+  --t-h3: 1.2rem;
+  --t-lead: clamp(1.06rem, 1.25vw, 1.2rem);
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-fine: 0.8rem;
+
+  /* space */
+  --sp-1: 8px; --sp-2: 12px; --sp-3: 16px; --sp-4: 24px; --sp-5: 40px; --sp-6: 64px; --sp-7: 96px;
+  --scene: clamp(64px, 8.5vw, 124px);
+  --gutter: clamp(18px, 4vw, 56px);
+  --wrap: 1240px;
+
+  /* shape, motion */
+  --r-ctl: 12px;
+  --r-panel: 22px;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-text);
+  font-size: var(--t-body);
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+.x *, .x *::before, .x *::after { box-sizing: border-box; }
+:where(.x) :is(h1, h2, h3, p, ol, ul, dl, dd, figure) { margin: 0; padding: 0; }
+:where(.x) :is(ol, ul) { list-style: none; }
+:where(.x) a { color: inherit; }
+:where(.x) button, :where(.x) input, :where(.x) select { font: inherit; color: inherit; }
+:where(.x) button { cursor: pointer; background: none; border: 0; padding: 0; }
+.x :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+.x [hidden] { display: none !important; }
+.x h1, .x h2 { font-family: var(--f-head); font-weight: 700; letter-spacing: 0; text-wrap: balance; }
+.x h2 { font-size: var(--t-h2); line-height: 1.3; }
+.x svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.x-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.x-skip { position: absolute; inset-inline-start: 12px; top: -60px; z-index: 60; padding: 10px 16px; background: var(--ink); color: var(--paper); border-radius: 8px; }
+.x-skip:focus { top: 12px; }
+.x-wrap { width: min(var(--wrap), 100% - var(--gutter) * 2); margin-inline: auto; }
+.x-fine { font-size: var(--t-fine); line-height: 1.7; opacity: 0.72; }
+.x-link { font-family: var(--f-head); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.x-link:hover { text-decoration-thickness: 2px; }
+.x-btn { display: inline-flex; align-items: center; min-height: 50px; padding: 0 28px; border-radius: 999px; background: var(--teal-deep); color: var(--leaf); font-family: var(--f-head); font-weight: 600; font-size: 1.05rem; text-decoration: none; transition: background-color 160ms; }
+.x-btn:hover { background: var(--ink); }
+.x-icon { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; flex: none; }
+.x-icon:hover { background: rgb(30 25 21 / 8%); }
+.x-ghost { min-height: 42px; padding: 0 18px; border: 1px solid currentColor; border-radius: 999px; font-family: var(--f-head); font-weight: 600; }
+
+/* ---------- top ---------- */
+.x-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); padding-top: 18px; position: relative; z-index: 3; }
+.x-logo { display: block; width: 70px; height: 42px; }
+.x-logo span { display: block; width: 100%; height: 100%; background: var(--teal-deep); -webkit-mask: var(--logo-url) center / contain no-repeat; mask: var(--logo-url) center / contain no-repeat; }
+.x-nav { display: flex; align-items: center; gap: clamp(12px, 2.2vw, 28px); font-family: var(--f-head); font-size: 0.95rem; }
+.x-nav a { text-decoration: none; padding: 8px 0; }
+.x-nav a:hover { color: var(--teal); }
+.x-nav .x-nav-get { padding: 7px 18px; border: 1px solid var(--ink); border-radius: 999px; font-weight: 600; }
+.x-nav .x-nav-get:hover { background: var(--ink); color: var(--paper); }
+
+/* ---------- footer (shared partial, restyled here) ---------- */
+.x .launch-footer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px var(--sp-4); padding: var(--sp-4) 0 var(--sp-5); border-top: 1px solid var(--rule); font-size: var(--t-small); color: var(--ink-2); }
+.x .launch-footer .footer-rule { display: none; }
+.x .launch-footer-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-inline-start: auto; }
+.x .launch-footer a { text-decoration: none; }
+.x .launch-footer a:hover { color: var(--teal-deep); text-decoration: underline; }
+.x .social-link { display: inline-flex; align-items: center; gap: 6px; }
+.x .social-link svg { width: 1.2em; height: 1.2em; }
+.x .fb-glyph { font-weight: 800; font-style: normal; }
+.x.has-dock .launch-footer { padding-bottom: 120px; }
+
+@media (max-width: 720px) {
+  .x-nav a:not(.x-nav-get):not([href^="/lang"]) { display: none; }
+  .x .launch-footer-links { margin-inline-start: 0; }
+}

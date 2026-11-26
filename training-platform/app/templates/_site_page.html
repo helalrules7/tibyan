@@ -16,24 +16,19 @@
   <meta property="og:title" content="{{ self.title() }} | {{ 'تبيان' if ar else 'Tibyan' }}">
   <meta property="og:description" content="{{ self.desc() }}">
   <meta property="og:url" content="{{ url }}">
-  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=2">
+  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
   <meta name="twitter:card" content="summary_large_image">
-  {% include "_launch_head.html" %}
+  {% include "_site_head.html" %}
+  <link rel="stylesheet" href="/static/pages.css?v={{ asset_v }}">
 </head>
-<body>
-  <main class="launch-page site-page">
-{% include "_launch_header.html" %}
-      <nav class="launch-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
-        <a href="{{ prefix }}/">{{ 'الصفحة الرئيسية' if ar else 'Home' }}</a>
-        {% if page_path != '/features' %}<a href="{{ prefix }}/features">{{ 'المزايا' if ar else 'Features' }}</a>{% endif %}
-        <a href="{{ prefix }}/download">{{ 'التحميل' if ar else 'Download' }}</a>
-        <a class="language-link" href="/lang/{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
-      </nav>
-    </header>
-
+<body class="x x-inner">
+{% include "_site_header.html" %}
+  <main class="x-wrap x-doc">
 {% block content %}{% endblock %}
 
-{% include "_launch_footer.html" %}
   </main>
+  <div class="x-wrap">
+{% include "_launch_footer.html" %}
+  </div>
 </body>
 </html>

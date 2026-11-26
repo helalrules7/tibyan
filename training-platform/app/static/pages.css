@@ -1,0 +1,120 @@
+/* altibyan.app inner pages (download, features, about, sources, changelog,
+   help, press, privacy). Same language as the home page: tokens and shell
+   from site.css, hairline rules, flat colour fields, no ornament. The
+   markup keeps its existing class names; only their look is defined here. */
+.x-doc { padding: clamp(32px, 5vw, 72px) 0 var(--scene); }
+.x-doc h1, .x-doc h2, .x-doc h3, .x-doc h4 { font-family: var(--f-head); letter-spacing: 0; margin: 0; }
+.x-doc h1 { font-size: clamp(2rem, 3.6vw, 3.1rem); line-height: 1.35; font-weight: 700; color: var(--teal-deep); text-wrap: balance; }
+.x-doc h2 { font-size: clamp(1.3rem, 1.9vw, 1.65rem); line-height: 1.45; font-weight: 700; }
+.x-doc h3 { font-size: var(--t-h3); line-height: 1.5; font-weight: 600; }
+.x-doc h4 { font-size: 1rem; font-weight: 600; }
+.x-doc a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.x-doc a:hover { color: var(--teal); }
+.x-doc code, .x-doc pre { font-family: var(--font-mono); }
+
+/* page intro */
+.coming-label { font-family: var(--f-head); font-weight: 600; font-size: var(--t-small); color: var(--teal); }
+.coming-label .star { display: none; }
+.install-lead, .policy-meta, .dl-lead, .shots-lead { max-width: 62ch; margin-top: var(--sp-1); color: var(--ink-2); font-size: var(--t-lead); line-height: 1.9; }
+.dl-lead, .shots-lead { font-size: var(--t-body); }
+
+/* sections: a rule, a heading, the content */
+.x-doc > section + section,
+.x-doc > section + .features,
+.x-doc > .features + section,
+.policy > section,
+.policy > header + section { margin-top: var(--sp-6); }
+.x-doc > section:not(:first-child) > h2:first-child,
+.policy > section > h2:first-child { padding-top: var(--sp-3); border-top: 1px solid var(--rule); }
+
+/* long-form text: about, sources, changelog, press, privacy */
+.policy { max-width: 780px; }
+.policy:has(.press-grid), .policy:has(.credit-list) { max-width: 980px; }
+.policy p, .policy li { line-height: 1.95; }
+.policy section > p, .policy section > ul, .policy section > ol, .policy section > h3 { margin-top: var(--sp-2); }
+.policy section ul, .policy section ol { padding-inline-start: 1.3em; list-style: revert; }
+.policy section li + li { margin-top: 4px; }
+.policy h3 { margin-top: var(--sp-4); }
+.policy-summary { padding: var(--sp-4); border-radius: var(--r-ctl); background: var(--sand); }
+.policy > .policy-summary > h2:first-child, .x-doc .policy-summary h2 { padding-top: 0; border-top: 0; }
+.policy-toc { margin-top: var(--sp-4); }
+.policy-toc ol, .policy-toc ul { columns: 2; column-gap: var(--sp-5); padding-inline-start: 1.3em; list-style: revert; }
+.policy-toc li { break-inside: avoid; line-height: 2; }
+.changelog section ul { margin-top: var(--sp-2); }
+
+/* credits */
+.x-doc .credit-list { list-style: none; padding: 0; margin-top: var(--sp-2); }
+.credit-list li { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 2px var(--sp-4); padding: 12px 0; border-top: 1px solid var(--rule); }
+.credit-list li + li { margin-top: 0; }
+.credit-list strong { font-family: var(--f-head); font-weight: 600; }
+.credit-list span { color: var(--ink-2); font-size: 0.95rem; }
+
+/* feature index (shared partial) */
+.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(20px, 4vw, 56px); margin-top: var(--sp-6); }
+.feature { padding: var(--sp-3) 0; border-top: 1px solid var(--rule); }
+.feature svg { display: none; }
+.feature h2 { font-size: var(--t-h3); line-height: 1.5; font-weight: 600; }
+.feature p { margin-top: 2px; color: var(--ink-2); font-size: 0.95rem; line-height: 1.8; }
+
+/* real screenshots strip (shared partial) */
+.app-shots { margin-top: var(--sp-6); }
+.shots-strip { display: flex; gap: var(--sp-3); margin-top: var(--sp-3); padding-bottom: var(--sp-3); overflow-x: auto; scroll-snap-type: x proximity; }
+.shots-strip li { flex: none; scroll-snap-align: start; }
+.shots-strip img { display: block; height: clamp(340px, 50vh, 480px); width: auto; border-radius: var(--r-panel); border: 1px solid var(--rule); }
+.shots-strip figcaption { margin-top: 6px; font-size: var(--t-small); color: var(--ink-2); text-align: center; }
+
+/* stores and direct downloads: rows, not cards */
+.dl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(20px, 4vw, 56px); margin-top: var(--sp-3); }
+.dl-item { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); padding: 6px 0; border-top: 1px solid var(--rule); }
+.x-doc .dl-btn { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: var(--sp-2); align-items: center; flex: 1; min-height: 60px; text-decoration: none; }
+.dl-btn svg { grid-row: span 2; width: 24px; height: 24px; }
+.dl-btn svg .glyph { fill: currentColor; stroke: none; }
+.dl-name { font-family: var(--f-head); font-weight: 600; font-size: 1.15rem; line-height: 1.4; }
+.dl-kind { font-size: var(--t-small); color: var(--ink-2); line-height: 1.4; }
+.dl-btn.is-soon { color: rgb(30 25 21 / 42%); }
+.dl-btn.is-soon .dl-kind { color: inherit; }
+a.dl-btn:hover .dl-name { color: var(--teal); }
+.dl-item.is-mine .dl-name { color: var(--teal-deep); }
+.dl-head { display: inline-flex; align-items: center; gap: var(--sp-2); flex: none; }
+.dl-meta { font-size: var(--t-fine); color: var(--ink-2); }
+.chosen-pill { padding: 1px 10px; border: 1px solid currentColor; border-radius: 999px; font-family: var(--f-head); font-size: var(--t-fine); font-weight: 600; color: var(--teal-deep); white-space: nowrap; }
+.dl-note { margin-top: var(--sp-2); font-size: var(--t-small); color: var(--ink-2); }
+
+/* guides: editions, install steps, ways to help */
+.site-cards, .platform-guides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(20px, 4vw, 56px); margin-top: var(--sp-3); }
+.site-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.guide { padding: var(--sp-3) 0 var(--sp-4); border-top: 1px solid var(--rule); scroll-margin-top: 20px; }
+.guide p { margin-top: 4px; color: var(--ink-2); font-size: 0.97rem; }
+.guide-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.guide.is-mine h3 { color: var(--teal-deep); }
+.guide-note { font-size: var(--t-small); }
+.steps { margin-top: var(--sp-2); padding-inline-start: 1.4em; list-style: decimal; }
+.steps li { margin-top: var(--sp-2); }
+.cmd-wrap { position: relative; margin-top: 6px; }
+.cmd { margin: 6px 0 0; padding: 12px 14px; border-radius: var(--r-ctl); background: var(--charcoal); color: var(--paper); font-size: 0.85rem; line-height: 1.7; overflow-x: auto; text-align: left; }
+.cmd-wrap .cmd { margin: 0; padding-bottom: 40px; }
+.copy-btn { position: absolute; bottom: 8px; right: 8px; min-height: 28px; padding: 0 12px; border: 1px solid var(--rule-dark); border-radius: 999px; color: var(--paper); font-size: var(--t-fine); }
+.copy-btn:hover, .copy-btn.done { background: var(--paper); color: var(--charcoal); }
+.x-doc .beta-button { display: inline-flex; align-items: center; min-height: 50px; margin-top: var(--sp-3); padding: 0 28px; border-radius: 999px; background: var(--teal-deep); color: var(--leaf); font-family: var(--f-head); font-weight: 600; text-decoration: none; }
+.x-doc .beta-button:hover { background: var(--ink); color: var(--leaf); }
+
+/* press kit */
+.x-doc .press-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-3); list-style: none; padding: 0; margin-top: var(--sp-3); }
+.press-grid li + li { margin-top: 0; }
+.x-doc .press-grid a { display: grid; gap: 6px; color: var(--ink-2); font-size: var(--t-small); text-decoration: none; }
+.press-grid img { width: 100%; border-radius: var(--r-ctl); border: 1px solid var(--rule); background: var(--leaf); }
+.press-logo img { aspect-ratio: 1; object-fit: contain; padding: 16px; }
+.press-logo.is-dark img { background: var(--night); }
+.press-shots img { aspect-ratio: 9 / 19; object-fit: cover; object-position: top; }
+.press-shots li:has(.is-wide) { grid-column: span 2; }
+.press-shots img.is-wide { aspect-ratio: auto; object-fit: contain; }
+
+@media (max-width: 900px) {
+  .features, .site-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .features, .site-cards, .platform-guides, .dl-grid { grid-template-columns: minmax(0, 1fr); }
+  .credit-list li { grid-template-columns: minmax(0, 1fr); }
+  .policy-toc ol, .policy-toc ul { columns: 1; }
+  .x-doc .press-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

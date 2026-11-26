@@ -1,4 +1,6 @@
 from __future__ import annotations
+import os
+from unittest import mock
 
 import unittest
 
@@ -24,6 +26,7 @@ def make_request(host: str) -> Request:
     )
 
 
+@mock.patch.dict(os.environ, {"LAUNCH_FORCE": "before"})  # the countdown page exists only before launch
 class ComingSoonTests(unittest.TestCase):
     def test_main_domain_serves_coming_soon(self):
         for host in (

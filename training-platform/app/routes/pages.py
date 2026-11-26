@@ -69,6 +69,10 @@ def lang_prefix(request: Request) -> str:
 @router.get("/")
 def index(request: Request, db: Session = Depends(get_db)):
     if is_root_host(request):
+        state = launch_state(force=preview_force(request, db))
+        if state["launch_phase"] == "live":
+            return render(request, "home.html", **home_context(request, db))
+        # Before the launch: the countdown page.
         notify = request.session.pop("notify", None)
         if notify is None and request.query_params.get("n") == "busy":
             notify = "busy"  # nginx's 429 redirect lands here
@@ -81,7 +85,7 @@ def index(request: Request, db: Session = Depends(get_db)):
             totals=public_totals(db),
             stores=stores.STORES,
             prefix=lang_prefix(request),
-            **launch_state(force=preview_force(request, db)),
+            **state,
         )
 
     user = current_user(request, db)
@@ -103,11 +107,9 @@ def home_context(request: Request, db: Session) -> dict:
 
 
 @router.get("/next")
-def home_next(request: Request, db: Session = Depends(get_db)):
-    """Preview of the redesigned home (not indexed) until it replaces "/"."""
-    if not is_root_host(request):
-        return RedirectResponse(f"{ROOT_ORIGIN}/next", status_code=301)
-    return render(request, "home.html", noindex=True, **home_context(request, db))
+def home_next(request: Request):
+    """The redesign was previewed here; it is the home page now."""
+    return RedirectResponse(f"{ROOT_ORIGIN}{lang_prefix(request)}/", status_code=301)
 
 
 @router.get("/download")

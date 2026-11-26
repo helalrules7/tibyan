@@ -35,9 +35,11 @@ def render_at(offset: timedelta, lang: str = "ar") -> str:
 
 class LaunchCountdownTests(unittest.TestCase):
     def test_default_target_in_page(self):
-        with mock.patch.dict(os.environ, {"LAUNCH_AT": ""}):
-            body = index(make_request(), db=None).body.decode()
-        self.assertIn('data-launch="2026-11-26T00:00:00+02:00"', body)
+        from app.routes.pages import launch_state
+        with mock.patch.dict(os.environ, {"LAUNCH_AT": "", "LAUNCH_FORCE": ""}):
+            state = launch_state()
+        self.assertEqual(state["launch_iso"], "2026-11-26T00:00:00+02:00")
+        self.assertEqual(state["launch_phase"], "live")
 
     def test_before_launch(self):
         body = render_at(timedelta(days=30))
@@ -58,13 +60,13 @@ class LaunchCountdownTests(unittest.TestCase):
 
     def test_after_launch(self):
         body = render_at(timedelta(minutes=-1))
-        self.assertIn('<p class="launched" data-launched>انطلق تبيان، الحمد لله</p>', body)
-        self.assertIn('data-prelaunch hidden', body)
+        # after the launch the home is the redesigned page, with the stores
+        self.assertIn('id="get"', body)
+        self.assertNotIn('data-launch=', body)
         self.assertIn("play.google.com/store/apps/details?id=app.tibyan.tibyan", body)
         self.assertNotIn("apps.apple.com/app/id6818990351", body)  # iOS/Mac: «قريبًا» until Apple approves
         self.assertIn("apps.microsoft.com/detail/9N944SZ21PTS", body)
         self.assertIn('href="/download"', body)
-        self.assertNotIn('data-launched hidden', body)
 
     def test_english(self):
         body = render_at(timedelta(days=3), lang="en")
@@ -72,4 +74,4 @@ class LaunchCountdownTests(unittest.TestCase):
         for label in ("days", "hours", "minutes", "seconds"):
             self.assertIn(f'class="cd-label">{label}<', body)
         live = render_at(timedelta(seconds=-5), lang="en")
-        self.assertIn("Tibyan is live, alhamdulillah", live)
+        self.assertIn("Get Tibyan", live)

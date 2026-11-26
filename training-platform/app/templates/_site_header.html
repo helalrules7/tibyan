@@ -1,0 +1,12 @@
+  {% set ar = lang == 'ar' %}
+  {% set pfx = prefix if prefix is defined else ('' if ar else '/en') %}
+  <header class="x-top x-wrap">
+    <a class="x-logo" href="{{ pfx }}/" aria-label="{{ 'تبيان، الصفحة الرئيسية' if ar else 'Tibyan home' }}"><span aria-hidden="true"></span></a>
+    <nav class="x-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
+      <a href="{{ pfx }}/features">{{ 'المزايا' if ar else 'Features' }}</a>
+      <a href="{{ pfx }}/sources">{{ 'المصادر' if ar else 'Sources' }}</a>
+      <a href="https://train.altibyan.app/">{{ 'منصة التدريب' if ar else 'Training platform' }}</a>
+      <a href="{{ lang_href if lang_href is defined else '/lang/' ~ ('en' if ar else 'ar') }}">{{ 'English' if ar else 'العربية' }}</a>
+      <a class="x-nav-get" href="{{ '#get' if is_home else pfx ~ '/download' }}">{{ 'نزّل تبيان' if ar else 'Get Tibyan' }}</a>
+    </nav>
+  </header>

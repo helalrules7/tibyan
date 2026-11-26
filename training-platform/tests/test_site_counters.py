@@ -147,19 +147,16 @@ class PublicTotalsTest(CountersBase):
     def test_home_shows_arabic_digits(self):
         self.seed()
         html = self.client.get("/", headers={"user-agent": UA}).text
-        self.assertIn('class="site-counters"', html)
-        self.assertIn("<strong>١٬٢٣٤</strong>", html)
-        self.assertIn('<span class="cc-label">تحميل</span>', html)
-        self.assertEqual(html.count('class="counter-card'), 2)
-        self.assertIn("<strong>٥</strong>", html)
+        self.assertIn('class="x-totals"', html)
+        self.assertIn("<b>١٬٢٣٤</b> تحميل", html)
+        self.assertIn("<b>٥</b> زيارة", html)
 
     def test_home_english(self):
         self.seed()
         self.client.cookies.set("lang", "en")
         html = self.client.get("/", headers={"user-agent": UA}).text
         self.assertIn('lang="en"', html)
-        self.assertIn("<strong>1,234</strong>", html)
-        self.assertIn('<span class="cc-label">downloads</span>', html)
+        self.assertIn("<b>1,234</b> downloads", html)
 
     def test_totals_cached(self):
         self.seed()
