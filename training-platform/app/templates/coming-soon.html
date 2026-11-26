@@ -3,30 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}</title>
-  <meta name="description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. اشترك ليصلك خبر الإطلاق.{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. Sign up to hear when it launches.{% endif %}">
+  <title>{% if launch_phase == 'live' %}{% if lang == 'ar' %}تبيان | تطبيق قرآن غير ربحي بلا إعلانات{% else %}Tibyan | A non-profit, ad-free Quran app{% endif %}{% else %}{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}{% endif %}</title>
+  <meta name="description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. {{ 'متاح الآن للتحميل.' if launch_phase == 'live' else 'اشترك ليصلك خبر الإطلاق.' }}{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. {{ 'Available to download now.' if launch_phase == 'live' else 'Sign up to hear when it launches.' }}{% endif %}">
   <link rel="canonical" href="https://altibyan.app{{ prefix }}/">
   <link rel="alternate" hreflang="ar" href="https://altibyan.app/">
   <link rel="alternate" hreflang="en" href="https://altibyan.app/en/">
   <link rel="alternate" hreflang="x-default" href="https://altibyan.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="تبيان">
-  <meta property="og:title" content="{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}">
-  <meta property="og:description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. اشترك ليصلك خبر الإطلاق.{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. Sign up to hear when it launches.{% endif %}">
+  <meta property="og:title" content="{% if launch_phase == 'live' %}{% if lang == 'ar' %}تبيان | تطبيق قرآن غير ربحي بلا إعلانات{% else %}Tibyan | A non-profit, ad-free Quran app{% endif %}{% else %}{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}{% endif %}">
+  <meta property="og:description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. {{ 'متاح الآن للتحميل.' if launch_phase == 'live' else 'اشترك ليصلك خبر الإطلاق.' }}{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. {{ 'Available to download now.' if launch_phase == 'live' else 'Sign up to hear when it launches.' }}{% endif %}">
   <meta property="og:url" content="https://altibyan.app{{ prefix }}/">
-  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=2">
-  <meta property="og:image:secure_url" content="https://altibyan.app/static/coming-soon-share.png?v=2">
+  <meta property="og:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
+  <meta property="og:image:secure_url" content="https://altibyan.app/static/coming-soon-share.png?v=3">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="{% if lang == 'ar' %}تبيان قريبًا، منصة تدريب نموذج التسميع{% else %}Tibyan is coming soon, with a Quran recitation training platform{% endif %}">
+  <meta property="og:image:alt" content="{% if lang == 'ar' %}تبيان، تطبيق قرآن غير ربحي بلا إعلانات{% else %}Tibyan, a non-profit, ad-free Quran app{% endif %}">
   <meta property="og:locale" content="ar_EG">
   <meta property="og:locale:alternate" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}">
-  <meta name="twitter:description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. اشترك ليصلك خبر الإطلاق.{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. Sign up to hear when it launches.{% endif %}">
-  <meta name="twitter:image" content="https://altibyan.app/static/coming-soon-share.png?v=2">
-  <meta name="twitter:image:alt" content="{% if lang == 'ar' %}تبيان قريبًا، منصة تدريب نموذج التسميع{% else %}Tibyan is coming soon, with a Quran recitation training platform{% endif %}">
+  <meta name="twitter:title" content="{% if launch_phase == 'live' %}{% if lang == 'ar' %}تبيان | تطبيق قرآن غير ربحي بلا إعلانات{% else %}Tibyan | A non-profit, ad-free Quran app{% endif %}{% else %}{% if lang == 'ar' %}تبيان | قريبًا{% else %}Tibyan | Coming soon{% endif %}{% endif %}">
+  <meta name="twitter:description" content="{% if lang == 'ar' %}تبيان تطبيق قرآن غير ربحي بلا إعلانات: يعمل دون إنترنت، مع التفسير والتسميع من الحفظ على جهازك. {{ 'متاح الآن للتحميل.' if launch_phase == 'live' else 'اشترك ليصلك خبر الإطلاق.' }}{% else %}Tibyan is a non-profit, ad-free Quran app: works offline, with tafsir and on-device recitation from memory. {{ 'Available to download now.' if launch_phase == 'live' else 'Sign up to hear when it launches.' }}{% endif %}">
+  <meta name="twitter:image" content="https://altibyan.app/static/coming-soon-share.png?v=3">
+  <meta name="twitter:image:alt" content="{% if lang == 'ar' %}تبيان، تطبيق قرآن غير ربحي بلا إعلانات{% else %}Tibyan, a non-profit, ad-free Quran app{% endif %}">
   {% include "_launch_head.html" %}
 </head>
 <body>
@@ -34,7 +34,7 @@
   <main class="launch-page">
 {% include "_launch_header.html" %}
       <nav class="launch-nav" aria-label="{{ 'روابط الموقع' if ar else 'Site links' }}">
-        <a href="#notify">{{ 'تابع الإطلاق' if ar else 'Get updates' }}</a>
+        {% if launch_phase != 'live' %}<a href="#notify">{{ 'تابع الإطلاق' if ar else 'Get updates' }}</a>{% endif %}
         <a href="{{ prefix }}/download">{{ 'التحميل' if ar else 'Download' }}</a>
         <a href="https://train.altibyan.app/">{{ 'منصة التدريب' if ar else 'Training platform' }}</a>
         <a class="language-link" href="/lang/{{ 'en' if ar else 'ar' }}">{{ 'English' if ar else 'العربية' }}</a>
@@ -44,7 +44,7 @@
     <section class="hero has-pattern" aria-labelledby="launch-title">
       <div class="hero-copy">
         {% set live = launch_phase == 'live' %}
-        <p class="coming-label launch-date">
+        <p class="coming-label launch-date" data-prelaunch{% if live %} hidden{% endif %}>
           <span class="star" aria-hidden="true"></span>
           {% if ar %}<span class="date-long">الإطلاق ليلة ٢٧ رجب ١٤٤٨ · <b>٤ يناير ٢٠٢٧</b></span><span class="date-short">ليلة ٢٧ رجب · <b>٤ يناير</b></span>
           {% else %}<span class="date-long">Launching on the night of 27 Rajab 1448 · <b>4 January 2027</b></span><span class="date-short">Night of 27 Rajab · <b>4 January</b></span>{% endif %}

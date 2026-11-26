@@ -37,7 +37,7 @@ class ComingSoonTests(unittest.TestCase):
                 self.assertIn("تجربة جديدة من تبيان".encode(), response.body)
                 self.assertIn(b"train.altibyan.app", response.body)
                 self.assertIn(
-                    b'https://altibyan.app/static/coming-soon-share.png?v=2',
+                    b'https://altibyan.app/static/coming-soon-share.png?v=3',
                     response.body,
                 )
                 self.assertIn(b'name="twitter:card" content="summary_large_image"', response.body)
